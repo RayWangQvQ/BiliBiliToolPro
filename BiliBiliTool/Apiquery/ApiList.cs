@@ -6,15 +6,27 @@ namespace BiliBiliTool.Apiquery
 {
     public class ApiList
     {
+        /// <summary>
+        /// 登录
+        /// </summary>
+        public static String LOGIN = "https://api.bilibili.com/x/web-interface/nav";
+
+        /// <summary>
+        /// 每日任务完成情况
+        /// </summary>
+        public static String reward = "https://api.bilibili.com/x/member/web/exp/reward";
+
+        /// <summary>
+        /// 上报观看进度
+        /// </summary>
+        public static String videoHeartbeat = "https://api.bilibili.com/x/click-interface/web/heartbeat";
 
         public static String ServerPush = "https://sc.ftqq.com/";
-        public static String LOGIN = "https://api.bilibili.com/x/web-interface/nav";
         public static String Manga = "https://manga.bilibili.com/twirp/activity.v1.Activity/ClockIn";
         public static String AvShare = "https://api.bilibili.com/x/web-interface/share/add";
         public static String CoinAdd = "https://api.bilibili.com/x/web-interface/coin/add";
         public static String isCoin = "https://api.bilibili.com/x/web-interface/archive/coins";
         public static String getRegionRanking = "https://api.bilibili.com/x/web-interface/ranking/region";
-        public static String reward = "https://api.bilibili.com/x/member/web/exp/reward";
 
         /**
          * 查询获取已获取的投币经验
@@ -31,10 +43,7 @@ namespace BiliBiliTool.Apiquery
          */
         public static String getSilver2coinStatus = "https://api.live.bilibili.com/pay/v1/Exchange/getStatus";
 
-        /**
-         * 上报观看进度
-         */
-        public static String videoHeartbeat = "https://api.bilibili.com/x/click-interface/web/heartbeat";
+
 
         /**
          * 查询主站硬币余额

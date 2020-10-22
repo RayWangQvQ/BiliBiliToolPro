@@ -26,19 +26,37 @@ namespace BiliBiliTool.Task
 
         public void doDailyTask()
         {
+            Login();
+
+            videoWatch(); //观看视频 默认会调用分享
+
+            /*
+            Config.getInstance().configInit();
+            doMangaSign(); //漫画签到
+            silver2coin(); //银瓜子换硬币
+            doCoinAdd(); //投币任务
+            doLiveCheckin(); //直播签到
+            doCharge();
+            mangaGetVipReward(1);
+            logger.info("本日任务已全部执行完毕");
+            doServerPush();
+            */
+        }
+
+        /// <summary>
+        /// 登录
+        /// </summary>
+        private void Login()
+        {
             var request = new HttpRequestMessage(HttpMethod.Get, ApiList.LOGIN);
-
             var client = _httpClientFactory.CreateClient("bilibili");
-
             var response = client.SendAsync(request).Result;
-
             var contentStr = response.Content.ReadAsStringAsync().Result;
 
             ApiResponse<LoginResponse> apiResponse = JsonSerializer.Deserialize<ApiResponse<LoginResponse>>(contentStr);
             _logger.LogInformation(JsonSerializer.Serialize(apiResponse.Data));
 
-            if (apiResponse.Code != 0
-                || !apiResponse.Data.IsLogin)
+            if (apiResponse.Code != 0 || !apiResponse.Data.IsLogin)
             {
                 _logger.LogWarning("登录异常，Cookies可能失效了,请仔细检查Github Secrets中DEDEUSERID SESSDATA BILI_JCT三项的值是否正确");
                 return;
@@ -63,19 +81,122 @@ namespace BiliBiliTool.Task
             {
                 _logger.LogInformation("当前等级Lv6，经验值为：" + userInfo.Level_info.Current_exp);
             }
+        }
 
-            /*
-            Config.getInstance().configInit();
-            videoWatch(); //观看视频 默认会调用分享
-            doMangaSign(); //漫画签到
-            silver2coin(); //银瓜子换硬币
-            doCoinAdd(); //投币任务
-            doLiveCheckin(); //直播签到
-            doCharge();
-            mangaGetVipReward(1);
-            logger.info("本日任务已全部执行完毕");
-            doServerPush();
-            */
+        /// <summary>
+        /// 观看视频
+        /// </summary>
+        public void videoWatch()
+        {
+            DailyTaskInfo dailyTaskStatus = GetDailyTaskStatus();
+
+            String aid = regionRanking();
+            if (!dailyTaskStatus.Watch)
+            {
+                _logger.LogInformation("本日观看视频任务已经完成了，不需要再观看视频了");
+                //desp.appendDesp("本日观看视频任务已经完成了，不需要再观看视频了");
+            }
+            else
+            {
+                int playedTime = new Random().Next(1, 90);
+                String postBody = $"?aid={aid}&played_time={playedTime}";
+
+                var request = new HttpRequestMessage(HttpMethod.Post, ApiList.videoHeartbeat + postBody);
+                var client = _httpClientFactory.CreateClient("bilibili");
+                var response = client.SendAsync(request).Result;
+                var contentStr = response.Content.ReadAsStringAsync().Result;
+
+                var apiResponse = JsonSerializer.Deserialize<ApiResponse>(contentStr);
+
+                if (apiResponse.Code == 0)
+                {
+                    _logger.LogInformation("av{aid}播放成功,已观看到第{playedTime}秒", aid, playedTime);
+                    //desp.appendDesp("av" + aid + "播放成功,已观看到第" + playedTime + "秒");
+                }
+                else
+                {
+                    _logger.LogDebug("av{aid}播放失败,原因：{msg}", aid, apiResponse.Message);
+                    //desp.appendDesp("av" + aid + "播放成功,已观看到第" + playedTime + "秒");
+                }
+            }
+
+            //if (!dailyTaskStatus.get("share").getAsBoolean())
+            //{
+            //    dailyAvShare(aid);
+            //}
+            //else
+            //{
+            //    logger.info("本日分享视频任务已经完成了，不需要再分享视频了");
+            //    desp.appendDesp("本日分享视频任务已经完成了，不需要再分享视频了");
+            //}
+        }
+
+        /// <summary>
+        /// 获取每日任务的完成情况
+        /// </summary>
+        /// <returns></returns>
+        public DailyTaskInfo GetDailyTaskStatus()
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, ApiList.reward);
+            var client = _httpClientFactory.CreateClient("bilibili");
+            var response = client.SendAsync(request).Result;
+            var contentStr = response.Content.ReadAsStringAsync().Result;
+
+            var apiResponse = JsonSerializer.Deserialize<ApiResponse<DailyTaskInfo>>(contentStr);
+            if (apiResponse.Code == 0)
+            {
+                _logger.LogInformation("请求本日任务完成状态成功");
+                //desp.appendDesp("请求本日任务完成状态成功");
+                return apiResponse.Data;
+            }
+            else
+            {
+                _logger.LogDebug(JsonSerializer.Serialize(apiResponse));
+                return GetDailyTaskStatus();
+                //偶发性请求失败，再请求一次。
+            }
+        }
+
+        /**
+         * 默认请求动画区，3日榜单
+         */
+        public String regionRanking()
+        {
+            int rid = randomRegion();
+            int day = 3;
+            return regionRanking(rid, day);
+        }
+
+        /**
+         * 从有限分区中随机返回一个分区rid
+         * 后续会更新请求分区
+         *
+         * @return regionId 分区id
+         */
+        public int randomRegion()
+        {
+            int[] arr = { 1, 3, 4, 5, 160, 22, 119 };
+            return arr[new Random().Next(arr.Length - 1)];
+        }
+
+        /**
+         * @param rid 分区id 默认为3
+         * @param day 日榜，三日榜 周榜 1，3，7
+         * @return 随机返回一个aid
+         */
+        public String regionRanking(int rid, int day)
+        {
+            String urlParam = $"?rid={rid}&day={day}";
+            var request = new HttpRequestMessage(HttpMethod.Get, ApiList.getRegionRanking + urlParam);
+            var client = _httpClientFactory.CreateClient("bilibili");
+            var response = client.SendAsync(request).Result;
+            var contentStr = response.Content.ReadAsStringAsync().Result;
+
+            _logger.LogInformation("获取分区:{rid}的{day}日top10榜单成功", rid, day);
+
+            var apiResponse = JsonSerializer.Deserialize<ApiResponse<List<RankingInfo>>>(contentStr);
+
+            return apiResponse.Data[new Random().Next(apiResponse.Data.Count)].Aid;
         }
 
         #region 
@@ -181,70 +302,11 @@ namespace BiliBiliTool.Task
         //    }
         //}
 
-        ///**
-        // * @param rid 分区id 默认为3
-        // * @param day 日榜，三日榜 周榜 1，3，7
-        // * @return 随机返回一个aid
-        // */
-        //public String regionRanking(int rid, int day)
-        //{
-        //    Map<String, Boolean> videoMap = new HashMap(12);
 
-        //    String urlParam = "?rid=" + rid + "&day=" + day;
-        //    JsonObject resultJson = HttpUnit.doGet(ApiList.getRegionRanking + urlParam);
 
-        //    logger.info("获取分区: " + rid + "的" + day + "日top10榜单成功");
 
-        //    JsonArray jsonArray = null;
-        //    try
-        //    {
-        //        jsonArray = resultJson.getAsJsonArray("data");
-        //        //极低的概率会抛异常，初步判断是部分分区不参与排行榜，导致没请求到数据。
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        logger.debug("如果出现了这个异常，麻烦提个Issues告诉下我: " + e);
-        //        logger.debug("提Issues时请附上这条信息-请求参数: " + ApiList.getRegionRanking + urlParam);
-        //        logger.debug("提Issues时请附上这条信息-返回结果: " + resultJson);
-        //    }
 
-        //    if (jsonArray != null)
-        //    {
-        //        for (JsonElement videoInfo :
-        //        jsonArray)
-        //        {
-        //            JsonObject tempObject = videoInfo.getAsJsonObject();
-        //            videoMap.put(tempObject.get("aid").getAsString(), false);
-        //        }
-        //    }
 
-        //    String[] keys = videoMap.keySet().toArray(new String[0]);
-        //    Random random = new Random();
-
-        //    return keys[random.nextInt(keys.length)];
-        //}
-
-        ///**
-        // * 从有限分区中随机返回一个分区rid
-        // * 后续会更新请求分区
-        // *
-        // * @return regionId 分区id
-        // */
-        //public int randomRegion()
-        //{
-        //    int[] arr = { 1, 3, 4, 5, 160, 22, 119 };
-        //    return arr[(int)(Math.random() * arr.length)];
-        //}
-
-        ///**
-        // * 默认请求动画区，3日榜单
-        // */
-        //public String regionRanking()
-        //{
-        //    int rid = randomRegion();
-        //    int day = 3;
-        //    return regionRanking(rid, day);
-        //}
 
         ///**
         // * 获取当前投币获得的经验值
@@ -362,67 +424,9 @@ namespace BiliBiliTool.Task
 
         //}
 
-        ///**
-        // * @return jsonObject 返回status对象，包含{"login":true,"watch":true,"coins":50,
-        // * "share":true,"email":true,"tel":true,"safe_question":true,"identify_card":false}
-        // * @author @srcrs
-        // */
-        //public JsonObject getDailyTaskStatus()
-        //{
-        //    JsonObject jsonObject = HttpUnit.doGet(ApiList.reward);
-        //    int responseCode = jsonObject.get(statusCodeStr).getAsInt();
-        //    if (responseCode == 0)
-        //    {
-        //        logger.info("请求本日任务完成状态成功");
-        //        desp.appendDesp("请求本日任务完成状态成功");
-        //        return jsonObject.get("data").getAsJsonObject();
-        //    }
-        //    else
-        //    {
-        //        logger.debug(jsonObject.get("message").getAsString());
-        //        return HttpUnit.doGet(ApiList.reward).get("data").getAsJsonObject();
-        //        //偶发性请求失败，再请求一次。
-        //    }
-        //}
 
-        //public void videoWatch()
-        //{
-        //    JsonObject dailyTaskStatus = getDailyTaskStatus();
-        //    String aid = regionRanking();
-        //    if (!dailyTaskStatus.get("watch").getAsBoolean())
-        //    {
-        //        int playedTime = new Random().nextInt(90) + 1;
-        //        String postBody = "aid=" + aid
-        //                                 + "&played_time=" + playedTime;
-        //        JsonObject resultJson = HttpUnit.doPost(ApiList.videoHeartbeat, postBody);
-        //        int responseCode = resultJson.get("code").getAsInt();
-        //        if (responseCode == 0)
-        //        {
-        //            logger.info("av" + aid + "播放成功,已观看到第" + playedTime + "秒");
-        //            desp.appendDesp("av" + aid + "播放成功,已观看到第" + playedTime + "秒");
-        //        }
-        //        else
-        //        {
-        //            logger.debug("av" + aid + "播放失败,原因: " + resultJson.get("message").getAsString());
-        //            desp.appendDesp("av" + aid + "播放成功,已观看到第" + playedTime + "秒");
-        //        }
-        //    }
-        //    else
-        //    {
-        //        logger.info("本日观看视频任务已经完成了，不需要再观看视频了");
-        //        desp.appendDesp("本日观看视频任务已经完成了，不需要再观看视频了");
-        //    }
 
-        //    if (!dailyTaskStatus.get("share").getAsBoolean())
-        //    {
-        //        dailyAvShare(aid);
-        //    }
-        //    else
-        //    {
-        //        logger.info("本日分享视频任务已经完成了，不需要再分享视频了");
-        //        desp.appendDesp("本日分享视频任务已经完成了，不需要再分享视频了");
-        //    }
-        //}
+
 
         ///**
         // * @return 返回会员类型

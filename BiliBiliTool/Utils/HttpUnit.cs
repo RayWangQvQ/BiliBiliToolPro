@@ -97,56 +97,6 @@ namespace BiliBiliTool.Utils
             return resultJson;
         }
 
-        public static JsonObject doGet(String url)
-        {
-            CloseableHttpClient httpClient = null;
-            CloseableHttpResponse httpGetResponse = null;
-            JsonObject resultJson = null;
-            try
-            {
-                // 通过址默认配置创建一个httpClient实例
-                httpClient = HttpClients.createDefault();
-                // 创建httpGet远程连接实例
-                HttpGet httpGet = new HttpGet(url);
-                // 设置请求头信息，鉴权
-                httpGet.setHeader("Content-Type", "application/json");
-                httpGet.setHeader("Referer", "https://www.bilibili.com/");
-                httpGet.setHeader("Connection", "keep-alive");
-                httpGet.setHeader("User-Agent", PC_USER_AGENT);
-                httpGet.setHeader("Cookie", verify.getVerify());
-                // 为httpGet实例设置配置
-                httpGet.setConfig(REQUEST_CONFIG);
-
-                // 执行get请求得到返回对象
-                httpGetResponse = httpClient.execute(httpGet);
-                if (httpGetResponse != null && httpGetResponse.getStatusLine().getStatusCode() == 200)
-                {
-                    // 从响应对象中获取响应内容
-                    // 通过返回对象获取返回数据
-                    HttpEntity entity = httpGetResponse.getEntity();
-                    // 通过EntityUtils中的toString方法将结果转换为字符串
-                    String result = EntityUtils.toString(entity);
-                    resultJson = new JsonParser().parse(result).getAsJsonObject();
-                }
-                else if (httpGetResponse != null)
-                {
-                    logger.debug(httpGetResponse.getStatusLine().toString());
-                }
-
-            }
-            catch (IOException e)
-            {
-                e.printStackTrace();
-            }
-            finally
-            {
-                // 关闭资源
-                httpResource(httpClient, httpGetResponse);
-            }
-            return resultJson;
-
-        }
-
 
         private static void httpResource(CloseableHttpClient httpClient, CloseableHttpResponse response)
         {

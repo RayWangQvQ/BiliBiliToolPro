@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30611.23
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BiliBiliTool", "BiliBiliTool\BiliBiliTool.csproj", "{6055550A-46CA-4DC5-AD6E-E092C4BD163C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BiliBiliTool", "BiliBiliTool\BiliBiliTool.csproj", "{6055550A-46CA-4DC5-AD6E-E092C4BD163C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ray.BiliTool.Application", "Ray.BiliTool.Application\Ray.BiliTool.Application.csproj", "{C102881C-A254-48F4-83ED-4428BD8D9FD3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ray.BiliTool.Application", "Ray.BiliTool.Application\Ray.BiliTool.Application.csproj", "{C102881C-A254-48F4-83ED-4428BD8D9FD3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UI", "UI", "{38736647-2196-417E-8519-C48A012A63D9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ray.BiliTool.OpenApi", "Ray.BiliTool.OpenApi\Ray.BiliTool.OpenApi.csproj", "{24EFDCE0-70D6-4F9B-957E-2C17F84965B2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ray.BiliTool.OpenApi", "Ray.BiliTool.OpenApi\Ray.BiliTool.OpenApi.csproj", "{24EFDCE0-70D6-4F9B-957E-2C17F84965B2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Application", "Application", "{98051127-2868-4F5C-9B2C-2150975E05F3}"
 EndProject
@@ -19,7 +19,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{AF21E067-330
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{E9BDDCBE-A57D-4E3B-8252-708088386ADF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeserializeTest", "DeserializeTest\DeserializeTest.csproj", "{37478355-6D65-44C4-80E3-E0094FE62352}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeserializeTest", "DeserializeTest\DeserializeTest.csproj", "{37478355-6D65-44C4-80E3-E0094FE62352}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GetDailyTaskStatusTest", "GetDailyTaskStatusTest\GetDailyTaskStatusTest.csproj", "{496EDBF6-C4A9-4EF4-B2B9-86E6785067F7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GetRegionRankingTest", "GetRegionRankingTest\GetRegionRankingTest.csproj", "{10F88E41-D147-4C9F-A7E7-E68C1CC55FE3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WatchVideoTest", "WatchVideoTest\WatchVideoTest.csproj", "{48E06359-D066-44C2-AB16-B1C6740DBA4F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,6 +49,18 @@ Global
 		{37478355-6D65-44C4-80E3-E0094FE62352}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{37478355-6D65-44C4-80E3-E0094FE62352}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{37478355-6D65-44C4-80E3-E0094FE62352}.Release|Any CPU.Build.0 = Release|Any CPU
+		{496EDBF6-C4A9-4EF4-B2B9-86E6785067F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{496EDBF6-C4A9-4EF4-B2B9-86E6785067F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{496EDBF6-C4A9-4EF4-B2B9-86E6785067F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{496EDBF6-C4A9-4EF4-B2B9-86E6785067F7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{10F88E41-D147-4C9F-A7E7-E68C1CC55FE3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10F88E41-D147-4C9F-A7E7-E68C1CC55FE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10F88E41-D147-4C9F-A7E7-E68C1CC55FE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10F88E41-D147-4C9F-A7E7-E68C1CC55FE3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{48E06359-D066-44C2-AB16-B1C6740DBA4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{48E06359-D066-44C2-AB16-B1C6740DBA4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{48E06359-D066-44C2-AB16-B1C6740DBA4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{48E06359-D066-44C2-AB16-B1C6740DBA4F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -55,6 +73,9 @@ Global
 		{98051127-2868-4F5C-9B2C-2150975E05F3} = {AF21E067-3307-4E7F-8CE8-C695E6B61876}
 		{120917DC-474C-448B-9EBB-1B3BA3A20B9D} = {AF21E067-3307-4E7F-8CE8-C695E6B61876}
 		{37478355-6D65-44C4-80E3-E0094FE62352} = {E9BDDCBE-A57D-4E3B-8252-708088386ADF}
+		{496EDBF6-C4A9-4EF4-B2B9-86E6785067F7} = {E9BDDCBE-A57D-4E3B-8252-708088386ADF}
+		{10F88E41-D147-4C9F-A7E7-E68C1CC55FE3} = {E9BDDCBE-A57D-4E3B-8252-708088386ADF}
+		{48E06359-D066-44C2-AB16-B1C6740DBA4F} = {E9BDDCBE-A57D-4E3B-8252-708088386ADF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {197319DA-1148-4A99-847C-8B270B6A29AB}
