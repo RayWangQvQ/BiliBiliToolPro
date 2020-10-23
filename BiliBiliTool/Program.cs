@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Unicode;
+using BiliBiliTool.Config;
 using BiliBiliTool.Login;
 using BiliBiliTool.Task;
 using Microsoft.Extensions.Configuration;
@@ -61,9 +62,20 @@ namespace BiliBiliTool
             var hostBuilder = new HostBuilder()
                 .ConfigureServices((hostContext, services) =>
                 {
+                    //配置
+                    ConfigurationRoot = new ConfigurationBuilder()
+                        .AddJsonFile("appsettings.json")
+                        .Build();
+                    services.AddSingleton<IConfiguration>(ConfigurationRoot);
+
+                    //Options
+                    services.AddOptions()
+                        .Configure<DailyTaskOptions>(ConfigurationRoot.GetSection("DailyTaskConfig"));
+
                     services.AddLogging(builder =>
                     {
                         builder.AddConsole().SetMinimumLevel(LogLevel.Information);
+                        builder.AddDebug().SetMinimumLevel(LogLevel.Information);
                     });
 
                     services.AddSingleton(verify);

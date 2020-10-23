@@ -5,9 +5,11 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using BiliBiliTool.Agent;
 using BiliBiliTool.Apiquery;
+using BiliBiliTool.Config;
 using BiliBiliTool.Login;
 //using BiliBiliTool.Utils;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace BiliBiliTool.Task
 {
@@ -16,17 +18,20 @@ namespace BiliBiliTool.Task
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ILogger<DailyTask> _logger;
         private readonly Verify _verify;
+        private readonly IOptionsMonitor<DailyTaskOptions> _dailyTaskOptions;
 
         //AppendPushMsg desp = AppendPushMsg.getInstance();
         //Data userInfo = null;
 
         public DailyTask(IHttpClientFactory httpClientFactory,
             ILogger<DailyTask> logger,
-            Verify verify)
+            Verify verify,
+            IOptionsMonitor<DailyTaskOptions> dailyTaskOptions)
         {
             _httpClientFactory = httpClientFactory;
             _logger = logger;
             _verify = verify;
+            _dailyTaskOptions = dailyTaskOptions;
         }
 
         public void DoDailyTask()
@@ -49,15 +54,18 @@ namespace BiliBiliTool.Task
             else
                 _logger.LogInformation("本日分享视频任务已经完成了，不需要再分享视频了");
 
+            //漫画签到
+            MangaSign();
+
             /*
-            Config.getInstance().configInit();
-            doMangaSign(); //漫画签到
             silver2coin(); //银瓜子换硬币
             doCoinAdd(); //投币任务
             doLiveCheckin(); //直播签到
-            doCharge();
+            doCharge();//充电
             mangaGetVipReward(1);
+
             logger.info("本日任务已全部执行完毕");
+
             doServerPush();
             */
         }
@@ -205,9 +213,10 @@ namespace BiliBiliTool.Task
             }
         }
 
-        /**
-         * @param aid 要分享的视频aid
-         */
+        /// <summary>
+        /// 分享视频
+        /// </summary>
+        /// <param name="aid">视频aid</param>
         public void ShareVideo(String aid)
         {
             String requestBody = $"?aid={aid}&csrf={_verify.BiliJct}";
@@ -231,26 +240,41 @@ namespace BiliBiliTool.Task
             }
         }
 
+        /// <summary>
+        /// 漫画签到
+        /// </summary>
+        public void MangaSign()
+        {
+            string requestBody = $"?platform={_dailyTaskOptions.CurrentValue.DevicePlatform}";
+            var request = new HttpRequestMessage(HttpMethod.Post, ApiList.Manga + requestBody);
+            var client = _httpClientFactory.CreateClient("bilibili");
+            var response = client.SendAsync(request).Result;
+
+            if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            {
+                _logger.LogInformation("哔哩哔哩漫画已经签到过了");
+                //desp.appendDesp("哔哩哔哩漫画已经签到过了");
+                return;
+            }
+
+            var contentStr = response.Content.ReadAsStringAsync().Result;
+            var apiResponse = JsonSerializer.Deserialize<ApiResponse>(contentStr);
+            if (apiResponse.Code == 0)
+            {
+                _logger.LogInformation("完成漫画签到");
+                //desp.appendDesp("完成漫画签到");
+            }
+            else
+            {
+                _logger.LogInformation("漫画签到异常");
+                //desp.appendDesp("完成漫画签到");
+            }
+        }
+
         #region 
 
 
-        //public void doMangaSign()
-        //{
-        //    String platform = Config.getInstance().getDevicePlatform();
-        //    String requestBody = "platform=" + platform;
-        //    JsonObject result = HttpUnit.doPost(ApiList.Manga, requestBody);
 
-        //    if (result == null)
-        //    {
-        //        logger.info("哔哩哔哩漫画已经签到过了");
-        //        desp.appendDesp("哔哩哔哩漫画已经签到过了");
-        //    }
-        //    else
-        //    {
-        //        logger.info("完成漫画签到");
-        //        desp.appendDesp("完成漫画签到");
-        //    }
-        //}
 
         ///**
         // * @param aid         av号
