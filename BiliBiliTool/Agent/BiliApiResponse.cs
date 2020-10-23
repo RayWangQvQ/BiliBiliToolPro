@@ -4,12 +4,12 @@ using System.Text;
 
 namespace BiliBiliTool.Agent
 {
-    public class ApiResponse : ApiResponse<object>
+    public class BiliApiResponse : BiliApiResponse<object>
     {
 
     }
 
-    public class ApiResponse<TData>
+    public class BiliApiResponse<TData>
     {
         public int Code { get; set; } = int.MinValue;
 

@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using BiliBiliTool.Agent;
+using BiliBiliTool.Agent.Interfaces;
 using BiliBiliTool.Apiquery;
 using BiliBiliTool.Config;
 using BiliBiliTool.Login;
@@ -19,6 +20,7 @@ namespace BiliBiliTool.Task
         private readonly ILogger<DailyTask> _logger;
         private readonly Verify _verify;
         private readonly IOptionsMonitor<DailyTaskOptions> _dailyTaskOptions;
+        private readonly IDailyTaskApi _dailyTaskApi;
 
         //AppendPushMsg desp = AppendPushMsg.getInstance();
         //Data userInfo = null;
@@ -26,12 +28,14 @@ namespace BiliBiliTool.Task
         public DailyTask(IHttpClientFactory httpClientFactory,
             ILogger<DailyTask> logger,
             Verify verify,
-            IOptionsMonitor<DailyTaskOptions> dailyTaskOptions)
+            IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
+            IDailyTaskApi dailyTaskApi)
         {
             _httpClientFactory = httpClientFactory;
             _logger = logger;
             _verify = verify;
             _dailyTaskOptions = dailyTaskOptions;
+            _dailyTaskApi = dailyTaskApi;
         }
 
         public void DoDailyTask()
@@ -57,9 +61,12 @@ namespace BiliBiliTool.Task
             //漫画签到
             MangaSign();
 
+            //投币任务
+            //doCoinAdd();
+
             /*
-            silver2coin(); //银瓜子换硬币
-            doCoinAdd(); //投币任务
+            silver2coin(); //直播中心的银瓜子兑换硬币
+            
             doLiveCheckin(); //直播签到
             doCharge();//充电
             mangaGetVipReward(1);
@@ -75,13 +82,7 @@ namespace BiliBiliTool.Task
         /// </summary>
         public void Login()
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, ApiList.LOGIN);
-            var client = _httpClientFactory.CreateClient("bilibili");
-            var response = client.SendAsync(request).Result;
-            var contentStr = response.Content.ReadAsStringAsync().Result;
-
-            ApiResponse<LoginResponse> apiResponse = JsonSerializer.Deserialize<ApiResponse<LoginResponse>>(contentStr);
-            _logger.LogInformation(JsonSerializer.Serialize(apiResponse.Data));
+            var apiResponse = _dailyTaskApi.LoginByCookie().Result;
 
             if (apiResponse.Code != 0 || !apiResponse.Data.IsLogin)
             {
@@ -116,12 +117,7 @@ namespace BiliBiliTool.Task
         /// <returns></returns>
         public DailyTaskInfo GetDailyTaskStatus()
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, ApiList.reward);
-            var client = _httpClientFactory.CreateClient("bilibili");
-            var response = client.SendAsync(request).Result;
-            var contentStr = response.Content.ReadAsStringAsync().Result;
-
-            var apiResponse = JsonSerializer.Deserialize<ApiResponse<DailyTaskInfo>>(contentStr);
+            var apiResponse = _dailyTaskApi.GetDailyTaskRewardInfo().Result;
             if (apiResponse.Code == 0)
             {
                 _logger.LogInformation("请求本日任务完成状态成功");
@@ -131,8 +127,8 @@ namespace BiliBiliTool.Task
             else
             {
                 _logger.LogDebug(JsonSerializer.Serialize(apiResponse));
-                return GetDailyTaskStatus();
-                //偶发性请求失败，再请求一次。
+                return _dailyTaskApi.GetDailyTaskRewardInfo().Result.Data;
+                //todo:偶发性请求失败，再请求一次
             }
         }
 
@@ -172,15 +168,9 @@ namespace BiliBiliTool.Task
         /// <returns>随机返回一个aid</returns>
         private string regionRanking(int rid, int day)
         {
-            String urlParam = $"?rid={rid}&day={day}";
-            var request = new HttpRequestMessage(HttpMethod.Get, ApiList.getRegionRanking + urlParam);
-            var client = _httpClientFactory.CreateClient("bilibili");
-            var response = client.SendAsync(request).Result;
-            var contentStr = response.Content.ReadAsStringAsync().Result;
+            var apiResponse = _dailyTaskApi.GetRegionRankingVideos(rid, day).Result;
 
             _logger.LogInformation("获取分区:{rid}的{day}日top10榜单成功", rid, day);
-
-            var apiResponse = JsonSerializer.Deserialize<ApiResponse<List<RankingInfo>>>(contentStr);
 
             return apiResponse.Data[new Random().Next(apiResponse.Data.Count)].Aid;
         }
@@ -199,7 +189,7 @@ namespace BiliBiliTool.Task
             var response = client.SendAsync(request).Result;
             var contentStr = response.Content.ReadAsStringAsync().Result;
 
-            var apiResponse = JsonSerializer.Deserialize<ApiResponse>(contentStr);
+            var apiResponse = JsonSerializer.Deserialize<BiliApiResponse>(contentStr);
 
             if (apiResponse.Code == 0)
             {
@@ -225,7 +215,7 @@ namespace BiliBiliTool.Task
             var response = client.SendAsync(request).Result;
             var contentStr = response.Content.ReadAsStringAsync().Result;
 
-            var apiResponse = JsonSerializer.Deserialize<ApiResponse>(contentStr);
+            var apiResponse = JsonSerializer.Deserialize<BiliApiResponse>(contentStr);
 
             if (apiResponse.Code == 0)
             {
@@ -258,7 +248,7 @@ namespace BiliBiliTool.Task
             }
 
             var contentStr = response.Content.ReadAsStringAsync().Result;
-            var apiResponse = JsonSerializer.Deserialize<ApiResponse>(contentStr);
+            var apiResponse = JsonSerializer.Deserialize<BiliApiResponse>(contentStr);
             if (apiResponse.Code == 0)
             {
                 _logger.LogInformation("完成漫画签到");
@@ -270,6 +260,122 @@ namespace BiliBiliTool.Task
                 //desp.appendDesp("完成漫画签到");
             }
         }
+
+        ///**
+        // * 由于bilibili Api数据更新的问题，可能造成投币多投。
+        // * 更换API后 已修复
+        // */
+        //public void doCoinAdd()
+        //{
+        //    //投币最多操作数 解决csrf校验失败时死循环的问题
+        //    int addCoinOperateCount = 0;
+        //    //安全检查，最多投币数
+        //    int maxNumberOfCoins = 5;
+        //    //获取自定义配置投币数 配置写在src/main/resources/config.json中
+        //    int setCoin = _dailyTaskOptions.CurrentValue.NumberOfCoins;
+        //    //已投的硬币
+        //    int useCoin = expConfirm();
+        //    //还需要投的币=设置投币数-已投的币数
+
+        //    if (setCoin > maxNumberOfCoins)
+        //    {
+        //        _logger.LogInformation("自定义投币数为: {setCoin}枚,为保护你的资产，自定义投币数重置为: {maxNumberOfCoins}枚", setCoin, maxNumberOfCoins);
+        //        setCoin = maxNumberOfCoins;
+        //    }
+
+        //    _logger.LogInformation("自定义投币数为: {setCoin}枚,程序执行前已投: {useCoin}枚", setCoin, useCoin);
+        //    //desp.appendDesp($"自定义投币数为: {setCoin}枚,程序执行前已投: {useCoin}枚");
+        //    int needCoins = setCoin - useCoin;
+
+        //    //投币前硬币余额
+        //    Double beforeAddCoinBalance = OftenAPI.getCoinBalance();
+        //    int coinBalance = (int)Math.floor(beforeAddCoinBalance);
+
+        //    if (needCoins <= 0)
+        //    {
+        //        logger.info("已完成设定的投币任务，今日无需再投币了");
+        //    }
+        //    else
+        //    {
+        //        logger.info("投币数调整为: " + needCoins + "枚");
+        //        //投币数大于余额时，按余额投
+        //        if (needCoins > coinBalance)
+        //        {
+        //            logger.info("完成今日设定投币任务还需要投: " + needCoins + "枚硬币，但是余额只有: " + beforeAddCoinBalance);
+        //            logger.info("投币数调整为: " + coinBalance);
+        //            needCoins = coinBalance;
+        //        }
+        //    }
+
+        //    logger.info("投币前余额为 : " + beforeAddCoinBalance);
+        //    desp.appendDesp("投币前余额为 : " + beforeAddCoinBalance);
+        //    /*
+        //     * 开始投币
+        //     * 请勿修改 max_numberOfCoins 这里多判断一次保证投币数超过5时 不执行投币操作
+        //     * 最后一道安全判断，保证即使前面的判断逻辑错了，也不至于发生投币事故
+        //     */
+        //    while (needCoins > 0 && needCoins <= maxNumberOfCoins)
+        //    {
+        //        String aid = regionRanking();
+        //        addCoinOperateCount++;
+        //        logger.info("正在为av" + aid + "投币");
+        //        desp.appendDesp("正在为av" + aid + "投币");
+        //        boolean flag = coinAdd(aid, 1, Config.getInstance().getSelectLike());
+        //        if (flag)
+        //        {
+        //            needCoins--;
+        //        }
+
+        //        if (addCoinOperateCount > 10)
+        //        {
+        //            break;
+        //        }
+        //    }
+
+        //    logger.info("投币任务完成后余额为: " + OftenAPI.getCoinBalance());
+        //    desp.appendDesp("投币任务完成后余额为: " + OftenAPI.getCoinBalance());
+        //}
+
+        ///**
+        // * 获取当前投币获得的经验值
+        // *
+        // * @return 本日已经投了几个币
+        // */
+        //public int expConfirm()
+        //{
+        //    JsonObject resultJson = HttpUnit.doGet(ApiList.needCoin);
+        //    int getCoinExp = resultJson.get("number").getAsInt();
+        //    logger.info("今日已获得投币经验: " + getCoinExp);
+        //    return getCoinExp / 10;
+        //}
+
+        //public void silver2coin()
+        //{
+        //    JsonObject resultJson = HttpUnit.doGet(ApiList.silver2coin);
+        //    int responseCode = resultJson.get("code").getAsInt();
+        //    if (responseCode == 0)
+        //    {
+        //        logger.info("银瓜子兑换硬币成功");
+        //        desp.appendDesp("银瓜子兑换硬币成功");
+        //    }
+        //    else
+        //    {
+        //        logger.debug("银瓜子兑换硬币失败 原因是: " + resultJson.get("msg").getAsString());
+        //        desp.appendDesp("银瓜子兑换硬币失败 原因是: " + resultJson.get("msg").getAsString());
+        //    }
+
+        //    JsonObject queryStatus = HttpUnit.doGet(ApiList.getSilver2coinStatus).get("data").getAsJsonObject();
+        //    double silver2coinMoney = OftenAPI.getCoinBalance();
+        //    logger.info("当前银瓜子余额: " + queryStatus.get("silver").getAsInt());
+        //    desp.appendDesp("当前银瓜子余额: " + queryStatus.get("silver").getAsInt());
+        //    logger.info("兑换银瓜子后硬币余额: " + silver2coinMoney);
+
+        //    /*
+        //    兑换银瓜子后，更新userInfo中的硬币值
+        //     */
+        //    userInfo.setMoney(silver2coinMoney);
+
+        //}
 
         #region 
 
@@ -337,121 +443,9 @@ namespace BiliBiliTool.Task
         //    }
         //}
 
-        ///**
-        // * 获取当前投币获得的经验值
-        // *
-        // * @return 本日已经投了几个币
-        // */
-        //public int expConfirm()
-        //{
-        //    JsonObject resultJson = HttpUnit.doGet(ApiList.needCoin);
-        //    int getCoinExp = resultJson.get("number").getAsInt();
-        //    logger.info("今日已获得投币经验: " + getCoinExp);
-        //    return getCoinExp / 10;
-        //}
 
-        ///**
-        // * 由于bilibili Api数据更新的问题，可能造成投币多投。
-        // * 更换API后 已修复
-        // */
-        //public void doCoinAdd()
-        //{
-        //    //投币最多操作数 解决csrf校验失败时死循环的问题
-        //    int addCoinOperateCount = 0;
-        //    //安全检查，最多投币数
-        //    final int maxNumberOfCoins = 5;
-        //    //获取自定义配置投币数 配置写在src/main/resources/config.json中
-        //    int setCoin = Config.getInstance().getNumberOfCoins();
-        //    //已投的硬币
-        //    int useCoin = expConfirm();
-        //    //还需要投的币=设置投币数-已投的币数
 
-        //    if (setCoin > maxNumberOfCoins)
-        //    {
-        //        logger.info("自定义投币数为: " + setCoin + "枚," + "为保护你的资产，自定义投币数重置为: " + maxNumberOfCoins + "枚");
-        //        setCoin = maxNumberOfCoins;
-        //    }
 
-        //    logger.info("自定义投币数为: " + setCoin + "枚," + "程序执行前已投: " + useCoin + "枚");
-        //    desp.appendDesp("自定义投币数为: " + setCoin + "枚," + "程序执行前已投: " + useCoin + "枚");
-        //    int needCoins = setCoin - useCoin;
-
-        //    //投币前硬币余额
-        //    Double beforeAddCoinBalance = OftenAPI.getCoinBalance();
-        //    int coinBalance = (int)Math.floor(beforeAddCoinBalance);
-
-        //    if (needCoins <= 0)
-        //    {
-        //        logger.info("已完成设定的投币任务，今日无需再投币了");
-        //    }
-        //    else
-        //    {
-        //        logger.info("投币数调整为: " + needCoins + "枚");
-        //        //投币数大于余额时，按余额投
-        //        if (needCoins > coinBalance)
-        //        {
-        //            logger.info("完成今日设定投币任务还需要投: " + needCoins + "枚硬币，但是余额只有: " + beforeAddCoinBalance);
-        //            logger.info("投币数调整为: " + coinBalance);
-        //            needCoins = coinBalance;
-        //        }
-        //    }
-
-        //    logger.info("投币前余额为 : " + beforeAddCoinBalance);
-        //    desp.appendDesp("投币前余额为 : " + beforeAddCoinBalance);
-        //    /*
-        //     * 开始投币
-        //     * 请勿修改 max_numberOfCoins 这里多判断一次保证投币数超过5时 不执行投币操作
-        //     * 最后一道安全判断，保证即使前面的判断逻辑错了，也不至于发生投币事故
-        //     */
-        //    while (needCoins > 0 && needCoins <= maxNumberOfCoins)
-        //    {
-        //        String aid = regionRanking();
-        //        addCoinOperateCount++;
-        //        logger.info("正在为av" + aid + "投币");
-        //        desp.appendDesp("正在为av" + aid + "投币");
-        //        boolean flag = coinAdd(aid, 1, Config.getInstance().getSelectLike());
-        //        if (flag)
-        //        {
-        //            needCoins--;
-        //        }
-
-        //        if (addCoinOperateCount > 10)
-        //        {
-        //            break;
-        //        }
-        //    }
-
-        //    logger.info("投币任务完成后余额为: " + OftenAPI.getCoinBalance());
-        //    desp.appendDesp("投币任务完成后余额为: " + OftenAPI.getCoinBalance());
-        //}
-
-        //public void silver2coin()
-        //{
-        //    JsonObject resultJson = HttpUnit.doGet(ApiList.silver2coin);
-        //    int responseCode = resultJson.get("code").getAsInt();
-        //    if (responseCode == 0)
-        //    {
-        //        logger.info("银瓜子兑换硬币成功");
-        //        desp.appendDesp("银瓜子兑换硬币成功");
-        //    }
-        //    else
-        //    {
-        //        logger.debug("银瓜子兑换硬币失败 原因是: " + resultJson.get("msg").getAsString());
-        //        desp.appendDesp("银瓜子兑换硬币失败 原因是: " + resultJson.get("msg").getAsString());
-        //    }
-
-        //    JsonObject queryStatus = HttpUnit.doGet(ApiList.getSilver2coinStatus).get("data").getAsJsonObject();
-        //    double silver2coinMoney = OftenAPI.getCoinBalance();
-        //    logger.info("当前银瓜子余额: " + queryStatus.get("silver").getAsInt());
-        //    desp.appendDesp("当前银瓜子余额: " + queryStatus.get("silver").getAsInt());
-        //    logger.info("兑换银瓜子后硬币余额: " + silver2coinMoney);
-
-        //    /*
-        //    兑换银瓜子后，更新userInfo中的硬币值
-        //     */
-        //    userInfo.setMoney(silver2coinMoney);
-
-        //}
 
 
         ///**

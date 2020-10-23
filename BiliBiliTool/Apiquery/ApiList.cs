@@ -17,6 +17,11 @@ namespace BiliBiliTool.Apiquery
         public static String reward = "https://api.bilibili.com/x/member/web/exp/reward";
 
         /// <summary>
+        /// 获取某分区下的视频排行
+        /// </summary>
+        public static String getRegionRanking = "https://api.bilibili.com/x/web-interface/ranking/region";
+
+        /// <summary>
         /// 上报观看进度
         /// </summary>
         public static String videoHeartbeat = "https://api.bilibili.com/x/click-interface/web/heartbeat";
@@ -26,17 +31,21 @@ namespace BiliBiliTool.Apiquery
         /// </summary>
         public static String AvShare = "https://api.bilibili.com/x/web-interface/share/add";
 
+        /// <summary>
+        /// 漫画签到
+        /// </summary>
+        public static String Manga = "https://manga.bilibili.com/twirp/activity.v1.Activity/ClockIn";
+
+        /// <summary>
+        /// 查询已获取的投币经验
+        /// </summary>
+        public static String needCoin = "https://www.bilibili.com/plus/account/exp.php";
 
         public static String ServerPush = "https://sc.ftqq.com/";
-        public static String Manga = "https://manga.bilibili.com/twirp/activity.v1.Activity/ClockIn";
         public static String CoinAdd = "https://api.bilibili.com/x/web-interface/coin/add";
         public static String isCoin = "https://api.bilibili.com/x/web-interface/archive/coins";
-        public static String getRegionRanking = "https://api.bilibili.com/x/web-interface/ranking/region";
 
-        /**
-         * 查询获取已获取的投币经验
-         */
-        public static String needCoin = "https://www.bilibili.com/plus/account/exp.php";
+
 
         /**
          * 硬币换银瓜子

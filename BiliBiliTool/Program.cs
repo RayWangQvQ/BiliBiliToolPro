@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Unicode;
+using BiliBiliTool.Agent.Interfaces;
 using BiliBiliTool.Config;
 using BiliBiliTool.Login;
 using BiliBiliTool.Task;
@@ -9,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Refit;
 
 namespace BiliBiliTool
 {
@@ -18,8 +20,7 @@ namespace BiliBiliTool
 
         public static IServiceProvider ServiceProviderRoot { get; set; }
 
-        private static string PC_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
-        "(KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36 Edg/85.0.564.70";
+        private static string PC_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36 Edg/85.0.564.70";
 
         static void Main(string[] args)
         {
@@ -90,6 +91,13 @@ namespace BiliBiliTool
                         c.DefaultRequestHeaders.Add("User-Agent", PC_USER_AGENT);
                         c.DefaultRequestHeaders.Add("Cookie", sp.GetRequiredService<Verify>().getVerify());
                     });
+                    services.AddRefitClient<IDailyTaskApi>()
+                        .ConfigureHttpClient(
+                            (sp, c) =>
+                            {
+                                c.BaseAddress = new Uri("https://api.bilibili.com");
+                                c.DefaultRequestHeaders.Add("Cookie", sp.GetRequiredService<Verify>().getVerify());
+                            });
 
                     services.AddTransient<DailyTask>();
                 })
