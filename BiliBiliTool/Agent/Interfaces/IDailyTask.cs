@@ -9,14 +9,12 @@ namespace BiliBiliTool.Agent.Interfaces
     /// <summary>
     /// BiliBili每日任务相关接口
     /// </summary>
-    [Headers(
-        "Accept:application/json, text/plain, */*",
-        "Referer:https://www.bilibili.com/",
-        "Connection:keep-alive",
-        "User-Agent:Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36 Edg/85.0.564.70"
-        )]
     public interface IDailyTaskApi
     {
+        /// <summary>
+        /// 登录
+        /// </summary>
+        /// <returns></returns>
         [Get("/x/web-interface/nav")]
         Task<BiliApiResponse<LoginResponse>> LoginByCookie();
 
@@ -35,5 +33,21 @@ namespace BiliBiliTool.Agent.Interfaces
         /// <returns></returns>
         [Get("/x/web-interface/ranking/region?rid={rid}&day={day}")]
         Task<BiliApiResponse<List<RankingInfo>>> GetRegionRankingVideos(int rid, int day);
+
+        /// <summary>
+        /// 上传视频观看进度
+        /// </summary>
+        /// <returns></returns>
+        [Post("/x/click-interface/web/heartbeat?aid={aid}&played_time={playedTime}")]
+        Task<BiliApiResponse> UploadVideoHeartbeat(string aid, int playedTime);
+
+        /// <summary>
+        /// 分享视频
+        /// </summary>
+        /// <param name="aid"></param>
+        /// <param name="csrf"></param>
+        /// <returns></returns>
+        [Post("/x/web-interface/share/add?aid={aid}&csrf={csrf}")]
+        Task<BiliApiResponse> ShareVideo(string aid, string csrf);
     }
 }

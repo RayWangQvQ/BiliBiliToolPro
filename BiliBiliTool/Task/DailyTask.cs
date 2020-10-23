@@ -16,26 +16,27 @@ namespace BiliBiliTool.Task
 {
     public class DailyTask
     {
-        private readonly IHttpClientFactory _httpClientFactory;
         private readonly ILogger<DailyTask> _logger;
         private readonly Verify _verify;
         private readonly IOptionsMonitor<DailyTaskOptions> _dailyTaskOptions;
         private readonly IDailyTaskApi _dailyTaskApi;
+        private readonly IMangaApi _mangaApi;
 
         //AppendPushMsg desp = AppendPushMsg.getInstance();
         //Data userInfo = null;
 
-        public DailyTask(IHttpClientFactory httpClientFactory,
+        public DailyTask(
             ILogger<DailyTask> logger,
             Verify verify,
             IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
-            IDailyTaskApi dailyTaskApi)
+            IDailyTaskApi dailyTaskApi,
+            IMangaApi mangaApi)
         {
-            _httpClientFactory = httpClientFactory;
             _logger = logger;
             _verify = verify;
             _dailyTaskOptions = dailyTaskOptions;
             _dailyTaskApi = dailyTaskApi;
+            _mangaApi = mangaApi;
         }
 
         public void DoDailyTask()
@@ -182,14 +183,7 @@ namespace BiliBiliTool.Task
         public void WatchVideo(string aid)
         {
             int playedTime = new Random().Next(1, 90);
-            String postBody = $"?aid={aid}&played_time={playedTime}";
-
-            var request = new HttpRequestMessage(HttpMethod.Post, ApiList.videoHeartbeat + postBody);
-            var client = _httpClientFactory.CreateClient("bilibili");
-            var response = client.SendAsync(request).Result;
-            var contentStr = response.Content.ReadAsStringAsync().Result;
-
-            var apiResponse = JsonSerializer.Deserialize<BiliApiResponse>(contentStr);
+            var apiResponse = _dailyTaskApi.UploadVideoHeartbeat(aid, playedTime).Result;
 
             if (apiResponse.Code == 0)
             {
@@ -209,13 +203,7 @@ namespace BiliBiliTool.Task
         /// <param name="aid">视频aid</param>
         public void ShareVideo(String aid)
         {
-            String requestBody = $"?aid={aid}&csrf={_verify.BiliJct}";
-            var request = new HttpRequestMessage(HttpMethod.Post, ApiList.AvShare + requestBody);
-            var client = _httpClientFactory.CreateClient("bilibili");
-            var response = client.SendAsync(request).Result;
-            var contentStr = response.Content.ReadAsStringAsync().Result;
-
-            var apiResponse = JsonSerializer.Deserialize<BiliApiResponse>(contentStr);
+            var apiResponse = _dailyTaskApi.ShareVideo(aid, _verify.BiliJct).Result;
 
             if (apiResponse.Code == 0)
             {
@@ -235,21 +223,16 @@ namespace BiliBiliTool.Task
         /// </summary>
         public void MangaSign()
         {
-            string requestBody = $"?platform={_dailyTaskOptions.CurrentValue.DevicePlatform}";
-            var request = new HttpRequestMessage(HttpMethod.Post, ApiList.Manga + requestBody);
-            var client = _httpClientFactory.CreateClient("bilibili");
-            var response = client.SendAsync(request).Result;
+            var response = _mangaApi.ClockIn(_dailyTaskOptions.CurrentValue.DevicePlatform).Result;
 
-            if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            if (response == null)
             {
                 _logger.LogInformation("哔哩哔哩漫画已经签到过了");
                 //desp.appendDesp("哔哩哔哩漫画已经签到过了");
                 return;
             }
 
-            var contentStr = response.Content.ReadAsStringAsync().Result;
-            var apiResponse = JsonSerializer.Deserialize<BiliApiResponse>(contentStr);
-            if (apiResponse.Code == 0)
+            if (response.Code == 0)
             {
                 _logger.LogInformation("完成漫画签到");
                 //desp.appendDesp("完成漫画签到");

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Net.Http;
 using System.Text.Json;
 using System.Text.Unicode;
 using BiliBiliTool.Agent.Interfaces;
@@ -10,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Serialization;
 using Refit;
 
 namespace BiliBiliTool
@@ -81,22 +83,20 @@ namespace BiliBiliTool
 
                     services.AddSingleton(verify);
 
-                    services.AddHttpClient();
-                    services.AddHttpClient("bilibili", (sp, c) =>
-                    {
-                        //c.BaseAddress = new Uri("https://api.github.com/");
-                        c.DefaultRequestHeaders.Add("Accept", "application/json, text/plain, */*");
-                        c.DefaultRequestHeaders.Add("Referer", "https://www.bilibili.com/");
-                        c.DefaultRequestHeaders.Add("Connection", "keep-alive");
-                        c.DefaultRequestHeaders.Add("User-Agent", PC_USER_AGENT);
-                        c.DefaultRequestHeaders.Add("Cookie", sp.GetRequiredService<Verify>().getVerify());
-                    });
-                    services.AddRefitClient<IDailyTaskApi>()
+                    var settings = new RefitSettings(new SystemTextJsonContentSerializer(defaultJsonSerializerOptions));
+                    services.AddRefitClient<IDailyTaskApi>(settings)
                         .ConfigureHttpClient(
                             (sp, c) =>
                             {
+                                SetBiliDefaultRequestHeaders(sp, c);
                                 c.BaseAddress = new Uri("https://api.bilibili.com");
-                                c.DefaultRequestHeaders.Add("Cookie", sp.GetRequiredService<Verify>().getVerify());
+                            });
+                    services.AddRefitClient<IMangaApi>(settings)
+                        .ConfigureHttpClient(
+                            (sp, c) =>
+                            {
+                                SetBiliDefaultRequestHeaders(sp, c);
+                                c.BaseAddress = new Uri("https://manga.bilibili.com");
                             });
 
                     services.AddTransient<DailyTask>();
@@ -104,6 +104,20 @@ namespace BiliBiliTool
                 .UseConsoleLifetime();
 
             ServiceProviderRoot = hostBuilder.Build().Services;
+        }
+
+        /// <summary>
+        /// 设置请求的默认headers
+        /// </summary>
+        /// <param name="sp"></param>
+        /// <param name="c"></param>
+        private static void SetBiliDefaultRequestHeaders(IServiceProvider sp, HttpClient c)
+        {
+            c.DefaultRequestHeaders.Add("Accept", "application/json, text/plain, */*");
+            c.DefaultRequestHeaders.Add("Referer", "https://www.bilibili.com/");
+            c.DefaultRequestHeaders.Add("Connection", "keep-alive");
+            c.DefaultRequestHeaders.Add("User-Agent", PC_USER_AGENT);
+            c.DefaultRequestHeaders.Add("Cookie", sp.GetRequiredService<Verify>().getVerify());
         }
     }
 }
