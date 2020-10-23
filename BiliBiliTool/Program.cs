@@ -22,7 +22,8 @@ namespace BiliBiliTool
 
         static void Main(string[] args)
         {
-            PreWork(new Verify(args[0], args[1], args[2]));
+            PreWorks(new Verify(args[0], args[1], args[2]));
+
             ILogger logger = ServiceProviderRoot.GetRequiredService<ILogger<Program>>();
 
             if (args.Length < 3)
@@ -39,12 +40,16 @@ namespace BiliBiliTool
             //每日任务65经验
             logger.LogDebug("-----任务启动-----");
             DailyTask dailyTask = ServiceProviderRoot.GetRequiredService<DailyTask>();
-            dailyTask.doDailyTask();
+            dailyTask.DoDailyTask();
 
             Console.ReadLine();
         }
 
-        public static void PreWork(Verify verify)
+        /// <summary>
+        /// 初始化系统
+        /// </summary>
+        /// <param name="verify"></param>
+        public static void PreWorks(Verify verify)
         {
             //全局设置默认的序列化配置：驼峰式、支持中文（目前System.Text.Json不支持设置默认Options，这里用反射实现了，以后.net5中可能会新增默认options的接口）（https://github.com/dotnet/runtime/issues/31094）
             JsonSerializerOptions defaultJsonSerializerOptions = (JsonSerializerOptions)typeof(JsonSerializerOptions)

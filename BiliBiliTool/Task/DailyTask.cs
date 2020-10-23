@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using BiliBiliTool.Agent;
 using BiliBiliTool.Apiquery;
+using BiliBiliTool.Login;
 //using BiliBiliTool.Utils;
 using Microsoft.Extensions.Logging;
 
@@ -14,21 +15,39 @@ namespace BiliBiliTool.Task
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ILogger<DailyTask> _logger;
-        private string statusCodeStr = "code";
+        private readonly Verify _verify;
+
         //AppendPushMsg desp = AppendPushMsg.getInstance();
         //Data userInfo = null;
 
-        public DailyTask(IHttpClientFactory httpClientFactory, ILogger<DailyTask> logger)
+        public DailyTask(IHttpClientFactory httpClientFactory,
+            ILogger<DailyTask> logger,
+            Verify verify)
         {
             _httpClientFactory = httpClientFactory;
             _logger = logger;
+            _verify = verify;
         }
 
-        public void doDailyTask()
+        public void DoDailyTask()
         {
+            //登录
             Login();
 
-            videoWatch(); //观看视频 默认会调用分享
+            DailyTaskInfo dailyTaskStatus = GetDailyTaskStatus();
+            string videoAid = GetRandomVideo();
+
+            //观看视频
+            if (!dailyTaskStatus.Watch)
+                WatchVideo(videoAid); //观看视频 默认会调用分享
+            else
+                _logger.LogInformation("本日观看视频任务已经完成了，不需要再观看视频了");
+
+            //分享视频
+            if (!dailyTaskStatus.Share)
+                ShareVideo(videoAid);
+            else
+                _logger.LogInformation("本日分享视频任务已经完成了，不需要再分享视频了");
 
             /*
             Config.getInstance().configInit();
@@ -46,7 +65,7 @@ namespace BiliBiliTool.Task
         /// <summary>
         /// 登录
         /// </summary>
-        private void Login()
+        public void Login()
         {
             var request = new HttpRequestMessage(HttpMethod.Get, ApiList.LOGIN);
             var client = _httpClientFactory.CreateClient("bilibili");
@@ -84,55 +103,7 @@ namespace BiliBiliTool.Task
         }
 
         /// <summary>
-        /// 观看视频
-        /// </summary>
-        public void videoWatch()
-        {
-            DailyTaskInfo dailyTaskStatus = GetDailyTaskStatus();
-
-            String aid = regionRanking();
-            if (!dailyTaskStatus.Watch)
-            {
-                _logger.LogInformation("本日观看视频任务已经完成了，不需要再观看视频了");
-                //desp.appendDesp("本日观看视频任务已经完成了，不需要再观看视频了");
-            }
-            else
-            {
-                int playedTime = new Random().Next(1, 90);
-                String postBody = $"?aid={aid}&played_time={playedTime}";
-
-                var request = new HttpRequestMessage(HttpMethod.Post, ApiList.videoHeartbeat + postBody);
-                var client = _httpClientFactory.CreateClient("bilibili");
-                var response = client.SendAsync(request).Result;
-                var contentStr = response.Content.ReadAsStringAsync().Result;
-
-                var apiResponse = JsonSerializer.Deserialize<ApiResponse>(contentStr);
-
-                if (apiResponse.Code == 0)
-                {
-                    _logger.LogInformation("av{aid}播放成功,已观看到第{playedTime}秒", aid, playedTime);
-                    //desp.appendDesp("av" + aid + "播放成功,已观看到第" + playedTime + "秒");
-                }
-                else
-                {
-                    _logger.LogDebug("av{aid}播放失败,原因：{msg}", aid, apiResponse.Message);
-                    //desp.appendDesp("av" + aid + "播放成功,已观看到第" + playedTime + "秒");
-                }
-            }
-
-            //if (!dailyTaskStatus.get("share").getAsBoolean())
-            //{
-            //    dailyAvShare(aid);
-            //}
-            //else
-            //{
-            //    logger.info("本日分享视频任务已经完成了，不需要再分享视频了");
-            //    desp.appendDesp("本日分享视频任务已经完成了，不需要再分享视频了");
-            //}
-        }
-
-        /// <summary>
-        /// 获取每日任务的完成情况
+        /// 获取每日任务完成情况
         /// </summary>
         /// <returns></returns>
         public DailyTaskInfo GetDailyTaskStatus()
@@ -157,34 +128,41 @@ namespace BiliBiliTool.Task
             }
         }
 
-        /**
-         * 默认请求动画区，3日榜单
-         */
-        public String regionRanking()
+        #region 获取随机视频
+        public string GetRandomVideo()
+        {
+            return regionRanking();
+        }
+
+        /// <summary>
+        /// 默认请求动画区，3日榜单
+        /// </summary>
+        /// <returns></returns>
+        private string regionRanking()
         {
             int rid = randomRegion();
             int day = 3;
             return regionRanking(rid, day);
         }
 
-        /**
-         * 从有限分区中随机返回一个分区rid
-         * 后续会更新请求分区
-         *
-         * @return regionId 分区id
-         */
-        public int randomRegion()
+        /// <summary>
+        /// 从有限分区中随机返回一个分区rid
+        /// 后续会更新请求分区
+        /// </summary>
+        /// <returns>分区Id</returns>
+        private int randomRegion()
         {
             int[] arr = { 1, 3, 4, 5, 160, 22, 119 };
             return arr[new Random().Next(arr.Length - 1)];
         }
 
-        /**
-         * @param rid 分区id 默认为3
-         * @param day 日榜，三日榜 周榜 1，3，7
-         * @return 随机返回一个aid
-         */
-        public String regionRanking(int rid, int day)
+        /// <summary>
+        /// 获取随机视频aid
+        /// </summary>
+        /// <param name="rid">分区id</param>
+        /// <param name="day">日榜，三日榜 周榜 1，3，7</param>
+        /// <returns>随机返回一个aid</returns>
+        private string regionRanking(int rid, int day)
         {
             String urlParam = $"?rid={rid}&day={day}";
             var request = new HttpRequestMessage(HttpMethod.Get, ApiList.getRegionRanking + urlParam);
@@ -198,30 +176,63 @@ namespace BiliBiliTool.Task
 
             return apiResponse.Data[new Random().Next(apiResponse.Data.Count)].Aid;
         }
+        #endregion
+
+        /// <summary>
+        /// 观看视频
+        /// </summary>
+        public void WatchVideo(string aid)
+        {
+            int playedTime = new Random().Next(1, 90);
+            String postBody = $"?aid={aid}&played_time={playedTime}";
+
+            var request = new HttpRequestMessage(HttpMethod.Post, ApiList.videoHeartbeat + postBody);
+            var client = _httpClientFactory.CreateClient("bilibili");
+            var response = client.SendAsync(request).Result;
+            var contentStr = response.Content.ReadAsStringAsync().Result;
+
+            var apiResponse = JsonSerializer.Deserialize<ApiResponse>(contentStr);
+
+            if (apiResponse.Code == 0)
+            {
+                _logger.LogInformation("av{aid}播放成功,已观看到第{playedTime}秒", aid, playedTime);
+                //desp.appendDesp("av" + aid + "播放成功,已观看到第" + playedTime + "秒");
+            }
+            else
+            {
+                _logger.LogDebug("av{aid}播放失败,原因：{msg}", aid, apiResponse.Message);
+                //desp.appendDesp("av" + aid + "播放成功,已观看到第" + playedTime + "秒");
+            }
+        }
+
+        /**
+         * @param aid 要分享的视频aid
+         */
+        public void ShareVideo(String aid)
+        {
+            String requestBody = $"?aid={aid}&csrf={_verify.BiliJct}";
+            var request = new HttpRequestMessage(HttpMethod.Post, ApiList.AvShare + requestBody);
+            var client = _httpClientFactory.CreateClient("bilibili");
+            var response = client.SendAsync(request).Result;
+            var contentStr = response.Content.ReadAsStringAsync().Result;
+
+            var apiResponse = JsonSerializer.Deserialize<ApiResponse>(contentStr);
+
+            if (apiResponse.Code == 0)
+            {
+                _logger.LogInformation("视频: av{aid}分享成功", aid);
+                //desp.appendDesp("视频: av" + aid + "分享成功");
+            }
+            else
+            {
+                _logger.LogDebug("视频分享失败，原因: {msg}", apiResponse.Message);
+                _logger.LogDebug("开发者提示: 如果是csrf校验失败请检查BILI_JCT参数是否正确或者失效");
+                //desp.appendDesp("重要:csrf校验失败请检查BILI_JCT参数是否正确或者失效");
+            }
+        }
 
         #region 
 
-        ///**
-        // * @param aid 要分享的视频aid
-        // */
-        //public void dailyAvShare(String aid)
-        //{
-        //    String requestBody = "aid=" + aid + "&csrf=" + Verify.getInstance().getBiliJct();
-        //    JsonObject result = HttpUnit.doPost((ApiList.AvShare), requestBody);
-
-        //    if (result.get(statusCodeStr).getAsInt() == 0)
-        //    {
-        //        logger.info("视频: av" + aid + "分享成功");
-        //        desp.appendDesp("视频: av" + aid + "分享成功");
-        //    }
-        //    else
-        //    {
-        //        logger.debug("视频分享失败，原因: " + result.get("message").getAsString());
-        //        logger.debug("开发者提示: 如果是csrf校验失败请检查BILI_JCT参数是否正确或者失效");
-        //        desp.appendDesp("重要:csrf校验失败请检查BILI_JCT参数是否正确或者失效");
-        //    }
-
-        //}
 
         //public void doMangaSign()
         //{
@@ -301,12 +312,6 @@ namespace BiliBiliTool.Task
         //        return false;
         //    }
         //}
-
-
-
-
-
-
 
         ///**
         // * 获取当前投币获得的经验值
@@ -423,9 +428,6 @@ namespace BiliBiliTool.Task
         //    userInfo.setMoney(silver2coinMoney);
 
         //}
-
-
-
 
 
         ///**

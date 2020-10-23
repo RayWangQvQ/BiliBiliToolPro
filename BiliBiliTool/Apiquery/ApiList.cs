@@ -21,9 +21,14 @@ namespace BiliBiliTool.Apiquery
         /// </summary>
         public static String videoHeartbeat = "https://api.bilibili.com/x/click-interface/web/heartbeat";
 
+        /// <summary>
+        /// 分享视频
+        /// </summary>
+        public static String AvShare = "https://api.bilibili.com/x/web-interface/share/add";
+
+
         public static String ServerPush = "https://sc.ftqq.com/";
         public static String Manga = "https://manga.bilibili.com/twirp/activity.v1.Activity/ClockIn";
-        public static String AvShare = "https://api.bilibili.com/x/web-interface/share/add";
         public static String CoinAdd = "https://api.bilibili.com/x/web-interface/coin/add";
         public static String isCoin = "https://api.bilibili.com/x/web-interface/archive/coins";
         public static String getRegionRanking = "https://api.bilibili.com/x/web-interface/ranking/region";

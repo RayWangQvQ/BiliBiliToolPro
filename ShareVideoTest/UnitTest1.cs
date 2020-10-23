@@ -4,7 +4,7 @@ using BiliBiliTool.Task;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
-namespace WatchVideoTest
+namespace ShareVideoTest
 {
     public class UnitTest1
     {
@@ -18,7 +18,7 @@ namespace WatchVideoTest
             DailyTask dailyTask = Program.ServiceProviderRoot.GetRequiredService<DailyTask>();
 
             string aid = dailyTask.GetRandomVideo();
-            dailyTask.WatchVideo(aid);
+            dailyTask.ShareVideo(aid);
 
             Assert.True(true);
         }
