@@ -62,5 +62,8 @@ namespace BiliBiliTool.Agent.Interfaces
 
         [Post("/x/web-interface/coin/add?aid={aid}&multiply={multiply}&select_like={select_like}&cross_domain=true&csrf={csrf}")]
         Task<BiliApiResponse> AddCoinForVideo(string aid, int multiply, int select_like, string csrf);
+
+        [Post("/x/vip/privilege/receive?type={type}&csrf={csrf}")]
+        Task<BiliApiResponse> ReceiveVipPrivilege(int type, string csrf);
     }
 }

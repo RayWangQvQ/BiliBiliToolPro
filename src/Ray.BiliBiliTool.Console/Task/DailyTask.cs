@@ -38,6 +38,7 @@ namespace BiliBiliTool.Task
             ILogger<DailyTask> logger,
             IHttpClientFactory httpClientFactory,
             Verify verify,
+            LoginResponse loginResponse,
             IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
             IDailyTaskApi dailyTaskApi,
             IMangaApi mangaApi,
@@ -46,15 +47,18 @@ namespace BiliBiliTool.Task
             ILiveApi liveApi)
         {
             _logger = logger;
-            this._httpClientFactory = httpClientFactory;
+            _httpClientFactory = httpClientFactory;
             _verify = verify;
+            LoginResponse = loginResponse;
             _dailyTaskOptions = dailyTaskOptions;
             _dailyTaskApi = dailyTaskApi;
             _mangaApi = mangaApi;
-            this._experienceApi = experienceApi;
-            this._accountApi = accountApi;
-            this._liveApi = liveApi;
+            _experienceApi = experienceApi;
+            _accountApi = accountApi;
+            _liveApi = liveApi;
         }
+
+        private LoginResponse LoginResponse { get; set; }
 
         public void DoDailyTask()
         {
@@ -85,11 +89,13 @@ namespace BiliBiliTool.Task
             //直播中心的银瓜子兑换硬币
             ExchangeSilver2Coin();
 
+            //直播中心签到
             LiveSign();
 
-
+            //充电
+            doCharge();
             /*
-            doCharge();//充电
+            
             mangaGetVipReward(1);
 
             _logger.LogInformation("本日任务已全部执行完毕");
@@ -113,22 +119,21 @@ namespace BiliBiliTool.Task
 
             _logger.LogInformation("登录成功");
 
-
-            var userInfo = apiResponse.Data;
+            LoginResponse = apiResponse.Data;
 
             //用户名模糊处理 @happy88888
-            _logger.LogInformation("用户名称: {0}", userInfo.GetFuzzyUname());
-            _logger.LogInformation("硬币余额: " + userInfo.Money);
+            _logger.LogInformation("用户名称: {0}", LoginResponse.GetFuzzyUname());
+            _logger.LogInformation("硬币余额: " + LoginResponse.Money);
 
-            if (userInfo.Level_info.Current_level < 6)
+            if (LoginResponse.Level_info.Current_level < 6)
             {
                 _logger.LogInformation("距离升级到Lv{0}还有: {1}天",
-                    userInfo.Level_info.Current_level + 1,
-                    (userInfo.Level_info.Next_exp - userInfo.Level_info.Current_exp) / 65);
+                    LoginResponse.Level_info.Current_level + 1,
+                    (LoginResponse.Level_info.Next_exp - LoginResponse.Level_info.Current_exp) / 65);
             }
             else
             {
-                _logger.LogInformation("当前等级Lv6，经验值为：" + userInfo.Level_info.Current_exp);
+                _logger.LogInformation("当前等级Lv6，经验值为：" + LoginResponse.Level_info.Current_exp);
             }
         }
 
@@ -238,6 +243,7 @@ namespace BiliBiliTool.Task
             }
         }
 
+        #region 漫画
         /// <summary>
         /// 漫画签到
         /// </summary>
@@ -263,11 +269,12 @@ namespace BiliBiliTool.Task
                 //desp.appendDesp("完成漫画签到");
             }
         }
+        #endregion
 
-        /**
-         * 由于bilibili Api数据更新的问题，可能造成投币多投。
-         * 更换API后 已修复
-         */
+        #region 视频投币
+        /// <summary>
+        /// 投币
+        /// </summary>
         public void AddCoinsForVideo()
         {
             //投币最多操作数 解决csrf校验失败时死循环的问题
@@ -371,18 +378,6 @@ namespace BiliBiliTool.Task
             return re.Number;
         }
 
-
-        /// <summary>
-        /// 获取账户硬币余额
-        /// </summary>
-        /// <returns></returns>
-        public int GetCoinBalance()
-        {
-            var response = _accountApi.GetCoinBalance().Result;
-            return response.Data.Money;
-        }
-
-
         /// <summary>
         /// 为视频投币
         /// </summary>
@@ -435,7 +430,19 @@ namespace BiliBiliTool.Task
                 return false;
             }
         }
+        #endregion
 
+        /// <summary>
+        /// 获取账户硬币余额
+        /// </summary>
+        /// <returns></returns>
+        public int GetCoinBalance()
+        {
+            var response = _accountApi.GetCoinBalance().Result;
+            return response.Data.Money;
+        }
+
+        #region 直播中心签到、银瓜子兑换B币
         /// <summary>
         /// 直播中心银瓜子兑换B币
         /// </summary>
@@ -489,100 +496,148 @@ namespace BiliBiliTool.Task
                 _logger.LogDebug(response.Message);
             }
         }
+        #endregion
 
-        #region 
-        ///**
-        // * @return 返回会员类型
-        // * 0:无会员（会员过期，当前不是会员）
-        // * 1:月会员
-        // * 2:年会员
-        // */
-        //public int queryVipStatusType()
-        //{
-        //    if (userInfo.getVipStatus() == 1)
-        //    {
-        //        //只有VipStatus为1的时候获取到VipType才是有效的。
-        //        return userInfo.getVipType();
-        //    }
-        //    else
-        //    {
-        //        return 0;
-        //    }
-        //}
+        #region 充电
+        /// <summary>
+        /// 月底自动给自己充电
+        /// 仅充会到期的B币券，低于2的时候不会充
+        /// </summary>
+        public void doCharge()
+        {
+            int day = DateTime.Today.Day;
 
-        ///**
-        // * 月底自动给自己充电。//仅充会到期的B币券，低于2的时候不会充
-        // */
-        //public void doCharge()
-        //{
-        //    Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT+8"));
-        //    int day = cal.get(Calendar.DATE);
+            //B币券余额
+            int couponBalance = LoginResponse.Wallet.Coupon_balance;
+            //大会员类型
+            int vipType = queryVipStatusType();
+            //被充电用户的userID
+            string userId = _verify.UserId;
 
-        //    //B币券余额
-        //    int couponBalance = userInfo.getWallet().getCoupon_balance();
-        //    //大会员类型
-        //    int vipType = queryVipStatusType();
-        //    //被充电用户的userID
-        //    string userId = Verify.getInstance().getUserId();
+            if (day == 1 && vipType == 2)
+            {
+                ReceiveVipPrivilege(1);
+                ReceiveVipPrivilege(2);
+            }
 
-        //    if (day == 1 && vipType == 2)
-        //    {
-        //        OftenAPI.vipPrivilege(1);
-        //        OftenAPI.vipPrivilege(2);
-        //    }
+            if (vipType == 0 || vipType == 1)
+            {
+                _logger.LogInformation("普通会员和月度大会员每月不赠送B币券，所以没法给自己充电哦");
+                return;
+            }
 
-        //    if (vipType == 0 || vipType == 1)
-        //    {
-        //        _logger.LogInformation("普通会员和月度大会员每月不赠送B币券，所以没法给自己充电哦");
-        //        return;
-        //    }
+            ///*
+            //  判断条件 是月底&&是年大会员&&b币券余额大于2&&配置项允许自动充电
+            // */
+            //if (day == 28 && couponBalance >= 2 &&
+            //    Config.getInstance().isMonthEndAutoCharge() &&
+            //    vipType == 2)
+            //{
+            //    string requestBody = "elec_num=" + couponBalance * 10
+            //                                     + "&up_mid=" + userId
+            //                                     + "&otype=up"
+            //                                     + "&oid=" + userId
+            //                                     + "&csrf=" + Verify.getInstance().getBiliJct();
 
-        //    /*
-        //      判断条件 是月底&&是年大会员&&b币券余额大于2&&配置项允许自动充电
-        //     */
-        //    if (day == 28 && couponBalance >= 2 &&
-        //        Config.getInstance().isMonthEndAutoCharge() &&
-        //        vipType == 2)
-        //    {
-        //        string requestBody = "elec_num=" + couponBalance * 10
-        //                                         + "&up_mid=" + userId
-        //                                         + "&otype=up"
-        //                                         + "&oid=" + userId
-        //                                         + "&csrf=" + Verify.getInstance().getBiliJct();
+            //    JsonObject jsonObject = HttpUnit.doPost(ApiList.autoCharge, requestBody);
 
-        //        JsonObject jsonObject = HttpUnit.doPost(ApiList.autoCharge, requestBody);
+            //    int resultCode = jsonObject.get("code").getAsInt();
+            //    if (resultCode == 0)
+            //    {
+            //        JsonObject dataJson = jsonObject.get("data").getAsJsonObject();
+            //        int statusCode = dataJson.get("status").getAsInt();
+            //        if (statusCode == 4)
+            //        {
+            //            _logger.LogInformation("月底了，给自己充电成功啦，送的B币券没有浪费哦");
+            //            _logger.LogInformation("本次给自己充值了: " + couponBalance * 10 + "个电池哦");
+            //            desp.appendDesp("本次给自己充值了: " + couponBalance * 10 + "个电池哦");
+            //            //获取充电留言token
+            //            string order_no = dataJson.get("order_no").getAsstring();
+            //            chargeComments(order_no);
+            //        }
+            //        else
+            //        {
+            //            _logger.LogDebug("充电失败了啊 原因: " + jsonObject);
+            //        }
 
-        //        int resultCode = jsonObject.get("code").getAsInt();
-        //        if (resultCode == 0)
-        //        {
-        //            JsonObject dataJson = jsonObject.get("data").getAsJsonObject();
-        //            int statusCode = dataJson.get("status").getAsInt();
-        //            if (statusCode == 4)
-        //            {
-        //                _logger.LogInformation("月底了，给自己充电成功啦，送的B币券没有浪费哦");
-        //                _logger.LogInformation("本次给自己充值了: " + couponBalance * 10 + "个电池哦");
-        //                desp.appendDesp("本次给自己充值了: " + couponBalance * 10 + "个电池哦");
-        //                //获取充电留言token
-        //                string order_no = dataJson.get("order_no").getAsstring();
-        //                chargeComments(order_no);
-        //            }
-        //            else
-        //            {
-        //                _logger.LogDebug("充电失败了啊 原因: " + jsonObject);
-        //            }
+            //    }
+            //    else
+            //    {
+            //        _logger.LogDebug("充电失败了啊 原因: " + jsonObject);
+            //    }
+            //}
+            //else
+            //{
+            //    _logger.LogInformation("今天是本月的第: " + day + "天，还没到给自己充电日子呢");
+            //    desp.appendDesp("今天是本月的第: " + day + "天，还没到给自己充电日子呢");
+            //}
+        }
 
-        //        }
-        //        else
-        //        {
-        //            _logger.LogDebug("充电失败了啊 原因: " + jsonObject);
-        //        }
-        //    }
-        //    else
-        //    {
-        //        _logger.LogInformation("今天是本月的第: " + day + "天，还没到给自己充电日子呢");
-        //        desp.appendDesp("今天是本月的第: " + day + "天，还没到给自己充电日子呢");
-        //    }
-        //}
+        /// <summary>
+        /// 每月1号领取大会员福利
+        /// </summary>
+        public void ReceiveVipPrivilege()
+        {
+            int day = DateTime.Today.Day;
+
+            //大会员类型
+            int vipType = queryVipStatusType();
+
+            if (day == 1 && vipType == 2)
+            {
+                ReceiveVipPrivilege(1);
+                ReceiveVipPrivilege(2);
+            }
+
+            if (vipType == 0 || vipType == 1)
+            {
+                _logger.LogInformation("普通会员和月度大会员每月不赠送B币券，所以没法给自己充电哦");
+                return;
+            }
+        }
+
+        /// <summary>
+        /// 领取大会员每月赠送福利
+        /// </summary>
+        /// <param name="type">1.大会员B币券；2.大会员福利</param>
+        public void ReceiveVipPrivilege(int type)
+        {
+            var response = _dailyTaskApi.ReceiveVipPrivilege(type, _verify.BiliJct).Result;
+            if (response.Code == 0)
+            {
+                if (type == 1)
+                {
+                    _logger.LogInformation("领取年度大会员每月赠送的B币券成功");
+                }
+                else if (type == 2)
+                {
+                    _logger.LogInformation("领取大会员福利/权益成功");
+                }
+            }
+            else
+            {
+                _logger.LogDebug($"领取年度大会员每月赠送的B币券/大会员福利失败，原因: {response.Message}");
+            }
+        }
+
+        /**
+         * @return 返回会员类型
+         * 0:无会员（会员过期、当前不是会员）
+         * 1:月会员
+         * 2:年会员
+         */
+        public int queryVipStatusType()
+        {
+            if (LoginResponse.VipStatus == 1)
+            {
+                //只有VipStatus为1的时候获取到VipType才是有效的。
+                return LoginResponse.VipType;
+            }
+            else
+            {
+                return 0;
+            }
+        }
 
         //public void chargeComments(string token)
         //{
@@ -593,7 +648,10 @@ namespace BiliBiliTool.Task
         //    JsonObject jsonObject = HttpUnit.doPost(ApiList.chargeComment, requestBody);
 
         //}
+        #endregion
 
+
+        #region 
         ///**
         // * 获取大会员漫画权益
         // *

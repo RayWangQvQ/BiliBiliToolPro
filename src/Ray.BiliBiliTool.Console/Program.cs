@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text.Json;
+using BiliBiliTool.Agent;
 using BiliBiliTool.Agent.Interfaces;
 using BiliBiliTool.Config;
 using BiliBiliTool.Login;
@@ -87,6 +88,7 @@ namespace BiliBiliTool
                     services.AddBiliBiliClient<IAccountApi>("https://account.bilibili.com");
                     services.AddBiliBiliClient<ILiveApi>("https://api.live.bilibili.com");
 
+                    services.AddSingleton<LoginResponse>();
                     services.AddTransient<DailyTask>();
                 })
                 .UseConsoleLifetime();

@@ -69,6 +69,12 @@ namespace BiliBiliTool.Apiquery
         #endregion
 
 
+        /// <summary>
+        /// 领取大会员福利
+        /// </summary>
+        public static String vipPrivilegeReceive = "https://api.bilibili.com/x/vip/privilege/receive";
+
+
         public static String ServerPush = "https://sc.ftqq.com/";
 
 
@@ -87,10 +93,7 @@ namespace BiliBiliTool.Apiquery
          */
         public static String chargeComment = "https://api.bilibili.com/x/ugcpay/trade/elec/message";
 
-        /**
-         * 领取大会员福利
-         */
-        public static String vipPrivilegeReceive = "https://api.bilibili.com/x/vip/privilege/receive";
+
 
         /**
          * 领取大会员漫画福利

@@ -14,6 +14,12 @@ namespace BiliBiliTool.Agent
 
         public string Uname { get; set; }
 
+        public Wallet Wallet { get; set; }
+
+        public int VipStatus { get; set; }
+
+        public int VipType { get; set; }
+
         public string GetFuzzyUname()
         {
             StringBuilder sb = new StringBuilder();
@@ -37,5 +43,16 @@ namespace BiliBiliTool.Agent
         public long Current_exp { get; set; }
 
         public long Next_exp { get; set; }
+    }
+
+    public class Wallet
+    {
+        public long Mid { get; set; }
+
+        public int Bcoin_balance { get; set; }
+
+        public int Coupon_balance { get; set; }
+
+        public int Coupon_due_time { get; set; }
     }
 }
