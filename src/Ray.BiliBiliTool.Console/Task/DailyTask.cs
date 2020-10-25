@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
 using System.Net.Http;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using BiliBiliTool.Agent;
@@ -8,35 +11,42 @@ using BiliBiliTool.Agent.Interfaces;
 using BiliBiliTool.Apiquery;
 using BiliBiliTool.Config;
 using BiliBiliTool.Login;
-//using BiliBiliTool.Utils;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Ray.BiliBiliTool.Console.Agent;
+using Ray.BiliBiliTool.Console.Agent.Interfaces;
 
 namespace BiliBiliTool.Task
 {
     public class DailyTask
     {
         private readonly ILogger<DailyTask> _logger;
+        private readonly IHttpClientFactory _httpClientFactory;
         private readonly Verify _verify;
         private readonly IOptionsMonitor<DailyTaskOptions> _dailyTaskOptions;
         private readonly IDailyTaskApi _dailyTaskApi;
         private readonly IMangaApi _mangaApi;
+        private readonly IExperienceApi _experienceApi;
 
         //AppendPushMsg desp = AppendPushMsg.getInstance();
         //Data userInfo = null;
 
         public DailyTask(
             ILogger<DailyTask> logger,
+            IHttpClientFactory httpClientFactory,
             Verify verify,
             IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
             IDailyTaskApi dailyTaskApi,
-            IMangaApi mangaApi)
+            IMangaApi mangaApi,
+            IExperienceApi experienceApi)
         {
             _logger = logger;
+            this._httpClientFactory = httpClientFactory;
             _verify = verify;
             _dailyTaskOptions = dailyTaskOptions;
             _dailyTaskApi = dailyTaskApi;
             _mangaApi = mangaApi;
+            this._experienceApi = experienceApi;
         }
 
         public void DoDailyTask()
@@ -319,18 +329,58 @@ namespace BiliBiliTool.Task
         //    desp.appendDesp("投币任务完成后余额为: " + OftenAPI.getCoinBalance());
         //}
 
-        ///**
-        // * 获取当前投币获得的经验值
-        // *
-        // * @return 本日已经投了几个币
-        // */
-        //public int expConfirm()
-        //{
-        //    JsonObject resultJson = HttpUnit.doGet(ApiList.needCoin);
-        //    int getCoinExp = resultJson.get("number").getAsInt();
-        //    logger.info("今日已获得投币经验: " + getCoinExp);
-        //    return getCoinExp / 10;
-        //}
+        /// <summary>
+        /// 获取今日已投币数
+        /// </summary>
+        /// <returns></returns>
+        public int GetDonateCoins()
+        {
+            return GetDonateCoinExp() / 10;
+        }
+
+        /// <summary>
+        /// 获取今日通过投币已获取的经验值
+        /// </summary>
+        /// <returns></returns>
+        private int GetDonateCoinExp()
+        {
+            //var result = _experienceApi.GetDonateCoinExp().Result;
+            //todo:这里使用Refit调用，连接、获取成功(Status=200)，但是从Content获取Data异常，确定问题为返回内容被gzip压缩，但是暂未找到解决办法，下面先通过手动调用手动解压实现
+
+            var client = _httpClientFactory.CreateClient();
+            client.DefaultRequestHeaders.Add("Cookie", _verify.getVerify());
+
+            HttpResponseMessage result = client.GetAsync(ApiList.needCoin).Result;
+            var data = result.Content.ReadAsByteArrayAsync().Result;
+            var dataStr = ReadGzip(data);
+
+            ExperienceByDonateCoin re = JsonSerializer.Deserialize<ExperienceByDonateCoin>(dataStr);
+
+            _logger.LogInformation("今日已获得投币经验: " + re.Number);
+            return re.Number;
+        }
+
+        /// <summary>
+        /// 将Gzip的byte数组读取为字符串
+        /// </summary>
+        /// <param name="bytes"></param>
+        /// <param name="encoding"></param>
+        /// <returns></returns>
+        public static string ReadGzip(byte[] bytes, string encoding = "UTF-8")
+        {
+            string result = string.Empty;
+            using (MemoryStream ms = new MemoryStream(bytes))
+            {
+                using (GZipStream decompressedStream = new GZipStream(ms, CompressionMode.Decompress))
+                {
+                    using (StreamReader sr = new StreamReader(decompressedStream, Encoding.GetEncoding(encoding)))
+                    {
+                        result = sr.ReadToEnd();
+                    }
+                }
+            }
+            return result;
+        }
 
         //public void silver2coin()
         //{

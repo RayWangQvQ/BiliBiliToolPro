@@ -37,7 +37,7 @@ namespace BiliBiliTool.Apiquery
         public static String Manga = "https://manga.bilibili.com/twirp/activity.v1.Activity/ClockIn";
 
         /// <summary>
-        /// 查询已获取的投币经验
+        /// 查询已经通过投币获取到的经验值
         /// </summary>
         public static String needCoin = "https://www.bilibili.com/plus/account/exp.php";
 

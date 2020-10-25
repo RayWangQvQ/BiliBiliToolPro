@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Ray.BiliBiliTool.Console.Agent;
+using Ray.BiliBiliTool.Console.Agent.Interfaces;
 using Refit;
 
 namespace BiliBiliTool.Agent.Interfaces
@@ -9,7 +11,7 @@ namespace BiliBiliTool.Agent.Interfaces
     /// <summary>
     /// BiliBili每日任务相关接口
     /// </summary>
-    public interface IDailyTaskApi
+    public interface IDailyTaskApi : IBiliBiliApi
     {
         /// <summary>
         /// 登录
@@ -49,5 +51,7 @@ namespace BiliBiliTool.Agent.Interfaces
         /// <returns></returns>
         [Post("/x/web-interface/share/add?aid={aid}&csrf={csrf}")]
         Task<BiliApiResponse> ShareVideo(string aid, string csrf);
+
+
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Ray.BiliBiliTool.Console.Agent.Interfaces;
 using Refit;
 
 namespace BiliBiliTool.Agent.Interfaces
@@ -9,7 +10,7 @@ namespace BiliBiliTool.Agent.Interfaces
     /// <summary>
     /// 漫画接口
     /// </summary>
-    public interface IMangaApi
+    public interface IMangaApi : IBiliBiliApi
     {
         /// <summary>
         /// 漫画签到
