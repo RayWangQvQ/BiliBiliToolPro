@@ -18,7 +18,7 @@ namespace BiliBiliTool.Agent.Interfaces
         /// </summary>
         /// <returns></returns>
         [Get("/x/web-interface/nav")]
-        Task<BiliApiResponse<LoginResponse>> LoginByCookie();
+        Task<BiliApiResponse<UseInfo>> LoginByCookie();
 
         /// <summary>
         /// 获取每日任务的完成情况

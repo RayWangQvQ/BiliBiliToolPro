@@ -11,7 +11,7 @@ namespace LogTest
         [Fact]
         public void Test1()
         {
-            Program.PreWorks(new BiliBiliTool.Login.Verify("", "", ""));
+            Program.PreWorks(new string[] { });
 
             var logger = Program.ServiceProviderRoot.GetRequiredService<ILogger<UnitTest1>>();
 

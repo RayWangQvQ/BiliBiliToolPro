@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text.Json;
 using BiliBiliTool.Agent;
 using BiliBiliTool.Agent.Interfaces;
@@ -23,7 +24,7 @@ namespace BiliBiliTool
 
         static void Main(string[] args)
         {
-            PreWorks(new Verify(args[0], args[1], args[2]));
+            PreWorks(args);
 
             using (var serviceScope = ServiceProviderRoot.CreateScope())
             {
@@ -45,6 +46,7 @@ namespace BiliBiliTool
                 DailyTask dailyTask = serviceScope.ServiceProvider.GetRequiredService<DailyTask>();
                 dailyTask.DoDailyTask();
             }
+
             Console.ReadLine();
         }
 
@@ -52,48 +54,68 @@ namespace BiliBiliTool
         /// 初始化系统
         /// </summary>
         /// <param name="verify"></param>
-        public static void PreWorks(Verify verify)
+        public static void PreWorks(string[] args)
         {
+            var mapper = new Dictionary<string, string>
+            {
+                {"-userId","BiliBiliCookies:UserId" },
+                {"-sessData","BiliBiliCookies:SessData" },
+                {"-biliJct","BiliBiliCookies:BiliJct" },
+            };
+
+            ConfigurationRoot = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .AddCommandLine(args, mapper)
+                .Build();
+
             var hostBuilder = new HostBuilder()
                 .ConfigureServices((hostContext, services) =>
                 {
-                    //配置
-                    ConfigurationRoot = new ConfigurationBuilder()
-                        .AddJsonFile("appsettings.json")
-                        .Build();
-                    services.AddSingleton<IConfiguration>(ConfigurationRoot);
-
-                    //Options
-                    services.AddOptions()
-                        .Configure<DailyTaskOptions>(ConfigurationRoot.GetSection("DailyTaskConfig"))
-                        .Configure<JsonSerializerOptions>(o => o = JsonSerializerOptionsBuilder.DefaultOptions);
-
-                    //日志
-                    services.AddLogging(builder =>
-                    {
-                        builder.AddConsole()
-                            .AddDebug()
-                            .SetMinimumLevel(LogLevel.Information);
-                    });
-
-                    services.AddSingleton(verify);
-
-                    services.AddHttpClient();
-                    services.AddHttpClient("BiliBiliWithCookies",
-                        (sp, c) => c.DefaultRequestHeaders.Add("Cookie", sp.GetRequiredService<Verify>().getVerify()));
-                    //注册强类型api客户端
-                    services.AddBiliBiliClient<IDailyTaskApi>("https://api.bilibili.com");
-                    services.AddBiliBiliClient<IMangaApi>("https://manga.bilibili.com");
-                    services.AddBiliBiliClient<IExperienceApi>("https://www.bilibili.com");
-                    services.AddBiliBiliClient<IAccountApi>("https://account.bilibili.com");
-                    services.AddBiliBiliClient<ILiveApi>("https://api.live.bilibili.com");
-
-                    services.AddSingleton<LoginResponse>();
-                    services.AddTransient<DailyTask>();
+                    ConfigureServices(services);
                 })
                 .UseConsoleLifetime();
 
             ServiceProviderRoot = hostBuilder.Build().Services;
+        }
+
+        /// <summary>
+        /// 注册容器
+        /// </summary>
+        /// <param name="services"></param>
+        private static void ConfigureServices(IServiceCollection services)
+        {
+            //配置
+            services.AddSingleton<IConfiguration>(ConfigurationRoot);
+
+            //Options
+            services.AddOptions()
+                .Configure<DailyTaskOptions>(ConfigurationRoot.GetSection("DailyTaskConfig"))
+                .Configure<JsonSerializerOptions>(o => o = JsonSerializerOptionsBuilder.DefaultOptions)
+                .Configure<BiliBiliCookiesOptions>(o => ConfigurationRoot.GetSection("BiliBiliCookies"));
+
+            //日志
+            services.AddLogging(builder =>
+            {
+                builder.AddConsole()
+                    .AddDebug()
+                    .SetMinimumLevel(LogLevel.Information);
+            });
+
+            services.AddSingleton<BiliBiliCookiesOptions>(ConfigurationRoot.GetSection("BiliBiliCookies").Get<BiliBiliCookiesOptions>());
+
+            services.AddHttpClient();
+            services.AddHttpClient("BiliBiliWithCookies",
+                (sp, c) => c.DefaultRequestHeaders.Add("Cookie", sp.GetRequiredService<BiliBiliCookiesOptions>().ToString()));
+
+            //注册强类型api客户端
+            services.AddBiliBiliClient<IDailyTaskApi>("https://api.bilibili.com");
+            services.AddBiliBiliClient<IMangaApi>("https://manga.bilibili.com");
+            services.AddBiliBiliClient<IExperienceApi>("https://www.bilibili.com");
+            services.AddBiliBiliClient<IAccountApi>("https://account.bilibili.com");
+            services.AddBiliBiliClient<ILiveApi>("https://api.live.bilibili.com");
+
+            services.AddSingleton<UseInfo>();
+            services.AddTransient<DailyTask>();
         }
     }
 }

@@ -19,7 +19,7 @@ namespace Ray.BiliBiliTool.Console
             services.AddRefitClient<TInterface>(settings)
                 .ConfigureHttpClient((sp, c) =>
                 {
-                    c.DefaultRequestHeaders.Add("Cookie", sp.GetRequiredService<Verify>().getVerify());
+                    c.DefaultRequestHeaders.Add("Cookie", sp.GetRequiredService<BiliBiliCookiesOptions>().ToString());
                     c.BaseAddress = new Uri(host);
                 })
                 .AddHttpMessageHandler(sp => new MyHttpClientDelegatingHandler(sp.GetRequiredService<ILogger<MyHttpClientDelegatingHandler>>()));

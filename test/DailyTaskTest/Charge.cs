@@ -12,7 +12,7 @@ namespace DailyTaskTest
             var dailyTaskAppService = DailyTaskBuilder.Build();
 
             dailyTaskAppService.Login();
-            dailyTaskAppService.doCharge();
+            dailyTaskAppService.Charge();
 
             Assert.True(true);
         }

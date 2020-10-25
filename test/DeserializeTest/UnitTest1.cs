@@ -21,7 +21,7 @@ namespace DeserializeTest
             defaultOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
             defaultOptions.Encoder = System.Text.Encodings.Web.JavaScriptEncoder.Create(UnicodeRanges.All);
 
-            var re = JsonSerializer.Deserialize<BiliApiResponse<LoginResponse>>(s);
+            var re = JsonSerializer.Deserialize<BiliApiResponse<UseInfo>>(s);
 
             Debug.WriteLine(JsonSerializer.Serialize(re));
             Assert.NotNull(re);

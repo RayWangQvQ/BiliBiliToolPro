@@ -3,6 +3,7 @@ using System.Diagnostics;
 using BiliBiliTool;
 using BiliBiliTool.Task;
 using Microsoft.Extensions.DependencyInjection;
+using Ray.BiliBiliTool.Console.Extensions;
 using Xunit;
 
 namespace GetLastDayOfMonthTest
@@ -12,11 +13,11 @@ namespace GetLastDayOfMonthTest
         [Fact]
         public void Test1()
         {
-            Program.PreWorks(new BiliBiliTool.Login.Verify("", "", ""));
+            Program.PreWorks(new string[] { });
 
             var task = Program.ServiceProviderRoot.GetRequiredService<DailyTask>();
 
-            var dateTime = task.GetLastDayOfMonth(DateTime.Now);
+            var dateTime = DateTime.Now.LastDayOfMonth();
             Debug.WriteLine(dateTime);
 
             Assert.True(true);

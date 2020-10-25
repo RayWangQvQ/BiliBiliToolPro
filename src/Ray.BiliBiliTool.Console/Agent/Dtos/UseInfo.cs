@@ -4,7 +4,10 @@ using System.Text;
 
 namespace BiliBiliTool.Agent
 {
-    public class LoginResponse
+    /// <summary>
+    /// 账户信息
+    /// </summary>
+    public class UseInfo
     {
         public bool IsLogin { get; set; }
 
@@ -34,6 +37,9 @@ namespace BiliBiliTool.Agent
         }
     }
 
+    /// <summary>
+    /// 会员等级
+    /// </summary>
     public class LevelInfo
     {
         public int Current_level { get; set; }
@@ -45,6 +51,9 @@ namespace BiliBiliTool.Agent
         public long Next_exp { get; set; }
     }
 
+    /// <summary>
+    /// 钱包
+    /// </summary>
     public class Wallet
     {
         public long Mid { get; set; }

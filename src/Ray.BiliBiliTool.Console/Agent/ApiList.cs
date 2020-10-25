@@ -78,26 +78,25 @@ namespace BiliBiliTool.Apiquery
         public static String ServerPush = "https://sc.ftqq.com/";
 
 
-        /**
-         * 查询主站硬币余额
-         */
+        /// <summary>
+        /// 查询主站硬币余额
+        /// </summary>
         public static String getCoinBalance = "https://account.bilibili.com/site/getCoin";
 
-        /**
-         * 充电请求
-         */
+        /// <summary>
+        /// 充电
+        /// </summary>
         public static String autoCharge = "https://api.bilibili.com/x/ugcpay/trade/elec/pay/quick";
 
-        /**
-         * 充电留言
-         */
+        /// <summary>
+        ///  充电留言
+        /// </summary>
         public static String chargeComment = "https://api.bilibili.com/x/ugcpay/trade/elec/message";
 
 
-
-        /**
-         * 领取大会员漫画福利
-         */
+        /// <summary>
+        /// 领取大会员漫画福利
+        /// </summary>
         public static String mangaGetVipReward = "https://manga.bilibili.com/twirp/user.v1.User/GetVipReward";
 
     }

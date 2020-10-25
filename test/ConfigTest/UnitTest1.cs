@@ -14,7 +14,7 @@ namespace ConfigTest
         [Fact]
         public void Test1()
         {
-            Program.PreWorks(new BiliBiliTool.Login.Verify("", "", ""));
+            Program.PreWorks(new string[] { });
 
             string s = Program.ConfigurationRoot["DailyTaskConfig:NumberOfCoins"];
             Debug.WriteLine(s);

@@ -15,6 +15,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Console.Agent;
 using Ray.BiliBiliTool.Console.Agent.Interfaces;
+using Ray.BiliBiliTool.Console.Extensions;
 using Ray.BiliBiliTool.Console.Helpers;
 
 namespace BiliBiliTool.Task
@@ -23,7 +24,7 @@ namespace BiliBiliTool.Task
     {
         private readonly ILogger<DailyTask> _logger;
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly Verify _verify;
+        private readonly BiliBiliCookiesOptions _verify;
         private readonly IOptionsMonitor<DailyTaskOptions> _dailyTaskOptions;
         private readonly IDailyTaskApi _dailyTaskApi;
         private readonly IMangaApi _mangaApi;
@@ -37,8 +38,8 @@ namespace BiliBiliTool.Task
         public DailyTask(
             ILogger<DailyTask> logger,
             IHttpClientFactory httpClientFactory,
-            Verify verify,
-            LoginResponse loginResponse,
+            BiliBiliCookiesOptions verify,
+            UseInfo loginResponse,
             IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
             IDailyTaskApi dailyTaskApi,
             IMangaApi mangaApi,
@@ -58,7 +59,7 @@ namespace BiliBiliTool.Task
             _liveApi = liveApi;
         }
 
-        private LoginResponse LoginResponse { get; set; }
+        private UseInfo LoginResponse { get; set; }
 
         public void DoDailyTask()
         {
@@ -96,8 +97,9 @@ namespace BiliBiliTool.Task
             ReceiveVipPrivilege();
 
             //月底充电
-            doCharge();
+            Charge();
 
+            //获取每月大会员漫画权益
             ReceiveMangaVipReward(1);
 
             _logger.LogInformation("本日任务已全部执行完毕");
@@ -124,7 +126,7 @@ namespace BiliBiliTool.Task
 
             LoginResponse = apiResponse.Data;
 
-            //用户名模糊处理 @happy88888
+            //用户名模糊处理
             _logger.LogInformation("用户名称: {0}", LoginResponse.GetFuzzyUname());
             _logger.LogInformation("硬币余额: " + LoginResponse.Money);
 
@@ -164,18 +166,18 @@ namespace BiliBiliTool.Task
         #region 获取随机视频
         public string GetRandomVideo()
         {
-            return regionRanking();
+            return RegionRanking();
         }
 
         /// <summary>
         /// 默认请求动画区，3日榜单
         /// </summary>
         /// <returns></returns>
-        private string regionRanking()
+        private string RegionRanking()
         {
-            int rid = randomRegion();
+            int rid = RandomRegion();
             int day = 3;
-            return regionRanking(rid, day);
+            return RegionRanking(rid, day);
         }
 
         /// <summary>
@@ -183,7 +185,7 @@ namespace BiliBiliTool.Task
         /// 后续会更新请求分区
         /// </summary>
         /// <returns>分区Id</returns>
-        private int randomRegion()
+        private int RandomRegion()
         {
             int[] arr = { 1, 3, 4, 5, 160, 22, 119 };
             return arr[new Random().Next(arr.Length - 1)];
@@ -195,7 +197,7 @@ namespace BiliBiliTool.Task
         /// <param name="rid">分区id</param>
         /// <param name="day">日榜，三日榜 周榜 1，3，7</param>
         /// <returns>随机返回一个aid</returns>
-        private string regionRanking(int rid, int day)
+        private string RegionRanking(int rid, int day)
         {
             var apiResponse = _dailyTaskApi.GetRegionRankingVideos(rid, day).Result;
 
@@ -252,10 +254,15 @@ namespace BiliBiliTool.Task
         /// </summary>
         public void MangaSign()
         {
-            var response = _mangaApi.ClockIn(_dailyTaskOptions.CurrentValue.DevicePlatform).Result;
-
-            if (response == null)
+            BiliApiResponse response;
+            try
             {
+                response = _mangaApi.ClockIn(_dailyTaskOptions.CurrentValue.DevicePlatform).Result;
+            }
+            catch (Exception)
+            {
+                //ignore
+                //重复签到会报400异常,这里忽略调
                 _logger.LogInformation("哔哩哔哩漫画已经签到过了");
                 //desp.appendDesp("哔哩哔哩漫画已经签到过了");
                 return;
@@ -322,14 +329,9 @@ namespace BiliBiliTool.Task
             _logger.LogInformation("投币前余额为 : " + coinBalance);
             //desp.appendDesp("投币前余额为 : " + beforeAddCoinBalance);
 
-            /*
-             * 开始投币
-             * 请勿修改 max_numberOfCoins 这里多判断一次保证投币数超过5时 不执行投币操作
-             * 最后一道安全判断，保证即使前面的判断逻辑错了，也不至于发生投币事故
-             */
             while (needCoins > 0 && needCoins <= maxNumberOfCoins)
             {
-                string aid = regionRanking();
+                string aid = RegionRanking();
                 addCoinOperateCount++;
                 _logger.LogInformation("正在为av{aid}投币", aid);
                 //desp.appendDesp("正在为av" + aid + "投币");
@@ -369,7 +371,7 @@ namespace BiliBiliTool.Task
             //todo:这里使用Refit调用，连接、获取成功(Status=200)，但是从Content获取Data异常，确定问题为返回内容被gzip压缩，但是暂未找到解决办法，下面先通过手动调用手动解压实现
 
             var client = _httpClientFactory.CreateClient();
-            client.DefaultRequestHeaders.Add("Cookie", _verify.getVerify());
+            client.DefaultRequestHeaders.Add("Cookie", _verify.ToString());
 
             HttpResponseMessage result = client.GetAsync(ApiList.needCoin).Result;
             var data = result.Content.ReadAsByteArrayAsync().Result;
@@ -464,17 +466,14 @@ namespace BiliBiliTool.Task
             }
 
             var queryStatus = _liveApi.GetExchangeSilverStatus().Result;
-            double silver2coinMoney = GetCoinBalance();
+            int silver2coinMoney = GetCoinBalance();
 
             _logger.LogInformation("当前银瓜子余额: {0}", queryStatus.Data.Silver);
             //desp.appendDesp("当前银瓜子余额: " + queryStatus.get("silver").getAsInt());
             _logger.LogInformation("兑换银瓜子后硬币余额: {0}", silver2coinMoney);
 
-            /*
-            兑换银瓜子后，更新userInfo中的硬币值
-             */
-            //userInfo.setMoney(silver2coinMoney);
-
+            //兑换银瓜子后，更新userInfo中的硬币值,避免再调一次登录接口获取用户信息
+            LoginResponse.Money = silver2coinMoney;
         }
 
         /// <summary>
@@ -483,9 +482,6 @@ namespace BiliBiliTool.Task
         public void LiveSign()
         {
             _logger.LogInformation("开始直播签到");
-
-            //JsonObject liveCheckinResponse = HttpUnit.doGet(ApiList.liveCheckin);
-            //int code = liveCheckinResponse.get(statusCodeStr).getAsInt();
 
             var response = _liveApi.Sign().Result;
 
@@ -506,11 +502,11 @@ namespace BiliBiliTool.Task
         /// 月底自动给自己充电
         /// 仅充会到期的B币券，低于2的时候不会充
         /// </summary>
-        public void doCharge()
+        public void Charge()
         {
             if (!_dailyTaskOptions.CurrentValue.MonthEndAutoCharge) return;
 
-            int lastDay = GetLastDayOfMonth(DateTime.Today).Day;
+            int lastDay = DateTime.Today.LastDayOfMonth().Day;
             if (DateTime.Today.Day != lastDay)
             {
                 _logger.LogInformation($"今天是本月的第: {DateTime.Today.Day}天，等到{lastDay}号会自动为您充电哒");
@@ -527,20 +523,12 @@ namespace BiliBiliTool.Task
             }
 
             //大会员类型
-            int vipType = queryVipStatusType();
+            int vipType = GetVipType();
             if (vipType != 2)
             {
                 _logger.LogInformation("不是年度大会员或已过期,无法充电");
                 return;
             }
-
-            /*
-              判断条件 是月底&&是年大会员&&b币券余额大于2&&配置项允许自动充电
-             */
-
-            //string requestBody = $"elec_num={couponBalance * 10}&up_mid={userId}&otype=up&oid={userId}&csrf={_verify.BiliJct}";
-            //JsonObject jsonObject = HttpUnit.doPost(ApiList.autoCharge, requestBody);
-            //int resultCode = jsonObject.get("code").getAsInt();
 
             var response = _dailyTaskApi.Charge(couponBalance * 10, _verify.UserId, _verify.UserId, _verify.BiliJct).Result;
             if (response.Code == 0)
@@ -552,7 +540,7 @@ namespace BiliBiliTool.Task
                     //desp.appendDesp("本次给自己充值了: " + couponBalance * 10 + "个电池哦");
 
                     //获取充电留言token
-                    chargeComments(response.Data.Order_no);
+                    ChargeComments(response.Data.Order_no);
                 }
                 else
                 {
@@ -565,13 +553,6 @@ namespace BiliBiliTool.Task
             }
         }
 
-        public DateTime GetLastDayOfMonth(DateTime dateTime)
-        {
-            return dateTime.AddDays(1 - dateTime.Day)
-                .AddMonths(1)
-                .AddDays(-1);
-        }
-
         /// <summary>
         /// 每月1号领取大会员福利
         /// </summary>
@@ -580,7 +561,7 @@ namespace BiliBiliTool.Task
             int day = DateTime.Today.Day;
 
             //大会员类型
-            int vipType = queryVipStatusType();
+            int vipType = GetVipType();
 
             if (day == 1 && vipType == 2)
             {
@@ -619,13 +600,13 @@ namespace BiliBiliTool.Task
             }
         }
 
-        /**
-         * @return 返回会员类型
-         * 0:无会员（会员过期、当前不是会员）
-         * 1:月会员
-         * 2:年会员
-         */
-        public int queryVipStatusType()
+        /// <summary>
+        /// 返回会员类型
+        /// </summary>
+        /// <returns>0:无会员（会员过期、当前不是会员）;
+        /// 1:月会员
+        /// 2:年会员</returns>
+        public int GetVipType()
         {
             if (LoginResponse.VipStatus == 1)
             {
@@ -638,42 +619,33 @@ namespace BiliBiliTool.Task
             }
         }
 
-        public void chargeComments(string token)
+        /// <summary>
+        /// 充电后留言
+        /// </summary>
+        /// <param name="token"></param>
+        public void ChargeComments(string token)
         {
-            //string requestBody = $"order_id={token}&message=BILIBILI-HELPER自动充电&csrf={_verify.BiliJct}";
-            //JsonObject jsonObject = HttpUnit.doPost(ApiList.chargeComment, requestBody);
-
             _dailyTaskApi.ChargeComment(token, "Ray.BiliBiliTool自动充电", _verify.BiliJct);
         }
         #endregion
 
 
-        /**
-         * 获取大会员漫画权益
-         *
-         * @param reason_id 权益号，由https://api.bilibili.com/x/vip/privilege/my
-         *                  得到权益号数组，取值范围为数组中的整数
-         *                  为方便直接取1，为领取漫读劵，暂时不取其他的值
-         * @return 返回领取结果和数量
-         */
+        /// <summary>
+        /// 获取大会员漫画权益
+        /// </summary>
+        /// <param name="reason_id">权益号，由https://api.bilibili.com/x/vip/privilege/my得到权益号数组，取值范围为数组中的整数
+        /// 这里为方便直接取1，为领取漫读劵，暂时不取其他的值</param>
         public void ReceiveMangaVipReward(int reason_id)
         {
             int day = DateTime.Today.Day;
 
-            //根据userInfo.getVipStatus() ,如果是1 ，会员有效，0会员失效。
-            //@JunzhouLiu: fixed query_vipStatusType()现在可以查询会员状态，以及会员类型了 2020-10-15
-            if (day != 1 || queryVipStatusType() == 0)
+            if (day != 1 || GetVipType() == 0)
             {
-                //一个月执行一次就行，跟几号没关系，由B站策略决定(有可能改领取时间)
-                //return;
+                //一个月执行一次就行
+                return;
             }
 
-            //string requestBody = "{\"reason_id\":" + reason_id + "}";
-            ////注意参数构造格式为json，不知道需不需要重载下面的Post函数改请求头
-            //JsonObject jsonObject = HttpUnit.doPost(ApiList.mangaGetVipReward, requestBody);
-
             var response = _mangaApi.ReceiveMangaVipReward(reason_id).Result;
-
             if (response.Code == 0)
             {
                 _logger.LogInformation($"大会员成功领取{response.Data.Amount}张漫读劵");

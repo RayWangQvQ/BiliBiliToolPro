@@ -23,7 +23,7 @@ namespace Ray.BiliBiliTool.Console
             //记录请求内容
             if (request.Content != null)
             {
-                _logger.LogInformation(await request.Content.ReadAsStringAsync());
+                _logger.LogTrace(await request.Content.ReadAsStringAsync());
             }
 
             HttpResponseMessage response = await base.SendAsync(request, cancellationToken);
@@ -32,7 +32,7 @@ namespace Ray.BiliBiliTool.Console
             if (response.Content != null)
             {
                 var content = await response.Content.ReadAsStringAsync();
-                _logger.LogInformation(content);
+                _logger.LogTrace(content);
 
                 //如果返回不是json格式，则抛异常
                 try
@@ -43,7 +43,7 @@ namespace Ray.BiliBiliTool.Console
                 }
                 catch (Exception)
                 {
-                    _logger.LogInformation("接口返回异常");
+                    _logger.LogDebug("接口返回异常");
                     throw;
                 }
             }
