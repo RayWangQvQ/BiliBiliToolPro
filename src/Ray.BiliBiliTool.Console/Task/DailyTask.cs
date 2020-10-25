@@ -82,10 +82,13 @@ namespace BiliBiliTool.Task
             //投币任务
             AddCoinsForVideo();//todo:传入up主Id，只为指定ups投币
 
-            ExchangeSilver2Coin(); //直播中心的银瓜子兑换硬币
+            //直播中心的银瓜子兑换硬币
+            ExchangeSilver2Coin();
+
+            LiveSign();
+
 
             /*
-            doLiveCheckin(); //直播签到
             doCharge();//充电
             mangaGetVipReward(1);
 
@@ -464,6 +467,29 @@ namespace BiliBiliTool.Task
 
         }
 
+        /// <summary>
+        /// 直播签到
+        /// </summary>
+        public void LiveSign()
+        {
+            _logger.LogInformation("开始直播签到");
+
+            //JsonObject liveCheckinResponse = HttpUnit.doGet(ApiList.liveCheckin);
+            //int code = liveCheckinResponse.get(statusCodeStr).getAsInt();
+
+            var response = _liveApi.Sign().Result;
+
+            if (response.Code == 0)
+            {
+                _logger.LogInformation($"直播签到成功，本次签到获得{response.Data.Text},{response.Data.SpecialText}");
+                //desp.appendDesp("直播签到成功，本次签到获得" + data.get("text").getAsstring() + "," + data.get("specialText").getAsstring());
+            }
+            else
+            {
+                _logger.LogDebug(response.Message);
+            }
+        }
+
         #region 
         ///**
         // * @return 返回会员类型
@@ -605,28 +631,7 @@ namespace BiliBiliTool.Task
         //    }
         //}
 
-        ///**
-        // * 直播签到
-        // */
-        //public void doLiveCheckin()
-        //{
-        //    _logger.LogInformation("开始直播签到");
-        //    JsonObject liveCheckinResponse = HttpUnit.doGet(ApiList.liveCheckin);
-        //    int code = liveCheckinResponse.get(statusCodeStr).getAsInt();
-        //    if (code == 0)
-        //    {
-        //        JsonObject data = liveCheckinResponse.get("data").getAsJsonObject();
-        //        _logger.LogInformation("直播签到成功，本次签到获得" + data.get("text").getAsstring() + "," +
-        //                    data.get("specialText").getAsstring());
-        //        desp.appendDesp("直播签到成功，本次签到获得" + data.get("text").getAsstring() + "," +
-        //                        data.get("specialText").getAsstring());
-        //    }
-        //    else
-        //    {
-        //        string message = liveCheckinResponse.get("message").getAsstring();
-        //        _logger.LogDebug(message);
-        //    }
-        //}
+
 
 
         //public void doServerPush()

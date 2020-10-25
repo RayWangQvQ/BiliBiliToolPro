@@ -51,6 +51,7 @@ namespace BiliBiliTool.Apiquery
         /// </summary>
         public static String CoinAdd = "https://api.bilibili.com/x/web-interface/coin/add";
 
+        #region 直播
         /// <summary>
         /// 直播中心银瓜子兑换B币
         /// </summary>
@@ -61,6 +62,11 @@ namespace BiliBiliTool.Apiquery
         /// </summary>
         public static String getSilver2coinStatus = "https://api.live.bilibili.com/pay/v1/Exchange/getStatus";
 
+        /// <summary>
+        /// 直播签到
+        /// </summary>
+        public static String liveCheckin = "https://api.live.bilibili.com/xlive/web-ucenter/v1/sign/DoSign";
+        #endregion
 
 
         public static String ServerPush = "https://sc.ftqq.com/";
@@ -91,10 +97,6 @@ namespace BiliBiliTool.Apiquery
          */
         public static String mangaGetVipReward = "https://manga.bilibili.com/twirp/user.v1.User/GetVipReward";
 
-        /**
-         * 直播签到
-         */
-        public static String liveCheckin = "https://api.live.bilibili.com/xlive/web-ucenter/v1/sign/DoSign";
     }
 
 }

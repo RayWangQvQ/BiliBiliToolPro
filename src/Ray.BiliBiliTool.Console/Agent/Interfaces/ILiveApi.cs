@@ -14,5 +14,8 @@ namespace Ray.BiliBiliTool.Console.Agent.Interfaces
 
         [Get("/pay/v1/Exchange/getStatus")]
         Task<BiliApiResponse<ExchangeSilverStatusResponse>> GetExchangeSilverStatus();
+
+        [Get("/xlive/web-ucenter/v1/sign/DoSign")]
+        Task<BiliApiResponse<LiveSignResponse>> Sign();
     }
 }
