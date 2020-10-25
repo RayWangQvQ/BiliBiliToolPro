@@ -92,7 +92,10 @@ namespace BiliBiliTool.Task
             //直播中心签到
             LiveSign();
 
-            //充电
+            //月初领取大会员福利
+            ReceiveVipPrivilege();
+
+            //月底充电
             doCharge();
             /*
             
@@ -505,72 +508,68 @@ namespace BiliBiliTool.Task
         /// </summary>
         public void doCharge()
         {
-            int day = DateTime.Today.Day;
+            if (!_dailyTaskOptions.CurrentValue.MonthEndAutoCharge) return;
 
-            //B币券余额
-            int couponBalance = LoginResponse.Wallet.Coupon_balance;
-            //大会员类型
-            int vipType = queryVipStatusType();
-            //被充电用户的userID
-            string userId = _verify.UserId;
-
-            if (day == 1 && vipType == 2)
+            int lastDay = GetLastDayOfMonth(DateTime.Today).Day;
+            if (DateTime.Today.Day != lastDay)
             {
-                ReceiveVipPrivilege(1);
-                ReceiveVipPrivilege(2);
-            }
-
-            if (vipType == 0 || vipType == 1)
-            {
-                _logger.LogInformation("普通会员和月度大会员每月不赠送B币券，所以没法给自己充电哦");
+                _logger.LogInformation($"今天是本月的第: {DateTime.Today.Day}天，等到{lastDay}号会自动为您充电哒");
+                //desp.appendDesp("今天是本月的第: " + day + "天，还没到给自己充电日子呢");
                 return;
             }
 
-            ///*
-            //  判断条件 是月底&&是年大会员&&b币券余额大于2&&配置项允许自动充电
-            // */
-            //if (day == 28 && couponBalance >= 2 &&
-            //    Config.getInstance().isMonthEndAutoCharge() &&
-            //    vipType == 2)
-            //{
-            //    string requestBody = "elec_num=" + couponBalance * 10
-            //                                     + "&up_mid=" + userId
-            //                                     + "&otype=up"
-            //                                     + "&oid=" + userId
-            //                                     + "&csrf=" + Verify.getInstance().getBiliJct();
+            //B币券余额
+            int couponBalance = LoginResponse.Wallet.Coupon_balance;
+            if (couponBalance < 2)
+            {
+                _logger.LogInformation("B币券余额<2,无法充电");
+                return;
+            }
 
-            //    JsonObject jsonObject = HttpUnit.doPost(ApiList.autoCharge, requestBody);
+            //大会员类型
+            int vipType = queryVipStatusType();
+            if (vipType != 2)
+            {
+                _logger.LogInformation("不是年度大会员或已过期,无法充电");
+                return;
+            }
 
-            //    int resultCode = jsonObject.get("code").getAsInt();
-            //    if (resultCode == 0)
-            //    {
-            //        JsonObject dataJson = jsonObject.get("data").getAsJsonObject();
-            //        int statusCode = dataJson.get("status").getAsInt();
-            //        if (statusCode == 4)
-            //        {
-            //            _logger.LogInformation("月底了，给自己充电成功啦，送的B币券没有浪费哦");
-            //            _logger.LogInformation("本次给自己充值了: " + couponBalance * 10 + "个电池哦");
-            //            desp.appendDesp("本次给自己充值了: " + couponBalance * 10 + "个电池哦");
-            //            //获取充电留言token
-            //            string order_no = dataJson.get("order_no").getAsstring();
-            //            chargeComments(order_no);
-            //        }
-            //        else
-            //        {
-            //            _logger.LogDebug("充电失败了啊 原因: " + jsonObject);
-            //        }
+            /*
+              判断条件 是月底&&是年大会员&&b币券余额大于2&&配置项允许自动充电
+             */
 
-            //    }
-            //    else
-            //    {
-            //        _logger.LogDebug("充电失败了啊 原因: " + jsonObject);
-            //    }
-            //}
-            //else
-            //{
-            //    _logger.LogInformation("今天是本月的第: " + day + "天，还没到给自己充电日子呢");
-            //    desp.appendDesp("今天是本月的第: " + day + "天，还没到给自己充电日子呢");
-            //}
+            //string requestBody = $"elec_num={couponBalance * 10}&up_mid={userId}&otype=up&oid={userId}&csrf={_verify.BiliJct}";
+            //JsonObject jsonObject = HttpUnit.doPost(ApiList.autoCharge, requestBody);
+            //int resultCode = jsonObject.get("code").getAsInt();
+
+            var response = _dailyTaskApi.Charge(couponBalance * 10, _verify.UserId, _verify.UserId, _verify.BiliJct).Result;
+            if (response.Code == 0)
+            {
+                if (response.Data.Status == 4)
+                {
+                    _logger.LogInformation("月底了，给自己充电成功啦，送的B币券没有浪费哦");
+                    _logger.LogInformation("本次给自己充值了: " + couponBalance * 10 + "个电池哦");
+                    //desp.appendDesp("本次给自己充值了: " + couponBalance * 10 + "个电池哦");
+
+                    //获取充电留言token
+                    chargeComments(response.Data.Order_no);
+                }
+                else
+                {
+                    _logger.LogDebug("充电失败了啊 原因: " + JsonSerializer.Serialize(response));
+                }
+            }
+            else
+            {
+                _logger.LogDebug("充电失败了啊 原因: " + response.Message);
+            }
+        }
+
+        public DateTime GetLastDayOfMonth(DateTime dateTime)
+        {
+            return dateTime.AddDays(1 - dateTime.Day)
+                .AddMonths(1)
+                .AddDays(-1);
         }
 
         /// <summary>
@@ -639,15 +638,13 @@ namespace BiliBiliTool.Task
             }
         }
 
-        //public void chargeComments(string token)
-        //{
+        public void chargeComments(string token)
+        {
+            //string requestBody = $"order_id={token}&message=BILIBILI-HELPER自动充电&csrf={_verify.BiliJct}";
+            //JsonObject jsonObject = HttpUnit.doPost(ApiList.chargeComment, requestBody);
 
-        //    string requestBody = "order_id=" + token
-        //                                     + "&message=" + "BILIBILI-HELPER自动充电"
-        //                                     + "&csrf=" + Verify.getInstance().getBiliJct();
-        //    JsonObject jsonObject = HttpUnit.doPost(ApiList.chargeComment, requestBody);
-
-        //}
+            _dailyTaskApi.ChargeComment(token, "Ray.BiliBiliTool自动充电", _verify.BiliJct);
+        }
         #endregion
 
 

@@ -65,5 +65,27 @@ namespace BiliBiliTool.Agent.Interfaces
 
         [Post("/x/vip/privilege/receive?type={type}&csrf={csrf}")]
         Task<BiliApiResponse> ReceiveVipPrivilege(int type, string csrf);
+
+        /// <summary>
+        /// 充电
+        /// </summary>
+        /// <param name="elec_num"></param>
+        /// <param name="up_mid"></param>
+        /// <param name="oid"></param>
+        /// <param name="csrf"></param>
+        /// <returns></returns>
+        [Post("/x/ugcpay/trade/elec/pay/quick?elec_num={elec_num}&up_mid={up_mid}&otype=up&oid={oid}&csrf={csrf}")]
+        Task<BiliApiResponse<ChargeResponse>> Charge(int elec_num, string up_mid, string oid, string csrf);
+
+        /// <summary>
+        /// 充电
+        /// </summary>
+        /// <param name="elec_num"></param>
+        /// <param name="up_mid"></param>
+        /// <param name="oid"></param>
+        /// <param name="csrf"></param>
+        /// <returns></returns>
+        [Post("/x/ugcpay/trade/elec/message?order_id={order_id}&message={message}&csrf={csrf}")]
+        Task<BiliApiResponse<ChargeResponse>> ChargeComment(string order_id, string message, string csrf);
     }
 }
