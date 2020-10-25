@@ -52,6 +52,15 @@ namespace BiliBiliTool.Agent.Interfaces
         [Post("/x/web-interface/share/add?aid={aid}&csrf={csrf}")]
         Task<BiliApiResponse> ShareVideo(string aid, string csrf);
 
+        /// <summary>
+        /// 分享视频
+        /// </summary>
+        /// <param name="aid"></param>
+        /// <returns></returns>
+        [Get("/x/web-interface/archive/coins?aid={aid}")]
+        Task<BiliApiResponse<DonatedCoinsForVideo>> GetDonatedCoinsForVideo(string aid);
 
+        [Post("/x/web-interface/coin/add?aid={aid}&multiply={multiply}&select_like={select_like}&cross_domain=true&csrf={csrf}")]
+        Task<BiliApiResponse> AddCoinForVideo(string aid, int multiply, int select_like, string csrf);
     }
 }

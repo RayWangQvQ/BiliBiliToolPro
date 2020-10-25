@@ -4,16 +4,16 @@ using Xunit;
 
 namespace DailyTaskTest
 {
-    public class GetDonatedCoinNumber
+    public class AddCoinsForVideo
     {
         [Fact]
         public void Test1()
         {
             var dailyTaskAppService = DailyTaskBuilder.Build();
 
-            int number = dailyTaskAppService.GetDonatedCoins();
+            bool b = dailyTaskAppService.AddCoinsForVideo("585105826", 1, 0);
 
-            Assert.True(number >= 0);
+            Assert.True(true);
         }
     }
 }

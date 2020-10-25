@@ -15,6 +15,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Console.Agent;
 using Ray.BiliBiliTool.Console.Agent.Interfaces;
+using Ray.BiliBiliTool.Console.Helpers;
 
 namespace BiliBiliTool.Task
 {
@@ -27,6 +28,7 @@ namespace BiliBiliTool.Task
         private readonly IDailyTaskApi _dailyTaskApi;
         private readonly IMangaApi _mangaApi;
         private readonly IExperienceApi _experienceApi;
+        private readonly IAccountApi _accountApi;
 
         //AppendPushMsg desp = AppendPushMsg.getInstance();
         //Data userInfo = null;
@@ -38,7 +40,8 @@ namespace BiliBiliTool.Task
             IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
             IDailyTaskApi dailyTaskApi,
             IMangaApi mangaApi,
-            IExperienceApi experienceApi)
+            IExperienceApi experienceApi,
+            IAccountApi accountApi)
         {
             _logger = logger;
             this._httpClientFactory = httpClientFactory;
@@ -47,6 +50,7 @@ namespace BiliBiliTool.Task
             _dailyTaskApi = dailyTaskApi;
             _mangaApi = mangaApi;
             this._experienceApi = experienceApi;
+            this._accountApi = accountApi;
         }
 
         public void DoDailyTask()
@@ -73,7 +77,7 @@ namespace BiliBiliTool.Task
             MangaSign();
 
             //投币任务
-            //doCoinAdd();
+            AddCoinsForVideo();//todo:传入up主Id，只为指定ups投币
 
             /*
             silver2coin(); //直播中心的银瓜子兑换硬币
@@ -82,7 +86,7 @@ namespace BiliBiliTool.Task
             doCharge();//充电
             mangaGetVipReward(1);
 
-            logger.info("本日任务已全部执行完毕");
+            _logger.LogInformation("本日任务已全部执行完毕");
 
             doServerPush();
             */
@@ -211,7 +215,7 @@ namespace BiliBiliTool.Task
         /// 分享视频
         /// </summary>
         /// <param name="aid">视频aid</param>
-        public void ShareVideo(String aid)
+        public void ShareVideo(string aid)
         {
             var apiResponse = _dailyTaskApi.ShareVideo(aid, _verify.BiliJct).Result;
 
@@ -254,86 +258,87 @@ namespace BiliBiliTool.Task
             }
         }
 
-        ///**
-        // * 由于bilibili Api数据更新的问题，可能造成投币多投。
-        // * 更换API后 已修复
-        // */
-        //public void doCoinAdd()
-        //{
-        //    //投币最多操作数 解决csrf校验失败时死循环的问题
-        //    int addCoinOperateCount = 0;
-        //    //安全检查，最多投币数
-        //    int maxNumberOfCoins = 5;
-        //    //获取自定义配置投币数 配置写在src/main/resources/config.json中
-        //    int setCoin = _dailyTaskOptions.CurrentValue.NumberOfCoins;
-        //    //已投的硬币
-        //    int useCoin = expConfirm();
-        //    //还需要投的币=设置投币数-已投的币数
+        /**
+         * 由于bilibili Api数据更新的问题，可能造成投币多投。
+         * 更换API后 已修复
+         */
+        public void AddCoinsForVideo()
+        {
+            //投币最多操作数 解决csrf校验失败时死循环的问题
+            int addCoinOperateCount = 0;
+            //安全检查，最多投币数
+            int maxNumberOfCoins = 5;
+            //获取自定义配置投币数 配置写在src/main/resources/config.json中
+            int setCoin = _dailyTaskOptions.CurrentValue.NumberOfCoins;
+            //已投的硬币
+            int useCoin = GetDonatedCoins();
 
-        //    if (setCoin > maxNumberOfCoins)
-        //    {
-        //        _logger.LogInformation("自定义投币数为: {setCoin}枚,为保护你的资产，自定义投币数重置为: {maxNumberOfCoins}枚", setCoin, maxNumberOfCoins);
-        //        setCoin = maxNumberOfCoins;
-        //    }
+            //还需要投的币=设置投币数-已投的币数
+            if (setCoin > maxNumberOfCoins)
+            {
+                _logger.LogInformation("自定义投币数为: {setCoin}枚,为保护你的资产，自定义投币数重置为: {maxNumberOfCoins}枚", setCoin, maxNumberOfCoins);
+                setCoin = maxNumberOfCoins;
+            }
 
-        //    _logger.LogInformation("自定义投币数为: {setCoin}枚,程序执行前已投: {useCoin}枚", setCoin, useCoin);
-        //    //desp.appendDesp($"自定义投币数为: {setCoin}枚,程序执行前已投: {useCoin}枚");
-        //    int needCoins = setCoin - useCoin;
+            _logger.LogInformation("自定义投币数为: {setCoin}枚,程序执行前已投: {useCoin}枚", setCoin, useCoin);
+            //desp.appendDesp($"自定义投币数为: {setCoin}枚,程序执行前已投: {useCoin}枚");
+            int needCoins = setCoin - useCoin;
 
-        //    //投币前硬币余额
-        //    Double beforeAddCoinBalance = OftenAPI.getCoinBalance();
-        //    int coinBalance = (int)Math.floor(beforeAddCoinBalance);
+            //投币前硬币余额
+            int coinBalance = GetCoinBalance();
 
-        //    if (needCoins <= 0)
-        //    {
-        //        logger.info("已完成设定的投币任务，今日无需再投币了");
-        //    }
-        //    else
-        //    {
-        //        logger.info("投币数调整为: " + needCoins + "枚");
-        //        //投币数大于余额时，按余额投
-        //        if (needCoins > coinBalance)
-        //        {
-        //            logger.info("完成今日设定投币任务还需要投: " + needCoins + "枚硬币，但是余额只有: " + beforeAddCoinBalance);
-        //            logger.info("投币数调整为: " + coinBalance);
-        //            needCoins = coinBalance;
-        //        }
-        //    }
+            if (needCoins <= 0)
+            {
+                _logger.LogInformation("已完成设定的投币任务，今日无需再投币了");
+            }
+            else
+            {
+                _logger.LogInformation("投币数调整为: {needCoins}枚", needCoins);
+                //投币数大于余额时，按余额投
+                if (needCoins > coinBalance)
+                {
+                    _logger.LogInformation("完成今日设定投币任务还需要投: {needCoins}枚硬币，但是余额只有: {coinBalance}", needCoins, coinBalance);
+                    _logger.LogInformation("投币数调整为: {coinBalance}", coinBalance);
+                    needCoins = coinBalance;
+                }
+            }
 
-        //    logger.info("投币前余额为 : " + beforeAddCoinBalance);
-        //    desp.appendDesp("投币前余额为 : " + beforeAddCoinBalance);
-        //    /*
-        //     * 开始投币
-        //     * 请勿修改 max_numberOfCoins 这里多判断一次保证投币数超过5时 不执行投币操作
-        //     * 最后一道安全判断，保证即使前面的判断逻辑错了，也不至于发生投币事故
-        //     */
-        //    while (needCoins > 0 && needCoins <= maxNumberOfCoins)
-        //    {
-        //        String aid = regionRanking();
-        //        addCoinOperateCount++;
-        //        logger.info("正在为av" + aid + "投币");
-        //        desp.appendDesp("正在为av" + aid + "投币");
-        //        boolean flag = coinAdd(aid, 1, Config.getInstance().getSelectLike());
-        //        if (flag)
-        //        {
-        //            needCoins--;
-        //        }
+            _logger.LogInformation("投币前余额为 : " + coinBalance);
+            //desp.appendDesp("投币前余额为 : " + beforeAddCoinBalance);
 
-        //        if (addCoinOperateCount > 10)
-        //        {
-        //            break;
-        //        }
-        //    }
+            /*
+             * 开始投币
+             * 请勿修改 max_numberOfCoins 这里多判断一次保证投币数超过5时 不执行投币操作
+             * 最后一道安全判断，保证即使前面的判断逻辑错了，也不至于发生投币事故
+             */
+            while (needCoins > 0 && needCoins <= maxNumberOfCoins)
+            {
+                string aid = regionRanking();
+                addCoinOperateCount++;
+                _logger.LogInformation("正在为av{aid}投币", aid);
+                //desp.appendDesp("正在为av" + aid + "投币");
 
-        //    logger.info("投币任务完成后余额为: " + OftenAPI.getCoinBalance());
-        //    desp.appendDesp("投币任务完成后余额为: " + OftenAPI.getCoinBalance());
-        //}
+                bool flag = AddCoinsForVideo(aid, 1, _dailyTaskOptions.CurrentValue.SelectLike);
+                if (flag)
+                {
+                    needCoins--;
+                }
+
+                if (addCoinOperateCount > 10)
+                {
+                    break;
+                }
+            }
+
+            _logger.LogInformation("投币任务完成后余额为: " + _accountApi.GetCoinBalance().Result.Data.Money);
+            //desp.appendDesp("投币任务完成后余额为: " + OftenAPI.getCoinBalance());
+        }
 
         /// <summary>
         /// 获取今日已投币数
         /// </summary>
         /// <returns></returns>
-        public int GetDonateCoins()
+        public int GetDonatedCoins()
         {
             return GetDonateCoinExp() / 10;
         }
@@ -352,7 +357,7 @@ namespace BiliBiliTool.Task
 
             HttpResponseMessage result = client.GetAsync(ApiList.needCoin).Result;
             var data = result.Content.ReadAsByteArrayAsync().Result;
-            var dataStr = ReadGzip(data);
+            var dataStr = ZipHelper.ReadGzip(data);
 
             ExperienceByDonateCoin re = JsonSerializer.Deserialize<ExperienceByDonateCoin>(dataStr);
 
@@ -360,26 +365,69 @@ namespace BiliBiliTool.Task
             return re.Number;
         }
 
+
         /// <summary>
-        /// 将Gzip的byte数组读取为字符串
+        /// 获取账户硬币余额
         /// </summary>
-        /// <param name="bytes"></param>
-        /// <param name="encoding"></param>
         /// <returns></returns>
-        public static string ReadGzip(byte[] bytes, string encoding = "UTF-8")
+        public int GetCoinBalance()
         {
-            string result = string.Empty;
-            using (MemoryStream ms = new MemoryStream(bytes))
+            var response = _accountApi.GetCoinBalance().Result;
+            return response.Data.Money;
+        }
+
+
+        /// <summary>
+        /// 为视频投币
+        /// </summary>
+        /// <param name="aid">av号</param>
+        /// <param name="multiply">投币数量</param>
+        /// <param name="select_like">是否同时点赞 1是0否</param>
+        /// <returns>是否投币成功</returns>
+        public bool AddCoinsForVideo(string aid, int multiply, int select_like)
+        {
+            //判断曾经是否对此av投币过
+            if (IsDonatedCoinsForVideo(aid))
             {
-                using (GZipStream decompressedStream = new GZipStream(ms, CompressionMode.Decompress))
+                _logger.LogDebug("{aid}已经投币过了", aid);
+                return false;
+            }
+            else
+            {
+                var result = _dailyTaskApi.AddCoinForVideo(aid, multiply, select_like, _verify.BiliJct).Result;
+
+                if (result != null)
                 {
-                    using (StreamReader sr = new StreamReader(decompressedStream, Encoding.GetEncoding(encoding)))
-                    {
-                        result = sr.ReadToEnd();
-                    }
+                    _logger.LogInformation("为Av{aid}投币成功", aid);
+                    //desp.appendDesp("为Av" + aid + "投币成功");
+                    return true;
+                }
+                else
+                {
+                    _logger.LogInformation("投币失败");
+                    return false;
                 }
             }
-            return result;
+        }
+
+        /// <summary>
+        /// 是否已为视频投币
+        /// </summary>
+        /// <param name="aid">av号</param>
+        /// <returns></returns>
+        public bool IsDonatedCoinsForVideo(string aid)
+        {
+            int multiply = _dailyTaskApi.GetDonatedCoinsForVideo(aid).Result.Data.Multiply;
+            if (multiply > 0)
+            {
+                _logger.LogInformation("已经为Av" + aid + "投过" + multiply + "枚硬币啦");
+                return true;
+            }
+            else
+            {
+                _logger.LogInformation("还没有为Av" + aid + " 投过硬币，开始投币");
+                return false;
+            }
         }
 
         //public void silver2coin()
@@ -388,20 +436,20 @@ namespace BiliBiliTool.Task
         //    int responseCode = resultJson.get("code").getAsInt();
         //    if (responseCode == 0)
         //    {
-        //        logger.info("银瓜子兑换硬币成功");
+        //        _logger.LogInformation("银瓜子兑换硬币成功");
         //        desp.appendDesp("银瓜子兑换硬币成功");
         //    }
         //    else
         //    {
-        //        logger.debug("银瓜子兑换硬币失败 原因是: " + resultJson.get("msg").getAsString());
-        //        desp.appendDesp("银瓜子兑换硬币失败 原因是: " + resultJson.get("msg").getAsString());
+        //        _logger.LogDebug("银瓜子兑换硬币失败 原因是: " + resultJson.get("msg").getAsstring());
+        //        desp.appendDesp("银瓜子兑换硬币失败 原因是: " + resultJson.get("msg").getAsstring());
         //    }
 
         //    JsonObject queryStatus = HttpUnit.doGet(ApiList.getSilver2coinStatus).get("data").getAsJsonObject();
         //    double silver2coinMoney = OftenAPI.getCoinBalance();
-        //    logger.info("当前银瓜子余额: " + queryStatus.get("silver").getAsInt());
+        //    _logger.LogInformation("当前银瓜子余额: " + queryStatus.get("silver").getAsInt());
         //    desp.appendDesp("当前银瓜子余额: " + queryStatus.get("silver").getAsInt());
-        //    logger.info("兑换银瓜子后硬币余额: " + silver2coinMoney);
+        //    _logger.LogInformation("兑换银瓜子后硬币余额: " + silver2coinMoney);
 
         //    /*
         //    兑换银瓜子后，更新userInfo中的硬币值
@@ -415,66 +463,9 @@ namespace BiliBiliTool.Task
 
 
 
-        ///**
-        // * @param aid         av号
-        // * @param multiply    投币数量
-        // * @param select_like 是否同时点赞 1是
-        // * @return 是否投币成功
-        // */
-        //public bool coinAdd(String aid, int multiply, int select_like)
-        //{
-        //    String requestBody = "aid=" + aid
-        //                                + "&multiply=" + multiply
-        //                                + "&select_like=" + select_like
-        //                                + "&cross_domain=" + "true"
-        //                                + "&csrf=" + Verify.getInstance().getBiliJct();
 
-        //    //判断曾经是否对此av投币过
-        //    if (!isCoin(aid))
-        //    {
-        //        JsonObject jsonObject = HttpUnit.doPost(ApiList.CoinAdd, requestBody);
-        //        if (jsonObject.get(statusCodeStr).getAsInt() == 0)
-        //        {
-        //            logger.info("为Av" + aid + "投币成功");
-        //            desp.appendDesp("为Av" + aid + "投币成功");
-        //            return true;
-        //        }
-        //        else
-        //        {
-        //            logger.info("投币失败" + jsonObject.get("message").getAsString());
-        //            return false;
-        //        }
-        //    }
-        //    else
-        //    {
-        //        logger.debug(aid + "已经投币过了");
-        //        return false;
-        //    }
-        //}
 
-        ///**
-        // * 检查是否投币
-        // *
-        // * @param aid av号
-        // * @return 返回是否投过硬币了
-        // */
-        //public bool isCoin(String aid)
-        //{
-        //    String urlParam = "?aid=" + aid;
-        //    JsonObject result = HttpUnit.doGet(ApiList.isCoin + urlParam);
 
-        //    int multiply = result.getAsJsonObject("data").get("multiply").getAsInt();
-        //    if (multiply > 0)
-        //    {
-        //        logger.info("已经为Av" + aid + "投过" + multiply + "枚硬币啦");
-        //        return true;
-        //    }
-        //    else
-        //    {
-        //        logger.info("还没有为Av" + aid + " 投过硬币，开始投币");
-        //        return false;
-        //    }
-        //}
 
 
 
@@ -513,7 +504,7 @@ namespace BiliBiliTool.Task
         //    //大会员类型
         //    int vipType = queryVipStatusType();
         //    //被充电用户的userID
-        //    String userId = Verify.getInstance().getUserId();
+        //    string userId = Verify.getInstance().getUserId();
 
         //    if (day == 1 && vipType == 2)
         //    {
@@ -523,7 +514,7 @@ namespace BiliBiliTool.Task
 
         //    if (vipType == 0 || vipType == 1)
         //    {
-        //        logger.info("普通会员和月度大会员每月不赠送B币券，所以没法给自己充电哦");
+        //        _logger.LogInformation("普通会员和月度大会员每月不赠送B币券，所以没法给自己充电哦");
         //        return;
         //    }
 
@@ -534,7 +525,7 @@ namespace BiliBiliTool.Task
         //        Config.getInstance().isMonthEndAutoCharge() &&
         //        vipType == 2)
         //    {
-        //        String requestBody = "elec_num=" + couponBalance * 10
+        //        string requestBody = "elec_num=" + couponBalance * 10
         //                                         + "&up_mid=" + userId
         //                                         + "&otype=up"
         //                                         + "&oid=" + userId
@@ -549,35 +540,35 @@ namespace BiliBiliTool.Task
         //            int statusCode = dataJson.get("status").getAsInt();
         //            if (statusCode == 4)
         //            {
-        //                logger.info("月底了，给自己充电成功啦，送的B币券没有浪费哦");
-        //                logger.info("本次给自己充值了: " + couponBalance * 10 + "个电池哦");
+        //                _logger.LogInformation("月底了，给自己充电成功啦，送的B币券没有浪费哦");
+        //                _logger.LogInformation("本次给自己充值了: " + couponBalance * 10 + "个电池哦");
         //                desp.appendDesp("本次给自己充值了: " + couponBalance * 10 + "个电池哦");
         //                //获取充电留言token
-        //                String order_no = dataJson.get("order_no").getAsString();
+        //                string order_no = dataJson.get("order_no").getAsstring();
         //                chargeComments(order_no);
         //            }
         //            else
         //            {
-        //                logger.debug("充电失败了啊 原因: " + jsonObject);
+        //                _logger.LogDebug("充电失败了啊 原因: " + jsonObject);
         //            }
 
         //        }
         //        else
         //        {
-        //            logger.debug("充电失败了啊 原因: " + jsonObject);
+        //            _logger.LogDebug("充电失败了啊 原因: " + jsonObject);
         //        }
         //    }
         //    else
         //    {
-        //        logger.info("今天是本月的第: " + day + "天，还没到给自己充电日子呢");
+        //        _logger.LogInformation("今天是本月的第: " + day + "天，还没到给自己充电日子呢");
         //        desp.appendDesp("今天是本月的第: " + day + "天，还没到给自己充电日子呢");
         //    }
         //}
 
-        //public void chargeComments(String token)
+        //public void chargeComments(string token)
         //{
 
-        //    String requestBody = "order_id=" + token
+        //    string requestBody = "order_id=" + token
         //                                     + "&message=" + "BILIBILI-HELPER自动充电"
         //                                     + "&csrf=" + Verify.getInstance().getBiliJct();
         //    JsonObject jsonObject = HttpUnit.doPost(ApiList.chargeComment, requestBody);
@@ -606,18 +597,18 @@ namespace BiliBiliTool.Task
         //        return;
         //    }
 
-        //    String requestBody = "{\"reason_id\":" + reason_id + "}";
+        //    string requestBody = "{\"reason_id\":" + reason_id + "}";
         //    //注意参数构造格式为json，不知道需不需要重载下面的Post函数改请求头
         //    JsonObject jsonObject = HttpUnit.doPost(ApiList.mangaGetVipReward, requestBody);
         //    if (jsonObject.get(statusCodeStr).getAsInt() == 0)
         //    {
-        //        //@happy888888:好像也可以getAsString或,getAsShort
+        //        //@happy888888:好像也可以getAsstring或,getAsShort
         //        //@JunzhouLiu:Int比较好判断
-        //        logger.info("大会员成功领取" + jsonObject.get("data").getAsJsonObject().get("amount").getAsInt() + "张漫读劵");
+        //        _logger.LogInformation("大会员成功领取" + jsonObject.get("data").getAsJsonObject().get("amount").getAsInt() + "张漫读劵");
         //    }
         //    else
         //    {
-        //        logger.info("大会员领取漫读劵失败，原因为:" + jsonObject.get("msg").getAsString());
+        //        _logger.LogInformation("大会员领取漫读劵失败，原因为:" + jsonObject.get("msg").getAsstring());
         //    }
         //}
 
@@ -626,21 +617,21 @@ namespace BiliBiliTool.Task
         // */
         //public void doLiveCheckin()
         //{
-        //    logger.info("开始直播签到");
+        //    _logger.LogInformation("开始直播签到");
         //    JsonObject liveCheckinResponse = HttpUnit.doGet(ApiList.liveCheckin);
         //    int code = liveCheckinResponse.get(statusCodeStr).getAsInt();
         //    if (code == 0)
         //    {
         //        JsonObject data = liveCheckinResponse.get("data").getAsJsonObject();
-        //        logger.info("直播签到成功，本次签到获得" + data.get("text").getAsString() + "," +
-        //                    data.get("specialText").getAsString());
-        //        desp.appendDesp("直播签到成功，本次签到获得" + data.get("text").getAsString() + "," +
-        //                        data.get("specialText").getAsString());
+        //        _logger.LogInformation("直播签到成功，本次签到获得" + data.get("text").getAsstring() + "," +
+        //                    data.get("specialText").getAsstring());
+        //        desp.appendDesp("直播签到成功，本次签到获得" + data.get("text").getAsstring() + "," +
+        //                        data.get("specialText").getAsstring());
         //    }
         //    else
         //    {
-        //        String message = liveCheckinResponse.get("message").getAsString();
-        //        logger.debug(message);
+        //        string message = liveCheckinResponse.get("message").getAsstring();
+        //        _logger.LogDebug(message);
         //    }
         //}
 
@@ -654,7 +645,7 @@ namespace BiliBiliTool.Task
         //    }
         //    else
         //    {
-        //        logger.info("未配置server酱,本次执行不推送日志到微信");
+        //        _logger.LogInformation("未配置server酱,本次执行不推送日志到微信");
         //    }
 
         //}

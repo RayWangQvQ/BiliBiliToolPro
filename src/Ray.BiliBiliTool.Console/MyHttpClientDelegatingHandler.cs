@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -30,7 +31,21 @@ namespace Ray.BiliBiliTool.Console
             //记录返回内容
             if (response.Content != null)
             {
-                _logger.LogInformation(await response.Content.ReadAsStringAsync());
+                var content = await response.Content.ReadAsStringAsync();
+                _logger.LogInformation(content);
+
+                //如果返回不是json格式，则抛异常
+                try
+                {
+                    var ob = JsonSerializer.Deserialize<object>(content);
+                    if (ob == null)
+                        throw new NullReferenceException();
+                }
+                catch (Exception)
+                {
+                    _logger.LogInformation("接口返回异常");
+                    throw;
+                }
             }
             return response;
         }

@@ -4,14 +4,14 @@ using Xunit;
 
 namespace DailyTaskTest
 {
-    public class GetDonatedCoinNumber
+    public class GetCoinBalance
     {
         [Fact]
         public void Test1()
         {
             var dailyTaskAppService = DailyTaskBuilder.Build();
 
-            int number = dailyTaskAppService.GetDonatedCoins();
+            int number = dailyTaskAppService.GetCoinBalance();
 
             Assert.True(number >= 0);
         }
