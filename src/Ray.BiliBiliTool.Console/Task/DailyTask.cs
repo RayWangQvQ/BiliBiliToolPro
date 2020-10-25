@@ -97,12 +97,12 @@ namespace BiliBiliTool.Task
 
             //月底充电
             doCharge();
-            /*
-            
-            mangaGetVipReward(1);
+
+            ReceiveMangaVipReward(1);
 
             _logger.LogInformation("本日任务已全部执行完毕");
 
+            /*
             doServerPush();
             */
         }
@@ -648,47 +648,44 @@ namespace BiliBiliTool.Task
         #endregion
 
 
+        /**
+         * 获取大会员漫画权益
+         *
+         * @param reason_id 权益号，由https://api.bilibili.com/x/vip/privilege/my
+         *                  得到权益号数组，取值范围为数组中的整数
+         *                  为方便直接取1，为领取漫读劵，暂时不取其他的值
+         * @return 返回领取结果和数量
+         */
+        public void ReceiveMangaVipReward(int reason_id)
+        {
+            int day = DateTime.Today.Day;
+
+            //根据userInfo.getVipStatus() ,如果是1 ，会员有效，0会员失效。
+            //@JunzhouLiu: fixed query_vipStatusType()现在可以查询会员状态，以及会员类型了 2020-10-15
+            if (day != 1 || queryVipStatusType() == 0)
+            {
+                //一个月执行一次就行，跟几号没关系，由B站策略决定(有可能改领取时间)
+                //return;
+            }
+
+            //string requestBody = "{\"reason_id\":" + reason_id + "}";
+            ////注意参数构造格式为json，不知道需不需要重载下面的Post函数改请求头
+            //JsonObject jsonObject = HttpUnit.doPost(ApiList.mangaGetVipReward, requestBody);
+
+            var response = _mangaApi.ReceiveMangaVipReward(reason_id).Result;
+
+            if (response.Code == 0)
+            {
+                _logger.LogInformation($"大会员成功领取{response.Data.Amount}张漫读劵");
+            }
+            else
+            {
+                _logger.LogInformation($"大会员领取漫读劵失败，原因为:{response.Message}");
+            }
+        }
+
+
         #region 
-        ///**
-        // * 获取大会员漫画权益
-        // *
-        // * @param reason_id 权益号，由https://api.bilibili.com/x/vip/privilege/my
-        // *                  得到权益号数组，取值范围为数组中的整数
-        // *                  为方便直接取1，为领取漫读劵，暂时不取其他的值
-        // * @return 返回领取结果和数量
-        // */
-        //public void mangaGetVipReward(int reason_id)
-        //{
-
-        //    Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT+8"));
-        //    int day = cal.get(Calendar.DATE);
-
-        //    //根据userInfo.getVipStatus() ,如果是1 ，会员有效，0会员失效。
-        //    //@JunzhouLiu: fixed query_vipStatusType()现在可以查询会员状态，以及会员类型了 2020-10-15
-        //    if (day != 1 || queryVipStatusType() == 0)
-        //    {
-        //        //一个月执行一次就行，跟几号没关系，由B站策略决定(有可能改领取时间)
-        //        return;
-        //    }
-
-        //    string requestBody = "{\"reason_id\":" + reason_id + "}";
-        //    //注意参数构造格式为json，不知道需不需要重载下面的Post函数改请求头
-        //    JsonObject jsonObject = HttpUnit.doPost(ApiList.mangaGetVipReward, requestBody);
-        //    if (jsonObject.get(statusCodeStr).getAsInt() == 0)
-        //    {
-        //        //@happy888888:好像也可以getAsstring或,getAsShort
-        //        //@JunzhouLiu:Int比较好判断
-        //        _logger.LogInformation("大会员成功领取" + jsonObject.get("data").getAsJsonObject().get("amount").getAsInt() + "张漫读劵");
-        //    }
-        //    else
-        //    {
-        //        _logger.LogInformation("大会员领取漫读劵失败，原因为:" + jsonObject.get("msg").getAsstring());
-        //    }
-        //}
-
-
-
-
         //public void doServerPush()
         //{
         //    if (ServerVerify.getMsgPushKey() != null)
@@ -702,7 +699,6 @@ namespace BiliBiliTool.Task
         //    }
 
         //}
-
         #endregion
     }
 }
