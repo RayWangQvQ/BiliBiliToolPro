@@ -85,6 +85,7 @@ namespace BiliBiliTool
                     services.AddBiliBiliClient<IMangaApi>("https://manga.bilibili.com");
                     services.AddBiliBiliClient<IExperienceApi>("https://www.bilibili.com");
                     services.AddBiliBiliClient<IAccountApi>("https://account.bilibili.com");
+                    services.AddBiliBiliClient<ILiveApi>("https://api.live.bilibili.com");
 
                     services.AddTransient<DailyTask>();
                 })

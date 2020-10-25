@@ -41,22 +41,29 @@ namespace BiliBiliTool.Apiquery
         /// </summary>
         public static String needCoin = "https://www.bilibili.com/plus/account/exp.php";
 
-        public static String ServerPush = "https://sc.ftqq.com/";
-        public static String CoinAdd = "https://api.bilibili.com/x/web-interface/coin/add";
+        /// <summary>
+        /// 获取已对某视频的投币数量
+        /// </summary>
         public static String isCoin = "https://api.bilibili.com/x/web-interface/archive/coins";
 
+        /// <summary>
+        /// 投币
+        /// </summary>
+        public static String CoinAdd = "https://api.bilibili.com/x/web-interface/coin/add";
 
-
-        /**
-         * 硬币换银瓜子
-         */
+        /// <summary>
+        /// 直播中心银瓜子兑换B币
+        /// </summary>
         public static String silver2coin = "https://api.live.bilibili.com/pay/v1/Exchange/silver2coin";
 
-        /**
-         * 查询银瓜子兑换状态
-         */
+        /// <summary>
+        /// 查询银瓜子兑换状态
+        /// </summary>
         public static String getSilver2coinStatus = "https://api.live.bilibili.com/pay/v1/Exchange/getStatus";
 
+
+
+        public static String ServerPush = "https://sc.ftqq.com/";
 
 
         /**
@@ -83,6 +90,7 @@ namespace BiliBiliTool.Apiquery
          * 领取大会员漫画福利
          */
         public static String mangaGetVipReward = "https://manga.bilibili.com/twirp/user.v1.User/GetVipReward";
+
         /**
          * 直播签到
          */

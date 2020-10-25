@@ -29,6 +29,7 @@ namespace BiliBiliTool.Task
         private readonly IMangaApi _mangaApi;
         private readonly IExperienceApi _experienceApi;
         private readonly IAccountApi _accountApi;
+        private readonly ILiveApi _liveApi;
 
         //AppendPushMsg desp = AppendPushMsg.getInstance();
         //Data userInfo = null;
@@ -41,7 +42,8 @@ namespace BiliBiliTool.Task
             IDailyTaskApi dailyTaskApi,
             IMangaApi mangaApi,
             IExperienceApi experienceApi,
-            IAccountApi accountApi)
+            IAccountApi accountApi,
+            ILiveApi liveApi)
         {
             _logger = logger;
             this._httpClientFactory = httpClientFactory;
@@ -51,6 +53,7 @@ namespace BiliBiliTool.Task
             _mangaApi = mangaApi;
             this._experienceApi = experienceApi;
             this._accountApi = accountApi;
+            this._liveApi = liveApi;
         }
 
         public void DoDailyTask()
@@ -79,9 +82,9 @@ namespace BiliBiliTool.Task
             //投币任务
             AddCoinsForVideo();//todo:传入up主Id，只为指定ups投币
 
+            ExchangeSilver2Coin(); //直播中心的银瓜子兑换硬币
+
             /*
-            silver2coin(); //直播中心的银瓜子兑换硬币
-            
             doLiveCheckin(); //直播签到
             doCharge();//充电
             mangaGetVipReward(1);
@@ -430,48 +433,38 @@ namespace BiliBiliTool.Task
             }
         }
 
-        //public void silver2coin()
-        //{
-        //    JsonObject resultJson = HttpUnit.doGet(ApiList.silver2coin);
-        //    int responseCode = resultJson.get("code").getAsInt();
-        //    if (responseCode == 0)
-        //    {
-        //        _logger.LogInformation("银瓜子兑换硬币成功");
-        //        desp.appendDesp("银瓜子兑换硬币成功");
-        //    }
-        //    else
-        //    {
-        //        _logger.LogDebug("银瓜子兑换硬币失败 原因是: " + resultJson.get("msg").getAsstring());
-        //        desp.appendDesp("银瓜子兑换硬币失败 原因是: " + resultJson.get("msg").getAsstring());
-        //    }
+        /// <summary>
+        /// 直播中心银瓜子兑换B币
+        /// </summary>
+        public void ExchangeSilver2Coin()
+        {
+            var response = _liveApi.ExchangeSilver2Coin().Result;
+            if (response.Code == 0)
+            {
+                _logger.LogInformation("银瓜子兑换硬币成功");
+                //desp.appendDesp("银瓜子兑换硬币成功");
+            }
+            else
+            {
+                _logger.LogDebug("银瓜子兑换硬币失败，原因：{0}", response.Message);
+                //desp.appendDesp("银瓜子兑换硬币失败 原因是: " + resultJson.get("msg").getAsstring());
+            }
 
-        //    JsonObject queryStatus = HttpUnit.doGet(ApiList.getSilver2coinStatus).get("data").getAsJsonObject();
-        //    double silver2coinMoney = OftenAPI.getCoinBalance();
-        //    _logger.LogInformation("当前银瓜子余额: " + queryStatus.get("silver").getAsInt());
-        //    desp.appendDesp("当前银瓜子余额: " + queryStatus.get("silver").getAsInt());
-        //    _logger.LogInformation("兑换银瓜子后硬币余额: " + silver2coinMoney);
+            var queryStatus = _liveApi.GetExchangeSilverStatus().Result;
+            double silver2coinMoney = GetCoinBalance();
 
-        //    /*
-        //    兑换银瓜子后，更新userInfo中的硬币值
-        //     */
-        //    userInfo.setMoney(silver2coinMoney);
+            _logger.LogInformation("当前银瓜子余额: {0}", queryStatus.Data.Silver);
+            //desp.appendDesp("当前银瓜子余额: " + queryStatus.get("silver").getAsInt());
+            _logger.LogInformation("兑换银瓜子后硬币余额: {0}", silver2coinMoney);
 
-        //}
+            /*
+            兑换银瓜子后，更新userInfo中的硬币值
+             */
+            //userInfo.setMoney(silver2coinMoney);
+
+        }
 
         #region 
-
-
-
-
-
-
-
-
-
-
-
-
-
         ///**
         // * @return 返回会员类型
         // * 0:无会员（会员过期，当前不是会员）
