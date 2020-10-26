@@ -1,10 +1,10 @@
 using System.Text.Json;
 using System.Diagnostics;
 using Xunit;
-using DailyTaskTest.Share;
 using Ray.BiliBiliTool.Console;
 using Microsoft.Extensions.DependencyInjection;
 using Ray.BiliBiliTool.DomainService.Interfaces;
+using Ray.BiliBiliTool.Infrastructure;
 
 namespace GetDailyTaskStatusTest
 {
@@ -15,7 +15,7 @@ namespace GetDailyTaskStatusTest
         {
             Program.PreWorks(new string[] { });
 
-            using (var scope = Program.ServiceProviderRoot.CreateScope())
+            using (var scope = RayContainer.Root.CreateScope())
             {
                 var dailyTaskService = scope.ServiceProvider.GetRequiredService<IAccountDomainService>();
 

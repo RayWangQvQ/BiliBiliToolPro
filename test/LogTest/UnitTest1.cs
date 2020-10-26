@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Ray.BiliBiliTool.Console;
+using Ray.BiliBiliTool.Infrastructure;
 using Xunit;
 
 namespace LogTest
@@ -13,7 +14,7 @@ namespace LogTest
         {
             Program.PreWorks(new string[] { });
 
-            var logger = Program.ServiceProviderRoot.GetRequiredService<ILogger<UnitTest1>>();
+            var logger = RayContainer.Root.GetRequiredService<ILogger<UnitTest1>>();
 
             logger.LogInformation("testInfo");
             logger.LogDebug("testDebug");

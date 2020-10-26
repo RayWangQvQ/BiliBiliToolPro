@@ -5,7 +5,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Ray.BiliBiliTool.Agent.Dtos;
 using Ray.BiliBiliTool.Agent.Interfaces;
 using Ray.BiliBiliTool.Application;
 using Ray.BiliBiliTool.Application.Contracts;
@@ -18,16 +17,11 @@ namespace Ray.BiliBiliTool.Console
 {
     public class Program
     {
-        public static IConfigurationRoot ConfigurationRoot { get; set; }
-
-        public static IServiceProvider ServiceProviderRoot { get; set; }
-
-
         static void Main(string[] args)
         {
             PreWorks(args);
 
-            using (var serviceScope = ServiceProviderRoot.CreateScope())
+            using (var serviceScope = RayContainer.Root.CreateScope())
             {
                 ILogger logger = serviceScope.ServiceProvider.GetRequiredService<ILogger<Program>>();
 
@@ -49,13 +43,13 @@ namespace Ray.BiliBiliTool.Console
                 dailyTask.DoDailyTask();
             }
 
-            System.Console.ReadLine();
+            //System.Console.ReadLine();
         }
 
         /// <summary>
         /// 初始化系统
         /// </summary>
-        /// <param name="verify"></param>
+        /// <param name="args"></param>
         public static void PreWorks(string[] args)
         {
             var mapper = new Dictionary<string, string>
@@ -65,7 +59,7 @@ namespace Ray.BiliBiliTool.Console
                 {"-biliJct","BiliBiliCookies:BiliJct" },
             };
 
-            ConfigurationRoot = new ConfigurationBuilder()
+            RayConfiguration.Root = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
                 .AddCommandLine(args, mapper)
                 .AddJsonFile("appsettings.Development.json", true)
@@ -78,7 +72,7 @@ namespace Ray.BiliBiliTool.Console
                 })
                 .UseConsoleLifetime();
 
-            ServiceProviderRoot = hostBuilder.Build().Services;
+            RayContainer.Root = hostBuilder.Build().Services;
         }
 
         /// <summary>
@@ -88,23 +82,23 @@ namespace Ray.BiliBiliTool.Console
         private static void ConfigureServices(IServiceCollection services)
         {
             //配置
-            services.AddSingleton<IConfiguration>(ConfigurationRoot);
+            services.AddSingleton<IConfiguration>(RayConfiguration.Root);
 
             //Options
             services.AddOptions()
-                .Configure<DailyTaskOptions>(ConfigurationRoot.GetSection("DailyTaskConfig"))
+                .Configure<DailyTaskOptions>(RayConfiguration.Root.GetSection("DailyTaskConfig"))
                 .Configure<JsonSerializerOptions>(o => o = JsonSerializerOptionsBuilder.DefaultOptions)
-                .Configure<BiliBiliCookiesOptions>(o => ConfigurationRoot.GetSection("BiliBiliCookies"));
+                .Configure<BiliBiliCookiesOptions>(o => RayConfiguration.Root.GetSection("BiliBiliCookies"));
 
             //日志
             services.AddLogging(builder =>
             {
-                builder.AddConfiguration(Program.ConfigurationRoot.GetSection("Logging"))
+                builder.AddConfiguration(RayConfiguration.Root.GetSection("Logging"))
                     .AddConsole()
                     .AddDebug();
             });
 
-            services.AddSingleton<BiliBiliCookiesOptions>(ConfigurationRoot.GetSection("BiliBiliCookies").Get<BiliBiliCookiesOptions>());
+            services.AddSingleton<BiliBiliCookiesOptions>(RayConfiguration.Root.GetSection("BiliBiliCookies").Get<BiliBiliCookiesOptions>());
 
             services.AddHttpClient();
             services.AddHttpClient("BiliBiliWithCookies",
@@ -118,7 +112,6 @@ namespace Ray.BiliBiliTool.Console
             services.AddBiliBiliClient<ILiveApi>("https://api.live.bilibili.com");
 
             services.AddTransient<IDailyTaskAppService, DailyTaskAppService>();
-            services.AddTransient<DailyTaskAppService>();
             services.AddDomainServices();
         }
     }

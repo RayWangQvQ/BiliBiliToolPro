@@ -1,7 +1,7 @@
-using DailyTaskTest.Share;
 using Microsoft.Extensions.DependencyInjection;
 using Ray.BiliBiliTool.Console;
 using Ray.BiliBiliTool.DomainService.Interfaces;
+using Ray.BiliBiliTool.Infrastructure;
 using Xunit;
 
 namespace WatchVideoTest
@@ -13,7 +13,7 @@ namespace WatchVideoTest
         {
             Program.PreWorks(new string[] { });
 
-            using (var scope = Program.ServiceProviderRoot.CreateScope())
+            using (var scope = RayContainer.Root.CreateScope())
             {
                 var dailyTask = scope.ServiceProvider.GetRequiredService<IVideoDomainService>();
 
