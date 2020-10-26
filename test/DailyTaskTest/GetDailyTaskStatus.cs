@@ -3,6 +3,8 @@ using System.Diagnostics;
 using Xunit;
 using DailyTaskTest.Share;
 using Ray.BiliBiliTool.Console;
+using Microsoft.Extensions.DependencyInjection;
+using Ray.BiliBiliTool.DomainService.Interfaces;
 
 namespace GetDailyTaskStatusTest
 {
@@ -13,12 +15,16 @@ namespace GetDailyTaskStatusTest
         {
             Program.PreWorks(new string[] { });
 
-            var dailyTask = DailyTaskBuilder.Build();
-            var re = dailyTask.GetDailyTaskStatus();
+            using (var scope = Program.ServiceProviderRoot.CreateScope())
+            {
+                var dailyTaskService = scope.ServiceProvider.GetRequiredService<IAccountDomainService>();
 
-            Debug.WriteLine(JsonSerializer.Serialize(re, new JsonSerializerOptions { WriteIndented = true }));
+                var re = dailyTaskService.GetDailyTaskStatus();
 
-            Assert.NotNull(re);
+                Debug.WriteLine(JsonSerializer.Serialize(re, new JsonSerializerOptions { WriteIndented = true }));
+
+                Assert.NotNull(re);
+            }
         }
     }
 }

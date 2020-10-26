@@ -1,5 +1,8 @@
 using System;
 using DailyTaskTest.Share;
+using Microsoft.Extensions.DependencyInjection;
+using Ray.BiliBiliTool.Console;
+using Ray.BiliBiliTool.DomainService.Interfaces;
 using Xunit;
 
 namespace DailyTaskTest
@@ -9,12 +12,16 @@ namespace DailyTaskTest
         [Fact]
         public void Test1()
         {
-            string aid = "585105826";
+            Program.PreWorks(new string[] { });
 
-            var dailyTaskAppService = DailyTaskBuilder.Build();
+            using (var scope = Program.ServiceProviderRoot.CreateScope())
+            {
+                var dailyTask = scope.ServiceProvider.GetRequiredService<IVideoDomainService>();
 
-            bool result = dailyTaskAppService.IsDonatedCoinsForVideo(aid);
-            Assert.False(result);
+                string aid = "585105826";
+                bool result = dailyTask.IsDonatedCoinsForVideo(aid);
+                Assert.False(result);
+            }
         }
     }
 }

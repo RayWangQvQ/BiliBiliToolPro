@@ -1,6 +1,10 @@
+using System.Diagnostics;
 using DailyTaskTest.Share;
+using Microsoft.Extensions.DependencyInjection;
 using Ray.BiliBiliTool.Console;
+using Ray.BiliBiliTool.DomainService.Interfaces;
 using Xunit;
+using System.Text.Json;
 
 namespace LoginTest
 {
@@ -11,10 +15,15 @@ namespace LoginTest
         {
             Program.PreWorks(new string[] { });
 
-            var dailyTask = DailyTaskBuilder.Build();
-            dailyTask.Login();
+            using (var scope = Program.ServiceProviderRoot.CreateScope())
+            {
+                var dailyTask = scope.ServiceProvider.GetRequiredService<IAccountDomainService>();
 
-            Assert.NotNull("");
+                var userInfo = dailyTask.LoginByCookie();
+                Debug.WriteLine(JsonSerializer.Serialize(userInfo));
+
+                Assert.NotNull("");
+            }
         }
     }
 }

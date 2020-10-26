@@ -11,6 +11,7 @@ using Ray.BiliBiliTool.Application;
 using Ray.BiliBiliTool.Application.Contracts;
 using Ray.BiliBiliTool.Config;
 using Ray.BiliBiliTool.Console.Extensions;
+using Ray.BiliBiliTool.DomainService.Extensions;
 using Ray.BiliBiliTool.Infrastructure;
 
 namespace Ray.BiliBiliTool.Console
@@ -116,9 +117,9 @@ namespace Ray.BiliBiliTool.Console
             services.AddBiliBiliClient<IAccountApi>("https://account.bilibili.com");
             services.AddBiliBiliClient<ILiveApi>("https://api.live.bilibili.com");
 
-            services.AddSingleton<UseInfo>();
             services.AddTransient<IDailyTaskAppService, DailyTaskAppService>();
             services.AddTransient<DailyTaskAppService>();
+            services.AddDomainServices();
         }
     }
 }

@@ -1,5 +1,8 @@
 using System;
 using DailyTaskTest.Share;
+using Microsoft.Extensions.DependencyInjection;
+using Ray.BiliBiliTool.Console;
+using Ray.BiliBiliTool.DomainService.Interfaces;
 using Xunit;
 
 namespace DailyTaskTest
@@ -9,13 +12,18 @@ namespace DailyTaskTest
         [Fact]
         public void Test1()
         {
-            var dailyTaskAppService = DailyTaskBuilder.Build();
+            Program.PreWorks(new string[] { });
 
-            dailyTaskAppService.Login();
+            using (var scope = Program.ServiceProviderRoot.CreateScope())
+            {
+                var dailyTask = scope.ServiceProvider.GetRequiredService<IVipPrivilegeDomainService>();
+                var account = scope.ServiceProvider.GetRequiredService<IAccountDomainService>();
 
-            dailyTaskAppService.ReceiveVipPrivilege();
+                var userInfo = account.LoginByCookie();
+                dailyTask.ReceiveVipPrivilege(userInfo);
 
-            Assert.True(true);
+                Assert.True(true);
+            }
         }
     }
 }

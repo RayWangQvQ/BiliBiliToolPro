@@ -1,5 +1,7 @@
 using DailyTaskTest.Share;
+using Microsoft.Extensions.DependencyInjection;
 using Ray.BiliBiliTool.Console;
+using Ray.BiliBiliTool.DomainService.Interfaces;
 using Xunit;
 
 namespace GetRegionRankingTest
@@ -11,10 +13,14 @@ namespace GetRegionRankingTest
         {
             Program.PreWorks(new string[] { });
 
-            var dailyTask = DailyTaskBuilder.Build();
-            var re = dailyTask.GetRandomVideo();
+            using (var scope = Program.ServiceProviderRoot.CreateScope())
+            {
+                var dailyTaskService = scope.ServiceProvider.GetRequiredService<IVideoDomainService>();
 
-            Assert.NotNull(re);
+                var re = dailyTaskService.GetRandomVideo();
+
+                Assert.NotNull(re);
+            }
         }
     }
 }

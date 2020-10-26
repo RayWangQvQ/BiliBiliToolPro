@@ -1,5 +1,7 @@
 using DailyTaskTest.Share;
+using Microsoft.Extensions.DependencyInjection;
 using Ray.BiliBiliTool.Console;
+using Ray.BiliBiliTool.DomainService.Interfaces;
 using Xunit;
 
 namespace WatchVideoTest
@@ -11,12 +13,15 @@ namespace WatchVideoTest
         {
             Program.PreWorks(new string[] { });
 
-            var dailyTask = DailyTaskBuilder.Build();
+            using (var scope = Program.ServiceProviderRoot.CreateScope())
+            {
+                var dailyTask = scope.ServiceProvider.GetRequiredService<IVideoDomainService>();
 
-            string aid = dailyTask.GetRandomVideo();
-            dailyTask.WatchVideo(aid);
+                string aid = dailyTask.GetRandomVideo();
+                dailyTask.WatchVideo(aid);
 
-            Assert.True(true);
+                Assert.True(true);
+            }
         }
     }
 }

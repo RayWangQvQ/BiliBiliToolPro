@@ -1,5 +1,8 @@
 using System;
 using DailyTaskTest.Share;
+using Microsoft.Extensions.DependencyInjection;
+using Ray.BiliBiliTool.Console;
+using Ray.BiliBiliTool.DomainService.Interfaces;
 using Xunit;
 
 namespace DailyTaskTest
@@ -9,11 +12,16 @@ namespace DailyTaskTest
         [Fact]
         public void Test1()
         {
-            var dailyTaskAppService = DailyTaskBuilder.Build();
+            Program.PreWorks(new string[] { });
 
-            dailyTaskAppService.LiveSign();
+            using (var scope = Program.ServiceProviderRoot.CreateScope())
+            {
+                var dailyTask = scope.ServiceProvider.GetRequiredService<ILiveDomainService>();
 
-            Assert.True(true);
+                dailyTask.LiveSign();
+
+                Assert.True(true);
+            }
         }
     }
 }

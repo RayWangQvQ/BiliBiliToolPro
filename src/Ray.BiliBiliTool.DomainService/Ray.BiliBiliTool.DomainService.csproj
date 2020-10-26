@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -6,14 +6,13 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Http" Version="3.1.9" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.9" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="3.1.9" />
+    <PackageReference Include="Scrutor" Version="3.2.2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Ray.BiliBiliTool.Agent\Ray.BiliBiliTool.Agent.csproj" />
-    <ProjectReference Include="..\Ray.BiliBiliTool.Application.Contracts\Ray.BiliBiliTool.Application.Contracts.csproj" />
     <ProjectReference Include="..\Ray.BiliBiliTool.Config\Ray.BiliBiliTool.Config.csproj" />
-    <ProjectReference Include="..\Ray.BiliBiliTool.DomainService\Ray.BiliBiliTool.DomainService.csproj" />
     <ProjectReference Include="..\Ray.BiliBiliTool.Infrastructure\Ray.BiliBiliTool.Infrastructure.csproj" />
   </ItemGroup>
 

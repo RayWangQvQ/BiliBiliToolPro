@@ -33,6 +33,25 @@ namespace Ray.BiliBiliTool.Agent.Dtos
 
             return sb.ToString();
         }
+
+        /// <summary>
+        /// 返回会员类型
+        /// </summary>
+        /// <returns>0:无会员（会员过期、当前不是会员）;
+        /// 1:月会员
+        /// 2:年会员</returns>
+        public int GetVipType()
+        {
+            if (this.VipStatus == 1)
+            {
+                //只有VipStatus为1的时候获取到VipType才是有效的。
+                return this.VipType;
+            }
+            else
+            {
+                return 0;
+            }
+        }
     }
 
     /// <summary>

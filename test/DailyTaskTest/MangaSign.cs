@@ -1,5 +1,7 @@
 using DailyTaskTest.Share;
+using Microsoft.Extensions.DependencyInjection;
 using Ray.BiliBiliTool.Console;
+using Ray.BiliBiliTool.DomainService.Interfaces;
 using Xunit;
 
 namespace MangaSignTest
@@ -11,11 +13,14 @@ namespace MangaSignTest
         {
             Program.PreWorks(new string[] { });
 
-            var dailyTask = DailyTaskBuilder.Build();
+            using (var scope = Program.ServiceProviderRoot.CreateScope())
+            {
+                var dailyTask = scope.ServiceProvider.GetRequiredService<IMangaDomainService>();
 
-            dailyTask.MangaSign();
+                dailyTask.MangaSign();
 
-            Assert.True(true);
+                Assert.True(true);
+            }
         }
     }
 }
