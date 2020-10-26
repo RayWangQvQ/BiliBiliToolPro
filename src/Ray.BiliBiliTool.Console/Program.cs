@@ -3,17 +3,18 @@ using System.Collections.Generic;
 using System.Text.Json;
 using BiliBiliTool.Agent;
 using BiliBiliTool.Agent.Interfaces;
-using BiliBiliTool.Config;
-using BiliBiliTool.Login;
-using BiliBiliTool.Task;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Ray.BiliBiliTool.Console;
+using Ray.BiliBiliTool.Application;
+using Ray.BiliBiliTool.Application.Contracts;
+using Ray.BiliBiliTool.Config;
 using Ray.BiliBiliTool.Console.Agent.Interfaces;
+using Ray.BiliBiliTool.Console.Extensions;
+using Ray.BiliBiliTool.Infrastructure;
 
-namespace BiliBiliTool
+namespace Ray.BiliBiliTool.Console
 {
     public class Program
     {
@@ -43,11 +44,12 @@ namespace BiliBiliTool
 
                 //每日任务65经验
                 logger.LogDebug("-----任务启动-----");
-                DailyTask dailyTask = serviceScope.ServiceProvider.GetRequiredService<DailyTask>();
+
+                IDailyTaskAppService dailyTask = serviceScope.ServiceProvider.GetRequiredService<IDailyTaskAppService>();
                 dailyTask.DoDailyTask();
             }
 
-            Console.ReadLine();
+            System.Console.ReadLine();
         }
 
         /// <summary>
@@ -115,7 +117,8 @@ namespace BiliBiliTool
             services.AddBiliBiliClient<ILiveApi>("https://api.live.bilibili.com");
 
             services.AddSingleton<UseInfo>();
-            services.AddTransient<DailyTask>();
+            services.AddTransient<IDailyTaskAppService, DailyTaskAppService>();
+            services.AddTransient<DailyTaskAppService>();
         }
     }
 }

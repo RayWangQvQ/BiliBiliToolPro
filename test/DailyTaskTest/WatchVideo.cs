@@ -1,22 +1,23 @@
 using System;
 using BiliBiliTool;
-using BiliBiliTool.Task;
+using DailyTaskTest.Share;
 using Microsoft.Extensions.DependencyInjection;
+using Ray.BiliBiliTool.Console;
 using Xunit;
 
-namespace ShareVideoTest
+namespace WatchVideoTest
 {
-    public class UnitTest1
+    public class WatchVideo
     {
         [Fact]
         public void Test1()
         {
             Program.PreWorks(new string[] { });
 
-            DailyTask dailyTask = Program.ServiceProviderRoot.GetRequiredService<DailyTask>();
+            var dailyTask = DailyTaskBuilder.Build();
 
             string aid = dailyTask.GetRandomVideo();
-            dailyTask.ShareVideo(aid);
+            dailyTask.WatchVideo(aid);
 
             Assert.True(true);
         }

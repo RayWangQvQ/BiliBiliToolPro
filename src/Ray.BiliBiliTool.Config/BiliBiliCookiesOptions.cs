@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace BiliBiliTool.Login
+namespace Ray.BiliBiliTool.Config
 {
     public class BiliBiliCookiesOptions
     {

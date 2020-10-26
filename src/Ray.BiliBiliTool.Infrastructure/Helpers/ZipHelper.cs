@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.IO.Compression;
 using System.Text;
 
-namespace Ray.BiliBiliTool.Console.Helpers
+namespace Ray.BiliBiliTool.Infrastructure.Helpers
 {
     public class ZipHelper
     {

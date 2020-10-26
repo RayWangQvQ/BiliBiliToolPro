@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Text.Json;
 using System.Text.Unicode;
 
-namespace Ray.BiliBiliTool.Console
+namespace Ray.BiliBiliTool.Infrastructure
 {
     public class JsonSerializerOptionsBuilder
     {

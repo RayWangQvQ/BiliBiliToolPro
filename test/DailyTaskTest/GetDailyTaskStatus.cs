@@ -2,20 +2,21 @@ using System;
 using System.Text.Json;
 using System.Diagnostics;
 using BiliBiliTool;
-using BiliBiliTool.Task;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
+using DailyTaskTest.Share;
+using Ray.BiliBiliTool.Console;
 
 namespace GetDailyTaskStatusTest
 {
-    public class UnitTest1
+    public class GetDailyTaskStatus
     {
         [Fact]
         public void Test1()
         {
             Program.PreWorks(new string[] { });
 
-            DailyTask dailyTask = Program.ServiceProviderRoot.GetRequiredService<DailyTask>();
+            var dailyTask = DailyTaskBuilder.Build();
             var re = dailyTask.GetDailyTaskStatus();
 
             Debug.WriteLine(JsonSerializer.Serialize(re, new JsonSerializerOptions { WriteIndented = true }));

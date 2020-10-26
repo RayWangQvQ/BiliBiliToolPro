@@ -2,9 +2,10 @@ using System;
 using System.Text.Json;
 using System.Diagnostics;
 using BiliBiliTool;
-using BiliBiliTool.Config;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Ray.BiliBiliTool.Config;
+using Ray.BiliBiliTool.Console;
 using Xunit;
 
 namespace ConfigTest

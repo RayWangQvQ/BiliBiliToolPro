@@ -1,28 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using BiliBiliTool.Agent;
 using BiliBiliTool.Agent.Interfaces;
 using BiliBiliTool.Apiquery;
-using BiliBiliTool.Config;
-using BiliBiliTool.Login;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Ray.BiliBiliTool.Application.Contracts;
+using Ray.BiliBiliTool.Config;
 using Ray.BiliBiliTool.Console.Agent;
 using Ray.BiliBiliTool.Console.Agent.Interfaces;
-using Ray.BiliBiliTool.Console.Extensions;
-using Ray.BiliBiliTool.Console.Helpers;
+using Ray.BiliBiliTool.Infrastructure.Extensions;
+using Ray.BiliBiliTool.Infrastructure.Helpers;
 
-namespace BiliBiliTool.Task
+namespace Ray.BiliBiliTool.Application
 {
-    public class DailyTask
+    public class DailyTaskAppService : IDailyTaskAppService
     {
-        private readonly ILogger<DailyTask> _logger;
+        private readonly ILogger<DailyTaskAppService> _logger;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly BiliBiliCookiesOptions _verify;
         private readonly IOptionsMonitor<DailyTaskOptions> _dailyTaskOptions;
@@ -33,10 +30,9 @@ namespace BiliBiliTool.Task
         private readonly ILiveApi _liveApi;
 
         //AppendPushMsg desp = AppendPushMsg.getInstance();
-        //Data userInfo = null;
 
-        public DailyTask(
-            ILogger<DailyTask> logger,
+        public DailyTaskAppService(
+            ILogger<DailyTaskAppService> logger,
             IHttpClientFactory httpClientFactory,
             BiliBiliCookiesOptions verify,
             UseInfo loginResponse,
@@ -60,6 +56,7 @@ namespace BiliBiliTool.Task
         }
 
         private UseInfo LoginResponse { get; set; }
+
 
         public void DoDailyTask()
         {

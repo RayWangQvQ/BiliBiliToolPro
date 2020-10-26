@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace BiliBiliTool.Config
+﻿namespace Ray.BiliBiliTool.Config
 {
     /// <summary>
     /// 每日任务配置

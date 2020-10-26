@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using BiliBiliTool.Login;
 using Microsoft.Extensions.DependencyInjection;
-using Ray.BiliBiliTool.Console.Agent.Interfaces;
-using Refit;
 using Microsoft.Extensions.Logging;
-using System.Net.Http;
+using Ray.BiliBiliTool.Config;
+using Ray.BiliBiliTool.Infrastructure;
+using Refit;
 
-namespace Ray.BiliBiliTool.Console
+namespace Ray.BiliBiliTool.Console.Extensions
 {
     public static class RefitClientExtension
     {

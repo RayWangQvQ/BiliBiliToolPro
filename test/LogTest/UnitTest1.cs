@@ -2,6 +2,7 @@ using System;
 using BiliBiliTool;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Ray.BiliBiliTool.Console;
 using Xunit;
 
 namespace LogTest

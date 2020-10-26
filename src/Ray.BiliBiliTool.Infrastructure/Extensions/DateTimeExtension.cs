@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Ray.BiliBiliTool.Console.Extensions
+namespace Ray.BiliBiliTool.Infrastructure.Extensions
 {
     public static class DateTimeExtension
     {
