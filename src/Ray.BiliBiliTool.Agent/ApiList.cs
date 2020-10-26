@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace BiliBiliTool.Apiquery
+namespace Ray.BiliBiliTool.Agent
 {
     public class ApiList
     {

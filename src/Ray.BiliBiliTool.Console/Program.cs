@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.Json;
-using BiliBiliTool.Agent;
-using BiliBiliTool.Agent.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Ray.BiliBiliTool.Agent.Dtos;
+using Ray.BiliBiliTool.Agent.Interfaces;
 using Ray.BiliBiliTool.Application;
 using Ray.BiliBiliTool.Application.Contracts;
 using Ray.BiliBiliTool.Config;
-using Ray.BiliBiliTool.Console.Agent.Interfaces;
 using Ray.BiliBiliTool.Console.Extensions;
 using Ray.BiliBiliTool.Infrastructure;
 
@@ -43,7 +42,7 @@ namespace Ray.BiliBiliTool.Console
                 }
 
                 //每日任务65经验
-                logger.LogDebug("-----任务启动-----");
+                logger.LogInformation("-----任务启动-----");
 
                 IDailyTaskAppService dailyTask = serviceScope.ServiceProvider.GetRequiredService<IDailyTaskAppService>();
                 dailyTask.DoDailyTask();
@@ -68,6 +67,7 @@ namespace Ray.BiliBiliTool.Console
             ConfigurationRoot = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
                 .AddCommandLine(args, mapper)
+                .AddJsonFile("appsettings.Development.json", true)
                 .Build();
 
             var hostBuilder = new HostBuilder()
@@ -98,9 +98,9 @@ namespace Ray.BiliBiliTool.Console
             //日志
             services.AddLogging(builder =>
             {
-                builder.AddConsole()
-                    .AddDebug()
-                    .SetMinimumLevel(LogLevel.Information);
+                builder.AddConfiguration(Program.ConfigurationRoot.GetSection("Logging"))
+                    .AddConsole()
+                    .AddDebug();
             });
 
             services.AddSingleton<BiliBiliCookiesOptions>(ConfigurationRoot.GetSection("BiliBiliCookies").Get<BiliBiliCookiesOptions>());

@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using BiliBiliTool.Agent;
+﻿using System.Threading.Tasks;
+using Ray.BiliBiliTool.Agent.Dtos;
 using Refit;
 
-namespace Ray.BiliBiliTool.Console.Agent.Interfaces
+namespace Ray.BiliBiliTool.Agent.Interfaces
 {
     public interface IExperienceApi
     {

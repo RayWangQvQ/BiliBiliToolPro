@@ -1,7 +1,6 @@
 using System;
 using System.Text.Json;
 using System.Diagnostics;
-using BiliBiliTool;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Config;

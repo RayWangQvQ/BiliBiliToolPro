@@ -1,8 +1,7 @@
-using System;
 using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Unicode;
-using BiliBiliTool.Agent;
+using Ray.BiliBiliTool.Agent.Dtos;
 using Xunit;
 
 namespace DeserializeTest

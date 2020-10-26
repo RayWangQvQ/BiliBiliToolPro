@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net.Http;
-using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
-namespace Ray.BiliBiliTool.Console
+namespace Ray.BiliBiliTool.Agent
 {
     public class MyHttpClientDelegatingHandler : DelegatingHandler
     {
@@ -23,7 +21,7 @@ namespace Ray.BiliBiliTool.Console
             //记录请求内容
             if (request.Content != null)
             {
-                _logger.LogTrace(await request.Content.ReadAsStringAsync());
+                _logger.LogDebug(await request.Content.ReadAsStringAsync());
             }
 
             HttpResponseMessage response = await base.SendAsync(request, cancellationToken);
@@ -32,7 +30,7 @@ namespace Ray.BiliBiliTool.Console
             if (response.Content != null)
             {
                 var content = await response.Content.ReadAsStringAsync();
-                _logger.LogTrace(content);
+                _logger.LogDebug(content);
 
                 //如果返回不是json格式，则抛异常
                 try
@@ -43,7 +41,7 @@ namespace Ray.BiliBiliTool.Console
                 }
                 catch (Exception)
                 {
-                    _logger.LogDebug("接口返回异常");
+                    _logger.LogInformation("接口返回异常");
                     throw;
                 }
             }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace BiliBiliTool.Agent
+﻿namespace Ray.BiliBiliTool.Agent.Dtos
 {
     public class BiliApiResponse : BiliApiResponse<object>
     {

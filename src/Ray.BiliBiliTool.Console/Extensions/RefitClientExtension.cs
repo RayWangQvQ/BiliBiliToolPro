@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Config;
 using Ray.BiliBiliTool.Infrastructure;
 using Refit;

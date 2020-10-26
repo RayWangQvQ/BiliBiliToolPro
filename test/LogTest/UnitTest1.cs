@@ -1,5 +1,4 @@
-using System;
-using BiliBiliTool;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Ray.BiliBiliTool.Console;
@@ -18,6 +17,9 @@ namespace LogTest
 
             logger.LogInformation("testInfo");
             logger.LogDebug("testDebug");
+            logger.LogError("testError");
+
+            Task.Delay(3000);
         }
     }
 }

@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Refit;
+﻿using Refit;
 
-namespace Ray.BiliBiliTool.Console.Agent.Interfaces
+namespace Ray.BiliBiliTool.Agent.Interfaces
 {
     [Headers(
     "Accept:application/json, text/plain, */*",

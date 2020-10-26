@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using BiliBiliTool;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Ray.BiliBiliTool.Application;
 using Ray.BiliBiliTool.Console;
 

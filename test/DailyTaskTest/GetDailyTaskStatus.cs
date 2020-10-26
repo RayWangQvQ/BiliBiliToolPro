@@ -1,8 +1,5 @@
-using System;
 using System.Text.Json;
 using System.Diagnostics;
-using BiliBiliTool;
-using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using DailyTaskTest.Share;
 using Ray.BiliBiliTool.Console;

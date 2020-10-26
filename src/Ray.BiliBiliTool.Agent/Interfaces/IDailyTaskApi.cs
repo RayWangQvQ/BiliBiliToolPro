@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Ray.BiliBiliTool.Console.Agent;
-using Ray.BiliBiliTool.Console.Agent.Interfaces;
+using Ray.BiliBiliTool.Agent.Dtos;
 using Refit;
 
-namespace BiliBiliTool.Agent.Interfaces
+namespace Ray.BiliBiliTool.Agent.Interfaces
 {
     /// <summary>
     /// BiliBili每日任务相关接口

@@ -1,7 +1,4 @@
-using System;
-using BiliBiliTool;
 using DailyTaskTest.Share;
-using Microsoft.Extensions.DependencyInjection;
 using Ray.BiliBiliTool.Console;
 using Xunit;
 

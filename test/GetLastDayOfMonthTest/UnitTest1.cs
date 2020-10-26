@@ -1,7 +1,5 @@
 using System;
 using System.Diagnostics;
-using BiliBiliTool;
-using Microsoft.Extensions.DependencyInjection;
 using Ray.BiliBiliTool.Console;
 using Ray.BiliBiliTool.Infrastructure.Extensions;
 using Xunit;

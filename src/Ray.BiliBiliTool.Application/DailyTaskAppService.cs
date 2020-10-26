@@ -1,17 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net.Http;
-using System.Text;
 using System.Text.Json;
-using BiliBiliTool.Agent;
-using BiliBiliTool.Agent.Interfaces;
-using BiliBiliTool.Apiquery;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Ray.BiliBiliTool.Agent;
+using Ray.BiliBiliTool.Agent.Dtos;
+using Ray.BiliBiliTool.Agent.Interfaces;
 using Ray.BiliBiliTool.Application.Contracts;
 using Ray.BiliBiliTool.Config;
-using Ray.BiliBiliTool.Console.Agent;
-using Ray.BiliBiliTool.Console.Agent.Interfaces;
 using Ray.BiliBiliTool.Infrastructure.Extensions;
 using Ray.BiliBiliTool.Infrastructure.Helpers;
 
@@ -458,7 +454,7 @@ namespace Ray.BiliBiliTool.Application
             }
             else
             {
-                _logger.LogDebug("银瓜子兑换硬币失败，原因：{0}", response.Message);
+                _logger.LogInformation("银瓜子兑换硬币失败，原因：{0}", response.Message);
                 //desp.appendDesp("银瓜子兑换硬币失败 原因是: " + resultJson.get("msg").getAsstring());
             }
 
