@@ -53,8 +53,8 @@ namespace Ray.BiliBiliTool.Application
         public void DoDailyTask()
         {
             //登录
-            var userInfo = _loginDomainService.LoginByCookie();
-            LoginResponse = userInfo;
+            //var userInfo = _loginDomainService.LoginByCookie();
+            //LoginResponse = userInfo;
 
             DailyTaskInfo dailyTaskStatus = _loginDomainService.GetDailyTaskStatus();
             string videoAid = _videoDomainService.GetRandomVideo();

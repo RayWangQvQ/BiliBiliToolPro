@@ -29,6 +29,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.1.9" />
     <PackageReference Include="Refit" Version="5.2.1" />
     <PackageReference Include="Refit.HttpClientFactory" Version="5.2.1" />
+    <PackageReference Include="Serilog.AspNetCore" Version="3.4.0" />
   </ItemGroup>
 
   <ItemGroup>

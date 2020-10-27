@@ -13,6 +13,7 @@ using Ray.BiliBiliTool.Config;
 using Ray.BiliBiliTool.Config.Extensions;
 using Ray.BiliBiliTool.DomainService.Extensions;
 using Ray.BiliBiliTool.Infrastructure;
+using Serilog;
 
 namespace Ray.BiliBiliTool.Console
 {
@@ -24,7 +25,7 @@ namespace Ray.BiliBiliTool.Console
 
             using (var serviceScope = RayContainer.Root.CreateScope())
             {
-                ILogger logger = serviceScope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+                var logger = serviceScope.ServiceProvider.GetRequiredService<ILogger<Program>>();
                 logger.LogInformation("-----任务启动-----");
 
                 BiliBiliCookiesOptions biliBiliCookiesOptions = serviceScope.ServiceProvider.GetRequiredService<IOptionsMonitor<BiliBiliCookiesOptions>>().CurrentValue;
@@ -51,24 +52,31 @@ namespace Ray.BiliBiliTool.Console
         /// <param name="args"></param>
         public static void PreWorks(string[] args)
         {
+            //配置:
             var mapper = new Dictionary<string, string>
             {
                 {"-userId","BiliBiliCookies:UserId" },
                 {"-sessData","BiliBiliCookies:SessData" },
                 {"-biliJct","BiliBiliCookies:BiliJct" },
             };
-
             RayConfiguration.Root = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json")
+                .AddJsonFile("appsettings.json", false, true)
                 .AddCommandLine(args, mapper)
-                //.AddJsonFile("appsettings.local.json", true)
+                //.AddJsonFile("appsettings.local.json", true,true)
                 .Build();
 
+            //日志:
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(RayConfiguration.Root)
+                .CreateLogger();
+
+            //Host:
             var hostBuilder = new HostBuilder()
                 .ConfigureServices((hostContext, services) =>
                 {
                     ConfigureServices(services);
                 })
+                .UseSerilog()
                 .UseConsoleLifetime();
 
             RayContainer.Root = hostBuilder.Build().Services;
@@ -80,18 +88,8 @@ namespace Ray.BiliBiliTool.Console
         /// <param name="services"></param>
         private static void ConfigureServices(IServiceCollection services)
         {
-            //配置
             services.AddSingleton<IConfiguration>(RayConfiguration.Root);
             services.AddBiliBiliConfigs(RayConfiguration.Root);
-
-            //日志
-            services.AddLogging(builder =>
-            {
-                builder.AddConfiguration(RayConfiguration.Root.GetSection("Logging"))
-                    .AddConsole()
-                    .AddDebug();
-            });
-
             services.AddBiliBiliClientApi();
             services.AddDomainServices();
             services.AddAppServices();
