@@ -3,6 +3,7 @@ using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Ray.BiliBiliTool.Agent.Dtos;
 using Ray.BiliBiliTool.Agent.Interfaces;
+using Ray.BiliBiliTool.DomainService.Attributes;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 
 namespace Ray.BiliBiliTool.DomainService
@@ -19,10 +20,13 @@ namespace Ray.BiliBiliTool.DomainService
             _dailyTaskApi = dailyTaskApi;
         }
 
+        /// <summary>
+        /// 登录
+        /// </summary>
+        /// <returns></returns>
+        [LogIntercepter("登录")]
         public UseInfo LoginByCookie()
         {
-            _logger.LogInformation("-----开始【登录】-----");
-
             var apiResponse = _dailyTaskApi.LoginByCookie().Result;
 
             if (apiResponse.Code != 0 || !apiResponse.Data.IsLogin)
@@ -50,7 +54,6 @@ namespace Ray.BiliBiliTool.DomainService
                 _logger.LogInformation("当前等级Lv6，经验值为：" + useInfo.Level_info.Current_exp);
             }
 
-            _logger.LogInformation("-----【登录】结束-----");
             return useInfo;
         }
 
@@ -58,10 +61,9 @@ namespace Ray.BiliBiliTool.DomainService
         /// 获取每日任务完成情况
         /// </summary>
         /// <returns></returns>
+        [LogIntercepter("获取今日任务完成状态")]
         public DailyTaskInfo GetDailyTaskStatus()
         {
-            _logger.LogInformation("-----开始【获取今日任务完成状态】-----");
-
             DailyTaskInfo result = new DailyTaskInfo();
             var apiResponse = _dailyTaskApi.GetDailyTaskRewardInfo().Result;
             if (apiResponse.Code == 0)
@@ -77,7 +79,6 @@ namespace Ray.BiliBiliTool.DomainService
                 //todo:偶发性请求失败，再请求一次
             }
 
-            _logger.LogInformation("-----【获取今日任务完成状态】结束-----");
             return result;
         }
     }

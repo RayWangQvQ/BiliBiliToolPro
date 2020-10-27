@@ -26,7 +26,7 @@ namespace Ray.BiliBiliTool.Console
             using (var serviceScope = RayContainer.Root.CreateScope())
             {
                 var logger = serviceScope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-                logger.LogInformation("-----任务启动-----");
+                logger.LogInformation("-----任务启动-----\r\n");
 
                 BiliBiliCookiesOptions biliBiliCookiesOptions = serviceScope.ServiceProvider.GetRequiredService<IOptionsMonitor<BiliBiliCookiesOptions>>().CurrentValue;
                 if (!biliBiliCookiesOptions.Check(logger)) return;

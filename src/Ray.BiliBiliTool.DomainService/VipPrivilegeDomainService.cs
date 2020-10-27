@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent.Dtos;
 using Ray.BiliBiliTool.Agent.Interfaces;
 using Ray.BiliBiliTool.Config;
+using Ray.BiliBiliTool.DomainService.Attributes;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 
 namespace Ray.BiliBiliTool.DomainService
@@ -28,11 +29,10 @@ namespace Ray.BiliBiliTool.DomainService
         /// <summary>
         /// 每月1号领取大会员福利（B币券、大会员权益）
         /// </summary>
+        [LogIntercepter("领取每月大会员权益")]
+
         public void ReceiveVipPrivilege(UseInfo useInfo)
         {
-            _logger.LogInformation("-----开始【领取每月大会员权益】-----");
-
-
             int day = DateTime.Today.Day;
 
             //大会员类型
@@ -48,8 +48,6 @@ namespace Ray.BiliBiliTool.DomainService
             {
                 _logger.LogInformation("普通会员和月度大会员每月不赠送B币券，所以没法给自己充电哦");
             }
-
-            _logger.LogInformation("-----【领取每月大会员权益】结束-----");
         }
 
 

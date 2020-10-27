@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent.Dtos;
 using Ray.BiliBiliTool.Agent.Interfaces;
 using Ray.BiliBiliTool.Config;
+using Ray.BiliBiliTool.DomainService.Attributes;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 using Ray.BiliBiliTool.Infrastructure.Extensions;
 
@@ -34,6 +35,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// 月底自动给自己充电
         /// 仅充会到期的B币券，低于2的时候不会充
         /// </summary>
+        [LogIntercepter("自动充电")]
         public void Charge(UseInfo userInfo)
         {
             if (!_dailyTaskOptions.CurrentValue.MonthEndAutoCharge)
@@ -41,8 +43,6 @@ namespace Ray.BiliBiliTool.DomainService
                 _logger.LogInformation("未配置自动充电,跳过充电任务");
                 return;
             }
-
-            _logger.LogInformation("-----开始【自动充电】-----");
 
             int lastDay = DateTime.Today.LastDayOfMonth().Day;
             if (DateTime.Today.Day != lastDay)
@@ -89,8 +89,6 @@ namespace Ray.BiliBiliTool.DomainService
             {
                 _logger.LogDebug("充电失败了啊 原因: " + response.Message);
             }
-
-            _logger.LogInformation("-----开始【自动充电】-----");//todo:AOP实现开始\结束日志
         }
 
         /// <summary>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Ray.BiliBiliTool.Agent.Interfaces;
+using Ray.BiliBiliTool.DomainService.Attributes;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 
 namespace Ray.BiliBiliTool.DomainService
@@ -25,10 +26,9 @@ namespace Ray.BiliBiliTool.DomainService
         /// <summary>
         /// 直播签到
         /// </summary>
+        [LogIntercepter("直播签到")]
         public void LiveSign()
         {
-            _logger.LogInformation("-----开始【直播签到】-----");
-
             var response = _liveApi.Sign().Result;
 
             if (response.Code == 0)
@@ -40,18 +40,15 @@ namespace Ray.BiliBiliTool.DomainService
             {
                 _logger.LogDebug(response.Message);
             }
-
-            _logger.LogInformation("-----【直播签到】结束-----");
         }
 
         /// <summary>
         /// 直播中心银瓜子兑换B币
         /// </summary>
         /// <returns>兑换银瓜子后硬币余额</returns>
+        [LogIntercepter("直播中心新瓜子兑换B币")]
         public int ExchangeSilver2Coin()
         {
-            _logger.LogInformation("-----开始【直播中心新瓜子兑换B币】-----");
-
             var response = _liveApi.ExchangeSilver2Coin().Result;
             if (response.Code == 0)
             {
@@ -71,7 +68,6 @@ namespace Ray.BiliBiliTool.DomainService
             //desp.appendDesp("当前银瓜子余额: " + queryStatus.get("silver").getAsInt());
             _logger.LogInformation("兑换银瓜子后硬币余额: {0}", silver2coinMoney);
 
-            _logger.LogInformation("-----【直播中心新瓜子兑换B币】结束-----");
             return silver2coinMoney;
         }
     }

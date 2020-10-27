@@ -53,8 +53,8 @@ namespace Ray.BiliBiliTool.Application
         public void DoDailyTask()
         {
             //登录
-            //var userInfo = _loginDomainService.LoginByCookie();
-            //LoginResponse = userInfo;
+            var userInfo = _loginDomainService.LoginByCookie();
+            LoginResponse = userInfo;
 
             DailyTaskInfo dailyTaskStatus = _loginDomainService.GetDailyTaskStatus();
             string videoAid = _videoDomainService.GetRandomVideo();
@@ -63,7 +63,7 @@ namespace Ray.BiliBiliTool.Application
             if (!dailyTaskStatus.Watch)
                 _videoDomainService.WatchVideo(videoAid);
             else
-                _logger.LogInformation("本日观看视频任务已经完成了，不需要再观看视频了");
+                _logger.LogInformation("本日观看视频任务已经完成了，不需要再观看视频了");//todo:将判断逻辑转移到DomainService里
 
             //分享视频
             if (!dailyTaskStatus.Share)
