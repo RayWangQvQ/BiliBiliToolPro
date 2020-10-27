@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Ray.BiliBiliTool.Agent.Dtos;
 using Ray.BiliBiliTool.Agent.Interfaces;
 using Ray.BiliBiliTool.Config;
 using Ray.BiliBiliTool.DomainService.Attributes;
@@ -49,8 +50,14 @@ namespace Ray.BiliBiliTool.DomainService
         /// 观看视频
         /// </summary>
         [LogIntercepter("观看视频")]
-        public void WatchVideo(string aid)
+        public void WatchVideo(string aid, DailyTaskInfo dailyTaskStatus)
         {
+            if (dailyTaskStatus.Watch)
+            {
+                _logger.LogInformation("本日观看视频任务已经完成了，不需要再观看视频了");
+                return;
+            }
+
             int playedTime = new Random().Next(1, 90);
             var apiResponse = _dailyTaskApi.UploadVideoHeartbeat(aid, playedTime).Result;
 
@@ -71,8 +78,14 @@ namespace Ray.BiliBiliTool.DomainService
         /// </summary>
         /// <param name="aid">视频aid</param>
         [LogIntercepter("分享视频")]
-        public void ShareVideo(string aid)
+        public void ShareVideo(string aid, DailyTaskInfo dailyTaskStatus)
         {
+            if (!dailyTaskStatus.Share)
+            {
+                _logger.LogInformation("本日分享视频任务已经完成了，不需要再分享视频了");
+                return;
+            }
+
             var apiResponse = _dailyTaskApi.ShareVideo(aid, _biliBiliCookiesOptions.BiliJct).Result;
 
             if (apiResponse.Code == 0)

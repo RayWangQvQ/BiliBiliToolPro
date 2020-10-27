@@ -45,54 +45,47 @@ namespace Ray.BiliBiliTool.Application
         }
 
         /// <summary>
-        /// 当前登录账户信息缓存
+        /// 记录当前登录账户信息
         /// </summary>
-        private UseInfo LoginResponse { get; set; }
+        private UseInfo _userInfo;
+
+        /// <summary>
+        /// 记录当前完成任务状态
+        /// </summary>
+        private DailyTaskInfo _dailyTaskInfo;
 
 
         public void DoDailyTask()
         {
             //登录
-            var userInfo = _loginDomainService.LoginByCookie();
-            LoginResponse = userInfo;
+            _userInfo = _loginDomainService.LoginByCookie();
+            //获取任务完成情况
+            _dailyTaskInfo = _loginDomainService.GetDailyTaskStatus();
 
-            DailyTaskInfo dailyTaskStatus = _loginDomainService.GetDailyTaskStatus();
+            //获取随机视频
             string videoAid = _videoDomainService.GetRandomVideo();
-
             //观看视频
-            if (!dailyTaskStatus.Watch)
-                _videoDomainService.WatchVideo(videoAid);
-            else
-                _logger.LogInformation("本日观看视频任务已经完成了，不需要再观看视频了");//todo:将判断逻辑转移到DomainService里
-
+            _videoDomainService.WatchVideo(videoAid, _dailyTaskInfo);
             //分享视频
-            if (!dailyTaskStatus.Share)
-                _videoDomainService.ShareVideo(videoAid);
-            else
-                _logger.LogInformation("本日分享视频任务已经完成了，不需要再分享视频了");
-
+            _videoDomainService.ShareVideo(videoAid, _dailyTaskInfo);
             //投币任务
             _videoDomainService.AddCoinsForVideo();//todo:传入up主Id，只为指定ups投币
 
             //直播中心签到
             _liveDomainService.LiveSign();
-
             //直播中心的银瓜子兑换硬币
-            int coinTotal = _liveDomainService.ExchangeSilver2Coin();
-            LoginResponse.Money = coinTotal;
+            _userInfo.Money = _liveDomainService.ExchangeSilver2Coin();
 
             //月初领取大会员福利
-            _vipPrivilegeDomainService.ReceiveVipPrivilege(LoginResponse);
+            _vipPrivilegeDomainService.ReceiveVipPrivilege(_userInfo);
 
             //月底充电
-            _chargeDomainService.Charge(LoginResponse);
+            _chargeDomainService.Charge(_userInfo);
 
             //漫画签到
             _mangaDomainService.MangaSign();
             //获取每月大会员漫画权益
-            _mangaDomainService.ReceiveMangaVipReward(1, LoginResponse);
-
-            _logger.LogInformation("本日任务已全部执行完毕");
+            _mangaDomainService.ReceiveMangaVipReward(1, _userInfo);
 
             /*
             doServerPush();

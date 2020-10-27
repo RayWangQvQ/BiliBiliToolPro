@@ -18,7 +18,7 @@ namespace WatchVideoTest
                 var dailyTask = scope.ServiceProvider.GetRequiredService<IVideoDomainService>();
 
                 string aid = dailyTask.GetRandomVideo();
-                dailyTask.WatchVideo(aid);
+                dailyTask.WatchVideo(aid, null);//todo:bug
 
                 Assert.True(true);
             }

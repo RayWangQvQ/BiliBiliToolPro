@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Ray.BiliBiliTool.Agent.Dtos;
 
 namespace Ray.BiliBiliTool.DomainService.Interfaces
 {
@@ -8,9 +9,9 @@ namespace Ray.BiliBiliTool.DomainService.Interfaces
     {
         string GetRandomVideo();
 
-        void WatchVideo(string aid);
+        void WatchVideo(string aid, DailyTaskInfo dailyTaskStatus);
 
-        void ShareVideo(string aid);
+        void ShareVideo(string aid, DailyTaskInfo dailyTaskStatus);
 
         void AddCoinsForVideo();
 
