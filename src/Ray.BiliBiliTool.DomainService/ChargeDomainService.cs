@@ -22,12 +22,12 @@ namespace Ray.BiliBiliTool.DomainService
         public ChargeDomainService(ILogger<ChargeDomainService> logger,
             IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
             IDailyTaskApi dailyTaskApi,
-            BiliBiliCookiesOptions verify)
+            IOptionsMonitor<BiliBiliCookiesOptions> verify)
         {
             _logger = logger;
             _dailyTaskOptions = dailyTaskOptions;
             _dailyTaskApi = dailyTaskApi;
-            _verify = verify;
+            _verify = verify.CurrentValue;
         }
 
         /// <summary>
@@ -36,7 +36,13 @@ namespace Ray.BiliBiliTool.DomainService
         /// </summary>
         public void Charge(UseInfo userInfo)
         {
-            if (!_dailyTaskOptions.CurrentValue.MonthEndAutoCharge) return;
+            if (!_dailyTaskOptions.CurrentValue.MonthEndAutoCharge)
+            {
+                _logger.LogInformation("未配置自动充电,跳过充电任务");
+                return;
+            }
+
+            _logger.LogInformation("-----开始【自动充电】-----");
 
             int lastDay = DateTime.Today.LastDayOfMonth().Day;
             if (DateTime.Today.Day != lastDay)
@@ -83,6 +89,8 @@ namespace Ray.BiliBiliTool.DomainService
             {
                 _logger.LogDebug("充电失败了啊 原因: " + response.Message);
             }
+
+            _logger.LogInformation("-----开始【自动充电】-----");//todo:AOP实现开始\结束日志
         }
 
         /// <summary>

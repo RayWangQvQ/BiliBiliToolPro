@@ -20,14 +20,14 @@ namespace Ray.BiliBiliTool.DomainService
 
         public VideoDomainService(ILogger<VideoDomainService> logger,
             IDailyTaskApi dailyTaskApi,
-            BiliBiliCookiesOptions biliBiliCookiesOptions,
+            IOptionsMonitor<BiliBiliCookiesOptions> biliBiliCookiesOptions,
             IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
             IAccountApi accountApi,
             ICoinDomainService coinDomainService)
         {
             _logger = logger;
             _dailyTaskApi = dailyTaskApi;
-            _biliBiliCookiesOptions = biliBiliCookiesOptions;
+            _biliBiliCookiesOptions = biliBiliCookiesOptions.CurrentValue;
             _dailyTaskOptions = dailyTaskOptions;
             _accountApi = accountApi;
             _coinDomainService = coinDomainService;
@@ -35,7 +35,10 @@ namespace Ray.BiliBiliTool.DomainService
 
         public string GetRandomVideo()
         {
-            return RegionRanking();
+            _logger.LogInformation("-----开始【获取随机视频】-----");
+            string aid = RegionRanking();
+            _logger.LogInformation("-----【获取随机视频】结束-----");
+            return aid;
         }
 
         /// <summary>
@@ -43,6 +46,8 @@ namespace Ray.BiliBiliTool.DomainService
         /// </summary>
         public void WatchVideo(string aid)
         {
+            _logger.LogInformation("-----开始【观看视频】-----");
+
             int playedTime = new Random().Next(1, 90);
             var apiResponse = _dailyTaskApi.UploadVideoHeartbeat(aid, playedTime).Result;
 
@@ -56,6 +61,8 @@ namespace Ray.BiliBiliTool.DomainService
                 _logger.LogDebug("av{aid}播放失败,原因：{msg}", aid, apiResponse.Message);
                 //desp.appendDesp("av" + aid + "播放成功,已观看到第" + playedTime + "秒");
             }
+
+            _logger.LogInformation("-----【观看视频】结束-----");
         }
 
         /// <summary>
@@ -64,6 +71,8 @@ namespace Ray.BiliBiliTool.DomainService
         /// <param name="aid">视频aid</param>
         public void ShareVideo(string aid)
         {
+            _logger.LogInformation("-----开始【分享视频】-----");
+
             var apiResponse = _dailyTaskApi.ShareVideo(aid, _biliBiliCookiesOptions.BiliJct).Result;
 
             if (apiResponse.Code == 0)
@@ -77,6 +86,8 @@ namespace Ray.BiliBiliTool.DomainService
                 _logger.LogDebug("开发者提示: 如果是csrf校验失败请检查BILI_JCT参数是否正确或者失效");
                 //desp.appendDesp("重要:csrf校验失败请检查BILI_JCT参数是否正确或者失效");
             }
+
+            _logger.LogInformation("-----【分享视频】结束-----");
         }
 
         /// <summary>
@@ -104,6 +115,8 @@ namespace Ray.BiliBiliTool.DomainService
         /// </summary>
         public void AddCoinsForVideo()
         {
+            _logger.LogInformation("-----开始【投币】-----");
+
             //投币最多操作数 解决csrf校验失败时死循环的问题
             int addCoinOperateCount = 0;
             //安全检查，最多投币数
@@ -167,6 +180,8 @@ namespace Ray.BiliBiliTool.DomainService
 
             _logger.LogInformation("投币任务完成后余额为: " + _accountApi.GetCoinBalance().Result.Data.Money);
             //desp.appendDesp("投币任务完成后余额为: " + OftenAPI.getCoinBalance());
+
+            _logger.LogInformation("-----【投币】结束-----");
         }
 
         /// <summary>

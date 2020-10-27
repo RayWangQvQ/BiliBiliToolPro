@@ -17,14 +17,14 @@ namespace ConfigTest
         {
             Program.PreWorks(new string[] { });
 
-            string s = RayConfiguration.Root["DailyTaskConfig:NumberOfCoins"];
+            string s = RayConfiguration.Root["BiliBiliCookies:UserId"];
             Debug.WriteLine(s);
-            Assert.Equal("5", s);
+            Assert.True(!string.IsNullOrWhiteSpace(s));
 
-            var options = RayContainer.Root.GetRequiredService<IOptionsMonitor<DailyTaskOptions>>();
+            var options = RayContainer.Root.GetRequiredService<IOptionsMonitor<BiliBiliCookiesOptions>>();
 
             Debug.WriteLine(JsonSerializer.Serialize(options.CurrentValue, new JsonSerializerOptions { WriteIndented = true }));
-            Assert.Equal(5, options.CurrentValue.NumberOfCoins);
+            Assert.True(!string.IsNullOrWhiteSpace(options.CurrentValue.UserId));
         }
     }
 }

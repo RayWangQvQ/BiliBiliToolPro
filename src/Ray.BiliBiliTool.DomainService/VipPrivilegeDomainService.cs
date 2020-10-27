@@ -2,13 +2,15 @@
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent.Dtos;
 using Ray.BiliBiliTool.Agent.Interfaces;
 using Ray.BiliBiliTool.Config;
+using Ray.BiliBiliTool.DomainService.Interfaces;
 
 namespace Ray.BiliBiliTool.DomainService
 {
-    public class VipPrivilegeDomainService
+    public class VipPrivilegeDomainService : IVipPrivilegeDomainService
     {
         private readonly ILogger<VipPrivilegeDomainService> _logger;
         private readonly IDailyTaskApi _dailyTaskApi;
@@ -16,11 +18,11 @@ namespace Ray.BiliBiliTool.DomainService
 
         public VipPrivilegeDomainService(ILogger<VipPrivilegeDomainService> logger,
             IDailyTaskApi dailyTaskApi,
-            BiliBiliCookiesOptions biliBiliCookiesOptions)
+            IOptionsMonitor<BiliBiliCookiesOptions> biliBiliCookiesOptions)
         {
             _logger = logger;
             _dailyTaskApi = dailyTaskApi;
-            _biliBiliCookiesOptions = biliBiliCookiesOptions;
+            _biliBiliCookiesOptions = biliBiliCookiesOptions.CurrentValue;
         }
 
         /// <summary>
@@ -28,6 +30,9 @@ namespace Ray.BiliBiliTool.DomainService
         /// </summary>
         public void ReceiveVipPrivilege(UseInfo useInfo)
         {
+            _logger.LogInformation("-----开始【领取每月大会员权益】-----");
+
+
             int day = DateTime.Today.Day;
 
             //大会员类型
@@ -42,8 +47,9 @@ namespace Ray.BiliBiliTool.DomainService
             if (vipType == 0 || vipType == 1)
             {
                 _logger.LogInformation("普通会员和月度大会员每月不赠送B币券，所以没法给自己充电哦");
-                return;
             }
+
+            _logger.LogInformation("-----【领取每月大会员权益】结束-----");
         }
 
 

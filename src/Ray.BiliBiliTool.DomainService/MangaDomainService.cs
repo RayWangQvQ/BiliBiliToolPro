@@ -30,6 +30,8 @@ namespace Ray.BiliBiliTool.DomainService
         /// </summary>
         public void MangaSign()
         {
+            _logger.LogInformation("-----开始【漫画签到】-----");
+
             BiliApiResponse response;
             try
             {
@@ -54,6 +56,8 @@ namespace Ray.BiliBiliTool.DomainService
                 _logger.LogInformation("漫画签到异常");
                 //desp.appendDesp("完成漫画签到");
             }
+
+            _logger.LogInformation("-----【漫画签到】结束-----");
         }
 
         /// <summary>
@@ -63,6 +67,8 @@ namespace Ray.BiliBiliTool.DomainService
         /// 这里为方便直接取1，为领取漫读劵，暂时不取其他的值</param>
         public void ReceiveMangaVipReward(int reason_id, UseInfo userIfo)
         {
+            _logger.LogInformation("-----开始【领取大会员漫画权益】-----");
+
             int day = DateTime.Today.Day;
 
             if (day != 1 || userIfo.GetVipType() == 0)
@@ -80,6 +86,8 @@ namespace Ray.BiliBiliTool.DomainService
             {
                 _logger.LogInformation($"大会员领取漫读劵失败，原因为:{response.Message}");
             }
+
+            _logger.LogInformation("-----【领取大会员漫画权益】结束-----");
         }
     }
 }

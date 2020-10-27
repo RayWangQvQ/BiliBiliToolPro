@@ -24,13 +24,13 @@ namespace Ray.BiliBiliTool.DomainService
 
         public CoinDomainService(ILogger<CoinDomainService> logger,
             IHttpClientFactory httpClientFactory,
-            BiliBiliCookiesOptions biliBiliCookiesOptions,
+            IOptionsMonitor<BiliBiliCookiesOptions> biliBiliCookiesOptions,
             IDailyTaskApi dailyTaskApi,
             IAccountApi accountApi)
         {
             _logger = logger;
             _httpClientFactory = httpClientFactory;
-            _biliBiliCookiesOptions = biliBiliCookiesOptions;
+            _biliBiliCookiesOptions = biliBiliCookiesOptions.CurrentValue;
             _dailyTaskApi = dailyTaskApi;
             _accountApi = accountApi;
         }
