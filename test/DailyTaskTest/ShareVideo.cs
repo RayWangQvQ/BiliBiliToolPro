@@ -16,9 +16,12 @@ namespace ShareVideoTest
             using (var scope = RayContainer.Root.CreateScope())
             {
                 var dailyTaskService = scope.ServiceProvider.GetRequiredService<IVideoDomainService>();
+                var account = scope.ServiceProvider.GetRequiredService<IAccountDomainService>();
+
+                var dailyTaskStatus = account.GetDailyTaskStatus();
 
                 string aid = dailyTaskService.GetRandomVideo();
-                dailyTaskService.ShareVideo(aid,null);//todo:bug
+                dailyTaskService.ShareVideo(aid, dailyTaskStatus);
 
                 Assert.True(true);
             }

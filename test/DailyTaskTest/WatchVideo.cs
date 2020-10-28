@@ -16,9 +16,11 @@ namespace WatchVideoTest
             using (var scope = RayContainer.Root.CreateScope())
             {
                 var dailyTask = scope.ServiceProvider.GetRequiredService<IVideoDomainService>();
+                var account = scope.ServiceProvider.GetRequiredService<IAccountDomainService>();
 
+                var dailyTaskStatus = account.GetDailyTaskStatus();
                 string aid = dailyTask.GetRandomVideo();
-                dailyTask.WatchVideo(aid, null);//todo:bug
+                dailyTask.WatchVideo(aid, dailyTaskStatus);
 
                 Assert.True(true);
             }
