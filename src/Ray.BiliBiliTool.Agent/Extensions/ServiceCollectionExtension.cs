@@ -1,0 +1,56 @@
+﻿using System;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Ray.BiliBiliTool.Agent.Interfaces;
+using Ray.BiliBiliTool.Config;
+using Ray.BiliBiliTool.Infrastructure;
+using Refit;
+
+namespace Ray.BiliBiliTool.Agent.Extensions
+{
+    public static class ServiceCollectionExtension
+    {
+        /// <summary>
+        /// 注册强类型api客户端
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddBiliBiliClientApi(this IServiceCollection services)
+        {
+            services.AddHttpClient();
+            services.AddHttpClient("BiliBiliWithCookies",
+                (sp, c) => c.DefaultRequestHeaders.Add("Cookie", sp.GetRequiredService<BiliBiliCookiesOptions>().ToString()));
+
+            services.AddBiliBiliClientApi<IDailyTaskApi>("https://api.bilibili.com");
+            services.AddBiliBiliClientApi<IMangaApi>("https://manga.bilibili.com");
+            services.AddBiliBiliClientApi<IExperienceApi>("https://www.bilibili.com");
+            services.AddBiliBiliClientApi<IAccountApi>("https://account.bilibili.com");
+            services.AddBiliBiliClientApi<ILiveApi>("https://api.live.bilibili.com");
+
+            return services;
+        }
+
+        /// <summary>
+        /// 封装Refit，默认将Cookie添加到Header中
+        /// </summary>
+        /// <typeparam name="TInterface"></typeparam>
+        /// <param name="services"></param>
+        /// <param name="host"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddBiliBiliClientApi<TInterface>(this IServiceCollection services, string host) where TInterface : class
+        {
+            var settings = new RefitSettings(new SystemTextJsonContentSerializer(JsonSerializerOptionsBuilder.DefaultOptions));
+
+            services.AddRefitClient<TInterface>(settings)
+                .ConfigureHttpClient((sp, c) =>
+                {
+                    c.DefaultRequestHeaders.Add("Cookie", sp.GetRequiredService<IOptionsMonitor<BiliBiliCookiesOptions>>().CurrentValue.ToString());
+                    c.BaseAddress = new Uri(host);
+                })
+                .AddHttpMessageHandler(sp => new MyHttpClientDelegatingHandler(sp.GetRequiredService<ILogger<MyHttpClientDelegatingHandler>>()));
+
+            return services;
+        }
+    }
+}
