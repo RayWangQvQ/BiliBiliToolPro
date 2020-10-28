@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.Json;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -19,31 +20,14 @@ namespace Ray.BiliBiliTool.Console
 {
     public class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             PreWorks(args);
 
-            using (var serviceScope = RayContainer.Root.CreateScope())
-            {
-                var logger = serviceScope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-                logger.LogInformation("-----任务启动-----\r\n");
+            StartRun();
 
-                BiliBiliCookiesOptions biliBiliCookiesOptions = serviceScope.ServiceProvider.GetRequiredService<IOptionsMonitor<BiliBiliCookiesOptions>>().CurrentValue;
-                if (!biliBiliCookiesOptions.Check(logger)) return;
-
-                if (args.Length > 3)
-                {
-                    //ServerVerify.verifyInit(args[3]);
-                }
-
-                //每日任务65经验
-                IDailyTaskAppService dailyTask = serviceScope.ServiceProvider.GetRequiredService<IDailyTaskAppService>();
-                dailyTask.DoDailyTask();
-
-                logger.LogInformation("-----任务结束-----");
-            }
-
-            //System.Console.ReadLine();
+            System.Console.WriteLine("30秒后窗口将自动关闭");//todo:输入任意内容停止关闭
+            Task.Delay(30000).Wait();
         }
 
         /// <summary>
@@ -52,16 +36,9 @@ namespace Ray.BiliBiliTool.Console
         /// <param name="args"></param>
         public static void PreWorks(string[] args)
         {
-            //配置:
-            var mapper = new Dictionary<string, string>
-            {
-                {"-userId","BiliBiliCookies:UserId" },
-                {"-sessData","BiliBiliCookies:SessData" },
-                {"-biliJct","BiliBiliCookies:BiliJct" },
-            };
             RayConfiguration.Root = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", false, true)
-                .AddCommandLine(args, mapper)
+                .AddCommandLine(args, CommandLineMapper.Mapper)
                 //.AddJsonFile("appsettings.local.json", true,true)
                 .Build();
 
@@ -81,6 +58,28 @@ namespace Ray.BiliBiliTool.Console
 
             RayContainer.Root = hostBuilder.Build().Services;
         }
+
+        /// <summary>
+        /// 开始运行
+        /// </summary>
+        public static void StartRun()
+        {
+            using (var serviceScope = RayContainer.Root.CreateScope())
+            {
+                var logger = serviceScope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+                logger.LogInformation("-----任务启动-----\r\n");
+
+                BiliBiliCookiesOptions biliBiliCookiesOptions = serviceScope.ServiceProvider.GetRequiredService<IOptionsMonitor<BiliBiliCookiesOptions>>().CurrentValue;
+                if (!biliBiliCookiesOptions.Check(logger)) return;
+
+                //每日任务65经验
+                IDailyTaskAppService dailyTask = serviceScope.ServiceProvider.GetRequiredService<IDailyTaskAppService>();
+                dailyTask.DoDailyTask();
+
+                logger.LogInformation("-----任务结束-----");
+            }
+        }
+
 
         /// <summary>
         /// 注册容器
