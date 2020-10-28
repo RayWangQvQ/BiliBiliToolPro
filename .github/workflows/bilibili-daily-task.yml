@@ -1,0 +1,37 @@
+name: bilibili-daily-task
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+  schedule:
+    - cron: '10 6 * * *'
+    # cron表达式，Actions时区是UTC时间，所以要往前推8个小时
+
+jobs:
+  run-bilibili-tool:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.301
+
+    - name: Install dependencies
+      run: dotnet restore
+      
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+      
+    - name: Run
+      env:
+        userId: ${{secrets.USERID}}
+        sessData: ${{secrets.SESSDATA}}
+        biliJct: ${{secrets.BILIJCT}}
+      run: dotnet run -p ./src/Ray.BiliBiliTool.Console -userId=${userId} -sessData=${sessData} -biliJct=${biliJct}
