@@ -12,6 +12,7 @@ using Ray.BiliBiliTool.Application.Contracts;
 using Ray.BiliBiliTool.Application.Extensions;
 using Ray.BiliBiliTool.Config;
 using Ray.BiliBiliTool.Config.Extensions;
+using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Extensions;
 using Ray.BiliBiliTool.Infrastructure;
 using Serilog;
@@ -26,8 +27,8 @@ namespace Ray.BiliBiliTool.Console
 
             StartRun();
 
-            System.Console.WriteLine("30秒后窗口将自动关闭");//todo:输入任意内容停止关闭
-            Task.Delay(30000).Wait();
+            System.Console.WriteLine("2分钟后窗口将自动关闭");//todo:输入任意内容停止关闭
+            Task.Delay(2 * 60 * 1000).Wait();
         }
 
         /// <summary>
@@ -74,7 +75,15 @@ namespace Ray.BiliBiliTool.Console
 
                 //每日任务65经验
                 IDailyTaskAppService dailyTask = serviceScope.ServiceProvider.GetRequiredService<IDailyTaskAppService>();
-                dailyTask.DoDailyTask();
+
+                try
+                {
+                    dailyTask.DoDailyTask();
+                }
+                catch (Exception e)
+                {
+                    logger.LogError("程序发生异常：{msg}。详情：{error}", e.Message, JsonSerializer.Serialize(e));
+                }
 
                 logger.LogInformation("-----任务结束-----");
             }
