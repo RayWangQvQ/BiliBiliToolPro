@@ -64,7 +64,7 @@ b. **解压并填写配置**
 
 下载并解压后，找到appsettings.json文件，使用记事本编辑，填入之前获取到的Cookie信息，保存后关闭。
 
-![图示](docs/imgs/appsettings-cookie.png)
+![配置文件图示](docs/imgs/appsettings-cookie.png)
 
 c. **运行**
 
@@ -130,4 +130,18 @@ c. 如果想自己解决，请fork仓库后，在devlop分支进行编码开发�
 
 ## 6.支持
 
-待更新
+如果觉得我的项目对你小有帮助
+
+或者，就是单纯的想集资给我买瓶霸王增发液
+
+那么下面的赞赏码可以扫一扫啦
+
+（赞赏时记得留下【昵称】和【留言】~）
+
+微信扫码自动赞赏1元：
+
+![微信赞赏码](docs/imgs/donate-wechat.jpg)
+
+支付宝扫码自动赞赏1元：
+
+![支付宝赞赏码](docs/imgs/donate-ali.jpg)
