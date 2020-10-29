@@ -1,6 +1,6 @@
 # BiliBiliTool
 
-BiliBiliTool是一个针对B站用户自动自动执行任务的工具，通过它可以实现每日自动观看、分享、投币视频，获取经验，每月自动领取会员权益、自动为自己充电等功能，帮助我们轻松升级会员到Lv6并赚取电池，详细功能目录如下:
+BiliBiliTool是一个针对B站用户自动执行任务的工具，通过它可以实现每日自动观看、分享、投币视频，获取经验，每月自动领取会员权益、自动为自己充电等功能，帮助我们轻松升级会员到Lv6并赚取电池，详细功能目录如下:
 
 * 每天自动登录，获取经验
 * 每天自动观看、分享一个视频
@@ -12,6 +12,7 @@ BiliBiliTool是一个针对B站用户自动自动执行任务的工具，通过�
 * 每个月自动领取5张B币券和大会员权益
 
 喜欢的话欢迎大家贡献Star~
+
 Github仓库地址：
 [RayWangQvQ/BiliBiliTool](https://github.com/RayWangQvQ/BiliBiliTool)
 
@@ -19,14 +20,18 @@ Github仓库地址：
 
 BiliBiliTool实现自动任务的原理，是通过调用一系列B站开放的接口实现的。
 
-举例来说，比如实现观看视频任务，则是通过调用B站的上传视频观看进度接口实现的，接口Api："https://api.bilibili.com/x/click-interface/web/heartbeat"，入参为视频Id、当前观看时间和用于身份认证的Cookie。
+举例来说，上面实现观看视频的任务，是通过调用B站的上传视频观看进度接口实现的。
 
-我们要做的一共有两步，首先是获取自己的Cookie信息并配置到程序中，然后运行BiliBiliTool即可。
+接口Api："https://api.bilibili.com/x/click-interface/web/heartbeat"
+
+入参：视频Id、当前观看时间、用于身份认证的Cookie。
+
+** 我们要做的一共有两步，首先是获取自己的Cookie信息并配置到程序中，然后运行BiliBiliTool即可。 **
 
 ### 1.1.获取自己的Cookie
 
 - 浏览器打开并登录[bilibili网站](https://www.bilibili.com/)
-- 按F12打开“开发者工具”，找到应用程序/Application -> 存储-> Cookies
+- 按F12打开“开发者工具”，依次点击 应用程序/Application -> 存储-> Cookies
 - 找到`DEDEUSERID`、`SESSDATA`、`bili_jct`三项，复制保存它们到记事本，待会儿会用到。
 
 | Name       | Value          |
@@ -37,7 +42,7 @@ BiliBiliTool实现自动任务的原理，是通过调用一系列B站开放的�
 
 运行BiliBiliTool有两种方式，一种是下载Release包到本地运行，一种是通过Github的Actions实现线上的每天自动运行。
 
-对于想先快速运行调试一下的或者没有Github账号的朋友，建议使用第一种方式，操作简单快速。
+对于想先快速运行调试一下或者没有Github账号的朋友，建议使用第一种方式，操作简单快速。
 
 对于熟悉Github Actions的朋友，推荐使用Github Actions，可以实现线上的每天自动运行，一劳永逸。
 
@@ -45,7 +50,7 @@ BiliBiliTool实现自动任务的原理，是通过调用一系列B站开放的�
 
 #### 1.2.1.方式一：本地运行
 
-a. 下载程序文件
+a. **下载应用文件**
 
 点击[BiliBiliTool/release](https://github.com/RayWangQvQ/BiliBiliTool/releases)，下载已发布的最新版本：
 
@@ -53,17 +58,21 @@ a. 下载程序文件
 
 没有环境或不确定有没有的，可以根据操作系统下载对应的zip文件，因为是自包含的（self-contained），文件比较大（而且Github服务器在国外，下载也会比较慢），但是好处是不需要额外安装NetCore的运行时或SDK。
 
-b. 解压并填写配置
+b. **解压并填写配置**
+
 下载并解压后，找到appsettings.json文件，使用记事本编辑，填入之前获取到的Cookie信息，保存后关闭。
 
-c. 运行
+c. **运行**
+
 找到名称为Ray.BiliBiliTool.Console的可执行文件（Win环境下是Ray.BiliBiliTool.Console.exe），双击运行（Linux使用命令行运行），结果如下：
 
 P.S.如果自己有服务器，也可以将程序发布到自己的服务器，利用自己的任务系统实现每天自动运行。（有服务器的大佬应该就不需要我多BB了）
 
 #### 1.2.2.方式二：Github Actions每天定时线上自动运行
 a. **fork本项目**
+
 b. **点击项目 Settings-> Secrets-> New Secrets 添加以下3个Secrets。** 
+
 c. **开启Actions并触发每日自动执行**
    
 **Github Actions默认处于关闭状态，请手动开启Actions，执行一次工作流，验证是否可以正常工作。**
