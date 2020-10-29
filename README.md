@@ -1,6 +1,6 @@
 # BiliBiliTool
 
-BiliBiliTool是一个针对B站用户自动执行任务的工具，通过它可以实现每日自动观看、分享、投币视频，获取经验，每月自动领取会员权益、自动为自己充电等功能，帮助我们轻松升级会员到Lv6并赚取电池，详细功能目录如下:
+BiliBiliTool是一个针对B站用户自动执行任务的工具，通过它可以实现B站帐号的每日自动观看、分享、投币视频，获取经验，每月自动领取会员权益、自动为自己充电等功能，帮助我们轻松升级会员到Lv6并赚取电池，详细功能目录如下:
 
 * 每天自动登录，获取经验
 * 每天自动观看、分享一个视频
@@ -11,9 +11,7 @@ BiliBiliTool是一个针对B站用户自动执行任务的工具，通过它可�
 * 每月自动使用快过期的B币券为自己充电
 * 每个月自动领取5张B币券和大会员权益
 
-![运行示意](docs/imgs/run-exe.png)
-
-喜欢的话欢迎大家贡献Star~
+![运行图示](docs/imgs/run-exe.png)
 
 Github仓库地址：
 [RayWangQvQ/BiliBiliTool](https://github.com/RayWangQvQ/BiliBiliTool)
@@ -22,13 +20,13 @@ Github仓库地址：
 
 BiliBiliTool实现自动任务的原理，是通过调用一系列B站开放的接口实现的。
 
-举例来说，上面实现观看视频的任务，是通过调用B站的上传视频观看进度接口实现的。
+举例来说，上面实现观看视频的任务，就是通过调用B站的上传视频观看进度接口实现的。
 
 接口Api："https://api.bilibili.com/x/click-interface/web/heartbeat"
 
 入参：视频Id、当前观看时间、用于身份认证的Cookie。
 
-**我们要做的一共有两步，首先是获取自己的Cookie信息并配置到程序中，然后运行BiliBiliTool即可。**
+**要使用BiliBiliTool，我们只需要做两步，首先是获取自己的Cookie信息并配置到程序中，然后运行BiliBiliTool即可。**
 
 ### 1.1.获取自己的Cookie
 
@@ -42,13 +40,12 @@ BiliBiliTool实现自动任务的原理，是通过调用一系列B站开放的�
 | SESSDATA   | 从Cookie中获取 |
 | BILI_JCT   | 从Cookie中获取 |
 
+### 1.2.运行BiliBiliTool
 运行BiliBiliTool有两种方式，一种是下载Release包到本地运行，一种是通过Github的Actions实现线上的每天自动运行。
 
-对于想先快速运行调试一下或者没有Github账号的朋友，建议使用第一种方式，操作简单快速。
+对于想先快速运行调试一下或者没有Github账号的朋友，建议使用方法一，操作简单快速。
 
-对于熟悉Github Actions的朋友，推荐使用Github Actions，可以实现线上的每天自动运行，一劳永逸。
-
-### 1.2.运行BiliBiliTool
+对于熟悉Github Actions的朋友，推荐使用方法二Github Actions，可以实现线上的每天自动运行，一劳永逸。
 
 #### 1.2.1.方式一：本地运行
 
@@ -70,21 +67,26 @@ c. **运行**
 
 找到名称为Ray.BiliBiliTool.Console的可执行文件（Win环境下是Ray.BiliBiliTool.Console.exe），双击运行（Linux使用命令行运行），结果如下：
 
+![运行图示](docs/imgs/run-exe.png)
 
 P.S.如果自己有服务器，也可以将程序发布到自己的服务器，利用自己的任务系统实现每天自动运行。（有服务器的大佬应该就不需要我多BB了）
 
 #### 1.2.2.方式二：Github Actions每天定时线上自动运行
-a. **fork本项目**
+Github Actions是微软巨硬收购G站之后新增的内置CI/CD方案，其核心就是一个可以运行脚本的小型服务器（2核CPU + 7G RAM + 14 G SSD）。在本例中，我们将利用它实现每天线上自动运行我们的应用程序。
 
-b. **点击项目 Settings-> Secrets-> New Secrets 添加以下3个Secrets。** 
+a. **首先fork本项目到自己的仓库**
+
+b. **进入自己fork的仓库，点击 Settings-> Secrets-> New Secrets 添加以下3个Secrets。它们将作为应用启动时的命令行参数被传入程序。** 
 
 ![Secrets图示](docs/imgs/git-secrets.png)
 
 c. **开启Actions并触发每日自动执行**
    
-Github Actions默认处于关闭状态，请手动开启Actions，执行一次工作流，验证是否可以正常工作。
+Github Actions默认处于关闭状态，前面都配置好后，请手动开启Actions，执行一次工作流，验证是否可以正常工作。
 
 ![Actions图示](docs/imgs/run-workflow.png)
+
+成功后，可查看运行日志。
 
 Fork仓库后，GitHub默认不自动执行Actions任务，请修改`./github/trigger.json`文件,将`trigger`的值改为`1`，这样每天就会自动执行定时任务了。
 
@@ -126,7 +128,7 @@ b. 确认没有同类issue后，自己新建issue，描述问题或建议
 
 c. 如果想自己解决，请fork仓库后，在devlop分支进行编码开发，完成后提交pr，并标注解决的issue编号
 
-我会尽快进行代码审核，谢谢你的贡献。
+我会尽快进行代码审核，提前感谢你的贡献。
 
 ## 6.支持
 
