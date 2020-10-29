@@ -11,6 +11,8 @@ BiliBiliTool是一个针对B站用户自动执行任务的工具，通过它可�
 * 每月自动使用快过期的B币券为自己充电
 * 每个月自动领取5张B币券和大会员权益
 
+![运行示意](docs/imgs/run-exe.png)
+
 喜欢的话欢迎大家贡献Star~
 
 Github仓库地址：
@@ -26,7 +28,7 @@ BiliBiliTool实现自动任务的原理，是通过调用一系列B站开放的�
 
 入参：视频Id、当前观看时间、用于身份认证的Cookie。
 
-** 我们要做的一共有两步，首先是获取自己的Cookie信息并配置到程序中，然后运行BiliBiliTool即可。 **
+**我们要做的一共有两步，首先是获取自己的Cookie信息并配置到程序中，然后运行BiliBiliTool即可。**
 
 ### 1.1.获取自己的Cookie
 
@@ -62,9 +64,12 @@ b. **解压并填写配置**
 
 下载并解压后，找到appsettings.json文件，使用记事本编辑，填入之前获取到的Cookie信息，保存后关闭。
 
+![图示](docs/imgs/appsettings-cookie.png)
+
 c. **运行**
 
 找到名称为Ray.BiliBiliTool.Console的可执行文件（Win环境下是Ray.BiliBiliTool.Console.exe），双击运行（Linux使用命令行运行），结果如下：
+
 
 P.S.如果自己有服务器，也可以将程序发布到自己的服务器，利用自己的任务系统实现每天自动运行。（有服务器的大佬应该就不需要我多BB了）
 
@@ -73,11 +78,15 @@ a. **fork本项目**
 
 b. **点击项目 Settings-> Secrets-> New Secrets 添加以下3个Secrets。** 
 
+![Secrets图示](docs/imgs/git-secrets.png)
+
 c. **开启Actions并触发每日自动执行**
    
-**Github Actions默认处于关闭状态，请手动开启Actions，执行一次工作流，验证是否可以正常工作。**
+Github Actions默认处于关闭状态，请手动开启Actions，执行一次工作流，验证是否可以正常工作。
 
-**Fork仓库后，GitHub默认不自动执行Actions任务，请修改`./github/trigger.json`文件,将`trigger`的值改为`1`，这样每天就会自动执行定时任务了。**
+![Actions图示](docs/imgs/run-workflow.png)
+
+Fork仓库后，GitHub默认不自动执行Actions任务，请修改`./github/trigger.json`文件,将`trigger`的值改为`1`，这样每天就会自动执行定时任务了。
 
 ```patch
 {
