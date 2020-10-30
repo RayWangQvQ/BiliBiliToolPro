@@ -24,8 +24,6 @@ namespace Ray.BiliBiliTool.Application
         private readonly IVipPrivilegeDomainService _vipPrivilegeDomainService;
         private readonly IChargeDomainService _chargeDomainService;
 
-        //AppendPushMsg desp = AppendPushMsg.getInstance();
-
         public DailyTaskAppService(
             ILogger<DailyTaskAppService> logger,
             IAccountDomainService loginDomainService,
@@ -59,6 +57,8 @@ namespace Ray.BiliBiliTool.Application
         {
             //登录
             _userInfo = _loginDomainService.LoginByCookie();
+            if (_userInfo == null) return;
+
             //获取任务完成情况
             _dailyTaskInfo = _loginDomainService.GetDailyTaskStatus();
 
@@ -86,26 +86,6 @@ namespace Ray.BiliBiliTool.Application
             _mangaDomainService.MangaSign();
             //获取每月大会员漫画权益
             _mangaDomainService.ReceiveMangaVipReward(1, _userInfo);
-
-            /*
-            doServerPush();
-            */
         }
-
-        #region 
-        //public void doServerPush()
-        //{
-        //    if (ServerVerify.getMsgPushKey() != null)
-        //    {
-        //        ServerPush serverPush = new ServerPush();
-        //        serverPush.pushMsg("BILIBILIHELPER任务简报", desp.getPushDesp());
-        //    }
-        //    else
-        //    {
-        //        _logger.LogInformation("未配置server酱,本次执行不推送日志到微信");
-        //    }
-
-        //}
-        #endregion
     }
 }

@@ -31,7 +31,7 @@ namespace Ray.BiliBiliTool.DomainService
 
             if (apiResponse.Code != 0 || !apiResponse.Data.IsLogin)
             {
-                _logger.LogWarning("登录异常，Cookies可能失效了,请仔细检查Github Secrets中DEDEUSERID SESSDATA BILI_JCT三项的值是否正确");
+                _logger.LogWarning("登录异常，Cookies可能失效了,请仔细检查Github Secrets中DEDEUSERID、SESSDATA、BILI_JCT三项的值是否正确");
                 return null;
             }
 
@@ -41,7 +41,7 @@ namespace Ray.BiliBiliTool.DomainService
 
             //用户名模糊处理
             _logger.LogInformation("用户名称: {0}", useInfo.GetFuzzyUname());
-            _logger.LogInformation("硬币余额: " + useInfo.Money);
+            _logger.LogInformation("硬币余额: {0}", useInfo.Money);
 
             if (useInfo.Level_info.Current_level < 6)
             {
@@ -51,7 +51,7 @@ namespace Ray.BiliBiliTool.DomainService
             }
             else
             {
-                _logger.LogInformation("当前等级Lv6，经验值为：" + useInfo.Level_info.Current_exp);
+                _logger.LogInformation("当前等级Lv6，经验值为：{0}", useInfo.Level_info.Current_exp);
             }
 
             return useInfo;
@@ -61,22 +61,21 @@ namespace Ray.BiliBiliTool.DomainService
         /// 获取每日任务完成情况
         /// </summary>
         /// <returns></returns>
-        [LogIntercepter("获取今日任务完成状态")]
+        //[LogIntercepter("获取今日任务完成状态")]
         public DailyTaskInfo GetDailyTaskStatus()
         {
-            DailyTaskInfo result = new DailyTaskInfo();
+            var result = new DailyTaskInfo();
             var apiResponse = _dailyTaskApi.GetDailyTaskRewardInfo().Result;
             if (apiResponse.Code == 0)
             {
-                _logger.LogInformation("请求本日任务完成状态成功");
-                //desp.appendDesp("请求本日任务完成状态成功");
+                //_logger.LogInformation("请求本日任务完成状态成功");
                 result = apiResponse.Data;
             }
             else
             {
-                _logger.LogDebug(JsonSerializer.Serialize(apiResponse));
+                _logger.LogWarning("获取今日任务完成状态失败：{result}", JsonSerializer.Serialize(apiResponse));
                 result = _dailyTaskApi.GetDailyTaskRewardInfo().Result.Data;
-                //todo:偶发性请求失败，再请求一次
+                //todo:偶发性请求失败，再请求一次，这么些很丑陋，待用polly实现
             }
 
             return result;
