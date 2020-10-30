@@ -36,18 +36,22 @@ namespace Ray.BiliBiliTool.DomainService
         {
             int day = DateTime.Today.Day;
 
+            if (day != 1)
+            {
+                _logger.LogInformation("今天是{day}号，每月的1号会自动为您领取权益哒", day);
+            }
+
             //大会员类型
             int vipType = useInfo.GetVipType();
 
-            if (day == 1 && vipType == 2)
+            if (vipType == 2)
             {
                 ReceiveVipPrivilege(1);
                 ReceiveVipPrivilege(2);
             }
-
-            if (vipType == 0 || vipType == 1)
+            else
             {
-                _logger.LogInformation("普通会员和月度大会员每月不赠送B币券，所以没法给自己充电哦");
+                _logger.LogInformation("普通会员和月度大会员每月不赠送B币券，所以不需要领取权益喽");
             }
         }
 
@@ -73,7 +77,7 @@ namespace Ray.BiliBiliTool.DomainService
             }
             else
             {
-                _logger.LogDebug($"领取年度大会员每月赠送的B币券/大会员福利失败，原因: {response.Message}");
+                _logger.LogInformation($"领取年度大会员每月赠送的B币券/大会员福利失败，原因: {response.Message}");
             }
         }
         #endregion

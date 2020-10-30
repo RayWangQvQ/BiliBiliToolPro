@@ -48,8 +48,7 @@ namespace Ray.BiliBiliTool.DomainService
             int lastDay = DateTime.Today.LastDayOfMonth().Day;
             if (DateTime.Today.Day != lastDay)
             {
-                _logger.LogInformation($"今天是本月的第: {DateTime.Today.Day}天，等到{lastDay}号会自动为您充电哒");
-                //desp.appendDesp("今天是本月的第: " + day + "天，还没到给自己充电日子呢");
+                _logger.LogInformation($"今天是{DateTime.Today.Day}号，本月底（{lastDay}号）会自动为您充电哒");
                 return;
             }
 
@@ -76,7 +75,6 @@ namespace Ray.BiliBiliTool.DomainService
                 {
                     _logger.LogInformation("月底了，给自己充电成功啦，送的B币券没有浪费哦");
                     _logger.LogInformation("本次给自己充值了: " + couponBalance * 10 + "个电池哦");
-                    //desp.appendDesp("本次给自己充值了: " + couponBalance * 10 + "个电池哦");
 
                     //获取充电留言token
                     ChargeComments(response.Data.Order_no);

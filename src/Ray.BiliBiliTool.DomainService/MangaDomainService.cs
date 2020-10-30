@@ -41,21 +41,18 @@ namespace Ray.BiliBiliTool.DomainService
             catch (Exception)
             {
                 //ignore
-                //重复签到会报400异常,这里忽略调
+                //重复签到会报400异常,这里忽略掉
                 _logger.LogInformation("哔哩哔哩漫画已经签到过了");
-                //desp.appendDesp("哔哩哔哩漫画已经签到过了");
                 return;
             }
 
             if (response.Code == 0)
             {
                 _logger.LogInformation("完成漫画签到");
-                //desp.appendDesp("完成漫画签到");
             }
             else
             {
                 _logger.LogInformation("漫画签到异常");
-                //desp.appendDesp("完成漫画签到");
             }
         }
 
@@ -72,6 +69,7 @@ namespace Ray.BiliBiliTool.DomainService
             if (day != 1 || userIfo.GetVipType() == 0)
             {
                 //一个月执行一次就行
+                _logger.LogInformation("今天是{day}号，每月的1号会自动为您领取漫读券", day);
                 return;
             }
 

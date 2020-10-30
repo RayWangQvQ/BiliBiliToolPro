@@ -79,7 +79,7 @@ namespace Ray.BiliBiliTool.DomainService
         [LogIntercepter("分享视频")]
         public void ShareVideo(string aid, DailyTaskInfo dailyTaskStatus)
         {
-            if (!dailyTaskStatus.Share)
+            if (dailyTaskStatus.Share)
             {
                 _logger.LogInformation("本日分享视频任务已经完成了，不需要再分享视频了");
                 return;
