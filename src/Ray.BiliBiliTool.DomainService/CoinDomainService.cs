@@ -20,19 +20,16 @@ namespace Ray.BiliBiliTool.DomainService
         private readonly ILogger<CoinDomainService> _logger;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly BiliBiliCookiesOptions _biliBiliCookiesOptions;
-        private readonly IDailyTaskApi _dailyTaskApi;
         private readonly IAccountApi _accountApi;
 
         public CoinDomainService(ILogger<CoinDomainService> logger,
             IHttpClientFactory httpClientFactory,
             IOptionsMonitor<BiliBiliCookiesOptions> biliBiliCookiesOptions,
-            IDailyTaskApi dailyTaskApi,
             IAccountApi accountApi)
         {
             _logger = logger;
             _httpClientFactory = httpClientFactory;
             _biliBiliCookiesOptions = biliBiliCookiesOptions.CurrentValue;
-            _dailyTaskApi = dailyTaskApi;
             _accountApi = accountApi;
         }
 

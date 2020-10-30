@@ -159,7 +159,7 @@ namespace Ray.BiliBiliTool.DomainService
                 tryCount++;
 
                 string aid = RegionRanking();//todo：只调用一次获取视频集合接口，一次性获取足够数量的视频，避免每次都获取视频
-                //_logger.LogInformation("正在为av{aid}投币", aid);
+                _logger.LogDebug("正在为av{aid}投币", aid);
 
                 bool isSuccess = AddCoinsForVideo(aid, 1, _dailyTaskOptions.CurrentValue.SelectLike);
                 if (isSuccess)
@@ -184,20 +184,20 @@ namespace Ray.BiliBiliTool.DomainService
         /// <param name="multiply">投币数量</param>
         /// <param name="select_like">是否同时点赞 1是0否</param>
         /// <returns>是否投币成功</returns>
-        public bool AddCoinsForVideo(string aid, int multiply, int select_like)
+        public bool AddCoinsForVideo(string aid, int multiply, bool select_like)
         {
             //判断曾经是否对此av投币过
             if (IsDonatedCoinsForVideo(aid))
             {
-                //_logger.LogDebug("{aid}已经投币过了", aid);
+                _logger.LogDebug("{aid}已经投币过了", aid);
                 return false;
             }
 
-            var result = _dailyTaskApi.AddCoinForVideo(aid, multiply, select_like, _biliBiliCookiesOptions.BiliJct).Result;
+            var result = _dailyTaskApi.AddCoinForVideo(aid, multiply, select_like ? 1 : 0, _biliBiliCookiesOptions.BiliJct).Result;
 
             if (result != null)//todo：
             {
-                _logger.LogInformation("为Av{aid}投币成功", aid);
+                _logger.LogInformation("为Av{aid}投币成功", aid);//todo:视频名称
                 return true;
             }
             else

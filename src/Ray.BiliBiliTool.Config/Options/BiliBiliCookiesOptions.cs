@@ -1,13 +1,18 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.ComponentModel;
+using Microsoft.Extensions.Logging;
+using Ray.BiliBiliTool.Infrastructure.Extensions;
 
 namespace Ray.BiliBiliTool.Config.Options
 {
     public class BiliBiliCookiesOptions
     {
+        [Description("DedeUserID")]
         public string UserId { get; set; }
 
+        [Description("SESSDATA")]
         public string SessData { get; set; }
 
+        [Description("bili_jct")]
         public string BiliJct { get; set; }
 
         public bool Check(ILogger logger)
@@ -17,17 +22,17 @@ namespace Ray.BiliBiliTool.Config.Options
 
             if (string.IsNullOrWhiteSpace(UserId))
             {
-                logger.LogWarning(msg, "UserId", "DEDEUSERID");
+                logger.LogWarning(msg, nameof(UserId), GetPropertyDescription(nameof(UserId)));
                 result = false;
             }
             if (string.IsNullOrWhiteSpace(SessData))
             {
-                logger.LogWarning(msg, "SessData", "SESSDATA");
+                logger.LogWarning(msg, nameof(SessData), GetPropertyDescription(nameof(SessData)));
                 result = false;
             }
             if (string.IsNullOrWhiteSpace(BiliJct))
             {
-                logger.LogWarning(msg, "BiliJct", "BILI_JCT");
+                logger.LogWarning(msg, nameof(BiliJct), GetPropertyDescription(nameof(BiliJct)));
                 result = false;
             }
 
@@ -37,7 +42,12 @@ namespace Ray.BiliBiliTool.Config.Options
 
         public override string ToString()
         {
-            return $"bili_jct={BiliJct};SESSDATA={SessData};DedeUserID={UserId}";
+            return $"{GetPropertyDescription(nameof(BiliJct))}={BiliJct};{GetPropertyDescription(nameof(SessData))}={SessData};{GetPropertyDescription(nameof(UserId))}={UserId}";
+        }
+
+        private string GetPropertyDescription(string propertyName)
+        {
+            return GetType().GetPropertyDescription(propertyName);
         }
     }
 }

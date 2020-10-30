@@ -7,6 +7,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Ray.BiliBiliTool.Agent
 {
+    /// <summary>
+    /// HttpClient切面
+    /// </summary>
     public class MyHttpClientDelegatingHandler : DelegatingHandler
     {
         private readonly ILogger<MyHttpClientDelegatingHandler> _logger;
