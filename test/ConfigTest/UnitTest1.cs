@@ -4,6 +4,7 @@ using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Config;
+using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.Console;
 using Xunit;
 using Ray.BiliBiliTool.Infrastructure;

@@ -1,4 +1,4 @@
-﻿namespace Ray.BiliBiliTool.Config
+﻿namespace Ray.BiliBiliTool.Config.Options
 {
     /// <summary>
     /// 每日任务配置

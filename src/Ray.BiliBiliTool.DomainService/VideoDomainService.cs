@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent.Dtos;
 using Ray.BiliBiliTool.Agent.Interfaces;
 using Ray.BiliBiliTool.Config;
+using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Attributes;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 
@@ -39,7 +40,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// 获取随机视频
         /// </summary>
         /// <returns></returns>
-        [LogIntercepter("获取随机视频")]
+        //[LogIntercepter("获取随机视频")]
         public string GetRandomVideo()
         {
             string aid = RegionRanking();
@@ -64,12 +65,10 @@ namespace Ray.BiliBiliTool.DomainService
             if (apiResponse.Code == 0)
             {
                 _logger.LogInformation("av{aid}播放成功,已观看到第{playedTime}秒", aid, playedTime);
-                //desp.appendDesp("av" + aid + "播放成功,已观看到第" + playedTime + "秒");
             }
             else
             {
                 _logger.LogDebug("av{aid}播放失败,原因：{msg}", aid, apiResponse.Message);
-                //desp.appendDesp("av" + aid + "播放成功,已观看到第" + playedTime + "秒");
             }
         }
 
@@ -80,7 +79,7 @@ namespace Ray.BiliBiliTool.DomainService
         [LogIntercepter("分享视频")]
         public void ShareVideo(string aid, DailyTaskInfo dailyTaskStatus)
         {
-            if (!dailyTaskStatus.Share)
+            if (dailyTaskStatus.Share)
             {
                 _logger.LogInformation("本日分享视频任务已经完成了，不需要再分享视频了");
                 return;
@@ -91,13 +90,11 @@ namespace Ray.BiliBiliTool.DomainService
             if (apiResponse.Code == 0)
             {
                 _logger.LogInformation("视频: av{aid}分享成功", aid);
-                //desp.appendDesp("视频: av" + aid + "分享成功");
             }
             else
             {
                 _logger.LogDebug("视频分享失败，原因: {msg}", apiResponse.Message);
                 _logger.LogDebug("开发者提示: 如果是csrf校验失败请检查BILI_JCT参数是否正确或者失效");
-                //desp.appendDesp("重要:csrf校验失败请检查BILI_JCT参数是否正确或者失效");
             }
         }
 
@@ -111,12 +108,12 @@ namespace Ray.BiliBiliTool.DomainService
             int multiply = _dailyTaskApi.GetDonatedCoinsForVideo(aid).Result.Data.Multiply;
             if (multiply > 0)
             {
-                _logger.LogInformation("已经为Av" + aid + "投过" + multiply + "枚硬币啦");
+                //_logger.LogInformation("已经为Av" + aid + "投过" + multiply + "枚硬币啦");
                 return true;
             }
             else
             {
-                _logger.LogInformation("还没有为Av" + aid + " 投过硬币，开始投币");
+                //_logger.LogInformation("还没有为Av" + aid + " 投过硬币，开始投币");
                 return false;
             }
         }
@@ -127,69 +124,57 @@ namespace Ray.BiliBiliTool.DomainService
         [LogIntercepter("投币")]
         public void AddCoinsForVideo()
         {
-            //投币最多操作数 解决csrf校验失败时死循环的问题
-            int addCoinOperateCount = 0;
-            //安全检查，最多投币数
-            int maxNumberOfCoins = 5;
-            //获取自定义配置投币数 配置写在src/main/resources/config.json中
-            int setCoin = _dailyTaskOptions.CurrentValue.NumberOfCoins;
-            //已投的硬币
-            int useCoin = _coinDomainService.GetDonatedCoins();
-
-            //还需要投的币=设置投币数-已投的币数
-            if (setCoin > maxNumberOfCoins)
-            {
-                _logger.LogInformation("自定义投币数为: {setCoin}枚,为保护你的资产，自定义投币数重置为: {maxNumberOfCoins}枚", setCoin, maxNumberOfCoins);
-                setCoin = maxNumberOfCoins;
-            }
-
-            _logger.LogInformation("自定义投币数为: {setCoin}枚,程序执行前已投: {useCoin}枚", setCoin, useCoin);
-            //desp.appendDesp($"自定义投币数为: {setCoin}枚,程序执行前已投: {useCoin}枚");
-            int needCoins = setCoin - useCoin;
-
-            //投币前硬币余额
-            int coinBalance = _coinDomainService.GetCoinBalance();
+            int needCoins = GetNeedDonateCoins(out int alreadyCoins, out int targetCoins);
+            _logger.LogInformation("今日已投{already}枚硬币，目标是投{target}枚硬币", alreadyCoins, targetCoins);
 
             if (needCoins <= 0)
             {
-                _logger.LogInformation("已完成设定的投币任务，今日无需再投币了");
-            }
-            else
-            {
-                _logger.LogInformation("投币数调整为: {needCoins}枚", needCoins);
-                //投币数大于余额时，按余额投
-                if (needCoins > coinBalance)
-                {
-                    _logger.LogInformation("完成今日设定投币任务还需要投: {needCoins}枚硬币，但是余额只有: {coinBalance}", needCoins, coinBalance);
-                    _logger.LogInformation("投币数调整为: {coinBalance}", coinBalance);
-                    needCoins = coinBalance;
-                }
+                _logger.LogInformation("已完成投币任务，今天不需要再投啦");
+                return;
             }
 
+            _logger.LogInformation("还需再投{need}枚硬币", needCoins);
+
+            //投币前硬币余额
+            int coinBalance = _coinDomainService.GetCoinBalance();
             _logger.LogInformation("投币前余额为 : " + coinBalance);
-            //desp.appendDesp("投币前余额为 : " + beforeAddCoinBalance);
 
-            while (needCoins > 0 && needCoins <= maxNumberOfCoins)
+            if (coinBalance <= 0)
             {
-                string aid = RegionRanking();
-                addCoinOperateCount++;
-                _logger.LogInformation("正在为av{aid}投币", aid);
-                //desp.appendDesp("正在为av" + aid + "投币");
+                _logger.LogInformation("因硬币余额不足，今日暂不执行投币任务");
+                return;
+            }
 
-                bool flag = AddCoinsForVideo(aid, 1, _dailyTaskOptions.CurrentValue.SelectLike);
-                if (flag)
+            //余额小于目标投币数，按余额投
+            if (coinBalance < needCoins)
+            {
+                _logger.LogInformation("因硬币余额不足，目标投币数调整为: {coinBalance}", coinBalance);
+                needCoins = coinBalance;
+            }
+
+            int successCoins = 0;
+            int tryCount = 0;//投币最多操作数 解决csrf校验失败时死循环的问题
+            while (successCoins < needCoins)
+            {
+                tryCount++;
+
+                string aid = RegionRanking();//todo：只调用一次获取视频集合接口，一次性获取足够数量的视频，避免每次都获取视频
+                //_logger.LogInformation("正在为av{aid}投币", aid);
+
+                bool isSuccess = AddCoinsForVideo(aid, 1, _dailyTaskOptions.CurrentValue.SelectLike);
+                if (isSuccess)
                 {
-                    needCoins--;
+                    successCoins++;
                 }
 
-                if (addCoinOperateCount > 10)
+                if (tryCount > 10)
                 {
+                    _logger.LogInformation("尝试投币次数超过10次，投币任务终止");
                     break;
                 }
             }
 
             _logger.LogInformation("投币任务完成后余额为: " + _accountApi.GetCoinBalance().Result.Data.Money);
-            //desp.appendDesp("投币任务完成后余额为: " + OftenAPI.getCoinBalance());
         }
 
         /// <summary>
@@ -204,24 +189,21 @@ namespace Ray.BiliBiliTool.DomainService
             //判断曾经是否对此av投币过
             if (IsDonatedCoinsForVideo(aid))
             {
-                _logger.LogDebug("{aid}已经投币过了", aid);
+                //_logger.LogDebug("{aid}已经投币过了", aid);
                 return false;
+            }
+
+            var result = _dailyTaskApi.AddCoinForVideo(aid, multiply, select_like, _biliBiliCookiesOptions.BiliJct).Result;
+
+            if (result != null)//todo：
+            {
+                _logger.LogInformation("为Av{aid}投币成功", aid);
+                return true;
             }
             else
             {
-                var result = _dailyTaskApi.AddCoinForVideo(aid, multiply, select_like, _biliBiliCookiesOptions.BiliJct).Result;
-
-                if (result != null)
-                {
-                    _logger.LogInformation("为Av{aid}投币成功", aid);
-                    //desp.appendDesp("为Av" + aid + "投币成功");
-                    return true;
-                }
-                else
-                {
-                    _logger.LogInformation("投币失败");
-                    return false;
-                }
+                _logger.LogInformation("为Av{aid}投币失败", aid);
+                return false;
             }
         }
 
@@ -259,9 +241,35 @@ namespace Ray.BiliBiliTool.DomainService
         {
             var apiResponse = _dailyTaskApi.GetRegionRankingVideos(rid, day).Result;
 
-            _logger.LogInformation("获取分区:{rid}的{day}日top10榜单成功", rid, day);
+            //_logger.LogInformation("获取分区:{rid}的{day}日top10榜单成功", rid, day);
 
             return apiResponse.Data[new Random().Next(apiResponse.Data.Count)].Aid;
+        }
+
+        /// <summary>
+        /// 获取今日的目标投币数
+        /// </summary>
+        /// <param name="alreadyCoins"></param>
+        /// <param name="targetCoins"></param>
+        /// <returns></returns>
+        private int GetNeedDonateCoins(out int alreadyCoins, out int targetCoins)
+        {
+            int needCoins = 0;
+
+            //获取自定义配置投币数
+            int configCoins = _dailyTaskOptions.CurrentValue.NumberOfCoins;
+            //已投的硬币
+            alreadyCoins = _coinDomainService.GetDonatedCoins();
+            //目标
+            targetCoins = configCoins > Constants.MaxNumberOfDonateCoins
+                ? Constants.MaxNumberOfDonateCoins
+                : configCoins;
+
+            if (targetCoins > alreadyCoins)
+            {
+                return targetCoins - alreadyCoins;
+            }
+            return needCoins;
         }
         #endregion
     }

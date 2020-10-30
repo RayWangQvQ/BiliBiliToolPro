@@ -1,7 +1,6 @@
-﻿using System;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 
-namespace Ray.BiliBiliTool.Config
+namespace Ray.BiliBiliTool.Config.Options
 {
     public class BiliBiliCookiesOptions
     {

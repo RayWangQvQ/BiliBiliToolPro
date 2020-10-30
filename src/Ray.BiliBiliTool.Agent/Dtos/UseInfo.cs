@@ -19,7 +19,7 @@ namespace Ray.BiliBiliTool.Agent.Dtos
 
         public int VipStatus { get; set; }
 
-        public int VipType { get; set; }
+        public int VipType { get; set; }//todo:是否可以改为枚举
 
         public string GetFuzzyUname()
         {

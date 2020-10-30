@@ -9,6 +9,7 @@ using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.Dtos;
 using Ray.BiliBiliTool.Agent.Interfaces;
 using Ray.BiliBiliTool.Config;
+using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 using Ray.BiliBiliTool.Infrastructure.Helpers;
 
@@ -70,6 +71,8 @@ namespace Ray.BiliBiliTool.DomainService
             HttpResponseMessage result = client.GetAsync(ApiList.needCoin).Result;
             var data = result.Content.ReadAsByteArrayAsync().Result;
             var dataStr = ZipHelper.ReadGzip(data);
+
+            _logger.LogDebug("调用获取今日投币经验返回: {0}", dataStr);
 
             ExperienceByDonateCoin re = JsonSerializer.Deserialize<ExperienceByDonateCoin>(dataStr);
 
