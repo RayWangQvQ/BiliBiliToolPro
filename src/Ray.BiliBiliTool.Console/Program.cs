@@ -75,7 +75,7 @@ namespace Ray.BiliBiliTool.Console
                 {
                     logger.LogWarning("请正确配置后再运行，配置方式见 https://github.com/RayWangQvQ/BiliBiliTool");
                     return;
-                };
+                }
 
                 //每日任务65经验
                 IDailyTaskAppService dailyTask = serviceScope.ServiceProvider.GetRequiredService<IDailyTaskAppService>();
@@ -86,7 +86,8 @@ namespace Ray.BiliBiliTool.Console
                 }
                 catch (Exception e)
                 {
-                    logger.LogError("程序发生异常：{msg}。详情：{error}", e.Message, JsonSerializer.Serialize(e));
+                    logger.LogError("程序发生异常：{msg}", e.Message);
+                    throw;
                 }
 
                 logger.LogInformation("-----任务结束-----");

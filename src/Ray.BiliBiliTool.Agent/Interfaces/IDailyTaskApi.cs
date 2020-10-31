@@ -40,7 +40,7 @@ namespace Ray.BiliBiliTool.Agent.Interfaces
         /// </summary>
         /// <returns></returns>
         [Post("/x/click-interface/web/heartbeat?aid={aid}&played_time={playedTime}")]
-        Task<BiliApiResponse> UploadVideoHeartbeat(long aid, int playedTime);
+        Task<BiliApiResponse> UploadVideoHeartbeat(string aid, int playedTime);
 
         /// <summary>
         /// 分享视频
@@ -49,7 +49,7 @@ namespace Ray.BiliBiliTool.Agent.Interfaces
         /// <param name="csrf"></param>
         /// <returns></returns>
         [Post("/x/web-interface/share/add?aid={aid}&csrf={csrf}")]
-        Task<BiliApiResponse> ShareVideo(long aid, string csrf);
+        Task<BiliApiResponse> ShareVideo(string aid, string csrf);
 
         /// <summary>
         /// 分享视频
@@ -57,10 +57,10 @@ namespace Ray.BiliBiliTool.Agent.Interfaces
         /// <param name="aid"></param>
         /// <returns></returns>
         [Get("/x/web-interface/archive/coins?aid={aid}")]
-        Task<BiliApiResponse<DonatedCoinsForVideo>> GetDonatedCoinsForVideo(long aid);
+        Task<BiliApiResponse<DonatedCoinsForVideo>> GetDonatedCoinsForVideo(string aid);
 
         [Post("/x/web-interface/coin/add?aid={aid}&multiply={multiply}&select_like={select_like}&cross_domain=true&csrf={csrf}")]
-        Task<BiliApiResponse> AddCoinForVideo(long aid, int multiply, int select_like, string csrf);
+        Task<BiliApiResponse> AddCoinForVideo(string aid, int multiply, int select_like, string csrf);
 
         [Post("/x/vip/privilege/receive?type={type}&csrf={csrf}")]
         Task<BiliApiResponse> ReceiveVipPrivilege(int type, string csrf);

@@ -18,7 +18,7 @@ namespace DailyTaskTest
             {
                 var dailyTask = scope.ServiceProvider.GetRequiredService<IVideoDomainService>();
 
-                long aid = 585105826;
+                string aid = "585105826";
                 bool result = dailyTask.IsDonatedCoinsForVideo(aid);
                 Assert.False(result);
             }
