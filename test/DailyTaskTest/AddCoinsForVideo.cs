@@ -33,7 +33,7 @@ namespace DailyTaskTest
             {
                 var dailyTaskAppService = scope.ServiceProvider.GetRequiredService<IVideoDomainService>();
 
-                dailyTaskAppService.AddCoinsForVideo(627549610, 1, true);
+                dailyTaskAppService.AddCoinsForVideo("627549610", 1, true);
             }
 
             Assert.True(true);
