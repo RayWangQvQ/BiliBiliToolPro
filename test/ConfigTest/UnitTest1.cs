@@ -18,11 +18,11 @@ namespace ConfigTest
         {
             Program.PreWorks(new string[] { });
 
-            string s = RayConfiguration.Root["BiliBiliCookies:UserId"];
+            string s = RayConfiguration.Root["BiliBiliCookie:UserId"];
             Debug.WriteLine(s);
             Assert.True(!string.IsNullOrWhiteSpace(s));
 
-            var options = RayContainer.Root.GetRequiredService<IOptionsMonitor<BiliBiliCookiesOptions>>();
+            var options = RayContainer.Root.GetRequiredService<IOptionsMonitor<BiliBiliCookieOptions>>();
 
             Debug.WriteLine(JsonSerializer.Serialize(options.CurrentValue, new JsonSerializerOptions { WriteIndented = true }));
             Assert.True(!string.IsNullOrWhiteSpace(options.CurrentValue.UserId));

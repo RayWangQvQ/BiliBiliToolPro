@@ -23,5 +23,20 @@ namespace DailyTaskTest
 
             Assert.True(true);
         }
+
+        [Fact]
+        public void Test2()
+        {
+            Program.PreWorks(new string[] { });
+
+            using (var scope = RayContainer.Root.CreateScope())
+            {
+                var dailyTaskAppService = scope.ServiceProvider.GetRequiredService<IVideoDomainService>();
+
+                dailyTaskAppService.AddCoinsForVideo(627549610, 1, true);
+            }
+
+            Assert.True(true);
+        }
     }
 }

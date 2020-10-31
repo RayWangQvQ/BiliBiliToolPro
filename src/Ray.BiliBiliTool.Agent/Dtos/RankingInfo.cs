@@ -5,7 +5,7 @@
     /// </summary>
     public class RankingInfo
     {
-        public string Aid { get; set; }
+        public long Aid { get; set; }
 
         public string Bvid { get; set; }
 

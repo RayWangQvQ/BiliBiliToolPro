@@ -39,7 +39,7 @@ namespace Ray.BiliBiliTool.Console
         {
             RayConfiguration.Root = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", false, true)
-                .AddCommandLine(args, CommandLineMapper.Mapper)
+                .AddCommandLine(args, Constants.CommandLineMapper)
                 //.AddJsonFile("appsettings.local.json", true,true)
                 .Build();
 
@@ -70,8 +70,12 @@ namespace Ray.BiliBiliTool.Console
                 var logger = serviceScope.ServiceProvider.GetRequiredService<ILogger<Program>>();
                 logger.LogInformation("-----任务启动-----\r\n");
 
-                BiliBiliCookiesOptions biliBiliCookiesOptions = serviceScope.ServiceProvider.GetRequiredService<IOptionsMonitor<BiliBiliCookiesOptions>>().CurrentValue;
-                if (!biliBiliCookiesOptions.Check(logger)) return;
+                BiliBiliCookieOptions biliBiliCookieOptions = serviceScope.ServiceProvider.GetRequiredService<IOptionsMonitor<BiliBiliCookieOptions>>().CurrentValue;
+                if (!biliBiliCookieOptions.Check(logger))
+                {
+                    logger.LogWarning("请正确配置后再运行，配置方式见 https://github.com/RayWangQvQ/BiliBiliTool");
+                    return;
+                };
 
                 //每日任务65经验
                 IDailyTaskAppService dailyTask = serviceScope.ServiceProvider.GetRequiredService<IDailyTaskAppService>();

@@ -2,6 +2,9 @@
 
 namespace Ray.BiliBiliTool.Agent
 {
+    /// <summary>
+    /// bilibili接口列表
+    /// </summary>
     public class ApiList
     {
         /// <summary>
@@ -72,10 +75,6 @@ namespace Ray.BiliBiliTool.Agent
         /// </summary>
         public static String vipPrivilegeReceive = "https://api.bilibili.com/x/vip/privilege/receive";
 
-
-        public static String ServerPush = "https://sc.ftqq.com/";
-
-
         /// <summary>
         /// 查询主站硬币余额
         /// </summary>
@@ -97,6 +96,6 @@ namespace Ray.BiliBiliTool.Agent
         /// </summary>
         public static String mangaGetVipReward = "https://manga.bilibili.com/twirp/user.v1.User/GetVipReward";
 
+        public static String ServerPush = "https://sc.ftqq.com/";
     }
-
 }
