@@ -21,6 +21,8 @@ namespace Ray.BiliBiliTool.Config
             {"-dayOfAutoCharge","DailyTaskConfig:DayOfAutoCharge" },
             {"-dayOfReceiveVipPrivilege","DailyTaskConfig:DayOfReceiveVipPrivilege" },
             {"-devicePlatform","DailyTaskConfig:DevicePlatform" },
+
+            {"-closeConsoleWhenEnd","CloseConsoleWhenEnd" }
         };
 
         /// <summary>

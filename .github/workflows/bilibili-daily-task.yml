@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '10 6 * * *'
-    # cron表达式，Actions时区是UTC时间，所以要往前推8个小时
+    # cron表达式，Actions时区是UTC时间，所以要往前推8个小时,如上表示每天14点10分
 
 jobs:
   run-bilibili-tool:
@@ -34,5 +34,5 @@ jobs:
         userId: ${{secrets.USERID}}
         sessData: ${{secrets.SESSDATA}}
         biliJct: ${{secrets.BILIJCT}}
-        otherConfig: ${{secrets.OTHERCONFIG}}
-      run: dotnet run -p ./src/Ray.BiliBiliTool.Console -userId=${userId} -sessData=${sessData} -biliJct=${biliJct} ${otherConfig}
+        otherConfigs: ${{secrets.OTHERCONFIGS}}
+      run: dotnet run -p ./src/Ray.BiliBiliTool.Console -userId=${userId} -sessData=${sessData} -biliJct=${biliJct} -closeConsoleWhenEnd=1 ${otherConfigs}
