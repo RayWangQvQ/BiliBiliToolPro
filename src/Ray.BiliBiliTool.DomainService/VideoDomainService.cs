@@ -42,7 +42,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// </summary>
         /// <returns></returns>
         //[LogIntercepter("获取随机视频")]
-        public long GetRandomVideo()
+        public string GetRandomVideo()
         {
             return RegionRanking().Item1;
         }
@@ -51,7 +51,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// 观看视频
         /// </summary>
         [LogIntercepter("观看视频")]
-        public void WatchVideo(long aid, DailyTaskInfo dailyTaskStatus)
+        public void WatchVideo(string aid, DailyTaskInfo dailyTaskStatus)
         {
             if (dailyTaskStatus.Watch)
             {
@@ -77,7 +77,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// </summary>
         /// <param name="aid">视频aid</param>
         [LogIntercepter("分享视频")]
-        public void ShareVideo(long aid, DailyTaskInfo dailyTaskStatus)
+        public void ShareVideo(string aid, DailyTaskInfo dailyTaskStatus)
         {
             if (dailyTaskStatus.Share)
             {
@@ -103,7 +103,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// </summary>
         /// <param name="aid">av号</param>
         /// <returns></returns>
-        public bool IsDonatedCoinsForVideo(long aid)
+        public bool IsDonatedCoinsForVideo(string aid)
         {
             int multiply = _dailyTaskApi.GetDonatedCoinsForVideo(aid).Result.Data.Multiply;
             if (multiply > 0)
@@ -160,12 +160,12 @@ namespace Ray.BiliBiliTool.DomainService
             {
                 tryCount++;
 
-                long aid;
+                string aid;
                 string title;
                 //优选使用配置的up主视频
                 if (upVideoIndex < upVideos.Count)
                 {
-                    aid = upVideos[tryCount - 1].Aid;
+                    aid = upVideos[tryCount - 1].Aid.ToString();
                     title = upVideos[tryCount - 1].Title;
                     upVideoIndex++;
                 }
@@ -209,7 +209,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// <param name="multiply">投币数量</param>
         /// <param name="select_like">是否同时点赞 1是0否</param>
         /// <returns>是否投币成功</returns>
-        public bool AddCoinsForVideo(long aid, int multiply, bool select_like)
+        public bool AddCoinsForVideo(string aid, int multiply, bool select_like)
         {
             var result = _dailyTaskApi.AddCoinForVideo(aid, multiply, select_like ? 1 : 0, _biliBiliCookieOptions.BiliJct).Result;
 
@@ -291,7 +291,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// <param name="rid">分区id</param>
         /// <param name="day">日榜，三日榜 周榜 1，3，7</param>
         /// <returns>随机返回一个aid</returns>
-        private Tuple<long, string> RegionRanking()
+        private Tuple<string, string> RegionRanking()
         {
             int[] arr = { 1, 3, 4, 5, 160, 22, 119 };
             int rid = arr[new Random().Next(arr.Length - 1)];
@@ -301,7 +301,7 @@ namespace Ray.BiliBiliTool.DomainService
             //_logger.LogInformation("获取分区:{rid}的{day}日top10榜单成功", rid, day);
             var data = apiResponse.Data[new Random().Next(apiResponse.Data.Count)];
 
-            return Tuple.Create<long, string>(data.Aid, data.Title);
+            return Tuple.Create<string, string>(data.Aid, data.Title);
         }
 
         /// <summary>

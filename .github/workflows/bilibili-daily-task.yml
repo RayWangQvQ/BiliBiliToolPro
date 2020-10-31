@@ -34,10 +34,5 @@ jobs:
         userId: ${{secrets.USERID}}
         sessData: ${{secrets.SESSDATA}}
         biliJct: ${{secrets.BILIJCT}}
-        numberOfCoins: ${{secrets.NUMBEROFCOINS}}
-        selectLike: ${{secrets.SELECTLIKE}}
-        supportUpIds: ${{secrets.SUPPORTUPIDS}}
-        dayOfAutoCharge: ${{secrets.DAYOFAUTOCHARGE}}
-        dayOfReceiveVipPrivilege: ${{secrets.DAYOFRECEIVEVIPPRIVILEGE}}
-        devicePlatform: ${{secrets.DEVICEPLATFORM}}
-      run: dotnet run -p ./src/Ray.BiliBiliTool.Console -userId=${userId} -sessData=${sessData} -biliJct=${biliJct} -numberOfCoins=${numberOfCoins} -selectLike=${selectLike} -supportUpIds=${supportUpIds} -dayOfAutoCharge=${dayOfAutoCharge} -dayOfReceiveVipPrivilege=${dayOfReceiveVipPrivilege} -devicePlatform=${devicePlatform}
+        otherConfig: ${{secrets.OTHERCONFIG}}
+      run: dotnet run -p ./src/Ray.BiliBiliTool.Console -userId=${userId} -sessData=${sessData} -biliJct=${biliJct} ${otherConfig}
