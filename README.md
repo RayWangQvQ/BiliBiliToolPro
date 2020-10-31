@@ -30,6 +30,8 @@ BiliBiliTool是一个针对B站用户自动执行任务的工具，通过它可�
 Github仓库地址：
 [RayWangQvQ/BiliBiliTool](https://github.com/RayWangQvQ/BiliBiliTool)
 
+**注意：本应用仅用于学习和测试,请勿滥用！**
+
 ## 1.如何使用
 
 BiliBiliTool实现自动任务的原理，是通过调用一系列B站开放的接口实现的。
@@ -87,7 +89,7 @@ c. **运行**
 
 P.S.如果自己有服务器，也可以将程序发布到自己的服务器，利用自己的任务系统实现每天自动运行。（有服务器的大佬应该就不需要我多BB了）
 
-#### 1.2.2.方式二：Github Actions每天定时线上自动运行
+#### 1.2.2.方式二（推荐）：Github Actions每天定时线上自动运行
 Github Actions是微软巨硬收购G站之后新增的内置CI/CD方案，其核心就是一个可以运行脚本的小型服务器（2核CPU + 7G RAM + 14 G SSD）。在本例中，我们将利用它实现每天线上自动运行我们的应用程序。
 
 a. **首先fork本项目到自己的仓库**

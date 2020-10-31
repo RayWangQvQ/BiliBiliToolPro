@@ -4,7 +4,10 @@ using Ray.BiliBiliTool.Infrastructure.Extensions;
 
 namespace Ray.BiliBiliTool.Config.Options
 {
-    public class BiliBiliCookiesOptions
+    /// <summary>
+    /// Cookie信息
+    /// </summary>
+    public class BiliBiliCookieOptions
     {
         [Description("DedeUserID")]
         public string UserId { get; set; }

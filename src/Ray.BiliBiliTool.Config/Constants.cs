@@ -11,9 +11,9 @@ namespace Ray.BiliBiliTool.Config
         /// </summary>
         public static readonly Dictionary<string, string> CommandLineMapper = new Dictionary<string, string>
         {
-            {"-userId","BiliBiliCookies:UserId" },
-            {"-sessData","BiliBiliCookies:SessData" },
-            {"-biliJct","BiliBiliCookies:BiliJct" },
+            {"-userId","BiliBiliCookie:UserId" },
+            {"-sessData","BiliBiliCookie:SessData" },
+            {"-biliJct","BiliBiliCookie:BiliJct" },
         };
 
         /// <summary>

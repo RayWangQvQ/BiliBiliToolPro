@@ -19,17 +19,17 @@ namespace Ray.BiliBiliTool.DomainService
     {
         private readonly ILogger<CoinDomainService> _logger;
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly BiliBiliCookiesOptions _biliBiliCookiesOptions;
+        private readonly BiliBiliCookieOptions _biliBiliCookieOptions;
         private readonly IAccountApi _accountApi;
 
         public CoinDomainService(ILogger<CoinDomainService> logger,
             IHttpClientFactory httpClientFactory,
-            IOptionsMonitor<BiliBiliCookiesOptions> biliBiliCookiesOptions,
+            IOptionsMonitor<BiliBiliCookieOptions> biliBiliCookieOptions,
             IAccountApi accountApi)
         {
             _logger = logger;
             _httpClientFactory = httpClientFactory;
-            _biliBiliCookiesOptions = biliBiliCookiesOptions.CurrentValue;
+            _biliBiliCookieOptions = biliBiliCookieOptions.CurrentValue;
             _accountApi = accountApi;
         }
 
@@ -63,7 +63,7 @@ namespace Ray.BiliBiliTool.DomainService
             //todo:这里使用Refit调用，连接、获取成功(Status=200)，但是从Content获取Data异常，确定问题为返回内容被gzip压缩，但是暂未找到解决办法，下面先通过手动调用手动解压实现
 
             var client = _httpClientFactory.CreateClient();
-            client.DefaultRequestHeaders.Add("Cookie", _biliBiliCookiesOptions.ToString());
+            client.DefaultRequestHeaders.Add("Cookie", _biliBiliCookieOptions.ToString());
 
             HttpResponseMessage result = client.GetAsync(ApiList.needCoin).Result;
             var data = result.Content.ReadAsByteArrayAsync().Result;

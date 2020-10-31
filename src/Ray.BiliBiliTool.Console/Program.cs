@@ -70,8 +70,8 @@ namespace Ray.BiliBiliTool.Console
                 var logger = serviceScope.ServiceProvider.GetRequiredService<ILogger<Program>>();
                 logger.LogInformation("-----任务启动-----\r\n");
 
-                BiliBiliCookiesOptions biliBiliCookiesOptions = serviceScope.ServiceProvider.GetRequiredService<IOptionsMonitor<BiliBiliCookiesOptions>>().CurrentValue;
-                if (!biliBiliCookiesOptions.Check(logger)) return;
+                BiliBiliCookieOptions biliBiliCookieOptions = serviceScope.ServiceProvider.GetRequiredService<IOptionsMonitor<BiliBiliCookieOptions>>().CurrentValue;
+                if (!biliBiliCookieOptions.Check(logger)) return;
 
                 //每日任务65经验
                 IDailyTaskAppService dailyTask = serviceScope.ServiceProvider.GetRequiredService<IDailyTaskAppService>();

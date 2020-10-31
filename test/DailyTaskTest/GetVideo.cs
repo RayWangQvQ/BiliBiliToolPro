@@ -6,7 +6,7 @@ using Xunit;
 
 namespace WatchVideoTest
 {
-    public class WatchVideo
+    public class GetVideo
     {
         [Fact]
         public void Test1()
@@ -16,13 +16,10 @@ namespace WatchVideoTest
             using (var scope = RayContainer.Root.CreateScope())
             {
                 var dailyTask = scope.ServiceProvider.GetRequiredService<IVideoDomainService>();
-                var account = scope.ServiceProvider.GetRequiredService<IAccountDomainService>();
 
-                var dailyTaskStatus = account.GetDailyTaskStatus();
-                long aid = dailyTask.GetRandomVideo();
-                dailyTask.WatchVideo(aid, dailyTaskStatus);
+                var re = dailyTask.GetRandomVideosOfUps();
 
-                Assert.True(true);
+                Assert.True(re.Count > 0);
             }
         }
     }

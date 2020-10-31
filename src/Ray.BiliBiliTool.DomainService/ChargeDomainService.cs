@@ -17,19 +17,19 @@ namespace Ray.BiliBiliTool.DomainService
     public class ChargeDomainService : IChargeDomainService
     {
         private readonly ILogger<ChargeDomainService> _logger;
-        private readonly IOptionsMonitor<DailyTaskOptions> _dailyTaskOptions;
+        private readonly DailyTaskOptions _dailyTaskOptions;
         private readonly IDailyTaskApi _dailyTaskApi;
-        private readonly BiliBiliCookiesOptions _verify;
+        private readonly BiliBiliCookieOptions _cookieOptions;
 
         public ChargeDomainService(ILogger<ChargeDomainService> logger,
             IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
             IDailyTaskApi dailyTaskApi,
-            IOptionsMonitor<BiliBiliCookiesOptions> verify)
+            IOptionsMonitor<BiliBiliCookieOptions> cookieOptions)
         {
             _logger = logger;
-            _dailyTaskOptions = dailyTaskOptions;
+            _dailyTaskOptions = dailyTaskOptions.CurrentValue;
             _dailyTaskApi = dailyTaskApi;
-            _verify = verify.CurrentValue;
+            _cookieOptions = cookieOptions.CurrentValue;
         }
 
         /// <summary>
@@ -39,16 +39,19 @@ namespace Ray.BiliBiliTool.DomainService
         [LogIntercepter("自动充电")]
         public void Charge(UseInfo userInfo)
         {
-            if (!_dailyTaskOptions.CurrentValue.MonthEndAutoCharge)
+            if (_dailyTaskOptions.DayOfAutoCharge == 0)
             {
-                _logger.LogInformation("未配置自动充电,跳过充电任务");
+                _logger.LogInformation("已配置为不进行自动充电，跳过充电任务");
                 return;
             }
 
-            int lastDay = DateTime.Today.LastDayOfMonth().Day;
-            if (DateTime.Today.Day != lastDay)
+            int targetDay = _dailyTaskOptions.DayOfAutoCharge == -1
+                ? DateTime.Today.LastDayOfMonth().Day
+                : _dailyTaskOptions.DayOfAutoCharge;
+
+            if (DateTime.Today.Day != targetDay)
             {
-                _logger.LogInformation($"今天是{DateTime.Today.Day}号，本月底（{lastDay}号）会自动为您充电哒");
+                _logger.LogInformation($"目标充电日期为{targetDay}号，今天是{DateTime.Today.Day}号，跳过充电任务");
                 return;
             }
 
@@ -68,13 +71,13 @@ namespace Ray.BiliBiliTool.DomainService
                 return;
             }
 
-            var response = _dailyTaskApi.Charge(couponBalance * 10, _verify.UserId, _verify.UserId, _verify.BiliJct).Result;
+            var response = _dailyTaskApi.Charge(couponBalance * 10, _cookieOptions.UserId, _cookieOptions.UserId, _cookieOptions.BiliJct).Result;
             if (response.Code == 0)
             {
                 if (response.Data.Status == 4)
                 {
-                    _logger.LogInformation("月底了，给自己充电成功啦，送的B币券没有浪费哦");
-                    _logger.LogInformation("本次给自己充值了: " + couponBalance * 10 + "个电池哦");
+                    _logger.LogInformation("给自己充电成功啦，送的B币券没有浪费哦");
+                    _logger.LogInformation($"本次给自己充值了: {couponBalance * 10}个电池哦");
 
                     //获取充电留言token
                     ChargeComments(response.Data.Order_no);
@@ -96,7 +99,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// <param name="token"></param>
         public void ChargeComments(string token)
         {
-            _dailyTaskApi.ChargeComment(token, "Ray.BiliBiliTool自动充电", _verify.BiliJct);
+            _dailyTaskApi.ChargeComment(token, "Ray.BiliBiliTool自动充电", _cookieOptions.BiliJct);
         }
     }
 }

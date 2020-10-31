@@ -10,6 +10,8 @@ namespace Ray.BiliBiliTool.Agent.Interfaces
     /// </summary>
     public interface IDailyTaskApi : IBiliBiliApi
     {
+        //todo：考虑根据领域拆分改接口
+
         /// <summary>
         /// 登录
         /// </summary>
@@ -38,7 +40,7 @@ namespace Ray.BiliBiliTool.Agent.Interfaces
         /// </summary>
         /// <returns></returns>
         [Post("/x/click-interface/web/heartbeat?aid={aid}&played_time={playedTime}")]
-        Task<BiliApiResponse> UploadVideoHeartbeat(string aid, int playedTime);
+        Task<BiliApiResponse> UploadVideoHeartbeat(long aid, int playedTime);
 
         /// <summary>
         /// 分享视频
@@ -47,7 +49,7 @@ namespace Ray.BiliBiliTool.Agent.Interfaces
         /// <param name="csrf"></param>
         /// <returns></returns>
         [Post("/x/web-interface/share/add?aid={aid}&csrf={csrf}")]
-        Task<BiliApiResponse> ShareVideo(string aid, string csrf);
+        Task<BiliApiResponse> ShareVideo(long aid, string csrf);
 
         /// <summary>
         /// 分享视频
@@ -55,10 +57,10 @@ namespace Ray.BiliBiliTool.Agent.Interfaces
         /// <param name="aid"></param>
         /// <returns></returns>
         [Get("/x/web-interface/archive/coins?aid={aid}")]
-        Task<BiliApiResponse<DonatedCoinsForVideo>> GetDonatedCoinsForVideo(string aid);
+        Task<BiliApiResponse<DonatedCoinsForVideo>> GetDonatedCoinsForVideo(long aid);
 
         [Post("/x/web-interface/coin/add?aid={aid}&multiply={multiply}&select_like={select_like}&cross_domain=true&csrf={csrf}")]
-        Task<BiliApiResponse> AddCoinForVideo(string aid, int multiply, int select_like, string csrf);
+        Task<BiliApiResponse> AddCoinForVideo(long aid, int multiply, int select_like, string csrf);
 
         [Post("/x/vip/privilege/receive?type={type}&csrf={csrf}")]
         Task<BiliApiResponse> ReceiveVipPrivilege(int type, string csrf);
@@ -84,5 +86,25 @@ namespace Ray.BiliBiliTool.Agent.Interfaces
         /// <returns></returns>
         [Post("/x/ugcpay/trade/elec/message?order_id={order_id}&message={message}&csrf={csrf}")]
         Task<BiliApiResponse<ChargeResponse>> ChargeComment(string order_id, string message, string csrf);
+
+        /// <summary>
+        /// 获取指定Up的视频
+        /// </summary>
+        /// <param name="upId"></param>
+        /// <param name="pageSize"></param>
+        /// <returns></returns>
+        [Get("/x/v2/medialist/resource/list?type=1&biz_id={upId}&bvid=&mobi_app=web&ps={pageSize}&direction=false")]
+        Task<BiliApiResponse<GetVideosResponse>> GetVideosByUpId(long upId, int pageSize);
+
+        /// <summary>
+        /// 获取指定Up的视频
+        /// </summary>
+        /// <param name="upId"></param>
+        /// <param name="pageSize">[1,100]验证不通过接口会报异常</param>
+        /// <param name="pageNumber"></param>
+        /// <param name="keyword"></param>
+        /// <returns></returns>
+        [Get("/x/space/arc/search?mid={upId}&ps={pageSize}&tid=0&pn={pageNumber}&keyword={keyword}&order=pubdate&jsonp=jsonp")]
+        Task<BiliApiResponse<SearchUpVideosResponse>> SearchVideosByUpId(long upId, int pageSize = 20, int pageNumber = 1, string keyword = "");
     }
 }

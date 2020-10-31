@@ -20,8 +20,8 @@ namespace Ray.BiliBiliTool.Agent.Extensions
         public static IServiceCollection AddBiliBiliClientApi(this IServiceCollection services)
         {
             services.AddHttpClient();
-            services.AddHttpClient("BiliBiliWithCookies",
-                (sp, c) => c.DefaultRequestHeaders.Add("Cookie", sp.GetRequiredService<BiliBiliCookiesOptions>().ToString()));
+            services.AddHttpClient("BiliBiliWithCookie",
+                (sp, c) => c.DefaultRequestHeaders.Add("Cookie", sp.GetRequiredService<BiliBiliCookieOptions>().ToString()));
 
             services.AddBiliBiliClientApi<IDailyTaskApi>("https://api.bilibili.com");
             services.AddBiliBiliClientApi<IMangaApi>("https://manga.bilibili.com");
@@ -46,7 +46,7 @@ namespace Ray.BiliBiliTool.Agent.Extensions
             services.AddRefitClient<TInterface>(settings)
                 .ConfigureHttpClient((sp, c) =>
                 {
-                    c.DefaultRequestHeaders.Add("Cookie", sp.GetRequiredService<IOptionsMonitor<BiliBiliCookiesOptions>>().CurrentValue.ToString());
+                    c.DefaultRequestHeaders.Add("Cookie", sp.GetRequiredService<IOptionsMonitor<BiliBiliCookieOptions>>().CurrentValue.ToString());
                     c.BaseAddress = new Uri(host);
                 })
                 .AddHttpMessageHandler(sp => new MyHttpClientDelegatingHandler(sp.GetRequiredService<ILogger<MyHttpClientDelegatingHandler>>()));
