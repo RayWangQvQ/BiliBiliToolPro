@@ -63,7 +63,7 @@ namespace Ray.BiliBiliTool.Application
             _dailyTaskInfo = _loginDomainService.GetDailyTaskStatus();
 
             //获取随机视频
-            string videoAid = _videoDomainService.GetRandomVideo();
+            long videoAid = _videoDomainService.GetRandomVideo();
             //观看视频
             _videoDomainService.WatchVideo(videoAid, _dailyTaskInfo);
             //分享视频

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -16,22 +17,22 @@ namespace Ray.BiliBiliTool.DomainService
     {
         private readonly ILogger<VideoDomainService> _logger;
         private readonly IDailyTaskApi _dailyTaskApi;
-        private readonly BiliBiliCookiesOptions _biliBiliCookiesOptions;
-        private readonly IOptionsMonitor<DailyTaskOptions> _dailyTaskOptions;
+        private readonly BiliBiliCookieOptions _biliBiliCookieOptions;
+        private readonly DailyTaskOptions _dailyTaskOptions;
         private readonly IAccountApi _accountApi;
         private readonly ICoinDomainService _coinDomainService;
 
         public VideoDomainService(ILogger<VideoDomainService> logger,
             IDailyTaskApi dailyTaskApi,
-            IOptionsMonitor<BiliBiliCookiesOptions> biliBiliCookiesOptions,
+            IOptionsMonitor<BiliBiliCookieOptions> biliBiliCookieOptions,
             IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
             IAccountApi accountApi,
             ICoinDomainService coinDomainService)
         {
             _logger = logger;
             _dailyTaskApi = dailyTaskApi;
-            _biliBiliCookiesOptions = biliBiliCookiesOptions.CurrentValue;
-            _dailyTaskOptions = dailyTaskOptions;
+            _biliBiliCookieOptions = biliBiliCookieOptions.CurrentValue;
+            _dailyTaskOptions = dailyTaskOptions.CurrentValue;
             _accountApi = accountApi;
             _coinDomainService = coinDomainService;
         }
@@ -41,17 +42,16 @@ namespace Ray.BiliBiliTool.DomainService
         /// </summary>
         /// <returns></returns>
         //[LogIntercepter("获取随机视频")]
-        public string GetRandomVideo()
+        public long GetRandomVideo()
         {
-            string aid = RegionRanking();
-            return aid;
+            return RegionRanking().Item1;
         }
 
         /// <summary>
         /// 观看视频
         /// </summary>
         [LogIntercepter("观看视频")]
-        public void WatchVideo(string aid, DailyTaskInfo dailyTaskStatus)
+        public void WatchVideo(long aid, DailyTaskInfo dailyTaskStatus)
         {
             if (dailyTaskStatus.Watch)
             {
@@ -77,7 +77,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// </summary>
         /// <param name="aid">视频aid</param>
         [LogIntercepter("分享视频")]
-        public void ShareVideo(string aid, DailyTaskInfo dailyTaskStatus)
+        public void ShareVideo(long aid, DailyTaskInfo dailyTaskStatus)
         {
             if (dailyTaskStatus.Share)
             {
@@ -85,7 +85,7 @@ namespace Ray.BiliBiliTool.DomainService
                 return;
             }
 
-            var apiResponse = _dailyTaskApi.ShareVideo(aid, _biliBiliCookiesOptions.BiliJct).Result;
+            var apiResponse = _dailyTaskApi.ShareVideo(aid, _biliBiliCookieOptions.BiliJct).Result;
 
             if (apiResponse.Code == 0)
             {
@@ -103,7 +103,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// </summary>
         /// <param name="aid">av号</param>
         /// <returns></returns>
-        public bool IsDonatedCoinsForVideo(string aid)
+        public bool IsDonatedCoinsForVideo(long aid)
         {
             int multiply = _dailyTaskApi.GetDonatedCoinsForVideo(aid).Result.Data.Multiply;
             if (multiply > 0)
@@ -154,14 +154,39 @@ namespace Ray.BiliBiliTool.DomainService
 
             int successCoins = 0;
             int tryCount = 0;//投币最多操作数 解决csrf校验失败时死循环的问题
+            var upVideos = GetRandomVideosOfUps();
+            int upVideoIndex = 0;
             while (successCoins < needCoins)
             {
                 tryCount++;
 
-                string aid = RegionRanking();//todo：只调用一次获取视频集合接口，一次性获取足够数量的视频，避免每次都获取视频
-                //_logger.LogInformation("正在为av{aid}投币", aid);
+                long aid;
+                string title;
+                //优选使用配置的up主视频
+                if (upVideoIndex < upVideos.Count)
+                {
+                    aid = upVideos[tryCount - 1].Aid;
+                    title = upVideos[tryCount - 1].Title;
+                    upVideoIndex++;
+                }
+                else
+                {
+                    var re = RegionRanking();
+                    aid = re.Item1;
+                    title = re.Item2;
+                }
 
-                bool isSuccess = AddCoinsForVideo(aid, 1, _dailyTaskOptions.CurrentValue.SelectLike);
+                _logger.LogDebug("正在为av{aid}({title})投币", aid, title);
+
+                //判断曾经是否对此av投币过
+                if (IsDonatedCoinsForVideo(aid))
+                {
+                    _logger.LogDebug("{aid}({title})已经投币过了", aid, title);
+                    tryCount--;
+                    continue;
+                }
+
+                bool isSuccess = AddCoinsForVideo(aid, 1, _dailyTaskOptions.SelectLike);
                 if (isSuccess)
                 {
                     successCoins++;
@@ -184,52 +209,81 @@ namespace Ray.BiliBiliTool.DomainService
         /// <param name="multiply">投币数量</param>
         /// <param name="select_like">是否同时点赞 1是0否</param>
         /// <returns>是否投币成功</returns>
-        public bool AddCoinsForVideo(string aid, int multiply, int select_like)
+        public bool AddCoinsForVideo(long aid, int multiply, bool select_like)
         {
-            //判断曾经是否对此av投币过
-            if (IsDonatedCoinsForVideo(aid))
-            {
-                //_logger.LogDebug("{aid}已经投币过了", aid);
-                return false;
-            }
+            var result = _dailyTaskApi.AddCoinForVideo(aid, multiply, select_like ? 1 : 0, _biliBiliCookieOptions.BiliJct).Result;
 
-            var result = _dailyTaskApi.AddCoinForVideo(aid, multiply, select_like, _biliBiliCookiesOptions.BiliJct).Result;
-
-            if (result != null)//todo：
+            if (result.Code == 0)
             {
-                _logger.LogInformation("为Av{aid}投币成功", aid);
+                _logger.LogInformation("为Av{aid}投币成功", aid);//todo:视频名称
                 return true;
             }
             else
             {
-                _logger.LogInformation("为Av{aid}投币失败", aid);
+                _logger.LogDebug("为Av{aid}投币失败，原因：{msg}", aid, result.Message);
                 return false;
             }
         }
 
+        public List<UpVideoInfo> GetVideosByUpId(long upId)
+        {
+            BiliApiResponse<SearchUpVideosResponse> re = _dailyTaskApi.SearchVideosByUpId(upId, 1, 11).Result;
+
+            if (re.Code != 0)
+            {
+                throw new Exception(re.Message);
+            }
+
+            return re.Data.List.Vlist;
+        }
+
+        public List<UpVideoInfo> GetRandomVideosOfUps()
+        {
+            var re = new List<UpVideoInfo>();
+
+            int configUpsCount = _dailyTaskOptions.SupportUpIdList.Count;
+            if (configUpsCount == 0) return re;
+
+            long upId = _dailyTaskOptions.SupportUpIdList[new Random().Next(0, configUpsCount)];
+            int count = GetVidoeCountOfUp(upId);
+
+            var targetNum = 10;
+            if (count < 10) targetNum = count;
+            for (int i = 0; i < targetNum; i++)
+            {
+                UpVideoInfo videoInfo = GetRandomVideoOfUp(upId, count);
+                if (re.Count(x => x.Aid == videoInfo.Aid) == 0) re.Add(videoInfo);
+            }
+
+            return re;
+        }
+
+        private UpVideoInfo GetRandomVideoOfUp(long upId, int total)
+        {
+            var pageNum = new Random().Next(1, total + 1);
+            BiliApiResponse<SearchUpVideosResponse> re = _dailyTaskApi.SearchVideosByUpId(upId, 1, pageNum).Result;
+
+            if (re.Code != 0)
+            {
+                throw new Exception(re.Message);
+            }
+
+            return re.Data.List.Vlist.First();
+        }
+
+        private int GetVidoeCountOfUp(long upId)
+        {
+            BiliApiResponse<SearchUpVideosResponse> re = _dailyTaskApi.SearchVideosByUpId(upId, 1, 1).Result;
+            if (re.Code != 0)
+            {
+                throw new Exception(re.Message);
+            }
+
+            return re.Data.Page.Count;
+        }
+
 
         #region private
-        /// <summary>
-        /// 默认请求动画区，3日榜单
-        /// </summary>
-        /// <returns></returns>
-        private string RegionRanking()
-        {
-            int rid = RandomRegion();
-            int day = 3;
-            return RegionRanking(rid, day);
-        }
-
-        /// <summary>
-        /// 从有限分区中随机返回一个分区rid
-        /// 后续会更新请求分区
-        /// </summary>
-        /// <returns>分区Id</returns>
-        private int RandomRegion()
-        {
-            int[] arr = { 1, 3, 4, 5, 160, 22, 119 };
-            return arr[new Random().Next(arr.Length - 1)];
-        }
 
         /// <summary>
         /// 获取随机视频aid
@@ -237,13 +291,17 @@ namespace Ray.BiliBiliTool.DomainService
         /// <param name="rid">分区id</param>
         /// <param name="day">日榜，三日榜 周榜 1，3，7</param>
         /// <returns>随机返回一个aid</returns>
-        private string RegionRanking(int rid, int day)
+        private Tuple<long, string> RegionRanking()
         {
-            var apiResponse = _dailyTaskApi.GetRegionRankingVideos(rid, day).Result;
+            int[] arr = { 1, 3, 4, 5, 160, 22, 119 };
+            int rid = arr[new Random().Next(arr.Length - 1)];
+
+            var apiResponse = _dailyTaskApi.GetRegionRankingVideos(rid, 3).Result;
 
             //_logger.LogInformation("获取分区:{rid}的{day}日top10榜单成功", rid, day);
+            var data = apiResponse.Data[new Random().Next(apiResponse.Data.Count)];
 
-            return apiResponse.Data[new Random().Next(apiResponse.Data.Count)].Aid;
+            return Tuple.Create<long, string>(data.Aid, data.Title);
         }
 
         /// <summary>
@@ -257,7 +315,7 @@ namespace Ray.BiliBiliTool.DomainService
             int needCoins = 0;
 
             //获取自定义配置投币数
-            int configCoins = _dailyTaskOptions.CurrentValue.NumberOfCoins;
+            int configCoins = _dailyTaskOptions.NumberOfCoins;
             //已投的硬币
             alreadyCoins = _coinDomainService.GetDonatedCoins();
             //目标

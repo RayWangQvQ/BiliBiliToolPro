@@ -8,6 +8,9 @@ using Serilog;
 
 namespace Ray.BiliBiliTool.DomainService.Attributes
 {
+    /// <summary>
+    /// 日志AOP
+    /// </summary>
     public class LogIntercepterAttribute : Attribute, IMethodDecorator
     {
         private readonly string _taskName;
@@ -19,7 +22,7 @@ namespace Ray.BiliBiliTool.DomainService.Attributes
         public LogIntercepterAttribute(string taskName)
         {
             _taskName = taskName;
-            _logger = Log.Logger;//todo:暂时没想到注入ILogger的方法,这里直接用来Serilog的静态Log
+            _logger = Log.Logger;//todo:暂时没想到从容器注入ILogger的方法,这里直接用了Serilog的静态Log
         }
 
         public void Init(object instance, MethodBase method, object[] args)
