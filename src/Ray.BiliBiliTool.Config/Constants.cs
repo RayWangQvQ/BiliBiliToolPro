@@ -14,6 +14,13 @@ namespace Ray.BiliBiliTool.Config
             {"-userId","BiliBiliCookie:UserId" },
             {"-sessData","BiliBiliCookie:SessData" },
             {"-biliJct","BiliBiliCookie:BiliJct" },
+
+            {"-numberOfCoins","DailyTaskConfig:NumberOfCoins" },
+            {"-selectLike","DailyTaskConfig:SelectLike" },
+            {"-supportUpIds","DailyTaskConfig:SupportUpIds" },
+            {"-dayOfAutoCharge","DailyTaskConfig:DayOfAutoCharge" },
+            {"-dayOfReceiveVipPrivilege","DailyTaskConfig:DayOfReceiveVipPrivilege" },
+            {"-devicePlatform","DailyTaskConfig:DevicePlatform" },
         };
 
         /// <summary>

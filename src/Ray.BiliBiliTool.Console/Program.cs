@@ -71,7 +71,11 @@ namespace Ray.BiliBiliTool.Console
                 logger.LogInformation("-----任务启动-----\r\n");
 
                 BiliBiliCookieOptions biliBiliCookieOptions = serviceScope.ServiceProvider.GetRequiredService<IOptionsMonitor<BiliBiliCookieOptions>>().CurrentValue;
-                if (!biliBiliCookieOptions.Check(logger)) return;
+                if (!biliBiliCookieOptions.Check(logger))
+                {
+                    logger.LogWarning("请正确配置后再运行，配置方式见 https://github.com/RayWangQvQ/BiliBiliTool");
+                    return;
+                };
 
                 //每日任务65经验
                 IDailyTaskAppService dailyTask = serviceScope.ServiceProvider.GetRequiredService<IDailyTaskAppService>();

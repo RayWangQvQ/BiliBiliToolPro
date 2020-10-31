@@ -17,10 +17,9 @@ BiliBiliTool
 BiliBiliTool是一个针对B站用户自动执行任务的工具，通过它可以实现B站帐号的每日自动观看、分享、投币视频，获取经验，每月自动领取会员权益、自动为自己充电等功能，帮助我们轻松升级会员到Lv6并赚取电池，详细功能目录如下:
 
 * 每天自动登录，获取经验
-* 每天自动观看、分享一个视频
-* 每天为指定视频投币
+* 每天自动观看、分享、投币视频（支持配置想要支持的up主，优先选择指定up的视频，不配置则随机选取）
 * 每天漫画自动签到
-* 每天自动直播签到，领取奖励
+* 每天自动直播签到，领取奖励（直播可以不看，但是奖励不领白不领）
 * 每天自动使用直播中心银瓜子兑换B币，避免浪费
 * 每月自动使用快过期的B币券为自己充电
 * 每个月自动领取5张B币券和大会员权益
@@ -52,7 +51,7 @@ BiliBiliTool实现自动任务的原理，是通过调用一系列B站开放的�
 
 ![获取Cookie图示](docs/imgs/get-bilibili-web-cookie.jpg)
 
-| Name       | Value          |
+| CookieName | Value          |
 | ---------- | -------------- |
 | DEDEUSERID | 从Cookie中获取 |
 | SESSDATA   | 从Cookie中获取 |
@@ -127,7 +126,27 @@ Fork仓库后，GitHub默认不自动执行Actions任务，请修改`./github/tr
 
 ## 2. 个性化自定义配置
 
-待整理
+全部个性化配置都在appsettings.json文件中，目前支持的配置方式有如下3种：
+
+### 方式一：修改appsettings.json文件
+
+如上1.2.1中所演示。
+
+### 方式二：本地命令行启动，通过命令设置配置
+
+```
+dotnet run -p ./src/Ray.BiliBiliTool.Console -userId=123 -sessData=456 -biliJct=789 -numberOfCoins=5
+```
+
+### 方式三：使用Github Actions，通过添加Secrets
+
+如上1.2.2中所演示。
+
+其优先级是：文件 < 命令行 < Actions。（其实Actions最终还是通过命令行参数实现的）
+
+对于使用Github Action的朋友，建议使用Secrets进行配置，因为Fork项目后，不会拷贝源仓库中的Secrets，可自由的在自己的仓库中进行修改配置。当有版本重大更新而需要将源仓库同步PR到自己Fork的仓库时，PR操作会很顺滑，不会影响到已配置的值。
+
+如果是Fork之后，自己改了appsettings.json文件再提交，那么以后如果需要PR源仓库，则要注意保留自己的修改不要被覆盖。
 
 ## 3.更新计划
 

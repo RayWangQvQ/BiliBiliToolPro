@@ -241,10 +241,10 @@ namespace Ray.BiliBiliTool.DomainService
         {
             var re = new List<UpVideoInfo>();
 
-            int configUpsCount = _dailyTaskOptions.SupportUpIds.Count;
+            int configUpsCount = _dailyTaskOptions.SupportUpIdList.Count;
             if (configUpsCount == 0) return re;
 
-            long upId = _dailyTaskOptions.SupportUpIds[new Random().Next(0, configUpsCount)];
+            long upId = _dailyTaskOptions.SupportUpIdList[new Random().Next(0, configUpsCount)];
             int count = GetVidoeCountOfUp(upId);
 
             var targetNum = 10;
