@@ -1,4 +1,18 @@
-# BiliBiliTool
+<div align="center"> 
+
+<h1 align="center">
+BiliBiliTool
+</h1>
+
+[![GitHub stars](https://img.shields.io/github/stars/RayWangQvQ/BiliBiliTool?style=flat-square)](https://github.com/RayWangQvQ/BiliBiliTool/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/RayWangQvQ/BiliBiliTool?style=flat-square)](https://github.com/RayWangQvQ/BiliBiliTool/network)
+[![GitHub issues](https://img.shields.io/github/issues/RayWangQvQ/BiliBiliTool?style=flat-square)](https://github.com/RayWangQvQ/BiliBiliTool/issues)
+[![GitHub license](https://img.shields.io/github/license/RayWangQvQ/BiliBiliTool?style=flat-square)](https://github.com/RayWangQvQ/BiliBiliTool/blob/main/LICENSE) 
+[![GitHub All Releases](https://img.shields.io/github/downloads/RayWangQvQ/BiliBiliTool/total?style=flat-square)](https://github.com/RayWangQvQ/BiliBiliTool/releases)
+[![GitHub contributors](https://img.shields.io/github/contributors/RayWangQvQ/BiliBiliTool?style=flat-square)](https://github.com/RayWangQvQ/BiliBiliTool/graphs/contributors)
+![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/RayWangQvQ/BiliBiliTool?style=flat-square)
+
+</div>
 
 BiliBiliTool是一个针对B站用户自动执行任务的工具，通过它可以实现B站帐号的每日自动观看、分享、投币视频，获取经验，每月自动领取会员权益、自动为自己充电等功能，帮助我们轻松升级会员到Lv6并赚取电池，详细功能目录如下:
 
@@ -33,6 +47,8 @@ BiliBiliTool实现自动任务的原理，是通过调用一系列B站开放的�
 - 浏览器打开并登录[bilibili网站](https://www.bilibili.com/)
 - 按F12打开“开发者工具”，依次点击 应用程序/Application -> 存储-> Cookies
 - 找到`DEDEUSERID`、`SESSDATA`、`bili_jct`三项，复制保存它们到记事本，待会儿会用到。
+
+![获取Cookie图示](docs/imgs/get-bilibili-web-cookie.jpg)
 
 | Name       | Value          |
 | ---------- | -------------- |
