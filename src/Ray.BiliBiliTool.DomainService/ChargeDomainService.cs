@@ -14,6 +14,9 @@ using Ray.BiliBiliTool.Infrastructure.Extensions;
 
 namespace Ray.BiliBiliTool.DomainService
 {
+    /// <summary>
+    /// 充电
+    /// </summary>
     public class ChargeDomainService : IChargeDomainService
     {
         private readonly ILogger<ChargeDomainService> _logger;

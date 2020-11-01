@@ -16,7 +16,9 @@ namespace ConfigTest
         [Fact]
         public void Test1()
         {
-            Program.PreWorks(new string[] { });
+            Program.PreWorks(new string[] { "-closeConsoleWhenEnd=1" });
+
+            Debug.WriteLine(RayConfiguration.Root["CloseConsoleWhenEnd"]);
 
             string s = RayConfiguration.Root["BiliBiliCookie:UserId"];
             Debug.WriteLine(s);

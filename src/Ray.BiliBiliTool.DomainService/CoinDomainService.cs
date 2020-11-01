@@ -15,6 +15,9 @@ using Ray.BiliBiliTool.Infrastructure.Helpers;
 
 namespace Ray.BiliBiliTool.DomainService
 {
+    /// <summary>
+    /// 硬币
+    /// </summary>
     public class CoinDomainService : ICoinDomainService
     {
         private readonly ILogger<CoinDomainService> _logger;
@@ -60,7 +63,7 @@ namespace Ray.BiliBiliTool.DomainService
         private int GetDonateCoinExp()
         {
             //var result = _experienceApi.GetDonateCoinExp().Result;
-            //todo:这里使用Refit调用，连接、获取成功(Status=200)，但是从Content获取Data异常，确定问题为返回内容被gzip压缩，但是暂未找到解决办法，下面先通过手动调用手动解压实现
+            //todo:这里使用Refit调用，连接、获取成功(Status=200)，但是从Content获取Data异常，怀疑和返回内容被gzip压缩有关，但是暂未找到解决办法，下面先通过手动调用手动解压实现
 
             var client = _httpClientFactory.CreateClient();
             client.DefaultRequestHeaders.Add("Cookie", _biliBiliCookieOptions.ToString());

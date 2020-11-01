@@ -20,7 +20,7 @@ namespace WatchVideoTest
 
                 var dailyTaskStatus = account.GetDailyTaskStatus();
                 var aid = dailyTask.GetRandomVideo();
-                dailyTask.WatchVideo(aid, dailyTaskStatus);
+                dailyTask.WatchVideo(dailyTaskStatus, aid);
 
                 Assert.True(true);
             }

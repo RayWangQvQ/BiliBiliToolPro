@@ -1,16 +1,8 @@
 ﻿using System;
-using System.Net.Http;
-using System.Text.Json;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.Dtos;
-using Ray.BiliBiliTool.Agent.Interfaces;
 using Ray.BiliBiliTool.Application.Contracts;
-using Ray.BiliBiliTool.Config;
 using Ray.BiliBiliTool.DomainService.Interfaces;
-using Ray.BiliBiliTool.Infrastructure.Extensions;
-using Ray.BiliBiliTool.Infrastructure.Helpers;
 
 namespace Ray.BiliBiliTool.Application
 {
@@ -57,19 +49,15 @@ namespace Ray.BiliBiliTool.Application
         {
             //登录
             _userInfo = _loginDomainService.LoginByCookie();
-            if (_userInfo == null) return;
+            if (_userInfo == null) throw new Exception("登录失败，请检查Cookie");
 
             //获取任务完成情况
             _dailyTaskInfo = _loginDomainService.GetDailyTaskStatus();
 
-            //获取随机视频
-            string videoAid = _videoDomainService.GetRandomVideo();
-            //观看视频
-            _videoDomainService.WatchVideo(videoAid, _dailyTaskInfo);
-            //分享视频
-            _videoDomainService.ShareVideo(videoAid, _dailyTaskInfo);
+            //观看、分享视频
+            _videoDomainService.WatchAndShareVideo(_dailyTaskInfo);
             //投币任务
-            _videoDomainService.AddCoinsForVideo();//todo:传入up主Id，只为指定ups投币
+            _videoDomainService.AddCoinsForVideo();
 
             //直播中心签到
             _liveDomainService.LiveSign();

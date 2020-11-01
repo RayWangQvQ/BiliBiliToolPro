@@ -4,6 +4,9 @@ using System.Text.Unicode;
 
 namespace Ray.BiliBiliTool.Infrastructure
 {
+    /// <summary>
+    /// System.Text.Json的序列化OptionsBuilder
+    /// </summary>
     public class JsonSerializerOptionsBuilder
     {
         static JsonSerializerOptionsBuilder()
@@ -22,6 +25,9 @@ namespace Ray.BiliBiliTool.Infrastructure
             DefaultOptions = defaultJsonSerializerOptions;
         }
 
+        /// <summary>
+        /// 默认配置
+        /// </summary>
         public static JsonSerializerOptions DefaultOptions;
 
         public static JsonSerializerOptions Builder(Action<JsonSerializerOptions> build)

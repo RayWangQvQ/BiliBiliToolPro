@@ -17,18 +17,24 @@ namespace Ray.BiliBiliTool.DomainService.Interfaces
         string GetRandomVideo();
 
         /// <summary>
+        /// 观看并分享视频
+        /// </summary>
+        /// <param name="dailyTaskStatus"></param>
+        void WatchAndShareVideo(DailyTaskInfo dailyTaskStatus);
+
+        /// <summary>
         /// 观看
         /// </summary>
         /// <param name="aid"></param>
         /// <param name="dailyTaskStatus"></param>
-        void WatchVideo(string aid, DailyTaskInfo dailyTaskStatus);
+        void WatchVideo(DailyTaskInfo dailyTaskStatus, string aid, string title = "");
 
         /// <summary>
         /// 分享
         /// </summary>
         /// <param name="aid"></param>
         /// <param name="dailyTaskStatus"></param>
-        void ShareVideo(string aid, DailyTaskInfo dailyTaskStatus);
+        void ShareVideo(DailyTaskInfo dailyTaskStatus, string aid, string title = "");
 
         /// <summary>
         /// 投币
@@ -42,7 +48,7 @@ namespace Ray.BiliBiliTool.DomainService.Interfaces
         /// <param name="multiply"></param>
         /// <param name="select_like"></param>
         /// <returns></returns>
-        bool AddCoinsForVideo(string aid, int multiply, bool select_like);
+        bool AddCoinsForVideo(string aid, int multiply, bool select_like, string title = "");
 
         /// <summary>
         /// 是否已对某视频投币

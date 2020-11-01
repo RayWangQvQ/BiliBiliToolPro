@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text.Json;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -27,8 +24,9 @@ namespace Ray.BiliBiliTool.Console
 
             StartRun();
 
-            System.Console.WriteLine("2分钟后窗口将自动关闭");//todo:输入任意内容停止关闭
-            Task.Delay(2 * 60 * 1000).Wait();
+            //如果配置了“1”就立即关闭，否则保持窗口以便查看日志信息
+            if (RayConfiguration.Root["CloseConsoleWhenEnd"] == "1") return;
+            System.Console.ReadLine();
         }
 
         /// <summary>
