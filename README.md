@@ -14,15 +14,17 @@ BiliBiliTool
 
 </div>
 
-BiliBiliTool是一个B站自动执行任务的工具，通过它可以实现B站帐号的每日自动观看、分享、投币视频，获取经验，每月自动领取会员权益、自动为自己充电等功能，帮助我们轻松升级会员到Lv6并赚取电池，详细功能目录如下:
+**BiliBiliTool是一个B站自动执行任务的工具，通过它可以实现B站帐号的每日自动观看、分享、投币视频，获取经验，每月自动领取会员权益、自动为自己充电等功能，帮助我们轻松升级会员到Lv6并赚取电池**
+
+详细功能目录如下:
 
 * **每天自动登录，获取经验**
-* **每天自动观看、分享、投币视频**（支持配置想要支持的up主，优先选择指定up的视频，不配置则随机选取）
+* **每天自动观看、分享、投币视频** *（支持指定想要支持的up主，优先选择配置的up主的视频，不配置则随机选取视频）*
 * **每天漫画自动签到**
-* **每天自动直播签到，领取奖励**（直播可以不看，但是奖励不领白不领~）
+* **每天自动直播签到，领取奖励** *（直播可以不看，但是奖励不领白不领~）*
 * **每天自动使用直播中心银瓜子兑换B币，避免浪费**
-* **每月自动使用快过期的B币券为自己充电**（你懂的~）
-* **每个月自动领取5张B币券和大会员权益**（既然买了会员就要领取该有的奖励~）
+* **每月自动使用快过期的B币券为自己充电** *（你懂的~）*
+* **每个月自动领取5张B币券和大会员权益** *（既然买了会员就要领取该有的奖励啊~）*
 
 ![运行图示](docs/imgs/run-exe.png)
 
@@ -58,13 +60,38 @@ BiliBiliTool就是收集了一系列这样的接口，通过每日自动运行�
 | BILI_JCT   | 从Cookie中获取 |
 
 ### 1.2.第二步：运行BiliBiliTool
-运行BiliBiliTool有两种方式，一种是本地运行或调试，一种是通过Github的Actions实现线上的每天自动运行。
+运行BiliBiliTool有两种方式，一种是通过Github的Actions实现线上的每天自动运行，一种是本地运行或调试。
 
-对于没有Github账号或者想先快速运行调试一下的朋友，建议使用方法一，操作简单快速。
+对于熟悉Github Actions的朋友，推荐使用方式一 Github Actions，可以实现线上的每天自动运行，不需自己动手，一劳永逸。
 
-对于熟悉Github Actions的朋友，推荐使用方法二Github Actions，可以实现线上的每天自动运行，一劳永逸。
+对于没有Github账号的、或者想先尝个鲜快速运行一下看看、或者是开发者想要本地调试的朋友，可以跳转到方式二，操作简单快速。
 
-#### 1.2.1.方式一：本地运行
+#### 1.2.1.运行方式一（推荐）：Github Actions每天定时线上自动运行
+Github Actions 是微软巨硬收购G站之后新增的内置CI/CD方案，其核心就是一个可以运行脚本的小型服务器（2核CPU + 7G RAM + 14 G SSD）。
+
+有了它，我们就可以实现每天线上自动运行我们的应用程序。
+
+a. **首先fork本项目到自己的仓库**
+
+b. **进入自己fork的仓库，点击 Settings-> Secrets-> New Secrets 添加以下3个Secrets。它们将作为应用启动时的命令行参数被传入程序。** 
+
+![Secrets图示](docs/imgs/git-secrets.png)
+
+c. **开启Actions并触发每日自动执行**
+   
+Github Actions默认处于关闭状态，前面都配置好后，请手动开启Actions，执行一次工作流，验证是否可以正常工作。
+
+![Actions图示](docs/imgs/run-workflow.png)
+
+运行结束后，可查看运行日志：
+
+![Actions日志图示](docs/imgs/github-actions-log-1.png)
+![Actions日志图示](docs/imgs/github-actions-log-2.png)
+
+*如果执行出现异常，会收到了GitHub Action的错误邮件通知，请检查Cookies是不是失效了，或者是否有bug。用户主动清除浏览器缓存，会导致`BILI_JCT`和`DEDEUSERID`失效。*
+
+
+#### 1.2.1.运行方式二：本地运行
 
 如果是DotNet开发者，直接clone源码然后vs打开解决方案，配置Cookie后直接运行调试即可。
 
@@ -92,40 +119,16 @@ c. **运行**
 
 *P.S.如果自己有服务器，也可以将程序发布到自己的服务器，利用自己的任务系统实现每天自动运行。（有服务器的大佬应该就不需要我多BB了）*
 
-#### 1.2.2.方式二（推荐）：Github Actions每天定时线上自动运行
-Github Actions 是微软巨硬收购G站之后新增的内置CI/CD方案，其核心就是一个可以运行脚本的小型服务器（2核CPU + 7G RAM + 14 G SSD）。
-
-有了它，我们就可以实现每天线上自动运行我们的应用程序。
-
-a. **首先fork本项目到自己的仓库**
-
-b. **进入自己fork的仓库，点击 Settings-> Secrets-> New Secrets 添加以下3个Secrets。它们将作为应用启动时的命令行参数被传入程序。** 
-
-![Secrets图示](docs/imgs/git-secrets.png)
-
-c. **开启Actions并触发每日自动执行**
-   
-Github Actions默认处于关闭状态，前面都配置好后，请手动开启Actions，执行一次工作流，验证是否可以正常工作。
-
-![Actions图示](docs/imgs/run-workflow.png)
-
-运行结束后，可查看运行日志：
-
-![Actions日志图示](docs/imgs/github-actions-log-1.png)
-![Actions日志图示](docs/imgs/github-actions-log-2.png)
-
-*如果执行出现异常，会收到了GitHub Action的错误邮件通知，请检查Cookies是不是失效了，或者是否有bug。用户主动清除浏览器缓存，会导致`BILI_JCT`和`DEDEUSERID`失效。*
-
 ## 2. 个性化自定义配置
 
-个性化配置的详细信息都通过注释写在 [appsettings.json](src/Ray.BiliBiliTool.Console/appsettings.json) 文件中了。
+个性化配置的详细信息可以在 [appsettings.json](src/Ray.BiliBiliTool.Console/appsettings.json) 文件中查看，有详细的注释信息。
 
 ### 2.1.配置方式
 目前支持的个性配置方式有如下3种：
 
 #### 方式一：修改appsettings.json文件
 
-如上1.2.1中所演示。
+如上1.2.2中所演示。
 
 #### 方式二：本地命令行启动，通过命令设置配置
 
@@ -137,7 +140,7 @@ dotnet run -p ./src/Ray.BiliBiliTool.Console -userId=123 -sessData=456 -biliJct=
 
 #### 方式三：使用Github Actions，通过添加Secrets
 
-如上1.2.2中所演示，在Github Secrets中添加即可。
+如上1.2.1中所演示，在Github Secrets中添加即可。
 
 除了3个必须配置的Cookie外，其他的配置可以通过名为`OTHERCONFIGS`的Secret Key进行配置，其值为多个命令行参数的拼接，如下图所示：
 
