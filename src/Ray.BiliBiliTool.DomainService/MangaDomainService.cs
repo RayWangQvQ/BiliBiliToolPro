@@ -12,6 +12,9 @@ using Ray.BiliBiliTool.DomainService.Interfaces;
 
 namespace Ray.BiliBiliTool.DomainService
 {
+    /// <summary>
+    /// 漫画
+    /// </summary>
     public class MangaDomainService : IMangaDomainService
     {
         private readonly ILogger<MangaDomainService> _logger;

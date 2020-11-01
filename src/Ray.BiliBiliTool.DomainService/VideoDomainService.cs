@@ -13,6 +13,9 @@ using Ray.BiliBiliTool.DomainService.Interfaces;
 
 namespace Ray.BiliBiliTool.DomainService
 {
+    /// <summary>
+    /// 视频
+    /// </summary>
     public class VideoDomainService : IVideoDomainService
     {
         private readonly ILogger<VideoDomainService> _logger;
@@ -47,11 +50,20 @@ namespace Ray.BiliBiliTool.DomainService
             return RegionRanking().Item1;
         }
 
+        [LogIntercepter("观看并分享视频")]
+        public void WatchAndShareVideo(DailyTaskInfo dailyTaskStatus)
+        {
+            var targetVideo = GetRandomVideoForWatch();
+
+            WatchVideo(dailyTaskStatus, targetVideo.Item1, targetVideo.Item2);
+            ShareVideo(dailyTaskStatus, targetVideo.Item1, targetVideo.Item2);
+        }
+
         /// <summary>
         /// 观看视频
         /// </summary>
-        [LogIntercepter("观看视频")]
-        public void WatchVideo(string aid, DailyTaskInfo dailyTaskStatus)
+        //[LogIntercepter("观看视频")]
+        public void WatchVideo(DailyTaskInfo dailyTaskStatus, string aid, string title = "")
         {
             if (dailyTaskStatus.Watch)
             {
@@ -64,11 +76,11 @@ namespace Ray.BiliBiliTool.DomainService
 
             if (apiResponse.Code == 0)
             {
-                _logger.LogInformation("av{aid}播放成功,已观看到第{playedTime}秒", aid, playedTime);
+                _logger.LogInformation("av{aid}({title})播放成功,已观看到第{playedTime}秒", aid, title, playedTime);
             }
             else
             {
-                _logger.LogDebug("av{aid}播放失败,原因：{msg}", aid, apiResponse.Message);
+                _logger.LogDebug("av{aid}({title})播放失败,原因：{msg}", aid, title, apiResponse.Message);
             }
         }
 
@@ -76,8 +88,8 @@ namespace Ray.BiliBiliTool.DomainService
         /// 分享视频
         /// </summary>
         /// <param name="aid">视频aid</param>
-        [LogIntercepter("分享视频")]
-        public void ShareVideo(string aid, DailyTaskInfo dailyTaskStatus)
+        //[LogIntercepter("分享视频")]
+        public void ShareVideo(DailyTaskInfo dailyTaskStatus, string aid, string title = "")
         {
             if (dailyTaskStatus.Share)
             {
@@ -89,7 +101,7 @@ namespace Ray.BiliBiliTool.DomainService
 
             if (apiResponse.Code == 0)
             {
-                _logger.LogInformation("视频: av{aid}分享成功", aid);
+                _logger.LogInformation("视频: av{aid}({title})分享成功", aid, title);
             }
             else
             {
@@ -186,7 +198,7 @@ namespace Ray.BiliBiliTool.DomainService
                     continue;
                 }
 
-                bool isSuccess = AddCoinsForVideo(aid, 1, _dailyTaskOptions.SelectLike);
+                bool isSuccess = AddCoinsForVideo(aid, 1, _dailyTaskOptions.SelectLike, title);
                 if (isSuccess)
                 {
                     successCoins++;
@@ -209,18 +221,18 @@ namespace Ray.BiliBiliTool.DomainService
         /// <param name="multiply">投币数量</param>
         /// <param name="select_like">是否同时点赞 1是0否</param>
         /// <returns>是否投币成功</returns>
-        public bool AddCoinsForVideo(string aid, int multiply, bool select_like)
+        public bool AddCoinsForVideo(string aid, int multiply, bool select_like, string title = "")
         {
             var result = _dailyTaskApi.AddCoinForVideo(aid, multiply, select_like ? 1 : 0, _biliBiliCookieOptions.BiliJct).Result;
 
             if (result.Code == 0)
             {
-                _logger.LogInformation("为Av{aid}投币成功", aid);//todo:视频名称
+                _logger.LogInformation("为Av{aid}({title})投币成功", aid, title);
                 return true;
             }
             else
             {
-                _logger.LogDebug("为Av{aid}投币失败，原因：{msg}", aid, result.Message);
+                _logger.LogDebug("为Av{aid}({title})投币失败，原因：{msg}", aid, title, result.Message);
                 return false;
             }
         }
@@ -328,6 +340,15 @@ namespace Ray.BiliBiliTool.DomainService
                 return targetCoins - alreadyCoins;
             }
             return needCoins;
+        }
+
+        private Tuple<string, string> GetRandomVideoForWatch()
+        {
+            List<UpVideoInfo> list = GetRandomVideosOfUps();
+            if (list.Count > 0)
+                return Tuple.Create<string, string>(list.First().Aid.ToString(), list.First().Title);
+
+            return RegionRanking();
         }
         #endregion
     }

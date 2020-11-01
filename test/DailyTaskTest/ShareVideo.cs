@@ -21,7 +21,7 @@ namespace ShareVideoTest
                 var dailyTaskStatus = account.GetDailyTaskStatus();
 
                 var aid = dailyTaskService.GetRandomVideo();
-                dailyTaskService.ShareVideo(aid, dailyTaskStatus);
+                dailyTaskService.ShareVideo(dailyTaskStatus, aid);
 
                 Assert.True(true);
             }

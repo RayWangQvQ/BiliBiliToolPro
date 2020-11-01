@@ -22,6 +22,8 @@ namespace Ray.BiliBiliTool.Agent
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             //记录请求内容
+            _logger.LogDebug($"[{request.Method}] {request.RequestUri}");
+
             if (request.Content != null)
             {
                 _logger.LogDebug(await request.Content.ReadAsStringAsync());
@@ -36,15 +38,19 @@ namespace Ray.BiliBiliTool.Agent
                 _logger.LogDebug(content);
 
                 //如果返回不是json格式，则抛异常
+                string msg = "Api返回Content序列化异常，怀疑为不标准返回类型";
                 try
                 {
                     var ob = JsonSerializer.Deserialize<object>(content);
                     if (ob == null)
-                        throw new NullReferenceException();
+                    {
+                        _logger.LogCritical(msg);
+                        throw new Exception(msg);
+                    }
                 }
                 catch (Exception)
                 {
-                    _logger.LogInformation("接口返回异常");
+                    _logger.LogInformation(msg);
                     throw;
                 }
             }

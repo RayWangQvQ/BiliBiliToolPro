@@ -5,6 +5,9 @@ using Ray.BiliBiliTool.Agent.Dtos;
 
 namespace Ray.BiliBiliTool.DomainService.Interfaces
 {
+    /// <summary>
+    /// 账户
+    /// </summary>
     public interface IAccountDomainService : IDomainService
     {
         /// <summary>

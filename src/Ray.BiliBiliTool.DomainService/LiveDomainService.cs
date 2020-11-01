@@ -8,6 +8,9 @@ using Ray.BiliBiliTool.DomainService.Interfaces;
 
 namespace Ray.BiliBiliTool.DomainService
 {
+    /// <summary>
+    /// 直播
+    /// </summary>
     public class LiveDomainService : ILiveDomainService
     {
         private readonly ILogger<LiveDomainService> _logger;
