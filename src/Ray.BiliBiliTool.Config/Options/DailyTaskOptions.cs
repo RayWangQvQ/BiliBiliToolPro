@@ -20,7 +20,7 @@ namespace Ray.BiliBiliTool.Config.Options
         /// <summary>
         /// 优先选择支持的up主Id集合，配置后会优先从指定的up主下挑选视频进行观看、分享和投币，不配置则从排行耪随机获取支持视频
         /// </summary>
-        public string SupportUpIds { get; set; }
+        public string SupportUpIds { get; set; } = "";
 
         /// <summary>
         /// 每月几号自动为自己充电的[-1,31]，-1表示不指定，默认月底最后一天；0表示不充电

@@ -9,15 +9,29 @@ namespace Ray.BiliBiliTool.Config.Options
     /// </summary>
     public class BiliBiliCookieOptions
     {
+        /// <summary>
+        /// DedeUserID
+        /// </summary>
         [Description("DedeUserID")]
         public string UserId { get; set; }
 
+        /// <summary>
+        /// SESSDATA
+        /// </summary>
         [Description("SESSDATA")]
         public string SessData { get; set; }
 
+        /// <summary>
+        /// bili_jct
+        /// </summary>
         [Description("bili_jct")]
         public string BiliJct { get; set; }
 
+        /// <summary>
+        /// 检查是否已配置
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <returns></returns>
         public bool Check(ILogger logger)
         {
             bool result = true;

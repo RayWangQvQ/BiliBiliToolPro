@@ -4,6 +4,9 @@ using System.Text;
 
 namespace Ray.BiliBiliTool.Infrastructure.Helpers
 {
+    /// <summary>
+    /// 解压缩Helper
+    /// </summary>
     public class ZipHelper
     {
         /// <summary>

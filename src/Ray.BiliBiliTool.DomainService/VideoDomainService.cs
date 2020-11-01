@@ -13,6 +13,9 @@ using Ray.BiliBiliTool.DomainService.Interfaces;
 
 namespace Ray.BiliBiliTool.DomainService
 {
+    /// <summary>
+    /// 视频
+    /// </summary>
     public class VideoDomainService : IVideoDomainService
     {
         private readonly ILogger<VideoDomainService> _logger;
@@ -195,7 +198,7 @@ namespace Ray.BiliBiliTool.DomainService
                     continue;
                 }
 
-                bool isSuccess = AddCoinsForVideo(aid, 1, _dailyTaskOptions.SelectLike);
+                bool isSuccess = AddCoinsForVideo(aid, 1, _dailyTaskOptions.SelectLike, title);
                 if (isSuccess)
                 {
                     successCoins++;
@@ -218,18 +221,18 @@ namespace Ray.BiliBiliTool.DomainService
         /// <param name="multiply">投币数量</param>
         /// <param name="select_like">是否同时点赞 1是0否</param>
         /// <returns>是否投币成功</returns>
-        public bool AddCoinsForVideo(string aid, int multiply, bool select_like)
+        public bool AddCoinsForVideo(string aid, int multiply, bool select_like, string title = "")
         {
             var result = _dailyTaskApi.AddCoinForVideo(aid, multiply, select_like ? 1 : 0, _biliBiliCookieOptions.BiliJct).Result;
 
             if (result.Code == 0)
             {
-                _logger.LogInformation("为Av{aid}投币成功", aid);//todo:视频名称
+                _logger.LogInformation("为Av{aid}({title})投币成功", aid, title);
                 return true;
             }
             else
             {
-                _logger.LogDebug("为Av{aid}投币失败，原因：{msg}", aid, result.Message);
+                _logger.LogDebug("为Av{aid}({title})投币失败，原因：{msg}", aid, title, result.Message);
                 return false;
             }
         }

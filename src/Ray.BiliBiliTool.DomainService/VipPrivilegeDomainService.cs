@@ -12,6 +12,9 @@ using Ray.BiliBiliTool.DomainService.Interfaces;
 
 namespace Ray.BiliBiliTool.DomainService
 {
+    /// <summary>
+    /// 会员权益
+    /// </summary>
     public class VipPrivilegeDomainService : IVipPrivilegeDomainService
     {
         private readonly ILogger<VipPrivilegeDomainService> _logger;

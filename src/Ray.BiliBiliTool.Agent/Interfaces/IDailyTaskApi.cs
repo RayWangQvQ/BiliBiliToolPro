@@ -10,7 +10,7 @@ namespace Ray.BiliBiliTool.Agent.Interfaces
     /// </summary>
     public interface IDailyTaskApi : IBiliBiliApi
     {
-        //todo：考虑根据领域拆分改接口
+        //todo：考虑根据领域拆分该接口
 
         /// <summary>
         /// 登录

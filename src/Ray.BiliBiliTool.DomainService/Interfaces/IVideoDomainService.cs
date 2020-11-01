@@ -48,7 +48,7 @@ namespace Ray.BiliBiliTool.DomainService.Interfaces
         /// <param name="multiply"></param>
         /// <param name="select_like"></param>
         /// <returns></returns>
-        bool AddCoinsForVideo(string aid, int multiply, bool select_like);
+        bool AddCoinsForVideo(string aid, int multiply, bool select_like, string title = "");
 
         /// <summary>
         /// 是否已对某视频投币
