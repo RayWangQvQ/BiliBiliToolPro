@@ -43,7 +43,7 @@ namespace Ray.BiliBiliTool.DomainService
         public int GetCoinBalance()
         {
             var response = _accountApi.GetCoinBalance().Result;
-            return response.Data.Money;
+            return response.Data.Money ?? 0;
         }
 
         /// <summary>
