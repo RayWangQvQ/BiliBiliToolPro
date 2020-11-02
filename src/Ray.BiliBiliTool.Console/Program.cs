@@ -88,7 +88,7 @@ namespace Ray.BiliBiliTool.Console
                     throw;
                 }
 
-                logger.LogInformation("-----任务结束-----");
+                logger.LogInformation("-----全部任务已结束-----");
             }
         }
 

@@ -34,46 +34,185 @@ namespace Ray.BiliBiliTool.Application
             _chargeDomainService = chargeDomainService;
         }
 
-        /// <summary>
-        /// 记录当前登录账户信息
-        /// </summary>
-        private UseInfo _userInfo;
-
-        /// <summary>
-        /// 记录当前完成任务状态
-        /// </summary>
-        private DailyTaskInfo _dailyTaskInfo;
-
-
         public void DoDailyTask()
         {
-            //登录
-            _userInfo = _loginDomainService.LoginByCookie();
-            if (_userInfo == null) throw new Exception("登录失败，请检查Cookie");
+            UseInfo userInfo;
+            DailyTaskInfo dailyTaskInfo;
 
-            //获取任务完成情况
-            _dailyTaskInfo = _loginDomainService.GetDailyTaskStatus();
+            userInfo = Login();
+            dailyTaskInfo = GetDailyTaskStatus();
 
-            //观看、分享视频
-            _videoDomainService.WatchAndShareVideo(_dailyTaskInfo);
-            //投币任务
-            _videoDomainService.AddCoinsForVideo();
+            WatchAndShareVideo(dailyTaskInfo);
+            AddCoinsForVideo();
+            LiveSign();
+            userInfo.Money = ExchangeSilver2Coin();
+            ReceiveVipPrivilege(userInfo);
+            Charge(userInfo);
+            MangaSign();
+            ReceiveMangaVipReward(userInfo);
+        }
 
-            //直播中心签到
-            _liveDomainService.LiveSign();
-            //直播中心的银瓜子兑换硬币
-            _userInfo.Money = _liveDomainService.ExchangeSilver2Coin();
+        /// <summary>
+        /// 登录
+        /// </summary>
+        /// <returns></returns>
+        private UseInfo Login()
+        {
+            UseInfo userInfo = null;
+            try
+            {
+                userInfo = _loginDomainService.LoginByCookie();
+            }
+            catch (Exception e)
+            {
+                _logger.LogCritical("登录失败，任务结束。Msg:{msg}\r\n", e.Message);
+            }
+            if (userInfo == null) throw new Exception("登录失败，请检查Cookie");//终止流程
+            return userInfo;
+        }
 
-            //月初领取大会员福利
-            _vipPrivilegeDomainService.ReceiveVipPrivilege(_userInfo);
+        /// <summary>
+        /// 获取任务完成情况
+        /// </summary>
+        /// <returns></returns>
+        private DailyTaskInfo GetDailyTaskStatus()
+        {
+            var result = new DailyTaskInfo();
 
-            //月底充电
-            _chargeDomainService.Charge(_userInfo);
+            try
+            {
+                result = _loginDomainService.GetDailyTaskStatus();
+            }
+            catch (Exception e)
+            {
+                _logger.LogCritical("获取任务完成情况失败，继续其他任务。Msg:{msg}\r\n", e.Message);
+            }
 
-            //漫画签到
-            _mangaDomainService.MangaSign();
-            //获取每月大会员漫画权益
-            _mangaDomainService.ReceiveMangaVipReward(1, _userInfo);
+            return result;
+        }
+
+        /// <summary>
+        /// 观看、分享视频
+        /// </summary>
+        private void WatchAndShareVideo(DailyTaskInfo dailyTaskInfo)
+        {
+            try
+            {
+                _videoDomainService.WatchAndShareVideo(dailyTaskInfo);
+            }
+            catch (Exception e)
+            {
+                _logger.LogCritical("观看、分享视频失败，继续其他任务。Msg:{msg}\r\n", e.Message);
+            }
+        }
+
+        /// <summary>
+        /// 投币任务
+        /// </summary>
+        private void AddCoinsForVideo()
+        {
+            try
+            {
+                _videoDomainService.AddCoinsForVideo();
+            }
+            catch (Exception e)
+            {
+                _logger.LogCritical("投币失败，继续其他任务。Msg:{msg}\r\n", e.Message);
+            }
+        }
+
+        /// <summary>
+        /// 直播中心签到
+        /// </summary>
+        private void LiveSign()
+        {
+            try
+            {
+                _liveDomainService.LiveSign();
+            }
+            catch (Exception e)
+            {
+                _logger.LogCritical("直播中心签到失败，继续其他任务。Msg:{msg}\r\n", e.Message);
+            }
+        }
+
+        /// <summary>
+        /// 直播中心的银瓜子兑换硬币
+        /// </summary>
+        private long ExchangeSilver2Coin()
+        {
+            long result = 0;
+            try
+            {
+                result = _liveDomainService.ExchangeSilver2Coin();
+            }
+            catch (Exception e)
+            {
+                _logger.LogCritical("直播中心的银瓜子兑换硬币失败，继续其他任务。Msg:{msg}\r\n", e.Message);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 月初领取大会员福利
+        /// </summary>
+        private void ReceiveVipPrivilege(UseInfo userInfo)
+        {
+            try
+            {
+                _vipPrivilegeDomainService.ReceiveVipPrivilege(userInfo);
+            }
+            catch (Exception e)
+            {
+                _logger.LogCritical("领取大会员福利失败，继续其他任务。Msg:{msg}\r\n", e.Message);
+            }
+        }
+
+        /// <summary>
+        /// 月底充电
+        /// </summary>
+        private void Charge(UseInfo userInfo)
+        {
+            try
+            {
+                _chargeDomainService.Charge(userInfo);
+            }
+            catch (Exception e)
+            {
+                _logger.LogCritical("充电失败，继续其他任务。Msg:{msg}\r\n", e.Message);
+            }
+        }
+
+        /// <summary>
+        /// 漫画签到
+        /// </summary>
+        private void MangaSign()
+        {
+            try
+            {
+                _mangaDomainService.MangaSign();
+            }
+            catch (Exception e)
+            {
+                _logger.LogCritical("漫画签到失败，继续其他任务。Msg:{msg}\r\n", e.Message);
+            }
+        }
+
+        /// <summary>
+        /// 获取每月大会员漫画权益
+        /// </summary>
+        private void ReceiveMangaVipReward(UseInfo userInfo)
+        {
+            try
+            {
+                _mangaDomainService.ReceiveMangaVipReward(1, userInfo);
+            }
+            catch (Exception e)
+            {
+                _logger.LogCritical("领取大会员漫画权益失败，继续其他任务。Msg:{msg}\r\n", e.Message);
+            }
+
         }
     }
 }
