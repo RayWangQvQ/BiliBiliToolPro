@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Text.Json;
 
 namespace Ray.BiliBiliTool.Agent.Dtos
 {
@@ -11,7 +12,7 @@ namespace Ray.BiliBiliTool.Agent.Dtos
 
         public LevelInfo Level_info { get; set; }
 
-        public long Money { get; set; }
+        public decimal? Money { get; set; }
 
         public string Uname { get; set; }
 
@@ -21,6 +22,10 @@ namespace Ray.BiliBiliTool.Agent.Dtos
 
         public int VipType { get; set; }//todo:是否可以改为枚举
 
+        /// <summary>
+        /// 获取隐私处理后的用户名
+        /// </summary>
+        /// <returns></returns>
         public string GetFuzzyUname()
         {
             StringBuilder sb = new StringBuilder();
@@ -61,11 +66,29 @@ namespace Ray.BiliBiliTool.Agent.Dtos
     {
         public int Current_level { get; set; }
 
-        public long Current_min { get; set; }
+        //public long Current_min { get; set; }
 
+        /// <summary>
+        /// 当前经验值
+        /// </summary>
         public long Current_exp { get; set; }
 
-        public long Next_exp { get; set; }
+        private string _next_exp;
+        /// <summary>
+        /// 下一升级经验值（因为Lv6的大佬会返回字符串“--”，所以这里只能用string接收）
+        /// </summary>
+        public object Next_exp
+        {
+            get { return _next_exp; }
+            set { _next_exp = value.ToString(); }
+        }
+
+        public long GetNext_expLong()
+        {
+            if (Current_level == 6) return long.MaxValue;
+            if (long.TryParse(Next_exp.ToString(), out long result)) return result;
+            return long.MinValue;
+        }
     }
 
     /// <summary>
@@ -73,12 +96,12 @@ namespace Ray.BiliBiliTool.Agent.Dtos
     /// </summary>
     public class Wallet
     {
-        public long Mid { get; set; }
+        //public long Mid { get; set; }
 
-        public int Bcoin_balance { get; set; }
+        //public int Bcoin_balance { get; set; }
 
         public int Coupon_balance { get; set; }
 
-        public int Coupon_due_time { get; set; }
+        //public int Coupon_due_time { get; set; }
     }
 }

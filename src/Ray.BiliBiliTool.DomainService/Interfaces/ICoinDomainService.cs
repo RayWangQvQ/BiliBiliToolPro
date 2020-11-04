@@ -13,7 +13,7 @@ namespace Ray.BiliBiliTool.DomainService.Interfaces
         /// 获取账户硬币余额
         /// </summary>
         /// <returns></returns>
-        int GetCoinBalance();
+        decimal GetCoinBalance();
 
         /// <summary>
         /// 获取今日已投币数量
