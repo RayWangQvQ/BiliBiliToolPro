@@ -93,11 +93,13 @@ Github Actions默认处于关闭状态，前面都配置好后，请手动开启
 ![Actions日志图示](docs/imgs/github-actions-log-1.png)
 ![Actions日志图示](docs/imgs/github-actions-log-2.png)
 
-workflow的执行策略默认是每天中午2点10分自动执行一次，主分支有push或pr操作会自动执行一次。想要修改策略详见下面常见问题3.2.Actions修改定时任务的执行时间
+workflow的执行策略默认是每天中午14点10分自动执行一次，主分支（main分支）有push或pr操作会自动执行一次。想要修改策略详见下面常见问题3.2.Actions修改定时任务的执行时间
 
 *如果执行出现异常，会收到了GitHub Action的错误邮件通知，请检查Cookies是不是失效了或者是否有bug。*
 
-*如果是Cookies失效了，用户主动清除浏览器缓存，会导致`BILI_JCT`和`DEDEUSERID`失效。*
+*如果是Cookies失效了，请从浏览器重新获取并更新到Secrets中。用户主动清除浏览器缓存，会导致`BILI_JCT`和`DEDEUSERID`失效。*
+
+*如果是发现bug，可以提交issue，我会尽快确认并解决*
 
 
 #### 1.2.1.运行方式二：本地运行
@@ -151,7 +153,7 @@ dotnet run -p ./src/Ray.BiliBiliTool.Console -userId=123 -sessData=456 -biliJct=
 
 如上1.2.1中所演示，在Github Secrets中添加即可。
 
-除了3个必须配置的Cookie外，其他的配置可以通过名为`OTHERCONFIGS`的Secret Key进行配置，其值为多个命令行参数的拼接，如下图所示：
+除了3个必须配置的Cookie外，其他的配置可以通过名为`OTHERCONFIGS`的Secret Key进行配置，其值为多个命令行参数的拼接，如：`-numberOfCoins=3 -supportUpIds=1234,5678`，可以参考下图：
 
 ![Github Secrets Other Configs](docs/imgs/github-secrets-other-configs.png)
 
@@ -169,7 +171,7 @@ dotnet run -p ./src/Ray.BiliBiliTool.Console -userId=123 -sessData=456 -biliJct=
 ## 3.常见问题
 
 ### 3.1.Actions定时任务没有每天自动运行
-fork的仓库actions默认是关闭的，需要对仓库进行1次操作才会触发webhook。
+Fork的仓库，actions默认是关闭的，需要对仓库进行1次操作才会触发webhook。
 可以通过在页面上点击创建wiki来触发，也可以通过任意一次提交推送代码来触发。
 
 ### 3.2.Actions修改定时任务的执行时间
