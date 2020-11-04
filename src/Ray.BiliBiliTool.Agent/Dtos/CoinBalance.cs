@@ -5,6 +5,6 @@
     /// </summary>
     public class CoinBalance
     {
-        public int? Money { get; set; } = int.MinValue;
+        public decimal? Money { get; set; } = int.MinValue;
     }
 }

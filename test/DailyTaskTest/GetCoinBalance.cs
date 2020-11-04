@@ -18,7 +18,7 @@ namespace DailyTaskTest
             {
                 var dailyTaskAppService = scope.ServiceProvider.GetRequiredService<ICoinDomainService>();
 
-                int number = dailyTaskAppService.GetCoinBalance();
+                var number = dailyTaskAppService.GetCoinBalance();
                 Assert.True(number >= 0);
             }
         }
