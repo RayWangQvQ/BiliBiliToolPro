@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using Ray.BiliBiliTool.Agent.Dtos;
 using Ray.BiliBiliTool.Agent.Interfaces;
 using Ray.BiliBiliTool.Config;
-using Ray.BiliBiliTool.DomainService.Attributes;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 
 namespace Ray.BiliBiliTool.DomainService
@@ -28,7 +27,6 @@ namespace Ray.BiliBiliTool.DomainService
         /// 登录
         /// </summary>
         /// <returns></returns>
-        //[LogIntercepter("登录")]
         public UseInfo LoginByCookie()
         {
             var apiResponse = _dailyTaskApi.LoginByCookie().Result;
@@ -65,7 +63,6 @@ namespace Ray.BiliBiliTool.DomainService
         /// 获取每日任务完成情况
         /// </summary>
         /// <returns></returns>
-        //[LogIntercepter("获取今日任务完成状态")]
         public DailyTaskInfo GetDailyTaskStatus()
         {
             var result = new DailyTaskInfo();

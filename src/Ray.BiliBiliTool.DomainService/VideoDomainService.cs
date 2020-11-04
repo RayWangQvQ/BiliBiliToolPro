@@ -8,7 +8,6 @@ using Ray.BiliBiliTool.Agent.Dtos;
 using Ray.BiliBiliTool.Agent.Interfaces;
 using Ray.BiliBiliTool.Config;
 using Ray.BiliBiliTool.Config.Options;
-using Ray.BiliBiliTool.DomainService.Attributes;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 
 namespace Ray.BiliBiliTool.DomainService
@@ -50,7 +49,6 @@ namespace Ray.BiliBiliTool.DomainService
             return RegionRanking().Item1;
         }
 
-        [LogIntercepter("观看并分享视频")]
         public void WatchAndShareVideo(DailyTaskInfo dailyTaskStatus)
         {
             var targetVideo = GetRandomVideoForWatch();
@@ -62,7 +60,6 @@ namespace Ray.BiliBiliTool.DomainService
         /// <summary>
         /// 观看视频
         /// </summary>
-        //[LogIntercepter("观看视频")]
         public void WatchVideo(DailyTaskInfo dailyTaskStatus, string aid, string title = "")
         {
             if (dailyTaskStatus.Watch)
@@ -88,7 +85,6 @@ namespace Ray.BiliBiliTool.DomainService
         /// 分享视频
         /// </summary>
         /// <param name="aid">视频aid</param>
-        //[LogIntercepter("分享视频")]
         public void ShareVideo(DailyTaskInfo dailyTaskStatus, string aid, string title = "")
         {
             if (dailyTaskStatus.Share)
@@ -133,7 +129,6 @@ namespace Ray.BiliBiliTool.DomainService
         /// <summary>
         /// 投币
         /// </summary>
-        [LogIntercepter("投币")]
         public void AddCoinsForVideo()
         {
             int needCoins = GetNeedDonateCoins(out int alreadyCoins, out int targetCoins);

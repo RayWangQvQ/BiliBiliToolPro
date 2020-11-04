@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Ray.BiliBiliTool.Agent.Interfaces;
-using Ray.BiliBiliTool.DomainService.Attributes;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 
 namespace Ray.BiliBiliTool.DomainService
@@ -29,7 +28,6 @@ namespace Ray.BiliBiliTool.DomainService
         /// <summary>
         /// 直播签到
         /// </summary>
-        [LogIntercepter("直播签到")]
         public void LiveSign()
         {
             var response = _liveApi.Sign().Result;
@@ -48,7 +46,6 @@ namespace Ray.BiliBiliTool.DomainService
         /// 直播中心银瓜子兑换B币
         /// </summary>
         /// <returns>兑换银瓜子后硬币余额</returns>
-        [LogIntercepter("直播中心银瓜子兑换B币")]
         public decimal ExchangeSilver2Coin()
         {
             var response = _liveApi.ExchangeSilver2Coin().Result;
