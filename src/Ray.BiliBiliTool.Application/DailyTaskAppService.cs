@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
 using Ray.BiliBiliTool.Agent.Dtos;
+using Ray.BiliBiliTool.Application.Attributes;
 using Ray.BiliBiliTool.Application.Contracts;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 
@@ -56,6 +57,7 @@ namespace Ray.BiliBiliTool.Application
         /// 登录
         /// </summary>
         /// <returns></returns>
+        [TaskInterceptor("登录")]
         private UseInfo Login()
         {
             UseInfo userInfo = null;

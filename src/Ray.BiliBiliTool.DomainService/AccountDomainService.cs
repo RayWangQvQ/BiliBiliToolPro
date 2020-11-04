@@ -28,7 +28,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// 登录
         /// </summary>
         /// <returns></returns>
-        [LogIntercepter("登录")]
+        //[LogIntercepter("登录")]
         public UseInfo LoginByCookie()
         {
             var apiResponse = _dailyTaskApi.LoginByCookie().Result;
