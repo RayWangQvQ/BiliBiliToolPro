@@ -1,9 +1,12 @@
-![2233](https://images.cnblogs.com/cnblogs_com/RayWang/1874052/o_2011040134052233.jpg)
+
+![2233](docs/imgs/2233.jpg)
 
 <div align="center"> 
 
 <h1 align="center">
+
 BiliBiliTool
+
 </h1>
 
 [![GitHub Stars](https://img.shields.io/github/stars/RayWangQvQ/BiliBiliTool?style=flat-square)](https://github.com/RayWangQvQ/BiliBiliTool/stargazers)
@@ -205,11 +208,11 @@ c. 如果想自己解决，请fork仓库后，在devlop分支进行编码开发�
 
 微信扫码自动赞赏1元：
 
-![微信赞赏码](https://images.cnblogs.com/cnblogs_com/RayWang/1490646/o_%E5%BE%AE%E4%BF%A1%E8%B5%9E%E8%B5%8F%E7%A0%81.jpg)
+![微信赞赏码](docs/imgs/donate-wechat.jpg)
 
 支付宝扫码自动赞赏1元：
 
-![支付宝赞赏码](https://images.cnblogs.com/cnblogs_com/RayWang/1490646/o_%E6%94%AF%E4%BB%98%E5%AE%9D%E8%B5%9E%E8%B5%8F%E7%A0%81.jpg)
+![支付宝赞赏码](docs/imgs/donate-ali.jpg)
 
 ## 7.感谢
 本程序的灵感来源于Github的开源项目：[JunzhouLiu/BILIBILI-HELPER](https://github.com/JunzhouLiu/BILIBILI-HELPER)，该项目由Java编写，有使用Java而不是C#的朋友也可以去Star该项目，他的作者是个很棒的开源分享者，欢迎大家前往支持。
