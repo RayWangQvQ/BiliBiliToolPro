@@ -1,7 +1,12 @@
+
+![2233](docs/imgs/2233.jpg)
+
 <div align="center"> 
 
 <h1 align="center">
+
 BiliBiliTool
+
 </h1>
 
 [![GitHub Stars](https://img.shields.io/github/stars/RayWangQvQ/BiliBiliTool?style=flat-square)](https://github.com/RayWangQvQ/BiliBiliTool/stargazers)
@@ -88,7 +93,11 @@ Github Actions默认处于关闭状态，前面都配置好后，请手动开启
 ![Actions日志图示](docs/imgs/github-actions-log-1.png)
 ![Actions日志图示](docs/imgs/github-actions-log-2.png)
 
-*如果执行出现异常，会收到了GitHub Action的错误邮件通知，请检查Cookies是不是失效了，或者是否有bug。用户主动清除浏览器缓存，会导致`BILI_JCT`和`DEDEUSERID`失效。*
+workflow的执行策略默认是每天中午2点10分自动执行一次，主分支有push或pr操作会自动执行一次。想要修改策略详见下面常见问题3.2.Actions修改定时任务的执行时间
+
+*如果执行出现异常，会收到了GitHub Action的错误邮件通知，请检查Cookies是不是失效了或者是否有bug。*
+
+*如果是Cookies失效了，用户主动清除浏览器缓存，会导致`BILI_JCT`和`DEDEUSERID`失效。*
 
 
 #### 1.2.1.运行方式二：本地运行
@@ -160,14 +169,8 @@ dotnet run -p ./src/Ray.BiliBiliTool.Console -userId=123 -sessData=456 -biliJct=
 ## 3.常见问题
 
 ### 3.1.Actions定时任务没有每天自动运行
-Fork仓库后，GitHub默认不自动执行Actions任务，请修改`./github/trigger.json`文件,将`trigger`的值改为`1`，这样每天就会自动执行定时任务了。
-
-```patch
-{
-- "trigger": 0
-+ "trigger": 1
-}
-```
+fork的仓库actions默认是关闭的，需要对仓库进行1次操作才会触发webhook。
+可以通过在页面上点击创建wiki来触发，也可以通过任意一次提交推送代码来触发。
 
 ### 3.2.Actions修改定时任务的执行时间
 如果需要修改每日任务执行的时间，请修改`.github/workflows/bilibili-daily-task.yml` 中的cron表达式:
