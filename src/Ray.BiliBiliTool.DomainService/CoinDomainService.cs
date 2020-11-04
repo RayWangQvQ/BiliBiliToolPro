@@ -40,7 +40,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// 获取账户硬币余额
         /// </summary>
         /// <returns></returns>
-        public int GetCoinBalance()
+        public decimal GetCoinBalance()
         {
             var response = _accountApi.GetCoinBalance().Result;
             return response.Data.Money ?? 0;

@@ -148,7 +148,7 @@ namespace Ray.BiliBiliTool.DomainService
             _logger.LogInformation("还需再投{need}枚硬币", needCoins);
 
             //投币前硬币余额
-            int coinBalance = _coinDomainService.GetCoinBalance();
+            var coinBalance = _coinDomainService.GetCoinBalance();
             _logger.LogInformation("投币前余额为 : " + coinBalance);
 
             if (coinBalance <= 0)
@@ -160,8 +160,8 @@ namespace Ray.BiliBiliTool.DomainService
             //余额小于目标投币数，按余额投
             if (coinBalance < needCoins)
             {
-                _logger.LogInformation("因硬币余额不足，目标投币数调整为: {coinBalance}", coinBalance);
-                needCoins = coinBalance;
+                int.TryParse(decimal.Truncate(coinBalance).ToString(), out needCoins);
+                _logger.LogInformation("因硬币余额不足，目标投币数调整为: {needCoins}", needCoins);
             }
 
             int successCoins = 0;

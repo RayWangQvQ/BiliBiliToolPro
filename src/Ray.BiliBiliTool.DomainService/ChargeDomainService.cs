@@ -59,7 +59,7 @@ namespace Ray.BiliBiliTool.DomainService
             }
 
             //B币券余额
-            int couponBalance = userInfo.Wallet.Coupon_balance;
+            var couponBalance = userInfo.Wallet.Coupon_balance;
             if (couponBalance < 2)
             {
                 _logger.LogInformation("B币券余额<2,无法充电");

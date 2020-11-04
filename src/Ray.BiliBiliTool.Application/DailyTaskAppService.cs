@@ -139,9 +139,9 @@ namespace Ray.BiliBiliTool.Application
         /// <summary>
         /// 直播中心的银瓜子兑换硬币
         /// </summary>
-        private long ExchangeSilver2Coin()
+        private decimal ExchangeSilver2Coin()
         {
-            long result = 0;
+            decimal result = 0;
             try
             {
                 result = _liveDomainService.ExchangeSilver2Coin();
