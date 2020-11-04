@@ -353,4 +353,4 @@ MigrationBackup/
 .ionide/
 
 #
-appsettings.Development.json
+.idea/
