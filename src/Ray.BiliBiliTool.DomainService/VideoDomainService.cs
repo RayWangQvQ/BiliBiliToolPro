@@ -182,12 +182,12 @@ namespace Ray.BiliBiliTool.DomainService
                     title = re.Item2;
                 }
 
-                _logger.LogDebug("正在为【{title}】投币", title);
+                _logger.LogDebug("正在为“{title}”投币", title);
 
                 //判断曾经是否对此av投币过
                 if (IsDonatedCoinsForVideo(aid))
                 {
-                    _logger.LogDebug("【{title}】已经投币过了", title);
+                    _logger.LogDebug("“{title}”已经投币过了", title);
                     tryCount--;
                     continue;
                 }
@@ -221,12 +221,12 @@ namespace Ray.BiliBiliTool.DomainService
 
             if (result.Code == 0)
             {
-                _logger.LogInformation("为【{title}】投币成功", title);
+                _logger.LogInformation("为“{title}”投币成功", title);
                 return true;
             }
             else
             {
-                _logger.LogInformation("为【{title}】投币失败，原因：{msg}", aid, title, result.Message);
+                _logger.LogInformation("为“{title}”投币失败，原因：{msg}", aid, title, result.Message);
                 return false;
             }
         }
