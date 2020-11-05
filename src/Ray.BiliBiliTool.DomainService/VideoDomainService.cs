@@ -43,7 +43,6 @@ namespace Ray.BiliBiliTool.DomainService
         /// 获取随机视频
         /// </summary>
         /// <returns></returns>
-        //[LogIntercepter("获取随机视频")]
         public string GetRandomVideo()
         {
             return RegionRanking().Item1;
@@ -169,7 +168,7 @@ namespace Ray.BiliBiliTool.DomainService
 
                 string aid;
                 string title;
-                //优选使用配置的up主视频
+                //优先使用配置的up主视频
                 if (upVideoIndex < upVideos.Count)
                 {
                     aid = upVideos[tryCount - 1].Aid.ToString();

@@ -4,6 +4,8 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Ray.BiliBiliTool.Config.Options;
 
 namespace Ray.BiliBiliTool.Agent
 {
@@ -13,10 +15,12 @@ namespace Ray.BiliBiliTool.Agent
     public class MyHttpClientDelegatingHandler : DelegatingHandler
     {
         private readonly ILogger<MyHttpClientDelegatingHandler> _logger;
+        private readonly SecurityOptions _securityOptions;
 
-        public MyHttpClientDelegatingHandler(ILogger<MyHttpClientDelegatingHandler> logger)
+        public MyHttpClientDelegatingHandler(ILogger<MyHttpClientDelegatingHandler> logger, IOptionsMonitor<SecurityOptions> securityOptions)
         {
-            this._logger = logger;
+            _logger = logger;
+            _securityOptions = securityOptions.CurrentValue;
         }
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
@@ -29,6 +33,7 @@ namespace Ray.BiliBiliTool.Agent
                 _logger.LogDebug(await request.Content.ReadAsStringAsync());
             }
 
+            IntervalForSecurity(request.Method);
             HttpResponseMessage response = await base.SendAsync(request, cancellationToken);
 
             //记录返回内容
@@ -55,6 +60,18 @@ namespace Ray.BiliBiliTool.Agent
                 }
             }
             return response;
+        }
+
+        /// <summary>
+        /// 安全间隔
+        /// </summary>
+        /// <param name="method"></param>
+        private void IntervalForSecurity(HttpMethod method)
+        {
+            if (_securityOptions.IntervalSecondsBetweenRequestApi <= 0) return;
+            if (!_securityOptions.GetIntervalMethods().Contains(method)) return;
+
+            Task.Delay(_securityOptions.IntervalSecondsBetweenRequestApi * 1000).Wait();
         }
     }
 }

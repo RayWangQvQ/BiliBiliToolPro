@@ -22,6 +22,9 @@ namespace Ray.BiliBiliTool.Config
             {"-dayOfReceiveVipPrivilege","DailyTaskConfig:DayOfReceiveVipPrivilege" },
             {"-devicePlatform","DailyTaskConfig:DevicePlatform" },
 
+            {"-intervalSecondsBetweenRequestApi","Security:IntervalSecondsBetweenRequestApi" },
+            {"-intervalMethodTypes", "Security:IntervalMethodTypes"},
+
             {"-closeConsoleWhenEnd","CloseConsoleWhenEnd" }
         };
 
