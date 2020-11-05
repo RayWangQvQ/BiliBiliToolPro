@@ -18,7 +18,7 @@ namespace Ray.BiliBiliTool.DomainService
     {
         private readonly ILogger<MangaDomainService> _logger;
         private readonly IMangaApi _mangaApi;
-        private readonly IOptionsMonitor<DailyTaskOptions> _dailyTaskOptions;
+        private readonly DailyTaskOptions _dailyTaskOptions;
 
         public MangaDomainService(ILogger<MangaDomainService> logger,
             IMangaApi mangaApi,
@@ -26,7 +26,7 @@ namespace Ray.BiliBiliTool.DomainService
         {
             _logger = logger;
             _mangaApi = mangaApi;
-            _dailyTaskOptions = dailyTaskOptions;
+            _dailyTaskOptions = dailyTaskOptions.CurrentValue;
         }
 
         /// <summary>
@@ -37,13 +37,13 @@ namespace Ray.BiliBiliTool.DomainService
             BiliApiResponse response;
             try
             {
-                response = _mangaApi.ClockIn(_dailyTaskOptions.CurrentValue.DevicePlatform).Result;
+                response = _mangaApi.ClockIn(_dailyTaskOptions.DevicePlatform).Result;
             }
             catch (Exception)
             {
                 //ignore
                 //重复签到会报400异常,这里忽略掉
-                _logger.LogInformation("哔哩哔哩漫画已经签到过了");
+                _logger.LogInformation("今日已签到过，无法重复签到");
                 return;
             }
 
@@ -66,10 +66,10 @@ namespace Ray.BiliBiliTool.DomainService
         {
             int day = DateTime.Today.Day;
 
-            if (day != 1 || userIfo.GetVipType() == 0)
+            if (day != _dailyTaskOptions.DayOfReceiveVipPrivilege || userIfo.GetVipType() == 0)
             {
                 //一个月执行一次就行
-                _logger.LogInformation("今天是{day}号，每月的1号会自动为您领取漫读券", day);
+                _logger.LogInformation("目标领取日期为{target}号，今天是{day}号，跳过领取任务", _dailyTaskOptions.DayOfReceiveVipPrivilege, day);
                 return;
             }
 

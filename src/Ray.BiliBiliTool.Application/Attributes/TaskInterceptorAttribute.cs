@@ -26,17 +26,17 @@ namespace Ray.BiliBiliTool.Application.Attributes
 
         public override void OnEntry(MethodExecutionArgs arg)
         {
-            if (_taskName != null)
-            {
-                PushService.PushStringWriter.WriteLine("####  \r\n");//todo:微信推送换行失败
-                _logger.Information("---开始【{taskName}】---", _taskName);
-            }
+            if (_taskName == null) return;
+
+            PushService.PushStringWriter.WriteLine("#### >\r\n");
+            _logger.Information("---开始【{taskName}】---", _taskName);
         }
 
         public override void OnExit(MethodExecutionArgs arg)
         {
-            if (_taskName != null)
-                _logger.Information("---【{taskName}】结束---\r\n", _taskName);
+            if (_taskName == null) return;
+
+            _logger.Information("---【{taskName}】结束---\r\n", _taskName);
         }
 
         public override void OnException(MethodExecutionArgs arg)

@@ -50,33 +50,39 @@ namespace Ray.BiliBiliTool.DomainService
 
         public void WatchAndShareVideo(DailyTaskInfo dailyTaskStatus)
         {
-            var targetVideo = GetRandomVideoForWatch();
+            Tuple<string, string> targetVideo = null;
 
-            WatchVideo(dailyTaskStatus, targetVideo.Item1, targetVideo.Item2);
-            ShareVideo(dailyTaskStatus, targetVideo.Item1, targetVideo.Item2);
+            if (!dailyTaskStatus.Watch || !dailyTaskStatus.Share)
+            {
+                targetVideo = GetRandomVideoForWatch();
+                _logger.LogInformation("获取随机视频：{title}", targetVideo.Item2);
+            }
+            if (!dailyTaskStatus.Watch)
+                WatchVideo(targetVideo.Item1, targetVideo.Item2);
+            else
+                _logger.LogInformation("今天已经观看过了，不需要再看啦");
+
+            if (!dailyTaskStatus.Share)
+                ShareVideo(targetVideo.Item1, targetVideo.Item2);
+            else
+                _logger.LogInformation("今天已经分享过了，不要再分享啦");
         }
 
         /// <summary>
         /// 观看视频
         /// </summary>
-        public void WatchVideo(DailyTaskInfo dailyTaskStatus, string aid, string title = "")
+        public void WatchVideo(string aid, string title = "")
         {
-            if (dailyTaskStatus.Watch)
-            {
-                _logger.LogInformation("本日观看视频任务已经完成了，不需要再观看视频了");
-                return;
-            }
-
             int playedTime = new Random().Next(1, 90);
             var apiResponse = _dailyTaskApi.UploadVideoHeartbeat(aid, playedTime).Result;
 
             if (apiResponse.Code == 0)
             {
-                _logger.LogInformation("av{aid}({title})播放成功,已观看到第{playedTime}秒", aid, title, playedTime);
+                _logger.LogInformation("视频播放成功,已观看到第{playedTime}秒", playedTime);
             }
             else
             {
-                _logger.LogDebug("av{aid}({title})播放失败,原因：{msg}", aid, title, apiResponse.Message);
+                _logger.LogDebug("视频播放失败,原因：{msg}", apiResponse.Message);
             }
         }
 
@@ -84,23 +90,17 @@ namespace Ray.BiliBiliTool.DomainService
         /// 分享视频
         /// </summary>
         /// <param name="aid">视频aid</param>
-        public void ShareVideo(DailyTaskInfo dailyTaskStatus, string aid, string title = "")
+        public void ShareVideo(string aid, string title = "")
         {
-            if (dailyTaskStatus.Share)
-            {
-                _logger.LogInformation("本日分享视频任务已经完成了，不需要再分享视频了");
-                return;
-            }
-
             var apiResponse = _dailyTaskApi.ShareVideo(aid, _biliBiliCookieOptions.BiliJct).Result;
 
             if (apiResponse.Code == 0)
             {
-                _logger.LogInformation("视频: av{aid}({title})分享成功", aid, title);
+                _logger.LogInformation("视频分享成功");
             }
             else
             {
-                _logger.LogDebug("视频分享失败，原因: {msg}", apiResponse.Message);
+                _logger.LogInformation("视频分享失败，原因: {msg}", apiResponse.Message);
                 _logger.LogDebug("开发者提示: 如果是csrf校验失败请检查BILI_JCT参数是否正确或者失效");
             }
         }
@@ -143,7 +143,7 @@ namespace Ray.BiliBiliTool.DomainService
 
             //投币前硬币余额
             var coinBalance = _coinDomainService.GetCoinBalance();
-            _logger.LogInformation("投币前余额为 : " + coinBalance);
+            _logger.LogInformation("投币前余额为 : {coinBalance}",coinBalance);
 
             if (coinBalance <= 0)
             {
@@ -182,12 +182,12 @@ namespace Ray.BiliBiliTool.DomainService
                     title = re.Item2;
                 }
 
-                _logger.LogDebug("正在为av{aid}({title})投币", aid, title);
+                _logger.LogDebug("正在为【{title}】投币", title);
 
                 //判断曾经是否对此av投币过
                 if (IsDonatedCoinsForVideo(aid))
                 {
-                    _logger.LogDebug("{aid}({title})已经投币过了", aid, title);
+                    _logger.LogDebug("【{title}】已经投币过了", title);
                     tryCount--;
                     continue;
                 }
@@ -205,7 +205,7 @@ namespace Ray.BiliBiliTool.DomainService
                 }
             }
 
-            _logger.LogInformation("投币任务完成后余额为: " + _accountApi.GetCoinBalance().Result.Data.Money);
+            _logger.LogInformation("投币任务完成，余额为: " + _accountApi.GetCoinBalance().Result.Data.Money);
         }
 
         /// <summary>
@@ -221,12 +221,12 @@ namespace Ray.BiliBiliTool.DomainService
 
             if (result.Code == 0)
             {
-                _logger.LogInformation("为Av{aid}({title})投币成功", aid, title);
+                _logger.LogInformation("为【{title}】投币成功", title);
                 return true;
             }
             else
             {
-                _logger.LogDebug("为Av{aid}({title})投币失败，原因：{msg}", aid, title, result.Message);
+                _logger.LogInformation("为【{title}】投币失败，原因：{msg}", aid, title, result.Message);
                 return false;
             }
         }

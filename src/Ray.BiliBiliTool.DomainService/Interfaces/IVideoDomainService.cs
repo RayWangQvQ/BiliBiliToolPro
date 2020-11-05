@@ -27,14 +27,14 @@ namespace Ray.BiliBiliTool.DomainService.Interfaces
         /// </summary>
         /// <param name="aid"></param>
         /// <param name="dailyTaskStatus"></param>
-        void WatchVideo(DailyTaskInfo dailyTaskStatus, string aid, string title = "");
+        void WatchVideo(string aid, string title = "");
 
         /// <summary>
         /// 分享
         /// </summary>
         /// <param name="aid"></param>
         /// <param name="dailyTaskStatus"></param>
-        void ShareVideo(DailyTaskInfo dailyTaskStatus, string aid, string title = "");
+        void ShareVideo(string aid, string title = "");
 
         /// <summary>
         /// 投币

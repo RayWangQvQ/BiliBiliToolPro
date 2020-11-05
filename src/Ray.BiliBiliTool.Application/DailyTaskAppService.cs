@@ -55,7 +55,7 @@ namespace Ray.BiliBiliTool.Application
             ReceiveMangaVipReward(userInfo);
             Charge(userInfo);
 
-            _logger.LogInformation("-----每日任务全部执行结束-----\r\n");
+            _logger.LogInformation("-----全部任务已执行结束-----\r\n");
         }
 
         /// <summary>
@@ -65,15 +65,7 @@ namespace Ray.BiliBiliTool.Application
         [TaskInterceptor("登录")]
         private UseInfo Login()
         {
-            UseInfo userInfo = null;
-            try
-            {
-                userInfo = _loginDomainService.LoginByCookie();
-            }
-            catch (Exception e)
-            {
-                _logger.LogCritical("登录失败，任务结束。Msg:{msg}\r\n", e.Message);
-            }
+            UseInfo userInfo = _loginDomainService.LoginByCookie();
             if (userInfo == null) throw new Exception("登录失败，请检查Cookie");//终止流程
             return userInfo;
         }
@@ -125,7 +117,7 @@ namespace Ray.BiliBiliTool.Application
         }
 
         /// <summary>
-        /// 月初领取大会员福利
+        /// 每月领取大会员福利
         /// </summary>
         [TaskInterceptor("每月领取大会员福利", false)]
         private void ReceiveVipPrivilege(UseInfo userInfo)
@@ -134,7 +126,7 @@ namespace Ray.BiliBiliTool.Application
         }
 
         /// <summary>
-        /// 月底充电
+        /// 每月为自己充电
         /// </summary>
         [TaskInterceptor("每月为自己充电", false)]
         private void Charge(UseInfo userInfo)
@@ -152,7 +144,7 @@ namespace Ray.BiliBiliTool.Application
         }
 
         /// <summary>
-        /// 获取每月大会员漫画权益
+        /// 每月获取大会员漫画权益
         /// </summary>
         [TaskInterceptor("每月领取大会员漫画权益", false)]
         private void ReceiveMangaVipReward(UseInfo userInfo)

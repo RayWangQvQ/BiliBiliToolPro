@@ -77,7 +77,7 @@ namespace Ray.BiliBiliTool.DomainService
 
             ExperienceByDonateCoin re = JsonSerializer.Deserialize<ExperienceByDonateCoin>(dataStr);
 
-            _logger.LogInformation("今日已获得投币经验: " + re.Number);
+            _logger.LogDebug("今日已获得投币经验: " + re.Number);
             return re.Number;
         }
         #endregion
