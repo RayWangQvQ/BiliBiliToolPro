@@ -200,6 +200,10 @@ c. 如果想自己解决，请fork仓库后，在devlop分支进行编码开发�
 
 ## 6.捐赠支持
 
+[点击查看已捐赠列表和留言](https://github.com/RayWangQvQ/BiliBiliTool.Docs/blob/main/donate-list.md)
+
+个人维护开源不易
+
 如果觉得我写的程序对你小有帮助
 
 或者，就是单纯的想集资给我买瓶霸王增发液
