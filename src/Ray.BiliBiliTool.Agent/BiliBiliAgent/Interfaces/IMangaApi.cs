@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
-using Ray.BiliBiliTool.Agent.Dtos;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Refit;
 
-namespace Ray.BiliBiliTool.Agent.Interfaces
+namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
 {
     /// <summary>
     /// 漫画接口

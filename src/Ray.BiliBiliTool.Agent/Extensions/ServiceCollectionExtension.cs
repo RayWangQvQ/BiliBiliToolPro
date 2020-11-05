@@ -2,7 +2,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Ray.BiliBiliTool.Agent.Interfaces;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
+using Ray.BiliBiliTool.Agent.ServerChanAgent;
+using Ray.BiliBiliTool.Agent.ServerChanAgent.Interfaces;
 using Ray.BiliBiliTool.Config;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.Infrastructure;
@@ -23,11 +25,20 @@ namespace Ray.BiliBiliTool.Agent.Extensions
             services.AddHttpClient("BiliBiliWithCookie",
                 (sp, c) => c.DefaultRequestHeaders.Add("Cookie", sp.GetRequiredService<BiliBiliCookieOptions>().ToString()));
 
+            //bilibli
             services.AddBiliBiliClientApi<IDailyTaskApi>("https://api.bilibili.com");
             services.AddBiliBiliClientApi<IMangaApi>("https://manga.bilibili.com");
             services.AddBiliBiliClientApi<IExperienceApi>("https://www.bilibili.com");
             services.AddBiliBiliClientApi<IAccountApi>("https://account.bilibili.com");
             services.AddBiliBiliClientApi<ILiveApi>("https://api.live.bilibili.com");
+
+            //server酱推送
+            services.AddRefitClient<IPushApi>()
+                .ConfigureHttpClient((sp, c) =>
+                {
+                    c.BaseAddress = new Uri("http://sc.ftqq.com");
+                });
+            services.AddScoped<PushService>();
 
             return services;
         }

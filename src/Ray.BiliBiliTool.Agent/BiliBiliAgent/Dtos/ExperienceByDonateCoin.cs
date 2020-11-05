@@ -1,4 +1,4 @@
-﻿namespace Ray.BiliBiliTool.Agent.Dtos
+﻿namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos
 {
     public class ExperienceByDonateCoin
     {

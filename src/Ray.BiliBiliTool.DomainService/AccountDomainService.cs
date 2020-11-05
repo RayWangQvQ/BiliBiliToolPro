@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
-using Ray.BiliBiliTool.Agent.Dtos;
-using Ray.BiliBiliTool.Agent.Interfaces;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Config;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 
