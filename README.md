@@ -1,5 +1,5 @@
 
-![2233](docs/imgs/2233.png)
+![2233](https://github.com/RayWangQvQ/BiliBiliTool.Docs/blob/main/imgs/2233.png)
 
 <div align="center"> 
 
@@ -31,7 +31,7 @@ BiliBiliTool
 * **每月自动使用快过期的B币券为自己充电** *（你懂的~）*
 * **每个月自动领取5张B币券和大会员权益** *（既然买了会员就要领取该有的奖励啊~）*
 
-![运行图示](docs/imgs/run-exe.png)
+![运行图示](https://github.com/RayWangQvQ/BiliBiliTool.Docs/blob/main/imgs/run-exe.png)
 
 Github仓库地址：
 [RayWangQvQ/BiliBiliTool](https://github.com/RayWangQvQ/BiliBiliTool)
@@ -56,7 +56,7 @@ BiliBiliTool就是收集了一系列这样的接口，通过每日自动运行�
 - 按 F12 打开“开发者工具”，依次点击 应用程序/Application -> 存储-> Cookies
 - 找到`DEDEUSERID`、`SESSDATA`、`bili_jct`三项，复制保存它们到记事本，待会儿会用到。
 
-![获取Cookie图示](docs/imgs/get-bilibili-web-cookie.jpg)
+![获取Cookie图示](https://github.com/RayWangQvQ/BiliBiliTool.Docs/blob/main/imgs/get-bilibili-web-cookie.jpg)
 
 | CookieName | Value          |
 | ---------- | -------------- |
@@ -80,18 +80,18 @@ a. **首先fork本项目到自己的仓库**
 
 b. **进入自己fork的仓库，点击 Settings-> Secrets-> New Secrets 添加以下3个Secrets。它们将作为应用启动时的命令行参数被传入程序。** 
 
-![Secrets图示](docs/imgs/git-secrets.png)
+![Secrets图示](https://github.com/RayWangQvQ/BiliBiliTool.Docs/blob/main/imgs/git-secrets.png)
 
 c. **开启Actions并触发每日自动执行**
    
 Github Actions默认处于关闭状态，前面都配置好后，请手动开启Actions，执行一次工作流，验证是否可以正常工作。
 
-![Actions图示](docs/imgs/run-workflow.png)
+![Actions图示](https://github.com/RayWangQvQ/BiliBiliTool.Docs/blob/main/imgs/run-workflow.png)
 
 运行结束后，可查看运行日志：
 
-![Actions日志图示](docs/imgs/github-actions-log-1.png)
-![Actions日志图示](docs/imgs/github-actions-log-2.png)
+![Actions日志图示](https://github.com/RayWangQvQ/BiliBiliTool.Docs/blob/main/imgs/github-actions-log-1.png)
+![Actions日志图示](https://github.com/RayWangQvQ/BiliBiliTool.Docs/blob/main/imgs/github-actions-log-2.png)
 
 workflow的执行策略默认是每天中午14点10分自动执行一次，主分支（main分支）有push或pr操作会自动执行一次。想要修改策略详见下面常见问题3.2.Actions修改定时任务的执行时间
 
@@ -120,13 +120,13 @@ b. **解压并填写配置**
 
 下载并解压后，找到appsettings.json文件，使用记事本编辑，填入之前获取到的Cookie信息，保存后关闭：
 
-![配置文件图示](docs/imgs/appsettings-cookie.png)
+![配置文件图示](https://github.com/RayWangQvQ/BiliBiliTool.Docs/blob/main/imgs/appsettings-cookie.png)
 
 c. **运行**
 
 找到名称为 Ray.BiliBiliTool.Console 的可执行文件（Win环境下是Ray.BiliBiliTool.Console.exe），双击运行（Linux使用命令行运行），结果如下：
 
-![运行图示](docs/imgs/run-exe.png)
+![运行图示](https://github.com/RayWangQvQ/BiliBiliTool.Docs/blob/main/imgs/run-exe.png)
 
 *P.S.如果自己有服务器，也可以将程序发布到自己的服务器，利用自己的任务系统实现每天自动运行。（有服务器的大佬应该就不需要我多BB了）*
 
@@ -155,7 +155,7 @@ dotnet run -p ./src/Ray.BiliBiliTool.Console -userId=123 -sessData=456 -biliJct=
 
 除了3个必须配置的Cookie外，其他的配置可以通过名为`OTHERCONFIGS`的Secret Key进行配置，其值为多个命令行参数的拼接，如：`-numberOfCoins=3 -supportUpIds=1234,5678`，可以参考下图：
 
-![Github Secrets Other Configs](docs/imgs/github-secrets-other-configs.png)
+![Github Secrets Other Configs](https://github.com/RayWangQvQ/BiliBiliTool.Docs/blob/main/imgs/github-secrets-other-configs.png)
 
 ### 2.2.优先级
 以上3种配置方式，其优先级由低到高依次是：文件 < 命令行 < Actions。
@@ -210,11 +210,11 @@ c. 如果想自己解决，请fork仓库后，在devlop分支进行编码开发�
 
 微信扫码自动赞赏1元：
 
-![微信赞赏码](docs/imgs/donate-wechat.jpg)
+![微信赞赏码](https://github.com/RayWangQvQ/BiliBiliTool.Docs/blob/main/imgs/donate-wechat.jpg)
 
 支付宝扫码自动赞赏1元：
 
-![支付宝赞赏码](docs/imgs/donate-ali.jpg)
+![支付宝赞赏码](https://github.com/RayWangQvQ/BiliBiliTool.Docs/blob/main/imgs/donate-ali.jpg)
 
 ## 7.感谢
 本程序的灵感来源于Github的开源项目：[JunzhouLiu/BILIBILI-HELPER](https://github.com/JunzhouLiu/BILIBILI-HELPER)，该项目由Java编写，有使用Java而不是C#的朋友也可以去Star该项目，他的作者是个很棒的开源分享者，欢迎大家前往支持。
