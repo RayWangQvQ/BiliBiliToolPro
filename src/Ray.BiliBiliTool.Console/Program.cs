@@ -1,10 +1,12 @@
 ﻿using System;
+using System.IO;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent.Extensions;
+using Ray.BiliBiliTool.Agent.ServerChanAgent;
 using Ray.BiliBiliTool.Application.Contracts;
 using Ray.BiliBiliTool.Application.Extensions;
 using Ray.BiliBiliTool.Config;
@@ -44,13 +46,20 @@ namespace Ray.BiliBiliTool.Console
             //日志:
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(RayConfiguration.Root)
+                .WriteTo.TextWriter(PushService.PushStringWriter,
+                                    Serilog.Events.LogEventLevel.Information,
+                                    "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}\r\n")//用来做微信推送
                 .CreateLogger();
 
             //Host:
             var hostBuilder = new HostBuilder()
                 .ConfigureServices((hostContext, services) =>
                 {
-                    ConfigureServices(services);
+                    services.AddSingleton<IConfiguration>(RayConfiguration.Root);
+                    services.AddBiliBiliConfigs(RayConfiguration.Root);
+                    services.AddBiliBiliClientApi();
+                    services.AddDomainServices();
+                    services.AddAppServices();
                 })
                 .UseSerilog()
                 .UseConsoleLifetime();
@@ -66,44 +75,17 @@ namespace Ray.BiliBiliTool.Console
             using (var serviceScope = RayContainer.Root.CreateScope())
             {
                 var logger = serviceScope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-                logger.LogInformation("-----任务启动-----\r\n");
 
                 BiliBiliCookieOptions biliBiliCookieOptions = serviceScope.ServiceProvider.GetRequiredService<IOptionsMonitor<BiliBiliCookieOptions>>().CurrentValue;
                 if (!biliBiliCookieOptions.Check(logger))
-                {
-                    logger.LogWarning("请正确配置后再运行，配置方式见 https://github.com/RayWangQvQ/BiliBiliTool");
-                    return;
-                }
+                    throw new Exception("请正确配置Cookie后再运行，配置方式见 https://github.com/RayWangQvQ/BiliBiliTool");
 
-                //每日任务65经验
                 IDailyTaskAppService dailyTask = serviceScope.ServiceProvider.GetRequiredService<IDailyTaskAppService>();
+                var pushService = serviceScope.ServiceProvider.GetRequiredService<PushService>();
 
-                try
-                {
-                    dailyTask.DoDailyTask();
-                }
-                catch (Exception e)
-                {
-                    logger.LogError("程序发生异常：{msg}", e.Message);
-                    throw;
-                }
-
-                logger.LogInformation("-----全部任务已结束-----");
+                dailyTask.DoDailyTask();
+                pushService.SendStringWriter();
             }
-        }
-
-
-        /// <summary>
-        /// 注册容器
-        /// </summary>
-        /// <param name="services"></param>
-        private static void ConfigureServices(IServiceCollection services)
-        {
-            services.AddSingleton<IConfiguration>(RayConfiguration.Root);
-            services.AddBiliBiliConfigs(RayConfiguration.Root);
-            services.AddBiliBiliClientApi();
-            services.AddDomainServices();
-            services.AddAppServices();
         }
     }
 }

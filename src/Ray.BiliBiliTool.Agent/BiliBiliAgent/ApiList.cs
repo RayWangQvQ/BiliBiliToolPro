@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Ray.BiliBiliTool.Agent
+namespace Ray.BiliBiliTool.Agent.BiliBiliAgent
 {
     /// <summary>
     /// bilibili接口列表

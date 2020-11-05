@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
-using Ray.BiliBiliTool.Agent.Dtos;
-using Ray.BiliBiliTool.Agent.Interfaces;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Config;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 
@@ -37,12 +37,10 @@ namespace Ray.BiliBiliTool.DomainService
                 return null;
             }
 
-            _logger.LogInformation("登录成功");
-
             UseInfo useInfo = apiResponse.Data;
 
             //用户名模糊处理
-            _logger.LogInformation("用户名称: {0}", useInfo.GetFuzzyUname());
+            _logger.LogInformation("登录成功，用户名: {0}", useInfo.GetFuzzyUname());
             _logger.LogInformation("硬币余额: {0}", useInfo.Money ?? 0);
 
             if (useInfo.Level_info.Current_level < 6)

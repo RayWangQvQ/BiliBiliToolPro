@@ -1,6 +1,6 @@
 ﻿using Refit;
 
-namespace Ray.BiliBiliTool.Agent.Interfaces
+namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
 {
     [Headers(
     "Accept:application/json, text/plain, */*",

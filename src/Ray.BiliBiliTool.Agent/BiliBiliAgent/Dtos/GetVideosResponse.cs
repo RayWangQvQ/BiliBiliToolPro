@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
-namespace Ray.BiliBiliTool.Agent.Dtos
+namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos
 {
     public class GetVideosResponse
     {
