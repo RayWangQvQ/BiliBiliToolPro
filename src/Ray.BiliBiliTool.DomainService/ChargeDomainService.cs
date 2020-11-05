@@ -8,7 +8,6 @@ using Ray.BiliBiliTool.Agent.Dtos;
 using Ray.BiliBiliTool.Agent.Interfaces;
 using Ray.BiliBiliTool.Config;
 using Ray.BiliBiliTool.Config.Options;
-using Ray.BiliBiliTool.DomainService.Attributes;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 using Ray.BiliBiliTool.Infrastructure.Extensions;
 
@@ -39,7 +38,6 @@ namespace Ray.BiliBiliTool.DomainService
         /// 月底自动给自己充电
         /// 仅充会到期的B币券，低于2的时候不会充
         /// </summary>
-        [LogIntercepter("自动充电")]
         public void Charge(UseInfo userInfo)
         {
             if (_dailyTaskOptions.DayOfAutoCharge == 0)

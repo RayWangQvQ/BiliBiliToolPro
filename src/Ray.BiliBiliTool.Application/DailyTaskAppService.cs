@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
 using Ray.BiliBiliTool.Agent.Dtos;
+using Ray.BiliBiliTool.Application.Attributes;
 using Ray.BiliBiliTool.Application.Contracts;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 
@@ -56,6 +57,7 @@ namespace Ray.BiliBiliTool.Application
         /// 登录
         /// </summary>
         /// <returns></returns>
+        [TaskInterceptor("登录")]
         private UseInfo Login()
         {
             UseInfo userInfo = null;
@@ -75,144 +77,82 @@ namespace Ray.BiliBiliTool.Application
         /// 获取任务完成情况
         /// </summary>
         /// <returns></returns>
+        [TaskInterceptor(null, false)]
         private DailyTaskInfo GetDailyTaskStatus()
         {
-            var result = new DailyTaskInfo();
-
-            try
-            {
-                result = _loginDomainService.GetDailyTaskStatus();
-            }
-            catch (Exception e)
-            {
-                _logger.LogCritical("获取任务完成情况失败，继续其他任务。Msg:{msg}\r\n", e.Message);
-            }
-
-            return result;
+            return _loginDomainService.GetDailyTaskStatus();
         }
 
         /// <summary>
         /// 观看、分享视频
         /// </summary>
+        [TaskInterceptor("观看、分享视频", false)]
         private void WatchAndShareVideo(DailyTaskInfo dailyTaskInfo)
         {
-            try
-            {
-                _videoDomainService.WatchAndShareVideo(dailyTaskInfo);
-            }
-            catch (Exception e)
-            {
-                _logger.LogCritical("观看、分享视频失败，继续其他任务。Msg:{msg}\r\n", e.Message);
-            }
+            _videoDomainService.WatchAndShareVideo(dailyTaskInfo);
         }
 
         /// <summary>
         /// 投币任务
         /// </summary>
+        [TaskInterceptor("投币任务", false)]
         private void AddCoinsForVideo()
         {
-            try
-            {
-                _videoDomainService.AddCoinsForVideo();
-            }
-            catch (Exception e)
-            {
-                _logger.LogCritical("投币失败，继续其他任务。Msg:{msg}\r\n", e.Message);
-            }
+            _videoDomainService.AddCoinsForVideo();
         }
 
         /// <summary>
         /// 直播中心签到
         /// </summary>
+        [TaskInterceptor("直播中心签到", false)]
         private void LiveSign()
         {
-            try
-            {
-                _liveDomainService.LiveSign();
-            }
-            catch (Exception e)
-            {
-                _logger.LogCritical("直播中心签到失败，继续其他任务。Msg:{msg}\r\n", e.Message);
-            }
+            _liveDomainService.LiveSign();
         }
 
         /// <summary>
         /// 直播中心的银瓜子兑换硬币
         /// </summary>
+        [TaskInterceptor("直播中心的银瓜子兑换硬币", false)]
         private decimal ExchangeSilver2Coin()
         {
-            decimal result = 0;
-            try
-            {
-                result = _liveDomainService.ExchangeSilver2Coin();
-            }
-            catch (Exception e)
-            {
-                _logger.LogCritical("直播中心的银瓜子兑换硬币失败，继续其他任务。Msg:{msg}\r\n", e.Message);
-            }
-
-            return result;
+            return _liveDomainService.ExchangeSilver2Coin();
         }
 
         /// <summary>
         /// 月初领取大会员福利
         /// </summary>
+        [TaskInterceptor("月初领取大会员福利", false)]
         private void ReceiveVipPrivilege(UseInfo userInfo)
         {
-            try
-            {
-                _vipPrivilegeDomainService.ReceiveVipPrivilege(userInfo);
-            }
-            catch (Exception e)
-            {
-                _logger.LogCritical("领取大会员福利失败，继续其他任务。Msg:{msg}\r\n", e.Message);
-            }
+            _vipPrivilegeDomainService.ReceiveVipPrivilege(userInfo);
         }
 
         /// <summary>
         /// 月底充电
         /// </summary>
+        [TaskInterceptor("充电",false)]
         private void Charge(UseInfo userInfo)
         {
-            try
-            {
-                _chargeDomainService.Charge(userInfo);
-            }
-            catch (Exception e)
-            {
-                _logger.LogCritical("充电失败，继续其他任务。Msg:{msg}\r\n", e.Message);
-            }
+            _chargeDomainService.Charge(userInfo);
         }
 
         /// <summary>
         /// 漫画签到
         /// </summary>
+        [TaskInterceptor("漫画签到", false)]
         private void MangaSign()
         {
-            try
-            {
-                _mangaDomainService.MangaSign();
-            }
-            catch (Exception e)
-            {
-                _logger.LogCritical("漫画签到失败，继续其他任务。Msg:{msg}\r\n", e.Message);
-            }
+            _mangaDomainService.MangaSign();
         }
 
         /// <summary>
         /// 获取每月大会员漫画权益
         /// </summary>
+        [TaskInterceptor("获取每月大会员漫画权益", false)]
         private void ReceiveMangaVipReward(UseInfo userInfo)
         {
-            try
-            {
-                _mangaDomainService.ReceiveMangaVipReward(1, userInfo);
-            }
-            catch (Exception e)
-            {
-                _logger.LogCritical("领取大会员漫画权益失败，继续其他任务。Msg:{msg}\r\n", e.Message);
-            }
-
+            _mangaDomainService.ReceiveMangaVipReward(1, userInfo);
         }
     }
 }
