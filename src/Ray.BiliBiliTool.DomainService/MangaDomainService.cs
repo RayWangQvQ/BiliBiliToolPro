@@ -7,7 +7,6 @@ using Ray.BiliBiliTool.Agent.Dtos;
 using Ray.BiliBiliTool.Agent.Interfaces;
 using Ray.BiliBiliTool.Config;
 using Ray.BiliBiliTool.Config.Options;
-using Ray.BiliBiliTool.DomainService.Attributes;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 
 namespace Ray.BiliBiliTool.DomainService
@@ -33,7 +32,6 @@ namespace Ray.BiliBiliTool.DomainService
         /// <summary>
         /// 漫画签到
         /// </summary>
-        [LogIntercepter("漫画签到")]
         public void MangaSign()
         {
             BiliApiResponse response;
@@ -64,7 +62,6 @@ namespace Ray.BiliBiliTool.DomainService
         /// </summary>
         /// <param name="reason_id">权益号，由https://api.bilibili.com/x/vip/privilege/my得到权益号数组，取值范围为数组中的整数
         /// 这里为方便直接取1，为领取漫读劵，暂时不取其他的值</param>
-        [LogIntercepter("领取大会员漫画权益")]
         public void ReceiveMangaVipReward(int reason_id, UseInfo userIfo)
         {
             int day = DateTime.Today.Day;

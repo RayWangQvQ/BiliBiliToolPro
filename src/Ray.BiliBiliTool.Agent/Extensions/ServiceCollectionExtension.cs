@@ -49,7 +49,10 @@ namespace Ray.BiliBiliTool.Agent.Extensions
                     c.DefaultRequestHeaders.Add("Cookie", sp.GetRequiredService<IOptionsMonitor<BiliBiliCookieOptions>>().CurrentValue.ToString());
                     c.BaseAddress = new Uri(host);
                 })
-                .AddHttpMessageHandler(sp => new MyHttpClientDelegatingHandler(sp.GetRequiredService<ILogger<MyHttpClientDelegatingHandler>>()));
+                .AddHttpMessageHandler(sp => new MyHttpClientDelegatingHandler(
+                    sp.GetRequiredService<ILogger<MyHttpClientDelegatingHandler>>(),
+                    sp.GetRequiredService<IOptionsMonitor<SecurityOptions>>()
+                    ));
 
             return services;
         }
