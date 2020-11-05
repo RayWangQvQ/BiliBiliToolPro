@@ -102,7 +102,7 @@ workflow的执行策略默认是每天中午14点10分自动执行一次，主�
 *如果是发现bug，可以提交issue，我会尽快确认并解决*
 
 
-#### 1.2.1.运行方式二：本地运行
+#### 1.2.2.运行方式二：本地运行
 
 如果是DotNet开发者，直接clone源码然后vs打开解决方案，配置Cookie后直接运行调试即可。
 
@@ -132,16 +132,19 @@ c. **运行**
 
 ## 2. 个性化自定义配置
 
-个性化配置的详细信息可以在 [appsettings.json](src/Ray.BiliBiliTool.Console/appsettings.json) 文件中查看，有详细的注释信息。
+### 2.1.配置说明
+各配置的**简略介绍**可直接在 [appsettings.json](src/Ray.BiliBiliTool.Console/appsettings.json) 文件中查看相关注释信息。
 
-### 2.1.配置方式
-目前支持的个性配置方式有如下3种：
+如还需了解配置项的**详细信息**，可点击[配置详细信息](https://github.com/RayWangQvQ/BiliBiliTool.Docs/blob/main/configuration.md)查看每个配置的详细介绍。
+
+### 2.2.配置方式
+目前支持的配置方式有如下3种：
 
 #### 方式一：修改appsettings.json文件
 
 如上1.2.2中所演示。
 
-#### 方式二：本地命令行启动，通过命令设置配置
+#### 方式二：本地命令行启动时，通过命令设置配置
 
 ```
 dotnet run -p ./src/Ray.BiliBiliTool.Console -userId=123 -sessData=456 -biliJct=789 -numberOfCoins=5
@@ -153,20 +156,26 @@ dotnet run -p ./src/Ray.BiliBiliTool.Console -userId=123 -sessData=456 -biliJct=
 
 如上1.2.1中所演示，在Github Secrets中添加即可。
 
-除了3个必须配置的Cookie外，其他的配置可以通过名为`OTHERCONFIGS`的Secret Key进行配置，其值为多个命令行参数的拼接，如：`-numberOfCoins=3 -supportUpIds=1234,5678`，可以参考下图：
+除了3个必须配置的Cookie外，其他的配置可以通过名为`OTHERCONFIGS`的Secret Key进行配置。
+
+其他配置的配置风格与Cookie不同，Cookie是每个Key对应一个Value，共添加了3个Secret。**但是其他配置只需添加一个Secret，其Key为`OTHERCONFIGS`，值为多个命令行参数的拼接。**
+
+Value例如：`-numberOfCoins=3 -supportUpIds=1234,5678`，可以参考下图：
 
 ![Github Secrets Other Configs](https://github.com/RayWangQvQ/BiliBiliTool.Docs/blob/main/imgs/github-secrets-other-configs.png)
 
-### 2.2.优先级
-以上3种配置方式，其优先级由低到高依次是：文件 < 命令行 < Actions。
+这么设计是因为这些其他配置是可选的，我直接将其值附加到GitHub Actions的启动脚本命令的最后，如果有值就配置成功，如果为空也不会引起脚本异常。
+
+### 2.3.优先级
+以上3种配置方式，其优先级由低到高依次是：文件 < 命令行 和 GitHub Secrets。
 
 即如果既在配置文件中写入了配置值，又在命令行启动时使用命令行参数指定了配置值，则最后会使用命令行的。
 
-（其实Actions最终还是通过命令行参数实现的，只是通过Github Secrets来将配置传入Actions的命令行中的）
+（其实GitHub Secrets最终还是通过命令行参数传入程序的，只是通过环境变量的形式先传入Actions的命令行中，然后再通过启动脚本的命令行传入程序的）
 
-对于使用Github Action的朋友，建议使用Secrets进行配置，因为Fork项目后，不会拷贝源仓库中的Secrets，可自由的在自己的仓库中进行私人配置。当有版本重大更新而需要将源仓库同步PR到自己Fork的仓库时，PR操作会很顺滑，不会影响到已配置的值。
+对于使用Github Action线上运行的朋友，建议使用Secrets进行配置，因为Fork项目后，不会拷贝源仓库中的Secrets，可自由的在自己的仓库中进行私人配置。当有版本重大更新而需要将源仓库同步PR到自己Fork的仓库时，PR操作会很顺滑，不会影响到已配置的值。
 
-如果是Fork之后，自己改了appsettings.json文件再提交的，那么以后如果需要PR源仓库，则要注意保留自己的修改不要被覆盖。
+当然，Fork之后自己改了appsettings.json文件再提交，也是可以实现配置的。但是一则你的配置值将被暴露出来（别人可通过访问你的仓库里的配置查看到值），二是以后如果需要PR源仓库的更新到自己仓库，则要注意保留自己的修改不要被PR覆盖。
 
 ## 3.常见问题
 
@@ -179,22 +188,22 @@ Fork的仓库，actions默认是关闭的，需要对仓库进行1次操作才�
 
 ```yml
   schedule:
-    - cron: '30 6 * * *'
-    # cron表达式，Actions时区是UTC时间，比我们东8区要早8个小时，所以如果想每天14点30分运行，则小时数要输入6（14-8=6），如上示例。
+    - cron: '10 6 * * *'
+    # cron表达式，Actions时区是UTC时间，比我们东8区要早8个小时，所以如果想每天14点10分运行，则小时数要输入6（14-8=6），如上示例。
 ```
 
 ## 4.更新计划
 
-见源码中的todo任务列表。
+当前正处于快速开发迭代中，详细待更新内容可参见源码中的todo任务列表。
 
 ## 5.贡献代码
-目前软件还在迭代开发中，如果你有好的想法，欢迎向仓库贡献你的代码，贡献步骤：
+如果你有好的想法，欢迎向仓库贡献你的代码，贡献步骤：
 
 a. 搜索查看issue，确定是否已有人提过同类问题
 
 b. 确认没有同类issue后，自己可新建issue，描述问题或建议
 
-c. 如果想自己解决，请fork仓库后，在devlop分支进行编码开发，完成后提交pr，并标注解决的issue编号
+c. 如果想自己解决，请fork仓库后，在devlop分支进行编码开发，完成后提交pr到devlop分支，并标注解决的issue编号
 
 我会尽快进行代码审核，提前感谢你的贡献。
 
