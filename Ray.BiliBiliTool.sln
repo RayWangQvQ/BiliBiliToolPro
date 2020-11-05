@@ -39,6 +39,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ray.BiliBiliTool.Config", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ray.BiliBiliTool.DomainService", "src\Ray.BiliBiliTool.DomainService\Ray.BiliBiliTool.DomainService.csproj", "{7105652A-B1C1-4F9E-BA38-8034BC8B26B4}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PushTest", "test\PushTest\PushTest.csproj", "{060E0E92-B3A3-4E5C-92C1-F2FC07F090FA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -93,6 +95,10 @@ Global
 		{7105652A-B1C1-4F9E-BA38-8034BC8B26B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7105652A-B1C1-4F9E-BA38-8034BC8B26B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7105652A-B1C1-4F9E-BA38-8034BC8B26B4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{060E0E92-B3A3-4E5C-92C1-F2FC07F090FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{060E0E92-B3A3-4E5C-92C1-F2FC07F090FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{060E0E92-B3A3-4E5C-92C1-F2FC07F090FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{060E0E92-B3A3-4E5C-92C1-F2FC07F090FA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -114,6 +120,7 @@ Global
 		{D5F9FBCE-31BE-4E80-93E2-183CF029431F} = {120917DC-474C-448B-9EBB-1B3BA3A20B9D}
 		{191C48BD-5CB5-42CA-B394-7A4A9BFA6275} = {120917DC-474C-448B-9EBB-1B3BA3A20B9D}
 		{7105652A-B1C1-4F9E-BA38-8034BC8B26B4} = {120917DC-474C-448B-9EBB-1B3BA3A20B9D}
+		{060E0E92-B3A3-4E5C-92C1-F2FC07F090FA} = {E9BDDCBE-A57D-4E3B-8252-708088386ADF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {197319DA-1148-4A99-847C-8B270B6A29AB}

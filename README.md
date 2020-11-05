@@ -95,6 +95,12 @@ Github Actions默认处于关闭状态，前面都配置好后，请手动开启
 
 workflow的执行策略默认是每天中午14点10分自动执行一次，主分支（main分支）有push或pr操作会自动执行一次。想要修改策略详见下面常见问题3.2.Actions修改定时任务的执行时间
 
+如果配置了Server酱微信推送，执行成功后微信会收到推送消息：
+
+![微信推送图示](https://github.com/RayWangQvQ/BiliBiliTool.Docs/blob/main/imgs/wechat-push.png)
+
+可以点击 [配置详细信息](https://github.com/RayWangQvQ/BiliBiliTool.Docs/blob/main/configuration.md) 查看如何配置微信推送。
+
 *如果执行出现异常，会收到了GitHub Action的错误邮件通知，请检查Cookies是不是失效了或者是否有bug。*
 
 *如果是Cookies失效了，请从浏览器重新获取并更新到Secrets中。用户主动清除浏览器缓存，会导致`BILI_JCT`和`DEDEUSERID`失效。*

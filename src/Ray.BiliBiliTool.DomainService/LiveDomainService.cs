@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.Extensions.Logging;
-using Ray.BiliBiliTool.Agent.Interfaces;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 
 namespace Ray.BiliBiliTool.DomainService
@@ -62,7 +62,7 @@ namespace Ray.BiliBiliTool.DomainService
             var silver2CoinMoney = _coinDomainService.GetCoinBalance();
 
             _logger.LogInformation("当前银瓜子余额: {0}", queryStatus.Data.Silver);
-            _logger.LogInformation("兑换银瓜子后硬币余额: {0}", silver2CoinMoney);
+            _logger.LogInformation("当前硬币余额: {0}", silver2CoinMoney);
 
             return silver2CoinMoney;
         }
