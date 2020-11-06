@@ -25,6 +25,8 @@ namespace Ray.BiliBiliTool.Config
             {"-intervalSecondsBetweenRequestApi","Security:IntervalSecondsBetweenRequestApi" },
             {"-intervalMethodTypes", "Security:IntervalMethodTypes"},
 
+            {"-pushScKey","Push:ScKey" },
+
             {"-closeConsoleWhenEnd","CloseConsoleWhenEnd" }
         };
 
