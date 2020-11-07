@@ -57,8 +57,8 @@ namespace Ray.BiliBiliTool.DomainService.Interfaces
         /// <returns></returns>
         bool IsDonatedCoinsForVideo(string aid);
 
-        List<UpVideoInfo> GetVideosByUpId(long upId);
-
         List<UpVideoInfo> GetRandomVideosOfUps();
+
+        Tuple<string, string> TryGetNotDonatedVideo();
     }
 }
