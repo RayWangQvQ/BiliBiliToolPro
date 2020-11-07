@@ -19,7 +19,7 @@ jobs:
     
     # 检出
     - name: Checkout
-    - uses: actions/checkout@v2
+      uses: actions/checkout@v2
       
     # 设置服务器时区为东八区 
     - name: Set time zone
