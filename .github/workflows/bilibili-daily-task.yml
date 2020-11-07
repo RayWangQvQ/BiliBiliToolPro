@@ -3,8 +3,6 @@ name: bilibili-daily-task
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
   workflow_dispatch:
   schedule:
     - cron: '10 6 * * *'
@@ -16,19 +14,28 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    
     - uses: actions/checkout@v2
       
+    # 设置服务器时区为东八区 
+    - name: Set Time Zone
+      run: sudo timedatectl set-timezone 'Asia/Shanghai'
+      
+    # .Net Core 环境
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.301
 
+    # 安装依赖
     - name: Install dependencies
       run: dotnet restore
       
+    # 构建应用
     - name: Build
       run: dotnet build --configuration Release --no-restore
-      
+       
+    # 运行
     - name: Run
       env:
         userId: ${{secrets.USERID}}
