@@ -143,7 +143,7 @@ namespace Ray.BiliBiliTool.DomainService
 
             //投币前硬币余额
             var coinBalance = _coinDomainService.GetCoinBalance();
-            _logger.LogInformation("投币前余额为 : {coinBalance}",coinBalance);
+            _logger.LogInformation("投币前余额为 : {coinBalance}", coinBalance);
 
             if (coinBalance <= 0)
             {
@@ -160,39 +160,16 @@ namespace Ray.BiliBiliTool.DomainService
 
             int successCoins = 0;
             int tryCount = 0;//投币最多操作数 解决csrf校验失败时死循环的问题
-            var upVideos = GetRandomVideosOfUps();
-            int upVideoIndex = 0;
             while (successCoins < needCoins)
             {
                 tryCount++;
 
-                string aid;
-                string title;
-                //优先使用配置的up主视频
-                if (upVideoIndex < upVideos.Count)
-                {
-                    aid = upVideos[tryCount - 1].Aid.ToString();
-                    title = upVideos[tryCount - 1].Title;
-                    upVideoIndex++;
-                }
-                else
-                {
-                    var re = RegionRanking();
-                    aid = re.Item1;
-                    title = re.Item2;
-                }
+                var video = TryGetNotDonatedVideo();
+                if (video == null) continue;
 
-                _logger.LogDebug("正在为“{title}”投币", title);
+                _logger.LogDebug("正在为“{title}”投币", video.Item2);
 
-                //判断曾经是否对此av投币过
-                if (IsDonatedCoinsForVideo(aid))
-                {
-                    _logger.LogDebug("“{title}”已经投币过了", title);
-                    tryCount--;
-                    continue;
-                }
-
-                bool isSuccess = AddCoinsForVideo(aid, 1, _dailyTaskOptions.SelectLike, title);
+                bool isSuccess = AddCoinsForVideo(video.Item1, 1, _dailyTaskOptions.SelectLike, video.Item2);
                 if (isSuccess)
                 {
                     successCoins++;
@@ -231,16 +208,68 @@ namespace Ray.BiliBiliTool.DomainService
             }
         }
 
-        public List<UpVideoInfo> GetVideosByUpId(long upId)
-        {
-            BiliApiResponse<SearchUpVideosResponse> re = _dailyTaskApi.SearchVideosByUpId(upId, 1, 11).Result;
 
-            if (re.Code != 0)
+        public Tuple<string, string> TryGetNotDonatedVideo()
+        {
+            Tuple<string, string> result = null;
+            //如果配置upID，则从up尝试10次
+            if (_dailyTaskOptions.SupportUpIdList.Count > 0)
             {
-                throw new Exception(re.Message);
+                result = TryGetNotDonatedVideoByUp(10);
+                if (result != null) return result;
             }
 
-            return re.Data.List.Vlist;
+            //然后从排行榜尝试5次
+            result = TryGetNotDonatedVideoByRegion(5);
+
+            return result;
+        }
+
+        public Tuple<string, string> TryGetNotDonatedVideoByUp(int tryCount)
+        {
+            if (_dailyTaskOptions.SupportUpIdList.Count == 0) return null;
+
+            //获取每个up的视频总数
+            Dictionary<long, int> videoCountDic = new Dictionary<long, int>();
+            foreach (var item in _dailyTaskOptions.SupportUpIdList)
+            {
+                var count = GetVidoeCountOfUp(item);
+                if (count > 0)
+                    videoCountDic.Add(item, count);
+            }
+            if (videoCountDic.Count == 0) return null;
+
+            //尝试tryCount次
+            for (int i = 0; i < tryCount; i++)
+            {
+                long randomUpId = videoCountDic.Keys.ToList()[new Random().Next(0, videoCountDic.Count)];
+                int videoCount = videoCountDic[randomUpId];
+
+                UpVideoInfo videoInfo = GetRandomVideoOfUp(randomUpId, videoCount);
+                if (IsDonatedCoinsForVideo(videoInfo.Aid.ToString())) continue;
+                return Tuple.Create(videoInfo.Aid.ToString(), videoInfo.Title);
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// 尝试从排行榜中获取一个没有看过的视频
+        /// </summary>
+        /// <param name="tryCount"></param>
+        /// <returns></returns>
+        public Tuple<string, string> TryGetNotDonatedVideoByRegion(int tryCount)
+        {
+            if (tryCount <= 0) return null;
+
+            for (int i = 0; i < tryCount; i++)
+            {
+                var video = RegionRanking();
+                if (IsDonatedCoinsForVideo(video.Item1)) continue;
+                return video;
+            }
+
+            return null;
         }
 
         public List<UpVideoInfo> GetRandomVideosOfUps()
@@ -277,6 +306,11 @@ namespace Ray.BiliBiliTool.DomainService
             return re.Data.List.Vlist.First();
         }
 
+        /// <summary>
+        /// 获取UP主的视频总数量
+        /// </summary>
+        /// <param name="upId"></param>
+        /// <returns></returns>
         private int GetVidoeCountOfUp(long upId)
         {
             BiliApiResponse<SearchUpVideosResponse> re = _dailyTaskApi.SearchVideosByUpId(upId, 1, 1).Result;

@@ -17,9 +17,9 @@ namespace WatchVideoTest
             {
                 var dailyTask = scope.ServiceProvider.GetRequiredService<IVideoDomainService>();
 
-                var re = dailyTask.GetRandomVideosOfUps();
+                var re = dailyTask.TryGetNotDonatedVideo();
 
-                Assert.True(re.Count > 0);
+                Assert.True(re!=null);
             }
         }
     }
