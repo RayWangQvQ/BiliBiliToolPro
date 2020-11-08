@@ -19,7 +19,9 @@ BiliBiliTool
 
 </div>
 
-**BiliBiliTool是一个B站自动执行任务的工具，通过它可以实现B站帐号的每日自动观看、分享、投币视频，获取经验，每月自动领取会员权益、自动为自己充电等功能，帮助我们轻松升级会员到Lv6并赚取电池**
+**BiliBiliTool是一个B站自动执行任务的工具，通过它可以实现B站帐号的每日自动观看、分享、投币视频，获取经验，每月自动领取会员权益、自动为自己充电等功能，帮助我们轻松升级会员到Lv6并赚取电池。**
+
+**通过结合GitHub Actions，可以实现每天线上自动运行，一劳永逸。**
 
 详细功能目录如下:
 
@@ -37,6 +39,8 @@ Github仓库地址：
 [RayWangQvQ/BiliBiliTool](https://github.com/RayWangQvQ/BiliBiliTool)
 
 **本应用仅用于学习和测试，自觉爱护小破站，请勿滥用！**
+
+*（如果图片挂了，是因为GitHub的服务器在国外，经常会刷不出，有VPN的开启VPN，没有的也可先先参考 [我的博客](https://www.cnblogs.com/RayWang/p/13909784.html)，只是博客内容可能不是最新的)*
 
 ## 1.如何使用
 
@@ -58,7 +62,7 @@ BiliBiliTool就是收集了一系列这样的接口，通过每日自动运行�
 
 ![获取Cookie图示](https://github.com/RayWangQvQ/BiliBiliTool.Docs/blob/main/imgs/get-bilibili-web-cookie.jpg)
 
-| CookieName | Value          |
+| Cookie Key | Cookie Value   |
 | ---------- | -------------- |
 | DEDEUSERID | 从Cookie中获取 |
 | SESSDATA   | 从Cookie中获取 |
@@ -80,15 +84,13 @@ a. **首先fork本项目到自己的仓库**
 
 b. **进入自己fork的仓库，点击 Settings-> Secrets-> New Secrets 添加以下3个Secrets。它们将作为应用启动时的命令行参数被传入程序。** 
 
-**注意**：CookieName与Actions Secrets的变量名的对应关系
-
-| CookieName | Actions Secrets name |
-| ---------- | -------------------- |
-| DEDEUSERID | USERID               |
-| SESSDATA   | SESSDATA             |
-| BILI_JCT   | BILIJCT              |
-
 ![Secrets图示](https://github.com/RayWangQvQ/BiliBiliTool.Docs/blob/main/imgs/git-secrets.png)
+
+| Secret Key | Cookie Key |
+| ----------- | ----------- |
+|  USERID | DEDEUSERID |
+|  SESSDATA | SESSDATA |
+|  BILIJCT | BILI_JCT |
 
 c. **开启Actions并触发每日自动执行**
    
@@ -217,7 +219,7 @@ a. 搜索查看issue，确定是否已有人提过同类问题
 
 b. 确认没有同类issue后，自己可新建issue，描述问题或建议
 
-c. 如果想自己解决，请fork仓库后，在devlop分支进行编码开发，完成后提交pr到devlop分支，并标注解决的issue编号
+c. 如果想自己解决，请fork仓库后，在**devlop分支**进行编码开发，完成后**提交pr到devlop分支**，并标注解决的issue编号
 
 我会尽快进行代码审核，提前感谢你的贡献。
 
