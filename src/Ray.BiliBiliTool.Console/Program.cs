@@ -82,9 +82,19 @@ namespace Ray.BiliBiliTool.Console
 
                 IDailyTaskAppService dailyTask = serviceScope.ServiceProvider.GetRequiredService<IDailyTaskAppService>();
                 var pushService = serviceScope.ServiceProvider.GetRequiredService<PushService>();
+                bool isPushed = false;
 
-                dailyTask.DoDailyTask();
-                pushService.SendStringWriter();
+                try
+                {
+                    dailyTask.DoDailyTask();
+                }
+                catch (Exception ex)
+                {
+                    pushService.SendStringWriter();
+                    isPushed = true;
+                }
+
+                if (!isPushed) pushService.SendStringWriter();
             }
         }
     }
