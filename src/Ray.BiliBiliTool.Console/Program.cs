@@ -88,7 +88,7 @@ namespace Ray.BiliBiliTool.Console
                 {
                     dailyTask.DoDailyTask();
                 }
-                catch (Exception ex)
+                catch
                 {
                     pushService.SendStringWriter();
                     isPushed = true;
