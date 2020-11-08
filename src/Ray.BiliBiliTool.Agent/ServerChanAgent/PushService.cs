@@ -24,12 +24,12 @@ namespace Ray.BiliBiliTool.Agent.ServerChanAgent
 
         public PushResponse DoSend(string title, string content)
         {
-            return _pushApi.Send(_pushOptions.ScKey, title, content).Result;
+            return _pushApi.Send(_pushOptions.PushScKey, title, content).Result;
         }
 
         public PushResponse SendStringWriter()
         {
-            if (string.IsNullOrWhiteSpace(_pushOptions.ScKey)) return new PushResponse { Errno = int.MinValue, Errmsg = "未配置SCKEY" };
+            if (string.IsNullOrWhiteSpace(_pushOptions.PushScKey)) return new PushResponse { Errno = int.MinValue, Errmsg = "未配置SCKEY" };
 
             var title = $"Ray.BiliBiliTool任务日报";
             var content = $"#### 日期：{DateTime.Now:yyyy-MM-dd} \r\n{PushStringWriter.GetStringBuilder()}";

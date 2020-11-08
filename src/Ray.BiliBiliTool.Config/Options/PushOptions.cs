@@ -6,6 +6,6 @@ namespace Ray.BiliBiliTool.Config.Options
 {
     public class PushOptions
     {
-        public string ScKey { get; set; }
+        public string PushScKey { get; set; }
     }
 }
