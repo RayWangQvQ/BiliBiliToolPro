@@ -80,6 +80,14 @@ a. **首先fork本项目到自己的仓库**
 
 b. **进入自己fork的仓库，点击 Settings-> Secrets-> New Secrets 添加以下3个Secrets。它们将作为应用启动时的命令行参数被传入程序。** 
 
+**注意**：CookieName与Actions Secrets的变量名的对应关系
+
+| CookieName | Actions Secrets name |
+| ---------- | -------------------- |
+| DEDEUSERID | USERID               |
+| SESSDATA   | SESSDATA             |
+| BILI_JCT   | BILIJCT              |
+
 ![Secrets图示](https://github.com/RayWangQvQ/BiliBiliTool.Docs/blob/main/imgs/git-secrets.png)
 
 c. **开启Actions并触发每日自动执行**
