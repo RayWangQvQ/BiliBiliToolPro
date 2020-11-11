@@ -99,7 +99,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos
 
         //public int Bcoin_balance { get; set; }
 
-        public int Coupon_balance { get; set; }
+        public decimal Coupon_balance { get; set; }
 
         //public int Coupon_due_time { get; set; }
     }
