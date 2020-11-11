@@ -110,17 +110,17 @@ namespace Ray.BiliBiliTool.DomainService
         /// </summary>
         /// <param name="aid">av号</param>
         /// <returns></returns>
-        public bool IsDonatedCoinsForVideo(string aid)
+        public bool CanDonatedCoinsForVideo(string aid)
         {
             int multiply = _dailyTaskApi.GetDonatedCoinsForVideo(aid).Result.Data.Multiply;
-            if (multiply > 0)
+            if (multiply < 2)
             {
-                //_logger.LogInformation("已经为Av" + aid + "投过" + multiply + "枚硬币啦");
+                _logger.LogDebug("已为Av" + aid + "投过" + multiply + "枚硬币，可以继续投币");
                 return true;
             }
             else
             {
-                //_logger.LogInformation("还没有为Av" + aid + " 投过硬币，开始投币");
+                _logger.LogDebug("已为Av" + aid + " 投过2枚硬币，不能再投币啦");
                 return false;
             }
         }
@@ -203,7 +203,7 @@ namespace Ray.BiliBiliTool.DomainService
             }
             else
             {
-                _logger.LogInformation("为“{title}”投币失败，原因：{msg}", aid, title, result.Message);
+                _logger.LogInformation("为“{title}”投币失败，原因：{msg}", title, result.Message);
                 return false;
             }
         }
@@ -246,7 +246,7 @@ namespace Ray.BiliBiliTool.DomainService
                 int videoCount = videoCountDic[randomUpId];
 
                 UpVideoInfo videoInfo = GetRandomVideoOfUp(randomUpId, videoCount);
-                if (IsDonatedCoinsForVideo(videoInfo.Aid.ToString())) continue;
+                if (!CanDonatedCoinsForVideo(videoInfo.Aid.ToString())) continue;
                 return Tuple.Create(videoInfo.Aid.ToString(), videoInfo.Title);
             }
 
@@ -265,7 +265,7 @@ namespace Ray.BiliBiliTool.DomainService
             for (int i = 0; i < tryCount; i++)
             {
                 var video = RegionRanking();
-                if (IsDonatedCoinsForVideo(video.Item1)) continue;
+                if (!CanDonatedCoinsForVideo(video.Item1)) continue;
                 return video;
             }
 

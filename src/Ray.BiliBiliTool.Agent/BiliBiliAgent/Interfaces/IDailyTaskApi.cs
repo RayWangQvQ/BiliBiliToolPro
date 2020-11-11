@@ -74,7 +74,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         /// <param name="csrf"></param>
         /// <returns></returns>
         [Post("/x/ugcpay/trade/elec/pay/quick?elec_num={elec_num}&up_mid={up_mid}&otype=up&oid={oid}&csrf={csrf}")]
-        Task<BiliApiResponse<ChargeResponse>> Charge(int elec_num, string up_mid, string oid, string csrf);
+        Task<BiliApiResponse<ChargeResponse>> Charge(decimal elec_num, string up_mid, string oid, string csrf);
 
         /// <summary>
         /// 充电
