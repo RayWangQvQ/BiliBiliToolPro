@@ -42,8 +42,8 @@ jobs:
     # 运行
     - name: Run
       env:
-        userId: ${{secrets.USERID}}
-        sessData: ${{secrets.SESSDATA}}
-        biliJct: ${{secrets.BILIJCT}}
-        otherConfigs: ${{secrets.OTHERCONFIGS}}
-      run: dotnet run -p ./src/Ray.BiliBiliTool.Console -userId=${userId} -sessData=${sessData} -biliJct=${biliJct} -closeConsoleWhenEnd=1 ${otherConfigs}
+        BiliBiliCookie:UserId: ${{secrets.USERID}}
+        BiliBiliCookie:SessData: ${{secrets.SESSDATA}}
+        BiliBiliCookie:BiliJct: ${{secrets.BILIJCT}}
+        Push:PushScKey: ${{secrets.PUSHScKEY}}
+      run: dotnet run -p ./src/Ray.BiliBiliTool.Console -userId=${{secrets.USERID}} -sessData=${{secrets.SESSDATA}} -biliJct=${{secrets.BILIJCT}} -closeConsoleWhenEnd=1 ${{secrets.OTHERCONFIGS}}
