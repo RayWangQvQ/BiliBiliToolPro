@@ -46,4 +46,12 @@ jobs:
         BiliBiliCookie__SessData: ${{secrets.SESSDATA}}
         BiliBiliCookie__BiliJct: ${{secrets.BILIJCT}}
         Push__PushScKey: ${{secrets.PUSHSCKEY}}
+        Security__IntervalSecondsBetweenRequestApi: ${{secrets.INTERVALSECONDSBETWEENREQUESTAPI}}
+        Security__IntervalMethodTypes: ${{secrets.INTERVALMETHODTYPES}}
+        DailyTaskConfig__NumberOfCoins: ${{secrets.NUMBEROFCOINS}}
+        DailyTaskConfig__SelectLike: ${{secrets.SELECTLIKE}}
+        DailyTaskConfig__SupportUpIds: ${{secrets.SUPPORTUPIDS}}
+        DailyTaskConfig__DayOfAutoCharge: ${{secrets.DAYOFAUTOCHARGE}}
+        DailyTaskConfig__DayOfReceiveVipPrivilege: ${{secrets.DAYOFRECEIVEVIPPRIVILEGE}}
+        DailyTaskConfig__DevicePlatform: ${{secrets.DEVICEPLATFORM}}
       run: dotnet run -p ./src/Ray.BiliBiliTool.Console -userId=${{secrets.USERID}} -sessData=${{secrets.SESSDATA}} -biliJct=${{secrets.BILIJCT}} -closeConsoleWhenEnd=1 ${{secrets.OTHERCONFIGS}}
