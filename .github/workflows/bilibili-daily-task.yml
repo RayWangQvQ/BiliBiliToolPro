@@ -54,4 +54,5 @@ jobs:
         DailyTaskConfig__DayOfAutoCharge: ${{secrets.DAYOFAUTOCHARGE}}
         DailyTaskConfig__DayOfReceiveVipPrivilege: ${{secrets.DAYOFRECEIVEVIPPRIVILEGE}}
         DailyTaskConfig__DevicePlatform: ${{secrets.DEVICEPLATFORM}}
+        Serilog__WriteTo__0__Args__restrictedToMinimumLevel: ${{secrets.CONSOLELOGLEVEL}}
       run: dotnet run -p ./src/Ray.BiliBiliTool.Console -userId=${{secrets.USERID}} -sessData=${{secrets.SESSDATA}} -biliJct=${{secrets.BILIJCT}} -closeConsoleWhenEnd=1 ${{secrets.OTHERCONFIGS}}

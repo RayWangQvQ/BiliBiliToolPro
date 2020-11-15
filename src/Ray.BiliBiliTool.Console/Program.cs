@@ -49,7 +49,7 @@ namespace Ray.BiliBiliTool.Console
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(RayConfiguration.Root)
                 .WriteTo.TextWriter(PushService.PushStringWriter,
-                                    Serilog.Events.LogEventLevel.Information,
+                                    GetConsoleLogLevel(),
                                     "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}\r\n")//用来做微信推送
                 .CreateLogger();
 
@@ -102,6 +102,18 @@ namespace Ray.BiliBiliTool.Console
 
                 if (!isPushed) pushService.SendStringWriter();
             }
+        }
+
+        /// <summary>
+        /// 获取配置的Console的日志等级，作为推送日志的等级
+        /// </summary>
+        /// <returns></returns>
+        private static Serilog.Events.LogEventLevel GetConsoleLogLevel()
+        {
+            var consoleLevelStr = RayConfiguration.Root["Serilog:WriteTo:0:Args:restrictedToMinimumLevel"];
+            Serilog.Events.LogEventLevel levelEnum = (Serilog.Events.LogEventLevel)
+                Enum.Parse(typeof(Serilog.Events.LogEventLevel), consoleLevelStr);
+            return levelEnum;
         }
     }
 }
