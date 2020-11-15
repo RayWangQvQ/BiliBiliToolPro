@@ -40,8 +40,9 @@ namespace Ray.BiliBiliTool.Console
         {
             RayConfiguration.Root = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", false, true)
-                .AddCommandLine(args, Constants.CommandLineMapper)
                 //.AddJsonFile("appsettings.local.json", true,true)
+                .AddEnvironmentVariables()
+                .AddCommandLine(args, Constants.CommandLineMapper)
                 .Build();
 
             //日志:
