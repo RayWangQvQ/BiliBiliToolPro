@@ -45,5 +45,5 @@ jobs:
         BiliBiliCookie:UserId: ${{secrets.USERID}}
         BiliBiliCookie:SessData: ${{secrets.SESSDATA}}
         BiliBiliCookie:BiliJct: ${{secrets.BILIJCT}}
-        Push:PushScKey: ${{secrets.PUSHScKEY}}
+        Push:PushScKey: ${{secrets.PUSHSCKEY}}
       run: dotnet run -p ./src/Ray.BiliBiliTool.Console -userId=${{secrets.USERID}} -sessData=${{secrets.SESSDATA}} -biliJct=${{secrets.BILIJCT}} -closeConsoleWhenEnd=1 ${{secrets.OTHERCONFIGS}}
