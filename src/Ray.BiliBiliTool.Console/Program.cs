@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -76,9 +77,12 @@ namespace Ray.BiliBiliTool.Console
             {
                 var logger = serviceScope.ServiceProvider.GetRequiredService<ILogger<Program>>();
 
+                logger.LogInformation("版本号：{version}", typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "未知");
+                logger.LogInformation("开源地址：{url} \r\n", Constants.SourceCodeUrl);
+
                 BiliBiliCookieOptions biliBiliCookieOptions = serviceScope.ServiceProvider.GetRequiredService<IOptionsMonitor<BiliBiliCookieOptions>>().CurrentValue;
                 if (!biliBiliCookieOptions.Check(logger))
-                    throw new Exception("请正确配置Cookie后再运行，配置方式见 https://github.com/RayWangQvQ/BiliBiliTool");
+                    throw new Exception($"请正确配置Cookie后再运行，配置方式见 {Constants.SourceCodeUrl}");
 
                 IDailyTaskAppService dailyTask = serviceScope.ServiceProvider.GetRequiredService<IDailyTaskAppService>();
                 var pushService = serviceScope.ServiceProvider.GetRequiredService<PushService>();
@@ -92,6 +96,7 @@ namespace Ray.BiliBiliTool.Console
                 {
                     pushService.SendStringWriter();
                     isPushed = true;
+                    throw;
                 }
 
                 if (!isPushed) pushService.SendStringWriter();
