@@ -25,11 +25,11 @@ jobs:
     - name: Set time zone
       run: sudo timedatectl set-timezone 'Asia/Shanghai'
       
-    # .Net Core 环境
-    - name: Setup .NET Core
+    # .Net 环境
+    - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 3.1.301
+        dotnet-version: 5.0
 
     # 安装依赖
     - name: Install dependencies
