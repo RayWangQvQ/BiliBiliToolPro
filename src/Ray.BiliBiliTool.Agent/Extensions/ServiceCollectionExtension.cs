@@ -33,11 +33,15 @@ namespace Ray.BiliBiliTool.Agent.Extensions
             services.AddBiliBiliClientApi<ILiveApi>("https://api.live.bilibili.com");
 
             //server酱推送
-            services.AddRefitClient<IPushApi>()
+            services.AddRefitClient<IPushApi>(new RefitSettings(new SystemTextJsonContentSerializer(JsonSerializerOptionsBuilder.DefaultOptions)))
                 .ConfigureHttpClient((sp, c) =>
                 {
                     c.BaseAddress = new Uri("http://sc.ftqq.com");
-                });
+                })
+                .AddHttpMessageHandler(sp => new MyHttpClientDelegatingHandler(
+                    sp.GetRequiredService<ILogger<MyHttpClientDelegatingHandler>>(),
+                    sp.GetRequiredService<IOptionsMonitor<SecurityOptions>>()
+                    ));
             services.AddScoped<PushService>();
 
             return services;
