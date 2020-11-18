@@ -36,23 +36,24 @@ jobs:
       run: dotnet restore
       
     # 构建应用
-    - name: Build
+    - name: Build APP
       run: dotnet build --configuration Release --no-restore
        
     # 运行
-    - name: Run
+    - name: Run APP
       env:
-        BiliBiliCookie__UserId: ${{secrets.USERID}}
-        BiliBiliCookie__SessData: ${{secrets.SESSDATA}}
-        BiliBiliCookie__BiliJct: ${{secrets.BILIJCT}}
-        Push__PushScKey: ${{secrets.PUSHSCKEY}}
-        Security__IntervalSecondsBetweenRequestApi: ${{secrets.INTERVALSECONDSBETWEENREQUESTAPI}}
-        Security__IntervalMethodTypes: ${{secrets.INTERVALMETHODTYPES}}
-        DailyTaskConfig__NumberOfCoins: ${{secrets.NUMBEROFCOINS}}
-        DailyTaskConfig__SelectLike: ${{secrets.SELECTLIKE}}
-        DailyTaskConfig__SupportUpIds: ${{secrets.SUPPORTUPIDS}}
-        DailyTaskConfig__DayOfAutoCharge: ${{secrets.DAYOFAUTOCHARGE}}
-        DailyTaskConfig__DayOfReceiveVipPrivilege: ${{secrets.DAYOFRECEIVEVIPPRIVILEGE}}
-        DailyTaskConfig__DevicePlatform: ${{secrets.DEVICEPLATFORM}}
-        Serilog__WriteTo__0__Args__restrictedToMinimumLevel: ${{secrets.CONSOLELOGLEVEL}}
+        Ray_BiliBiliCookie:UserId: ${{secrets.USERID}}
+        Ray_BiliBiliCookie:SessData: ${{secrets.SESSDATA}}
+        Ray_BiliBiliCookie:BiliJct: ${{secrets.BILIJCT}}
+        Ray_Push:PushScKey: ${{secrets.PUSHSCKEY}}
+        Ray_Security:IntervalSecondsBetweenRequestApi: ${{secrets.INTERVALSECONDSBETWEENREQUESTAPI}}
+        Ray_Security:IntervalMethodTypes: ${{secrets.INTERVALMETHODTYPES}}
+        Ray_DailyTaskConfig:NumberOfCoins: ${{secrets.NUMBEROFCOINS}}
+        Ray_DailyTaskConfig:SelectLike: ${{secrets.SELECTLIKE}}
+        Ray_DailyTaskConfig:SupportUpIds: ${{secrets.SUPPORTUPIDS}}
+        Ray_DailyTaskConfig:DayOfAutoCharge: ${{secrets.DAYOFAUTOCHARGE}}
+        Ray_DailyTaskConfig:DayOfReceiveVipPrivilege: ${{secrets.DAYOFRECEIVEVIPPRIVILEGE}}
+        Ray_DailyTaskConfig:DevicePlatform: ${{secrets.DEVICEPLATFORM}}
+        Ray_Serilog:WriteTo:0:Args:restrictedToMinimumLevel: ${{secrets.CONSOLELOGLEVEL}}
+        Ray_Serilog:WriteTo:0:Args:outputTemplate: ${{secrets.CONSOLELOGTEMPLATE}}
       run: dotnet run -p ./src/Ray.BiliBiliTool.Console -closeConsoleWhenEnd=1 ${{secrets.OTHERCONFIGS}}

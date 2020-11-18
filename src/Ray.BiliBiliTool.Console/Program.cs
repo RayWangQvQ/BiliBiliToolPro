@@ -13,6 +13,7 @@ using Ray.BiliBiliTool.Application.Extensions;
 using Ray.BiliBiliTool.Config;
 using Ray.BiliBiliTool.Config.Extensions;
 using Ray.BiliBiliTool.Config.Options;
+using Ray.BiliBiliTool.Console.Helpers;
 using Ray.BiliBiliTool.DomainService.Extensions;
 using Ray.BiliBiliTool.Infrastructure;
 using Serilog;
@@ -41,7 +42,7 @@ namespace Ray.BiliBiliTool.Console
             RayConfiguration.Root = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", false, true)
                 //.AddJsonFile("appsettings.local.json", true,true)
-                .AddEnvironmentVariables()
+                .AddExcludeEmptyEnvironmentVariables("Ray_")
                 .AddCommandLine(args, Constants.CommandLineMapper)
                 .Build();
 
@@ -49,8 +50,8 @@ namespace Ray.BiliBiliTool.Console
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(RayConfiguration.Root)
                 .WriteTo.TextWriter(PushService.PushStringWriter,
-                                    GetConsoleLogLevel(),
-                                    "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}\r\n")//用来做微信推送
+                    LogHelper.GetConsoleLogLevel(),
+                    LogHelper.GetConsoleLogTemplate() + "\r\n")//用来做微信推送
                 .CreateLogger();
 
             //Host:
@@ -87,7 +88,6 @@ namespace Ray.BiliBiliTool.Console
 
                 IDailyTaskAppService dailyTask = serviceScope.ServiceProvider.GetRequiredService<IDailyTaskAppService>();
                 var pushService = serviceScope.ServiceProvider.GetRequiredService<PushService>();
-                bool isPushed = false;
 
                 try
                 {
@@ -96,24 +96,11 @@ namespace Ray.BiliBiliTool.Console
                 catch
                 {
                     pushService.SendStringWriter();
-                    isPushed = true;
                     throw;
                 }
 
-                if (!isPushed) pushService.SendStringWriter();
+                pushService.SendStringWriter();
             }
-        }
-
-        /// <summary>
-        /// 获取配置的Console的日志等级，作为推送日志的等级
-        /// </summary>
-        /// <returns></returns>
-        private static Serilog.Events.LogEventLevel GetConsoleLogLevel()
-        {
-            var consoleLevelStr = RayConfiguration.Root["Serilog:WriteTo:0:Args:restrictedToMinimumLevel"];
-            Serilog.Events.LogEventLevel levelEnum = (Serilog.Events.LogEventLevel)
-                Enum.Parse(typeof(Serilog.Events.LogEventLevel), consoleLevelStr);
-            return levelEnum;
         }
     }
 }
