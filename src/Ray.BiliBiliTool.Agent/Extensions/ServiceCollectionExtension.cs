@@ -28,7 +28,6 @@ namespace Ray.BiliBiliTool.Agent.Extensions
             //bilibli
             services.AddBiliBiliClientApi<IDailyTaskApi>("https://api.bilibili.com");
             services.AddBiliBiliClientApi<IMangaApi>("https://manga.bilibili.com");
-            services.AddBiliBiliClientApi<IExperienceApi>("https://www.bilibili.com");
             services.AddBiliBiliClientApi<IAccountApi>("https://account.bilibili.com");
             services.AddBiliBiliClientApi<ILiveApi>("https://api.live.bilibili.com");
 
@@ -37,11 +36,7 @@ namespace Ray.BiliBiliTool.Agent.Extensions
                 .ConfigureHttpClient((sp, c) =>
                 {
                     c.BaseAddress = new Uri("http://sc.ftqq.com");
-                })
-                .AddHttpMessageHandler(sp => new MyHttpClientDelegatingHandler(
-                    sp.GetRequiredService<ILogger<MyHttpClientDelegatingHandler>>(),
-                    sp.GetRequiredService<IOptionsMonitor<SecurityOptions>>()
-                    ));
+                });
             services.AddScoped<PushService>();
 
             return services;

@@ -25,16 +25,19 @@ namespace Ray.BiliBiliTool.DomainService
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly BiliBiliCookieOptions _biliBiliCookieOptions;
         private readonly IAccountApi _accountApi;
+        private readonly IDailyTaskApi _dailyTaskApi;
 
         public CoinDomainService(ILogger<CoinDomainService> logger,
             IHttpClientFactory httpClientFactory,
             IOptionsMonitor<BiliBiliCookieOptions> biliBiliCookieOptions,
-            IAccountApi accountApi)
+            IAccountApi accountApi,
+            IDailyTaskApi dailyTaskApi)
         {
             _logger = logger;
             _httpClientFactory = httpClientFactory;
             _biliBiliCookieOptions = biliBiliCookieOptions.CurrentValue;
             _accountApi = accountApi;
+            _dailyTaskApi = dailyTaskApi;
         }
 
         /// <summary>
@@ -63,22 +66,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// <returns></returns>
         private int GetDonateCoinExp()
         {
-            //var result = _experienceApi.GetDonateCoinExp().Result;
-            //todo:这里使用Refit调用，连接、获取成功(Status=200)，但是从Content获取Data异常，怀疑和返回内容被gzip压缩有关，但是暂未找到解决办法，下面先通过手动调用手动解压实现
-
-            var client = _httpClientFactory.CreateClient();
-            client.DefaultRequestHeaders.Add("Cookie", _biliBiliCookieOptions.ToString());
-
-            HttpResponseMessage result = client.GetAsync(ApiList.needCoin).Result;
-            var data = result.Content.ReadAsByteArrayAsync().Result;
-            var dataStr = ZipHelper.ReadGzip(data);
-
-            _logger.LogDebug("调用获取今日投币经验返回: {0}", dataStr);
-
-            ExperienceByDonateCoin re = JsonSerializer.Deserialize<ExperienceByDonateCoin>(dataStr);
-
-            _logger.LogDebug("今日已获得投币经验: " + re.Number);
-            return re.Number;
+            return _dailyTaskApi.GetDonateCoinExp().Result.Data;
         }
         #endregion
     }
