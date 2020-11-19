@@ -1,4 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
+using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.Console;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 using Ray.BiliBiliTool.Infrastructure;
@@ -17,9 +20,9 @@ namespace WatchVideoTest
             {
                 var dailyTask = scope.ServiceProvider.GetRequiredService<IVideoDomainService>();
 
-                var re = dailyTask.TryGetNotDonatedVideo();
+                var re = dailyTask.TryGetCanDonatedVideo();
 
-                Assert.True(re!=null);
+                Assert.True(re != null);
             }
         }
     }

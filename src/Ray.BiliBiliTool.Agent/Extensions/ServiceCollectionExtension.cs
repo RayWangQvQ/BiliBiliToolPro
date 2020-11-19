@@ -30,6 +30,7 @@ namespace Ray.BiliBiliTool.Agent.Extensions
             services.AddBiliBiliClientApi<IMangaApi>("https://manga.bilibili.com");
             services.AddBiliBiliClientApi<IAccountApi>("https://account.bilibili.com");
             services.AddBiliBiliClientApi<ILiveApi>("https://api.live.bilibili.com");
+            services.AddBiliBiliClientApi<IRelationApi>("https://api.bilibili.com/x/relation");
 
             //server酱推送
             services.AddRefitClient<IPushApi>(new RefitSettings(new SystemTextJsonContentSerializer(JsonSerializerOptionsBuilder.DefaultOptions)))
