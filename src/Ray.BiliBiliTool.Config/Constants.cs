@@ -39,5 +39,10 @@ namespace Ray.BiliBiliTool.Config
         /// 每天可获取的满额经验值
         /// </summary>
         public static int EveryDayExp = 65;
+
+        /// <summary>
+        /// 开源地址
+        /// </summary>
+        public static string SourceCodeUrl = "https://github.com/RayWangQvQ/BiliBiliTool";
     }
 }

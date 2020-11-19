@@ -24,7 +24,7 @@ namespace Ray.BiliBiliTool.Agent.ServerChanAgent
 
         public PushResponse DoSend(string title, string content)
         {
-            return _pushApi.Send(_pushOptions.PushScKey, title, content).Result;
+            return _pushApi.Send(_pushOptions.PushScKey, new PushRequest { Text = title, Desp = content }).Result;
         }
 
         public PushResponse SendStringWriter()

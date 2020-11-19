@@ -59,6 +59,6 @@ namespace Ray.BiliBiliTool.DomainService.Interfaces
 
         List<UpVideoInfo> GetRandomVideosOfUps();
 
-        Tuple<string, string> TryGetNotDonatedVideo();
+        Tuple<string, string> TryGetCanDonatedVideo();
     }
 }

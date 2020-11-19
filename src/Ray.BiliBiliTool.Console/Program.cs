@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -12,6 +13,7 @@ using Ray.BiliBiliTool.Application.Extensions;
 using Ray.BiliBiliTool.Config;
 using Ray.BiliBiliTool.Config.Extensions;
 using Ray.BiliBiliTool.Config.Options;
+using Ray.BiliBiliTool.Console.Helpers;
 using Ray.BiliBiliTool.DomainService.Extensions;
 using Ray.BiliBiliTool.Infrastructure;
 using Serilog;
@@ -39,16 +41,17 @@ namespace Ray.BiliBiliTool.Console
         {
             RayConfiguration.Root = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", false, true)
-                .AddCommandLine(args, Constants.CommandLineMapper)
                 //.AddJsonFile("appsettings.local.json", true,true)
+                .AddExcludeEmptyEnvironmentVariables("Ray_")
+                .AddCommandLine(args, Constants.CommandLineMapper)
                 .Build();
 
             //日志:
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(RayConfiguration.Root)
                 .WriteTo.TextWriter(PushService.PushStringWriter,
-                                    Serilog.Events.LogEventLevel.Information,
-                                    "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}\r\n")//用来做微信推送
+                    LogHelper.GetConsoleLogLevel(),
+                    LogHelper.GetConsoleLogTemplate() + "\r\n")//用来做微信推送
                 .CreateLogger();
 
             //Host:
@@ -76,13 +79,15 @@ namespace Ray.BiliBiliTool.Console
             {
                 var logger = serviceScope.ServiceProvider.GetRequiredService<ILogger<Program>>();
 
+                logger.LogInformation("版本号：{version}", typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "未知");
+                logger.LogInformation("开源地址：{url} \r\n", Constants.SourceCodeUrl);
+
                 BiliBiliCookieOptions biliBiliCookieOptions = serviceScope.ServiceProvider.GetRequiredService<IOptionsMonitor<BiliBiliCookieOptions>>().CurrentValue;
                 if (!biliBiliCookieOptions.Check(logger))
-                    throw new Exception("请正确配置Cookie后再运行，配置方式见 https://github.com/RayWangQvQ/BiliBiliTool");
+                    throw new Exception($"请正确配置Cookie后再运行，配置方式见 {Constants.SourceCodeUrl}");
 
                 IDailyTaskAppService dailyTask = serviceScope.ServiceProvider.GetRequiredService<IDailyTaskAppService>();
                 var pushService = serviceScope.ServiceProvider.GetRequiredService<PushService>();
-                bool isPushed = false;
 
                 try
                 {
@@ -91,10 +96,10 @@ namespace Ray.BiliBiliTool.Console
                 catch
                 {
                     pushService.SendStringWriter();
-                    isPushed = true;
+                    throw;
                 }
 
-                if (!isPushed) pushService.SendStringWriter();
+                pushService.SendStringWriter();
             }
         }
     }
