@@ -25,25 +25,37 @@ jobs:
     - name: Set time zone
       run: sudo timedatectl set-timezone 'Asia/Shanghai'
       
-    # .Net Core 环境
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
+    # .Net 环境
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1.7.2
       with:
-        dotnet-version: 3.1.301
+        dotnet-version: 5.0.100
 
     # 安装依赖
     - name: Install dependencies
       run: dotnet restore
       
     # 构建应用
-    - name: Build
+    - name: Build APP
       run: dotnet build --configuration Release --no-restore
        
     # 运行
-    - name: Run
+    - name: Run APP
       env:
-        userId: ${{secrets.USERID}}
-        sessData: ${{secrets.SESSDATA}}
-        biliJct: ${{secrets.BILIJCT}}
-        otherConfigs: ${{secrets.OTHERCONFIGS}}
-      run: dotnet run -p ./src/Ray.BiliBiliTool.Console -userId=${userId} -sessData=${sessData} -biliJct=${biliJct} -closeConsoleWhenEnd=1 ${otherConfigs}
+        Ray_BiliBiliCookie:UserId: ${{secrets.USERID}}
+        Ray_BiliBiliCookie:DedeUserID: ${{secrets.DEDEUSERID}} # 为了兼容 GitHub Secrets 经常会被填错
+        Ray_BiliBiliCookie:SessData: ${{secrets.SESSDATA}}
+        Ray_BiliBiliCookie:BiliJct: ${{secrets.BILIJCT}}
+        Ray_BiliBiliCookie:Bili_jct: ${{secrets.BILI_JCT}} # 为了兼容 GitHub Secrets 经常会被填错
+        Ray_Push:PushScKey: ${{secrets.PUSHSCKEY}}
+        Ray_Security:IntervalSecondsBetweenRequestApi: ${{secrets.INTERVALSECONDSBETWEENREQUESTAPI}}
+        Ray_Security:IntervalMethodTypes: ${{secrets.INTERVALMETHODTYPES}}
+        Ray_DailyTaskConfig:NumberOfCoins: ${{secrets.NUMBEROFCOINS}}
+        Ray_DailyTaskConfig:SelectLike: ${{secrets.SELECTLIKE}}
+        Ray_DailyTaskConfig:SupportUpIds: ${{secrets.SUPPORTUPIDS}}
+        Ray_DailyTaskConfig:DayOfAutoCharge: ${{secrets.DAYOFAUTOCHARGE}}
+        Ray_DailyTaskConfig:DayOfReceiveVipPrivilege: ${{secrets.DAYOFRECEIVEVIPPRIVILEGE}}
+        Ray_DailyTaskConfig:DevicePlatform: ${{secrets.DEVICEPLATFORM}}
+        Ray_Serilog:WriteTo:0:Args:restrictedToMinimumLevel: ${{secrets.CONSOLELOGLEVEL}}
+        Ray_Serilog:WriteTo:0:Args:outputTemplate: ${{secrets.CONSOLELOGTEMPLATE}}
+      run: dotnet run -p ./src/Ray.BiliBiliTool.Console -closeConsoleWhenEnd=1 ${{secrets.OTHERCONFIGS}}

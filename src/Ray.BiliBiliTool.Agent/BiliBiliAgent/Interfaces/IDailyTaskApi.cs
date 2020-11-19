@@ -106,5 +106,12 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         /// <returns></returns>
         [Get("/x/space/arc/search?mid={upId}&ps={pageSize}&tid=0&pn={pageNumber}&keyword={keyword}&order=pubdate&jsonp=jsonp")]
         Task<BiliApiResponse<SearchUpVideosResponse>> SearchVideosByUpId(long upId, int pageSize = 20, int pageNumber = 1, string keyword = "");
+
+        /// <summary>
+        /// 获取通过投币已获取的经验值
+        /// </summary>
+        /// <returns></returns>
+        [Get("/x/web-interface/coin/today/exp")]
+        Task<BiliApiResponse<int>> GetDonateCoinExp();
     }
 }

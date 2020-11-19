@@ -36,7 +36,7 @@ namespace Ray.BiliBiliTool.Application.Attributes
         {
             if (_taskName == null) return;
 
-            _logger.Information("---【{taskName}】结束---\r\n", _taskName);
+            _logger.Information("---结束---\r\n", _taskName);
         }
 
         public override void OnException(MethodExecutionArgs arg)

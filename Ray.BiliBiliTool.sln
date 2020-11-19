@@ -39,7 +39,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ray.BiliBiliTool.Config", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ray.BiliBiliTool.DomainService", "src\Ray.BiliBiliTool.DomainService\Ray.BiliBiliTool.DomainService.csproj", "{7105652A-B1C1-4F9E-BA38-8034BC8B26B4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PushTest", "test\PushTest\PushTest.csproj", "{ECEEFE3F-F39F-44EE-8FA2-D5CDBB25397F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PushTest", "test\PushTest\PushTest.csproj", "{ECEEFE3F-F39F-44EE-8FA2-D5CDBB25397F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

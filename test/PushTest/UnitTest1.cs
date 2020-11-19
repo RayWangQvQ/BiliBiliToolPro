@@ -19,7 +19,7 @@ namespace PushTest
             {
                 var pushService = scope.ServiceProvider.GetRequiredService<PushService>();
 
-                var re = pushService.DoSend($"²âÊÔ±êÌâ{new Random().Next(100)}", "²âÊÔÄÚÈÝ");
+                var re = pushService.DoSend($"æµ‹è¯•æ ‡é¢˜{new Random().Next(100)}", "æµ‹è¯•å†…å®¹");
                 Assert.True(re.Errno == 0);
             }
         }
@@ -31,10 +31,10 @@ namespace PushTest
 
             using (var scope = RayContainer.Root.CreateScope())
             {
-                Log.Logger.Debug("ÕâÊÇdebug");
-                Log.Logger.Information("ÕâÊÇinfo");
-                Log.Logger.Warning("ÕâÊÇwarning");
-                Log.Logger.Fatal("ÕâÊÇfatal");
+                Log.Logger.Debug("ï¿½ï¿½ï¿½ï¿½debug");
+                Log.Logger.Information("ï¿½ï¿½ï¿½ï¿½info");
+                Log.Logger.Warning("ï¿½ï¿½ï¿½ï¿½warning");
+                Log.Logger.Fatal("ï¿½ï¿½ï¿½ï¿½fatal");
 
                 var pushService = scope.ServiceProvider.GetRequiredService<PushService>();
                 var re = pushService.SendStringWriter();

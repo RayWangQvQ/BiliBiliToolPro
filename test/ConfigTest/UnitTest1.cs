@@ -22,7 +22,10 @@ namespace ConfigTest
 
             string s = RayConfiguration.Root["BiliBiliCookie:UserId"];
             Debug.WriteLine(s);
-            Assert.True(!string.IsNullOrWhiteSpace(s));
+            //Assert.True(!string.IsNullOrWhiteSpace(s));
+
+            string logLevel = RayConfiguration.Root["Serilog:WriteTo:0:Args:restrictedToMinimumLevel"];
+            Debug.WriteLine(logLevel);
 
             var options = RayContainer.Root.GetRequiredService<IOptionsMonitor<BiliBiliCookieOptions>>();
 

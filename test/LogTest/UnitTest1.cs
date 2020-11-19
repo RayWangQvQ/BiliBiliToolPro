@@ -16,8 +16,9 @@ namespace LogTest
 
             var logger = RayContainer.Root.GetRequiredService<ILogger<UnitTest1>>();
 
-            logger.LogInformation("testInfo");
+            logger.LogTrace("testTrace");
             logger.LogDebug("testDebug");
+            logger.LogInformation("testInfo");
             logger.LogError("testError");
 
             Task.Delay(3000);
