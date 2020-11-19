@@ -62,7 +62,8 @@ namespace Ray.BiliBiliTool.Config.Options
 
                 result = false;
             }
-            else if (!string.IsNullOrWhiteSpace(RayConfiguration.Root["BiliBiliCookie:DedeUserID"]))
+            else if (string.IsNullOrWhiteSpace(RayConfiguration.Root["BiliBiliCookie:UserID"])
+                && !string.IsNullOrWhiteSpace(RayConfiguration.Root["BiliBiliCookie:DedeUserID"]))
             {
                 logger.LogWarning(tips, "DEDEUSERID", "DEDEUSERID");
             }
@@ -78,7 +79,8 @@ namespace Ray.BiliBiliTool.Config.Options
                 logger.LogWarning(msg, nameof(BiliJct), GetPropertyDescription(nameof(BiliJct)));
                 result = false;
             }
-            else if (!string.IsNullOrWhiteSpace(RayConfiguration.Root["BiliBiliCookie:Bili_jct"]))
+            else if (string.IsNullOrWhiteSpace(RayConfiguration.Root["BiliBiliCookie:BiliJct"])
+                && !string.IsNullOrWhiteSpace(RayConfiguration.Root["BiliBiliCookie:Bili_jct"]))
             {
                 logger.LogWarning(tips, "BILI_JCT", "BILI_JCT");
             }
