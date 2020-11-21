@@ -12,6 +12,11 @@ namespace Ray.BiliBiliTool.Config.Options
     public class SecurityOptions
     {
         /// <summary>
+        /// 是否跳过执行任务，用于特殊情况下，通过配置灵活的开启和关闭任务
+        /// </summary>
+        public bool IsSkipDailyTask { get; set; } = false;
+
+        /// <summary>
         /// 两次调用api之间间隔的秒数[0,+]
         /// 有人担心在几秒内连续调用api会被b站安全机制发现，所以为不放心的朋友添加了间隔秒数配置，两次调用Api之间会大于该秒数
         /// </summary>
@@ -43,5 +48,10 @@ namespace Ray.BiliBiliTool.Config.Options
 
             return result;
         }
+
+        /// <summary>
+        /// 请求B站接口时头部传递的User-Agent
+        /// </summary>
+        public string UserAgent { get; set; } = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.66 Safari/537.36 Edg/87.0.664.41";
     }
 }

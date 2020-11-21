@@ -23,7 +23,13 @@ namespace Ray.BiliBiliTool.Agent.Extensions
         {
             services.AddHttpClient();
             services.AddHttpClient("BiliBiliWithCookie",
-                (sp, c) => c.DefaultRequestHeaders.Add("Cookie", sp.GetRequiredService<BiliBiliCookieOptions>().ToString()));
+                (sp, c) =>
+                {
+                    c.DefaultRequestHeaders.Add("Cookie",
+                        sp.GetRequiredService<IOptionsMonitor<BiliBiliCookieOptions>>().CurrentValue.ToString());
+                    c.DefaultRequestHeaders.Add("User-Agent",
+                        sp.GetRequiredService<IOptionsMonitor<SecurityOptions>>().CurrentValue.UserAgent);
+                });
 
             //bilibli
             services.AddBiliBiliClientApi<IDailyTaskApi>("https://api.bilibili.com");
@@ -57,7 +63,10 @@ namespace Ray.BiliBiliTool.Agent.Extensions
             services.AddRefitClient<TInterface>(settings)
                 .ConfigureHttpClient((sp, c) =>
                 {
-                    c.DefaultRequestHeaders.Add("Cookie", sp.GetRequiredService<IOptionsMonitor<BiliBiliCookieOptions>>().CurrentValue.ToString());
+                    c.DefaultRequestHeaders.Add("Cookie",
+                        sp.GetRequiredService<IOptionsMonitor<BiliBiliCookieOptions>>().CurrentValue.ToString());
+                    c.DefaultRequestHeaders.Add("User-Agent",
+                        sp.GetRequiredService<IOptionsMonitor<SecurityOptions>>().CurrentValue.UserAgent);
                     c.BaseAddress = new Uri(host);
                 })
                 .AddHttpMessageHandler(sp => new MyHttpClientDelegatingHandler(

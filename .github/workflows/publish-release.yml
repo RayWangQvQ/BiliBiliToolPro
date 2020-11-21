@@ -1,0 +1,106 @@
+name: Publish release
+
+on:
+  workflow_dispatch: # 手动触发
+    inputs:
+      version:
+        description: '版本号'
+        required: true
+
+jobs:
+  build:
+    name: Publish release and upload asset
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+    
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1.7.2
+        with:
+          dotnet-version: 5.0.100
+        
+      - name: Publish and zip
+        run: |
+          cd ./test
+          dotnet restore
+          dotnet build --configuration Release --no-restore
+          cd ./src/Ray.BiliBiliTool.Console
+          dotnet publish --self-contained false -o ./bin/Publish/net5-dependent
+          dotnet publish --runtime win-x86 --self-contained true -o ./bin/Publish/win-x86-x64
+          dotnet publish --runtime linux-arm --self-contained true -o ./bin/Publish/linux-arm
+          dotnet publish --runtime linux-x64 --self-contained true -o ./bin/Publish/linux-x64
+          dotnet publish --runtime osx-x64 --self-contained true -o ./bin/Publish/osx-x64
+          cd ./bin/Publish
+          zip -q -r  bilibili-tool-v${{ github.event.inputs.version }}-net5-dependent.zip net5-dependent
+          zip -q -r  bilibili-tool-v${{ github.event.inputs.version }}-win-x86-x64.zip win-x86-x64
+          zip -q -r  bilibili-tool-v${{ github.event.inputs.version }}-linux-arm.zip linux-arm
+          zip -q -r  bilibili-tool-v${{ github.event.inputs.version }}-linux-x64.zip linux-x64
+          zip -q -r  bilibili-tool-v${{ github.event.inputs.version }}-osx-x64.zip osx-x64
+          
+      - name: Create release info
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.event.inputs.version }}
+          release_name: BiliBiliTool-V${{ github.event.inputs.version }}
+          draft: true
+          prerelease: false
+
+      - name: Upload release asset
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./test/src/Ray.BiliBiliTool.Console/bin/Publish/bilibili-tool-v${{ github.event.inputs.version }}-net5-dependent.zip
+          asset_name: bilibili-tool-v${{ github.event.inputs.version }}-net5-dependent.zip
+          asset_content_type: application/zip
+          
+      - name: Upload win-x86-x64
+        id: upload-win-x86-x64
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./test/src/Ray.BiliBiliTool.Console/bin/Publish/bilibili-tool-v${{ github.event.inputs.version }}-win-x86-x64.zip
+          asset_name: bilibili-tool-v${{ github.event.inputs.version }}-win-x86-x64.zip
+          asset_content_type: application/zip
+
+      - name: Upload linux-arm
+        id: upload-linux-arm
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./test/src/Ray.BiliBiliTool.Console/bin/Publish/bilibili-tool-v${{ github.event.inputs.version }}-linux-arm.zip
+          asset_name: bilibili-tool-v${{ github.event.inputs.version }}-linux-arm.zip
+          asset_content_type: application/zip
+
+      - name: Upload linux-x64
+        id: upload-linux-x64
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./test/src/Ray.BiliBiliTool.Console/bin/Publish/bilibili-tool-v${{ github.event.inputs.version }}-linux-x64.zip
+          asset_name: bilibili-tool-v${{ github.event.inputs.version }}-linux-x64.zip
+          asset_content_type: application/zip
+
+      - name: Upload osx-x64
+        id: upload-osx-x64
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./test/src/Ray.BiliBiliTool.Console/bin/Publish/bilibili-tool-v${{ github.event.inputs.version }}-osx-x64.zip
+          asset_name: bilibili-tool-v${{ github.event.inputs.version }}-osx-x64.zip
+          asset_content_type: application/zip
