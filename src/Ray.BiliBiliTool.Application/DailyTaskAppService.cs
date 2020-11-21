@@ -1,8 +1,10 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Application.Attributes;
 using Ray.BiliBiliTool.Application.Contracts;
+using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 
 namespace Ray.BiliBiliTool.Application
@@ -16,6 +18,7 @@ namespace Ray.BiliBiliTool.Application
         private readonly ILiveDomainService _liveDomainService;
         private readonly IVipPrivilegeDomainService _vipPrivilegeDomainService;
         private readonly IChargeDomainService _chargeDomainService;
+        private readonly SecurityOptions _securityOptions;
 
         public DailyTaskAppService(
             ILogger<DailyTaskAppService> logger,
@@ -24,7 +27,8 @@ namespace Ray.BiliBiliTool.Application
             IMangaDomainService mangaDomainService,
             ILiveDomainService liveDomainService,
             IVipPrivilegeDomainService vipPrivilegeDomainService,
-            IChargeDomainService chargeDomainService)
+            IChargeDomainService chargeDomainService,
+            IOptionsMonitor<SecurityOptions> securityOptions)
         {
             _logger = logger;
             _loginDomainService = loginDomainService;
@@ -33,10 +37,17 @@ namespace Ray.BiliBiliTool.Application
             _liveDomainService = liveDomainService;
             _vipPrivilegeDomainService = vipPrivilegeDomainService;
             _chargeDomainService = chargeDomainService;
+            _securityOptions = securityOptions.CurrentValue;
         }
 
         public void DoDailyTask()
         {
+            if(_securityOptions.IsSkipDailyTask)
+            {
+                _logger.LogWarning("已配置为跳过每日任务");
+                return;
+            }
+
             _logger.LogInformation("-----开始每日任务-----\r\n");
 
             UseInfo userInfo;
