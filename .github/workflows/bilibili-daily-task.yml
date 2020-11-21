@@ -48,8 +48,10 @@ jobs:
         Ray_BiliBiliCookie:BiliJct: ${{secrets.BILIJCT}}
         Ray_BiliBiliCookie:Bili_jct: ${{secrets.BILI_JCT}} # 为了兼容 GitHub Secrets 经常会被填错
         Ray_Push:PushScKey: ${{secrets.PUSHSCKEY}}
+        Ray_Security:IsSkipDailyTask: ${{secrets.ISSKIPDAILYTASK}}
         Ray_Security:IntervalSecondsBetweenRequestApi: ${{secrets.INTERVALSECONDSBETWEENREQUESTAPI}}
         Ray_Security:IntervalMethodTypes: ${{secrets.INTERVALMETHODTYPES}}
+        Ray_Security:UserAgent: ${{secrets.USERAGENT}}
         Ray_DailyTaskConfig:NumberOfCoins: ${{secrets.NUMBEROFCOINS}}
         Ray_DailyTaskConfig:SelectLike: ${{secrets.SELECTLIKE}}
         Ray_DailyTaskConfig:SupportUpIds: ${{secrets.SUPPORTUPIDS}}
