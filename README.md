@@ -1,5 +1,6 @@
 
-![2233](https://github.com/RayWangQvQ/BiliBiliTool.Docs/blob/main/imgs/2233.png)
+![2233](https://cdn.jsdelivr.net/gh/RayWangQvQ/BiliBiliTool.Docs@main/imgs/2233.png)
+
 
 <div align="center"> 
 
@@ -33,7 +34,7 @@ BiliBiliTool
 * **每月自动使用快过期的B币券为自己充电** *（你懂的~）*
 * **每个月自动领取5张B币券和大会员权益** *（既然买了会员就要领取该有的奖励啊~）*
 
-![运行图示](https://github.com/RayWangQvQ/BiliBiliTool.Docs/blob/main/imgs/run-exe.png)
+![运行图示](https://cdn.jsdelivr.net/gh/RayWangQvQ/BiliBiliTool.Docs@main/imgs/run-exe.png)
 
 **Github仓库地址：[RayWangQvQ/BiliBiliTool](https://github.com/RayWangQvQ/BiliBiliTool)**
 
@@ -56,10 +57,10 @@ BiliBiliTool就是收集了一系列这样的接口，通过每日自动运行�
 ### 1.1.第一步：获取自己的Cookie
 
 - 浏览器打开并登录[bilibili网站](https://www.bilibili.com/)
-- 按 **F12** 打开“开发者工具”，依次点击 **应用程序/Application** -> **存储**-> **Cookies**
+- 按 **F12** 打开"开发者工具"，依次点击 **应用程序/Application** -> **存储**-> **Cookies**
 - 找到`DEDEUSERID`、`SESSDATA`、`bili_jct`三项，复制保存它们到记事本，待会儿会用到。
 
-![获取Cookie图示](https://github.com/RayWangQvQ/BiliBiliTool.Docs/blob/main/imgs/get-bilibili-web-cookie.jpg)
+![获取Cookie图示](https://cdn.jsdelivr.net/gh/RayWangQvQ/BiliBiliTool.Docs@main/imgs/get-bilibili-web-cookie.jpg)
 
 
 ### 1.2.第二步：运行BiliBiliTool
@@ -78,7 +79,7 @@ a. **首先fork本项目到自己的仓库**
 
 b. **进入自己fork的仓库，点击 Settings-> Secrets-> New Secrets 添加以下3个Secrets。它们将作为应用启动时的命令行参数被传入程序。** 
 
-![Secrets图示](https://github.com/RayWangQvQ/BiliBiliTool.Docs/blob/main/imgs/git-secrets.png)
+![Secrets图示](https://cdn.jsdelivr.net/gh/RayWangQvQ/BiliBiliTool.Docs@main/imgs/git-secrets.png)
 
 要新增的 Secret Name 与之前的 Cookie Name 的对应关系如下：
 
@@ -92,20 +93,20 @@ c. **开启Actions并触发每日自动执行**
    
 Github Actions默认处于关闭状态，前面都配置好后，请手动开启Actions，执行一次工作流，验证是否可以正常工作，操作步骤如下图所示：
 
-![Actions图示](https://github.com/RayWangQvQ/BiliBiliTool.Docs/blob/main/imgs/run-workflow.png)
+![Actions图示](https://cdn.jsdelivr.net/gh/RayWangQvQ/BiliBiliTool.Docs@main/imgs/run-workflow.png)
 
 运行结束后，可查看运行日志：
 
-![Actions日志图示](https://github.com/RayWangQvQ/BiliBiliTool.Docs/blob/main/imgs/github-actions-log-1.png)
-![Actions日志图示](https://github.com/RayWangQvQ/BiliBiliTool.Docs/blob/main/imgs/github-actions-log-2.png)
+![Actions日志图示](https://cdn.jsdelivr.net/gh/RayWangQvQ/BiliBiliTool.Docs@main/imgs/github-actions-log-1.png)
+![Actions日志图示](https://cdn.jsdelivr.net/gh/RayWangQvQ/BiliBiliTool.Docs@main/imgs/github-actions-log-2.png)
 
 workflow 的执行策略默认是每天中午14点10分自动执行一次，主分支（main分支）有 push 操作也会自动执行一次。想要修改策略详见下面**3.常见问题**中的**Actions 如何修改定时任务的执行时间？**
 
 如果配置了 Server 酱微信推送，执行成功后微信会收到推送消息：
 
-![微信推送图示](https://github.com/RayWangQvQ/BiliBiliTool.Docs/blob/main/imgs/wechat-push.png)
+![微信推送图示](https://cdn.jsdelivr.net/gh/RayWangQvQ/BiliBiliTool.Docs@main/imgs/wechat-push.png)
 
-可以[>>点击配置详细信息](https://github.com/RayWangQvQ/BiliBiliTool.Docs/blob/main/configuration.md) 查看如何配置微信推送。
+可以[>>点击配置详细信息](https://hub.fastgit.org/RayWangQvQ/BiliBiliTool.Docs/blob/main/configuration.md) 查看如何配置微信推送。
 
 *如果执行出现异常，会收到了GitHub Action的错误邮件通知，请检查Cookies是不是失效了或者是否有bug。*
 
@@ -132,13 +133,13 @@ b. **解压并填写配置**
 
 下载并解压后，找到appsettings.json文件，使用记事本编辑，填入之前获取到的Cookie信息，保存后关闭：
 
-![配置文件图示](https://github.com/RayWangQvQ/BiliBiliTool.Docs/blob/main/imgs/appsettings-cookie.png)
+![配置文件图示](https://cdn.jsdelivr.net/gh/RayWangQvQ/BiliBiliTool.Docs@main/imgs/appsettings-cookie.png)
 
 c. **运行**
 
 找到名称为 Ray.BiliBiliTool.Console 的可执行文件（Win 环境下是 Ray.BiliBiliTool.Console.exe），双击运行（Linux 使用命令行运行），结果如下：
 
-![运行图示](https://github.com/RayWangQvQ/BiliBiliTool.Docs/blob/main/imgs/run-exe.png)
+![运行图示](https://cdn.jsdelivr.net/gh/RayWangQvQ/BiliBiliTool.Docs@main/imgs/run-exe.png)
 
 *P.S.如果自己有服务器，也可以将程序发布到自己的服务器，利用自己的任务系统实现每天自动运行。（有服务器的大佬应该就不需要我多BB了）*
 
@@ -147,7 +148,7 @@ c. **运行**
 ### 2.1.配置说明
 各配置的**简略介绍**可直接在 [appsettings.json](src/Ray.BiliBiliTool.Console/appsettings.json) 文件中查看相关注释信息。
 
-如还需了解配置项的**详细信息**，可点击 [>>配置详细信息](https://github.com/RayWangQvQ/BiliBiliTool.Docs/blob/main/configuration.md) 查看每个配置的详细介绍。
+如还需了解配置项的**详细信息**，可点击 [>>配置详细信息](https://hub.fastgit.org/RayWangQvQ/BiliBiliTool.Docs/blob/main/configuration.md) 查看每个配置的详细介绍。
 
 ### 2.2.配置方式
 目前支持的配置源有3种：appsettings.json配置文件、环境变量、命令行参数，外加一种专用于Actions模式使用的 GitHub Secrets 配置源。
@@ -173,7 +174,7 @@ dotnet run -p ./src/Ray.BiliBiliTool.Console -userId=123 -sessData=456 -biliJct=
 
 如下图所示：
 
-![Github Secrets Other Configs](https://github.com/RayWangQvQ/BiliBiliTool.Docs/blob/main/imgs/github-secrets-other-configs.png)
+![Github Secrets Other Configs](https://cdn.jsdelivr.net/gh/RayWangQvQ/BiliBiliTool.Docs@main/imgs/github-secrets-other-configs.png)
 
 
 ### 2.3.优先级
@@ -187,7 +188,7 @@ dotnet run -p ./src/Ray.BiliBiliTool.Console -userId=123 -sessData=456 -biliJct=
 
 ## 3.常见问题
 
-[>>点击查看常见问题列表](https://github.com/RayWangQvQ/BiliBiliTool.Docs/blob/main/questions.md)
+[>>点击查看常见问题列表](https://hub.fastgit.org/RayWangQvQ/BiliBiliTool.Docs/blob/main/questions.md)
 
 ## 4.更新计划
 
@@ -208,7 +209,7 @@ c. 如果想自己解决，请fork仓库后，在**devlop分支**进行编码开
 
 ## 6.捐赠支持
 
-[>>点击查看已捐赠列表和留言](https://github.com/RayWangQvQ/BiliBiliTool.Docs/blob/main/donate-list.md)
+[>>点击查看已捐赠列表和留言](https://hub.fastgit.org/RayWangQvQ/BiliBiliTool.Docs/blob/main/donate-list.md)
 
 个人维护开源不易
 
@@ -222,11 +223,11 @@ c. 如果想自己解决，请fork仓库后，在**devlop分支**进行编码开
 
 微信扫码自动赞赏1元：
 
-![微信赞赏码](https://github.com/RayWangQvQ/BiliBiliTool.Docs/blob/main/imgs/donate-wechat.jpg)
+![微信赞赏码](https://cdn.jsdelivr.net/gh/RayWangQvQ/BiliBiliTool.Docs@main/imgs/donate-wechat.jpg)
 
 支付宝扫码自动赞赏1元：
 
-![支付宝赞赏码](https://github.com/RayWangQvQ/BiliBiliTool.Docs/blob/main/imgs/donate-ali.jpg)
+![支付宝赞赏码](https://cdn.jsdelivr.net/gh/RayWangQvQ/BiliBiliTool.Docs@main/imgs/donate-ali.jpg)
 
 ## 7.API参考
 [JunzhouLiu/BILIBILI-HELPER](https://github.com/JunzhouLiu/BILIBILI-HELPER)
