@@ -217,7 +217,7 @@ Fork 被 GitHub 译为复刻，相当于拷贝了一份源作者的代码到自�
 
 ##### 方法二： 使用 Repo Sync 同步
 
-1. 创建[新仓库](https://github.com/new)：填入`Repository name`后点击最下方的`Create repository`即可完成创建新仓库。
+1. 创建[新仓库](https://github.com/new)：填入`Repository name`后点击最下方的`Create repository`即可完成创建新仓库。更多关于创建新仓库的说明可以查看 Github 官方文档：[创建新仓库](https://docs.github.com/cn/free-pro-team@latest/github/creating-cloning-and-archiving-repositories/creating-a-new-repository)。
 
    ![Create a new repository](https://cdn.jsdelivr.net/gh/Ryanjiena/BiliBiliTool.Docs@main/imgs/create_a_new_repository.png)
 
@@ -260,7 +260,7 @@ Fork 被 GitHub 译为复刻，相当于拷贝了一份源作者的代码到自�
 
    ![Set up workflow 02](https://cdn.jsdelivr.net/gh/Ryanjiena/BiliBiliTool.Docs@main/imgs/set_up_workflow_02.png)
 
-4. [>> 点击 Generate a token](https://github.com/settings/tokens/new?description=repo-sync&scopes=repo,workflow) 生成 `Token`，将生成的 `Token` 复制下来。（只显示一次，没复制只能重新生成）
+4. [>> 点击 Generate a token](https://github.com/settings/tokens/new?description=repo-sync&scopes=repo,workflow) 生成 `Token`，将生成的 `Token` 复制下来（只显示一次，没复制只能重新生成）。更多关于加密机密的说明可以查看 Github 官方文档：[加密机密](https://docs.github.com/cn/free-pro-team@latest/actions/reference/encrypted-secrets)。
 
    ![Generate a token 01](https://cdn.jsdelivr.net/gh/Ryanjiena/BiliBiliTool.Docs@main/imgs/generate_a_token_01.png)
 
