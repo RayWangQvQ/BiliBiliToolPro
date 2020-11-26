@@ -206,14 +206,25 @@ Fork 被 GitHub 译为复刻，相当于拷贝了一份源作者的代码到自�
 ##### 方法一：使用 Pull 插件同步
 
 1. 安装 **[![<img src="https://prod.download/pull-18h-svg" valign="bottom"/> Pull](https://prod.download/pull-18h-svg) Pull app](https://github.com/apps/pull)** 插件，安装过程中会让你选择要选择那一种方式，`All repositories`(就是同步已经 frok 的仓库以及未来 fork 的仓库)，`Only select repositories`(仅选择要自己需要同步的仓库，其他 fork 的仓库不会被同步)，根据自己需求选择，实在不知道怎么选择，就选 `All repositories`；点击 `install`，完成安装。
+
+   ![Install Pull App](https://cdn.jsdelivr.net/gh/Ryanjiena/BiliBiliTool.Docs@main/imgs/install_pull_app.png)
+
 2. 将 `.github/pull.yml` 文件第 5 行内容修改为 `mergeMethod: hardreset`，然后保存提交。（默认就是）
+
 3. 上游代码更新后 pull 插件会自动发起 PR 更新**覆盖**自己分支代码！
+
 4. 手动触发同步。`https://pull.git.ci/process/${owner}/${repo}`
 
 ##### 方法二： 使用 Repo Sync 同步
 
 1. 创建[新仓库](https://github.com/new)：填入`Repository name`后点击最下方的`Create repository`即可完成创建新仓库。
+
+   ![Create a new repository](https://cdn.jsdelivr.net/gh/Ryanjiena/BiliBiliTool.Docs@main/imgs/create_a_new_repository.png)
+
 2. 创建 `workflow` 工作流。
+
+   ![Set up workflow 01](https://cdn.jsdelivr.net/gh/Ryanjiena/BiliBiliTool.Docs@main/imgs/set_up_workflow_01.png)
+
 3. 复制粘贴以下代码，然后提交。
 
    ```yaml
@@ -247,7 +258,14 @@ Fork 被 GitHub 译为复刻，相当于拷贝了一份源作者的代码到自�
              github_token: ${{ secrets.PAT }}
    ```
 
+   ![Set up workflow 02](https://cdn.jsdelivr.net/gh/Ryanjiena/BiliBiliTool.Docs@main/imgs/set_up_workflow_02.png)
+
 4. [>> 点击 Generate a token](https://github.com/settings/tokens/new?description=repo-sync&scopes=repo,workflow) 生成 `Token`，将生成的 `Token` 复制下来。（只显示一次，没复制只能重新生成）
+
+   ![Generate a token 01](https://cdn.jsdelivr.net/gh/Ryanjiena/BiliBiliTool.Docs@main/imgs/generate_a_token_01.png)
+
+   ![Generate a token 02](https://cdn.jsdelivr.net/gh/Ryanjiena/BiliBiliTool.Docs@main/imgs/generate_a_token_02.png)
+
 5. 将上一步生成的 `Token `添加到 `Github Secrets` 中。
 
    | GitHub Secrets | CONTENT               |
@@ -255,7 +273,13 @@ Fork 被 GitHub 译为复刻，相当于拷贝了一份源作者的代码到自�
    | Name           | `PAT`                 |
    | Value          | 上一步生成的 `Token ` |
 
+   ![New repository secret 01](https://cdn.jsdelivr.net/gh/Ryanjiena/BiliBiliTool.Docs@main/imgs/new_repository_secret_01.png)
+
+   ![New repository secret 02](https://cdn.jsdelivr.net/gh/Ryanjiena/BiliBiliTool.Docs@main/imgs/new_repository_secret_02.png)
+
 6. 手动触发 `workflow` 工作流进行代码同步。
+
+   ![Run sync workflow](https://cdn.jsdelivr.net/gh/Ryanjiena/BiliBiliTool.Docs@main/imgs/run_sync_workflows.png)
 
 #### 3.2.2 保留自己分支
 
@@ -312,6 +336,5 @@ c. 如果想自己解决，请 fork 仓库后，在**devlop 分支**进行编码
 
 ## 8.API 参考
 
-[JunzhouLiu/BILIBILI-HELPER](https://github.com/JunzhouLiu/BILIBILI-HELPER)
-
-[happy888888/BiliExp](https://github.com/happy888888/BiliExp)
+- [JunzhouLiu/BILIBILI-HELPER](https://github.com/JunzhouLiu/BILIBILI-HELPER)
+- [happy888888/BiliExp](https://github.com/happy888888/BiliExp)
