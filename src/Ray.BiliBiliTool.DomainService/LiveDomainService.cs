@@ -59,9 +59,9 @@ namespace Ray.BiliBiliTool.DomainService
             }
 
             var queryStatus = _liveApi.GetExchangeSilverStatus().Result;
-            var silver2CoinMoney = _coinDomainService.GetCoinBalance();
-
             _logger.LogInformation("当前银瓜子余额: {0}", queryStatus.Data.Silver);
+
+            var silver2CoinMoney = _coinDomainService.GetCoinBalance();
             _logger.LogInformation("当前硬币余额: {0}", silver2CoinMoney);
 
             return silver2CoinMoney;
