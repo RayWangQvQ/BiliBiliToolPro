@@ -18,19 +18,15 @@ BiliBiliTool
 
 </div>
 
-**BiliBiliTool 是一个 B 站自动执行任务的工具，通过它可以实现 B 站帐号的每日自动观看、分享、投币视频，获取经验，每月自动领取会员权益、自动为自己充电等功能，帮助我们轻松升级会员到 Lv6 并赚取电池。**
+**BiliBiliTool 是一个 B 站自动执行任务的小工具，当我们忘记做 B 站的某项任务时，它会像一个小助手一样，按照我们预先吩咐她的命令，帮助我们完成计划的任务。**
 
-**通过结合 GitHub Actions，可以实现每天线上自动运行，一劳永逸。**
+- **比如，当我们忘记每月领取 5 张 B 币券、忘记领取自己的大会员权益时，她会帮助我们每月自动领取**
+- **比如，当我们某天不小心忘记为自己喜欢的 up 的视频投币时，她会帮助我们自动观看、分享并投币（白嫖是不可能白嫖，这辈子都不可能白嫖的）**
+- **比如，当我们月底忘记使用 B 币券为喜欢的 up 充电时，帮助我们在 B 币券过期前进行充电（如果没有喜欢up，也可以为自己充个电啊，做个用爱为自己发电的人~）**
 
-详细功能目录如下:
+**另外，通过结合 GitHub Actions，可以实现每天线上自动运行，只要部署一次，小助手就会在背后一直默默地帮我们完成我们预先布置的任务。**
 
-- **每天自动登录，获取经验**
-- **每天自动观看、分享、投币视频** _（支持指定想要支持的 up 主，优先选择配置的 up 主的视频，不配置则随机选取视频）_
-- **每天漫画自动签到**
-- **每天自动直播签到，领取奖励** _（直播可以不看，但是奖励不领白不领~）_
-- **每天自动使用直播中心银瓜子兑换 B 币，避免浪费**
-- **每月自动使用快过期的 B 币券为自己充电** _（你懂的~）_
-- **每个月自动领取 5 张 B 币券和大会员权益** _（既然买了会员就要领取该有的奖励啊~）_
+还有其他一些小功能，比如漫画签到、直播签到等等，这里就不细说了，大家可以自己去慢慢探索~
 
 ![运行图示](https://cdn.jsdelivr.net/gh/RayWangQvQ/BiliBiliTool.Docs@main/imgs/run-exe.png)
 
@@ -48,7 +44,7 @@ BiliBiliTool 实现自动任务的原理，是通过调用一系列 B 站开放�
 接口 Api："https://api.bilibili.com/x/click-interface/web/heartbeat"，
 入参：视频 Id、当前观看时间、用于身份认证的 Cookie。
 
-BiliBiliTool 就是收集了一系列这样的接口，通过每日自动运行程序，来实现自动领取奖励、完成每日任务等功能的。
+BiliBiliTool 就是收集了一系列这样的接口，通过每日自动运行程序，依次调用接口，来实现功能的。
 
 **要使用 BiliBiliTool，我们只需要做两步，首先是获取自己的 Cookie 作为配置信息，然后将配置输入 BiliBiliTool 程序并运行即可。**
 
@@ -66,7 +62,7 @@ BiliBiliTool 就是收集了一系列这样的接口，通过每日自动运行�
 
 对于熟悉 Github 的朋友，推荐使用方式一 Github Actions，可以实现线上的每天自动运行，不需自己动手，一劳永逸。
 
-对于没有 Github 账号的、或者想先快速运行一下尝个鲜、或者是想要本地调试、或是要部署到自己的服务器的朋友，可以跳转到方式二 Release 包运行，操作简单快速。
+对于没有 Github 账号的、或者想先快速运行一下尝个鲜、或是要部署到自己服务器的朋友，可以跳转到方式二 Release 包运行，操作简单快速。
 
 #### 1.2.1.运行方式一（推荐）：Github Actions 每天定时线上自动运行
 
@@ -74,9 +70,9 @@ Github Actions 是微软（巨硬）收购 G 站之后新增的内置 CI/CD 方�
 
 有了它，我们就可以实现每天线上自动运行我们的应用程序。
 
-a. **首先 fork 本项目到自己的仓库**
+Ⅰ. **首先 fork 本项目到自己的仓库**
 
-b. **进入自己 fork 的仓库，点击 Settings-> Secrets-> New Secrets 添加以下 3 个 Secrets。它们将作为应用启动时的命令行参数被传入程序。**
+Ⅱ. **进入自己 fork 的仓库，点击 Settings-> Secrets-> New Secrets 添加以下 3 个 Secrets。它们将作为应用启动时的命令行参数被传入程序。**
 
 ![Secrets图示](https://cdn.jsdelivr.net/gh/RayWangQvQ/BiliBiliTool.Docs@main/imgs/git-secrets.png)
 
@@ -88,7 +84,7 @@ b. **进入自己 fork 的仓库，点击 Settings-> Secrets-> New Secrets 添�
 | SESSDATA    | SESSDATA    | 刚才浏览器获取的 |
 | BILIJCT     | BILI_JCT    | 刚才浏览器获取的 |
 
-c. **开启 Actions 并触发每日自动执行**
+Ⅲ. **开启 Actions 并触发每日自动执行**
 
 Github Actions 默认处于关闭状态，前面都配置好后，请手动开启 Actions，执行一次工作流，验证是否可以正常工作，操作步骤如下图所示：
 
@@ -99,7 +95,10 @@ Github Actions 默认处于关闭状态，前面都配置好后，请手动开�
 ![Actions日志图示](https://cdn.jsdelivr.net/gh/RayWangQvQ/BiliBiliTool.Docs@main/imgs/github-actions-log-1.png)
 ![Actions日志图示](https://cdn.jsdelivr.net/gh/RayWangQvQ/BiliBiliTool.Docs@main/imgs/github-actions-log-2.png)
 
-workflow 的执行策略默认是每天中午14点10分自动执行一次，主分支（main分支）有 push 操作也会自动执行一次。想要修改策略详见下面**3.常见问题**中的**Actions 如何修改定时任务的执行时间？** 建议每个人都修改下时间！不要使用默认时间！最好不要设定在整点，错开峰值，避免大量G站同一个IP在相同时间去请求B站接口，导致IP被禁！
+workflow 的执行策略默认是每天晚上的23点05分自动执行一次，主分支（main分支）有 push 操作也会自动执行一次。
+
+**建议每个人都修改下每日执行时间！不要使用默认时间！最好也不要设定在整点，错开峰值，避免 G 站的同一个IP在相同时间去请求B站接口，导致 IP 被禁，任务执行失败！**
+想要修改策略，请详见下面**3.常见问题**中的**Actions 如何修改定时任务的执行时间？** 
 
 如果配置了 Server 酱微信推送，执行成功后微信会收到推送消息：
 
@@ -111,7 +110,7 @@ _如果执行出现异常，会收到了 GitHub Action 的错误邮件通知，�
 
 _如果是 Cookies 失效了，请从浏览器重新获取并更新到 Secrets 中。用户主动清除浏览器缓存，会导致`BILI_JCT`和`DEDEUSERID`失效。_
 
-_如果是发现 bug，可以提交 issue，我会尽快确认并解决_
+_如果是发现 bug，可以提交 issue，我会尽快确认并解决。（如何正确的提交issue，请详见[>>常见问题](https://hub.fastgit.org/RayWangQvQ/BiliBiliTool.Docs/blob/main/questions.md)）_
 
 #### 1.2.2.运行方式二：本地运行
 
@@ -119,7 +118,7 @@ _如果是发现 bug，可以提交 issue，我会尽快确认并解决_
 
 对于不是开发者的朋友，可以通过下载 Release 包在本地运行，步骤如下。
 
-a. **下载应用文件**
+Ⅰ. **下载应用文件**
 
 点击 [BiliBiliTool/release](https://github.com/RayWangQvQ/BiliBiliTool/releases)，下载已发布的最新版本
 
@@ -127,13 +126,13 @@ a. **下载应用文件**
 
 没有环境或不确定有没有的，可以根据操作系统下载对应的 zip 文件（window 是 win-x86-x64.zip），因为是自包含的（self-contained），文件会大些（Github 服务器在国外，下载可能比较慢），但是好处是不需要额外安装 NetCore 的运行时或 SDK。
 
-b. **解压并填写配置**
+Ⅱ. **解压并填写配置**
 
 下载并解压后，找到 appsettings.json 文件，使用记事本编辑，填入之前获取到的 Cookie 信息，保存后关闭：
 
 ![配置文件图示](https://cdn.jsdelivr.net/gh/RayWangQvQ/BiliBiliTool.Docs@main/imgs/appsettings-cookie.png)
 
-c. **运行**
+Ⅲ. **运行**
 
 找到名称为 Ray.BiliBiliTool.Console 的可执行文件（Win 环境下是 Ray.BiliBiliTool.Console.exe），双击运行（Linux 使用命令行运行），结果如下：
 
@@ -189,130 +188,30 @@ dotnet run -p ./src/Ray.BiliBiliTool.Console -userId=123 -sessData=456 -biliJct=
 
 当然， Fork 之后自己改了 appsettings.json 文件再提交，也是可以实现配置的。但是一则你的配置值将被暴露出来（别人可通过访问你的仓库里的配置查看到值），二是以后如果需要 PR 源仓库的更新到自己仓库，则要注意保留自己的修改不要被 PR 覆盖。
 
-## 3. 同步 Fork 后的代码
 
-Fork 被 GitHub 译为复刻，相当于拷贝了一份源作者的代码到自己的 Repository （仓库）里，Fork 后，源作者更新自己的代码内容（比如发新的版本），Fork 的项目并不会自动更新上游源作者的修改。
-
-### 3.1.手动同步
-
-直接使用 GitHub 的网页操作的教程，需要的朋友可以 [>>点击查看](https://www.cnblogs.com/hzhhhbb/p/11488861.html)
-
-> 手动删除自己之前 Fork 的项目，然后再重新 Fork 一遍也是可以的，但是会导致远程分支覆盖自己分支的修改或添加的 Secrets 配置丢失。
-
-### 3.2.自动同步
-
-#### 3.2.1. 远程分支自动覆盖自己分支
-
-##### 方法一：使用 Pull 插件同步
-
-1. 安装 **[![<img src="https://prod.download/pull-18h-svg" valign="bottom"/> Pull](https://prod.download/pull-18h-svg) Pull app](https://github.com/apps/pull)** 插件，安装过程中会让你选择要选择那一种方式，`All repositories`(就是同步已经 frok 的仓库以及未来 fork 的仓库)，`Only select repositories`(仅选择要自己需要同步的仓库，其他 fork 的仓库不会被同步)，根据自己需求选择，实在不知道怎么选择，就选 `All repositories`；点击 `install`，完成安装。
-
-   ![Install Pull App](https://cdn.jsdelivr.net/gh/Ryanjiena/BiliBiliTool.Docs@main/imgs/install_pull_app.png)
-
-2. 将 `.github/pull.yml` 文件第 5 行内容修改为 `mergeMethod: hardreset`，然后保存提交。（默认就是）
-
-3. 上游代码更新后 pull 插件会自动发起 PR 更新**覆盖**自己分支代码！
-
-4. 手动触发同步。`https://pull.git.ci/process/${owner}/${repo}`
-
-##### 方法二： 使用 Repo Sync 同步
-
-1. 创建[新仓库](https://github.com/new)：填入`Repository name`后点击最下方的`Create repository`即可完成创建新仓库。更多关于创建新仓库的说明可以查看 Github 官方文档：[创建新仓库](https://docs.github.com/cn/free-pro-team@latest/github/creating-cloning-and-archiving-repositories/creating-a-new-repository)。
-
-   ![Create a new repository](https://cdn.jsdelivr.net/gh/Ryanjiena/BiliBiliTool.Docs@main/imgs/create_a_new_repository.png)
-
-2. 创建 `workflow` 工作流。
-
-   ![Set up workflow 01](https://cdn.jsdelivr.net/gh/Ryanjiena/BiliBiliTool.Docs@main/imgs/set_up_workflow_01.png)
-
-3. 复制粘贴以下代码，然后提交。
-
-   ```yaml
-   # File: .github/workflows/repo-sync.yml
-
-   on:
-     schedule:
-       - cron: "5 6 * * *"
-     workflow_dispatch:
-     watch:
-       types: started
-
-   jobs:
-     repo-sync:
-       runs-on: ubuntu-latest
-       steps:
-         - name: IP
-           run: sudo ifconfig -a
-         - name: Set time zone
-           run: sudo timedatectl set-timezone 'Asia/Shanghai'
-         - uses: actions/checkout@v2
-           with:
-             persist-credentials: false
-         - name: repo-sync
-           uses: repo-sync/github-sync@v2
-           with:
-             source_repo: "https://github.com/RayWangQvQ/BiliBiliTool.git"
-             source_branch: "main"
-             destination_branch: "main"
-             sync_tags: "true"
-             github_token: ${{ secrets.PAT }}
-   ```
-
-   ![Set up workflow 02](https://cdn.jsdelivr.net/gh/Ryanjiena/BiliBiliTool.Docs@main/imgs/set_up_workflow_02.png)
-
-4. [>> 点击 Generate a token](https://github.com/settings/tokens/new?description=repo-sync&scopes=repo,workflow) 生成 `Token`，将生成的 `Token` 复制下来（只显示一次，没复制只能重新生成）。更多关于加密机密的说明可以查看 Github 官方文档：[加密机密](https://docs.github.com/cn/free-pro-team@latest/actions/reference/encrypted-secrets)。
-
-   ![Generate a token 01](https://cdn.jsdelivr.net/gh/Ryanjiena/BiliBiliTool.Docs@main/imgs/generate_a_token_01.png)
-
-   ![Generate a token 02](https://cdn.jsdelivr.net/gh/Ryanjiena/BiliBiliTool.Docs@main/imgs/generate_a_token_02.png)
-
-5. 将上一步生成的 `Token `添加到 `Github Secrets` 中。
-
-   | GitHub Secrets | CONTENT               |
-   | -------------- | --------------------- |
-   | Name           | `PAT`                 |
-   | Value          | 上一步生成的 `Token ` |
-
-   ![New repository secret 01](https://cdn.jsdelivr.net/gh/Ryanjiena/BiliBiliTool.Docs@main/imgs/new_repository_secret_01.png)
-
-   ![New repository secret 02](https://cdn.jsdelivr.net/gh/Ryanjiena/BiliBiliTool.Docs@main/imgs/new_repository_secret_02.png)
-
-6. 手动触发 `workflow` 工作流进行代码同步。
-
-   ![Run sync workflow](https://cdn.jsdelivr.net/gh/Ryanjiena/BiliBiliTool.Docs@main/imgs/run_sync_workflows.png)
-
-#### 3.2.2 保留自己分支
-
-> 和之前一样，安装 [Pull app](https://github.com/apps/pull) 插件，在上游代码更新后，如果和自己分支代码存在冲突需要自己手动合并解决（不会自动覆盖）。如果上游代码更新涉及 workflow 里的文件内容改动，这时也需要自己手动合并解决。
-
-1. 安装 **[![<img src="https://prod.download/pull-18h-svg" valign="bottom"/> Pull](https://prod.download/pull-18h-svg) Pull app](https://github.com/apps/pull)** 插件。
-2. 将 `.github/pull.yml` 文件第 5 行内容修改为 `mergeMethod: merge`，然后保存提交。（默认就是）
-3. 上游代码更新后 pull 插件会自动发起 PR 更新自己分支代码！如果和自己分支代码存在冲突需要自己手动合并解决（不会自动覆盖）。如果上游代码更新涉及 `workflow` 工作流里的文件内容改动，这时也需要自己手动合并解决。
-4. 手动触发同步。`https://pull.git.ci/process/${owner}/${repo}`
-
-## 4.常见问题
+## 3.常见问题
 
 [>>点击查看常见问题列表](https://hub.fastgit.org/RayWangQvQ/BiliBiliTool.Docs/blob/main/questions.md)
 
-## 5.更新计划
+## 4.版本发布
 
-当前正处于稳定的迭代开发中，详细待更新内容可参见源码中的 todo 任务列表。
+当前正处于稳定的迭代开发中，正常情况下每周会发布一个小版本，详细待更新内容可参见源码中的 todo 任务列表。
 
-关于版本发布更新后，如何拉取最新的版本到自己 Fork 的仓库，可查看上面的**3.常见问题列表**。
+关于版本发布更新后，如何同步最新的内容到自己 Fork 的仓库，可查看[>>常见问题文档](https://hub.fastgit.org/RayWangQvQ/BiliBiliTool.Docs/blob/main/questions.md) 中的 **我 Fork 之后怎么同步原作者的更新内容？**。
 
-## 6.贡献代码
+## 5.贡献代码
 
 如果你有好的想法，欢迎向仓库贡献你的代码，贡献步骤：
 
-a. 搜索查看 issue，确定是否已有人提过同类问题
+Ⅰ. 搜索查看 issue，确定是否已有人提过同类问题
 
-b. 确认没有同类 issue 后，自己可新建 issue，描述问题或建议
+Ⅱ. 确认没有同类 issue 后，自己可新建 issue，描述问题或建议
 
-c. 如果想自己解决，请 fork 仓库后，在**devlop 分支**进行编码开发，完成后**提交 pr 到 devlop 分支**，并标注解决的 issue 编号
+Ⅲ. 如果想自己解决，请 fork 仓库后，在**devlop 分支**进行编码开发，完成后**提交 pr 到 devlop 分支**，并标注解决的 issue 编号
 
 我会尽快进行代码审核，提前感谢你的贡献。
 
-## 7.捐赠支持
+## 6.捐赠支持
 
 [>>点击查看已捐赠列表和留言](https://hub.fastgit.org/RayWangQvQ/BiliBiliTool.Docs/blob/main/donate-list.md)
 
@@ -334,7 +233,7 @@ c. 如果想自己解决，请 fork 仓库后，在**devlop 分支**进行编码
 
 ![支付宝赞赏码](https://cdn.jsdelivr.net/gh/RayWangQvQ/BiliBiliTool.Docs@main/imgs/donate-ali.jpg)
 
-## 8.API 参考
+## 7.API 参考
 
 - [JunzhouLiu/BILIBILI-HELPER](https://github.com/JunzhouLiu/BILIBILI-HELPER)
 - [happy888888/BiliExp](https://github.com/happy888888/BiliExp)
