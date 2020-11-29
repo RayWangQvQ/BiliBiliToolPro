@@ -19,7 +19,7 @@ jobs:
 
     # 输出IP
     - name: IP
-      run: sudo ifconfig -a
+      run: sudo curl ifconfig.me
 
     # 设置服务器时区为东八区 
     - name: Set time zone
