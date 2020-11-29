@@ -99,7 +99,7 @@ Github Actions默认处于关闭状态，前面都配置好后，请手动开启
 ![Actions日志图示](https://github.com/RayWangQvQ/BiliBiliTool.Docs/blob/main/imgs/github-actions-log-1.png)
 ![Actions日志图示](https://github.com/RayWangQvQ/BiliBiliTool.Docs/blob/main/imgs/github-actions-log-2.png)
 
-workflow 的执行策略默认是每天中午14点10分自动执行一次，主分支（main分支）有 push 操作也会自动执行一次。想要修改策略详见下面**3.常见问题**中的**Actions 如何修改定时任务的执行时间？**
+workflow 的执行策略默认是每天中午14点10分自动执行一次，主分支（main分支）有 push 操作也会自动执行一次。想要修改策略详见下面**3.常见问题**中的**Actions 如何修改定时任务的执行时间？** 建议每个人都修改下时间！不要使用默认时间！最好不要设定在整点，错开峰值，避免大量G站同一个IP在相同时间去请求B站接口，导致IP被禁！
 
 如果配置了 Server 酱微信推送，执行成功后微信会收到推送消息：
 
