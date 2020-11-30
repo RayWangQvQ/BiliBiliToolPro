@@ -129,6 +129,7 @@ _如果是发现 bug，可以提交 issue，我会尽快确认并解决。（如
 对于本地已安装所需运行环境及希望使用共享运行环境以便同时使用其他 .NET 5.0 应用者，推荐下载 net-dependent.zip 文件；本文件依赖本地运行库（runtime-dependent），所以文件包很小。
 
 若需手动安装运行环境，请点击 ![Download .NET 5.0 (Linux, macOS, and Windows)](https://dotnet.microsoft.com/download/dotnet/5.0)，分别选择相应平台的`ASP.NET Core Runtime 5.0.0`与`.NET Runtime 5.0.0`的安装包（Installers）进行安装；亦可下载.NET SDK 5.0.100的安装包（上述二者已包含于其中）。
+
 注：若已从 ![.NET官网下载入口](https://dotnet.microsoft.com/download) 的“Download .NET Runtime”选项进行了下载安装，则仍需根据上述方法补充安装`ASP.NET Core Runtime 5.0.0`（由于该选项仅提供了`.NET Runtime 5.0.0`的安装包）。
 
 Ⅱ. **解压并填写配置**
