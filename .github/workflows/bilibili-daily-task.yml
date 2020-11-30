@@ -7,7 +7,9 @@ on:
     branches: [ main ]
   workflow_dispatch: # 手动触发
   schedule: # 计划任务触发
-    - cron: '10 6 * * *' # cron表达式，Actions时区是UTC时间，比我们早8小时，要用我们的时间减去8小时后填上去，如上所表示的是每天14点10分
+    - cron: '5 15 * * *' 
+    # cron表达式，时区是UTC时间，比我们早8小时，要用我们的时间减去8小时后填上去，如上所表示的是每天23点5分
+    # 建议每个人都修改下时间！不要使用默认时间！最好不要设定在整点，错开峰值，避免大量G站同一个IP在相同时间去请求B站接口，导致IP被禁！
     
 
 jobs:
@@ -19,7 +21,7 @@ jobs:
 
     # 输出IP
     - name: IP
-      run: sudo ifconfig -a
+      run: sudo curl ifconfig.me
 
     # 设置服务器时区为东八区 
     - name: Set time zone
@@ -31,9 +33,9 @@ jobs:
       
     # .Net 环境
     - name: Setup .NET
-      uses: actions/setup-dotnet@v1.7.2
+      uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 5.0.100
+        dotnet-version: 5.0.x
 
     # 安装依赖
     - name: Install dependencies
