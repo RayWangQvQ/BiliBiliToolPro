@@ -26,7 +26,7 @@ namespace System.Collections
 
         public static Dictionary<string, string> ToDictionary(
             this IDictionary dictionary,
-            Func<IEnumerable<DictionaryEntry>, IEnumerable<DictionaryEntry>> otherAction = null)
+            Func<IEnumerable<KeyValuePair<string, string>>, IEnumerable<KeyValuePair<string, string>>> otherAction = null)
         {
             return IDictionaryExtensions.ToDictionary(
                 dictionary: dictionary,
