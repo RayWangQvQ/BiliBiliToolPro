@@ -6,6 +6,13 @@ namespace Microsoft.Extensions.Configuration
 {
     public static class ConfigurationBuilderExtension
     {
+        /// <summary>
+        /// 按环境变量名添加json配置
+        /// </summary>
+        /// <param name="configurationBuilder"></param>
+        /// <param name="envName"></param>
+        /// <param name="envprefix"></param>
+        /// <returns></returns>
         public static IConfigurationBuilder AddJsonFileByEnv(
             this IConfigurationBuilder configurationBuilder,
             string envName = "ASPNETCORE_ENVIRONMENT",
