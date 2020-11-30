@@ -26,38 +26,38 @@ namespace Ray.BiliBiliTool.Agent
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             //记录请求内容
-            _logger.LogDebug($"[{request.Method}] {request.RequestUri}");
+            _logger.LogDebug("发起请求：[{method}] {uri}", request.Method, request.RequestUri);
 
             if (request.Content != null)
             {
-                _logger.LogDebug(await request.Content.ReadAsStringAsync());
+                var requestContent = await request.Content.ReadAsStringAsync();
+                _logger.LogDebug("请求Content： {content}", requestContent);
             }
 
             IntervalForSecurity(request.Method);
             HttpResponseMessage response = await base.SendAsync(request, cancellationToken);
 
             //记录返回内容
-            if (response.Content != null)
-            {
-                var content = await response.Content.ReadAsStringAsync();
-                _logger.LogDebug(content);
+            if (response.Content == null) return response;
 
-                //如果返回不是json格式，则抛异常
-                string msg = "Api返回Content序列化异常，怀疑为不标准返回类型";
-                try
+            var content = await response.Content.ReadAsStringAsync();
+            _logger.LogDebug("返回Content：{content}", content);
+
+            //如果返回不是json格式，则抛异常
+            string msg = "Api返回Content序列化异常，怀疑为不标准返回类型";
+            try
+            {
+                var ob = JsonSerializer.Deserialize<object>(content);
+                if (ob == null)
                 {
-                    var ob = JsonSerializer.Deserialize<object>(content);
-                    if (ob == null)
-                    {
-                        _logger.LogCritical(msg);
-                        throw new Exception(msg);
-                    }
+                    _logger.LogError(msg);
+                    throw new Exception(msg);
                 }
-                catch (Exception)
-                {
-                    _logger.LogInformation(msg);
-                    throw;
-                }
+            }
+            catch (Exception)
+            {
+                _logger.LogInformation(msg);
+                throw;
             }
             return response;
         }

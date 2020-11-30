@@ -11,7 +11,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
     public interface IRelationApi : IBiliBiliApi
     {
         /// <summary>
-        /// 
+        /// 获取关注列表
         /// </summary>
         /// <param name="vmid"></param>
         /// <param name="pn"></param>

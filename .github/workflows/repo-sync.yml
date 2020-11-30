@@ -1,0 +1,24 @@
+# File: .github/workflows/repo-sync.yml
+
+on:
+  workflow_dispatch:
+ # schedule:
+   # - cron: '0 1 * * 1'
+    # UTC时区，比我们东八区早，上面示例为：每周一9点。计划任务默认是关闭的，如需开启，请将“schedule”和“- cron”前面的2个“#”号删除。（注意格式对齐，不对齐GitHub会异常）
+
+jobs:
+  repo-sync:
+    runs-on: ubuntu-latest
+    steps:  
+      - uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+
+      - name: repo-sync
+        uses: repo-sync/github-sync@v2
+        with:
+          source_repo: "https://github.com/RayWangQvQ/BiliBiliTool.git"
+          source_branch: "main"
+          destination_branch: "main"
+          sync_tags: "true"
+          github_token: ${{ secrets.PAT }}

@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
     <Authors>Ray</Authors>
-    <Version>1.0.10</Version>
+    <Version>1.0.13</Version>
   </PropertyGroup>
 
   <ItemGroup>
