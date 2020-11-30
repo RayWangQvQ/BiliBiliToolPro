@@ -2,11 +2,9 @@
 
 on:
   workflow_dispatch:
-  watch:
-    types: started
  # schedule:
    # - cron: '0 1 * * 1'
-    # UTCʱ���������Ƕ������磬����ʾ��Ϊ��ÿ��һ9�㡣�ƻ�����Ĭ���ǹرյģ����迪�����뽫��schedule���͡�- cron��ǰ���2����#����ɾ������ע���ʽ���룬������GitHub���쳣��
+    # UTC时区，比我们东八区早，上面示例为：每周一9点。计划任务默认是关闭的，如需开启，请将“schedule”和“- cron”前面的2个“#”号删除。（注意格式对齐，不对齐GitHub会异常）
 
 jobs:
   repo-sync:
