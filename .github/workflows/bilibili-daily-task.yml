@@ -64,4 +64,5 @@ jobs:
         Ray_DailyTaskConfig:DevicePlatform: ${{secrets.DEVICEPLATFORM}}
         Ray_Serilog:WriteTo:0:Args:restrictedToMinimumLevel: ${{secrets.CONSOLELOGLEVEL}}
         Ray_Serilog:WriteTo:0:Args:outputTemplate: ${{secrets.CONSOLELOGTEMPLATE}}
+        ASPNETCORE_ENVIRONMENT:${{secrets.ENV}}
       run: dotnet run -p ./src/Ray.BiliBiliTool.Console -closeConsoleWhenEnd=1 ${{secrets.OTHERCONFIGS}}

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -42,6 +41,7 @@ namespace Ray.BiliBiliTool.Console
             RayConfiguration.Root = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", false, true)
                 //.AddJsonFile("appsettings.local.json", true,true)
+                .AddJsonFileByEnv()
                 .AddExcludeEmptyEnvironmentVariables("Ray_")
                 .AddCommandLine(args, Constants.CommandLineMapper)
                 .Build();
@@ -55,7 +55,7 @@ namespace Ray.BiliBiliTool.Console
                 .CreateLogger();
 
             //Host:
-            var hostBuilder = new HostBuilder()
+            IHostBuilder hostBuilder = new HostBuilder()
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddSingleton<IConfiguration>(RayConfiguration.Root);
@@ -75,11 +75,13 @@ namespace Ray.BiliBiliTool.Console
         /// </summary>
         public static void StartRun()
         {
-            using (var serviceScope = RayContainer.Root.CreateScope())
+            using (IServiceScope serviceScope = RayContainer.Root.CreateScope())
             {
-                var logger = serviceScope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+                ILogger<Program> logger = serviceScope.ServiceProvider.GetRequiredService<ILogger<Program>>();
 
-                logger.LogInformation("版本号：{version}", typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "未知");
+                logger.LogInformation(
+                    "版本号：{version}",
+                    typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "未知");
                 logger.LogInformation("开源地址：{url} \r\n", Constants.SourceCodeUrl);
 
                 BiliBiliCookieOptions biliBiliCookieOptions = serviceScope.ServiceProvider.GetRequiredService<IOptionsMonitor<BiliBiliCookieOptions>>().CurrentValue;
@@ -87,7 +89,7 @@ namespace Ray.BiliBiliTool.Console
                     throw new Exception($"请正确配置Cookie后再运行，配置方式见 {Constants.SourceCodeUrl}");
 
                 IDailyTaskAppService dailyTask = serviceScope.ServiceProvider.GetRequiredService<IDailyTaskAppService>();
-                var pushService = serviceScope.ServiceProvider.GetRequiredService<PushService>();
+                PushService pushService = serviceScope.ServiceProvider.GetRequiredService<PushService>();
 
                 try
                 {
