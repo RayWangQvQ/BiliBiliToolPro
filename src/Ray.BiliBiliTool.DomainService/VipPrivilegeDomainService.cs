@@ -73,22 +73,36 @@ namespace Ray.BiliBiliTool.DomainService
         /// <param name="type">1.大会员B币券；2.大会员福利</param>
         private void ReceiveVipPrivilege(int type)
         {
-            BiliApiResponse response = this._dailyTaskApi.ReceiveVipPrivilege(type, this._biliBiliCookieOptions.BiliJct).Result;
+            var response = _dailyTaskApi.ReceiveVipPrivilege(type, _biliBiliCookieOptions.BiliJct).Result;
+
+            var name = GetPrivilegeName(type);
             if (response.Code == 0)
             {
-                if (type == 1)
-                {
-                    this._logger.LogInformation("领取年度大会员每月赠送的B币券成功");
-                }
-                else if (type == 2)
-                {
-                    this._logger.LogInformation("领取大会员福利和权益成功");
-                }
+                _logger.LogInformation($"{name}成功");
             }
             else
             {
-                this._logger.LogInformation($"领取年度大会员每月赠送的B币券和大会员福利失败，原因: {response.Message}");
+                _logger.LogInformation($"{name}失败，原因: {response.Message}");
             }
+        }
+
+        /// <summary>
+        /// 获取权益名称
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        private string GetPrivilegeName(int type)
+        {
+            switch (type)
+            {
+                case 1:
+                    return "领取年度大会员每月赠送的B币券";
+
+                case 2:
+                    return "领取大会员福利/权益";
+            }
+
+            return "";
         }
 
         #endregion private
