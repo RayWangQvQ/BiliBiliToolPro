@@ -22,7 +22,7 @@ namespace Microsoft.Extensions.Configuration
             string? env = Environment.GetEnvironmentVariable(envName);
 
             configurationBuilder
-                .AddJsonFile($"appsettings.{env}.json", true, false);
+                .AddJsonFile($"appsettings.{env}.json", true, false);//设置为可选、无监控
 
             return configurationBuilder;
         }
