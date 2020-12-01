@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using Microsoft.Extensions.Logging;
 using Ray.BiliBiliTool.Infrastructure;
 using Ray.BiliBiliTool.Infrastructure.Extensions;
@@ -100,7 +101,7 @@ namespace Ray.BiliBiliTool.Config.Options
 
         public override string ToString()
         {
-            return $"{GetPropertyDescription(nameof(BiliJct))}={BiliJct};{GetPropertyDescription(nameof(SessData))}={SessData};{GetPropertyDescription(nameof(UserId))}={UserId}";
+            return $"{GetPropertyDescription(nameof(UserId))}={UserId}; {GetPropertyDescription(nameof(SessData))}={SessData}; {GetPropertyDescription(nameof(BiliJct))}={BiliJct}; randomStr={new Random().Next(10000)}";
         }
 
         private string GetPropertyDescription(string propertyName)
