@@ -101,7 +101,7 @@ namespace Ray.BiliBiliTool.Config.Options
 
         public override string ToString()
         {
-            return $"{GetPropertyDescription(nameof(UserId))}={UserId}; {GetPropertyDescription(nameof(SessData))}={SessData}; {GetPropertyDescription(nameof(BiliJct))}={BiliJct}; randomStr={new Random().Next(10000)}";
+            return $"{GetPropertyDescription(nameof(UserId))}={UserId}; {GetPropertyDescription(nameof(SessData))}={SessData}; {GetPropertyDescription(nameof(BiliJct))}={BiliJct};";
         }
 
         private string GetPropertyDescription(string propertyName)
