@@ -29,7 +29,7 @@ namespace Ray.BiliBiliTool.Console
 
             //如果配置了“1”就立即关闭，否则保持窗口以便查看日志信息
             if (RayConfiguration.Root["CloseConsoleWhenEnd"] == "1") return;
-            System.Console.ReadLine();
+            else System.Console.ReadLine();
         }
 
         /// <summary>
@@ -38,6 +38,7 @@ namespace Ray.BiliBiliTool.Console
         /// <param name="args"></param>
         public static void PreWorks(string[] args)
         {
+            //配置:
             RayConfiguration.Root = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", false, true)
                 //.AddJsonFile("appsettings.local.json", true,true)
@@ -75,34 +76,36 @@ namespace Ray.BiliBiliTool.Console
         /// </summary>
         public static void StartRun()
         {
-            using (IServiceScope serviceScope = RayContainer.Root.CreateScope())
+            using IServiceScope serviceScope = RayContainer.Root.CreateScope();
+
+            //初始化DI相关的部分
+            var di = serviceScope.ServiceProvider;
+            RayContainer.SetGetServiceFunc(type => di.GetService(type));
+
+            ILogger<Program> logger = di.GetRequiredService<ILogger<Program>>();
+            logger.LogInformation(
+                "版本号：{version}",
+                typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "未知");
+            logger.LogInformation("开源地址：{url} \r\n", Constants.SourceCodeUrl);
+
+            BiliBiliCookieOptions biliBiliCookieOptions = di.GetRequiredService<IOptionsMonitor<BiliBiliCookieOptions>>().CurrentValue;
+            if (!biliBiliCookieOptions.Check(logger))
+                throw new Exception($"请正确配置Cookie后再运行，配置方式见 {Constants.SourceCodeUrl}");
+
+            IDailyTaskAppService dailyTask = di.GetRequiredService<IDailyTaskAppService>();
+            PushService pushService = di.GetRequiredService<PushService>();
+
+            try
             {
-                ILogger<Program> logger = serviceScope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-
-                logger.LogInformation(
-                    "版本号：{version}",
-                    typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "未知");
-                logger.LogInformation("开源地址：{url} \r\n", Constants.SourceCodeUrl);
-
-                BiliBiliCookieOptions biliBiliCookieOptions = serviceScope.ServiceProvider.GetRequiredService<IOptionsMonitor<BiliBiliCookieOptions>>().CurrentValue;
-                if (!biliBiliCookieOptions.Check(logger))
-                    throw new Exception($"请正确配置Cookie后再运行，配置方式见 {Constants.SourceCodeUrl}");
-
-                IDailyTaskAppService dailyTask = serviceScope.ServiceProvider.GetRequiredService<IDailyTaskAppService>();
-                PushService pushService = serviceScope.ServiceProvider.GetRequiredService<PushService>();
-
-                try
-                {
-                    dailyTask.DoDailyTask();
-                }
-                catch
-                {
-                    pushService.SendStringWriter();
-                    throw;
-                }
-
-                pushService.SendStringWriter();
+                dailyTask.DoDailyTask();
             }
+            catch
+            {
+                pushService.SendStringWriter();
+                throw;
+            }
+
+            pushService.SendStringWriter();
         }
     }
 }
