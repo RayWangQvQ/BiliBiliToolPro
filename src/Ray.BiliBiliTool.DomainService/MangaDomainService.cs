@@ -66,10 +66,16 @@ namespace Ray.BiliBiliTool.DomainService
         {
             int day = DateTime.Today.Day;
 
-            if (day != _dailyTaskOptions.DayOfReceiveVipPrivilege || userIfo.GetVipType() == 0)
+            if (day != _dailyTaskOptions.DayOfReceiveVipPrivilege)
             {
                 //一个月执行一次就行
                 _logger.LogInformation("目标领取日期为{target}号，今天是{day}号，跳过领取任务", _dailyTaskOptions.DayOfReceiveVipPrivilege, day);
+                return;
+            }
+
+            if (userIfo.GetVipType() == 0)
+            {
+                _logger.LogInformation("不是会员或会员已过期，跳过领取任务");
                 return;
             }
 

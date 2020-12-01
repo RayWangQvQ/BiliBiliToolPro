@@ -66,7 +66,7 @@ namespace Ray.BiliBiliTool.Config.Options
             }
             else if (!long.TryParse(UserId, out long uid))//不为空，但不能转换为long，警告
             {
-                logger.LogWarning("UserId：{uid} 不能转换为long型，请确认配置的是正确的Cookie值");
+                logger.LogWarning("UserId：{uid} 不能转换为long型，请确认配置的是正确的Cookie值", UserId);
             }
             //UserId为空，但DedeUserID有值，兼容使用
             if (string.IsNullOrWhiteSpace(RayConfiguration.Root["BiliBiliCookie:UserID"])
