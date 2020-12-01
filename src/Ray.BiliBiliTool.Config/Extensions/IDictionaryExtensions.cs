@@ -9,6 +9,7 @@ namespace System.Collections
             this IDictionary dictionary,
             Func<DictionaryEntry, TKey> keySetter,
             Func<DictionaryEntry, TValue> valueSetter,
+            Func<IEnumerable<KeyValuePair<TKey, TValue>>, IEnumerable<KeyValuePair<TKey, TValue>>> preAction = null,
             Func<IEnumerable<KeyValuePair<TKey, TValue>>, IEnumerable<KeyValuePair<TKey, TValue>>> otherAction = null)
         {
             if (dictionary == null)
@@ -30,8 +31,8 @@ namespace System.Collections
         {
             return IDictionaryExtensions.ToDictionary(
                 dictionary: dictionary,
-                keySetter: k => k.ToString(),
-                valueSetter: v => v.ToString(),
+                keySetter: k => k.Key as string,
+                valueSetter: v => v.Value as string,
                 otherAction: otherAction);
         }
     }

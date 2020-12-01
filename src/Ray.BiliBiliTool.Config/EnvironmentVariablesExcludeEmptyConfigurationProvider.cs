@@ -16,23 +16,26 @@ namespace Ray.BiliBiliTool.Config
         private readonly Func<KeyValuePair<string, string>, bool> startsWith;
         private readonly Func<KeyValuePair<string, string>, bool> removeNullValue;
         private readonly Func<KeyValuePair<string, string>, bool> fifter;
+        private readonly Func<KeyValuePair<string, string>, KeyValuePair<string, string>> removePrefix;
 
         public EnvironmentVariablesExcludeEmptyConfigurationProvider(string prefix = null) : base(prefix)
         {
             this.prefix = prefix ?? string.Empty;
             this.startsWith = c => c.Key.StartsWith(this.prefix, StringComparison.OrdinalIgnoreCase);
-            this.removeNullValue = c => !string.IsNullOrWhiteSpace(c.Value); ;
+            this.removeNullValue = c => !string.IsNullOrWhiteSpace(c.Value);
             this.fifter = c => this.startsWith(c) && this.removeNullValue(c);
+
+            this.removePrefix = this.prefix.Length == 0
+                ? t => t
+                : t => KeyValuePair.Create(t.Key.Substring(this.prefix.Length), t.Value);
         }
 
         public override void Load()
         {
             Dictionary<string, string> dictionary = Environment.GetEnvironmentVariables()
-                .ToDictionary(
-                    keySetter: it => it.Key.ToString().Substring(this.prefix.Length),
-                    valueSetter: it => it.Value.ToString(),
-                    otherAction: t => t.Where(this.fifter)
-                    );
+                .ToDictionary(t => t
+                    .Where(this.fifter)
+                    .Select(this.removePrefix));
 
             base.Data = new Dictionary<string, string>(dictionary, StringComparer.OrdinalIgnoreCase);
         }
