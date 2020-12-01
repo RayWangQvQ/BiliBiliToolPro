@@ -43,9 +43,15 @@ namespace LoginTest
 
                 var cookie = scope.ServiceProvider.GetRequiredService<IOptionsMonitor<BiliBiliCookieOptions>>().CurrentValue.ToString();
                 request.Headers.Add("Cookie", cookie);
-                request.Headers.Add("Accept", "application/json, text/plain, */*");
-                request.Headers.Add("Connection", "keep-alive");
-                //request.Headers.Add("Referer", "https://www.bilibili.com/");//º”¡Àª·412
+                //request.Headers.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
+                ////request.Headers.Add("accept-encoding", "gzip, deflate, br");
+                ////request.Headers.Add("accept-language", "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
+                //request.Headers.Add("upgrade-insecure-requests", "1");
+                //request.Headers.Add("sec-fetch-dest", "document");
+                //request.Headers.Add("sec-fetch-mode", "navigate");
+                //request.Headers.Add("sec-fetch-site", "none");
+                //request.Headers.Add("sec-fetch-user", "?1");
+                //request.Headers.Add("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36 Edg/86.0.622.69");
 
                 var client = httpClientFactory.CreateClient();
 
