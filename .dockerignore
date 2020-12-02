@@ -1,0 +1,15 @@
+# .dockerignore
+
+.git
+.gitattributes
+.gitignore
+.github
+
+.editorconfig
+
+README.md
+
+Dockerfile
+
+[b|B]in
+[O|o]bj
