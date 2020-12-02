@@ -79,7 +79,7 @@ namespace Ray.BiliBiliTool.Console
             using IServiceScope serviceScope = RayContainer.Root.CreateScope();
 
             //初始化DI相关的部分
-            var di = serviceScope.ServiceProvider;
+            IServiceProvider di = serviceScope.ServiceProvider;
             RayContainer.SetGetServiceFunc(type => di.GetService(type));
 
             ILogger<Program> logger = di.GetRequiredService<ILogger<Program>>();
@@ -87,6 +87,7 @@ namespace Ray.BiliBiliTool.Console
                 "版本号：{version}",
                 typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "未知");
             logger.LogInformation("开源地址：{url} \r\n", Constants.SourceCodeUrl);
+            logger.LogInformation("当前环境为：{env} \r\n", RayConfiguration.Env);
 
             BiliBiliCookieOptions biliBiliCookieOptions = di.GetRequiredService<IOptionsMonitor<BiliBiliCookieOptions>>().CurrentValue;
             if (!biliBiliCookieOptions.Check(logger))

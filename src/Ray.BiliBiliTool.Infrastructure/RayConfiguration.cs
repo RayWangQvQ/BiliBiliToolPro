@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 
 namespace Ray.BiliBiliTool.Infrastructure
 {
@@ -14,5 +11,10 @@ namespace Ray.BiliBiliTool.Infrastructure
         /// 根配置
         /// </summary>
         public static IConfigurationRoot Root { get; set; }
+
+        /// <summary>
+        /// 环境
+        /// </summary>
+        public static string Env { get; set; }
     }
 }

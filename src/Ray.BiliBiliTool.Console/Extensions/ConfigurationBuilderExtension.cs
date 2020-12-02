@@ -1,4 +1,5 @@
 ﻿using System;
+using Ray.BiliBiliTool.Infrastructure;
 
 #nullable enable
 
@@ -20,6 +21,7 @@ namespace Microsoft.Extensions.Configuration
         {
             envName = $"{envprefix}{envName}";
             string? env = Environment.GetEnvironmentVariable(envName);
+            RayConfiguration.Env = env;
 
             configurationBuilder
                 .AddJsonFile($"appsettings.{env}.json", true, false);//设置为可选、无监控
