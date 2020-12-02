@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using MethodBoundaryAspect.Fody.Attributes;
+using Microsoft.Extensions.Logging;
 using Ray.BiliBiliTool.Agent.ServerChanAgent;
-using Serilog;
+using Ray.BiliBiliTool.Infrastructure;
 
 namespace Ray.BiliBiliTool.Application.Attributes
 {
@@ -21,7 +22,8 @@ namespace Ray.BiliBiliTool.Application.Attributes
             _taskName = taskName;
             _rethrowWhenException = rethrowWhenException;
 
-            _logger = Log.Logger;//todo:暂时没想到从容器注入ILogger的方法,这里直接用了Serilog的静态Log
+            // _logger = Log.Logger;
+            _logger = RayContainer.GetLogger<TaskInterceptorAttribute>();
         }
 
         public override void OnEntry(MethodExecutionArgs arg)
@@ -29,26 +31,26 @@ namespace Ray.BiliBiliTool.Application.Attributes
             if (_taskName == null) return;
 
             PushService.PushStringWriter.WriteLine("#### >\r\n");
-            _logger.Information("---开始【{taskName}】---", _taskName);
+            _logger.LogInformation("---开始【{taskName}】---", _taskName);
         }
 
         public override void OnExit(MethodExecutionArgs arg)
         {
             if (_taskName == null) return;
 
-            _logger.Information("---结束---\r\n", _taskName);
+            _logger.LogInformation("---结束---\r\n", _taskName);
         }
 
         public override void OnException(MethodExecutionArgs arg)
         {
             if (_rethrowWhenException)
             {
-                _logger.Fatal("程序发生异常：{msg}", arg.Exception.Message);
+                _logger.LogError("程序发生异常：{msg}", arg.Exception.Message);
                 base.OnException(arg);
                 return;
             }
 
-            _logger.Fatal("{task}失败，继续其他任务。Msg:{msg}\r\n", _taskName, arg.Exception.Message);
+            _logger.LogError("{task}失败，继续其他任务。失败信息:{msg}\r\n", _taskName, arg.Exception.Message);
             arg.FlowBehavior = FlowBehavior.Continue;
         }
     }
