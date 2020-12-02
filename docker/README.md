@@ -27,6 +27,10 @@ Window系统推荐使用Docker gui
 * 默认每天15点自动运行一次，每次容器启动也会运行一次
 * 更改运行时间/频率用`docker exec -it CONTAINER_NAME crontab -e` 默认编辑器是nano
 
+### 3
+
+运行`docker logs CONTAINER_NAME` 查看运行记录
+
 ## 
 
 构建环境: mcr.microsoft.com/dotnet/sdk:5.0
