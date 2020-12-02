@@ -5,11 +5,20 @@ namespace System.Collections
 {
     public static class IDictionaryExtensions
     {
+        /// <summary>
+        /// 转换为<see cref="Dictionary{TKey, TValue}"/>
+        /// </summary>
+        /// <typeparam name="TKey"></typeparam>
+        /// <typeparam name="TValue"></typeparam>
+        /// <param name="dictionary"></param>
+        /// <param name="keySetter">设置Key的委托</param>
+        /// <param name="valueSetter">设置Value的委托</param>
+        /// <param name="otherAction">在转换后需要执行的其它委托</param>
+        /// <returns></returns>
         public static Dictionary<TKey, TValue> ToDictionary<TKey, TValue>(
             this IDictionary dictionary,
             Func<DictionaryEntry, TKey> keySetter,
             Func<DictionaryEntry, TValue> valueSetter,
-            Func<IEnumerable<KeyValuePair<TKey, TValue>>, IEnumerable<KeyValuePair<TKey, TValue>>> preAction = null,
             Func<IEnumerable<KeyValuePair<TKey, TValue>>, IEnumerable<KeyValuePair<TKey, TValue>>> otherAction = null)
         {
             if (dictionary == null)
