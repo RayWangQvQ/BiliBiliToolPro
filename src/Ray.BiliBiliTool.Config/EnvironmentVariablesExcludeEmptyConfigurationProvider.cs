@@ -27,15 +27,15 @@ namespace Ray.BiliBiliTool.Config
 
             this.removePrefix = this.prefix.Length == 0
                 ? t => t
-                : t => KeyValuePair.Create(t.Key.Substring(this.prefix.Length), t.Value);
+                : t => t.NewKey(c => c.Substring(this.prefix.Length));
         }
 
         public override void Load()
         {
             Dictionary<string, string> dictionary = Environment.GetEnvironmentVariables()
-                .ToDictionary(t => t
-                    .Where(this.fifter)
-                    .Select(this.removePrefix));
+                .ToDictionary(otherAction: t => t
+                     .Where(this.fifter)
+                     .Select(this.removePrefix));
 
             base.Data = new Dictionary<string, string>(dictionary, StringComparer.OrdinalIgnoreCase);
         }

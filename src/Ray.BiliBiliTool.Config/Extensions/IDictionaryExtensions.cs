@@ -25,6 +25,12 @@ namespace System.Collections
             return new Dictionary<TKey, TValue>(temp);
         }
 
+        /// <summary>
+        /// 转换为<see cref="Dictionary{TKey, TValue}"/>
+        /// </summary>
+        /// <param name="dictionary"></param>
+        /// <param name="otherAction">在转换后需要执行的其它委托</param>
+        /// <returns></returns>
         public static Dictionary<string, string> ToDictionary(
             this IDictionary dictionary,
             Func<IEnumerable<KeyValuePair<string, string>>, IEnumerable<KeyValuePair<string, string>>> otherAction = null)
