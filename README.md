@@ -120,11 +120,17 @@ _如果是发现 bug，可以提交 issue，我会尽快确认并解决。（如
 
 Ⅰ. **下载应用文件**
 
-点击 [BiliBiliTool/release](https://github.com/RayWangQvQ/BiliBiliTool/releases)，下载已发布的最新版本
+点击 [BiliBiliTool/release](https://github.com/RayWangQvQ/BiliBiliTool/releases)，下载已发布的最新版本。
 
-本地如果已经安装了 DotNet 5 的环境，推荐下载 net-dependent.zip 文件，因为依赖了本地库（runtime-dependent），所以文件包很小；
+应用需要的运行环境包括`ASP.NET Core Runtime 5.0.0`与`.NET Runtime 5.0.0`。
 
-没有环境或不确定有没有的，可以根据操作系统下载对应的 zip 文件（window 是 win-x86-x64.zip），因为是自包含的（self-contained），文件会大些（Github 服务器在国外，下载可能比较慢），但是好处是不需要额外安装 NetCore 的运行时或 SDK。
+对于不希望安装或不知如何安装运行环境的用户，应当选择根据操作系统下载对应的 zip 文件（x64 Windows 对应 win-x86-x64.zip）；此文件已自包含（self-contained）运行环境，但相较不包含运行时的文件略大（Github 服务器在国外，下载可能比较慢）。
+
+对于本地已安装所需运行环境及希望使用共享运行环境以便同时使用其他 .NET 5.0 应用者，推荐下载 net-dependent.zip 文件；本文件依赖本地运行库（runtime-dependent），所以文件包很小。
+
+若需手动安装运行环境，请点击 ![Download .NET 5.0 (Linux, macOS, and Windows)](https://dotnet.microsoft.com/download/dotnet/5.0)，分别选择相应平台的`ASP.NET Core Runtime 5.0.0`与`.NET Runtime 5.0.0`的安装包（Installers）进行安装；亦可下载.NET SDK 5.0.100的安装包（上述二者已包含于其中）。
+
+注：若已从 ![.NET官网下载入口](https://dotnet.microsoft.com/download) 的“Download .NET Runtime”选项进行了下载安装，则仍需根据上述方法补充安装`ASP.NET Core Runtime 5.0.0`（由于该选项仅提供了`.NET Runtime 5.0.0`的安装包）。
 
 Ⅱ. **解压并填写配置**
 
@@ -137,6 +143,8 @@ _如果是发现 bug，可以提交 issue，我会尽快确认并解决。（如
 找到名称为 Ray.BiliBiliTool.Console 的可执行文件（Win 环境下是 Ray.BiliBiliTool.Console.exe），双击运行（Linux 使用命令行运行），结果如下：
 
 ![运行图示](https://cdn.jsdelivr.net/gh/RayWangQvQ/BiliBiliTool.Docs@main/imgs/run-exe.png)
+
+对于使用 net-dependent 用户的运行方式为，在终端中执行：`dotnet Ray.BiliBiliTool.Console.dll`。
 
 _P.S.如果自己有服务器，也可以将程序发布到自己的服务器，利用自己的任务系统实现每天自动运行。（有服务器的大佬应该就不需要我多 BB 了）_
 
