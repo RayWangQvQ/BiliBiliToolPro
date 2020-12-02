@@ -1,0 +1,54 @@
+﻿{
+  //Cookie信息，取自浏览器，必填，优先级低于命令行中的配置值
+  "BiliBiliCookie": {
+    "UserId": "", //请填入你的DEDEUSERID（重要！！！）
+    "SessData": "", //请填入你的SESSDATA（重要！！！）
+    "BiliJct": "" //请填入你的BILI_JCT（重要！！！）
+  },
+
+  //程序自定义个性化配置
+  "DailyTaskConfig": {
+    "NumberOfCoins": 5, //每日设定的投币数 [0,5]
+    "SelectLike": false, //投币时是否同时点赞[false,true]
+    "SupportUpIds": "", //优先选择支持的up主Id集合，多个以英文逗号分隔，如："123,456"。配置后会优先从指定的up主下挑选视频进行观看、分享和投币，不配置则从排行耪随机获取支持视频
+    "DayOfAutoCharge": -1, //每月几号自动充电的[-1,31]，-1表示不指定，默认月底最后一天；0表示不充电
+    "DayOfReceiveVipPrivilege": 1, //每月几号自动领取会员权益的[-1,31]，-1表示不指定，默认每月1号；0表示不自动领取
+    "DevicePlatform": "ios" //执行客户端操作时的平台 [ios,android]
+  },
+
+  //安全相关配置
+  "Security": {
+    "IntervalSecondsBetweenRequestApi": 3, //两次调用api之间间隔的秒数[0,+]。因为有人担心在几秒内连续调用api会被b站安全机制发现，所以为不放心的朋友添加了间隔秒数配置，两次连续调用Api之间会大于该秒数
+    "IntervalMethodTypes": "POST" //间隔秒数所针对的HttpMethod，多个用英文逗号隔开，当前有GET和POST两种，可配置如“GET,POST”。服务器一般对GET请求不是很敏感，建议只针对POST请求做间隔就可以了
+  },
+
+  //微信推送
+  "Push": {
+    "PushScKey": "" //请填入你的Server酱微信推送的SCKEY（http://sc.ftqq.com/3.version）
+  },
+
+  //日志
+  "Serilog": {
+    "Using": [ "Serilog.Sinks.Console", "Serilog.Sinks.Debug", "Serilog.Sinks.File" ],
+    "MinimumLevel": {
+      "Default": "Debug",
+      "Override": {
+        "Microsoft": "Warning",
+        "System": "Warning",
+        "Microsoft.AspNetCore": "Warning"
+      }
+    },
+    "WriteTo": [
+      {
+        "Name": "Console",
+        "Args": { "restrictedToMinimumLevel": "Information" }
+      },
+      { "Name": "Debug" },
+      {
+        "Name": "File",
+        "Args": { "path": "Logs/log.txt" }
+      }
+    ],
+    "Enrich": [ "FromLogContext", "WithMachineName", "WithThreadId" ]
+  }
+}
