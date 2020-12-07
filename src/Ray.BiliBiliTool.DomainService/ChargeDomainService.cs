@@ -49,7 +49,7 @@ namespace Ray.BiliBiliTool.DomainService
 
             if (DateTime.Today.Day != targetDay)
             {
-                this._logger.LogInformation($"目标充电日期为{targetDay}号，今天是{DateTime.Today.Day}号，跳过充电任务");
+                this._logger.LogInformation("目标充电日期为{targetDay}号，今天是{today}号，跳过充电任务", targetDay, DateTime.Today.Day);
                 return;
             }
 
@@ -57,7 +57,7 @@ namespace Ray.BiliBiliTool.DomainService
             decimal couponBalance = userInfo.Wallet.Coupon_balance;
             if (couponBalance < 2)
             {
-                this._logger.LogInformation("B币券余额小于2,无法充电");
+                this._logger.LogInformation("不是年度大会员或已过期，无法充电");
                 return;
             }
 
@@ -75,19 +75,19 @@ namespace Ray.BiliBiliTool.DomainService
                 if (response.Data.Status == 4)
                 {
                     this._logger.LogInformation("给自己充电成功啦，送的B币券没有浪费哦");
-                    this._logger.LogInformation($"本次给自己充值了: {couponBalance * 10}个电池哦");
+                    this._logger.LogInformation("本次给自己充值了: {num}个电池哦", couponBalance * 10);
 
                     //获取充电留言token
                     this.ChargeComments(response.Data.Order_no);
                 }
                 else
                 {
-                    this._logger.LogDebug("充电失败了啊 原因: " + JsonSerializer.Serialize(response));
+                    this._logger.LogDebug("充电失败了啊 原因：{reason}", JsonSerializer.Serialize(response));
                 }
             }
             else
             {
-                this._logger.LogDebug("充电失败了啊 原因: " + response.Message);
+                this._logger.LogDebug("充电失败了啊 原因：{reason}", response.Message);
             }
         }
 
