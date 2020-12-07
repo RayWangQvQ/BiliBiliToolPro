@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 
 namespace Ray.BiliBiliTool.DomainService.Extensions
@@ -10,7 +7,8 @@ namespace Ray.BiliBiliTool.DomainService.Extensions
     {
         public static IServiceCollection AddDomainServices(this IServiceCollection services)
         {
-            services.Scan(scan => scan.FromAssemblyOf<IAccountDomainService>()
+            services.Scan(scan => scan
+                .FromAssemblyOf<IAccountDomainService>()
                 .AddClasses(classes => classes.AssignableTo<IDomainService>())
                 .AsImplementedInterfaces()
                 .WithTransientLifetime()

@@ -34,7 +34,7 @@ namespace Ray.BiliBiliTool.DomainService
 
             if (response.Code == 0)
             {
-                _logger.LogInformation($"直播签到成功，本次签到获得{response.Data.Text},{response.Data.SpecialText}");
+                _logger.LogInformation("直播签到成功，本次签到获得{text},{special}", response.Data.Text, response.Data.SpecialText);
             }
             else
             {

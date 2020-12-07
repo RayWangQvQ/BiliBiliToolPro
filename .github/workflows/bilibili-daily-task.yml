@@ -3,8 +3,6 @@ name: bilibili-daily-task
 
 on:
   
-  push: # push触发
-    branches: [ main ]
   workflow_dispatch: # 手动触发
   schedule: # 计划任务触发
     - cron: '5 15 * * *' 
@@ -65,5 +63,6 @@ jobs:
         Ray_DailyTaskConfig:DayOfReceiveVipPrivilege: ${{secrets.DAYOFRECEIVEVIPPRIVILEGE}}
         Ray_DailyTaskConfig:DevicePlatform: ${{secrets.DEVICEPLATFORM}}
         Ray_Serilog:WriteTo:0:Args:restrictedToMinimumLevel: ${{secrets.CONSOLELOGLEVEL}}
-        Ray_Serilog:WriteTo:0:Args:outputTemplate: ${{secrets.CONSOLELOGTEMPLATE}}
+        Ray_Serilog:WriteTo:0:Args:outputTemplate: ${{secrets.CONSOLELOGTEMPLATE}} 
+        ASPNETCORE_ENVIRONMENT: ${{secrets.ENV}} # 方便切换不同的appsettings文件 也可以在不同的action yml文件中配置来同时运行多个任务
       run: dotnet run -p ./src/Ray.BiliBiliTool.Console -closeConsoleWhenEnd=1 ${{secrets.OTHERCONFIGS}}
