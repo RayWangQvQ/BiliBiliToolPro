@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Ray.BiliBiliTool.Infrastructure.Extensions
+﻿namespace System
 {
     public static class DateTimeExtension
     {

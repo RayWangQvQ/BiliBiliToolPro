@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Interfaces;
-using Ray.BiliBiliTool.Infrastructure.Extensions;
 
 namespace Ray.BiliBiliTool.DomainService
 {
@@ -82,7 +80,7 @@ namespace Ray.BiliBiliTool.DomainService
                 }
                 else
                 {
-                    this._logger.LogDebug("充电失败了啊 原因：{reason}", JsonSerializer.Serialize(response));
+                    this._logger.LogDebug("充电失败了啊 原因：{reason}", response.ToJson());
                 }
             }
             else

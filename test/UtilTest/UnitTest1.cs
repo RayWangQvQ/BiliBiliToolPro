@@ -1,7 +1,6 @@
 using System;
 using System.Diagnostics;
 using Ray.BiliBiliTool.Console;
-using Ray.BiliBiliTool.Infrastructure.Extensions;
 using Xunit;
 
 namespace GetLastDayOfMonthTest
@@ -13,7 +12,7 @@ namespace GetLastDayOfMonthTest
         {
             Program.PreWorks(new string[] { });
 
-            var dateTime = DateTime.Now.LastDayOfMonth();
+            DateTime dateTime = DateTime.Now.LastDayOfMonth();
             Debug.WriteLine(dateTime);
 
             Assert.True(true);
