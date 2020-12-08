@@ -7,8 +7,14 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos
     /// </summary>
     public class UseInfo
     {
+        /// <summary>
+        /// 是否登录
+        /// </summary>
         public bool IsLogin { get; set; }
 
+        /// <summary>
+        /// 等级信息
+        /// </summary>
         public LevelInfo Level_info { get; set; }
 
         public decimal? Money { get; set; }
@@ -17,6 +23,10 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos
 
         public Wallet Wallet { get; set; }
 
+        /// <summary>
+        /// 会员状态
+        /// <para>只有VipStatus为1的时候获取到VipType才是有效的</para>
+        /// </summary>
         public int VipStatus { get; set; }
 
         public int VipType { get; set; }//todo:是否可以改为枚举
@@ -28,11 +38,12 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos
         public string GetFuzzyUname()
         {
             StringBuilder sb = new StringBuilder();
-            int s1 = Uname.Length / 2, s2 = (s1 + 1) / 2;
-            for (int i = 0; i < Uname.Length; i++)
+            int s1 = this.Uname.Length / 2;
+            int s2 = (s1 + 1) / 2;
+            for (int i = 0 ; i < this.Uname.Length ; i++)
             {
                 if (i >= s2 && i < s1 + s2) sb.Append("*");
-                else sb.Append(Uname[i]);
+                else sb.Append(this.Uname[i]);
             }
 
             return sb.ToString();
@@ -41,9 +52,11 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos
         /// <summary>
         /// 返回会员类型
         /// </summary>
-        /// <returns>0:无会员（会员过期、当前不是会员）;
-        /// 1:月会员
-        /// 2:年会员</returns>
+        /// <returns>
+        /// <para> 0:无会员（会员过期、当前不是会员）</para>
+        /// <para>1:月会员</para>
+        /// <para>2:年会员</para>
+        /// </returns>
         public int GetVipType()
         {
             if (this.VipStatus == 1)
@@ -63,6 +76,9 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos
     /// </summary>
     public class LevelInfo
     {
+        /// <summary>
+        /// 当前等级
+        /// </summary>
         public int Current_level { get; set; }
 
         //public long Current_min { get; set; }
@@ -72,21 +88,30 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos
         /// </summary>
         public long Current_exp { get; set; }
 
-        private string _next_exp;
+        private long _next_exp;
+
         /// <summary>
-        /// 下一升级经验值（因为Lv6的大佬会返回字符串“--”，所以这里只能用string接收）
+        /// 下一升级经验值（因为Lv6的带佬会返回字符串“--”，所以这里只能用string接收）
         /// </summary>
         public object Next_exp
         {
-            get { return _next_exp; }
-            set { _next_exp = value.ToString(); }
+            get { return this._next_exp; }
+            set
+            {
+                bool isLong = long.TryParse(this.Next_exp.ToString(), out long exp);
+                if (isLong) { this._next_exp = exp; }
+                else this._next_exp = long.MinValue;
+            }
         }
 
+        /// <summary>
+        /// 获取下一升级经验值
+        /// </summary>
+        /// <returns></returns>
         public long GetNext_expLong()
         {
-            if (Current_level == 6) return long.MaxValue;
-            if (long.TryParse(Next_exp.ToString(), out long result)) return result;
-            return long.MinValue;
+            if (this.Current_level == 6) return long.MaxValue;
+            else return this._next_exp;
         }
     }
 
