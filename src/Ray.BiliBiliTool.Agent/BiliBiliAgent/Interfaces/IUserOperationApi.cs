@@ -53,16 +53,5 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         /// <returns></returns>
         [Post("/x/ugcpay/trade/elec/message?order_id={order_id}&message={message}&csrf={csrf}")]
         Task<BiliApiResponse<ChargeResponse>> ChargeComment(string order_id, string message, string csrf);
-
-        /// <summary>
-        /// 为视频投币
-        /// </summary>
-        /// <param name="aid"></param>
-        /// <param name="multiply"></param>
-        /// <param name="select_like"></param>
-        /// <param name="csrf"></param>
-        /// <returns></returns>
-        [Post("/x/web-interface/coin/add?aid={aid}&multiply={multiply}&select_like={select_like}&cross_domain=true&csrf={csrf}")]
-        Task<BiliApiResponse> AddCoinForVideo(string aid, int multiply, int select_like, string csrf);
     }
 }

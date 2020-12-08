@@ -40,5 +40,16 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         /// <returns></returns>
         [Get("/x/space/arc/search?mid={upId}&ps={pageSize}&tid=0&pn={pageNumber}&keyword={keyword}&order=pubdate&jsonp=jsonp")]
         Task<BiliApiResponse<SearchUpVideosResponse>> SearchVideosByUpId(long upId, int pageSize = 20, int pageNumber = 1, string keyword = "");
+
+        /// <summary>
+        /// 为视频投币
+        /// </summary>
+        /// <param name="aid"></param>
+        /// <param name="multiply"></param>
+        /// <param name="select_like"></param>
+        /// <param name="csrf"></param>
+        /// <returns></returns>
+        [Post("/x/web-interface/coin/add?aid={aid}&multiply={multiply}&select_like={select_like}&cross_domain=true&csrf={csrf}")]
+        Task<BiliApiResponse> AddCoinForVideo(string aid, int multiply, int select_like, string csrf);
     }
 }

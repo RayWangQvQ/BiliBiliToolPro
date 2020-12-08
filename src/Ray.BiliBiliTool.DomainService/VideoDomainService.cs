@@ -419,7 +419,7 @@ namespace Ray.BiliBiliTool.DomainService
             //_logger.LogInformation("获取分区:{rid}的{day}日top10榜单成功", rid, day);
             RankingInfo data = apiResponse.Data[new Random().Next(apiResponse.Data.Count)];
 
-            return Tuple.Create<string, string>(data.Aid, data.Title);
+            return Tuple.Create(data.Aid, data.Title);
         }
 
         /// <summary>
