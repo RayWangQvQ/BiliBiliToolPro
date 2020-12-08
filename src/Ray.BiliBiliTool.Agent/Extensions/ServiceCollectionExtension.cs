@@ -25,6 +25,16 @@ namespace Ray.BiliBiliTool.Agent.Extensions
             //全局代理
             services.SetGlobalProxy();
 
+            services.AddHttpClient();
+            services.AddHttpClient("BiliBiliWithCookie",
+                (sp, c) =>
+                {
+                    c.DefaultRequestHeaders.Add("Cookie",
+                        sp.GetRequiredService<IOptionsMonitor<BiliBiliCookieOptions>>().CurrentValue.ToString());
+                    c.DefaultRequestHeaders.Add("User-Agent",
+                        sp.GetRequiredService<IOptionsMonitor<SecurityOptions>>().CurrentValue.UserAgent);
+                });
+
             //bilibli
             services.AddBiliBiliClientApi<IDailyTaskApi>("https://api.bilibili.com");
             services.AddBiliBiliClientApi<IMangaApi>("https://manga.bilibili.com");
