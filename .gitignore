@@ -352,5 +352,8 @@ MigrationBackup/
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
 
+
 #
 .idea/
+
+/src/Ray.BiliBiliTool.Console/Properties/launchSettings.json

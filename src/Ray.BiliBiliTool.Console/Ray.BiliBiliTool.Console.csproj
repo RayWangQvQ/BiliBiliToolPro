@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="appsettings - 复制.json" />
     <None Remove="appsettings.Development.json" />
     <None Remove="appsettings.json" />
     <None Remove="appsettings.local.json" />
@@ -49,5 +50,4 @@
     <ProjectReference Include="..\Ray.BiliBiliTool.DomainService\Ray.BiliBiliTool.DomainService.csproj" />
     <ProjectReference Include="..\Ray.BiliBiliTool.Infrastructure\Ray.BiliBiliTool.Infrastructure.csproj" />
   </ItemGroup>
-
 </Project>
