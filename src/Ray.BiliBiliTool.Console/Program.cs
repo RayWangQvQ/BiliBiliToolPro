@@ -41,7 +41,6 @@ namespace Ray.BiliBiliTool.Console
             //配置:
             RayConfiguration.Root = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", false, true)
-                //.AddJsonFile("appsettings.local.json", true,true)
                 .AddJsonFileByEnv()
                 .AddExcludeEmptyEnvironmentVariables("Ray_")
                 .AddCommandLine(args, Constants.CommandLineMapper)
@@ -87,7 +86,7 @@ namespace Ray.BiliBiliTool.Console
                 "版本号：{version}",
                 typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "未知");
             logger.LogInformation("开源地址：{url} \r\n", Constants.SourceCodeUrl);
-            logger.LogInformation("当前环境为：{env} \r\n", RayConfiguration.Env);
+            logger.LogInformation("当前环境：{env} \r\n", RayConfiguration.Env ?? "无");
 
             BiliBiliCookieOptions biliBiliCookieOptions = di.GetRequiredService<IOptionsMonitor<BiliBiliCookieOptions>>().CurrentValue;
             if (!biliBiliCookieOptions.Check(logger))

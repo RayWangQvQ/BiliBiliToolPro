@@ -190,7 +190,7 @@ namespace Ray.BiliBiliTool.DomainService
                 }
             }
 
-            _logger.LogInformation("投币任务完成，余额为: " + _accountApi.GetCoinBalance().Result.Data.Money);
+            _logger.LogInformation("投币任务完成，余额为: {money}", _accountApi.GetCoinBalance().Result.Data.Money);
         }
 
         /// <summary>
