@@ -14,7 +14,7 @@ namespace Ray.BiliBiliTool.Infrastructure
         {
             builder.CheckNullWithException(nameof(builder));
             action.CheckNullWithException(nameof(action));
-            builder.buildActionList.Add(action);
+            builder.BuildActionList.Add(action);
             return builder;
         }
 

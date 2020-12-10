@@ -22,11 +22,11 @@ namespace Ray.BiliBiliTool.Infrastructure
         /// </summary>
         public static JsonSerializerOptions DefaultOptions;
 
-        public List<Action<JsonSerializerOptions>> buildActionList;
+        public List<Action<JsonSerializerOptions>> BuildActionList { get; }
 
         private JsonSerializerOptionsBuilder()
         {
-            this.buildActionList = new List<Action<JsonSerializerOptions>>();
+            BuildActionList = new List<Action<JsonSerializerOptions>>();
         }
 
         public static JsonSerializerOptionsBuilder Create()
@@ -38,7 +38,7 @@ namespace Ray.BiliBiliTool.Infrastructure
         {
             JsonSerializerOptions options = new();//这里没有使用 JsonSerializerDefaults.General 避免后续版本更新后设置改变
 
-            foreach (Action<JsonSerializerOptions> item in this.buildActionList)
+            foreach (Action<JsonSerializerOptions> item in BuildActionList)
             {
                 item?.Invoke(options);
             }

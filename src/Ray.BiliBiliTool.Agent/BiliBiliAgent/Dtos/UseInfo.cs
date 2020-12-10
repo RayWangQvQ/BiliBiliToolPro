@@ -38,12 +38,12 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos
         public string GetFuzzyUname()
         {
             StringBuilder sb = new StringBuilder();
-            int s1 = this.Uname.Length / 2;
+            int s1 = Uname.Length / 2;
             int s2 = (s1 + 1) / 2;
-            for (int i = 0 ; i < this.Uname.Length ; i++)
+            for (int i = 0 ; i < Uname.Length ; i++)
             {
                 if (i >= s2 && i < s1 + s2) sb.Append("*");
-                else sb.Append(this.Uname[i]);
+                else sb.Append(Uname[i]);
             }
 
             return sb.ToString();
@@ -59,10 +59,10 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos
         /// </returns>
         public int GetVipType()
         {
-            if (this.VipStatus == 1)
+            if (VipStatus == 1)
             {
                 //只有VipStatus为1的时候获取到VipType才是有效的。
-                return this.VipType;
+                return VipType;
             }
             else
             {
@@ -95,12 +95,12 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos
         /// </summary>
         public object Next_exp
         {
-            get { return this._next_exp; }
+            get { return _next_exp; }
             set
             {
                 bool isLong = long.TryParse(value.ToString(), out long exp);
-                if (isLong) { this._next_exp = exp; }
-                else this._next_exp = long.MinValue;
+                if (isLong) { _next_exp = exp; }
+                else _next_exp = long.MinValue;
             }
         }
 
@@ -110,8 +110,8 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos
         /// <returns></returns>
         public long GetNext_expLong()
         {
-            if (this.Current_level == 6) return long.MaxValue;
-            else return this._next_exp;
+            if (Current_level == 6) return long.MaxValue;
+            else return _next_exp;
         }
     }
 

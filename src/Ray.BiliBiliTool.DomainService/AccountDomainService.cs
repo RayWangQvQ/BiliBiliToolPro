@@ -62,7 +62,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// <returns></returns>
         public DailyTaskInfo GetDailyTaskStatus()
         {
-            DailyTaskInfo result = new DailyTaskInfo();
+            DailyTaskInfo result = new();
             BiliApiResponse<DailyTaskInfo> apiResponse = _dailyTaskApi.GetDailyTaskRewardInfo().Result;
             if (apiResponse.Code == 0)
             {
