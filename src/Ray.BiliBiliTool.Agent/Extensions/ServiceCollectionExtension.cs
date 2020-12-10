@@ -63,7 +63,7 @@ namespace Ray.BiliBiliTool.Agent.Extensions
         private static IServiceCollection AddBiliBiliClientApi<TInterface>(this IServiceCollection services, string host)
             where TInterface : class
         {
-            RefitSettings settings = new RefitSettings(new SystemTextJsonContentSerializer(JsonSerializerOptionsBuilder.DefaultOptions));
+            var settings = new RefitSettings(new SystemTextJsonContentSerializer(JsonSerializerOptionsBuilder.DefaultOptions));
 
             services.AddRefitClient<TInterface>(settings)
                 .ConfigureHttpClient((sp, c) =>
