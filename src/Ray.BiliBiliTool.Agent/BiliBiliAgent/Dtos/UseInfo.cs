@@ -98,7 +98,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos
             get { return this._next_exp; }
             set
             {
-                bool isLong = long.TryParse(this.Next_exp.ToString(), out long exp);
+                bool isLong = long.TryParse(value.ToString(), out long exp);
                 if (isLong) { this._next_exp = exp; }
                 else this._next_exp = long.MinValue;
             }
