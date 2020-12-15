@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Net;
+using System.Net.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Agent.ServerChanAgent;
 using Ray.BiliBiliTool.Agent.ServerChanAgent.Interfaces;
-using Ray.BiliBiliTool.Config;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.Infrastructure;
 using Refit;
@@ -21,6 +22,9 @@ namespace Ray.BiliBiliTool.Agent.Extensions
         /// <returns></returns>
         public static IServiceCollection AddBiliBiliClientApi(this IServiceCollection services)
         {
+            //全局代理
+            services.SetGlobalProxy();
+
             services.AddHttpClient();
             services.AddHttpClient("BiliBiliWithCookie",
                 (sp, c) =>
@@ -56,7 +60,8 @@ namespace Ray.BiliBiliTool.Agent.Extensions
         /// <param name="services"></param>
         /// <param name="host"></param>
         /// <returns></returns>
-        public static IServiceCollection AddBiliBiliClientApi<TInterface>(this IServiceCollection services, string host) where TInterface : class
+        private static IServiceCollection AddBiliBiliClientApi<TInterface>(this IServiceCollection services, string host)
+            where TInterface : class
         {
             var settings = new RefitSettings(new SystemTextJsonContentSerializer(JsonSerializerOptionsBuilder.DefaultOptions));
 
@@ -73,6 +78,22 @@ namespace Ray.BiliBiliTool.Agent.Extensions
                     sp.GetRequiredService<ILogger<MyHttpClientDelegatingHandler>>(),
                     sp.GetRequiredService<IOptionsMonitor<SecurityOptions>>()
                     ));
+
+            return services;
+        }
+
+        /// <summary>
+        /// 设置全局代理(如果配置了代理)
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        private static IServiceCollection SetGlobalProxy(this IServiceCollection services)
+        {
+            string proxyAddress = RayConfiguration.Root["WebProxy"];
+            if (proxyAddress.IsNotNullOrEmpty())
+            {
+                HttpClient.DefaultProxy = new WebProxy(proxyAddress);
+            }
 
             return services;
         }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
@@ -29,7 +28,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// <returns></returns>
         public UseInfo LoginByCookie()
         {
-            var apiResponse = _dailyTaskApi.LoginByCookie().Result;
+            BiliApiResponse<UseInfo> apiResponse = _dailyTaskApi.LoginByCookie().Result;
 
             if (apiResponse.Code != 0 || !apiResponse.Data.IsLogin)
             {
@@ -63,8 +62,8 @@ namespace Ray.BiliBiliTool.DomainService
         /// <returns></returns>
         public DailyTaskInfo GetDailyTaskStatus()
         {
-            var result = new DailyTaskInfo();
-            var apiResponse = _dailyTaskApi.GetDailyTaskRewardInfo().Result;
+            DailyTaskInfo result = new();
+            BiliApiResponse<DailyTaskInfo> apiResponse = _dailyTaskApi.GetDailyTaskRewardInfo().Result;
             if (apiResponse.Code == 0)
             {
                 //_logger.LogInformation("请求本日任务完成状态成功");
@@ -72,7 +71,7 @@ namespace Ray.BiliBiliTool.DomainService
             }
             else
             {
-                _logger.LogWarning("获取今日任务完成状态失败：{result}", JsonSerializer.Serialize(apiResponse));
+                _logger.LogWarning("获取今日任务完成状态失败：{result}", apiResponse.ToJson());
                 result = _dailyTaskApi.GetDailyTaskRewardInfo().Result.Data;
                 //todo:偶发性请求失败，再请求一次，这么写很丑陋，待用polly再框架层面实现
             }

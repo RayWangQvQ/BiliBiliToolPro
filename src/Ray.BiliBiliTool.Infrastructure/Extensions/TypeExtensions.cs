@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Linq;
-using System.Reflection;
-using System.Text;
 
-namespace Ray.BiliBiliTool.Infrastructure.Extensions
+namespace System
 {
-    public static class ObjectExtension
+    public static class TypeExtensions
     {
         /// <summary>
         /// 获取属性的Description

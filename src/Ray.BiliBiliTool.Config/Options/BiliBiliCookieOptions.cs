@@ -2,7 +2,6 @@
 using System.ComponentModel;
 using Microsoft.Extensions.Logging;
 using Ray.BiliBiliTool.Infrastructure;
-using Ray.BiliBiliTool.Infrastructure.Extensions;
 
 namespace Ray.BiliBiliTool.Config.Options
 {
@@ -97,7 +96,6 @@ namespace Ray.BiliBiliTool.Config.Options
 
             return result;
         }
-
 
         public override string ToString()
         {
