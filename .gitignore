@@ -355,7 +355,3 @@ MigrationBackup/
 
 #
 .idea/
-
-/src/Ray.BiliBiliTool.Console/Properties/launchSettings.json
-/src/Ray.BiliBiliTool.Console/appsettings.PRD.json
-

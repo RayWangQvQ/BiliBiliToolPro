@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Ray.BiliBiliTool.Console": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

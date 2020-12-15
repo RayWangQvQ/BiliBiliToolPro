@@ -83,6 +83,7 @@ namespace Ray.BiliBiliTool.Console
             RayContainer.SetGetServiceFunc(type => di.GetService(type));
 
             ILogger<Program> logger = di.GetRequiredService<ILogger<Program>>();
+
             logger.LogInformation(
                 "版本号：{version}",
                 typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "未知");

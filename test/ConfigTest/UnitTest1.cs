@@ -22,7 +22,6 @@ namespace ConfigTest
 
             string s = RayConfiguration.Root["BiliBiliCookie:UserId"];
             Debug.WriteLine(s);
-            //Assert.True(!string.IsNullOrWhiteSpace(s));
 
             string logLevel = RayConfiguration.Root["Serilog:WriteTo:0:Args:restrictedToMinimumLevel"];
             Debug.WriteLine(logLevel);
@@ -59,13 +58,37 @@ namespace ConfigTest
         [Fact]
         public void CoverConfigByEnvWithNoError()
         {
-            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "PRD");
+            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Production");
             Program.PreWorks(new string[] { "-closeConsoleWhenEnd=1" });
 
             string result = RayConfiguration.Root["IsPrd"];
 
             Assert.Equal("True", result);
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", null);
+        }
+
+        /// <summary>
+        /// 为配置手动赋值
+        /// </summary>
+        [Fact]
+        public void TestSetConfiguration()
+        {
+            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
+            Program.PreWorks(new string[] { });
+
+            var options = RayContainer.Root.GetRequiredService<IOptionsMonitor<BiliBiliCookieOptions>>();
+            Debug.WriteLine(options.CurrentValue.ToJson());
+
+            //手动赋值
+            //RayConfiguration.Root["BiliBiliCookie:UserId"] = "123456";
+            options.CurrentValue.SetUserId("123456");
+
+            Debug.WriteLine($"从Configuration读取：{RayConfiguration.Root["BiliBiliCookie:UserId"]}");
+
+            Debug.WriteLine($"从老options读取：{options.CurrentValue.ToJson()}");
+
+            var optionsNew = RayContainer.Root.GetRequiredService<IOptionsMonitor<BiliBiliCookieOptions>>();
+            Debug.WriteLine($"从新options读取：{optionsNew.CurrentValue.ToJson()}");
         }
     }
 }

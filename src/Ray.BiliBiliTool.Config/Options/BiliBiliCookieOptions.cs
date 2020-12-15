@@ -45,6 +45,12 @@ namespace Ray.BiliBiliTool.Config.Options
             set => _biliJct = value;
         }
 
+        public void SetUserId(string userId)
+        {
+            this.UserId = userId;
+            RayConfiguration.Root["BiliBiliCookie:UserID"] = userId;
+        }
+
         /// <summary>
         /// 检查是否已配置
         /// </summary>
@@ -99,7 +105,13 @@ namespace Ray.BiliBiliTool.Config.Options
 
         public override string ToString()
         {
-            return $"{GetPropertyDescription(nameof(UserId))}={UserId}; {GetPropertyDescription(nameof(SessData))}={SessData}; {GetPropertyDescription(nameof(BiliJct))}={BiliJct};";
+            string re = "";
+
+            if (UserId.IsNotNullOrEmpty()) re += $"{GetPropertyDescription(nameof(UserId))}={UserId}; ";
+            if (SessData.IsNotNullOrEmpty()) re += $"{GetPropertyDescription(nameof(SessData))}={SessData}; ";
+            if (BiliJct.IsNotNullOrEmpty()) re += $"{GetPropertyDescription(nameof(BiliJct))}={BiliJct};";
+
+            return re;
         }
 
         private string GetPropertyDescription(string propertyName)

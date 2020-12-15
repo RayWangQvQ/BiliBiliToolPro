@@ -1,8 +1,10 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Config;
+using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 
 namespace Ray.BiliBiliTool.DomainService
@@ -14,12 +16,15 @@ namespace Ray.BiliBiliTool.DomainService
     {
         private readonly ILogger<AccountDomainService> _logger;
         private readonly IDailyTaskApi _dailyTaskApi;
+        private readonly BiliBiliCookieOptions _cookie;
 
         public AccountDomainService(ILogger<AccountDomainService> logger,
-            IDailyTaskApi dailyTaskApi)
+            IDailyTaskApi dailyTaskApi,
+            IOptionsMonitor<BiliBiliCookieOptions> cookie)
         {
             _logger = logger;
             _dailyTaskApi = dailyTaskApi;
+            _cookie = cookie.CurrentValue;
         }
 
         /// <summary>
@@ -37,6 +42,9 @@ namespace Ray.BiliBiliTool.DomainService
             }
 
             UseInfo useInfo = apiResponse.Data;
+
+            //获取到UserId
+            _cookie.SetUserId(useInfo.Mid.ToString());
 
             //用户名模糊处理
             _logger.LogInformation("登录成功，用户名: {0}", useInfo.GetFuzzyUname());
@@ -66,7 +74,7 @@ namespace Ray.BiliBiliTool.DomainService
             BiliApiResponse<DailyTaskInfo> apiResponse = _dailyTaskApi.GetDailyTaskRewardInfo().Result;
             if (apiResponse.Code == 0)
             {
-                //_logger.LogInformation("请求本日任务完成状态成功");
+                _logger.LogDebug("请求本日任务完成状态成功");
                 result = apiResponse.Data;
             }
             else

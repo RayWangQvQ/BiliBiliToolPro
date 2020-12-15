@@ -8,6 +8,11 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos
     public class UseInfo
     {
         /// <summary>
+        /// 用户Id
+        /// </summary>
+        public long Mid { get; set; }//todo:这里登陆后可以获取到自己的UserId，后面可以考虑将配置Cookie项去除UserId的配置，改为登陆后获取
+
+        /// <summary>
         /// 是否登录
         /// </summary>
         public bool IsLogin { get; set; }
@@ -40,7 +45,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos
             StringBuilder sb = new StringBuilder();
             int s1 = Uname.Length / 2;
             int s2 = (s1 + 1) / 2;
-            for (int i = 0 ; i < Uname.Length ; i++)
+            for (int i = 0; i < Uname.Length; i++)
             {
                 if (i >= s2 && i < s1 + s2) sb.Append("*");
                 else sb.Append(Uname[i]);
