@@ -16,9 +16,9 @@ namespace DailyTaskTest
 
             using (var scope = RayContainer.Root.CreateScope())
             {
-                var dailyTaskAppService = scope.ServiceProvider.GetRequiredService<IVideoDomainService>();
+                var service = scope.ServiceProvider.GetRequiredService<IDonateCoinDomainService>();
 
-                dailyTaskAppService.AddCoinsForVideo();
+                service.AddCoinsForVideo();
             }
 
             Assert.True(true);
