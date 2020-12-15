@@ -202,27 +202,28 @@ dotnet run -p ./src/Ray.BiliBiliTool.Console -userId=123 -sessData=456 -biliJct=
 1. 复制一个`appsettings.json`文件， 改为`appsettings.PRD.json`，中间这个`PRD`你也可以取其它名字，设置环境变量时匹配即可。
 2. 删除所有配置，然后把你想要修改的设置项复制过来，修改为你想要的值。
 3. 设置环境变量
-3.1. 【github action】 : 在secrets中增加`ENV`,值为刚才取的名字
-3.2. 【本地运行或docker】: 设置环境变量`ASPNETCORE_ENVIRONMENT`=`刚才取的名字`
+
+【github action】 : 在secrets中增加`ENV`,值为刚才取的名字
+【本地运行或docker】: 设置环境变量`ASPNETCORE_ENVIRONMENT`=`刚才取的名字`
 
 
-### 2.5 代理
+## 3.代理
 增加代理支持，如果需要请看:
 1. 【github action】 : 在secrets中增加`PROXY`,值为代理地址+端口，如`127.0.0.1:10240`
 2. 【本地运行或docker】: 设置环境变量`RAY_WebProxy`=`代理地址，格式如上`
 
 
-## 3.常见问题
+## 4.常见问题
 
 [>>点击查看常见问题列表](https://hub.fastgit.org/RayWangQvQ/BiliBiliTool.Docs/blob/main/questions.md)
 
-## 4.版本发布
+## 5.版本发布
 
 当前正处于稳定的迭代开发中，正常情况下每周会发布一个小版本，详细待更新内容可参见源码中的 todo 任务列表。
 
 关于版本发布更新后，如何同步最新的内容到自己 Fork 的仓库，可查看[>>常见问题文档](https://hub.fastgit.org/RayWangQvQ/BiliBiliTool.Docs/blob/main/questions.md) 中的 **我 Fork 之后怎么同步原作者的更新内容？**。
 
-## 5.贡献代码
+## 6.贡献代码
 
 如果你有好的想法，欢迎向仓库贡献你的代码，贡献步骤：
 
@@ -234,7 +235,7 @@ dotnet run -p ./src/Ray.BiliBiliTool.Console -userId=123 -sessData=456 -biliJct=
 
 我会尽快进行代码审核，提前感谢你的贡献。
 
-## 6.捐赠支持
+## 7.捐赠支持
 
 [>>点击查看已捐赠列表和留言](https://hub.fastgit.org/RayWangQvQ/BiliBiliTool.Docs/blob/main/donate-list.md)
 
@@ -256,7 +257,7 @@ dotnet run -p ./src/Ray.BiliBiliTool.Console -userId=123 -sessData=456 -biliJct=
 
 ![支付宝赞赏码](https://cdn.jsdelivr.net/gh/RayWangQvQ/BiliBiliTool.Docs@main/imgs/donate-ali.jpg)
 
-## 7.API 参考
+## 8.API 参考
 
 - [JunzhouLiu/BILIBILI-HELPER](https://github.com/JunzhouLiu/BILIBILI-HELPER)
 - [happy888888/BiliExp](https://github.com/happy888888/BiliExp)
