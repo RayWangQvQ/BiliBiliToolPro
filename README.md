@@ -158,7 +158,7 @@ _P.S.如果自己有服务器，也可以将程序发布到自己的服务器，
 
 ### 2.2.配置方式
 
-目前支持的配置源有 3 种：appsettings.json 配置文件、环境变量、命令行参数，外加一种专用于 Actions 模式使用的 GitHub Secrets 配置源。
+目前支持的配置源有 3 种：`appsettings.json` 配置文件、环境变量、命令行参数，外加一种专用于 Actions 模式使用的 GitHub Secrets 配置源。
 
 #### 配置源一：appsettings.json 文件
 
@@ -195,6 +195,21 @@ dotnet run -p ./src/Ray.BiliBiliTool.Console -userId=123 -sessData=456 -biliJct=
 对于使用 Github Action 线上运行的朋友，建议只使用 Secrets 进行配置。因为 Fork 项目后，不会拷贝源仓库中的 Secrets，可自由的在自己的仓库中进行私人配置。当有版本重大更新而需要将源仓库同步 PR 到自己 Fork 的仓库时，PR 操作会很顺滑，不会影响到已配置的值。
 
 当然， Fork 之后自己改了 appsettings.json 文件再提交，也是可以实现配置的。但是一则你的配置值将被暴露出来（别人可通过访问你的仓库里的配置查看到值），二是以后如果需要 PR 源仓库的更新到自己仓库，则要注意保留自己的修改不要被 PR 覆盖。
+
+### 2.4 按环境切换配置
+增加指定不同环境来加载配置文件的功能(增加一个自己的避免更新配置被覆盖),仅针对`appsettings.json`中的配置。使用方法:
+
+1. 复制一个`appsettings.json`文件， 改为`appsettings.PRD.json`，中间这个`PRD`你也可以取其它名字，设置环境变量时匹配即可。
+2. 删除所有配置，然后把你想要修改的设置项复制过来，修改为你想要的值。
+3. 设置环境变量
+3.1. 【github action】 : 在secrets中增加`ENV`,值为刚才取的名字
+3.2. 【本地运行或docker】: 设置环境变量`ASPNETCORE_ENVIRONMENT`=`刚才取的名字`
+
+
+### 2.5 代理
+增加代理支持，如果需要请看:
+1. 【github action】 : 在secrets中增加`PROXY`,值为代理地址+端口，如`127.0.0.1:10240`
+2. 【本地运行或docker】: 设置环境变量`RAY_WebProxy`=`代理地址，格式如上`
 
 
 ## 3.常见问题
