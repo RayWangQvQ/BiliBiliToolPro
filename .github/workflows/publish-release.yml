@@ -27,6 +27,7 @@ jobs:
           dotnet build --configuration Release --no-restore
           cd ./src/Ray.BiliBiliTool.Console
           dotnet publish --self-contained false -o ./bin/Publish/net5-dependent
+          echo "dotnet Ray.BiliBiliTool.Console.dll" > ./bin/Publish/net5-dependent/start.bat
           dotnet publish --runtime win-x86 --self-contained true -o ./bin/Publish/win-x86-x64
           dotnet publish --runtime linux-arm --self-contained true -o ./bin/Publish/linux-arm
           dotnet publish --runtime linux-x64 --self-contained true -o ./bin/Publish/linux-x64
