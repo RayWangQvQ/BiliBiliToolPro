@@ -176,7 +176,7 @@ _P.S.如果自己有服务器，也可以将程序发布到自己的服务器，
 
 #### 配置源三：命令行参数
 
-命令行参数与配置键的映射关系可以查看 [Constants.cs](src/Ray.BiliBiliTool.Config/Constants.cs) 中的 CommandLineMapper，程序会将命令行参数映射为对应的配置键后注册到系统。以自包含运行环境的 Windows 版本为例（其他版本同理，参见上述章节 1.2.2），运行命令：
+命令行参数与配置键的映射关系可以查看 [Constants.cs](src/Ray.BiliBiliTool.Config/Constants.cs) 中的 CommandLineMapper，程序会将命令行参数映射为对应的配置键后注册到系统。仅以自包含运行环境的 Windows 版本为例（其他版本同理，参见上述章节 1.2.2），运行命令：
 
 ```
 Ray.BiliBiliTool.Console.exe -userId=123 -sessData=456 -biliJct=789 -numberOfCoins=5
