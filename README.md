@@ -140,11 +140,15 @@ _如果是发现 bug，可以提交 issue，我会尽快确认并解决。（如
 
 Ⅲ. **运行**
 
-找到名称为 Ray.BiliBiliTool.Console 的可执行文件（Win 环境下是 Ray.BiliBiliTool.Console.exe），双击运行（Linux 使用命令行运行），结果如下：
+对于选择已自包含运行环境的 Windows 用户，双击运行名称为 Ray.BiliBiliTool.Console.exe 的可执行文件；
+
+对于选择依赖本地运行库版本的 Windows 用户，双击运行名称为 start.bat 的脚本文件，或在命令提示符中执行：`dotnet Ray.BiliBiliTool.Console.dll`；
+
+对于选择已自包含运行环境的 Linux 用户，在终端中执行：`Ray.BiliBiliTool.Console`；
+
+结果如下：
 
 ![运行图示](https://cdn.jsdelivr.net/gh/RayWangQvQ/BiliBiliTool.Docs@main/imgs/run-exe.png)
-
-对于使用 net-dependent 用户的运行方式为，在终端中执行：`dotnet Ray.BiliBiliTool.Console.dll`。
 
 _P.S.如果自己有服务器，也可以将程序发布到自己的服务器，利用自己的任务系统实现每天自动运行。（有服务器的大佬应该就不需要我多 BB 了）_
 
