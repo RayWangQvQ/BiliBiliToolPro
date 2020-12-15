@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Extensions.Hosting;
 using Ray.BiliBiliTool.Infrastructure;
 
 #nullable enable
@@ -19,12 +20,13 @@ namespace Microsoft.Extensions.Configuration
             string envName = "ASPNETCORE_ENVIRONMENT",
             string envprefix = "")
         {
+            var e= Environments.Development;
             envName = $"{envprefix}{envName}";
             string? env = Environment.GetEnvironmentVariable(envName);
             RayConfiguration.Env = env;
 
             configurationBuilder
-                .AddJsonFile($"appsettings.{env}.json", true, false);//设置为可选、无监控
+                .AddJsonFile($"appsettings.{env}.json", true, true);//设置为可选
 
             return configurationBuilder;
         }

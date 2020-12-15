@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace Ray.BiliBiliTool.Config
 {
@@ -27,7 +25,8 @@ namespace Ray.BiliBiliTool.Config
 
             {"-pushScKey","Push:PushScKey" },
 
-            {"-closeConsoleWhenEnd","CloseConsoleWhenEnd" }
+            {"-closeConsoleWhenEnd","CloseConsoleWhenEnd" },
+            {"-proxy","WebProxy" }
         };
 
         /// <summary>

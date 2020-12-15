@@ -18,7 +18,7 @@ namespace Ray.BiliBiliTool.Config
 
         public IConfigurationProvider Build(IConfigurationBuilder builder)
         {
-            return new EnvironmentVariablesExcludeEmptyConfigurationProvider(this.Prefix);
+            return new EnvironmentVariablesExcludeEmptyConfigurationProvider(Prefix);
         }
     }
 }

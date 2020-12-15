@@ -1,9 +1,10 @@
 ﻿using System;
-using System.Text.Json;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Config;
+using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 
 namespace Ray.BiliBiliTool.DomainService
@@ -15,12 +16,15 @@ namespace Ray.BiliBiliTool.DomainService
     {
         private readonly ILogger<AccountDomainService> _logger;
         private readonly IDailyTaskApi _dailyTaskApi;
+        private readonly BiliBiliCookieOptions _cookie;
 
         public AccountDomainService(ILogger<AccountDomainService> logger,
-            IDailyTaskApi dailyTaskApi)
+            IDailyTaskApi dailyTaskApi,
+            IOptionsMonitor<BiliBiliCookieOptions> cookie)
         {
             _logger = logger;
             _dailyTaskApi = dailyTaskApi;
+            _cookie = cookie.CurrentValue;
         }
 
         /// <summary>
@@ -29,7 +33,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// <returns></returns>
         public UseInfo LoginByCookie()
         {
-            var apiResponse = _dailyTaskApi.LoginByCookie().Result;
+            BiliApiResponse<UseInfo> apiResponse = _dailyTaskApi.LoginByCookie().Result;
 
             if (apiResponse.Code != 0 || !apiResponse.Data.IsLogin)
             {
@@ -38,6 +42,9 @@ namespace Ray.BiliBiliTool.DomainService
             }
 
             UseInfo useInfo = apiResponse.Data;
+
+            //获取到UserId
+            _cookie.SetUserId(useInfo.Mid.ToString());
 
             //用户名模糊处理
             _logger.LogInformation("登录成功，用户名: {0}", useInfo.GetFuzzyUname());
@@ -63,16 +70,16 @@ namespace Ray.BiliBiliTool.DomainService
         /// <returns></returns>
         public DailyTaskInfo GetDailyTaskStatus()
         {
-            var result = new DailyTaskInfo();
-            var apiResponse = _dailyTaskApi.GetDailyTaskRewardInfo().Result;
+            DailyTaskInfo result = new();
+            BiliApiResponse<DailyTaskInfo> apiResponse = _dailyTaskApi.GetDailyTaskRewardInfo().Result;
             if (apiResponse.Code == 0)
             {
-                //_logger.LogInformation("请求本日任务完成状态成功");
+                _logger.LogDebug("请求本日任务完成状态成功");
                 result = apiResponse.Data;
             }
             else
             {
-                _logger.LogWarning("获取今日任务完成状态失败：{result}", JsonSerializer.Serialize(apiResponse));
+                _logger.LogWarning("获取今日任务完成状态失败：{result}", apiResponse.ToJson());
                 result = _dailyTaskApi.GetDailyTaskRewardInfo().Result.Data;
                 //todo:偶发性请求失败，再请求一次，这么写很丑陋，待用polly再框架层面实现
             }

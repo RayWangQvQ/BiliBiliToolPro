@@ -49,9 +49,10 @@ namespace Ray.BiliBiliTool.Console
             //日志:
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(RayConfiguration.Root)
-                .WriteTo.TextWriter(PushService.PushStringWriter,
-                    LogHelper.GetConsoleLogLevel(),
-                    LogHelper.GetConsoleLogTemplate() + "\r\n")//用来做微信推送
+                .WriteTo.TextWriter(
+                    textWriter: PushService.PushStringWriter,
+                    restrictedToMinimumLevel: LogHelper.GetConsoleLogLevel(),
+                    outputTemplate: LogHelper.GetConsoleLogTemplate() + "\r\n")//用来做微信推送
                 .CreateLogger();
 
             //Host:
@@ -82,6 +83,7 @@ namespace Ray.BiliBiliTool.Console
             RayContainer.SetGetServiceFunc(type => di.GetService(type));
 
             ILogger<Program> logger = di.GetRequiredService<ILogger<Program>>();
+
             logger.LogInformation(
                 "版本号：{version}",
                 typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "未知");

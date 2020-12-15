@@ -2,7 +2,6 @@
 using System.ComponentModel;
 using Microsoft.Extensions.Logging;
 using Ray.BiliBiliTool.Infrastructure;
-using Ray.BiliBiliTool.Infrastructure.Extensions;
 
 namespace Ray.BiliBiliTool.Config.Options
 {
@@ -44,6 +43,12 @@ namespace Ray.BiliBiliTool.Config.Options
                     ? _biliJct
                     : RayConfiguration.Root["BiliBiliCookie:Bili_jct"];//为了兼容 GitHub Secrets 经常会被填错
             set => _biliJct = value;
+        }
+
+        public void SetUserId(string userId)
+        {
+            this.UserId = userId;
+            RayConfiguration.Root["BiliBiliCookie:UserID"] = userId;
         }
 
         /// <summary>
@@ -98,10 +103,15 @@ namespace Ray.BiliBiliTool.Config.Options
             return result;
         }
 
-
         public override string ToString()
         {
-            return $"{GetPropertyDescription(nameof(UserId))}={UserId}; {GetPropertyDescription(nameof(SessData))}={SessData}; {GetPropertyDescription(nameof(BiliJct))}={BiliJct};";
+            string re = "";
+
+            if (UserId.IsNotNullOrEmpty()) re += $"{GetPropertyDescription(nameof(UserId))}={UserId}; ";
+            if (SessData.IsNotNullOrEmpty()) re += $"{GetPropertyDescription(nameof(SessData))}={SessData}; ";
+            if (BiliJct.IsNotNullOrEmpty()) re += $"{GetPropertyDescription(nameof(BiliJct))}={BiliJct};";
+
+            return re;
         }
 
         private string GetPropertyDescription(string propertyName)

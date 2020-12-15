@@ -23,10 +23,10 @@ namespace Ray.BiliBiliTool.DomainService
             IOptionsMonitor<BiliBiliCookieOptions> biliBiliCookieOptions,
             IOptionsMonitor<DailyTaskOptions> dailyTaskOptions)
         {
-            this._logger = logger;
-            this._dailyTaskApi = dailyTaskApi;
-            this._dailyTaskOptions = dailyTaskOptions.CurrentValue;
-            this._biliBiliCookieOptions = biliBiliCookieOptions.CurrentValue;
+            _logger = logger;
+            _dailyTaskApi = dailyTaskApi;
+            _dailyTaskOptions = dailyTaskOptions.CurrentValue;
+            _biliBiliCookieOptions = biliBiliCookieOptions.CurrentValue;
         }
 
         /// <summary>
@@ -35,19 +35,19 @@ namespace Ray.BiliBiliTool.DomainService
         /// <param name="useInfo"></param>
         public void ReceiveVipPrivilege(UseInfo useInfo)
         {
-            if (this._dailyTaskOptions.DayOfReceiveVipPrivilege == 0)
+            if (_dailyTaskOptions.DayOfReceiveVipPrivilege == 0)
             {
-                this._logger.LogInformation("已配置为不进行自动领取会员权益，跳过领取任务");
+                _logger.LogInformation("已配置为不进行自动领取会员权益，跳过领取任务");
                 return;
             }
 
-            int targetDay = this._dailyTaskOptions.DayOfReceiveVipPrivilege == -1
+            int targetDay = _dailyTaskOptions.DayOfReceiveVipPrivilege == -1
                 ? 1
-                : this._dailyTaskOptions.DayOfReceiveVipPrivilege;
+                : _dailyTaskOptions.DayOfReceiveVipPrivilege;
 
             if (DateTime.Today.Day != targetDay)
             {
-                this._logger.LogInformation("目标领取日期为{targetDay}号，今天是{day}号，跳过领取任务", targetDay, DateTime.Today.Day);
+                _logger.LogInformation("目标领取日期为{targetDay}号，今天是{day}号，跳过领取任务", targetDay, DateTime.Today.Day);
                 return;
             }
 
@@ -56,12 +56,12 @@ namespace Ray.BiliBiliTool.DomainService
 
             if (vipType == 2)
             {
-                this.ReceiveVipPrivilege(1);
-                this.ReceiveVipPrivilege(2);
+                ReceiveVipPrivilege(1);
+                ReceiveVipPrivilege(2);
             }
             else
             {
-                this._logger.LogInformation("普通会员和月度大会员每月不赠送B币券，所以不需要领取权益喽");
+                _logger.LogInformation("普通会员和月度大会员每月不赠送B币券，所以不需要领取权益喽");
             }
         }
 
