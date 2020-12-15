@@ -36,9 +36,16 @@ namespace Ray.BiliBiliTool.DomainService
         /// 获取随机视频
         /// </summary>
         /// <returns></returns>
-        public string GetRandomVideo()
+        public Tuple<string, string> GetRandomVideoOfRegion()
         {
-            return RegionRanking().Item1;
+            int[] arr = { 1, 3, 4, 5, 160, 22, 119 };
+            int rid = arr[new Random().Next(arr.Length - 1)];
+
+            BiliApiResponse<List<RankingInfo>> apiResponse = _dailyTaskApi.GetRegionRankingVideos(rid, 3).Result;
+            _logger.LogDebug("获取分区:{rid}的{day}日top10榜单成功", rid, 3);
+            RankingInfo data = apiResponse.Data[new Random().Next(apiResponse.Data.Count)];
+
+            return Tuple.Create(data.Aid, data.Title);
         }
 
         public void WatchAndShareVideo(DailyTaskInfo dailyTaskStatus)
@@ -179,35 +186,14 @@ namespace Ray.BiliBiliTool.DomainService
         }
 
         #region private
-
-        /// <summary>
-        /// 获取随机视频aid
-        /// </summary>
-        /// <param name="rid">分区id</param>
-        /// <param name="day">日榜，三日榜 周榜 1，3，7</param>
-        /// <returns>随机返回一个aid</returns>
-        private Tuple<string, string> RegionRanking()
-        {
-            int[] arr = { 1, 3, 4, 5, 160, 22, 119 };
-            int rid = arr[new Random().Next(arr.Length - 1)];
-
-            BiliApiResponse<List<RankingInfo>> apiResponse = _dailyTaskApi.GetRegionRankingVideos(rid, 3).Result;
-
-            //_logger.LogInformation("获取分区:{rid}的{day}日top10榜单成功", rid, day);
-            RankingInfo data = apiResponse.Data[new Random().Next(apiResponse.Data.Count)];
-
-            return Tuple.Create(data.Aid, data.Title);
-        }
-
         private Tuple<string, string> GetRandomVideoForWatch()
         {
             List<UpVideoInfo> list = GetRandomVideosOfUps();
             if (list.Count > 0)
                 return Tuple.Create<string, string>(list.First().Aid.ToString(), list.First().Title);
 
-            return RegionRanking();
+            return GetRandomVideoOfRegion();
         }
-
         #endregion private
     }
 }

@@ -19,7 +19,7 @@ namespace WatchVideoTest
                 var account = scope.ServiceProvider.GetRequiredService<IAccountDomainService>();
 
                 var dailyTaskStatus = account.GetDailyTaskStatus();
-                var aid = dailyTask.GetRandomVideo();
+                var aid = dailyTask.GetRandomVideoOfRegion().Item1;
                 dailyTask.WatchVideo(aid);
 
                 Assert.True(true);

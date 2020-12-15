@@ -14,7 +14,7 @@ namespace Ray.BiliBiliTool.DomainService.Interfaces
         /// 获取一个随机视频aid
         /// </summary>
         /// <returns></returns>
-        string GetRandomVideo();
+        Tuple<string, string> GetRandomVideoOfRegion();
 
         /// <summary>
         /// 观看并分享视频

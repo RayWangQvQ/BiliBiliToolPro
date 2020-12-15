@@ -10,5 +10,7 @@ namespace Ray.BiliBiliTool.DomainService.Interfaces
     public interface IDonateCoinDomainService : IDomainService
     {
         void AddCoinsForVideo();
+
+        Tuple<string, string> TryGetCanDonatedVideo();
     }
 }
