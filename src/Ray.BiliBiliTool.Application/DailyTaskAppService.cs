@@ -14,6 +14,7 @@ namespace Ray.BiliBiliTool.Application
         private readonly ILogger<DailyTaskAppService> _logger;
         private readonly IAccountDomainService _loginDomainService;
         private readonly IVideoDomainService _videoDomainService;
+        private readonly IDonateCoinDomainService _donateCoinDomainService;
         private readonly IMangaDomainService _mangaDomainService;
         private readonly ILiveDomainService _liveDomainService;
         private readonly IVipPrivilegeDomainService _vipPrivilegeDomainService;
@@ -24,6 +25,7 @@ namespace Ray.BiliBiliTool.Application
             ILogger<DailyTaskAppService> logger,
             IAccountDomainService loginDomainService,
             IVideoDomainService videoDomainService,
+            IDonateCoinDomainService donateCoinDomainService,
             IMangaDomainService mangaDomainService,
             ILiveDomainService liveDomainService,
             IVipPrivilegeDomainService vipPrivilegeDomainService,
@@ -33,6 +35,7 @@ namespace Ray.BiliBiliTool.Application
             _logger = logger;
             _loginDomainService = loginDomainService;
             _videoDomainService = videoDomainService;
+            _donateCoinDomainService = donateCoinDomainService;
             _mangaDomainService = mangaDomainService;
             _liveDomainService = liveDomainService;
             _vipPrivilegeDomainService = vipPrivilegeDomainService;
@@ -107,7 +110,7 @@ namespace Ray.BiliBiliTool.Application
         [TaskInterceptor("投币", false)]
         private void AddCoinsForVideo()
         {
-            _videoDomainService.AddCoinsForVideo();
+            _donateCoinDomainService.AddCoinsForVideo();
         }
 
         /// <summary>

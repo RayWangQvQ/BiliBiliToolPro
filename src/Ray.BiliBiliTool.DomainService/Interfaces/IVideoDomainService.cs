@@ -14,7 +14,17 @@ namespace Ray.BiliBiliTool.DomainService.Interfaces
         /// 获取一个随机视频aid
         /// </summary>
         /// <returns></returns>
-        string GetRandomVideo();
+        Tuple<string, string> GetRandomVideoOfRegion();
+
+        /// <summary>
+        /// 从某个指定UP下获取随机视频
+        /// </summary>
+        /// <param name="upId"></param>
+        /// <param name="total"></param>
+        /// <returns></returns>
+        UpVideoInfo GetRandomVideoOfUp(long upId, int total);
+
+        int GetVideoCountOfUp(long upId);
 
         /// <summary>
         /// 观看并分享视频
@@ -35,30 +45,5 @@ namespace Ray.BiliBiliTool.DomainService.Interfaces
         /// <param name="aid"></param>
         /// <param name="dailyTaskStatus"></param>
         void ShareVideo(string aid, string title = "");
-
-        /// <summary>
-        /// 投币
-        /// </summary>
-        void AddCoinsForVideo();
-
-        /// <summary>
-        /// 投币
-        /// </summary>
-        /// <param name="aid"></param>
-        /// <param name="multiply"></param>
-        /// <param name="select_like"></param>
-        /// <returns></returns>
-        bool AddCoinsForVideo(string aid, int multiply, bool select_like, string title = "");
-
-        /// <summary>
-        /// 是否已对某视频投币
-        /// </summary>
-        /// <param name="aid"></param>
-        /// <returns></returns>
-        bool CanDonatedCoinsForVideo(string aid);
-
-        List<UpVideoInfo> GetRandomVideosOfUps();
-
-        Tuple<string, string> TryGetCanDonatedVideo();
     }
 }

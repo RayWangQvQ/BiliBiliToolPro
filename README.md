@@ -122,15 +122,20 @@ _如果是发现 bug，可以提交 issue，我会尽快确认并解决。（如
 
 点击 [BiliBiliTool/release](https://github.com/RayWangQvQ/BiliBiliTool/releases)，下载已发布的最新版本。
 
-应用需要的运行环境包括`ASP.NET Core Runtime 5.0.0`与`.NET Runtime 5.0.0`。
 
-对于不希望安装或不知如何安装运行环境的用户，应当选择根据操作系统下载对应的 zip 文件（x64 Windows 对应 win-x86-x64.zip）；此文件已自包含（self-contained）运行环境，但相较不包含运行时的文件略大（Github 服务器在国外，下载可能比较慢）。
 
-对于本地已安装所需运行环境及希望使用共享运行环境以便同时使用其他 .NET 5.0 应用者，推荐下载 net-dependent.zip 文件；本文件依赖本地运行库（runtime-dependent），所以文件包很小。
+* 如果本地已安装 `.NET 5.0` 环境：
 
-若需手动安装运行环境，请点击 ![Download .NET 5.0 (Linux, macOS, and Windows)](https://dotnet.microsoft.com/download/dotnet/5.0)，分别选择相应平台的`ASP.NET Core Runtime 5.0.0`与`.NET Runtime 5.0.0`的安装包（Installers）进行安装；亦可下载.NET SDK 5.0.100的安装包（上述二者已包含于其中）。
+请下载 `net-dependent.zip` 文件，本文件依赖本地运行库（runtime-dependent），所以文件包很小。
 
-注：若已从 ![.NET官网下载入口](https://dotnet.microsoft.com/download) 的“Download .NET Runtime”选项进行了下载安装，则仍需根据上述方法补充安装`ASP.NET Core Runtime 5.0.0`（由于该选项仅提供了`.NET Runtime 5.0.0`的安装包）。
+P.S.这里的运行环境指的是 `ASP.NET Core Runtime 5.0.0`与`.NET Runtime 5.0.0` ，安装方法可详见 [常见问题](https://github.com/RayWangQvQ/BiliBiliTool.Docs/blob/main/questions.md) 中的 **本地或服务器如何安装.net环境**
+
+* 如果不希望安装或不知如何安装运行环境：
+
+请根据操作系统下载对应的 zip 文件，此文件已自包含（self-contained）运行环境，但相较不包含运行时的文件略大（Github 服务器在国外，下载可能比较慢）。
+
+如，Windows系统请下载 `win-x86-x64.zip` ，其他以此类推。
+
 
 Ⅱ. **解压并填写配置**
 
@@ -140,11 +145,17 @@ _如果是发现 bug，可以提交 issue，我会尽快确认并解决。（如
 
 Ⅲ. **运行**
 
-找到名称为 Ray.BiliBiliTool.Console 的可执行文件（Win 环境下是 Ray.BiliBiliTool.Console.exe），双击运行（Linux 使用命令行运行），结果如下：
+对于选择已自包含运行环境版本的 Windows 用户，双击运行名称为 Ray.BiliBiliTool.Console.exe 的可执行文件；
+
+对于选择依赖本地运行库版本的 Windows 用户，双击运行名称为 start.bat 的批处理文件，或运行命令：`dotnet Ray.BiliBiliTool.Console.dll`；
+
+对于选择已自包含运行环境版本的 Linux 用户，在终端中执行：`Ray.BiliBiliTool.Console`；
+
+对于选择从源码运行，并已安装相应版本 .NET SDK 的开发者，运行命令`dotnet run -p ./src/Ray.BiliBiliTool.Console`。
+
+运行结果图示如下：
 
 ![运行图示](https://cdn.jsdelivr.net/gh/RayWangQvQ/BiliBiliTool.Docs@main/imgs/run-exe.png)
-
-对于使用 net-dependent 用户的运行方式为，在终端中执行：`dotnet Ray.BiliBiliTool.Console.dll`。
 
 _P.S.如果自己有服务器，也可以将程序发布到自己的服务器，利用自己的任务系统实现每天自动运行。（有服务器的大佬应该就不需要我多 BB 了）_
 
@@ -158,11 +169,11 @@ _P.S.如果自己有服务器，也可以将程序发布到自己的服务器，
 
 ### 2.2.配置方式
 
-目前支持的配置源有 3 种：appsettings.json 配置文件、环境变量、命令行参数，外加一种专用于 Actions 模式使用的 GitHub Secrets 配置源。
+目前支持的配置源有 3 种：`appsettings.json` 配置文件、环境变量、命令行参数，外加一种专用于 Actions 模式使用的 GitHub Secrets 配置源。
 
 #### 配置源一：appsettings.json 文件
 
-直接修改文件后保存即可，如上 1.2.2 中所演示。
+直接修改文件后保存即可，如章节 1.2.2 中所演示。
 
 #### 配置源二：环境变量
 
@@ -170,10 +181,10 @@ _P.S.如果自己有服务器，也可以将程序发布到自己的服务器，
 
 #### 配置源三：命令行参数
 
-命令行参数与配置键的映射关系可以查看 [Constants.cs](src/Ray.BiliBiliTool.Config/Constants.cs) 中的 CommandLineMapper，程序会将命令行参数映射为对应的配置键后注册到系统。
+命令行参数与配置键的映射关系可以查看 [Constants.cs](src/Ray.BiliBiliTool.Config/Constants.cs) 中的 CommandLineMapper，程序会将命令行参数映射为对应的配置键后注册到系统。仅以自包含运行环境的 Windows 版本为例（其他版本同理，参见上述章节 1.2.2），运行命令：
 
 ```
-dotnet run -p ./src/Ray.BiliBiliTool.Console -userId=123 -sessData=456 -biliJct=789 -numberOfCoins=5
+Ray.BiliBiliTool.Console.exe -userId=123 -sessData=456 -biliJct=789 -numberOfCoins=5
 ```
 
 #### 使用 Github Actions：通过添加 Secrets 传入配置
