@@ -122,15 +122,20 @@ _如果是发现 bug，可以提交 issue，我会尽快确认并解决。（如
 
 点击 [BiliBiliTool/release](https://github.com/RayWangQvQ/BiliBiliTool/releases)，下载已发布的最新版本。
 
-应用需要的运行环境包括`ASP.NET Core Runtime 5.0.0`与`.NET Runtime 5.0.0`。
 
-对于不希望安装或不知如何安装运行环境的用户，应当选择根据操作系统下载对应的 zip 文件（x64 Windows 对应 win-x86-x64.zip）；此文件已自包含（self-contained）运行环境，但相较不包含运行时的文件略大（Github 服务器在国外，下载可能比较慢）。
 
-对于本地已安装所需运行环境及希望使用共享运行环境以便同时使用其他 .NET 5.0 应用者，推荐下载 net-dependent.zip 文件；本文件依赖本地运行库（runtime-dependent），所以文件包很小。
+* 如果本地已安装 `.NET 5.0` 环境：
 
-若需手动安装运行环境，请点击 ![Download .NET 5.0 (Linux, macOS, and Windows)](https://dotnet.microsoft.com/download/dotnet/5.0)，分别选择相应平台的`ASP.NET Core Runtime 5.0.0`与`.NET Runtime 5.0.0`的安装包（Installers）进行安装；亦可下载.NET SDK 5.0.100的安装包（上述二者已包含于其中）。
+请下载 `net-dependent.zip` 文件，本文件依赖本地运行库（runtime-dependent），所以文件包很小。
 
-注：若已从 ![.NET官网下载入口](https://dotnet.microsoft.com/download) 的“Download .NET Runtime”选项进行了下载安装，则仍需根据上述方法补充安装`ASP.NET Core Runtime 5.0.0`（由于该选项仅提供了`.NET Runtime 5.0.0`的安装包）。
+P.S.这里的运行环境指的是 `ASP.NET Core Runtime 5.0.0`与`.NET Runtime 5.0.0` ，安装方法可详见 [常见问题](https://github.com/RayWangQvQ/BiliBiliTool.Docs/blob/main/questions.md) 中的 **本地或服务器如何安装.net环境**
+
+* 如果不希望安装或不知如何安装运行环境：
+
+请根据操作系统下载对应的 zip 文件，此文件已自包含（self-contained）运行环境，但相较不包含运行时的文件略大（Github 服务器在国外，下载可能比较慢）。
+
+如，Windows系统请下载 `win-x86-x64.zip` ，其他以此类推。
+
 
 Ⅱ. **解压并填写配置**
 
@@ -202,34 +207,18 @@ Ray.BiliBiliTool.Console.exe -userId=123 -sessData=456 -biliJct=789 -numberOfCoi
 
 当然， Fork 之后自己改了 appsettings.json 文件再提交，也是可以实现配置的。但是一则你的配置值将被暴露出来（别人可通过访问你的仓库里的配置查看到值），二是以后如果需要 PR 源仓库的更新到自己仓库，则要注意保留自己的修改不要被 PR 覆盖。
 
-### 2.4 按环境切换配置
-增加指定不同环境来加载配置文件的功能(增加一个自己的避免更新配置被覆盖),仅针对`appsettings.json`中的配置。使用方法:
 
-1. 复制一个`appsettings.json`文件， 改为`appsettings.PRD.json`，中间这个`PRD`你也可以取其它名字，设置环境变量时匹配即可。
-2. 删除所有配置，然后把你想要修改的设置项复制过来，修改为你想要的值。
-3. 设置环境变量
-
-【github action】 : 在secrets中增加`ENV`,值为刚才取的名字
-【本地运行或docker】: 设置环境变量`ASPNETCORE_ENVIRONMENT`=`刚才取的名字`
-
-
-## 3.代理
-增加代理支持，如果需要请看:
-1. 【github action】 : 在secrets中增加`PROXY`,值为代理地址+端口，如`127.0.0.1:10240`
-2. 【本地运行或docker】: 设置环境变量`RAY_WebProxy`=`代理地址，格式如上`
-
-
-## 4.常见问题
+## 3.常见问题
 
 [>>点击查看常见问题列表](https://hub.fastgit.org/RayWangQvQ/BiliBiliTool.Docs/blob/main/questions.md)
 
-## 5.版本发布
+## 4.版本发布
 
 当前正处于稳定的迭代开发中，正常情况下每周会发布一个小版本，详细待更新内容可参见源码中的 todo 任务列表。
 
 关于版本发布更新后，如何同步最新的内容到自己 Fork 的仓库，可查看[>>常见问题文档](https://hub.fastgit.org/RayWangQvQ/BiliBiliTool.Docs/blob/main/questions.md) 中的 **我 Fork 之后怎么同步原作者的更新内容？**。
 
-## 6.贡献代码
+## 5.贡献代码
 
 如果你有好的想法，欢迎向仓库贡献你的代码，贡献步骤：
 
@@ -241,7 +230,7 @@ Ray.BiliBiliTool.Console.exe -userId=123 -sessData=456 -biliJct=789 -numberOfCoi
 
 我会尽快进行代码审核，提前感谢你的贡献。
 
-## 7.捐赠支持
+## 6.捐赠支持
 
 [>>点击查看已捐赠列表和留言](https://hub.fastgit.org/RayWangQvQ/BiliBiliTool.Docs/blob/main/donate-list.md)
 
@@ -263,7 +252,7 @@ Ray.BiliBiliTool.Console.exe -userId=123 -sessData=456 -biliJct=789 -numberOfCoi
 
 ![支付宝赞赏码](https://cdn.jsdelivr.net/gh/RayWangQvQ/BiliBiliTool.Docs@main/imgs/donate-ali.jpg)
 
-## 8.API 参考
+## 7.API 参考
 
 - [JunzhouLiu/BILIBILI-HELPER](https://github.com/JunzhouLiu/BILIBILI-HELPER)
 - [happy888888/BiliExp](https://github.com/happy888888/BiliExp)
