@@ -25,11 +25,11 @@ namespace Ray.BiliBiliTool.DomainService
         private readonly IVideoDomainService _videoDomainService;
         private readonly IRelationApi _relationApi;
 
-        private Dictionary<string, int> _alreadyDonatedCoinsCatch = new Dictionary<string, int>();
+        private readonly Dictionary<string, int> _alreadyDonatedCoinsCatch = new Dictionary<string, int>();
 
         public DonateCoinDomainService(ILogger<DonateCoinDomainService> logger,
             IDailyTaskApi dailyTaskApi,
-            IOptionsMonitor<BiliBiliCookieOptions> biliBiliCookieOptions,
+            IOptionsMonitor<BiliBiliCookieOptions> cookieOptions,
             IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
             IAccountApi accountApi,
             ICoinDomainService coinDomainService,
@@ -38,7 +38,7 @@ namespace Ray.BiliBiliTool.DomainService
         {
             _logger = logger;
             _dailyTaskApi = dailyTaskApi;
-            _biliBiliCookieOptions = biliBiliCookieOptions.CurrentValue;
+            _biliBiliCookieOptions = cookieOptions.CurrentValue;
             _dailyTaskOptions = dailyTaskOptions.CurrentValue;
             _accountApi = accountApi;
             _coinDomainService = coinDomainService;
@@ -114,6 +114,35 @@ namespace Ray.BiliBiliTool.DomainService
             return result;
         }
 
+        /// <summary>
+        /// 为视频投币
+        /// </summary>
+        /// <param name="aid">av号</param>
+        /// <param name="multiply">投币数量</param>
+        /// <param name="select_like">是否同时点赞 1是0否</param>
+        /// <returns>是否投币成功</returns>
+        public bool DoAddCoinForVideo(string aid, int multiply, bool select_like, string title = "")
+        {
+            BiliApiResponse result = _dailyTaskApi.AddCoinForVideo(aid, multiply, select_like ? 1 : 0, _biliBiliCookieOptions.BiliJct).Result;
+
+            if (result.Code == 0)
+            {
+                _logger.LogInformation("为“{title}”投币成功", title);
+                return true;
+            }
+
+            if (result.Code == -111)
+            {
+                string errorMsg = $"投币异常，Cookie配置项[BiliJct]错误或已过期，请检查并更新。接口返回：{result.Message}";
+                _logger.LogError(errorMsg);
+                throw new Exception(errorMsg);
+            }
+            else
+            {
+                _logger.LogInformation("为“{title}”投币失败，原因：{msg}", title, result.Message);
+                return false;
+            }
+        }
 
         #region private
 
@@ -166,9 +195,6 @@ namespace Ray.BiliBiliTool.DomainService
         /// <returns></returns>
         private Tuple<string, string> TryGetCanDonatedVideoBySpecialUps(int tryCount)
         {
-            //缓存每个up的视频总数
-            var videoCountDic = new Dictionary<long, int>();
-
             //获取特别关注列表
             BiliApiResponse<List<UpInfo>> specials = _relationApi.GetSpecialFollowings().Result;
             if (specials.Data == null || specials.Data.Count == 0) return null;
@@ -177,15 +203,12 @@ namespace Ray.BiliBiliTool.DomainService
         }
 
         /// <summary>
-        /// 尝试从特别关注的Up主中随机获取一个可以投币的视频
+        /// 尝试从普通关注的Up主中随机获取一个可以投币的视频
         /// </summary>
         /// <param name="tryCount"></param>
         /// <returns></returns>
         private Tuple<string, string> TryGetCanDonatedVideoByFollowingUps(int tryCount)
         {
-            //缓存每个up的视频总数
-            Dictionary<long, int> videoCountDic = new Dictionary<long, int>();
-
             //获取特别关注列表
             BiliApiResponse<GetFollowingsResponse> result = _relationApi.GetFollowings(_biliBiliCookieOptions.UserId).Result;
             if (result.Data.Total == 0) return null;
@@ -235,12 +258,12 @@ namespace Ray.BiliBiliTool.DomainService
                 //该up的视频总数
                 if (!videoCountDic.TryGetValue(randomUpId, out int videoCount))
                 {
-                    videoCount = GetVidoeCountOfUp(randomUpId);
+                    videoCount = _videoDomainService.GetVideoCountOfUp(randomUpId);
                     videoCountDic.Add(randomUpId, videoCount);
                 }
                 if (videoCount == 0 | videoCount < i) continue;
 
-                UpVideoInfo videoInfo = GetRandomVideoOfUp(randomUpId, videoCount);
+                UpVideoInfo videoInfo = _videoDomainService.GetRandomVideoOfUp(randomUpId, videoCount);
 
                 if (!CanDonatedCoinsForVideo(videoInfo.Aid.ToString())) continue;
                 return Tuple.Create(videoInfo.Aid.ToString(), videoInfo.Title);
@@ -269,71 +292,6 @@ namespace Ray.BiliBiliTool.DomainService
             else
             {
                 _logger.LogDebug("已为Av{aid}投过2枚硬币，不能再投币啦", aid);
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// 获取UP主的视频总数量
-        /// </summary>
-        /// <param name="upId"></param>
-        /// <returns></returns>
-        private int GetVidoeCountOfUp(long upId)
-        {
-            BiliApiResponse<SearchUpVideosResponse> re = _dailyTaskApi.SearchVideosByUpId(upId, 1, 1).Result;
-            if (re.Code != 0)
-            {
-                throw new Exception(re.Message);
-            }
-
-            return re.Data.Page.Count;
-        }
-
-        /// <summary>
-        /// 获取某up的一个随机视频
-        /// </summary>
-        /// <param name="upId"></param>
-        /// <param name="total"></param>
-        /// <returns></returns>
-        private UpVideoInfo GetRandomVideoOfUp(long upId, int total)
-        {
-            int pageNum = new Random().Next(1, total + 1);
-            BiliApiResponse<SearchUpVideosResponse> re = _dailyTaskApi.SearchVideosByUpId(upId, 1, pageNum).Result;
-
-            if (re.Code != 0)
-            {
-                throw new Exception(re.Message);
-            }
-
-            return re.Data.List.Vlist.First();
-        }
-
-        /// <summary>
-        /// 为视频投币
-        /// </summary>
-        /// <param name="aid">av号</param>
-        /// <param name="multiply">投币数量</param>
-        /// <param name="select_like">是否同时点赞 1是0否</param>
-        /// <returns>是否投币成功</returns>
-        private bool DoAddCoinForVideo(string aid, int multiply, bool select_like, string title = "")
-        {
-            BiliApiResponse result = _dailyTaskApi.AddCoinForVideo(aid, multiply, select_like ? 1 : 0, _biliBiliCookieOptions.BiliJct).Result;
-
-            if (result.Code == 0)
-            {
-                _logger.LogInformation("为“{title}”投币成功", title);
-                return true;
-            }
-
-            if (result.Code == -111)
-            {
-                string errorMsg = $"投币异常，Cookie配置项[BiliJct]错误或已过期，请检查并更新。接口返回：{result.Message}";
-                _logger.LogError(errorMsg);
-                throw new Exception(errorMsg);
-            }
-            else
-            {
-                _logger.LogInformation("为“{title}”投币失败，原因：{msg}", title, result.Message);
                 return false;
             }
         }

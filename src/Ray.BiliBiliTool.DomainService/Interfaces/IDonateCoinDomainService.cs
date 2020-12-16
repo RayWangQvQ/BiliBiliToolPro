@@ -12,5 +12,7 @@ namespace Ray.BiliBiliTool.DomainService.Interfaces
         void AddCoinsForVideo();
 
         Tuple<string, string> TryGetCanDonatedVideo();
+
+        bool DoAddCoinForVideo(string aid, int multiply, bool select_like, string title = "");
     }
 }
