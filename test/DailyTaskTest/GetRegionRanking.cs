@@ -17,7 +17,7 @@ namespace GetRegionRankingTest
             {
                 var dailyTaskService = scope.ServiceProvider.GetRequiredService<IVideoDomainService>();
 
-                var re = dailyTaskService.GetRandomVideo();
+                var re = dailyTaskService.GetRandomVideoOfRegion();
 
                 Assert.NotNull(re);
             }

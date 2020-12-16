@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Ray.BiliBiliTool.Console;
 using Ray.BiliBiliTool.DomainService.Interfaces;
@@ -10,15 +11,32 @@ namespace DailyTaskTest
     public class AddCoinsForVideo
     {
         [Fact]
+        public void TestGetCanDonatedVideo()
+        {
+            Program.PreWorks(new string[] { });
+
+            using (var scope = RayContainer.Root.CreateScope())
+            {
+                var service = scope.ServiceProvider.GetRequiredService<IDonateCoinDomainService>();
+
+                var re = service.TryGetCanDonatedVideo();
+
+                Debug.WriteLine(re.ToJson());
+            }
+
+            Assert.True(true);
+        }
+
+        [Fact]
         public void Test1()
         {
             Program.PreWorks(new string[] { });
 
             using (var scope = RayContainer.Root.CreateScope())
             {
-                var dailyTaskAppService = scope.ServiceProvider.GetRequiredService<IVideoDomainService>();
+                var service = scope.ServiceProvider.GetRequiredService<IDonateCoinDomainService>();
 
-                dailyTaskAppService.AddCoinsForVideo();
+                service.AddCoinsForVideo();
             }
 
             Assert.True(true);
@@ -31,9 +49,9 @@ namespace DailyTaskTest
 
             using (var scope = RayContainer.Root.CreateScope())
             {
-                var dailyTaskAppService = scope.ServiceProvider.GetRequiredService<IVideoDomainService>();
+                var service = scope.ServiceProvider.GetRequiredService<IDonateCoinDomainService>();
 
-                dailyTaskAppService.AddCoinsForVideo("627549610", 1, true);
+                service.DoAddCoinForVideo("627549610", 1, true);
             }
 
             Assert.True(true);

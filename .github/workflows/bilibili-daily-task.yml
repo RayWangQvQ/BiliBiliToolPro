@@ -35,13 +35,13 @@ jobs:
       with:
         dotnet-version: 5.0.x
 
-    # 安装依赖
-    - name: Install dependencies
-      run: dotnet restore
-      
-    # 构建应用
-    - name: Build APP
-      run: dotnet build --configuration Release --no-restore
+    # 还原、构建、发布
+    - name: Publish
+      run: |
+        dotnet restore
+        dotnet build --configuration Release --no-restore
+        cd ./src/Ray.BiliBiliTool.Console
+        dotnet publish --self-contained false -o ./bin/Publish/net5-dependent
        
     # 运行
     - name: Run APP
@@ -66,4 +66,6 @@ jobs:
         Ray_Serilog:WriteTo:0:Args:outputTemplate: ${{secrets.CONSOLELOGTEMPLATE}} 
         ASPNETCORE_ENVIRONMENT: ${{secrets.ENV}} # 方便切换不同的appsettings文件 也可以在不同的action yml文件中配置来同时运行多个任务
         Ray_WebProxy: ${{secrets.PROXY}} # 代理
-      run: dotnet run -p ./src/Ray.BiliBiliTool.Console -closeConsoleWhenEnd=1 ${{secrets.OTHERCONFIGS}}
+      run: |
+        cd ./src/Ray.BiliBiliTool.Console/bin/Publish/net5-dependent
+        dotnet Ray.BiliBiliTool.Console.dll -closeConsoleWhenEnd=1 ${{secrets.OTHERCONFIGS}}
