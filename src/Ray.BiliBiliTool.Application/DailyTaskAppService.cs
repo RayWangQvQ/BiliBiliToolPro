@@ -47,17 +47,14 @@ namespace Ray.BiliBiliTool.Application
         {
             if (_securityOptions.IsSkipDailyTask)
             {
-                _logger.LogWarning("\r\n已配置为跳过每日任务");
+                _logger.LogWarning("已配置为跳过每日任务");
                 return;
             }
 
-            _logger.LogInformation("\r\n-----开始每日任务-----\r\n");
+            _logger.LogInformation("-----开始每日任务-----\r\n");
 
-            UseInfo userInfo;
-            DailyTaskInfo dailyTaskInfo;
-
-            userInfo = Login();
-            dailyTaskInfo = GetDailyTaskStatus();
+            UseInfo userInfo = Login();
+            DailyTaskInfo dailyTaskInfo = GetDailyTaskStatus();
 
             WatchAndShareVideo(dailyTaskInfo);
             AddCoinsForVideo();
