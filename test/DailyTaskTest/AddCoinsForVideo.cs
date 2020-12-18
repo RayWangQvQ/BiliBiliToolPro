@@ -36,7 +36,7 @@ namespace DailyTaskTest
             {
                 var service = scope.ServiceProvider.GetRequiredService<IDonateCoinDomainService>();
 
-                service.AddCoinsForVideo();
+                service.AddCoinsForVideos();
             }
 
             Assert.True(true);

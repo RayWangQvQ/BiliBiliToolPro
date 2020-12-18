@@ -19,6 +19,7 @@ namespace Ray.BiliBiliTool.Application
         private readonly ILiveDomainService _liveDomainService;
         private readonly IVipPrivilegeDomainService _vipPrivilegeDomainService;
         private readonly IChargeDomainService _chargeDomainService;
+        private readonly ICoinDomainService _coinDomainService;
         private readonly SecurityOptions _securityOptions;
 
         public DailyTaskAppService(
@@ -30,7 +31,8 @@ namespace Ray.BiliBiliTool.Application
             ILiveDomainService liveDomainService,
             IVipPrivilegeDomainService vipPrivilegeDomainService,
             IChargeDomainService chargeDomainService,
-            IOptionsMonitor<SecurityOptions> securityOptions)
+            IOptionsMonitor<SecurityOptions> securityOptions,
+            ICoinDomainService coinDomainService)
         {
             _logger = logger;
             _loginDomainService = loginDomainService;
@@ -40,6 +42,7 @@ namespace Ray.BiliBiliTool.Application
             _liveDomainService = liveDomainService;
             _vipPrivilegeDomainService = vipPrivilegeDomainService;
             _chargeDomainService = chargeDomainService;
+            _coinDomainService = coinDomainService;
             _securityOptions = securityOptions.CurrentValue;
         }
 
@@ -60,7 +63,7 @@ namespace Ray.BiliBiliTool.Application
             AddCoinsForVideo();
             MangaSign();
             LiveSign();
-            userInfo.Money = ExchangeSilver2Coin();
+            ExchangeSilver2Coin();
 
             ReceiveVipPrivilege(userInfo);
             ReceiveMangaVipReward(userInfo);
@@ -107,7 +110,7 @@ namespace Ray.BiliBiliTool.Application
         [TaskInterceptor("投币", false)]
         private void AddCoinsForVideo()
         {
-            _donateCoinDomainService.AddCoinsForVideo();
+            _donateCoinDomainService.AddCoinsForVideos();
         }
 
         /// <summary>
@@ -125,7 +128,10 @@ namespace Ray.BiliBiliTool.Application
         [TaskInterceptor("直播中心银瓜子兑换硬币", false)]
         private decimal ExchangeSilver2Coin()
         {
-            return _liveDomainService.ExchangeSilver2Coin();
+            _liveDomainService.ExchangeSilver2Coin();
+            var coinBalance = _coinDomainService.GetCoinBalance();
+            _logger.LogInformation("当前硬币余额: {0}", coinBalance);
+            return coinBalance;
         }
 
         /// <summary>

@@ -59,6 +59,7 @@ jobs:
         Ray_DailyTaskConfig:SupportUpIds: ${{secrets.SUPPORTUPIDS}}
         Ray_DailyTaskConfig:DayOfAutoCharge: ${{secrets.DAYOFAUTOCHARGE}}
         Ray_DailyTaskConfig:DayOfReceiveVipPrivilege: ${{secrets.DAYOFRECEIVEVIPPRIVILEGE}}
+        Ray_DailyTaskConfig:IsExchangeSilver2Coin: ${{secrets.IsExchangeSilver2Coin}}
         Ray_DailyTaskConfig:DevicePlatform: ${{secrets.DEVICEPLATFORM}}
         Ray_Serilog:WriteTo:0:Args:restrictedToMinimumLevel: ${{secrets.CONSOLELOGLEVEL}}
         Ray_Serilog:WriteTo:0:Args:outputTemplate: ${{secrets.CONSOLELOGTEMPLATE}} 

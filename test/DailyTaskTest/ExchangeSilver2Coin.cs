@@ -1,5 +1,7 @@
 using System;
+using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Console;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 using Ray.BiliBiliTool.Infrastructure;
@@ -19,6 +21,23 @@ namespace DailyTaskTest
                 var dailyTask = scope.ServiceProvider.GetRequiredService<ILiveDomainService>();
 
                 dailyTask.ExchangeSilver2Coin();
+
+                Assert.True(true);
+            }
+        }
+
+        [Fact]
+        public void Test2()
+        {
+            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
+            Program.PreWorks(new string[] { });
+
+            using (var scope = RayContainer.Root.CreateScope())
+            {
+                var api = scope.ServiceProvider.GetRequiredService<ILiveApi>();
+
+                var queryStatus = api.GetExchangeSilverStatus().Result;
+                Debug.WriteLine(queryStatus.ToJson());
 
                 Assert.True(true);
             }
