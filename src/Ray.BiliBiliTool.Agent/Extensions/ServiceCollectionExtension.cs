@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Net.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -20,10 +21,10 @@ namespace Ray.BiliBiliTool.Agent.Extensions
         /// </summary>
         /// <param name="services"></param>
         /// <returns></returns>
-        public static IServiceCollection AddBiliBiliClientApi(this IServiceCollection services)
+        public static IServiceCollection AddBiliBiliClientApi(this IServiceCollection services, IConfiguration configuration)
         {
             //全局代理
-            services.SetGlobalProxy();
+            services.SetGlobalProxy(configuration);
 
             services.AddHttpClient();
             services.AddHttpClient("BiliBiliWithCookie",
@@ -87,9 +88,9 @@ namespace Ray.BiliBiliTool.Agent.Extensions
         /// </summary>
         /// <param name="services"></param>
         /// <returns></returns>
-        private static IServiceCollection SetGlobalProxy(this IServiceCollection services)
+        private static IServiceCollection SetGlobalProxy(this IServiceCollection services, IConfiguration configuration)
         {
-            string proxyAddress = RayConfiguration.Root["WebProxy"];
+            string proxyAddress = configuration["WebProxy"];
             if (proxyAddress.IsNotNullOrEmpty())
             {
                 HttpClient.DefaultProxy = new WebProxy(proxyAddress);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Ray.BiliBiliTool.Infrastructure;
 
 namespace Ray.BiliBiliTool.Console.Helpers
@@ -13,9 +14,9 @@ namespace Ray.BiliBiliTool.Console.Helpers
         /// 获取配置的Console的日志等级
         /// </summary>
         /// <returns></returns>
-        public static Serilog.Events.LogEventLevel GetConsoleLogLevel()
+        public static Serilog.Events.LogEventLevel GetConsoleLogLevel(IConfiguration configuration)
         {
-            var consoleLevelStr = RayConfiguration.Root["Serilog:WriteTo:0:Args:restrictedToMinimumLevel"];
+            var consoleLevelStr = configuration["Serilog:WriteTo:0:Args:restrictedToMinimumLevel"];
             if (string.IsNullOrWhiteSpace(consoleLevelStr)) consoleLevelStr = "Information";
 
             Serilog.Events.LogEventLevel levelEnum = (Serilog.Events.LogEventLevel)
@@ -28,9 +29,9 @@ namespace Ray.BiliBiliTool.Console.Helpers
         /// 获取配置的Console的日志模板
         /// </summary>
         /// <returns></returns>
-        public static string GetConsoleLogTemplate()
+        public static string GetConsoleLogTemplate(IConfiguration configuration)
         {
-            var templateStr = RayConfiguration.Root["Serilog:WriteTo:0:Args:outputTemplate"];
+            var templateStr = configuration["Serilog:WriteTo:0:Args:outputTemplate"];
             if (string.IsNullOrWhiteSpace(templateStr)) templateStr = "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}";
 
             return templateStr;

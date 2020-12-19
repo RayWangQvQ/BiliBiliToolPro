@@ -18,7 +18,7 @@ namespace LoginTest
         {
             Program.PreWorks(new string[] { });
 
-            using (var scope = RayContainer.Root.CreateScope())
+            using (var scope = Global.ServiceProviderRoot.CreateScope())
             {
                 var dailyTask = scope.ServiceProvider.GetRequiredService<IAccountDomainService>();
 
@@ -34,7 +34,7 @@ namespace LoginTest
         {
             Program.PreWorks(new string[] { });
 
-            using (var scope = RayContainer.Root.CreateScope())
+            using (var scope = Global.ServiceProviderRoot.CreateScope())
             {
                 var httpClientFactory = scope.ServiceProvider.GetRequiredService<IHttpClientFactory>();
 

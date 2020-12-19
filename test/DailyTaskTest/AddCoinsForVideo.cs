@@ -15,7 +15,7 @@ namespace DailyTaskTest
         {
             Program.PreWorks(new string[] { });
 
-            using (var scope = RayContainer.Root.CreateScope())
+            using (var scope = Global.ServiceProviderRoot.CreateScope())
             {
                 var service = scope.ServiceProvider.GetRequiredService<IDonateCoinDomainService>();
 
@@ -32,7 +32,7 @@ namespace DailyTaskTest
         {
             Program.PreWorks(new string[] { });
 
-            using (var scope = RayContainer.Root.CreateScope())
+            using (var scope = Global.ServiceProviderRoot.CreateScope())
             {
                 var service = scope.ServiceProvider.GetRequiredService<IDonateCoinDomainService>();
 
@@ -47,7 +47,7 @@ namespace DailyTaskTest
         {
             Program.PreWorks(new string[] { });
 
-            using (var scope = RayContainer.Root.CreateScope())
+            using (var scope = Global.ServiceProviderRoot.CreateScope())
             {
                 var service = scope.ServiceProvider.GetRequiredService<IDonateCoinDomainService>();
 

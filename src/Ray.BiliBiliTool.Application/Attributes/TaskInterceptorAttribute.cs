@@ -23,7 +23,7 @@ namespace Ray.BiliBiliTool.Application.Attributes
             _rethrowWhenException = rethrowWhenException;
 
             // _logger = Log.Logger;
-            _logger = RayContainer.GetLogger<TaskInterceptorAttribute>();
+            _logger = Global.GetLogger<TaskInterceptorAttribute>();
         }
 
         public override void OnEntry(MethodExecutionArgs arg)

@@ -15,7 +15,7 @@ namespace PushTest
         {
             Program.PreWorks(new string[] { });
 
-            using (var scope = RayContainer.Root.CreateScope())
+            using (var scope = Global.ServiceProviderRoot.CreateScope())
             {
                 var pushService = scope.ServiceProvider.GetRequiredService<PushService>();
 
@@ -29,7 +29,7 @@ namespace PushTest
         {
             Program.PreWorks(new string[] { });
 
-            using (var scope = RayContainer.Root.CreateScope())
+            using (var scope = Global.ServiceProviderRoot.CreateScope())
             {
                 Log.Logger.Debug("����debug");
                 Log.Logger.Information("����info");

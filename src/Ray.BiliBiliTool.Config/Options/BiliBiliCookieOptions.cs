@@ -22,7 +22,7 @@ namespace Ray.BiliBiliTool.Config.Options
             get =>
                 !string.IsNullOrWhiteSpace(_userId)
                     ? _userId
-                    : RayConfiguration.Root["BiliBiliCookie:DedeUserID"];//为了兼容 GitHub Secrets 经常会被填错
+                    : Global.ConfigurationRoot["BiliBiliCookie:DedeUserID"];//为了兼容 GitHub Secrets 经常会被填错
             set => _userId = value;
         }
 
@@ -41,14 +41,14 @@ namespace Ray.BiliBiliTool.Config.Options
             get =>
                 !string.IsNullOrWhiteSpace(_biliJct)
                     ? _biliJct
-                    : RayConfiguration.Root["BiliBiliCookie:Bili_jct"];//为了兼容 GitHub Secrets 经常会被填错
+                    : Global.ConfigurationRoot["BiliBiliCookie:Bili_jct"];//为了兼容 GitHub Secrets 经常会被填错
             set => _biliJct = value;
         }
 
         public void SetUserId(string userId)
         {
             this.UserId = userId;
-            RayConfiguration.Root["BiliBiliCookie:UserID"] = userId;
+            Global.ConfigurationRoot["BiliBiliCookie:UserID"] = userId;
         }
 
         /// <summary>
@@ -74,8 +74,8 @@ namespace Ray.BiliBiliTool.Config.Options
                 logger.LogWarning("UserId：{uid} 不能转换为long型，请确认配置的是正确的Cookie值", UserId);
             }
             //UserId为空，但DedeUserID有值，兼容使用
-            if (string.IsNullOrWhiteSpace(RayConfiguration.Root["BiliBiliCookie:UserID"])
-                && !string.IsNullOrWhiteSpace(RayConfiguration.Root["BiliBiliCookie:DedeUserID"]))
+            if (string.IsNullOrWhiteSpace(Global.ConfigurationRoot["BiliBiliCookie:UserID"])
+                && !string.IsNullOrWhiteSpace(Global.ConfigurationRoot["BiliBiliCookie:DedeUserID"]))
             {
                 logger.LogWarning(tips, "DEDEUSERID", "DEDEUSERID");
             }
@@ -94,8 +94,8 @@ namespace Ray.BiliBiliTool.Config.Options
                 result = false;
             }
             //BiliJct为空，但Bili_jct有值，兼容使用
-            else if (string.IsNullOrWhiteSpace(RayConfiguration.Root["BiliBiliCookie:BiliJct"])
-                && !string.IsNullOrWhiteSpace(RayConfiguration.Root["BiliBiliCookie:Bili_jct"]))
+            else if (string.IsNullOrWhiteSpace(Global.ConfigurationRoot["BiliBiliCookie:BiliJct"])
+                && !string.IsNullOrWhiteSpace(Global.ConfigurationRoot["BiliBiliCookie:Bili_jct"]))
             {
                 logger.LogWarning(tips, "BILI_JCT", "BILI_JCT");
             }

@@ -28,7 +28,7 @@ namespace Ray.BiliBiliTool.Console
             StartRun();
 
             //如果配置了“1”就立即关闭，否则保持窗口以便查看日志信息
-            if (RayConfiguration.Root["CloseConsoleWhenEnd"] == "1") return;
+            if (Global.ConfigurationRoot["CloseConsoleWhenEnd"] == "1") return;
             else System.Console.ReadLine();
         }
 
@@ -38,37 +38,60 @@ namespace Ray.BiliBiliTool.Console
         /// <param name="args"></param>
         public static void PreWorks(string[] args)
         {
-            //配置:
-            RayConfiguration.Root = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json", false, true)
-                .AddJsonFileByEnv()
-                .AddExcludeEmptyEnvironmentVariables("Ray_")
-                .AddCommandLine(args, Constants.CommandLineMapper)
-                .Build();
+            IHostBuilder hostBuilder = new HostBuilder();
+
+            //承载系统配置
+            hostBuilder.ConfigureHostConfiguration(hostConfigurationBuilder =>
+            {
+                Environment.SetEnvironmentVariable(HostDefaults.EnvironmentKey, Environment.GetEnvironmentVariable(Global.EnvironmentKey));
+
+                hostConfigurationBuilder.AddEnvironmentVariables();
+                if (args != null && args.Length > 0)
+                {
+                    hostConfigurationBuilder.AddCommandLine(args);
+                }
+            });
+
+            //应用配置:
+            hostBuilder.ConfigureAppConfiguration((hostBuilderContext, configurationBuilder) =>
+            {
+                Global.HostingEnvironment = hostBuilderContext.HostingEnvironment;
+                configurationBuilder.AddJsonFile("appsettings.json", false, true)
+                    .AddJsonFile($"appsettings.{hostBuilderContext.HostingEnvironment.EnvironmentName}.json", true, true)
+                    .AddExcludeEmptyEnvironmentVariables("Ray_");
+                if (args != null && args.Length > 0)
+                {
+                    configurationBuilder.AddCommandLine(args, Constants.CommandLineMapper);
+                }
+            });
 
             //日志:
-            Log.Logger = new LoggerConfiguration()
-                .ReadFrom.Configuration(RayConfiguration.Root)
+            hostBuilder.ConfigureLogging((hostBuilderContext, loggingBuilder) =>
+            {
+                Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(hostBuilderContext.Configuration)
                 .WriteTo.TextWriter(
                     textWriter: PushService.PushStringWriter,
-                    restrictedToMinimumLevel: LogHelper.GetConsoleLogLevel(),
-                    outputTemplate: LogHelper.GetConsoleLogTemplate() + "\r\n")//用来做微信推送
+                    restrictedToMinimumLevel: LogHelper.GetConsoleLogLevel(hostBuilderContext.Configuration),
+                    outputTemplate: LogHelper.GetConsoleLogTemplate(hostBuilderContext.Configuration) + "\r\n")//用来做微信推送
                 .CreateLogger();
+            }).UseSerilog();
 
-            //Host:
-            IHostBuilder hostBuilder = new HostBuilder()
-                .ConfigureServices((hostContext, services) =>
-                {
-                    services.AddSingleton<IConfiguration>(RayConfiguration.Root);
-                    services.AddBiliBiliConfigs(RayConfiguration.Root);
-                    services.AddBiliBiliClientApi();
-                    services.AddDomainServices();
-                    services.AddAppServices();
-                })
-                .UseSerilog()
-                .UseConsoleLifetime();
 
-            RayContainer.Root = hostBuilder.Build().Services;
+            //DI容器:
+            hostBuilder.ConfigureServices((hostContext, services) =>
+            {
+                Global.ConfigurationRoot = (IConfigurationRoot)hostContext.Configuration;
+
+                services.AddBiliBiliConfigs(hostContext.Configuration);
+                services.AddBiliBiliClientApi(hostContext.Configuration);
+                services.AddDomainServices();
+                services.AddAppServices();
+            });
+
+            IHost host = hostBuilder.UseConsoleLifetime().Build();
+
+            Global.ServiceProviderRoot = host.Services;
         }
 
         /// <summary>
@@ -76,11 +99,11 @@ namespace Ray.BiliBiliTool.Console
         /// </summary>
         public static void StartRun()
         {
-            using IServiceScope serviceScope = RayContainer.Root.CreateScope();
+            using IServiceScope serviceScope = Global.ServiceProviderRoot.CreateScope();
 
             //初始化DI相关的部分
             IServiceProvider di = serviceScope.ServiceProvider;
-            RayContainer.SetGetServiceFunc(type => di.GetService(type));
+            Global.SetGetServiceFunc(type => di.GetService(type));
 
             ILogger<Program> logger = di.GetRequiredService<ILogger<Program>>();
 
@@ -88,7 +111,7 @@ namespace Ray.BiliBiliTool.Console
                 "版本号：{version}",
                 typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "未知");
             logger.LogInformation("开源地址：{url} \r\n", Constants.SourceCodeUrl);
-            logger.LogInformation("当前环境：{env} \r\n", RayConfiguration.Env ?? "无");
+            logger.LogInformation("当前环境：{env} \r\n", Global.HostingEnvironment.EnvironmentName ?? "无");
 
             BiliBiliCookieOptions biliBiliCookieOptions = di.GetRequiredService<IOptionsMonitor<BiliBiliCookieOptions>>().CurrentValue;
             if (!biliBiliCookieOptions.Check(logger))

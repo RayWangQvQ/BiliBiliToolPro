@@ -14,7 +14,7 @@ namespace LogTest
         {
             Program.PreWorks(new string[] { });
 
-            var logger = RayContainer.Root.GetRequiredService<ILogger<UnitTest1>>();
+            var logger = Global.ServiceProviderRoot.GetRequiredService<ILogger<UnitTest1>>();
 
             logger.LogTrace("testTrace");
             logger.LogDebug("testDebug");
