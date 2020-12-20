@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,16 +41,13 @@ namespace Ray.BiliBiliTool.Console
         {
             IHostBuilder hostBuilder = new HostBuilder();
 
-            //承载系统配置
+            //承载系统自身的配置：
             hostBuilder.ConfigureHostConfiguration(hostConfigurationBuilder =>
             {
-                Environment.SetEnvironmentVariable(HostDefaults.EnvironmentKey, Environment.GetEnvironmentVariable(Global.EnvironmentKey));
+                hostConfigurationBuilder.AddJsonFile("commandLineMappings.json", false, false);
 
+                Environment.SetEnvironmentVariable(HostDefaults.EnvironmentKey, Environment.GetEnvironmentVariable(Global.EnvironmentKey));
                 hostConfigurationBuilder.AddEnvironmentVariables();
-                if (args != null && args.Length > 0)
-                {
-                    hostConfigurationBuilder.AddCommandLine(args);
-                }
             });
 
             //应用配置:
@@ -61,7 +59,9 @@ namespace Ray.BiliBiliTool.Console
                     .AddExcludeEmptyEnvironmentVariables("Ray_");
                 if (args != null && args.Length > 0)
                 {
-                    configurationBuilder.AddCommandLine(args, Constants.CommandLineMapper);
+                    configurationBuilder.AddCommandLine(args, hostBuilderContext.Configuration
+                        .GetSection("CommandLineMappings")
+                        .Get<Dictionary<string, string>>());
                 }
             });
 
@@ -76,7 +76,6 @@ namespace Ray.BiliBiliTool.Console
                     outputTemplate: LogHelper.GetConsoleLogTemplate(hostBuilderContext.Configuration) + "\r\n")//用来做微信推送
                 .CreateLogger();
             }).UseSerilog();
-
 
             //DI容器:
             hostBuilder.ConfigureServices((hostContext, services) =>
@@ -97,7 +96,7 @@ namespace Ray.BiliBiliTool.Console
         /// <summary>
         /// 开始运行
         /// </summary>
-        public static void StartRun()
+        private static void StartRun()
         {
             using IServiceScope serviceScope = Global.ServiceProviderRoot.CreateScope();
 

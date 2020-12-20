@@ -44,6 +44,7 @@ jobs:
     # 运行
     - name: Run APP
       env:
+        ASPNETCORE_ENVIRONMENT: ${{secrets.ENV}} # 运行环境
         Ray_BiliBiliCookie:UserId: ${{secrets.USERID}}
         Ray_BiliBiliCookie:DedeUserID: ${{secrets.DEDEUSERID}} # 为了兼容 GitHub Secrets 经常会被填错
         Ray_BiliBiliCookie:SessData: ${{secrets.SESSDATA}}
@@ -54,6 +55,7 @@ jobs:
         Ray_Security:IntervalSecondsBetweenRequestApi: ${{secrets.INTERVALSECONDSBETWEENREQUESTAPI}}
         Ray_Security:IntervalMethodTypes: ${{secrets.INTERVALMETHODTYPES}}
         Ray_Security:UserAgent: ${{secrets.USERAGENT}}
+        Ray_Security:WebProxy: ${{secrets.WEBPROXY}}
         Ray_DailyTaskConfig:NumberOfCoins: ${{secrets.NUMBEROFCOINS}}
         Ray_DailyTaskConfig:SelectLike: ${{secrets.SELECTLIKE}}
         Ray_DailyTaskConfig:SupportUpIds: ${{secrets.SUPPORTUPIDS}}
@@ -63,8 +65,6 @@ jobs:
         Ray_DailyTaskConfig:DevicePlatform: ${{secrets.DEVICEPLATFORM}}
         Ray_Serilog:WriteTo:0:Args:restrictedToMinimumLevel: ${{secrets.CONSOLELOGLEVEL}}
         Ray_Serilog:WriteTo:0:Args:outputTemplate: ${{secrets.CONSOLELOGTEMPLATE}} 
-        ASPNETCORE_ENVIRONMENT: ${{secrets.ENV}} # 运行环境
-        Ray_WebProxy: ${{secrets.PROXY}} # 代理
       run: |
         cd ./src/Ray.BiliBiliTool.Console/bin/Publish/net5-dependent
         dotnet Ray.BiliBiliTool.Console.dll -closeConsoleWhenEnd=1 ${{secrets.OTHERCONFIGS}}

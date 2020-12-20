@@ -1,0 +1,25 @@
+{
+  //命令行启动时的参数映射
+  "CommandLineMappings": {
+    "-userId": "BiliBiliCookie:UserId",
+    "-sessData": "BiliBiliCookie:SessData",
+    "-biliJct": "BiliBiliCookie:BiliJct",
+
+    "-numberOfCoins": "DailyTaskConfig:NumberOfCoins",
+    "-selectLike": "DailyTaskConfig:SelectLike",
+    "-supportUpIds": "DailyTaskConfig:SupportUpIds",
+    "-dayOfAutoCharge": "DailyTaskConfig:DayOfAutoCharge",
+    "-dayOfReceiveVipPrivilege": "DailyTaskConfig:DayOfReceiveVipPrivilege",
+    "-isExchangeSilver2Coin": "DailyTaskConfig:IsExchangeSilver2Coin",
+    "-devicePlatform": "DailyTaskConfig:DevicePlatform",
+
+    "-intervalSecondsBetweenRequestApi": "Security:IntervalSecondsBetweenRequestApi",
+    "-intervalMethodTypes": "Security:IntervalMethodTypes",
+
+    "-pushScKey": "Push:PushScKey",
+
+    "-closeConsoleWhenEnd": "CloseConsoleWhenEnd",
+
+    "-proxy": "WebProxy"
+  }
+}

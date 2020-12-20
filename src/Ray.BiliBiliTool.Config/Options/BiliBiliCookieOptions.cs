@@ -60,7 +60,7 @@ namespace Ray.BiliBiliTool.Config.Options
         {
             bool result = true;
             string msg = "配置项[{0}]为空，该项为必须配置，对应浏览器中Cookie中的[{1}]值";
-            string tips = "检测到已配置了[{0}]，已兼容使用[{1}]";
+            string tips = "检测到已配置了[{0}]，已兼容使用[{1}]\r\n";
 
             //UserId为空，抛异常
             if (string.IsNullOrWhiteSpace(UserId))
