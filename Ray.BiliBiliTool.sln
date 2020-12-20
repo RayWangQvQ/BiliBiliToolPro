@@ -52,6 +52,27 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InfrastructureTest", "test\InfrastructureTest\InfrastructureTest.csproj", "{AE6A5DBE-E9EA-49C1-AB6C-7F01B2F19A8B}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{73DD457B-E06E-45ED-A6BA-7E3C02F8BDF1}"
+	ProjectSection(SolutionItems) = preProject
+		.github\pull.yml = .github\pull.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{61613EF4-3644-42D4-A620-70547291FB38}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\bilibili-daily-task.yml = .github\workflows\bilibili-daily-task.yml
+		.github\workflows\publish-release.yml = .github\workflows\publish-release.yml
+		.github\workflows\repo-sync.yml = .github\workflows\repo-sync.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker", "docker", "{A93210FD-27B6-40E4-B08D-391F96CA2754}"
+	ProjectSection(SolutionItems) = preProject
+		docker\crontab = docker\crontab
+		docker\entry.sh = docker\entry.sh
+		docker\job.sh = docker\job.sh
+		docker\README.md = docker\README.md
+		docker\template.json = docker\template.json
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -132,6 +153,9 @@ Global
 		{7105652A-B1C1-4F9E-BA38-8034BC8B26B4} = {120917DC-474C-448B-9EBB-1B3BA3A20B9D}
 		{ECEEFE3F-F39F-44EE-8FA2-D5CDBB25397F} = {E9BDDCBE-A57D-4E3B-8252-708088386ADF}
 		{AE6A5DBE-E9EA-49C1-AB6C-7F01B2F19A8B} = {E9BDDCBE-A57D-4E3B-8252-708088386ADF}
+		{73DD457B-E06E-45ED-A6BA-7E3C02F8BDF1} = {F3DE0D72-426B-4AD9-B3ED-3343CF4223F1}
+		{61613EF4-3644-42D4-A620-70547291FB38} = {73DD457B-E06E-45ED-A6BA-7E3C02F8BDF1}
+		{A93210FD-27B6-40E4-B08D-391F96CA2754} = {F3DE0D72-426B-4AD9-B3ED-3343CF4223F1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {197319DA-1148-4A99-847C-8B270B6A29AB}

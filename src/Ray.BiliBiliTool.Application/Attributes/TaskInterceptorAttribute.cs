@@ -30,7 +30,7 @@ namespace Ray.BiliBiliTool.Application.Attributes
         {
             if (_taskName == null) return;
 
-            PushService.PushStringWriter.WriteLine("#### >\r\n");
+            Global.PushStringWriter.WriteLine("#### >\r\n");
             _logger.LogInformation("---开始【{taskName}】---", _taskName);
         }
 

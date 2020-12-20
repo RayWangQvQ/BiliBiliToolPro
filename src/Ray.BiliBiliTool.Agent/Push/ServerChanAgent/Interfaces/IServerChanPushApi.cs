@@ -7,7 +7,7 @@ using Refit;
 
 namespace Ray.BiliBiliTool.Agent.ServerChanAgent.Interfaces
 {
-    public interface IPushApi
+    public interface IServerChanPushApi
     {
         [Headers("Content-Type:application/x-www-form-urlencoded; charset=UTF-8",
             "Accept:zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6",

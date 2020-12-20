@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -51,5 +52,7 @@ namespace Ray.BiliBiliTool.Infrastructure
         }
 
         #endregion DI相关
+
+        public static StringWriter PushStringWriter { get; private set; } = new StringWriter();
     }
 }

@@ -71,7 +71,7 @@ namespace Ray.BiliBiliTool.Console
                 Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(hostBuilderContext.Configuration)
                 .WriteTo.TextWriter(
-                    textWriter: PushService.PushStringWriter,
+                    textWriter: Global.PushStringWriter,
                     restrictedToMinimumLevel: LogHelper.GetConsoleLogLevel(hostBuilderContext.Configuration),
                     outputTemplate: LogHelper.GetConsoleLogTemplate(hostBuilderContext.Configuration) + "\r\n")//用来做微信推送
                 .CreateLogger();
@@ -105,19 +105,14 @@ namespace Ray.BiliBiliTool.Console
             Global.SetGetServiceFunc(type => di.GetService(type));
 
             ILogger<Program> logger = di.GetRequiredService<ILogger<Program>>();
-
-            logger.LogInformation(
-                "版本号：{version}",
-                typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "未知");
-            logger.LogInformation("开源地址：{url} \r\n", Constants.SourceCodeUrl);
-            logger.LogInformation("当前环境：{env} \r\n", Global.HostingEnvironment.EnvironmentName ?? "无");
+            LogAppInfo(logger);
 
             BiliBiliCookieOptions biliBiliCookieOptions = di.GetRequiredService<IOptionsMonitor<BiliBiliCookieOptions>>().CurrentValue;
             if (!biliBiliCookieOptions.Check(logger))
                 throw new Exception($"请正确配置Cookie后再运行，配置方式见 {Constants.SourceCodeUrl}");
 
             IDailyTaskAppService dailyTask = di.GetRequiredService<IDailyTaskAppService>();
-            PushService pushService = di.GetRequiredService<PushService>();
+            IPushAppService pushService = di.GetRequiredService<IPushAppService>();
 
             try
             {
@@ -125,11 +120,24 @@ namespace Ray.BiliBiliTool.Console
             }
             catch
             {
-                pushService.SendStringWriter();
+                pushService.Push();
                 throw;
             }
 
-            pushService.SendStringWriter();
+            pushService.Push();
+        }
+
+        /// <summary>
+        /// 打印应用信息
+        /// </summary>
+        /// <param name="logger"></param>
+        private static void LogAppInfo(Microsoft.Extensions.Logging.ILogger logger)
+        {
+            logger.LogInformation(
+                "版本号：{version}",
+                typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "未知");
+            logger.LogInformation("开源地址：{url}", Constants.SourceCodeUrl);
+            logger.LogInformation("当前环境：{env} \r\n", Global.HostingEnvironment.EnvironmentName ?? "无");
         }
     }
 }
