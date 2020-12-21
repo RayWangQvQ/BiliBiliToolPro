@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Ray.BiliBiliTool.Agent.ServerChanAgent.Dtos
+﻿
+namespace Ray.BiliBiliTool.Agent.Push.ServerChanAgent.Dtos
 {
     public class PushResponse
     {

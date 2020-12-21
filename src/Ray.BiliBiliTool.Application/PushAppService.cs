@@ -35,16 +35,21 @@ namespace Ray.BiliBiliTool.Application
             _logger.LogInformation("开始推送");
 
             var title = $"Ray.BiliBiliTool任务日报";
-            var content = $"#### 日期：{DateTime.Now:yyyy-MM-dd} \r\n{Global.PushStringWriter.GetStringBuilder()}";
+            var content = $"#### 日期：{DateTime.Now:yyyy-MM-dd} \r\n{Global.PushStringWriter.GetStringBuilder()}";//todo：目前推送内容默认是md格式，可以用builder重构，使支持text、json等
 
-            var pushService = _pushServices.FirstOrDefault(it => it.Name == _pushOptions.Strategy);
-            if (pushService == null)
-            {
-                _logger.LogError("推送策略：{name} 不存在", _pushOptions.Strategy);
-                throw new Exception($"推送策略：{_pushOptions.Strategy} 不存在");
-            }
+            IPushService pushService = CreatePushService();
 
             pushService.Send(title, content);//todo：封装返回类型
+        }
+
+        private IPushService CreatePushService()
+        {
+            IPushService pushService = _pushServices.FirstOrDefault(it => it.Name == _pushOptions.Strategy);
+            if (pushService != null) return pushService;
+
+            string msg = "推送策略：【{0}】不存在，请检查配置";
+            _logger.LogError(msg, _pushOptions.Strategy);
+            throw new Exception(string.Format(msg, _pushOptions.Strategy));
         }
     }
 }

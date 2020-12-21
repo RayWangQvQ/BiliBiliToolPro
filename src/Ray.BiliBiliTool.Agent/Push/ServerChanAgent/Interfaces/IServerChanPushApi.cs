@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using Ray.BiliBiliTool.Agent.ServerChanAgent.Dtos;
+﻿using System.Threading.Tasks;
+using Ray.BiliBiliTool.Agent.Push.ServerChanAgent.Dtos;
 using Refit;
 
-namespace Ray.BiliBiliTool.Agent.ServerChanAgent.Interfaces
+namespace Ray.BiliBiliTool.Agent.Push.ServerChanAgent.Interfaces
 {
     public interface IServerChanPushApi
     {

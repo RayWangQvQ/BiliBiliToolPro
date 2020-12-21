@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using Microsoft.Extensions.Options;
-using Ray.BiliBiliTool.Agent.Push;
-using Ray.BiliBiliTool.Agent.ServerChanAgent.Dtos;
-using Ray.BiliBiliTool.Agent.ServerChanAgent.Interfaces;
+﻿using Microsoft.Extensions.Options;
+using Ray.BiliBiliTool.Agent.Push.ServerChanAgent.Dtos;
+using Ray.BiliBiliTool.Agent.Push.ServerChanAgent.Interfaces;
 using Ray.BiliBiliTool.Config.Options;
 
-namespace Ray.BiliBiliTool.Agent.ServerChanAgent
+namespace Ray.BiliBiliTool.Agent.Push.ServerChanAgent
 {
     public class ServerChanPushService : IPushService
     {

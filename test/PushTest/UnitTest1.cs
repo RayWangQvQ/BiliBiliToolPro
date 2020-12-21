@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Ray.BiliBiliTool.Agent.Push;
+using Ray.BiliBiliTool.Agent.Push.ServerChanAgent;
 using Ray.BiliBiliTool.Agent.ServerChanAgent;
 using Ray.BiliBiliTool.Application.Contracts;
 using Ray.BiliBiliTool.Console;

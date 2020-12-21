@@ -1,7 +1,6 @@
-﻿using System;
-using Refit;
+﻿using Refit;
 
-namespace Ray.BiliBiliTool.Agent.ServerChanAgent.Dtos
+namespace Ray.BiliBiliTool.Agent.Push.ServerChanAgent.Dtos
 {
     public class PushRequest
     {
