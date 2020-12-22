@@ -48,6 +48,7 @@
     <PackageReference Include="Refit" Version="5.2.4" />
     <PackageReference Include="Refit.HttpClientFactory" Version="5.2.4" />
     <PackageReference Include="Serilog.AspNetCore" Version="3.4.0" />
+    <PackageReference Include="Serilog.Sinks.Telegram" Version="0.2.1" />
     <PackageReference Include="Serilog.Sinks.TextWriter" Version="2.1.0" />
     <PackageReference Include="System.Collections" Version="4.3.0" />
   </ItemGroup>
