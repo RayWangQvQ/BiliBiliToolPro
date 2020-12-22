@@ -11,8 +11,6 @@ using Ray.BiliBiliTool.Agent.Push.ServerChanAgent;
 using Ray.BiliBiliTool.Agent.Push.ServerChanAgent.Interfaces;
 using Ray.BiliBiliTool.Agent.Push.WorkWeiXinAgent;
 using Ray.BiliBiliTool.Agent.Push.WorkWeiXinAgent.Interfaces;
-using Ray.BiliBiliTool.Agent.ServerChanAgent;
-using Ray.BiliBiliTool.Agent.ServerChanAgent.Interfaces;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.Infrastructure;
 using Refit;

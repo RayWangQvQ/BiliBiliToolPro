@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using MethodBoundaryAspect.Fody.Attributes;
 using Microsoft.Extensions.Logging;
-using Ray.BiliBiliTool.Agent.ServerChanAgent;
 using Ray.BiliBiliTool.Infrastructure;
 
 namespace Ray.BiliBiliTool.Application.Attributes

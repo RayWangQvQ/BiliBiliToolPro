@@ -7,7 +7,6 @@ using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Ray.BiliBiliTool.Agent.Push;
 using Ray.BiliBiliTool.Agent.Push.WorkWeiXinAgent.Dtos;
-using Ray.BiliBiliTool.Agent.ServerChanAgent;
 using Ray.BiliBiliTool.Console;
 using Ray.BiliBiliTool.Infrastructure;
 using Serilog;
