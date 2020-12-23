@@ -50,7 +50,7 @@ namespace Ray.BiliBiliTool.Application
         {
             if (_securityOptions.IsSkipDailyTask)
             {
-                _logger.LogWarning("已配置为跳过每日任务");
+                _logger.LogWarning("已配置为跳过每日任务\r\n");
                 return;
             }
 
