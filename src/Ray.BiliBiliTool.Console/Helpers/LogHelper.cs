@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Ray.BiliBiliTool.Infrastructure;
+using Serilog.Events;
 
 namespace Ray.BiliBiliTool.Console.Helpers
 {
@@ -14,13 +15,13 @@ namespace Ray.BiliBiliTool.Console.Helpers
         /// 获取配置的Console的日志等级
         /// </summary>
         /// <returns></returns>
-        public static Serilog.Events.LogEventLevel GetConsoleLogLevel(IConfiguration configuration)
+        public static LogEventLevel GetConsoleLogLevel(IConfiguration configuration)
         {
             var consoleLevelStr = configuration["Serilog:WriteTo:0:Args:restrictedToMinimumLevel"];
             if (string.IsNullOrWhiteSpace(consoleLevelStr)) consoleLevelStr = "Information";
 
-            Serilog.Events.LogEventLevel levelEnum = (Serilog.Events.LogEventLevel)
-                Enum.Parse(typeof(Serilog.Events.LogEventLevel), consoleLevelStr);
+            LogEventLevel levelEnum = (LogEventLevel)
+                Enum.Parse(typeof(LogEventLevel), consoleLevelStr);
 
             return levelEnum;
         }

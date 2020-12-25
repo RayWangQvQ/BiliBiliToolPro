@@ -7,7 +7,7 @@ using Serilog.Core;
 using Serilog.Debugging;
 using Serilog.Events;
 
-namespace Serilog.Sinks.Telegram
+namespace Ray.Serilog.Sinks.TelegramBatched
 {
     public class TelegramBatchedSink : ILogEventSink, IDisposable
     {
@@ -39,6 +39,7 @@ namespace Serilog.Sinks.Telegram
 
         public void Emit(LogEvent logEvent)
         {
+            if (_botToken.IsNullOrEmpty() | _chatId.IsNullOrEmpty()) return;
             if (logEvent == null) throw new ArgumentNullException("logEvent");
 
             try

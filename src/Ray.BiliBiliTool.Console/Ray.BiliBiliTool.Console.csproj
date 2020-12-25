@@ -59,6 +59,6 @@
     <ProjectReference Include="..\Ray.BiliBiliTool.Config\Ray.BiliBiliTool.Config.csproj" />
     <ProjectReference Include="..\Ray.BiliBiliTool.DomainService\Ray.BiliBiliTool.DomainService.csproj" />
     <ProjectReference Include="..\Ray.BiliBiliTool.Infrastructure\Ray.BiliBiliTool.Infrastructure.csproj" />
-    <ProjectReference Include="..\Ray.Serilog.Sinks.Telegram\Ray.Serilog.Sinks.Telegram.csproj" />
+    <ProjectReference Include="..\Ray.Serilog.Sinks.TelegramBatched\Ray.Serilog.Sinks.TelegramBatched.csproj" />
   </ItemGroup>
 </Project>

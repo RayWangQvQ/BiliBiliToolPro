@@ -73,7 +73,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker", "docker", "{A93210
 		docker\template.json = docker\template.json
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ray.Serilog.Sinks.Telegram", "src\Ray.Serilog.Sinks.Telegram\Ray.Serilog.Sinks.Telegram.csproj", "{5364F4AA-A927-4DE8-961B-CB4B225234DF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ray.Serilog.Sinks.TelegramBatched", "src\Ray.Serilog.Sinks.TelegramBatched\Ray.Serilog.Sinks.TelegramBatched.csproj", "{CBBB7AB9-382E-47EA-A535-16D4930CBA98}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -133,10 +133,10 @@ Global
 		{AE6A5DBE-E9EA-49C1-AB6C-7F01B2F19A8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AE6A5DBE-E9EA-49C1-AB6C-7F01B2F19A8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AE6A5DBE-E9EA-49C1-AB6C-7F01B2F19A8B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5364F4AA-A927-4DE8-961B-CB4B225234DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5364F4AA-A927-4DE8-961B-CB4B225234DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5364F4AA-A927-4DE8-961B-CB4B225234DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5364F4AA-A927-4DE8-961B-CB4B225234DF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CBBB7AB9-382E-47EA-A535-16D4930CBA98}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CBBB7AB9-382E-47EA-A535-16D4930CBA98}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CBBB7AB9-382E-47EA-A535-16D4930CBA98}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CBBB7AB9-382E-47EA-A535-16D4930CBA98}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -162,7 +162,7 @@ Global
 		{73DD457B-E06E-45ED-A6BA-7E3C02F8BDF1} = {F3DE0D72-426B-4AD9-B3ED-3343CF4223F1}
 		{61613EF4-3644-42D4-A620-70547291FB38} = {73DD457B-E06E-45ED-A6BA-7E3C02F8BDF1}
 		{A93210FD-27B6-40E4-B08D-391F96CA2754} = {F3DE0D72-426B-4AD9-B3ED-3343CF4223F1}
-		{5364F4AA-A927-4DE8-961B-CB4B225234DF} = {110D3D21-8E9B-45AB-9667-6DA1DB3862AC}
+		{CBBB7AB9-382E-47EA-A535-16D4930CBA98} = {110D3D21-8E9B-45AB-9667-6DA1DB3862AC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {197319DA-1148-4A99-847C-8B270B6A29AB}

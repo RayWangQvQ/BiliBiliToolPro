@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Serilog.Sinks.Telegram
+namespace Ray.Serilog.Sinks.TelegramBatched
 {
     public class TelegramApiClient
     {
@@ -45,7 +44,7 @@ namespace Serilog.Sinks.Telegram
         /// <returns>A <see cref="HttpResponseMessage"/>.</returns>
         public async Task<HttpResponseMessage> PostMessageAsync(string message, string chatId)
         {
-            var json = new { chat_id = chatId, text = message, parse_mode = "markdown" }.ToJson();
+            var json = new { chat_id = chatId, text = message, parse_mode = "HTML" }.ToJson();
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             var response = await this.httpClient.PostAsync(this.apiUrl, content);
             return response;

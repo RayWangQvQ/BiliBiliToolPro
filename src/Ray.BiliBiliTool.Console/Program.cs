@@ -15,8 +15,9 @@ using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.Console.Helpers;
 using Ray.BiliBiliTool.DomainService.Extensions;
 using Ray.BiliBiliTool.Infrastructure;
+using Ray.Serilog.Sinks.TelegramBatched;
 using Serilog;
-using Serilog.Sinks.Telegram;
+using Serilog.Events;
 
 namespace Ray.BiliBiliTool.Console
 {
@@ -74,11 +75,6 @@ namespace Ray.BiliBiliTool.Console
                     textWriter: Global.PushStringWriter,
                     restrictedToMinimumLevel: LogHelper.GetConsoleLogLevel(hostBuilderContext.Configuration),
                     outputTemplate: LogHelper.GetConsoleLogTemplate(hostBuilderContext.Configuration) + "\r\n")//用来做微信推送
-                .WriteTo.TelegramBatched(
-                    botToken: "",
-                    chatId: "",
-                    predicate: x => x.MessageTemplate.Text.EndsWith("\r\n"),
-                    restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information)
                 .CreateLogger();
             }).UseSerilog();
 
@@ -127,6 +123,10 @@ namespace Ray.BiliBiliTool.Console
             {
                 pushService.Push();
                 throw;
+            }
+            finally
+            {
+                logger.LogInformation("开始推送");
             }
 
             pushService.Push();
