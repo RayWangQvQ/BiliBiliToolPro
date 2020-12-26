@@ -27,30 +27,5 @@ namespace Ray.BiliBiliTool.Infrastructure
         /// 根容器
         /// </summary>
         public static IServiceProvider ServiceProviderRoot { get; set; }
-
-        #region DI相关
-
-        private static Func<Type, object> getObjectFromDi;
-        private static Type loggerType = typeof(ILogger<>);
-
-        public static void SetGetServiceFunc(Func<Type, object> func)
-        {
-            getObjectFromDi = func;
-        }
-
-        public static ILogger<T> GetLogger<T>()
-        {
-            if (Global.getObjectFromDi == null)
-            {
-                throw new SystemException($"{nameof(Global.getObjectFromDi)} 未初始化");
-            }
-
-            Type type = typeof(T);
-            Type newType = loggerType.MakeGenericType(type);
-
-            return Global.getObjectFromDi(newType) as ILogger<T>;
-        }
-
-        #endregion DI相关
     }
 }

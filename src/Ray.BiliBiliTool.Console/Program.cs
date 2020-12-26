@@ -95,10 +95,7 @@ namespace Ray.BiliBiliTool.Console
         private static void StartRun()
         {
             using IServiceScope serviceScope = Global.ServiceProviderRoot.CreateScope();
-
-            //初始化DI相关的部分
             IServiceProvider di = serviceScope.ServiceProvider;
-            Global.SetGetServiceFunc(type => di.GetService(type));
 
             ILogger<Program> logger = di.GetRequiredService<ILogger<Program>>();
             LogAppInfo(logger);

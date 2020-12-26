@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using MethodBoundaryAspect.Fody.Attributes;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Ray.BiliBiliTool.Infrastructure;
 
@@ -21,7 +22,7 @@ namespace Ray.BiliBiliTool.Application.Attributes
             _taskName = taskName;
             _rethrowWhenException = rethrowWhenException;
 
-            _logger = Global.GetLogger<TaskInterceptorAttribute>();
+            _logger = Global.ServiceProviderRoot.GetRequiredService<ILogger<TaskInterceptorAttribute>>();
         }
 
         public override void OnEntry(MethodExecutionArgs arg)
