@@ -56,7 +56,7 @@ namespace Ray.BiliBiliTool.Config.Options
         /// </summary>
         /// <param name="logger"></param>
         /// <returns></returns>
-        public bool Check(ILogger logger)
+        public void Check(ILogger logger)
         {
             bool result = true;
             string msg = "配置项[{0}]为空，该项为必须配置，对应浏览器中Cookie中的[{1}]值";
@@ -100,7 +100,8 @@ namespace Ray.BiliBiliTool.Config.Options
                 logger.LogWarning(tips, "BILI_JCT", "BILI_JCT");
             }
 
-            return result;
+            if (!result)
+                throw new Exception($"请正确配置Cookie后再运行，配置方式见 {Constants.SourceCodeUrl}");
         }
 
         public override string ToString()

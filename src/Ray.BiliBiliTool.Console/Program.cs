@@ -101,8 +101,7 @@ namespace Ray.BiliBiliTool.Console
             LogAppInfo(logger);
 
             BiliBiliCookieOptions biliBiliCookieOptions = di.GetRequiredService<IOptionsMonitor<BiliBiliCookieOptions>>().CurrentValue;
-            if (!biliBiliCookieOptions.Check(logger))
-                throw new Exception($"请正确配置Cookie后再运行，配置方式见 {Constants.SourceCodeUrl}");
+            biliBiliCookieOptions.Check(logger);//todo：使用配置检查
 
             IDailyTaskAppService dailyTask = di.GetRequiredService<IDailyTaskAppService>();
 
