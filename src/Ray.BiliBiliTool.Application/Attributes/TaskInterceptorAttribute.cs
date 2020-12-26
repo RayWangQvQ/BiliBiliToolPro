@@ -21,7 +21,6 @@ namespace Ray.BiliBiliTool.Application.Attributes
             _taskName = taskName;
             _rethrowWhenException = rethrowWhenException;
 
-            // _logger = Log.Logger;
             _logger = Global.GetLogger<TaskInterceptorAttribute>();
         }
 
@@ -29,7 +28,6 @@ namespace Ray.BiliBiliTool.Application.Attributes
         {
             if (_taskName == null) return;
 
-            Global.PushStringWriter.WriteLine("#### >\r\n");
             _logger.LogInformation("---开始【{taskName}】---", _taskName);
         }
 

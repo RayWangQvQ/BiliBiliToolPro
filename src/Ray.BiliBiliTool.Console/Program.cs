@@ -12,7 +12,6 @@ using Ray.BiliBiliTool.Application.Extensions;
 using Ray.BiliBiliTool.Config;
 using Ray.BiliBiliTool.Config.Extensions;
 using Ray.BiliBiliTool.Config.Options;
-using Ray.BiliBiliTool.Console.Helpers;
 using Ray.BiliBiliTool.DomainService.Extensions;
 using Ray.BiliBiliTool.Infrastructure;
 using Ray.Serilog.Sinks.TelegramBatched;
@@ -71,10 +70,6 @@ namespace Ray.BiliBiliTool.Console
             {
                 Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(hostBuilderContext.Configuration)
-                .WriteTo.TextWriter(
-                    textWriter: Global.PushStringWriter,
-                    restrictedToMinimumLevel: LogHelper.GetConsoleLogLevel(hostBuilderContext.Configuration),
-                    outputTemplate: LogHelper.GetConsoleLogTemplate(hostBuilderContext.Configuration) + "\r\n")//用来做微信推送
                 .CreateLogger();
             }).UseSerilog();
 
@@ -113,23 +108,15 @@ namespace Ray.BiliBiliTool.Console
                 throw new Exception($"请正确配置Cookie后再运行，配置方式见 {Constants.SourceCodeUrl}");
 
             IDailyTaskAppService dailyTask = di.GetRequiredService<IDailyTaskAppService>();
-            IPushAppService pushService = di.GetRequiredService<IPushAppService>();
 
             try
             {
                 dailyTask.DoDailyTask();
             }
-            catch
-            {
-                pushService.Push();
-                throw;
-            }
             finally
             {
                 logger.LogInformation("开始推送");
             }
-
-            pushService.Push();
         }
 
         /// <summary>

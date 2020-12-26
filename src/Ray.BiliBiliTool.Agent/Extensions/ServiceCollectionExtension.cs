@@ -6,11 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
-using Ray.BiliBiliTool.Agent.Push;
-using Ray.BiliBiliTool.Agent.Push.ServerChanAgent;
-using Ray.BiliBiliTool.Agent.Push.ServerChanAgent.Interfaces;
-using Ray.BiliBiliTool.Agent.Push.WorkWeiXinAgent;
-using Ray.BiliBiliTool.Agent.Push.WorkWeiXinAgent.Interfaces;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.Infrastructure;
 using Refit;
@@ -45,12 +40,6 @@ namespace Ray.BiliBiliTool.Agent.Extensions
             services.AddBiliBiliClientApi<IAccountApi>("https://account.bilibili.com");
             services.AddBiliBiliClientApi<ILiveApi>("https://api.live.bilibili.com");
             services.AddBiliBiliClientApi<IRelationApi>("https://api.bilibili.com/x/relation");
-
-            //server酱推送
-            services.AddServerChanClient(configuration);
-
-            //企业微信推送
-            services.AddWorkWeiXinClient(configuration);
 
             return services;
         }
@@ -96,31 +85,6 @@ namespace Ray.BiliBiliTool.Agent.Extensions
             {
                 HttpClient.DefaultProxy = new WebProxy(proxyAddress);
             }
-
-            return services;
-        }
-
-        private static IServiceCollection AddServerChanClient(this IServiceCollection services, IConfiguration configuration)
-        {
-            services.AddRefitClient<IServerChanPushApi>(new RefitSettings(new SystemTextJsonContentSerializer(JsonSerializerOptionsBuilder.DefaultOptions)))
-                .ConfigureHttpClient((sp, c) =>
-                {
-                    c.BaseAddress = new Uri("http://sc.ftqq.com");
-                });//todo：推送是否需要自己的HttpMessageHandler
-
-            services.AddScoped<IPushService, ServerChanPushService>();
-
-            return services;
-        }
-
-        private static IServiceCollection AddWorkWeiXinClient(this IServiceCollection services, IConfiguration configuration)
-        {
-            services.AddRefitClient<IWorkWeiXinPushApi>(new RefitSettings(new SystemTextJsonContentSerializer(JsonSerializerOptionsBuilder.DefaultOptions)))
-                .ConfigureHttpClient((sp, c) =>
-                {
-                    c.BaseAddress = new Uri("https://qyapi.weixin.qq.com");
-                });//todo：推送是否需要自己的HttpMessageHandler
-            services.AddScoped<IPushService, WorkWeiXinPushService>();
 
             return services;
         }
