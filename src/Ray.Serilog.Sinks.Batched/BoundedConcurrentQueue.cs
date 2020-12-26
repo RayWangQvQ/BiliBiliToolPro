@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using System.Threading;
 
-namespace Ray.Serilog.Sinks.TelegramBatched
+namespace Ray.Serilog.Sinks.Batched
 {
     internal class BoundedConcurrentQueue<T>
     {
