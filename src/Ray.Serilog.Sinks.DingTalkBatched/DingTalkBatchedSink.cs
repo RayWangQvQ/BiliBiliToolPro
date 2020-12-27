@@ -3,13 +3,13 @@ using System.Threading.Tasks;
 using Ray.Serilog.Sinks.Batched;
 using Serilog.Events;
 
-namespace Ray.Serilog.Sinks.WorkWeiXinBatched
+namespace Ray.Serilog.Sinks.DingTalkBatched
 {
-    public class WorkWeiXinBatchedSink : BatchedSink
+    public class DingTalkBatchedSink : BatchedSink
     {
         private readonly string _webHookUrl;
 
-        public WorkWeiXinBatchedSink(
+        public DingTalkBatchedSink(
             string webHookUrl,
             Predicate<LogEvent> predicate,
             bool sendBatchesAsOneMessages,
@@ -26,7 +26,7 @@ namespace Ray.Serilog.Sinks.WorkWeiXinBatched
             base.Emit(logEvent);
         }
 
-        protected override IPushService PushService => new WorkWeiXinApiClient(_webHookUrl);
+        protected override IPushService PushService => new DingTalkApiClient(_webHookUrl);
 
         public override void Dispose()
         {

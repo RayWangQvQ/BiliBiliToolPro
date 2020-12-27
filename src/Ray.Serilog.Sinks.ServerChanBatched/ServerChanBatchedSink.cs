@@ -20,6 +20,12 @@ namespace Ray.Serilog.Sinks.ServerChanBatched
             _scKey = scKey;
         }
 
+        public override void Emit(LogEvent logEvent)
+        {
+            if (_scKey.IsNullOrEmpty()) return;
+            base.Emit(logEvent);
+        }
+
         protected override IPushService PushService => new ServerChanApiClient(_scKey);
 
         public override void Dispose()

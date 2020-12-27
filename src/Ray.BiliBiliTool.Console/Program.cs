@@ -14,9 +14,7 @@ using Ray.BiliBiliTool.Config.Extensions;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Extensions;
 using Ray.BiliBiliTool.Infrastructure;
-using Ray.Serilog.Sinks.TelegramBatched;
 using Serilog;
-using Serilog.Events;
 
 namespace Ray.BiliBiliTool.Console
 {

@@ -75,11 +75,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ray.Serilog.Sinks.TelegramB
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ray.Serilog.Sinks.ServerChanBatched", "src\Ray.Serilog.Sinks.ServerChanBatched\Ray.Serilog.Sinks.ServerChanBatched.csproj", "{38716C78-96BB-4C00-8C8A-A790E361147E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ray.Serilog.Sinks.WorkWeiXinBatched", "src\Ray.Serilog.Sinks.WorkWeiXinBatched\Ray.Serilog.Sinks.WorkWeiXinBatched.csproj", "{9F2E70CF-0AD4-4B50-A37D-5CFD0EF8CC61}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ray.Serilog.Sinks.WorkWeiXinBatched", "src\Ray.Serilog.Sinks.WorkWeiXinBatched\Ray.Serilog.Sinks.WorkWeiXinBatched.csproj", "{9F2E70CF-0AD4-4B50-A37D-5CFD0EF8CC61}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Ray.Serilog.Sinks", "Ray.Serilog.Sinks", "{4BAFC980-7A73-45C3-9460-8B8CCB87939B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ray.Serilog.Sinks.Batched", "src\Ray.Serilog.Sinks.Batched\Ray.Serilog.Sinks.Batched.csproj", "{A58F9F2E-AAEA-498A-8C61-7497E774AD77}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ray.Serilog.Sinks.Batched", "src\Ray.Serilog.Sinks.Batched\Ray.Serilog.Sinks.Batched.csproj", "{A58F9F2E-AAEA-498A-8C61-7497E774AD77}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ray.Serilog.Sinks.DingTalkBatched", "src\Ray.Serilog.Sinks.DingTalkBatched\Ray.Serilog.Sinks.DingTalkBatched.csproj", "{99C07B4B-5CDE-4911-AE38-2F907F492657}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -151,6 +153,10 @@ Global
 		{A58F9F2E-AAEA-498A-8C61-7497E774AD77}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A58F9F2E-AAEA-498A-8C61-7497E774AD77}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A58F9F2E-AAEA-498A-8C61-7497E774AD77}.Release|Any CPU.Build.0 = Release|Any CPU
+		{99C07B4B-5CDE-4911-AE38-2F907F492657}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99C07B4B-5CDE-4911-AE38-2F907F492657}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99C07B4B-5CDE-4911-AE38-2F907F492657}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99C07B4B-5CDE-4911-AE38-2F907F492657}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -180,6 +186,7 @@ Global
 		{9F2E70CF-0AD4-4B50-A37D-5CFD0EF8CC61} = {4BAFC980-7A73-45C3-9460-8B8CCB87939B}
 		{4BAFC980-7A73-45C3-9460-8B8CCB87939B} = {110D3D21-8E9B-45AB-9667-6DA1DB3862AC}
 		{A58F9F2E-AAEA-498A-8C61-7497E774AD77} = {4BAFC980-7A73-45C3-9460-8B8CCB87939B}
+		{99C07B4B-5CDE-4911-AE38-2F907F492657} = {4BAFC980-7A73-45C3-9460-8B8CCB87939B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {197319DA-1148-4A99-847C-8B270B6A29AB}
