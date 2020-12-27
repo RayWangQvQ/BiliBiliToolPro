@@ -48,17 +48,20 @@ namespace Ray.BiliBiliTool.DomainService
         /// 直播中心银瓜子兑换B币
         /// </summary>
         /// <returns>兑换银瓜子后硬币余额</returns>
-        public void ExchangeSilver2Coin()
+        public bool ExchangeSilver2Coin()
         {
+            var result = false;
+
             if (!_dailyTaskOptions.IsExchangeSilver2Coin)
             {
                 _logger.LogInformation("已配置为跳过兑换任务");
-                return;
+                return result;
             }
 
             var response = _liveApi.ExchangeSilver2Coin().Result;
             if (response.Code == 0)
             {
+                result = true;
                 _logger.LogInformation("银瓜子兑换硬币成功");
             }
             else
@@ -68,6 +71,8 @@ namespace Ray.BiliBiliTool.DomainService
 
             var queryStatus = _liveApi.GetExchangeSilverStatus().Result;
             _logger.LogInformation("当前银瓜子余额: {0}", queryStatus.Data.Silver);
+
+            return result;
         }
     }
 }

@@ -126,12 +126,14 @@ namespace Ray.BiliBiliTool.Application
         /// 直播中心的银瓜子兑换硬币
         /// </summary>
         [TaskInterceptor("直播中心银瓜子兑换硬币", false)]
-        private decimal ExchangeSilver2Coin()
+        private void ExchangeSilver2Coin()
         {
-            _liveDomainService.ExchangeSilver2Coin();
+            var success = _liveDomainService.ExchangeSilver2Coin();
+            if (!success) return;
+
+            //如果兑换成功，则打印硬币余额
             var coinBalance = _coinDomainService.GetCoinBalance();
             _logger.LogInformation("当前硬币余额: {0}", coinBalance);
-            return coinBalance;
         }
 
         /// <summary>
