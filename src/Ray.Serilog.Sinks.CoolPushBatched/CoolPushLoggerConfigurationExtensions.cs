@@ -3,13 +3,13 @@ using Serilog;
 using Serilog.Configuration;
 using Serilog.Events;
 
-namespace Ray.Serilog.Sinks.ServerChanBatched
+namespace Ray.Serilog.Sinks.CoolPushBatched
 {
-    public static class ServerChanLoggerConfigurationExtensions
+    public static class CoolPushLoggerConfigurationExtensions
     {
-        public static LoggerConfiguration ServerChanBatched(
+        public static LoggerConfiguration CoolPushBatched(
             this LoggerSinkConfiguration loggerSinkConfiguration,
-            string scKey,
+            string sKey,
             string containsTrigger = null,
             bool sendBatchesAsOneMessages = true,
             IFormatProvider formatProvider = null,
@@ -18,12 +18,12 @@ namespace Ray.Serilog.Sinks.ServerChanBatched
         {
             Predicate<LogEvent> predicate = null;
             if (containsTrigger.IsNotNullOrEmpty()) predicate = x => x.MessageTemplate.Text.Contains(containsTrigger);
-            return loggerSinkConfiguration.ServerChanBatched(scKey, predicate, sendBatchesAsOneMessages, formatProvider, restrictedToMinimumLevel);
+            return loggerSinkConfiguration.CoolPushBatched(sKey, predicate, sendBatchesAsOneMessages, formatProvider, restrictedToMinimumLevel);
         }
 
-        public static LoggerConfiguration ServerChanBatched(
+        public static LoggerConfiguration CoolPushBatched(
             this LoggerSinkConfiguration loggerSinkConfiguration,
-            string scKey,
+            string sKey,
             Predicate<LogEvent> triggerPredicate = null,
             bool sendBatchesAsOneMessages = true,
             IFormatProvider formatProvider = null,
@@ -31,7 +31,7 @@ namespace Ray.Serilog.Sinks.ServerChanBatched
             )
         {
             if (triggerPredicate == null) triggerPredicate = x => true;
-            return loggerSinkConfiguration.Sink(new ServerChanBatchedSink(scKey, triggerPredicate, sendBatchesAsOneMessages, formatProvider, restrictedToMinimumLevel), restrictedToMinimumLevel);
+            return loggerSinkConfiguration.Sink(new CoolPushBatchedSink(sKey, triggerPredicate, sendBatchesAsOneMessages, formatProvider, restrictedToMinimumLevel), restrictedToMinimumLevel);
         }
     }
 }

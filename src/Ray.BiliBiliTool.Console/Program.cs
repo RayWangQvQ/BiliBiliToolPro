@@ -107,6 +107,10 @@ namespace Ray.BiliBiliTool.Console
             {
                 dailyTask.DoDailyTask();
             }
+            catch (Exception ex)
+            {
+                logger.LogError("程序异常终止，原因：{msg}", ex.Message);
+            }
             finally
             {
                 logger.LogInformation("开始推送");
