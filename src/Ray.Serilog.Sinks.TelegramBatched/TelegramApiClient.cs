@@ -14,12 +14,12 @@ namespace Ray.Serilog.Sinks.TelegramBatched
         /// <summary>
         /// The API URL.
         /// </summary>
-        private readonly Uri apiUrl;
+        private readonly Uri _apiUrl;
 
         /// <summary>
         /// The HTTP client.
         /// </summary>
-        private readonly HttpClient httpClient = new HttpClient();
+        private readonly HttpClient _httpClient = new HttpClient();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TelegramClient"/> class.
@@ -36,15 +36,15 @@ namespace Ray.Serilog.Sinks.TelegramBatched
 
             _chatId = chatId;
 
-            this.apiUrl = new Uri($"{TelegramBotApiUrl}{botToken}/sendMessage");
-            this.httpClient.Timeout = TimeSpan.FromSeconds(timeoutSeconds);
+            this._apiUrl = new Uri($"{TelegramBotApiUrl}{botToken}/sendMessage");
+            this._httpClient.Timeout = TimeSpan.FromSeconds(timeoutSeconds);
         }
 
         public async Task<HttpResponseMessage> PushMessageAsync(string message)
         {
             var json = new { chat_id = _chatId, text = message, parse_mode = "HTML" }.ToJson();
             var content = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await this.httpClient.PostAsync(this.apiUrl, content);
+            var response = await this._httpClient.PostAsync(this._apiUrl, content);
             return response;
         }
     }

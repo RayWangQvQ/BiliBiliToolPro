@@ -26,31 +26,10 @@ namespace LogTest
         }
 
         [Fact]
-        public void Test1()
-        {
-            ILogger logger = CreateLogger();
-
-            int count = 10;
-            for (int i = 0; i < count; i++)
-            {
-                if (i == 5)
-                    logger.LogInformation("---{num}---", i.ToString());
-                else
-                    logger.LogInformation(i.ToString());
-                Thread.Sleep(1000);
-            }
-            logger.LogInformation("开始推送");
-            //System.Console.ReadLine();
-        }
-
-        [Fact]
         public void Test2()
         {
-            var msg = "ℹ 版本号：\"1.0.18\"\r\n\r\nℹ 开源地址：\"https://github.com/RayWangQvQ/BiliBiliTool\"\r\n\r\nℹ 当前环境：\"Development\" \r\n\r\n\r\nℹ -----开始每日任务-----\r\n\r\n\r\nℹ ---开始【\"登录\"】---\r\n\r\nℹ 登录成功，用户名: \"在*楼\"\r\n\r\nℹ 硬币余额: 672.4\r\n\r\nℹ 距离升级到Lv6还有: 261天\r\n\r\nℹ ---结束---\r\n\r\n\r\nℹ ---开始【\"观看、分享视频\"】---\r\n\r\nℹ 今天已经观看过了，不需要再看啦\r\n\r\nℹ 今天已经分享过了，不要再分享啦\r\n\r\nℹ ---结束---\r\n\r\n\r\nℹ ---开始【\"投币\"】---\r\n\r\nℹ 今日已投5枚硬币，已完成投币任务，不需要再投啦~\r\n\r\nℹ ---结束---\r\n\r\n\r\nℹ ---开始【\"漫画签到\"】---\r\n\r\nℹ 今日已签到过，无法重复签到\r\n\r\nℹ ---结束---\r\n\r\n\r\nℹ ---开始【\"直播中心签到\"】---\r\n\r\nℹ 今日已签到过,无法重复签到\r\n\r\nℹ ---结束---\r\n\r\n\r\nℹ ---开始【\"直播中心银瓜子兑换硬币\"】---\r\n\r\nℹ 银瓜子兑换硬币失败，原因：\"银瓜子余额不足\"\r\n\r\nℹ 当前银瓜子余额: 564\r\n\r\nℹ 当前硬币余额: 672.4\r\n\r\nℹ ---结束---\r\n\r\n\r\nℹ ---开始【\"每月领取大会员福利\"】---\r\n\r\nℹ 目标领取日期为1号，今天是25号，跳过领取任务\r\n\r\nℹ ---结束---\r\n\r\n\r\nℹ ---开始【\"每月领取大会员漫画权益\"】---\r\n\r\nℹ 目标领取日期为1号，今天是25号，跳过领取任务\r\n\r\nℹ ---结束---\r\n\r\n\r\nℹ ---开始【\"每月为自己充电\"】---\r\n\r\nℹ 目标充电日期为31号，今天是25号，跳过充电任务\r\n\r\nℹ ---结束---\r\n\r\n\r\nℹ -----全部任务已执行结束-----\r\n\r\n\r\nℹ 开始推送\r\n\r\n";
-            var msg2 = "ℹ ---开始【\"登录\"】---\r\n\r\nℹ 登录成功，用户名: \"在*楼\"\r\n\r\nℹ 硬币余额: 672.4\r\n\r\nℹ 距离升级到Lv6还有: 261天\r\n\r\nℹ ---结束---\r\n\r\n\r\n";
-
             TelegramApiClient client = new TelegramApiClient(_botToken, _chatId);
-            var result = client.PushMessageAsync(msg).Result;
+            var result = client.PushMessageAsync(LogConstants.Msg).Result;
             Debug.WriteLine(result.Content.ReadAsStringAsync().Result);
 
             System.Console.ReadLine();
@@ -58,21 +37,6 @@ namespace LogTest
             /*
              * 如果指定markdown，星号会导致推送失败
              */
-        }
-
-        private ILogger CreateLogger()
-        {
-            /*
-            return new LoggerConfiguration()
-                .WriteTo.Debug()
-                .WriteTo.TelegramBatched(
-                _botToken,
-                _chatId,
-                x => x.MessageTemplate.Text.StartsWith("---"),
-                false)
-                .CreateLogger();
-            */
-            return Global.ServiceProviderRoot.GetRequiredService<ILogger<UnitTest1>>();
         }
     }
 }

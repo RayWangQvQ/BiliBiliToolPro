@@ -10,12 +10,12 @@ namespace Ray.Serilog.Sinks.CoolPushBatched
     {
         private const string Host = "https://push.xuthus.cc/send";
 
-        private readonly Uri apiUrl;
-        private readonly HttpClient httpClient = new HttpClient();
+        private readonly Uri _apiUrl;
+        private readonly HttpClient _httpClient = new HttpClient();
 
         public CoolPushApiClient(string sKey)
         {
-            apiUrl = new Uri($"{Host}/{sKey}");
+            _apiUrl = new Uri($"{Host}/{sKey}");
         }
 
         public async Task<HttpResponseMessage> PushMessageAsync(string message)
@@ -30,7 +30,7 @@ namespace Ray.Serilog.Sinks.CoolPushBatched
 
             var content = new StringContent(message, Encoding.UTF8, "application/json");
 
-            var response = await httpClient.PostAsync(apiUrl, content);
+            var response = await _httpClient.PostAsync(_apiUrl, content);
             return response;
         }
     }

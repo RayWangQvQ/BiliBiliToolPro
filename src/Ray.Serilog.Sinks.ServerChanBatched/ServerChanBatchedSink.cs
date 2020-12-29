@@ -28,6 +28,13 @@ namespace Ray.Serilog.Sinks.ServerChanBatched
 
         protected override IPushService PushService => new ServerChanApiClient(_scKey);
 
+        protected override string RenderMessage(LogEvent logEvent)
+        {
+            var msg = base.RenderMessage(logEvent);
+            msg += "\r\n";
+            return msg;
+        }
+
         public override void Dispose()
         {
             //todo

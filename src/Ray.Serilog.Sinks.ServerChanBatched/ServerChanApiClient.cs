@@ -11,14 +11,14 @@ namespace Ray.Serilog.Sinks.ServerChanBatched
     {
         private const string Host = "http://sc.ftqq.com";
 
-        private readonly Uri apiUrl;
+        private readonly Uri _apiUrl;
         private readonly string _title;
-        private readonly HttpClient httpClient = new HttpClient();
+        private readonly HttpClient _httpClient = new HttpClient();
 
         public ServerChanApiClient(string scKey, string title = "Ray.BiliBiliTool任务日报")
         {
             _title = title;
-            apiUrl = new Uri($"{Host}/{scKey}.send");
+            _apiUrl = new Uri($"{Host}/{scKey}.send");
         }
 
         public async Task<HttpResponseMessage> PushMessageAsync(string message)
@@ -29,7 +29,7 @@ namespace Ray.Serilog.Sinks.ServerChanBatched
                 {"desp", message}
             };
             var content = new FormUrlEncodedContent(dic);
-            var response = await httpClient.PostAsync(apiUrl, content);
+            var response = await _httpClient.PostAsync(_apiUrl, content);
             return response;
         }
     }

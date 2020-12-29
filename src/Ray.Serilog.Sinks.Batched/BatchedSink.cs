@@ -110,14 +110,15 @@ namespace Ray.Serilog.Sinks.Batched
 
         protected virtual string RenderMessage(LogEvent logEvent)
         {
-            var sb = new StringBuilder();
-            sb.AppendLine($"{GetEmoji(logEvent)} {logEvent.RenderMessage()}");
+            var msg = $"{GetEmoji(logEvent)} {logEvent.RenderMessage()}";
 
             if (logEvent.Exception == null)
             {
-                return sb.ToString();
+                return msg;
             }
 
+            var sb = new StringBuilder();
+            sb.AppendLine(msg);
             sb.AppendLine($"\n*{logEvent.Exception.Message}*\n");
             sb.AppendLine($"Message: `{logEvent.Exception.Message}`");
             sb.AppendLine($"Type: `{logEvent.Exception.GetType().Name}`\n");
