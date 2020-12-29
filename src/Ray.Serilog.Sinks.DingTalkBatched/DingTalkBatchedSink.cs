@@ -28,6 +28,13 @@ namespace Ray.Serilog.Sinks.DingTalkBatched
 
         protected override IPushService PushService => new DingTalkApiClient(_webHookUrl);
 
+        protected override string RenderMessage(LogEvent logEvent)
+        {
+            var msg = base.RenderMessage(logEvent);
+            msg += "\r\n";
+            return msg;
+        }
+
         public override void Dispose()
         {
             //todo

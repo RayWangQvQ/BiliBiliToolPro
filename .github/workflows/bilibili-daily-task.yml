@@ -50,7 +50,17 @@ jobs:
         Ray_BiliBiliCookie:SessData: ${{secrets.SESSDATA}}
         Ray_BiliBiliCookie:BiliJct: ${{secrets.BILIJCT}}
         Ray_BiliBiliCookie:Bili_jct: ${{secrets.BILI_JCT}} # 为了兼容 GitHub Secrets 经常会被填错
-        Ray_Push:PushScKey: ${{secrets.PUSHSCKEY}}
+        Ray_Serilog:WriteTo:3:Args:botToken: ${{secrets.PUSHTGTOKEN}} # Telegram
+        Ray_Serilog:WriteTo:3:Args:chatId: ${{secrets.PUSHTGCHATID}}
+        Ray_Serilog:WriteTo:3:Args:containsTrigger: ${{secrets.PUSHTGTRIGGER}}
+        Ray_Serilog:WriteTo:4:Args:webHookUrl: ${{secrets.PUSHWEIXINURL}} # 微信
+        Ray_Serilog:WriteTo:4:Args:containsTrigger: ${{secrets.PUSHWEIXINTRIGGER}}
+        Ray_Serilog:WriteTo:5:Args:webHookUrl: ${{secrets.PUSHDINGURL}} # 钉钉
+        Ray_Serilog:WriteTo:5:Args:containsTrigger: ${{secrets.PUSHDINGTRIGGER}}
+        Ray_Serilog:WriteTo:6:Args:scKey: ${{secrets.PUSHSCKEY}} # Server酱
+        Ray_Serilog:WriteTo:6:Args:containsTrigger: ${{secrets.PUSHSERVERTRIGGER}}
+        Ray_Serilog:WriteTo:7:Args:sKey: ${{secrets.PUSHCOOLSKEY}} # 酷推
+        Ray_Serilog:WriteTo:7:Args:containsTrigger: ${{secrets.PUSHCOOLTRIGGER}}
         Ray_Security:IsSkipDailyTask: ${{secrets.ISSKIPDAILYTASK}}
         Ray_Security:IntervalSecondsBetweenRequestApi: ${{secrets.INTERVALSECONDSBETWEENREQUESTAPI}}
         Ray_Security:IntervalMethodTypes: ${{secrets.INTERVALMETHODTYPES}}
