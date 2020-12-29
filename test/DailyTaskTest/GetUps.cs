@@ -16,7 +16,7 @@ namespace WatchVideoTest
         {
             Program.PreWorks(new string[] { });
 
-            using (var scope = RayContainer.Root.CreateScope())
+            using (var scope = Global.ServiceProviderRoot.CreateScope())
             {
                 var cookie = scope.ServiceProvider.GetRequiredService<IOptionsMonitor<BiliBiliCookieOptions>>();
                 var api = scope.ServiceProvider.GetRequiredService<IRelationApi>();
@@ -34,7 +34,7 @@ namespace WatchVideoTest
         {
             Program.PreWorks(new string[] { });
 
-            using (var scope = RayContainer.Root.CreateScope())
+            using (var scope = Global.ServiceProviderRoot.CreateScope())
             {
                 var api = scope.ServiceProvider.GetRequiredService<IRelationApi>();
 

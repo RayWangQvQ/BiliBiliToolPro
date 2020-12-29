@@ -18,6 +18,6 @@ namespace Ray.BiliBiliTool.DomainService.Interfaces
         /// 银瓜子兑换硬币
         /// </summary>
         /// <returns></returns>
-        decimal ExchangeSilver2Coin();
+        bool ExchangeSilver2Coin();
     }
 }

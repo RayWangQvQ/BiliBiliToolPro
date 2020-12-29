@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
+using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 
 namespace Ray.BiliBiliTool.DomainService
@@ -14,15 +16,15 @@ namespace Ray.BiliBiliTool.DomainService
     {
         private readonly ILogger<LiveDomainService> _logger;
         private readonly ILiveApi _liveApi;
-        private readonly ICoinDomainService _coinDomainService;
+        private readonly DailyTaskOptions _dailyTaskOptions;
 
         public LiveDomainService(ILogger<LiveDomainService> logger,
             ILiveApi liveApi,
-            ICoinDomainService coinDomainService)
+            IOptionsMonitor<DailyTaskOptions> dailyTaskOptions)
         {
             _logger = logger;
             _liveApi = liveApi;
-            _coinDomainService = coinDomainService;
+            _dailyTaskOptions = dailyTaskOptions.CurrentValue;
         }
 
         /// <summary>
@@ -46,11 +48,20 @@ namespace Ray.BiliBiliTool.DomainService
         /// 直播中心银瓜子兑换B币
         /// </summary>
         /// <returns>兑换银瓜子后硬币余额</returns>
-        public decimal ExchangeSilver2Coin()
+        public bool ExchangeSilver2Coin()
         {
+            var result = false;
+
+            if (!_dailyTaskOptions.IsExchangeSilver2Coin)
+            {
+                _logger.LogInformation("已配置为跳过兑换任务");
+                return result;
+            }
+
             var response = _liveApi.ExchangeSilver2Coin().Result;
             if (response.Code == 0)
             {
+                result = true;
                 _logger.LogInformation("银瓜子兑换硬币成功");
             }
             else
@@ -61,10 +72,7 @@ namespace Ray.BiliBiliTool.DomainService
             var queryStatus = _liveApi.GetExchangeSilverStatus().Result;
             _logger.LogInformation("当前银瓜子余额: {0}", queryStatus.Data.Silver);
 
-            var silver2CoinMoney = _coinDomainService.GetCoinBalance();
-            _logger.LogInformation("当前硬币余额: {0}", silver2CoinMoney);
-
-            return silver2CoinMoney;
+            return result;
         }
     }
 }
