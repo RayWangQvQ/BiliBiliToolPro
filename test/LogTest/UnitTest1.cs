@@ -1,3 +1,5 @@
+using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -9,12 +11,18 @@ namespace LogTest
 {
     public class UnitTest1
     {
+        public UnitTest1()
+        {
+            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
+            Program.PreWorks(new string[] { });
+        }
+
         [Fact]
         public void Test1()
         {
             Program.PreWorks(new string[] { });
 
-            var logger = RayContainer.Root.GetRequiredService<ILogger<UnitTest1>>();
+            var logger = Global.ServiceProviderRoot.GetRequiredService<ILogger<UnitTest1>>();
 
             logger.LogTrace("testTrace");
             logger.LogDebug("testDebug");
@@ -22,9 +30,39 @@ namespace LogTest
             logger.LogError("testError");
 
             logger.LogDebug(null);
-            logger.LogDebug("123{0}{1}", null,"haha");
+            logger.LogDebug("123{0}{1}", null, "haha");
 
-            Task.Delay(3000);
+            System.Console.ReadLine();
+        }
+
+        [Fact]
+        public void Test2()
+        {
+            ILogger logger = CreateLogger();
+
+            logger.LogInformation("开源地址：{url}", "https://github.com/RayWangQvQ/BiliBiliTool");
+            logger.LogInformation("当前环境：{env} \r\n", Global.HostingEnvironment.EnvironmentName ?? "无");
+
+            logger.LogInformation("-----开始每日任务-----\r\n");
+
+            logger.LogInformation("---开始【{taskName}】---", "登录");
+            logger.LogInformation("用户名: 在*楼");
+            logger.LogInformation("---结束---\r\n");
+
+            logger.LogInformation("-----全部任务已执行结束-----\r\n");
+
+            logger.LogInformation("开始推送");
+            System.Console.ReadLine();
+        }
+
+        private ILogger CreateLogger()
+        {
+            /*
+            return new LoggerConfiguration()
+                .WriteTo.Debug()
+                .CreateLogger();
+            */
+            return Global.ServiceProviderRoot.GetRequiredService<ILogger<UnitTest1>>();
         }
     }
 }

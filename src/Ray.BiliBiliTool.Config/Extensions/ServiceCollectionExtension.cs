@@ -20,8 +20,7 @@ namespace Ray.BiliBiliTool.Config.Extensions
                 .Configure<JsonSerializerOptions>(o => o = JsonSerializerOptionsBuilder.DefaultOptions)
                 .Configure<BiliBiliCookieOptions>(configuration.GetSection("BiliBiliCookie"))
                 .Configure<DailyTaskOptions>(configuration.GetSection("DailyTaskConfig"))
-                .Configure<SecurityOptions>(configuration.GetSection("Security"))
-                .Configure<PushOptions>(configuration.GetSection("Push"));
+                .Configure<SecurityOptions>(configuration.GetSection("Security"));
 
             return services;
         }

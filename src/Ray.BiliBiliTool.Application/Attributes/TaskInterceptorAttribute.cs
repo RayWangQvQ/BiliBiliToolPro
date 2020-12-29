@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 using MethodBoundaryAspect.Fody.Attributes;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Ray.BiliBiliTool.Agent.ServerChanAgent;
 using Ray.BiliBiliTool.Infrastructure;
 
 namespace Ray.BiliBiliTool.Application.Attributes
@@ -22,15 +22,13 @@ namespace Ray.BiliBiliTool.Application.Attributes
             _taskName = taskName;
             _rethrowWhenException = rethrowWhenException;
 
-            // _logger = Log.Logger;
-            _logger = RayContainer.GetLogger<TaskInterceptorAttribute>();
+            _logger = Global.ServiceProviderRoot.GetRequiredService<ILogger<TaskInterceptorAttribute>>();
         }
 
         public override void OnEntry(MethodExecutionArgs arg)
         {
             if (_taskName == null) return;
 
-            PushService.PushStringWriter.WriteLine("#### >\r\n");
             _logger.LogInformation("---开始【{taskName}】---", _taskName);
         }
 
@@ -38,7 +36,7 @@ namespace Ray.BiliBiliTool.Application.Attributes
         {
             if (_taskName == null) return;
 
-            _logger.LogInformation("---结束---\r\n", _taskName);
+            _logger.LogInformation("---结束---\r\n");
         }
 
         public override void OnException(MethodExecutionArgs arg)

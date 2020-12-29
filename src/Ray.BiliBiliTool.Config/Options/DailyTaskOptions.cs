@@ -33,6 +33,11 @@ namespace Ray.BiliBiliTool.Config.Options
         public int DayOfReceiveVipPrivilege { get; set; } = -1;
 
         /// <summary>
+        /// 是否开启直播中心银瓜子兑换硬币
+        /// </summary>
+        public bool IsExchangeSilver2Coin { get; set; } = true;
+
+        /// <summary>
         /// 执行客户端操作时的平台 [ios,android]
         /// </summary>
         public string DevicePlatform { get; set; } = "ios";

@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    name: Publish release and upload asset
+    name: publish relesae
     runs-on: ubuntu-latest
     
     steps:
@@ -17,21 +17,19 @@ jobs:
         uses: actions/checkout@v2
     
       - name: Setup .NET
-        uses: actions/setup-dotnet@v1.7.2
+        uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: 5.0.100
+          dotnet-version: 5.0.x
         
       - name: Publish and zip
         run: |
-          dotnet restore
-          dotnet build --configuration Release --no-restore
           cd ./src/Ray.BiliBiliTool.Console
-          dotnet publish --self-contained false -o ./bin/Publish/net5-dependent
+          dotnet publish --configuration Release --self-contained false -o ./bin/Publish/net5-dependent
           echo "dotnet Ray.BiliBiliTool.Console.dll" > ./bin/Publish/net5-dependent/start.bat
-          dotnet publish --runtime win-x86 --self-contained true -o ./bin/Publish/win-x86-x64
-          dotnet publish --runtime linux-arm --self-contained true -o ./bin/Publish/linux-arm
-          dotnet publish --runtime linux-x64 --self-contained true -o ./bin/Publish/linux-x64
-          dotnet publish --runtime osx-x64 --self-contained true -o ./bin/Publish/osx-x64
+          dotnet publish --configuration Release --runtime win-x86 --self-contained true -p:PublishTrimmed=true -o ./bin/Publish/win-x86-x64
+          dotnet publish --configuration Release --runtime linux-arm --self-contained true -p:PublishTrimmed=true -o ./bin/Publish/linux-arm
+          dotnet publish --configuration Release --runtime linux-x64 --self-contained true -p:PublishTrimmed=true -o ./bin/Publish/linux-x64
+          dotnet publish --configuration Release --runtime osx-x64 --self-contained true -p:PublishTrimmed=true -o ./bin/Publish/osx-x64
           cd ./bin/Publish
           zip -q -r  bilibili-tool-v${{ github.event.inputs.version }}-net5-dependent.zip net5-dependent
           zip -q -r  bilibili-tool-v${{ github.event.inputs.version }}-win-x86-x64.zip win-x86-x64

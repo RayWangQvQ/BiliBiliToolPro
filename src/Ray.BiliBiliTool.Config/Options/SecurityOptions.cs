@@ -53,5 +53,10 @@ namespace Ray.BiliBiliTool.Config.Options
         /// 请求B站接口时头部传递的User-Agent
         /// </summary>
         public string UserAgent { get; set; } = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.66 Safari/537.36 Edg/87.0.664.41";
+
+        /// <summary>
+        /// 代理
+        /// </summary>
+        public string WebProxy { get; set; }
     }
 }

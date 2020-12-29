@@ -49,7 +49,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// <summary>
         /// 完成投币任务
         /// </summary>
-        public void AddCoinsForVideo()
+        public void AddCoinsForVideos()
         {
             int needCoins = GetNeedDonateCoinNum();
             if (needCoins <= 0) return;
@@ -93,23 +93,23 @@ namespace Ray.BiliBiliTool.DomainService
         {
             Tuple<string, string> result = null;
 
-            //如果配置upID，则从up中随机尝试获取5次
+            //如果配置了upID，则从up中随机尝试获取1次
             if (_dailyTaskOptions.SupportUpIdList.Count > 0)
             {
-                result = TryGetCanDonatedVideoByUp(5);
+                result = TryGetCanDonateVideoByUp(1);
                 if (result != null) return result;
             }
 
-            //然后从特别关注列表尝试获取5次
-            result = TryGetCanDonatedVideoBySpecialUps(5);
+            //然后从特别关注列表尝试获取1次
+            result = TryGetCanDonateVideoBySpecialUps(1);
             if (result != null) return result;
 
-            //然后从普通关注列表获取5次
-            result = TryGetCanDonatedVideoByFollowingUps(5);
+            //然后从普通关注列表获取1次
+            result = TryGetCanDonateVideoByFollowingUps(1);
             if (result != null) return result;
 
-            //最后从排行榜尝试5次
-            result = TryGetNotDonatedVideoByRegion(5);
+            //最后从排行榜尝试3次
+            result = TryGetCanDonateVideoByRegion(3);
 
             return result;
         }
@@ -149,29 +149,32 @@ namespace Ray.BiliBiliTool.DomainService
         /// <summary>
         /// 获取今日的目标投币数
         /// </summary>
-        /// <param name="alreadyCoins"></param>
-        /// <param name="targetCoins"></param>
         /// <returns></returns>
         private int GetNeedDonateCoinNum()
         {
             //获取自定义配置投币数
             int configCoins = _dailyTaskOptions.NumberOfCoins;
+            if (configCoins <= 0)
+            {
+                _logger.LogInformation("已配置为跳过投币任务");
+                return configCoins;
+            }
+
             //已投的硬币
             int alreadyCoins = _coinDomainService.GetDonatedCoins();
             //目标
             int targetCoins = configCoins > Constants.MaxNumberOfDonateCoins
                 ? Constants.MaxNumberOfDonateCoins
                 : configCoins;
-            _logger.LogInformation("今日已投{already}枚硬币，目标是投{target}枚硬币", alreadyCoins, targetCoins);
 
             if (targetCoins > alreadyCoins)
             {
                 int needCoins = targetCoins - alreadyCoins;
-                _logger.LogInformation("还需再投{need}枚硬币", needCoins);
+                _logger.LogInformation("今日已投{already}枚硬币，目标是投{target}枚，还需再投{need}枚", alreadyCoins, targetCoins, needCoins);
                 return needCoins;
             }
 
-            _logger.LogInformation("已经完成投币任务，今天不需要再投啦");
+            _logger.LogInformation("今日已投{already}枚硬币，已完成投币任务，不需要再投啦~", alreadyCoins);
             return 0;
         }
 
@@ -180,7 +183,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// </summary>
         /// <param name="tryCount"></param>
         /// <returns></returns>
-        private Tuple<string, string> TryGetCanDonatedVideoByUp(int tryCount)
+        private Tuple<string, string> TryGetCanDonateVideoByUp(int tryCount)
         {
             //是否配置了up主
             if (_dailyTaskOptions.SupportUpIdList.Count == 0) return null;
@@ -193,7 +196,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// </summary>
         /// <param name="tryCount"></param>
         /// <returns></returns>
-        private Tuple<string, string> TryGetCanDonatedVideoBySpecialUps(int tryCount)
+        private Tuple<string, string> TryGetCanDonateVideoBySpecialUps(int tryCount)
         {
             //获取特别关注列表
             BiliApiResponse<List<UpInfo>> specials = _relationApi.GetSpecialFollowings().Result;
@@ -207,7 +210,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// </summary>
         /// <param name="tryCount"></param>
         /// <returns></returns>
-        private Tuple<string, string> TryGetCanDonatedVideoByFollowingUps(int tryCount)
+        private Tuple<string, string> TryGetCanDonateVideoByFollowingUps(int tryCount)
         {
             //获取特别关注列表
             BiliApiResponse<GetFollowingsResponse> result = _relationApi.GetFollowings(_biliBiliCookieOptions.UserId).Result;
@@ -221,7 +224,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// </summary>
         /// <param name="tryCount"></param>
         /// <returns></returns>
-        private Tuple<string, string> TryGetNotDonatedVideoByRegion(int tryCount)
+        private Tuple<string, string> TryGetCanDonateVideoByRegion(int tryCount)
         {
             if (tryCount <= 0) return null;
 

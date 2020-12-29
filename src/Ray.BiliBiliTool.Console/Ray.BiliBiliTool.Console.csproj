@@ -4,17 +4,17 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
     <Authors>Ray</Authors>
-    <Version>1.0.17</Version>
+    <Version>1.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="appsettings.Development.json" />
     <None Remove="appsettings.json" />
     <None Remove="appsettings.Production.json" />
+    <None Remove="commandLineMappings.json" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="appsettings.Development.json">
+    <Content Include="commandLineMappings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
@@ -33,16 +33,16 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="5.0.0" />
-    <PackageReference Include="Refit" Version="5.2.1" />
-    <PackageReference Include="Refit.HttpClientFactory" Version="5.2.1" />
+    <PackageReference Include="Refit" Version="5.2.4" />
+    <PackageReference Include="Refit.HttpClientFactory" Version="5.2.4" />
     <PackageReference Include="Serilog.AspNetCore" Version="3.4.0" />
-    <PackageReference Include="Serilog.Sinks.TextWriter" Version="2.1.0" />
+    <PackageReference Include="System.Collections" Version="4.3.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -52,5 +52,16 @@
     <ProjectReference Include="..\Ray.BiliBiliTool.Config\Ray.BiliBiliTool.Config.csproj" />
     <ProjectReference Include="..\Ray.BiliBiliTool.DomainService\Ray.BiliBiliTool.DomainService.csproj" />
     <ProjectReference Include="..\Ray.BiliBiliTool.Infrastructure\Ray.BiliBiliTool.Infrastructure.csproj" />
+    <ProjectReference Include="..\Ray.Serilog.Sinks.CoolPushBatched\Ray.Serilog.Sinks.CoolPushBatched.csproj" />
+    <ProjectReference Include="..\Ray.Serilog.Sinks.DingTalkBatched\Ray.Serilog.Sinks.DingTalkBatched.csproj" />
+    <ProjectReference Include="..\Ray.Serilog.Sinks.ServerChanBatched\Ray.Serilog.Sinks.ServerChanBatched.csproj" />
+    <ProjectReference Include="..\Ray.Serilog.Sinks.TelegramBatched\Ray.Serilog.Sinks.TelegramBatched.csproj" />
+    <ProjectReference Include="..\Ray.Serilog.Sinks.WorkWeiXinBatched\Ray.Serilog.Sinks.WorkWeiXinBatched.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.Development.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>
