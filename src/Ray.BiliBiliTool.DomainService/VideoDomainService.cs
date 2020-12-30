@@ -90,9 +90,10 @@ namespace Ray.BiliBiliTool.DomainService
 
             if (!dailyTaskStatus.Watch || !dailyTaskStatus.Share)
             {
-                targetVideo = GetRandomVideoForWatch();
+                targetVideo = GetRandomVideoForWatchAndShare();
                 _logger.LogInformation("获取随机视频：{title}", targetVideo.Item2);
             }
+
             if (!dailyTaskStatus.Watch)
                 WatchVideo(targetVideo.Item1, targetVideo.Item2);
             else
@@ -148,7 +149,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// 获取一个视频用来观看并分享
         /// </summary>
         /// <returns></returns>
-        private Tuple<string, string> GetRandomVideoForWatch()
+        private Tuple<string, string> GetRandomVideoForWatchAndShare()
         {
             Tuple<string, string> video = GetRandomVideoOfFollowingUps();
             if (video != null) return video;
