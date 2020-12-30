@@ -53,7 +53,7 @@ namespace Ray.BiliBiliTool.Config.Options
             get
             {
                 var re = new List<long>();
-                if (string.IsNullOrWhiteSpace(SupportUpIds)) return re;
+                if (string.IsNullOrWhiteSpace(SupportUpIds) | SupportUpIds == "-1") return re;
 
                 var array = SupportUpIds.Split(',');
                 foreach (var item in array)
