@@ -54,6 +54,7 @@ namespace Ray.BiliBiliTool.Console
                 Global.HostingEnvironment = hostBuilderContext.HostingEnvironment;
                 configurationBuilder.AddJsonFile("appsettings.json", false, true)
                     .AddJsonFile($"appsettings.{hostBuilderContext.HostingEnvironment.EnvironmentName}.json", true, true)
+                    .AddJsonFile("exp.json", false, true)
                     .AddExcludeEmptyEnvironmentVariables("Ray_");
                 if (args != null && args.Length > 0)
                 {

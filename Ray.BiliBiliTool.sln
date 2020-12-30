@@ -85,6 +85,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ray.Serilog.Sinks.DingTalkB
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ray.Serilog.Sinks.CoolPushBatched", "src\Ray.Serilog.Sinks.CoolPushBatched\Ray.Serilog.Sinks.CoolPushBatched.csproj", "{FD68D999-43F6-4840-9EB7-4D71AC0A2A21}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ray.Serilog.Sinks.OtherApiBatched", "src\Ray.Serilog.Sinks.OtherApiBatched\Ray.Serilog.Sinks.OtherApiBatched.csproj", "{1F247ACA-12D3-4E71-B874-DE35DC042E68}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -163,6 +165,10 @@ Global
 		{FD68D999-43F6-4840-9EB7-4D71AC0A2A21}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FD68D999-43F6-4840-9EB7-4D71AC0A2A21}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FD68D999-43F6-4840-9EB7-4D71AC0A2A21}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F247ACA-12D3-4E71-B874-DE35DC042E68}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F247ACA-12D3-4E71-B874-DE35DC042E68}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F247ACA-12D3-4E71-B874-DE35DC042E68}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F247ACA-12D3-4E71-B874-DE35DC042E68}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -194,6 +200,7 @@ Global
 		{A58F9F2E-AAEA-498A-8C61-7497E774AD77} = {4BAFC980-7A73-45C3-9460-8B8CCB87939B}
 		{99C07B4B-5CDE-4911-AE38-2F907F492657} = {4BAFC980-7A73-45C3-9460-8B8CCB87939B}
 		{FD68D999-43F6-4840-9EB7-4D71AC0A2A21} = {4BAFC980-7A73-45C3-9460-8B8CCB87939B}
+		{1F247ACA-12D3-4E71-B874-DE35DC042E68} = {4BAFC980-7A73-45C3-9460-8B8CCB87939B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {197319DA-1148-4A99-847C-8B270B6A29AB}

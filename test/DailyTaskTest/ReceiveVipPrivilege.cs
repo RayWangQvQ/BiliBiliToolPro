@@ -9,6 +9,12 @@ namespace DailyTaskTest
 {
     public class ReceiveVipPrivilege
     {
+        public ReceiveVipPrivilege()
+        {
+            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
+            Program.PreWorks(null);
+        }
+
         [Fact]
         public void Test1()
         {

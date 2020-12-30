@@ -46,6 +46,7 @@ namespace LogTest
             logger.LogInformation("-----开始每日任务-----\r\n");
 
             logger.LogInformation("---开始【{taskName}】---", "登录");
+            logger.LogInformation("登录成功，经验+5 √");
             logger.LogInformation("用户名: 在*楼");
             logger.LogInformation("---结束---\r\n");
 
