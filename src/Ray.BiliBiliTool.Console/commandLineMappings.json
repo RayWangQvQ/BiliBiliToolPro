@@ -9,6 +9,7 @@
     "-selectLike": "DailyTaskConfig:SelectLike",
     "-supportUpIds": "DailyTaskConfig:SupportUpIds",
     "-dayOfAutoCharge": "DailyTaskConfig:DayOfAutoCharge",
+    "-autoChargeUpId": "DailyTaskConfig:AutoChargeUpId",
     "-dayOfReceiveVipPrivilege": "DailyTaskConfig:DayOfReceiveVipPrivilege",
     "-isExchangeSilver2Coin": "DailyTaskConfig:IsExchangeSilver2Coin",
     "-devicePlatform": "DailyTaskConfig:DevicePlatform",

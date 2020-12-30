@@ -112,6 +112,9 @@ namespace Ray.Serilog.Sinks.Batched
         {
             var msg = $"{GetEmoji(logEvent)} {logEvent.RenderMessage()}";
 
+            if (msg.Contains("经验+") && msg.Contains("√"))
+                msg = msg.Replace('√', '✔');
+
             if (logEvent.Exception == null)
             {
                 return msg;
