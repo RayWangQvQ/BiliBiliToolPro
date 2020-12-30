@@ -24,6 +24,7 @@ namespace Ray.BiliBiliTool.DomainService
         private readonly ICoinDomainService _coinDomainService;
         private readonly IVideoDomainService _videoDomainService;
         private readonly IRelationApi _relationApi;
+        private readonly Dictionary<string, int> _expDic;
 
         private readonly Dictionary<string, int> _alreadyDonatedCoinsCatch = new Dictionary<string, int>();
 
@@ -34,7 +35,8 @@ namespace Ray.BiliBiliTool.DomainService
             IAccountApi accountApi,
             ICoinDomainService coinDomainService,
             IVideoDomainService videoDomainService,
-            IRelationApi relationApi)
+            IRelationApi relationApi,
+            IOptionsMonitor<Dictionary<string, int>> dicOptions)
         {
             _logger = logger;
             _dailyTaskApi = dailyTaskApi;
@@ -44,6 +46,7 @@ namespace Ray.BiliBiliTool.DomainService
             _coinDomainService = coinDomainService;
             _videoDomainService = videoDomainService;
             _relationApi = relationApi;
+            _expDic = dicOptions.Get(Constants.OptionsNames.ExpDictionaryName);
         }
 
         /// <summary>
@@ -127,7 +130,8 @@ namespace Ray.BiliBiliTool.DomainService
 
             if (result.Code == 0)
             {
-                _logger.LogInformation("为“{title}”投币成功", title);
+                _expDic.TryGetValue("每日投币", out int exp);
+                _logger.LogInformation("为“{title}”投币成功，经验+{exp} √", title, exp);
                 return true;
             }
 

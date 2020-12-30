@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
+using Ray.BiliBiliTool.Agent.HttpClientDelegatingHandlers;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.Infrastructure;
 using Refit;
@@ -23,6 +24,14 @@ namespace Ray.BiliBiliTool.Agent.Extensions
         {
             //全局代理
             services.SetGlobalProxy(configuration);
+
+            //DelegatingHandler
+            services.Scan(scan => scan
+                .FromAssemblyOf<IBiliBiliApi>()
+                .AddClasses(classes => classes.AssignableTo<DelegatingHandler>())
+                .AsSelf()
+                .WithTransientLifetime()
+            );
 
             services.AddHttpClient();
             services.AddHttpClient("BiliBiliWithCookie",
@@ -65,10 +74,8 @@ namespace Ray.BiliBiliTool.Agent.Extensions
                         sp.GetRequiredService<IOptionsMonitor<SecurityOptions>>().CurrentValue.UserAgent);
                     c.BaseAddress = new Uri(host);
                 })
-                .AddHttpMessageHandler(sp => new MyHttpClientDelegatingHandler(
-                    sp.GetRequiredService<ILogger<MyHttpClientDelegatingHandler>>(),
-                    sp.GetRequiredService<IOptionsMonitor<SecurityOptions>>()
-                    ));
+                .AddHttpMessageHandler<LogDelegatingHandler>()
+                .AddHttpMessageHandler<IntervalDelegatingHandler>();
 
             return services;
         }

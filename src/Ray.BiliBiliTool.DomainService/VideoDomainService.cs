@@ -20,18 +20,21 @@ namespace Ray.BiliBiliTool.DomainService
         private readonly IDailyTaskApi _dailyTaskApi;
         private readonly BiliBiliCookieOptions _biliBiliCookieOptions;
         private readonly DailyTaskOptions _dailyTaskOptions;
+        private readonly Dictionary<string, int> _expDic;
         private readonly IRelationApi _relationApi;
 
         public VideoDomainService(ILogger<VideoDomainService> logger,
             IDailyTaskApi dailyTaskApi,
             IOptionsMonitor<BiliBiliCookieOptions> biliBiliCookieOptions,
             IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
+            IOptionsMonitor<Dictionary<string, int>> dicOptions,
             IRelationApi relationApi)
         {
             _logger = logger;
             _dailyTaskApi = dailyTaskApi;
             _relationApi = relationApi;
             _biliBiliCookieOptions = biliBiliCookieOptions.CurrentValue;
+            _expDic = dicOptions.Get(Constants.OptionsNames.ExpDictionaryName);
             _dailyTaskOptions = dailyTaskOptions.CurrentValue;
         }
 
@@ -111,7 +114,8 @@ namespace Ray.BiliBiliTool.DomainService
 
             if (apiResponse.Code == 0)
             {
-                _logger.LogInformation("视频播放成功,已观看到第{playedTime}秒", playedTime);
+                _expDic.TryGetValue("每日观看视频", out int exp);
+                _logger.LogInformation("视频播放成功，已观看到第{playedTime}秒，经验+{exp} √", playedTime, exp);
             }
             else
             {
@@ -129,7 +133,8 @@ namespace Ray.BiliBiliTool.DomainService
 
             if (apiResponse.Code == 0)
             {
-                _logger.LogInformation("视频分享成功");
+                _expDic.TryGetValue("每日观看视频", out int exp);
+                _logger.LogInformation("视频分享成功，经验+{exp} √", exp);
             }
             else
             {
