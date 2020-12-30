@@ -27,6 +27,8 @@ namespace Ray.BiliBiliTool.DomainService
         private readonly Dictionary<string, int> _expDic;
 
         private readonly Dictionary<string, int> _alreadyDonatedCoinsCatch = new Dictionary<string, int>();
+        private readonly List<string> _failedAidsCatch = new List<string>();
+        private readonly Dictionary<long, int> _videoCountDicCatch = new Dictionary<long, int>();
 
         public DonateCoinDomainService(ILogger<DonateCoinDomainService> logger,
             IDailyTaskApi dailyTaskApi,
@@ -143,6 +145,7 @@ namespace Ray.BiliBiliTool.DomainService
             }
             else
             {
+                if (_failedAidsCatch.All(x => x != aid)) _failedAidsCatch.Add(aid);
                 _logger.LogInformation("为“{title}”投币失败，原因：{msg}", title, result.Message);
                 return false;
             }
@@ -250,10 +253,6 @@ namespace Ray.BiliBiliTool.DomainService
         /// <returns></returns>
         private Tuple<string, string> TryGetCanDonateVideoByUps(List<long> upIds, int tryCount)
         {
-            //缓存每个up的视频总数
-            Dictionary<long, int> videoCountDic = new Dictionary<long, int>();
-
-            //获取特别关注列表
             if (upIds == null || upIds.Count == 0) return null;
 
             //尝试tryCount次
@@ -263,16 +262,21 @@ namespace Ray.BiliBiliTool.DomainService
                 long randomUpId = upIds[new Random().Next(0, upIds.Count)];
 
                 //该up的视频总数
-                if (!videoCountDic.TryGetValue(randomUpId, out int videoCount))
+                if (!_videoCountDicCatch.TryGetValue(randomUpId, out int videoCount))
                 {
                     videoCount = _videoDomainService.GetVideoCountOfUp(randomUpId);
-                    videoCountDic.Add(randomUpId, videoCount);
+                    _videoCountDicCatch.Add(randomUpId, videoCount);
                 }
-                if (videoCount == 0 | videoCount < i) continue;
+                if (videoCount == 0) continue;
 
                 UpVideoInfo videoInfo = _videoDomainService.GetRandomVideoOfUp(randomUpId, videoCount);
+                if (_failedAidsCatch.Any(x => x == videoInfo.Aid.ToString())) continue;
 
-                if (!CanDonatedCoinsForVideo(videoInfo.Aid.ToString())) continue;
+                if (!CanDonatedCoinsForVideo(videoInfo.Aid.ToString()))
+                {
+                    _failedAidsCatch.Add(videoInfo.Aid.ToString());
+                    continue;
+                }
                 return Tuple.Create(videoInfo.Aid.ToString(), videoInfo.Title);
             }
 
