@@ -148,7 +148,7 @@ namespace Ray.BiliBiliTool.Application
         /// <summary>
         /// 每月为自己充电
         /// </summary>
-        [TaskInterceptor("每月为自己充电", false)]
+        [TaskInterceptor("每月使用快过期的B币充电", false)]
         private void Charge(UseInfo userInfo)
         {
             _chargeDomainService.Charge(userInfo);
