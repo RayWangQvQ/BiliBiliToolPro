@@ -61,6 +61,10 @@ jobs:
         Ray_Serilog:WriteTo:6:Args:containsTrigger: ${{secrets.PUSHSERVERTRIGGER}}
         Ray_Serilog:WriteTo:7:Args:sKey: ${{secrets.PUSHCOOLSKEY}} # 酷推
         Ray_Serilog:WriteTo:7:Args:containsTrigger: ${{secrets.PUSHCOOLTRIGGER}}
+        Ray_Serilog:WriteTo:8:Args:api: ${{secrets.PUSHOTHERAPI}} # 自定义api
+        Ray_Serilog:WriteTo:8:Args:placeholder: ${{secrets.PUSHOTHERPLACEHOLDER}}
+        Ray_Serilog:WriteTo:8:Args:bodyJsonTemplate: ${{secrets.PUSHOTHERBODYJSONTEMPLATE}}
+        Ray_Serilog:WriteTo:8:Args:containsTrigger: ${{secrets.PUSHOTHERTRIGGER}}
         Ray_Security:IsSkipDailyTask: ${{secrets.ISSKIPDAILYTASK}}
         Ray_Security:IntervalSecondsBetweenRequestApi: ${{secrets.INTERVALSECONDSBETWEENREQUESTAPI}}
         Ray_Security:IntervalMethodTypes: ${{secrets.INTERVALMETHODTYPES}}
