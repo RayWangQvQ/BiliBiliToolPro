@@ -94,7 +94,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         /// </summary>
         /// <returns></returns>
         [Get("/x/web-interface/nav")]
-        Task<BiliApiResponse<UseInfo>> LoginByCookie();
+        Task<BiliApiResponse<UserInfo>> LoginByCookie();
 
         /// <summary>
         /// 分享视频

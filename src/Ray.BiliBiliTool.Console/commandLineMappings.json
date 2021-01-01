@@ -17,7 +17,7 @@
     "-intervalSecondsBetweenRequestApi": "Security:IntervalSecondsBetweenRequestApi",
     "-intervalMethodTypes": "Security:IntervalMethodTypes",
 
-    "-pushScKey": "Push:PushScKey",
+    "-pushScKey": "Serilog:WriteTo:6:Args:scKey",
 
     "-closeConsoleWhenEnd": "CloseConsoleWhenEnd",
 

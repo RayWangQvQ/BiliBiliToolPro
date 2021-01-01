@@ -21,6 +21,8 @@ namespace Ray.BiliBiliTool.Config
         public static class OptionsNames
         {
             public static string ExpDictionaryName = "ExpDictionary";
+
+            public static string DonateCoinCanContinueStatusDictionaryName = "DonateCoinCanContinueStatusDictionary";
         }
     }
 }

@@ -35,9 +35,9 @@ namespace Ray.BiliBiliTool.DomainService
         /// 登录
         /// </summary>
         /// <returns></returns>
-        public UseInfo LoginByCookie()
+        public UserInfo LoginByCookie()
         {
-            BiliApiResponse<UseInfo> apiResponse = _dailyTaskApi.LoginByCookie().Result;
+            BiliApiResponse<UserInfo> apiResponse = _dailyTaskApi.LoginByCookie().Result;
 
             if (apiResponse.Code != 0 || !apiResponse.Data.IsLogin)
             {
@@ -45,7 +45,7 @@ namespace Ray.BiliBiliTool.DomainService
                 return null;
             }
 
-            UseInfo useInfo = apiResponse.Data;
+            UserInfo useInfo = apiResponse.Data;
 
             //获取到UserId
             _cookie.SetUserId(useInfo.Mid.ToString());

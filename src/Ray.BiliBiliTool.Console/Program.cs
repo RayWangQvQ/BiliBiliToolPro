@@ -55,6 +55,7 @@ namespace Ray.BiliBiliTool.Console
                 configurationBuilder.AddJsonFile("appsettings.json", false, true)
                     .AddJsonFile($"appsettings.{hostBuilderContext.HostingEnvironment.EnvironmentName}.json", true, true)
                     .AddJsonFile("exp.json", false, true)
+                    .AddJsonFile("donateCoinCanContinueStatus.json", false, true)
                     .AddExcludeEmptyEnvironmentVariables("Ray_");
                 if (args != null && args.Length > 0)
                 {
