@@ -32,7 +32,8 @@ namespace Ray.BiliBiliTool.Application
             IVipPrivilegeDomainService vipPrivilegeDomainService,
             IChargeDomainService chargeDomainService,
             IOptionsMonitor<SecurityOptions> securityOptions,
-            ICoinDomainService coinDomainService)
+            ICoinDomainService coinDomainService
+            )
         {
             _logger = logger;
             _loginDomainService = loginDomainService;
@@ -56,7 +57,7 @@ namespace Ray.BiliBiliTool.Application
 
             _logger.LogInformation("-----开始每日任务-----\r\n");
 
-            UseInfo userInfo = Login();
+            UserInfo userInfo = Login();
             DailyTaskInfo dailyTaskInfo = GetDailyTaskStatus();
 
             WatchAndShareVideo(dailyTaskInfo);
@@ -65,7 +66,7 @@ namespace Ray.BiliBiliTool.Application
             LiveSign();
             ExchangeSilver2Coin();
 
-            ReceiveVipPrivilege(userInfo);
+            ReceiveVipPrivilege(ref userInfo);
             ReceiveMangaVipReward(userInfo);
             Charge(userInfo);
 
@@ -77,9 +78,9 @@ namespace Ray.BiliBiliTool.Application
         /// </summary>
         /// <returns></returns>
         [TaskInterceptor("登录")]
-        private UseInfo Login()
+        private UserInfo Login()
         {
-            UseInfo userInfo = _loginDomainService.LoginByCookie();
+            UserInfo userInfo = _loginDomainService.LoginByCookie();
             if (userInfo == null) throw new Exception("登录失败，请检查Cookie");//终止流程
 
             return userInfo;
@@ -140,16 +141,29 @@ namespace Ray.BiliBiliTool.Application
         /// 每月领取大会员福利
         /// </summary>
         [TaskInterceptor("每月领取大会员福利", false)]
-        private void ReceiveVipPrivilege(UseInfo userInfo)
+        private void ReceiveVipPrivilege(ref UserInfo userInfo)
         {
-            _vipPrivilegeDomainService.ReceiveVipPrivilege(userInfo);
+            var suc = _vipPrivilegeDomainService.ReceiveVipPrivilege(userInfo);
+
+            //如果领取成功，需要刷新账户信息（比如B币余额）
+            if (suc)
+            {
+                try
+                {
+                    userInfo = _loginDomainService.LoginByCookie();
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError("领取福利成功，但之后刷新用户信息时异常，信息：{msg}", ex.Message);
+                }
+            }
         }
 
         /// <summary>
         /// 每月为自己充电
         /// </summary>
         [TaskInterceptor("每月使用快过期的B币充电", false)]
-        private void Charge(UseInfo userInfo)
+        private void Charge(UserInfo userInfo)
         {
             _chargeDomainService.Charge(userInfo);
         }
@@ -167,7 +181,7 @@ namespace Ray.BiliBiliTool.Application
         /// 每月获取大会员漫画权益
         /// </summary>
         [TaskInterceptor("每月领取大会员漫画权益", false)]
-        private void ReceiveMangaVipReward(UseInfo userInfo)
+        private void ReceiveMangaVipReward(UserInfo userInfo)
         {
             _mangaDomainService.ReceiveMangaVipReward(1, userInfo);
         }

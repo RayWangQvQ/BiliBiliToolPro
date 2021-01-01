@@ -14,7 +14,7 @@ namespace Ray.BiliBiliTool.DomainService.Interfaces
         /// 使用Cookie登录
         /// </summary>
         /// <returns></returns>
-        UseInfo LoginByCookie();
+        UserInfo LoginByCookie();
 
         /// <summary>
         /// 获取每日任务完成情况

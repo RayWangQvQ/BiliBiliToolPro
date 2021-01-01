@@ -5,7 +5,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos
     /// <summary>
     /// 账户信息
     /// </summary>
-    public class UseInfo
+    public class UserInfo
     {
         /// <summary>
         /// 用户Id

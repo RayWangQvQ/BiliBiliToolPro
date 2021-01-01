@@ -33,7 +33,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// 月底自动给自己充电
         /// 仅充会到期的B币券，低于2的时候不会充
         /// </summary>
-        public void Charge(UseInfo userInfo)
+        public void Charge(UserInfo userInfo)
         {
             if (_dailyTaskOptions.DayOfAutoCharge == 0)
             {
@@ -105,7 +105,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// <param name="token"></param>
         public void ChargeComments(string token)
         {
-            _dailyTaskApi.ChargeComment(token, "Ray.BiliBiliTool自动充电", _cookieOptions.BiliJct);
+            _dailyTaskApi.ChargeComment(token, _dailyTaskOptions.ChargeComment ?? "", _cookieOptions.BiliJct);
         }
     }
 }

@@ -10,11 +10,15 @@ namespace DailyTaskTest
 {
     public class AddCoinsForVideo
     {
+        public AddCoinsForVideo()
+        {
+            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
+            Program.PreWorks(new string[] { });
+        }
+
         [Fact]
         public void TestGetCanDonatedVideo()
         {
-            Program.PreWorks(new string[] { });
-
             using (var scope = Global.ServiceProviderRoot.CreateScope())
             {
                 var service = scope.ServiceProvider.GetRequiredService<IDonateCoinDomainService>();
@@ -30,8 +34,6 @@ namespace DailyTaskTest
         [Fact]
         public void Test1()
         {
-            Program.PreWorks(new string[] { });
-
             using (var scope = Global.ServiceProviderRoot.CreateScope())
             {
                 var service = scope.ServiceProvider.GetRequiredService<IDonateCoinDomainService>();
@@ -45,13 +47,11 @@ namespace DailyTaskTest
         [Fact]
         public void Test2()
         {
-            Program.PreWorks(new string[] { });
-
             using (var scope = Global.ServiceProviderRoot.CreateScope())
             {
                 var service = scope.ServiceProvider.GetRequiredService<IDonateCoinDomainService>();
 
-                service.DoAddCoinForVideo("627549610", 1, true);
+                service.DoAddCoinForVideo("543318157", 1, true);
             }
 
             Assert.True(true);

@@ -20,6 +20,6 @@ namespace Ray.BiliBiliTool.DomainService.Interfaces
         /// </summary>
         /// <param name="reason_id"></param>
         /// <param name="userIfo"></param>
-        void ReceiveMangaVipReward(int reason_id, UseInfo userIfo);
+        void ReceiveMangaVipReward(int reason_id, UserInfo userIfo);
     }
 }
