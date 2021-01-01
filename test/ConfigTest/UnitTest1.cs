@@ -33,6 +33,20 @@ namespace ConfigTest
             Assert.True(!string.IsNullOrWhiteSpace(options.CurrentValue.UserId));
         }
 
+        /// <summary>
+        /// 测试环境变量Key的分隔符
+        /// </summary>
+        [Fact]
+        public void TestEnvKeyDelimiter()
+        {
+            Environment.SetEnvironmentVariable("Ray_BiliBiliCookie__UserId", "123");
+            Program.PreWorks(null);
+
+            string result = Global.ConfigurationRoot["BiliBiliCookie:UserId"];
+
+            Assert.Equal("123", result);
+        }
+
         [Fact]
         public void LoadPrefixConfigByEnvWithNoError()
         {

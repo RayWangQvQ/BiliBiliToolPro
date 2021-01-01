@@ -14,6 +14,6 @@ namespace Ray.BiliBiliTool.DomainService.Interfaces
         /// 获取大会员权益
         /// </summary>
         /// <param name="useInfo"></param>
-        void ReceiveVipPrivilege(UseInfo useInfo);
+        bool ReceiveVipPrivilege(UserInfo userInfo);
     }
 }

@@ -14,7 +14,7 @@ namespace Ray.BiliBiliTool.DomainService.Interfaces
         /// 充电
         /// </summary>
         /// <param name="userInfo"></param>
-        void Charge(UseInfo userInfo);
+        void Charge(UserInfo userInfo);
 
         /// <summary>
         /// 充电后留言

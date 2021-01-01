@@ -18,10 +18,12 @@ namespace Ray.BiliBiliTool.DomainService
         private readonly DailyTaskOptions _dailyTaskOptions;
         private readonly BiliBiliCookieOptions _biliBiliCookieOptions;
 
-        public VipPrivilegeDomainService(ILogger<VipPrivilegeDomainService> logger,
+        public VipPrivilegeDomainService(
+            ILogger<VipPrivilegeDomainService> logger,
             IDailyTaskApi dailyTaskApi,
             IOptionsMonitor<BiliBiliCookieOptions> biliBiliCookieOptions,
-            IOptionsMonitor<DailyTaskOptions> dailyTaskOptions)
+            IOptionsMonitor<DailyTaskOptions> dailyTaskOptions
+            )
         {
             _logger = logger;
             _dailyTaskApi = dailyTaskApi;
@@ -30,38 +32,43 @@ namespace Ray.BiliBiliTool.DomainService
         }
 
         /// <summary>
-        /// 每月1号领取大会员福利（B币券、大会员权益）
+        /// 每月领取大会员福利（B币券、大会员权益）
         /// </summary>
         /// <param name="useInfo"></param>
-        public void ReceiveVipPrivilege(UseInfo useInfo)
+        public bool ReceiveVipPrivilege(UserInfo userInfo)
         {
             if (_dailyTaskOptions.DayOfReceiveVipPrivilege == 0)
             {
                 _logger.LogInformation("已配置为不进行自动领取会员权益，跳过领取任务");
-                return;
+                return false;
             }
 
             int targetDay = _dailyTaskOptions.DayOfReceiveVipPrivilege == -1
                 ? 1
                 : _dailyTaskOptions.DayOfReceiveVipPrivilege;
 
-            if (DateTime.Today.Day != targetDay)
+            if (DateTime.Today.Day != targetDay
+                && DateTime.Today.Day != DateTime.Today.LastDayOfMonth().Day)
             {
                 _logger.LogInformation("目标领取日期为{targetDay}号，今天是{day}号，跳过领取任务", targetDay, DateTime.Today.Day);
-                return;
+                return false;
             }
 
             //大会员类型
-            int vipType = useInfo.GetVipType();
+            int vipType = userInfo.GetVipType();
 
             if (vipType == 2)
             {
-                ReceiveVipPrivilege(1);
-                ReceiveVipPrivilege(2);
+                var suc1 = ReceiveVipPrivilege(1);
+                var suc2 = ReceiveVipPrivilege(2);
+
+                if (suc1 | suc2) return true;
+                return false;
             }
             else
             {
                 _logger.LogInformation("普通会员和月度大会员每月不赠送B币券，所以不需要领取权益喽");
+                return false;
             }
         }
 
@@ -71,7 +78,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// 领取大会员每月赠送福利
         /// </summary>
         /// <param name="type">1.大会员B币券；2.大会员福利</param>
-        private void ReceiveVipPrivilege(int type)
+        private bool ReceiveVipPrivilege(int type)
         {
             var response = _dailyTaskApi.ReceiveVipPrivilege(type, _biliBiliCookieOptions.BiliJct).Result;
 
@@ -79,10 +86,12 @@ namespace Ray.BiliBiliTool.DomainService
             if (response.Code == 0)
             {
                 _logger.LogInformation($"{name}成功");
+                return true;
             }
             else
             {
                 _logger.LogInformation($"{name}失败，原因: {response.Message}");
+                return false;
             }
         }
 
