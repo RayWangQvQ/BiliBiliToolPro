@@ -26,6 +26,9 @@ namespace Ray.BiliBiliTool.Config.Options
             set => _userId = value;
         }
 
+        [Description("DedeUserID__ckMd5")]
+        public string DedeUserID__ckMd5 { get; set; }
+
         /// <summary>
         /// SESSDATA
         /// </summary>
@@ -50,6 +53,11 @@ namespace Ray.BiliBiliTool.Config.Options
             this.UserId = userId;
             Global.ConfigurationRoot["BiliBiliCookie:UserID"] = userId;
         }
+
+        /// <summary>
+        /// 其他Cookies
+        /// </summary>
+        public string OtherCookies { get; set; } = "";
 
         /// <summary>
         /// 检查是否已配置
@@ -106,11 +114,12 @@ namespace Ray.BiliBiliTool.Config.Options
 
         public override string ToString()
         {
-            string re = "";
+            string re = (OtherCookies ?? "").Trim();
+            if (!re.EndsWith(";")) re += ";";
 
-            if (UserId.IsNotNullOrEmpty()) re += $"{GetPropertyDescription(nameof(UserId))}={UserId}; ";
-            if (SessData.IsNotNullOrEmpty()) re += $"{GetPropertyDescription(nameof(SessData))}={SessData}; ";
-            if (BiliJct.IsNotNullOrEmpty()) re += $"{GetPropertyDescription(nameof(BiliJct))}={BiliJct};";
+            if (UserId.IsNotNullOrEmpty()) re += $" {GetPropertyDescription(nameof(UserId))}={UserId};";
+            if (SessData.IsNotNullOrEmpty()) re += $" {GetPropertyDescription(nameof(SessData))}={SessData};";
+            if (BiliJct.IsNotNullOrEmpty()) re += $" {GetPropertyDescription(nameof(BiliJct))}={BiliJct};";
 
             return re;
         }

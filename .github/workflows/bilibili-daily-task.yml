@@ -52,21 +52,27 @@ jobs:
         Ray_BiliBiliCookie__SessData: ${{secrets.SESSDATA}}
         Ray_BiliBiliCookie__BiliJct: ${{secrets.BILIJCT}}
         Ray_BiliBiliCookie__Bili_jct: ${{secrets.BILI_JCT}} # 为了兼容 GitHub Secrets 经常会被填错
+        Ray_BiliBiliCookie__OtherCookies: ${{secrets.OTHERCOOKIES}} # 为了解决412问题
         Ray_Serilog__WriteTo__3__Args__botToken: ${{secrets.PUSHTGTOKEN}} # Telegram
         Ray_Serilog__WriteTo__3__Args__chatId: ${{secrets.PUSHTGCHATID}}
         Ray_Serilog__WriteTo__3__Args__containsTrigger: ${{secrets.PUSHTGTRIGGER}}
-        Ray_Serilog__WriteTo__4__Args__webHookUrl: ${{secrets.PUSHWEIXINURL}} # 微信
+        Ray_Serilog__WriteTo__4__Args__webHookUrl: ${{secrets.PUSHWEIXINURL}} # 企业微信
         Ray_Serilog__WriteTo__4__Args__containsTrigger: ${{secrets.PUSHWEIXINTRIGGER}}
+        Ray_Serilog__WriteTo__4__Args__restrictedToMinimumLevel: ${{secrets.PUSHWEIXINLEVEL}}
         Ray_Serilog__WriteTo__5__Args__webHookUrl: ${{secrets.PUSHDINGURL}} # 钉钉
         Ray_Serilog__WriteTo__5__Args__containsTrigger: ${{secrets.PUSHDINGTRIGGER}}
+        Ray_Serilog__WriteTo__5__Args__restrictedToMinimumLevel: ${{secrets.PUSHDINGLEVEL}}
         Ray_Serilog__WriteTo__6__Args__scKey: ${{secrets.PUSHSCKEY}} # Server酱
         Ray_Serilog__WriteTo__6__Args__containsTrigger: ${{secrets.PUSHSERVERTRIGGER}}
+        Ray_Serilog__WriteTo__6__Args__restrictedToMinimumLevel: ${{secrets.PUSHSERVERLEVEL}}
         Ray_Serilog__WriteTo__7__Args__sKey: ${{secrets.PUSHCOOLSKEY}} # 酷推
         Ray_Serilog__WriteTo__7__Args__containsTrigger: ${{secrets.PUSHCOOLTRIGGER}}
+        Ray_Serilog__WriteTo__7__Args__restrictedToMinimumLevel: ${{secrets.PUSHCOOLLEVEL}}
         Ray_Serilog__WriteTo__8__Args__api: ${{secrets.PUSHOTHERAPI}} # 自定义api
         Ray_Serilog__WriteTo__8__Args__placeholder: ${{secrets.PUSHOTHERPLACEHOLDER}}
         Ray_Serilog__WriteTo__8__Args__bodyJsonTemplate: ${{secrets.PUSHOTHERBODYJSONTEMPLATE}}
         Ray_Serilog__WriteTo__8__Args__containsTrigger: ${{secrets.PUSHOTHERTRIGGER}}
+        Ray_Serilog__WriteTo__8__Args__restrictedToMinimumLevel: ${{secrets.PUSHOTHERLEVEL}}
         Ray_Security__IsSkipDailyTask: ${{secrets.ISSKIPDAILYTASK}}
         Ray_Security__IntervalSecondsBetweenRequestApi: ${{secrets.INTERVALSECONDSBETWEENREQUESTAPI}}
         Ray_Security__IntervalMethodTypes: ${{secrets.INTERVALMETHODTYPES}}

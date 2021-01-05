@@ -73,7 +73,7 @@ namespace Ray.BiliBiliTool.DomainService
                 targetUpId = _cookieOptions.UserId;
 
             //BiliApiResponse<ChargeResponse> response = _dailyTaskApi.Charge(decimal.ToInt32(couponBalance * 10), _dailyTaskOptions.AutoChargeUpId, _cookieOptions.UserId, _cookieOptions.BiliJct).Result;
-            BiliApiResponse<ChargeV2Response> response = _dailyTaskApi.ChargeV2(couponBalance, targetUpId, targetUpId, _cookieOptions.BiliJct).Result;
+            BiliApiResponse<ChargeV2Response> response = _dailyTaskApi.ChargeV2(couponBalance, targetUpId, targetUpId, _cookieOptions.BiliJct).GetAwaiter().GetResult();
 
             if (response.Code == 0)
             {

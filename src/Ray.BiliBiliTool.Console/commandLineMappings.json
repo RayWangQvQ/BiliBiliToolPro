@@ -4,6 +4,7 @@
     "-userId": "BiliBiliCookie:UserId",
     "-sessData": "BiliBiliCookie:SessData",
     "-biliJct": "BiliBiliCookie:BiliJct",
+    "-otherCookies": "BiliBiliCookie:OtherCookies",
 
     "-numberOfCoins": "DailyTaskConfig:NumberOfCoins",
     "-selectLike": "DailyTaskConfig:SelectLike",
