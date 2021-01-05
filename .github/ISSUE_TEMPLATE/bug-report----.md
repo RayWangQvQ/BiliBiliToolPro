@@ -1,6 +1,6 @@
 ---
-name: Bug report（异常缺陷）
-about: 异常和缺陷
+name: Bug report（缺陷）
+about: 缺陷或异常
 title: "【Bug】请清晰地描述你遇到的异常或缺陷"
 labels: ''
 assignees: ''
