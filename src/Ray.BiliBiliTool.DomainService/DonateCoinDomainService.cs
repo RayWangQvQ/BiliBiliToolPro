@@ -97,12 +97,20 @@ namespace Ray.BiliBiliTool.DomainService
 
                 _logger.LogDebug("正在为视频“{title}”投币", video.Item2);
 
-                var re = DoAddCoinForVideo(video.Item1, 1, _dailyTaskOptions.SelectLike, video.Item2);
+                bool re = false;
+                try
+                {
+                    re = DoAddCoinForVideo(video.Item1, 1, _dailyTaskOptions.SelectLike, video.Item2);
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError("投币出详异常，原因：{msg}", e.Message);
+                }
                 if (re) success++;
             }
 
             if (success == needCoins)
-                _logger.LogInformation("投币任务完成，余额为: {money}", _accountApi.GetCoinBalance().Result.Data.Money ?? 0);
+                _logger.LogInformation("投币任务完成，余额为: {money}", _accountApi.GetCoinBalance().GetAwaiter().GetResult().Data.Money ?? 0);
             else
                 _logger.LogInformation("投币尝试超过10次，已终止");
         }
@@ -142,7 +150,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// <returns>是否投币成功</returns>
         public bool DoAddCoinForVideo(string aid, int multiply, bool select_like, string title = "")
         {
-            BiliApiResponse result = _dailyTaskApi.AddCoinForVideo(aid, multiply, select_like ? 1 : 0, _biliBiliCookieOptions.BiliJct).Result;
+            BiliApiResponse result = _dailyTaskApi.AddCoinForVideo(aid, multiply, select_like ? 1 : 0, _biliBiliCookieOptions.BiliJct).GetAwaiter().GetResult();
 
             if (result.Code == 0)
             {
@@ -220,7 +228,7 @@ namespace Ray.BiliBiliTool.DomainService
         private Tuple<string, string> TryGetCanDonateVideoBySpecialUps(int tryCount)
         {
             //获取特别关注列表
-            BiliApiResponse<List<UpInfo>> specials = _relationApi.GetSpecialFollowings().Result;
+            BiliApiResponse<List<UpInfo>> specials = _relationApi.GetSpecialFollowings().GetAwaiter().GetResult();
             if (specials.Data == null || specials.Data.Count == 0) return null;
 
             return TryCanDonateVideoByUps(specials.Data.Select(x => x.Mid).ToList(), tryCount);
@@ -234,7 +242,7 @@ namespace Ray.BiliBiliTool.DomainService
         private Tuple<string, string> TryGetCanDonateVideoByFollowingUps(int tryCount)
         {
             //获取特别关注列表
-            BiliApiResponse<GetFollowingsResponse> result = _relationApi.GetFollowings(_biliBiliCookieOptions.UserId).Result;
+            BiliApiResponse<GetFollowingsResponse> result = _relationApi.GetFollowings(_biliBiliCookieOptions.UserId).GetAwaiter().GetResult();
             if (result.Data.Total == 0) return null;
 
             return TryCanDonateVideoByUps(result.Data.List.Select(x => x.Mid).ToList(), tryCount);
@@ -308,7 +316,7 @@ namespace Ray.BiliBiliTool.DomainService
         {
             if (!_alreadyDonatedCoinCountCatch.TryGetValue(aid, out int multiply))
             {
-                multiply = _dailyTaskApi.GetDonatedCoinsForVideo(aid).Result.Data.Multiply;
+                multiply = _dailyTaskApi.GetDonatedCoinsForVideo(aid).GetAwaiter().GetResult().Data.Multiply;
                 _alreadyDonatedCoinCountCatch.TryAdd(aid, multiply);
             }
 

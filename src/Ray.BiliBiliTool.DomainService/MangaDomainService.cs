@@ -37,7 +37,7 @@ namespace Ray.BiliBiliTool.DomainService
             BiliApiResponse response;
             try
             {
-                response = _mangaApi.ClockIn(_dailyTaskOptions.DevicePlatform).Result;
+                response = _mangaApi.ClockIn(_dailyTaskOptions.DevicePlatform).GetAwaiter().GetResult();
             }
             catch (Exception)
             {
@@ -79,7 +79,7 @@ namespace Ray.BiliBiliTool.DomainService
                 return;
             }
 
-            var response = _mangaApi.ReceiveMangaVipReward(reason_id).Result;
+            var response = _mangaApi.ReceiveMangaVipReward(reason_id).GetAwaiter().GetResult();
             if (response.Code == 0)
             {
                 _logger.LogInformation($"大会员成功领取{response.Data.Amount}张漫读劵");

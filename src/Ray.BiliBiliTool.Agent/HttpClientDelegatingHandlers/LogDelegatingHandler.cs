@@ -21,14 +21,14 @@ namespace Ray.BiliBiliTool.Agent.HttpClientDelegatingHandlers
 
             if (request.Content != null)
             {
-                var requestContent = await request.Content.ReadAsStringAsync();
+                var requestContent = await request.Content.ReadAsStringAsync(cancellationToken);
                 _logger.LogDebug("请求Content： {content}", requestContent);
             }
 
             HttpResponseMessage response = await base.SendAsync(request, cancellationToken);
             if (response.Content == null) return response;
 
-            var content = await response.Content.ReadAsStringAsync();
+            var content = await response.Content.ReadAsStringAsync(cancellationToken);
             _logger.LogDebug("返回Content：{content}", content);
 
             return response;

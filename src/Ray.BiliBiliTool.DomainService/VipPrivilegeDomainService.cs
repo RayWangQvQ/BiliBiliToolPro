@@ -80,7 +80,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// <param name="type">1.大会员B币券；2.大会员福利</param>
         private bool ReceiveVipPrivilege(int type)
         {
-            var response = _dailyTaskApi.ReceiveVipPrivilege(type, _biliBiliCookieOptions.BiliJct).Result;
+            var response = _dailyTaskApi.ReceiveVipPrivilege(type, _biliBiliCookieOptions.BiliJct).GetAwaiter().GetResult();
 
             var name = GetPrivilegeName(type);
             if (response.Code == 0)

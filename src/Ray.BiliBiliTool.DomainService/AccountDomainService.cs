@@ -37,7 +37,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// <returns></returns>
         public UserInfo LoginByCookie()
         {
-            BiliApiResponse<UserInfo> apiResponse = _dailyTaskApi.LoginByCookie().Result;
+            BiliApiResponse<UserInfo> apiResponse = _dailyTaskApi.LoginByCookie().GetAwaiter().GetResult();
 
             if (apiResponse.Code != 0 || !apiResponse.Data.IsLogin)
             {
@@ -76,7 +76,7 @@ namespace Ray.BiliBiliTool.DomainService
         public DailyTaskInfo GetDailyTaskStatus()
         {
             DailyTaskInfo result = new();
-            BiliApiResponse<DailyTaskInfo> apiResponse = _dailyTaskApi.GetDailyTaskRewardInfo().Result;
+            BiliApiResponse<DailyTaskInfo> apiResponse = _dailyTaskApi.GetDailyTaskRewardInfo().GetAwaiter().GetResult();
             if (apiResponse.Code == 0)
             {
                 _logger.LogDebug("请求本日任务完成状态成功");
@@ -85,7 +85,7 @@ namespace Ray.BiliBiliTool.DomainService
             else
             {
                 _logger.LogWarning("获取今日任务完成状态失败：{result}", apiResponse.ToJson());
-                result = _dailyTaskApi.GetDailyTaskRewardInfo().Result.Data;
+                result = _dailyTaskApi.GetDailyTaskRewardInfo().GetAwaiter().GetResult().Data;
                 //todo:偶发性请求失败，再请求一次，这么写很丑陋，待用polly再框架层面实现
             }
 
