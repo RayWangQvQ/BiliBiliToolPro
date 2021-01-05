@@ -52,6 +52,7 @@ jobs:
         Ray_BiliBiliCookie__SessData: ${{secrets.SESSDATA}}
         Ray_BiliBiliCookie__BiliJct: ${{secrets.BILIJCT}}
         Ray_BiliBiliCookie__Bili_jct: ${{secrets.BILI_JCT}} # 为了兼容 GitHub Secrets 经常会被填错
+        Ray_BiliBiliCookie__OtherCookies: ${{secrets.OTHERCOOKIES}} # 为了解决412问题
         Ray_Serilog__WriteTo__3__Args__botToken: ${{secrets.PUSHTGTOKEN}} # Telegram
         Ray_Serilog__WriteTo__3__Args__chatId: ${{secrets.PUSHTGCHATID}}
         Ray_Serilog__WriteTo__3__Args__containsTrigger: ${{secrets.PUSHTGTRIGGER}}

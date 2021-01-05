@@ -46,7 +46,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// <returns></returns>
         public decimal GetCoinBalance()
         {
-            var response = _accountApi.GetCoinBalance().Result;
+            var response = _accountApi.GetCoinBalance().GetAwaiter().GetResult();
             return response.Data.Money ?? 0;
         }
 
@@ -66,7 +66,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// <returns></returns>
         private int GetDonateCoinExp()
         {
-            return _dailyTaskApi.GetDonateCoinExp().Result.Data;
+            return _dailyTaskApi.GetDonateCoinExp().GetAwaiter().GetResult().Data;
         }
         #endregion
     }

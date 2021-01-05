@@ -32,7 +32,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// </summary>
         public void LiveSign()
         {
-            var response = _liveApi.Sign().Result;
+            var response = _liveApi.Sign().GetAwaiter().GetResult();
 
             if (response.Code == 0)
             {
@@ -58,7 +58,7 @@ namespace Ray.BiliBiliTool.DomainService
                 return result;
             }
 
-            var response = _liveApi.ExchangeSilver2Coin().Result;
+            var response = _liveApi.ExchangeSilver2Coin().GetAwaiter().GetResult();
             if (response.Code == 0)
             {
                 result = true;
@@ -69,7 +69,7 @@ namespace Ray.BiliBiliTool.DomainService
                 _logger.LogInformation("银瓜子兑换硬币失败，原因：{0}", response.Message);
             }
 
-            var queryStatus = _liveApi.GetExchangeSilverStatus().Result;
+            var queryStatus = _liveApi.GetExchangeSilverStatus().GetAwaiter().GetResult();
             _logger.LogInformation("当前银瓜子余额: {0}", queryStatus.Data.Silver);
 
             return result;

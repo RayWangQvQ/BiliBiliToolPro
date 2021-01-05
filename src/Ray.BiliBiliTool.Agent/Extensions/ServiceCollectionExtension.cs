@@ -74,8 +74,8 @@ namespace Ray.BiliBiliTool.Agent.Extensions
                         sp.GetRequiredService<IOptionsMonitor<SecurityOptions>>().CurrentValue.UserAgent);
                     c.BaseAddress = new Uri(host);
                 })
-                .AddHttpMessageHandler<LogDelegatingHandler>()
-                .AddHttpMessageHandler<IntervalDelegatingHandler>();
+                .AddHttpMessageHandler<IntervalDelegatingHandler>()
+                .AddHttpMessageHandler<LogDelegatingHandler>();
 
             return services;
         }
