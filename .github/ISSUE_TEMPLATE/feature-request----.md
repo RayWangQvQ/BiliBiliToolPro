@@ -2,7 +2,7 @@
 name: Feature request（需求）
 about: 建议或需求
 title: "【建议】请清晰地描述你的建议内容"
-labels: ''
+labels: 需求/feature
 assignees: ''
 
 ---
