@@ -114,11 +114,11 @@ namespace Ray.BiliBiliTool.Console
             catch (Exception ex)
             {
                 logger.LogError("程序异常终止，原因：{msg}", ex.Message);
+                Environment.Exit(1);
             }
             finally
             {
                 logger.LogInformation("开始推送");
-                Environment.Exit(1);
             }
         }
 
@@ -136,10 +136,9 @@ namespace Ray.BiliBiliTool.Console
             logger.LogInformation("当前环境：{env}", Global.HostingEnvironment.EnvironmentName ?? "无");
             try
             {
-                logger.LogInformation(String.Format("当前IP  ：{0}",
-                    new HttpClient().GetAsync("http://api.ipify.org/").Result.Content.ReadAsStringAsync().Result));
+                logger.LogInformation("当前IP：" + new HttpClient().GetAsync("http://api.ipify.org/").Result.Content.ReadAsStringAsync().Result);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 Environment.Exit(1);
             }
