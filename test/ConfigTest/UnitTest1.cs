@@ -1,6 +1,8 @@
 using System;
 using System.Text.Json;
 using System.Diagnostics;
+using System.Net;
+using System.Net.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Config;
@@ -14,6 +16,39 @@ namespace ConfigTest
 {
     public class UnitTest1
     {
+        [Fact]
+        public void WebProxyTest()
+        {
+            string proxyAddress = "user:password@host:port";
+            if (proxyAddress.IsNotNullOrEmpty())
+            {
+                WebProxy webProxy = new WebProxy();
+
+                //user:password@host:port http proxy only .Tested with tinyproxy-1.11.0-rc1
+                if (proxyAddress.Contains("@"))
+                {
+                    string userPass = proxyAddress.Split("@")[0];
+                    string address = proxyAddress.Split("@")[1];
+
+                    string proxyUser = userPass.Split(":")[0];
+                    string proxyPass = userPass.Split(":")[1];
+
+                    webProxy.Address = new Uri("http://" + address);
+                    webProxy.Credentials = new NetworkCredential(proxyUser, proxyPass);
+                }
+                else
+                {
+                    webProxy.Address = new Uri(proxyAddress);
+                }
+
+                HttpClient.DefaultProxy = webProxy;
+
+                HttpClient httpClient = new HttpClient();
+                var response = httpClient.GetAsync("http://api.ipify.org/");
+                var resultIp = response.Result.Content.ReadAsStringAsync().Result;
+                Debug.WriteLine(String.Format("µ±Ç°IP£º {0}", resultIp));
+            }
+        }
         [Fact]
         public void Test1()
         {

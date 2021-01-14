@@ -3,7 +3,6 @@ using System.Net;
 using System.Net.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Agent.HttpClientDelegatingHandlers;
@@ -90,7 +89,26 @@ namespace Ray.BiliBiliTool.Agent.Extensions
             string proxyAddress = configuration["Security:WebProxy"];
             if (proxyAddress.IsNotNullOrEmpty())
             {
-                HttpClient.DefaultProxy = new WebProxy(proxyAddress);
+                WebProxy webProxy = new WebProxy();
+
+                //user:password@host:port http proxy only .Tested with tinyproxy-1.11.0-rc1
+                if (proxyAddress.Contains("@"))
+                {
+                    string userPass = proxyAddress.Split("@")[0];
+                    string address = proxyAddress.Split("@")[1];
+
+                    string proxyUser = userPass.Split(":")[0];
+                    string proxyPass = userPass.Split(":")[1];
+
+                    webProxy.Address = new Uri("http://" + address);
+                    webProxy.Credentials = new NetworkCredential(proxyUser, proxyPass);
+                }
+                else
+                {
+                    webProxy.Address = new Uri(proxyAddress);
+                }
+
+                HttpClient.DefaultProxy = webProxy;
             }
 
             return services;

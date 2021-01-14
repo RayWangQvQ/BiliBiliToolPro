@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -100,18 +101,21 @@ namespace Ray.BiliBiliTool.Console
             ILogger<Program> logger = di.GetRequiredService<ILogger<Program>>();
             LogAppInfo(logger);
 
-            BiliBiliCookieOptions biliBiliCookieOptions = di.GetRequiredService<IOptionsMonitor<BiliBiliCookieOptions>>().CurrentValue;
-            biliBiliCookieOptions.Check(logger);//todo：使用配置检查
-
-            IDailyTaskAppService dailyTask = di.GetRequiredService<IDailyTaskAppService>();
-
             try
             {
+                BiliBiliCookieOptions biliBiliCookieOptions =
+                    di.GetRequiredService<IOptionsMonitor<BiliBiliCookieOptions>>().CurrentValue;
+                biliBiliCookieOptions.Check(logger); //todo：使用配置检查
+
+                IDailyTaskAppService dailyTask = di.GetRequiredService<IDailyTaskAppService>();
+
                 dailyTask.DoDailyTask();
             }
             catch (Exception ex)
             {
                 logger.LogError("程序异常终止，原因：{msg}", ex.Message);
+                throw ex;
+                //Environment.Exit(1);
             }
             finally
             {
@@ -127,9 +131,18 @@ namespace Ray.BiliBiliTool.Console
         {
             logger.LogInformation(
                 "版本号：{version}",
-                typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "未知");
+                typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+                    ?.InformationalVersion ?? "未知");
             logger.LogInformation("开源地址：{url}", Constants.SourceCodeUrl);
-            logger.LogInformation("当前环境：{env} \r\n", Global.HostingEnvironment.EnvironmentName ?? "无");
+            logger.LogInformation("当前环境：{env}", Global.HostingEnvironment.EnvironmentName ?? "无");
+            try
+            {
+                logger.LogInformation("当前IP：" + new HttpClient().GetAsync("http://api.ipify.org/").Result.Content.ReadAsStringAsync().Result);
+            }
+            catch (Exception)
+            {
+                //Environment.Exit(1);
+            }
         }
     }
 }
