@@ -114,7 +114,8 @@ namespace Ray.BiliBiliTool.Console
             catch (Exception ex)
             {
                 logger.LogError("程序异常终止，原因：{msg}", ex.Message);
-                Environment.Exit(1);
+                throw ex;
+                //Environment.Exit(1);
             }
             finally
             {
@@ -140,7 +141,7 @@ namespace Ray.BiliBiliTool.Console
             }
             catch (Exception)
             {
-                Environment.Exit(1);
+                //Environment.Exit(1);
             }
         }
     }
