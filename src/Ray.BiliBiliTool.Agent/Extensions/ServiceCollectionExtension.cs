@@ -21,6 +21,8 @@ namespace Ray.BiliBiliTool.Agent.Extensions
         /// <returns></returns>
         public static IServiceCollection AddBiliBiliClientApi(this IServiceCollection services, IConfiguration configuration)
         {
+            services.AddSingleton<BiliCookie>();
+
             //全局代理
             services.SetGlobalProxy(configuration);
 
@@ -37,7 +39,7 @@ namespace Ray.BiliBiliTool.Agent.Extensions
                 (sp, c) =>
                 {
                     c.DefaultRequestHeaders.Add("Cookie",
-                        sp.GetRequiredService<IOptionsMonitor<BiliBiliCookieOptions>>().CurrentValue.ToString());
+                        sp.GetRequiredService<BiliCookie>().ToString());
                     c.DefaultRequestHeaders.Add("User-Agent",
                         sp.GetRequiredService<IOptionsMonitor<SecurityOptions>>().CurrentValue.UserAgent);
                 });
@@ -68,7 +70,7 @@ namespace Ray.BiliBiliTool.Agent.Extensions
                 .ConfigureHttpClient((sp, c) =>
                 {
                     c.DefaultRequestHeaders.Add("Cookie",
-                        sp.GetRequiredService<IOptionsMonitor<BiliBiliCookieOptions>>().CurrentValue.ToString());
+                        sp.GetRequiredService<BiliCookie>().ToString());
                     c.DefaultRequestHeaders.Add("User-Agent",
                         sp.GetRequiredService<IOptionsMonitor<SecurityOptions>>().CurrentValue.UserAgent);
                     c.BaseAddress = new Uri(host);

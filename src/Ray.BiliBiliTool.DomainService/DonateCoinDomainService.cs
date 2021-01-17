@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Config;
@@ -18,7 +19,7 @@ namespace Ray.BiliBiliTool.DomainService
     {
         private readonly ILogger<DonateCoinDomainService> _logger;
         private readonly IDailyTaskApi _dailyTaskApi;
-        private readonly BiliBiliCookieOptions _biliBiliCookieOptions;
+        private readonly BiliCookie _biliBiliCookie;
         private readonly DailyTaskOptions _dailyTaskOptions;
         private readonly IAccountApi _accountApi;
         private readonly ICoinDomainService _coinDomainService;
@@ -37,9 +38,10 @@ namespace Ray.BiliBiliTool.DomainService
         /// </summary>
         private readonly Dictionary<string, int> _alreadyDonatedCoinCountCatch = new Dictionary<string, int>();
 
-        public DonateCoinDomainService(ILogger<DonateCoinDomainService> logger,
+        public DonateCoinDomainService(
+            ILogger<DonateCoinDomainService> logger,
             IDailyTaskApi dailyTaskApi,
-            IOptionsMonitor<BiliBiliCookieOptions> cookieOptions,
+            BiliCookie cookie,
             IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
             IAccountApi accountApi,
             ICoinDomainService coinDomainService,
@@ -51,7 +53,7 @@ namespace Ray.BiliBiliTool.DomainService
         {
             _logger = logger;
             _dailyTaskApi = dailyTaskApi;
-            _biliBiliCookieOptions = cookieOptions.CurrentValue;
+            _biliBiliCookie = cookie;
             _dailyTaskOptions = dailyTaskOptions.CurrentValue;
             _accountApi = accountApi;
             _coinDomainService = coinDomainService;
@@ -150,7 +152,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// <returns>是否投币成功</returns>
         public bool DoAddCoinForVideo(string aid, int multiply, bool select_like, string title = "")
         {
-            BiliApiResponse result = _dailyTaskApi.AddCoinForVideo(aid, multiply, select_like ? 1 : 0, _biliBiliCookieOptions.BiliJct).GetAwaiter().GetResult();
+            BiliApiResponse result = _dailyTaskApi.AddCoinForVideo(aid, multiply, select_like ? 1 : 0, _biliBiliCookie.BiliJct).GetAwaiter().GetResult();
 
             if (result.Code == 0)
             {
@@ -242,7 +244,7 @@ namespace Ray.BiliBiliTool.DomainService
         private Tuple<string, string> TryGetCanDonateVideoByFollowingUps(int tryCount)
         {
             //获取特别关注列表
-            BiliApiResponse<GetFollowingsResponse> result = _relationApi.GetFollowings(_biliBiliCookieOptions.UserId).GetAwaiter().GetResult();
+            BiliApiResponse<GetFollowingsResponse> result = _relationApi.GetFollowings(_biliBiliCookie.UserId).GetAwaiter().GetResult();
             if (result.Data.Total == 0) return null;
 
             return TryCanDonateVideoByUps(result.Data.List.Select(x => x.Mid).ToList(), tryCount);
@@ -281,7 +283,7 @@ namespace Ray.BiliBiliTool.DomainService
                 //获取随机Up主Id
                 long randomUpId = upIds[new Random().Next(0, upIds.Count)];
 
-                if (randomUpId.ToString() == _biliBiliCookieOptions.UserId)
+                if (randomUpId.ToString() == _biliBiliCookie.UserId)
                 {
                     _logger.LogDebug("不能为自己投币");
                     continue;

@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.Console;
@@ -18,12 +19,12 @@ namespace WatchVideoTest
 
             using (var scope = Global.ServiceProviderRoot.CreateScope())
             {
-                var cookie = scope.ServiceProvider.GetRequiredService<IOptionsMonitor<BiliBiliCookieOptions>>();
+                var cookie = scope.ServiceProvider.GetRequiredService<BiliCookie>();
                 var api = scope.ServiceProvider.GetRequiredService<IRelationApi>();
 
-                var re = api.GetFollowings(cookie.CurrentValue.UserId, 1, 100).Result;
-                var re2 = api.GetFollowings(cookie.CurrentValue.UserId, 1, 200).Result;
-                var re3 = api.GetFollowings(cookie.CurrentValue.UserId, 1, int.MaxValue).Result;
+                var re = api.GetFollowings(cookie.UserId, 1, 100).Result;
+                var re2 = api.GetFollowings(cookie.UserId, 1, 200).Result;
+                var re3 = api.GetFollowings(cookie.UserId, 1, int.MaxValue).Result;
 
                 Assert.True(re.Code == 0);
             }

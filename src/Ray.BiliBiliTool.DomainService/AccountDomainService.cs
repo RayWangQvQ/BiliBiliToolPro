@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Config;
@@ -17,17 +18,17 @@ namespace Ray.BiliBiliTool.DomainService
     {
         private readonly ILogger<AccountDomainService> _logger;
         private readonly IDailyTaskApi _dailyTaskApi;
-        private readonly BiliBiliCookieOptions _cookie;
+        private readonly BiliCookie _cookie;
         private readonly Dictionary<string, int> _expDic;
 
         public AccountDomainService(ILogger<AccountDomainService> logger,
             IDailyTaskApi dailyTaskApi,
-            IOptionsMonitor<BiliBiliCookieOptions> cookie,
+            BiliCookie cookie,
             IOptionsMonitor<Dictionary<string, int>> dicOptions)
         {
             _logger = logger;
             _dailyTaskApi = dailyTaskApi;
-            _cookie = cookie.CurrentValue;
+            _cookie = cookie;
             _expDic = dicOptions.Get(Constants.OptionsNames.ExpDictionaryName);
         }
 
@@ -48,7 +49,7 @@ namespace Ray.BiliBiliTool.DomainService
             UserInfo useInfo = apiResponse.Data;
 
             //获取到UserId
-            _cookie.SetUserId(useInfo.Mid.ToString());
+            _cookie.UserId = useInfo.Mid.ToString();
 
             _expDic.TryGetValue("每日登录", out int exp);
             _logger.LogInformation("登录成功，经验+{exp} √", exp);

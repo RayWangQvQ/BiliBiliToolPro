@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Config;
@@ -19,22 +20,24 @@ namespace Ray.BiliBiliTool.DomainService
     {
         private readonly ILogger<VideoDomainService> _logger;
         private readonly IDailyTaskApi _dailyTaskApi;
-        private readonly BiliBiliCookieOptions _biliBiliCookieOptions;
+        private readonly BiliCookie _biliBiliCookie;
         private readonly DailyTaskOptions _dailyTaskOptions;
         private readonly Dictionary<string, int> _expDic;
         private readonly IRelationApi _relationApi;
 
-        public VideoDomainService(ILogger<VideoDomainService> logger,
+        public VideoDomainService(
+            ILogger<VideoDomainService> logger,
             IDailyTaskApi dailyTaskApi,
-            IOptionsMonitor<BiliBiliCookieOptions> biliBiliCookieOptions,
+            BiliCookie biliBiliCookie,
             IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
             IOptionsMonitor<Dictionary<string, int>> dicOptions,
-            IRelationApi relationApi)
+            IRelationApi relationApi
+            )
         {
             _logger = logger;
             _dailyTaskApi = dailyTaskApi;
             _relationApi = relationApi;
-            _biliBiliCookieOptions = biliBiliCookieOptions.CurrentValue;
+            _biliBiliCookie = biliBiliCookie;
             _expDic = dicOptions.Get(Constants.OptionsNames.ExpDictionaryName);
             _dailyTaskOptions = dailyTaskOptions.CurrentValue;
         }
@@ -122,7 +125,7 @@ namespace Ray.BiliBiliTool.DomainService
             }
             else
             {
-                _logger.LogError("视频播放失败,原因：{msg}", apiResponse.Message);
+                _logger.LogError("视频播放失败，原因：{msg}", apiResponse.Message);
             }
         }
 
@@ -132,7 +135,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// <param name="aid">视频aid</param>
         public void ShareVideo(VideoInfoDto videoInfo)
         {
-            BiliApiResponse apiResponse = _dailyTaskApi.ShareVideo(videoInfo.Aid, _biliBiliCookieOptions.BiliJct)
+            BiliApiResponse apiResponse = _dailyTaskApi.ShareVideo(videoInfo.Aid, _biliBiliCookie.BiliJct)
                 .GetAwaiter().GetResult();
 
             if (apiResponse.Code == 0)
@@ -177,7 +180,7 @@ namespace Ray.BiliBiliTool.DomainService
             }
 
             //关注列表
-            BiliApiResponse<GetFollowingsResponse> result = _relationApi.GetFollowings(_biliBiliCookieOptions.UserId).GetAwaiter().GetResult();
+            BiliApiResponse<GetFollowingsResponse> result = _relationApi.GetFollowings(_biliBiliCookie.UserId).GetAwaiter().GetResult();
             if (result.Data.Total > 0)
             {
                 VideoInfoDto video = GetRandomVideoOfUps(result.Data.List.Select(x => x.Mid).ToList());

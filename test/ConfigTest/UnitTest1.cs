@@ -11,6 +11,7 @@ using Ray.BiliBiliTool.Console;
 using Xunit;
 using Ray.BiliBiliTool.Infrastructure;
 using Microsoft.Extensions.Hosting;
+using Ray.BiliBiliTool.Agent;
 
 namespace ConfigTest
 {
@@ -62,10 +63,10 @@ namespace ConfigTest
             string logLevel = Global.ConfigurationRoot["Serilog:WriteTo:0:Args:restrictedToMinimumLevel"];
             Debug.WriteLine(logLevel);
 
-            var options = Global.ServiceProviderRoot.GetRequiredService<IOptionsMonitor<BiliBiliCookieOptions>>();
+            var cookie = Global.ServiceProviderRoot.GetRequiredService<BiliCookie>();
 
-            Debug.WriteLine(JsonSerializer.Serialize(options.CurrentValue, new JsonSerializerOptions { WriteIndented = true }));
-            Assert.True(!string.IsNullOrWhiteSpace(options.CurrentValue.UserId));
+            Debug.WriteLine(JsonSerializer.Serialize(cookie, new JsonSerializerOptions { WriteIndented = true }));
+            Assert.True(!string.IsNullOrWhiteSpace(cookie.UserId));
         }
 
         /// <summary>
@@ -131,7 +132,7 @@ namespace ConfigTest
 
             //手动赋值
             //RayConfiguration.Root["BiliBiliCookie:UserId"] = "123456";
-            options.CurrentValue.SetUserId("123456");
+            options.CurrentValue.UserId = "123456";
 
             Debug.WriteLine($"从Configuration读取：{Global.ConfigurationRoot["BiliBiliCookie:UserId"]}");
 

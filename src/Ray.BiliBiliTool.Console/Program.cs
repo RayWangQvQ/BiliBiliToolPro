@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.Extensions;
 using Ray.BiliBiliTool.Application.Contracts;
 using Ray.BiliBiliTool.Application.Extensions;
@@ -110,9 +111,8 @@ namespace Ray.BiliBiliTool.Console
 
             try
             {
-                BiliBiliCookieOptions biliBiliCookieOptions =
-                    di.GetRequiredService<IOptionsMonitor<BiliBiliCookieOptions>>().CurrentValue;
-                biliBiliCookieOptions.Check(logger); //todo：使用配置检查
+                BiliCookie biliBiliCookie = di.GetRequiredService<BiliCookie>();
+                biliBiliCookie.Check();
 
                 IDailyTaskAppService dailyTask = di.GetRequiredService<IDailyTaskAppService>();
 
