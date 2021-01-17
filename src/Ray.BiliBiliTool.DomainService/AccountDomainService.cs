@@ -41,7 +41,7 @@ namespace Ray.BiliBiliTool.DomainService
 
             if (apiResponse.Code != 0 || !apiResponse.Data.IsLogin)
             {
-                _logger.LogWarning("登录异常，Cookies可能失效了，请仔细检查Github Secrets中DEDEUSERID、SESSDATA、BILI_JCT三项的值是否正确");
+                _logger.LogWarning("登录异常，请检查Cookie是否错误或过期");
                 return null;
             }
 
@@ -57,7 +57,7 @@ namespace Ray.BiliBiliTool.DomainService
 
             if (useInfo.Level_info.Current_level < 6)
             {
-                _logger.LogInformation("距离升级到Lv{0}还有: {1}天",
+                _logger.LogInformation("如每日做满65点经验，距离升级到Lv{0}还有: {1}天",
                     useInfo.Level_info.Current_level + 1,
                     (useInfo.Level_info.GetNext_expLong() - useInfo.Level_info.Current_exp) / Constants.EveryDayExp);
             }

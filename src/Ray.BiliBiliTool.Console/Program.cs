@@ -114,7 +114,7 @@ namespace Ray.BiliBiliTool.Console
             catch (Exception ex)
             {
                 logger.LogError("程序异常终止，原因：{msg}", ex.Message);
-                throw ex;
+                throw;
                 //Environment.Exit(1);
             }
             finally
@@ -130,14 +130,14 @@ namespace Ray.BiliBiliTool.Console
         private static void LogAppInfo(Microsoft.Extensions.Logging.ILogger logger)
         {
             logger.LogInformation(
-                "版本号：{version}",
+                "版本号：Ray.BiliBiliTool-v{version}",
                 typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
                     ?.InformationalVersion ?? "未知");
             logger.LogInformation("开源地址：{url}", Constants.SourceCodeUrl);
             logger.LogInformation("当前环境：{env}", Global.HostingEnvironment.EnvironmentName ?? "无");
             try
             {
-                logger.LogInformation("当前IP：" + new HttpClient().GetAsync("http://api.ipify.org/").Result.Content.ReadAsStringAsync().Result);
+                logger.LogInformation("当前IP：{ip} \r\n", new HttpClient().GetAsync("http://api.ipify.org/").Result.Content.ReadAsStringAsync().Result);
             }
             catch (Exception)
             {
