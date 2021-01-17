@@ -112,7 +112,6 @@ namespace Ray.BiliBiliTool.Console
             try
             {
                 BiliCookie biliBiliCookie = di.GetRequiredService<BiliCookie>();
-                biliBiliCookie.Check();
 
                 IDailyTaskAppService dailyTask = di.GetRequiredService<IDailyTaskAppService>();
 
