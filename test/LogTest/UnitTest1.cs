@@ -14,13 +14,13 @@ namespace LogTest
         public UnitTest1()
         {
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
-            Program.PreWorks(new string[] { });
+            Program.Init(new string[] { });
         }
 
         [Fact]
         public void Test1()
         {
-            Program.PreWorks(new string[] { });
+            Program.Init(new string[] { });
 
             var logger = Global.ServiceProviderRoot.GetRequiredService<ILogger<UnitTest1>>();
 

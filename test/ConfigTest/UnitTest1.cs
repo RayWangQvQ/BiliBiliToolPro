@@ -52,7 +52,7 @@ namespace ConfigTest
         [Fact]
         public void Test1()
         {
-            Program.PreWorks(new string[] { "-closeConsoleWhenEnd=1" });
+            Program.Init(new string[] { "-closeConsoleWhenEnd=1" });
 
             Debug.WriteLine(Global.ConfigurationRoot["CloseConsoleWhenEnd"]);
 
@@ -75,7 +75,7 @@ namespace ConfigTest
         public void TestEnvKeyDelimiter()
         {
             Environment.SetEnvironmentVariable("Ray_BiliBiliCookie__UserId", "123");
-            Program.PreWorks(null);
+            Program.Init(null);
 
             string result = Global.ConfigurationRoot["BiliBiliCookie:UserId"];
 
@@ -86,7 +86,7 @@ namespace ConfigTest
         public void LoadPrefixConfigByEnvWithNoError()
         {
             Environment.SetEnvironmentVariable("Ray_BiliBiliCookie", "UserId: 123");
-            Program.PreWorks(new string[] { "-closeConsoleWhenEnd=1" });
+            Program.Init(new string[] { "-closeConsoleWhenEnd=1" });
 
             string result = Global.ConfigurationRoot["BiliBiliCookie"];
 
@@ -98,7 +98,7 @@ namespace ConfigTest
         public void LoadPrefixConfigByEnvWhenValueIsNullWithNoError2()
         {
             Environment.SetEnvironmentVariable("Ray_BiliBiliCookie", null);
-            Program.PreWorks(new string[] { "-closeConsoleWhenEnd=1" });
+            Program.Init(new string[] { "-closeConsoleWhenEnd=1" });
 
             string result = Global.ConfigurationRoot["BiliBiliCookie"];
 
@@ -109,7 +109,7 @@ namespace ConfigTest
         public void CoverConfigByEnvWithNoError()
         {
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Production");
-            Program.PreWorks(new string[] { "-closeConsoleWhenEnd=1" });
+            Program.Init(new string[] { "-closeConsoleWhenEnd=1" });
 
             string result = Global.ConfigurationRoot["IsPrd"];
 
@@ -124,7 +124,7 @@ namespace ConfigTest
         public void TestSetConfiguration()
         {
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
-            Program.PreWorks(new string[] { });
+            Program.Init(new string[] { });
 
             var options = Global.ServiceProviderRoot.GetRequiredService<IOptionsMonitor<BiliBiliCookieOptions>>();
             Debug.WriteLine(options.CurrentValue.ToJson());

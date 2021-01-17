@@ -14,7 +14,7 @@ namespace DailyTaskTest
         [Fact]
         public void Test1()
         {
-            Program.PreWorks(new string[] { });
+            Program.Init(new string[] { });
 
             using (var scope = Global.ServiceProviderRoot.CreateScope())
             {
@@ -30,7 +30,7 @@ namespace DailyTaskTest
         public void Test2()
         {
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
-            Program.PreWorks(new string[] { });
+            Program.Init(new string[] { });
 
             using (var scope = Global.ServiceProviderRoot.CreateScope())
             {

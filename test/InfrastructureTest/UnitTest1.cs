@@ -10,7 +10,7 @@ namespace GetLastDayOfMonthTest
         [Fact]
         public void Test1()
         {
-            Program.PreWorks(new string[] { });
+            Program.Init(new string[] { });
 
             DateTime dateTime = DateTime.Now.LastDayOfMonth();
             Debug.WriteLine(dateTime);

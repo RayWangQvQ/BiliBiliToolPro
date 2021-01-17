@@ -23,7 +23,7 @@ namespace Ray.BiliBiliTool.Console
     {
         public static void Main(string[] args)
         {
-            PreWorks(args);
+            Init(args);
 
             StartRun();
 
@@ -36,7 +36,7 @@ namespace Ray.BiliBiliTool.Console
         /// 初始化系统
         /// </summary>
         /// <param name="args"></param>
-        public static void PreWorks(string[] args)
+        public static void Init(string[] args)
         {
             IHostBuilder hostBuilder = new HostBuilder();
 
@@ -56,8 +56,14 @@ namespace Ray.BiliBiliTool.Console
                 configurationBuilder.AddJsonFile("appsettings.json", false, true)
                     .AddJsonFile($"appsettings.{hostBuilderContext.HostingEnvironment.EnvironmentName}.json", true, true)
                     .AddJsonFile("exp.json", false, true)
-                    .AddJsonFile("donateCoinCanContinueStatus.json", false, true)
-                    .AddExcludeEmptyEnvironmentVariables("Ray_");
+                    .AddJsonFile("donateCoinCanContinueStatus.json", false, true);
+                if (hostBuilderContext.HostingEnvironment.IsDevelopment())
+                {
+                    Assembly assembly = Assembly.Load(new AssemblyName(hostBuilderContext.HostingEnvironment.ApplicationName));
+                    if (assembly != null)
+                        configurationBuilder.AddUserSecrets(assembly, true);
+                }
+                configurationBuilder.AddExcludeEmptyEnvironmentVariables("Ray_");
                 if (args != null && args.Length > 0)
                 {
                     configurationBuilder.AddCommandLine(args, hostBuilderContext.Configuration

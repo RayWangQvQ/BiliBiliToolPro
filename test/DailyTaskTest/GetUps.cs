@@ -14,7 +14,7 @@ namespace WatchVideoTest
         [Fact]
         public void GetFollowings()
         {
-            Program.PreWorks(new string[] { });
+            Program.Init(new string[] { });
 
             using (var scope = Global.ServiceProviderRoot.CreateScope())
             {
@@ -32,7 +32,7 @@ namespace WatchVideoTest
         [Fact]
         public void GetSpecialFollowings()
         {
-            Program.PreWorks(new string[] { });
+            Program.Init(new string[] { });
 
             using (var scope = Global.ServiceProviderRoot.CreateScope())
             {
