@@ -24,9 +24,9 @@ BiliBiliTool
 
 - [1. 如何使用](#1-如何使用)
     - [1.1. 第一步：获取自己的 Cookie](#11-第一步获取自己的-cookie)
-    - [1.2. 第二步：运行 BiliBiliTool](#12-第二步运行-bilibilitool)
+    - [1.2. 第二步：配置 Cookie 并运行 BiliBiliTool](#12-第二步配置-cookie-并运行-bilibilitool)
         - [1.2.1. 运行方式一（推荐）：Github Actions 每天定时线上自动运行](#121-运行方式一推荐github-actions-每天定时线上自动运行)
-        - [1.2.2. 运行方式二：本地运行](#122-运行方式二本地运行)
+        - [1.2.2. 运行方式二：使用下载包运行](#122-运行方式二使用下载包运行)
 - [2. 个性化自定义配置](#2-个性化自定义配置)
 - [3. 常见问题](#3-常见问题)
 - [4. 版本发布](#4-版本发布)
@@ -44,13 +44,13 @@ BiliBiliTool
 
 **另外，通过结合 GitHub Actions，可以实现每天线上自动运行，只要部署一次，小助手就会在背后一直默默地帮我们完成我们预先布置的任务。**
 
-还有其他一些小功能，比如漫画签到、直播签到等等，大家可以自己去慢慢探索~
+还有其他一些辅助小功能，比如漫画签到、直播签到、银瓜子兑换硬币等等，大家可以自己去自由探索~
 
 ![运行图示](https://cdn.jsdelivr.net/gh/RayWangQvQ/BiliBiliTool.Docs@main/imgs/run-exe.png)
 
 **Github 仓库地址：[RayWangQvQ/BiliBiliTool](https://github.com/RayWangQvQ/BiliBiliTool)**
 
-**本应用仅用于学习和测试，自觉爱护小破站，请勿滥用！**
+**注意：本应用仅用于学习和测试，作者本人并不对其负责，请于运行测试完成后自行删除。自觉爱护小破站，请勿滥用！**
 
 _（如果图片挂了，是因为 GitHub 的服务器在国外，经常会刷不出，有 VPN 的开启 VPN，没有的也可先先参考 [我的博客](https://www.cnblogs.com/RayWang/p/13909784.html)，但博客内容不保证最新)_
 
@@ -58,23 +58,20 @@ _（如果图片挂了，是因为 GitHub 的服务器在国外，经常会刷�
 
 BiliBiliTool 实现自动任务的原理，是通过调用一系列 B 站开放的接口实现的。
 
-举例来说，要实现观看视频的任务，只需要通过调用 B 站的上传视频观看进度 Api 即可，
-接口 Api："https://api.bilibili.com/x/click-interface/web/heartbeat"，
-入参：视频 Id、当前观看时间、用于身份认证的 Cookie。
+BiliBiliTool 就是收集了一系列的 B 站开放接口，通过每日自动运行程序，依次调用接口，来实现各定制任务的。
 
-BiliBiliTool 就是收集了一系列这样的接口，通过每日自动运行程序，依次调用接口，来实现功能的。
-
-**要使用 BiliBiliTool，我们只需要做两步，首先是获取自己的 Cookie 作为配置信息，然后将配置输入 BiliBiliTool 程序并运行即可。**
+**要使用 BiliBiliTool，我们只需要做两步：首先是获取自己的 Cookie 作为配置信息，然后将其输入 BiliBiliTool 并运行即可。**
 
 ### 1.1. 第一步：获取自己的 Cookie
 
-- 浏览器打开并登录[bilibili 网站](https://www.bilibili.com/)
-- 按 **F12** 打开"开发者工具"，依次点击 **应用程序/Application** -> **存储**-> **Cookies**
-- 找到`DEDEUSERID`、`SESSDATA`、`bili_jct`三项，复制保存它们到记事本，待会儿会用到。
+- 浏览器打开并登录 [bilibili 网站](https://www.bilibili.com/)
+- 登录成功后，访问 `https://api.bilibili.com/x/web-interface/nav`，按 **F12** 打开"开发者工具"，按 **F5** 刷新一下
+- 在"开发者工具"面板中，点击 **网络（Network）**，在左侧的请求列表中，找到名称为 `nav` 的接口，点击它
+- 依次查找 **Headers** ——> **RequestHeader** ——> **cookie**，可以看到很长一串以英文分号分隔的字符串，复制整个这个cookie字符串，保存它们到记事本，待会儿会用到。
 
 ![获取Cookie图示](https://cdn.jsdelivr.net/gh/RayWangQvQ/BiliBiliTool.Docs@main/imgs/get-bilibili-web-cookie.jpg)
 
-### 1.2. 第二步：运行 BiliBiliTool
+### 1.2. 第二步：配置 Cookie 并运行 BiliBiliTool
 
 运行 BiliBiliTool 有两种方式，一种是通过 Github 的 Actions 实现线上的每天自动运行，一种是本地运行或调试。
 
@@ -90,21 +87,14 @@ Github Actions 是微软（巨硬）收购 G 站之后新增的内置 CI/CD 方�
 
 Ⅰ. **首先 fork 本项目到自己的仓库**
 
-Ⅱ. **进入自己 fork 的仓库，点击 Settings-> Secrets-> New Secrets 添加以下 3 个 Secrets。它们将作为应用启动时的命令行参数被传入程序。**
+Ⅱ. **进入自己 fork 的仓库，点击 Settings-> Secrets-> New Secrets， 添加 1 个 Secrets，其名称为`COOKIESTR`，值为刚才我们保存的`cookie字符串`。它们将作为配置项，在应用启动时传入程序。**
 
 ![Secrets图示](https://cdn.jsdelivr.net/gh/RayWangQvQ/BiliBiliTool.Docs@main/imgs/git-secrets.png)
 
-要新增的 Secret Name 与之前的 Cookie Name 的对应关系如下：
-
-| Secret Name | Cookie Name | Secret Value     |
-| ----------- | ----------- | ---------------- |
-| USERID      | DEDEUSERID  | 刚才浏览器获取的 |
-| SESSDATA    | SESSDATA    | 刚才浏览器获取的 |
-| BILIJCT     | BILI_JCT    | 刚才浏览器获取的 |
 
 Ⅲ. **开启 Actions 并触发每日自动执行**
 
-Github Actions 默认处于关闭状态，前面都配置好后，请手动开启 Actions，执行一次工作流，验证是否可以正常工作，操作步骤如下图所示：
+都配置好后，请手动开启 Actions，执行一次工作流，验证是否可以正常工作，操作步骤如下图所示：
 
 ![Actions图示](https://cdn.jsdelivr.net/gh/RayWangQvQ/BiliBiliTool.Docs@main/imgs/run-workflow.png)
 
@@ -115,7 +105,7 @@ Github Actions 默认处于关闭状态，前面都配置好后，请手动开�
 
 Actions 的执行策略默认是每天0点整触发运行，如果想要设置自己的运行时间，请详见下面**常见问题**章节中的《**Actions 如何修改定时任务的执行时间？**》
 
-**建议每个人都修改下每日执行时间！不要使用默认时间！最好也不要设定在整点，错开峰值，避免 G 站的同一个IP在相同时间去请求B站接口，导致 IP 被禁，任务执行失败！**
+**建议每个人都设置下每日执行时间！不要使用默认时间！最好也不要设定在整点，错开峰值，避免 G 站的同一个IP在相同时间去请求B站接口，导致 IP 被禁！**
 
 如果配置了推送，执行成功后接收端会收到推送消息，如下所示为Server酱微信推送效果：
 
@@ -129,11 +119,11 @@ _如果是 Cookies 失效了，请从浏览器重新获取并更新到 Secrets �
 
 _如果是发现 bug，可以提交 issue，我会尽快确认并解决。（如何正确的提交issue，请详见下面**常见问题**章节。_
 
-#### 1.2.2. 运行方式二：本地运行
+#### 1.2.2. 运行方式二：使用下载包运行
 
-如果是 DotNet 开发者，直接 clone 源码然后 vs 打开解决方案，配置 Cookie 后直接运行调试即可。
+如果是 DotNet 开发者，直接 clone 源码然后 vs 打开解决方案，配置 Cookie 后即可直接本地进行运行、调试。
 
-对于不是开发者的朋友，可以通过下载 Release 包在本地运行，步骤如下。
+对于不是开发者的朋友，可以通过下载 Release 包在本地、docker或任意服务器运行，步骤如下。
 
 Ⅰ. **下载应用文件**
 
@@ -154,7 +144,7 @@ P.S.这里的运行环境指的是 `ASP.NET Core Runtime 5.0.0`与`.NET Runtime 
 
 Ⅱ. **解压并填写配置**
 
-下载并解压后，找到 appsettings.json 文件，使用记事本编辑，填入之前获取到的 Cookie 信息，保存后关闭：
+下载并解压后，找到 appsettings.json 文件，使用记事本编辑，填入之前获取到的 Cookie 字符串，保存后关闭：
 
 ![配置文件图示](https://cdn.jsdelivr.net/gh/RayWangQvQ/BiliBiliTool.Docs@main/imgs/appsettings-cookie.png)
 
