@@ -21,7 +21,7 @@ namespace LogTest
         public TestCoolPush()
         {
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
-            Program.PreWorks(new string[] { });
+            Program.Init(new string[] { });
 
             _key = Global.ConfigurationRoot["Serilog:WriteTo:7:Args:sKey"];
         }

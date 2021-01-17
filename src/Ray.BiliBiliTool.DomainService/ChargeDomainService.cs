@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Config.Options;
@@ -16,17 +17,19 @@ namespace Ray.BiliBiliTool.DomainService
         private readonly ILogger<ChargeDomainService> _logger;
         private readonly DailyTaskOptions _dailyTaskOptions;
         private readonly IDailyTaskApi _dailyTaskApi;
-        private readonly BiliBiliCookieOptions _cookieOptions;
+        private readonly BiliCookie _cookie;
 
-        public ChargeDomainService(ILogger<ChargeDomainService> logger,
+        public ChargeDomainService(
+            ILogger<ChargeDomainService> logger,
             IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
             IDailyTaskApi dailyTaskApi,
-            IOptionsMonitor<BiliBiliCookieOptions> cookieOptions)
+            BiliCookie cookie
+            )
         {
             _logger = logger;
             _dailyTaskOptions = dailyTaskOptions.CurrentValue;
             _dailyTaskApi = dailyTaskApi;
-            _cookieOptions = cookieOptions.CurrentValue;
+            _cookie = cookie;
         }
 
         /// <summary>
@@ -70,10 +73,10 @@ namespace Ray.BiliBiliTool.DomainService
             string targetUpId = _dailyTaskOptions.AutoChargeUpId;
             //如果没有配置或配了-1，则为自己充电
             if (_dailyTaskOptions.AutoChargeUpId.IsNullOrEmpty() | _dailyTaskOptions.AutoChargeUpId == "-1")
-                targetUpId = _cookieOptions.UserId;
+                targetUpId = _cookie.UserId;
 
             //BiliApiResponse<ChargeResponse> response = _dailyTaskApi.Charge(decimal.ToInt32(couponBalance * 10), _dailyTaskOptions.AutoChargeUpId, _cookieOptions.UserId, _cookieOptions.BiliJct).Result;
-            BiliApiResponse<ChargeV2Response> response = _dailyTaskApi.ChargeV2(couponBalance, targetUpId, targetUpId, _cookieOptions.BiliJct).GetAwaiter().GetResult();
+            BiliApiResponse<ChargeV2Response> response = _dailyTaskApi.ChargeV2(couponBalance, targetUpId, targetUpId, _cookie.BiliJct).GetAwaiter().GetResult();
 
             if (response.Code == 0)
             {
@@ -105,7 +108,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// <param name="token"></param>
         public void ChargeComments(string token)
         {
-            _dailyTaskApi.ChargeComment(token, _dailyTaskOptions.ChargeComment ?? "", _cookieOptions.BiliJct);
+            _dailyTaskApi.ChargeComment(token, _dailyTaskOptions.ChargeComment ?? "", _cookie.BiliJct);
         }
     }
 }

@@ -17,7 +17,7 @@ namespace LoginTest
         public Login()
         {
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
-            Program.PreWorks(new string[] { });
+            Program.Init(new string[] { });
         }
 
         [Fact]
@@ -37,7 +37,7 @@ namespace LoginTest
         [Fact]
         public void Test2()
         {
-            Program.PreWorks(new string[] { });
+            Program.Init(new string[] { });
 
             using (var scope = Global.ServiceProviderRoot.CreateScope())
             {

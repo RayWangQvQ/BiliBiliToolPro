@@ -17,6 +17,11 @@ namespace Ray.BiliBiliTool.Config.Options
         public bool IsSkipDailyTask { get; set; } = false;
 
         /// <summary>
+        /// 随机睡眠的最大时长，用于使每天运行时间在范围内相对随机
+        /// </summary>
+        public int RandomSleepMaxMin { get; set; } = 10;
+
+        /// <summary>
         /// 两次调用api之间间隔的秒数[0,+]
         /// 有人担心在几秒内连续调用api会被b站安全机制发现，所以为不放心的朋友添加了间隔秒数配置，两次调用Api之间会大于该秒数
         /// </summary>

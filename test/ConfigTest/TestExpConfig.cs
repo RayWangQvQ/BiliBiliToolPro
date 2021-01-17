@@ -17,7 +17,7 @@ namespace ConfigTest
     {
         public TestExpConfig()
         {
-            Program.PreWorks(null);
+            Program.Init(null);
         }
 
         [Fact]

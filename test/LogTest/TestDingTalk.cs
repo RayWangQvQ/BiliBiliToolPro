@@ -20,7 +20,7 @@ namespace LogTest
         public TestDingTalk()
         {
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
-            Program.PreWorks(new string[] { });
+            Program.Init(new string[] { });
 
             _key = Global.ConfigurationRoot["Serilog:WriteTo:5:Args:webHookUrl"];
         }

@@ -47,15 +47,17 @@ jobs:
     - name: Run APP
       env:
         ASPNETCORE_ENVIRONMENT: ${{secrets.ENV}} # 运行环境
-        Ray_BiliBiliCookie__UserId: ${{secrets.USERID}}
-        Ray_BiliBiliCookie__DedeUserID: ${{secrets.DEDEUSERID}} # 为了兼容 GitHub Secrets 经常会被填错
-        Ray_BiliBiliCookie__SessData: ${{secrets.SESSDATA}}
-        Ray_BiliBiliCookie__BiliJct: ${{secrets.BILIJCT}}
-        Ray_BiliBiliCookie__Bili_jct: ${{secrets.BILI_JCT}} # 为了兼容 GitHub Secrets 经常会被填错
-        Ray_BiliBiliCookie__OtherCookies: ${{secrets.OTHERCOOKIES}} # 为了解决412问题
+        Ray_BiliBiliCookie__CookieStr: ${{secrets.COOKIESTR}}
+        Ray_BiliBiliCookie__UserId: ${{secrets.USERID}} # 已过时
+        Ray_BiliBiliCookie__DedeUserID: ${{secrets.DEDEUSERID}} # 已过时
+        Ray_BiliBiliCookie__SessData: ${{secrets.SESSDATA}} # 已过时
+        Ray_BiliBiliCookie__BiliJct: ${{secrets.BILIJCT}} # 已过时
+        Ray_BiliBiliCookie__Bili_jct: ${{secrets.BILI_JCT}} # 已过时
+        Ray_BiliBiliCookie__OtherCookies: ${{secrets.OTHERCOOKIES}} # 已过时
         Ray_Serilog__WriteTo__3__Args__botToken: ${{secrets.PUSHTGTOKEN}} # Telegram
         Ray_Serilog__WriteTo__3__Args__chatId: ${{secrets.PUSHTGCHATID}}
         Ray_Serilog__WriteTo__3__Args__containsTrigger: ${{secrets.PUSHTGTRIGGER}}
+        Ray_Serilog__WriteTo__3__Args__restrictedToMinimumLevel: ${{secrets.PUSHTGLEVEL}}
         Ray_Serilog__WriteTo__4__Args__webHookUrl: ${{secrets.PUSHWEIXINURL}} # 企业微信
         Ray_Serilog__WriteTo__4__Args__containsTrigger: ${{secrets.PUSHWEIXINTRIGGER}}
         Ray_Serilog__WriteTo__4__Args__restrictedToMinimumLevel: ${{secrets.PUSHWEIXINLEVEL}}
@@ -78,6 +80,7 @@ jobs:
         Ray_Security__IntervalMethodTypes: ${{secrets.INTERVALMETHODTYPES}}
         Ray_Security__UserAgent: ${{secrets.USERAGENT}}
         Ray_Security__WebProxy: ${{secrets.WEBPROXY}}
+        Ray_Security__RandomSleepMaxMin: ${{secrets.RANDOMSLEEPMAXMIN}}
         Ray_DailyTaskConfig__NumberOfCoins: ${{secrets.NUMBEROFCOINS}}
         Ray_DailyTaskConfig__SelectLike: ${{secrets.SELECTLIKE}}
         Ray_DailyTaskConfig__SupportUpIds: ${{secrets.SUPPORTUPIDS}}

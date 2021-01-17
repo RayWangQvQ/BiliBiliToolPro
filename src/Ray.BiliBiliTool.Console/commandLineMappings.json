@@ -1,6 +1,8 @@
 {
   //命令行启动时的参数映射
   "CommandLineMappings": {
+    "-cookieStr": "BiliBiliCookie:CookieStr",
+
     "-userId": "BiliBiliCookie:UserId",
     "-sessData": "BiliBiliCookie:SessData",
     "-biliJct": "BiliBiliCookie:BiliJct",
