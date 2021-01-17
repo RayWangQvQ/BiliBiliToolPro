@@ -59,7 +59,8 @@ namespace Ray.BiliBiliTool.Console
                     .AddJsonFile("donateCoinCanContinueStatus.json", false, true);
                 if (hostBuilderContext.HostingEnvironment.IsDevelopment())
                 {
-                    Assembly assembly = Assembly.Load(new AssemblyName(hostBuilderContext.HostingEnvironment.ApplicationName));
+                    //Assembly assembly = Assembly.Load(new AssemblyName(hostBuilderContext.HostingEnvironment.ApplicationName));
+                    Assembly assembly = typeof(Program).Assembly;
                     if (assembly != null)
                         configurationBuilder.AddUserSecrets(assembly, true);
                 }
