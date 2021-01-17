@@ -91,6 +91,8 @@ Github Actions 是微软（巨硬）收购 G 站之后新增的内置 CI/CD 方�
 
 ![Secrets图示](https://cdn.jsdelivr.net/gh/RayWangQvQ/BiliBiliTool.Docs@main/imgs/git-secrets.png)
 
+![添加CookieStr图示](https://cdn.jsdelivr.net/gh/RayWangQvQ/BiliBiliTool.Docs@main/imgs/git-secrets-add-cookie.png)
+
 
 Ⅲ. **开启 Actions 并触发每日自动执行**
 
