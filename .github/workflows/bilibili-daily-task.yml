@@ -56,6 +56,7 @@ jobs:
         Ray_Serilog__WriteTo__3__Args__botToken: ${{secrets.PUSHTGTOKEN}} # Telegram
         Ray_Serilog__WriteTo__3__Args__chatId: ${{secrets.PUSHTGCHATID}}
         Ray_Serilog__WriteTo__3__Args__containsTrigger: ${{secrets.PUSHTGTRIGGER}}
+        Ray_Serilog__WriteTo__3__Args__restrictedToMinimumLevel: ${{secrets.PUSHTGLEVEL}}
         Ray_Serilog__WriteTo__4__Args__webHookUrl: ${{secrets.PUSHWEIXINURL}} # 企业微信
         Ray_Serilog__WriteTo__4__Args__containsTrigger: ${{secrets.PUSHWEIXINTRIGGER}}
         Ray_Serilog__WriteTo__4__Args__restrictedToMinimumLevel: ${{secrets.PUSHWEIXINLEVEL}}
@@ -78,6 +79,7 @@ jobs:
         Ray_Security__IntervalMethodTypes: ${{secrets.INTERVALMETHODTYPES}}
         Ray_Security__UserAgent: ${{secrets.USERAGENT}}
         Ray_Security__WebProxy: ${{secrets.WEBPROXY}}
+        Ray_Security__RandomSleepMaxMin: ${{secrets.RANDOMSLEEPMAXMIN}}
         Ray_DailyTaskConfig__NumberOfCoins: ${{secrets.NUMBEROFCOINS}}
         Ray_DailyTaskConfig__SelectLike: ${{secrets.SELECTLIKE}}
         Ray_DailyTaskConfig__SupportUpIds: ${{secrets.SUPPORTUPIDS}}
