@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
+using Ray.BiliBiliTool.DomainService.Dtos;
 
 namespace Ray.BiliBiliTool.DomainService.Interfaces
 {
@@ -37,13 +38,13 @@ namespace Ray.BiliBiliTool.DomainService.Interfaces
         /// </summary>
         /// <param name="aid"></param>
         /// <param name="dailyTaskStatus"></param>
-        void WatchVideo(string aid, string title = "");
+        void WatchVideo(VideoInfoDto videoInfo);
 
         /// <summary>
         /// 分享
         /// </summary>
         /// <param name="aid"></param>
         /// <param name="dailyTaskStatus"></param>
-        void ShareVideo(string aid, string title = "");
+        void ShareVideo(VideoInfoDto videoInfo);
     }
 }

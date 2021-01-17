@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
@@ -56,6 +57,13 @@ namespace Ray.BiliBiliTool.Application
             }
 
             _logger.LogInformation("-----开始每日任务-----\r\n");
+
+            if (_securityOptions.RandomSleepMaxMin > 0)
+            {
+                int randomMin = new Random().Next(1, ++_securityOptions.RandomSleepMaxMin);
+                _logger.LogInformation("随机休眠{min}分钟 \r\n", randomMin);
+                Thread.Sleep(randomMin * 1000 * 60);
+            }
 
             UserInfo userInfo = Login();
             DailyTaskInfo dailyTaskInfo = GetDailyTaskStatus();

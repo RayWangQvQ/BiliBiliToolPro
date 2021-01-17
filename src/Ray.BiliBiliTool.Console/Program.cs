@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.Extensions;
 using Ray.BiliBiliTool.Application.Contracts;
 using Ray.BiliBiliTool.Application.Extensions;
@@ -23,7 +24,7 @@ namespace Ray.BiliBiliTool.Console
     {
         public static void Main(string[] args)
         {
-            PreWorks(args);
+            Init(args);
 
             StartRun();
 
@@ -36,7 +37,7 @@ namespace Ray.BiliBiliTool.Console
         /// 初始化系统
         /// </summary>
         /// <param name="args"></param>
-        public static void PreWorks(string[] args)
+        public static void Init(string[] args)
         {
             IHostBuilder hostBuilder = new HostBuilder();
 
@@ -56,8 +57,15 @@ namespace Ray.BiliBiliTool.Console
                 configurationBuilder.AddJsonFile("appsettings.json", false, true)
                     .AddJsonFile($"appsettings.{hostBuilderContext.HostingEnvironment.EnvironmentName}.json", true, true)
                     .AddJsonFile("exp.json", false, true)
-                    .AddJsonFile("donateCoinCanContinueStatus.json", false, true)
-                    .AddExcludeEmptyEnvironmentVariables("Ray_");
+                    .AddJsonFile("donateCoinCanContinueStatus.json", false, true);
+                if (hostBuilderContext.HostingEnvironment.IsDevelopment())
+                {
+                    //Assembly assembly = Assembly.Load(new AssemblyName(hostBuilderContext.HostingEnvironment.ApplicationName));
+                    Assembly assembly = typeof(Program).Assembly;
+                    if (assembly != null)
+                        configurationBuilder.AddUserSecrets(assembly, true);
+                }
+                configurationBuilder.AddExcludeEmptyEnvironmentVariables("Ray_");
                 if (args != null && args.Length > 0)
                 {
                     configurationBuilder.AddCommandLine(args, hostBuilderContext.Configuration
@@ -103,9 +111,7 @@ namespace Ray.BiliBiliTool.Console
 
             try
             {
-                BiliBiliCookieOptions biliBiliCookieOptions =
-                    di.GetRequiredService<IOptionsMonitor<BiliBiliCookieOptions>>().CurrentValue;
-                biliBiliCookieOptions.Check(logger); //todo：使用配置检查
+                BiliCookie biliBiliCookie = di.GetRequiredService<BiliCookie>();
 
                 IDailyTaskAppService dailyTask = di.GetRequiredService<IDailyTaskAppService>();
 
@@ -114,7 +120,7 @@ namespace Ray.BiliBiliTool.Console
             catch (Exception ex)
             {
                 logger.LogError("程序异常终止，原因：{msg}", ex.Message);
-                throw ex;
+                throw;
                 //Environment.Exit(1);
             }
             finally
@@ -130,14 +136,14 @@ namespace Ray.BiliBiliTool.Console
         private static void LogAppInfo(Microsoft.Extensions.Logging.ILogger logger)
         {
             logger.LogInformation(
-                "版本号：{version}",
+                "版本号：Ray.BiliBiliTool-v{version}",
                 typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
                     ?.InformationalVersion ?? "未知");
             logger.LogInformation("开源地址：{url}", Constants.SourceCodeUrl);
             logger.LogInformation("当前环境：{env}", Global.HostingEnvironment.EnvironmentName ?? "无");
             try
             {
-                logger.LogInformation("当前IP：" + new HttpClient().GetAsync("http://api.ipify.org/").Result.Content.ReadAsStringAsync().Result);
+                logger.LogInformation("当前IP：{ip} \r\n", new HttpClient().GetAsync("http://api.ipify.org/").Result.Content.ReadAsStringAsync().Result);
             }
             catch (Exception)
             {

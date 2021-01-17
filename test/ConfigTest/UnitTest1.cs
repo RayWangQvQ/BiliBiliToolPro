@@ -11,6 +11,7 @@ using Ray.BiliBiliTool.Console;
 using Xunit;
 using Ray.BiliBiliTool.Infrastructure;
 using Microsoft.Extensions.Hosting;
+using Ray.BiliBiliTool.Agent;
 
 namespace ConfigTest
 {
@@ -52,7 +53,7 @@ namespace ConfigTest
         [Fact]
         public void Test1()
         {
-            Program.PreWorks(new string[] { "-closeConsoleWhenEnd=1" });
+            Program.Init(new string[] { "-closeConsoleWhenEnd=1" });
 
             Debug.WriteLine(Global.ConfigurationRoot["CloseConsoleWhenEnd"]);
 
@@ -62,10 +63,10 @@ namespace ConfigTest
             string logLevel = Global.ConfigurationRoot["Serilog:WriteTo:0:Args:restrictedToMinimumLevel"];
             Debug.WriteLine(logLevel);
 
-            var options = Global.ServiceProviderRoot.GetRequiredService<IOptionsMonitor<BiliBiliCookieOptions>>();
+            var cookie = Global.ServiceProviderRoot.GetRequiredService<BiliCookie>();
 
-            Debug.WriteLine(JsonSerializer.Serialize(options.CurrentValue, new JsonSerializerOptions { WriteIndented = true }));
-            Assert.True(!string.IsNullOrWhiteSpace(options.CurrentValue.UserId));
+            Debug.WriteLine(JsonSerializer.Serialize(cookie, new JsonSerializerOptions { WriteIndented = true }));
+            Assert.True(!string.IsNullOrWhiteSpace(cookie.UserId));
         }
 
         /// <summary>
@@ -75,7 +76,7 @@ namespace ConfigTest
         public void TestEnvKeyDelimiter()
         {
             Environment.SetEnvironmentVariable("Ray_BiliBiliCookie__UserId", "123");
-            Program.PreWorks(null);
+            Program.Init(null);
 
             string result = Global.ConfigurationRoot["BiliBiliCookie:UserId"];
 
@@ -86,7 +87,7 @@ namespace ConfigTest
         public void LoadPrefixConfigByEnvWithNoError()
         {
             Environment.SetEnvironmentVariable("Ray_BiliBiliCookie", "UserId: 123");
-            Program.PreWorks(new string[] { "-closeConsoleWhenEnd=1" });
+            Program.Init(new string[] { "-closeConsoleWhenEnd=1" });
 
             string result = Global.ConfigurationRoot["BiliBiliCookie"];
 
@@ -98,7 +99,7 @@ namespace ConfigTest
         public void LoadPrefixConfigByEnvWhenValueIsNullWithNoError2()
         {
             Environment.SetEnvironmentVariable("Ray_BiliBiliCookie", null);
-            Program.PreWorks(new string[] { "-closeConsoleWhenEnd=1" });
+            Program.Init(new string[] { "-closeConsoleWhenEnd=1" });
 
             string result = Global.ConfigurationRoot["BiliBiliCookie"];
 
@@ -109,7 +110,7 @@ namespace ConfigTest
         public void CoverConfigByEnvWithNoError()
         {
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Production");
-            Program.PreWorks(new string[] { "-closeConsoleWhenEnd=1" });
+            Program.Init(new string[] { "-closeConsoleWhenEnd=1" });
 
             string result = Global.ConfigurationRoot["IsPrd"];
 
@@ -124,14 +125,14 @@ namespace ConfigTest
         public void TestSetConfiguration()
         {
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
-            Program.PreWorks(new string[] { });
+            Program.Init(new string[] { });
 
             var options = Global.ServiceProviderRoot.GetRequiredService<IOptionsMonitor<BiliBiliCookieOptions>>();
             Debug.WriteLine(options.CurrentValue.ToJson());
 
             //手动赋值
             //RayConfiguration.Root["BiliBiliCookie:UserId"] = "123456";
-            options.CurrentValue.SetUserId("123456");
+            options.CurrentValue.UserId = "123456";
 
             Debug.WriteLine($"从Configuration读取：{Global.ConfigurationRoot["BiliBiliCookie:UserId"]}");
 

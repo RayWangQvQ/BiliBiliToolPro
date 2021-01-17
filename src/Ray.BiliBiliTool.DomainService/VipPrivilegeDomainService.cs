@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Config.Options;
@@ -16,19 +17,19 @@ namespace Ray.BiliBiliTool.DomainService
         private readonly ILogger<VipPrivilegeDomainService> _logger;
         private readonly IDailyTaskApi _dailyTaskApi;
         private readonly DailyTaskOptions _dailyTaskOptions;
-        private readonly BiliBiliCookieOptions _biliBiliCookieOptions;
+        private readonly BiliCookie _biliBiliCookie;
 
         public VipPrivilegeDomainService(
             ILogger<VipPrivilegeDomainService> logger,
             IDailyTaskApi dailyTaskApi,
-            IOptionsMonitor<BiliBiliCookieOptions> biliBiliCookieOptions,
+            BiliCookie biliBiliCookieOptions,
             IOptionsMonitor<DailyTaskOptions> dailyTaskOptions
             )
         {
             _logger = logger;
             _dailyTaskApi = dailyTaskApi;
             _dailyTaskOptions = dailyTaskOptions.CurrentValue;
-            _biliBiliCookieOptions = biliBiliCookieOptions.CurrentValue;
+            _biliBiliCookie = biliBiliCookieOptions;
         }
 
         /// <summary>
@@ -80,7 +81,8 @@ namespace Ray.BiliBiliTool.DomainService
         /// <param name="type">1.大会员B币券；2.大会员福利</param>
         private bool ReceiveVipPrivilege(int type)
         {
-            var response = _dailyTaskApi.ReceiveVipPrivilege(type, _biliBiliCookieOptions.BiliJct).GetAwaiter().GetResult();
+            var response = _dailyTaskApi.ReceiveVipPrivilege(type, _biliBiliCookie.BiliJct)
+                .GetAwaiter().GetResult();
 
             var name = GetPrivilegeName(type);
             if (response.Code == 0)
