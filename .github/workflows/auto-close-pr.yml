@@ -1,0 +1,12 @@
+name: Autocloser
+on: pull_request_target
+jobs:
+  autoclose:
+    runs-on: ubuntu-latest
+    if: github.repository == 'RayWangQvQ/BiliBiliTool'
+    steps:
+    - uses: roots/issue-closer@v1.1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        pr-close-message: "This PR was automatically closed because it did not follow the PR template."
+        pr-pattern: ".*请问您是否明白：【yes】 -->.*"
