@@ -65,7 +65,9 @@ namespace DailyTaskTest
             {
                 var service = scope.ServiceProvider.GetRequiredService<IVideoApi>();
 
-                var re = service.GetVideoDetail("246364184").Result;
+                //var re = service.GetVideoDetail("246364184").Result;//зджЦ
+                var re = service.GetVideoDetail("373987080").Result;//зЊди
+
             }
 
             Assert.True(true);

@@ -12,6 +12,13 @@ namespace Ray.BiliBiliTool.DomainService.Interfaces
     public interface IVideoDomainService : IDomainService
     {
         /// <summary>
+        /// 获取视频详情
+        /// </summary>
+        /// <param name="aid"></param>
+        /// <returns></returns>
+        VideoDetail GetVideoDetail(string aid);
+
+        /// <summary>
         /// 获取一个随机视频aid
         /// </summary>
         /// <returns></returns>

@@ -10,7 +10,11 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
     /// </summary>
     public interface IVideoApi : IBiliBiliApi
     {
-
+        /// <summary>
+        /// 获取视频详情
+        /// </summary>
+        /// <param name="aid"></param>
+        /// <returns></returns>
         [Get("/x/web-interface/view?aid={aid}")]
         Task<BiliApiResponse<VideoDetail>> GetVideoDetail(string aid);
 

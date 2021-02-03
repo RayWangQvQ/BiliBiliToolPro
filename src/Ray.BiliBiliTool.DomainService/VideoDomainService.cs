@@ -24,6 +24,7 @@ namespace Ray.BiliBiliTool.DomainService
         private readonly DailyTaskOptions _dailyTaskOptions;
         private readonly Dictionary<string, int> _expDic;
         private readonly IRelationApi _relationApi;
+        private readonly IVideoApi _videoApi;
 
         public VideoDomainService(
             ILogger<VideoDomainService> logger,
@@ -31,15 +32,28 @@ namespace Ray.BiliBiliTool.DomainService
             BiliCookie biliBiliCookie,
             IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
             IOptionsMonitor<Dictionary<string, int>> dicOptions,
-            IRelationApi relationApi
+            IRelationApi relationApi,
+            IVideoApi videoApi
             )
         {
             _logger = logger;
             _dailyTaskApi = dailyTaskApi;
             _relationApi = relationApi;
+            _videoApi = videoApi;
             _biliBiliCookie = biliBiliCookie;
             _expDic = dicOptions.Get(Constants.OptionsNames.ExpDictionaryName);
             _dailyTaskOptions = dailyTaskOptions.CurrentValue;
+        }
+
+        /// <summary>
+        /// 获取视频详情
+        /// </summary>
+        /// <param name="aid"></param>
+        /// <returns></returns>
+        public VideoDetail GetVideoDetail(string aid)
+        {
+            var re = _videoApi.GetVideoDetail(aid).GetAwaiter().GetResult();
+            return re.Data;
         }
 
         /// <summary>
