@@ -25,15 +25,6 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         /// 获取指定Up的视频
         /// </summary>
         /// <param name="upId"></param>
-        /// <param name="pageSize"></param>
-        /// <returns></returns>
-        [Get("/x/v2/medialist/resource/list?type=1&biz_id={upId}&bvid=&mobi_app=web&ps={pageSize}&direction=false")]
-        Task<BiliApiResponse<GetVideosResponse>> GetVideosByUpId(long upId, int pageSize);
-
-        /// <summary>
-        /// 获取指定Up的视频
-        /// </summary>
-        /// <param name="upId"></param>
         /// <param name="pageSize">[1,100]验证不通过接口会报异常</param>
         /// <param name="pageNumber"></param>
         /// <param name="keyword"></param>

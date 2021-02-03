@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Console;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 using Ray.BiliBiliTool.Infrastructure;
@@ -52,6 +53,19 @@ namespace DailyTaskTest
                 var service = scope.ServiceProvider.GetRequiredService<IDonateCoinDomainService>();
 
                 service.DoAddCoinForVideo("543318157", 1, true);
+            }
+
+            Assert.True(true);
+        }
+
+        [Fact]
+        public void GetVideoInfo()
+        {
+            using (var scope = Global.ServiceProviderRoot.CreateScope())
+            {
+                var service = scope.ServiceProvider.GetRequiredService<IVideoApi>();
+
+                var re = service.GetVideoDetail("246364184").Result;
             }
 
             Assert.True(true);
