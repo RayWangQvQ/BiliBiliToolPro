@@ -120,7 +120,7 @@ namespace Ray.BiliBiliTool.DomainService
         {
             Tuple<string, string> result = null;
 
-            //从up中随机尝试获取1次
+            //从配置的up中随机尝试获取1次
             result = TryGetCanDonateVideoByConfigUps(1);
             if (result != null) return result;
 
@@ -285,6 +285,8 @@ namespace Ray.BiliBiliTool.DomainService
             {
                 //获取随机Up主Id
                 long randomUpId = upIds[new Random().Next(0, upIds.Count)];
+
+                if (randomUpId == 0 || randomUpId == long.MinValue) continue;
 
                 if (randomUpId.ToString() == _biliBiliCookie.UserId)
                 {

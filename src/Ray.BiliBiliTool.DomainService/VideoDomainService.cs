@@ -213,6 +213,8 @@ namespace Ray.BiliBiliTool.DomainService
         {
             long upId = upIds[new Random().Next(0, upIds.Count)];
 
+            if (upId == 0 || upId == long.MinValue) return null;
+
             int count = GetVideoCountOfUp(upId);
 
             if (count > 0)

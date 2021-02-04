@@ -63,8 +63,10 @@ namespace Ray.BiliBiliTool.Config.Options
                 var array = SupportUpIds.Split(',');
                 foreach (var item in array)
                 {
-                    if (int.TryParse(item.Trim(), out int upId))
+                    if (long.TryParse(item.Trim(), out long upId))
                         re.Add(upId);
+                    else
+                        re.Add(long.MinValue);
                 }
                 return re;
             }
