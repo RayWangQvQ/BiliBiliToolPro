@@ -2,8 +2,8 @@
 
 on:
   workflow_dispatch:
- # schedule:
-   # - cron: '0 1 * * 1'
+  schedule:
+    - cron: '0 1 * * 1'
     # UTC时区，比我们东八区早，上面示例为：每周一9点。
 
 jobs:
