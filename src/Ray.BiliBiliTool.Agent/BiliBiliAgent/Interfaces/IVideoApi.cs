@@ -39,6 +39,14 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         Task<BiliApiResponse<SearchUpVideosResponse>> SearchVideosByUpId(long upId, int pageSize = 20, int pageNumber = 1, string keyword = "");
 
         /// <summary>
+        /// 获取当前用户对<paramref name="aid"/>视频的投币信息
+        /// </summary>
+        /// <param name="aid"></param>
+        /// <returns></returns>
+        [Get("/x/web-interface/archive/coins?aid={aid}")]
+        Task<BiliApiResponse<DonatedCoinsForVideo>> GetDonatedCoinsForVideo(string aid);
+
+        /// <summary>
         /// 为视频投币
         /// </summary>
         /// <param name="aid"></param>

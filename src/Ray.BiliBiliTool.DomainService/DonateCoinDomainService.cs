@@ -25,6 +25,7 @@ namespace Ray.BiliBiliTool.DomainService
         private readonly ICoinDomainService _coinDomainService;
         private readonly IVideoDomainService _videoDomainService;
         private readonly IRelationApi _relationApi;
+        private readonly IVideoApi _videoApi;
         private readonly Dictionary<string, int> _expDic;
         private readonly Dictionary<string, string> _donateContinueStatusDic;
 
@@ -48,7 +49,8 @@ namespace Ray.BiliBiliTool.DomainService
             IVideoDomainService videoDomainService,
             IRelationApi relationApi,
             IOptionsMonitor<Dictionary<string, int>> expDicOptions,
-            IOptionsMonitor<Dictionary<string, string>> donateContinueStatusDicOptions
+            IOptionsMonitor<Dictionary<string, string>> donateContinueStatusDicOptions,
+            IVideoApi videoApi
             )
         {
             _logger = logger;
@@ -59,6 +61,7 @@ namespace Ray.BiliBiliTool.DomainService
             _coinDomainService = coinDomainService;
             _videoDomainService = videoDomainService;
             _relationApi = relationApi;
+            _videoApi = videoApi;
             _expDic = expDicOptions.Get(Constants.OptionsNames.ExpDictionaryName);
             _donateContinueStatusDic = donateContinueStatusDicOptions.Get(Constants.OptionsNames.DonateCoinCanContinueStatusDictionaryName);
         }
@@ -147,7 +150,7 @@ namespace Ray.BiliBiliTool.DomainService
             BiliApiResponse result;
             try
             {
-                result = _dailyTaskApi.AddCoinForVideo(aid, multiply, select_like ? 1 : 0, _biliBiliCookie.BiliJct).GetAwaiter().GetResult();
+                result = _videoApi.AddCoinForVideo(aid, multiply, select_like ? 1 : 0, _biliBiliCookie.BiliJct).GetAwaiter().GetResult();
             }
             catch (Exception e)
             {
@@ -319,7 +322,7 @@ namespace Ray.BiliBiliTool.DomainService
             //获取已投币数量
             if (!_alreadyDonatedCoinCountCatch.TryGetValue(aid, out int multiply))
             {
-                multiply = _dailyTaskApi.GetDonatedCoinsForVideo(aid).GetAwaiter().GetResult().Data.Multiply;
+                multiply = _videoApi.GetDonatedCoinsForVideo(aid).GetAwaiter().GetResult().Data.Multiply;
                 _alreadyDonatedCoinCountCatch.TryAdd(aid, multiply);
             }
 

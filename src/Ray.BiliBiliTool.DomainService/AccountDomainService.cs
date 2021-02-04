@@ -18,17 +18,22 @@ namespace Ray.BiliBiliTool.DomainService
     {
         private readonly ILogger<AccountDomainService> _logger;
         private readonly IDailyTaskApi _dailyTaskApi;
+        private readonly IUserInfoApi _userInfoApi;
         private readonly BiliCookie _cookie;
         private readonly Dictionary<string, int> _expDic;
 
-        public AccountDomainService(ILogger<AccountDomainService> logger,
+        public AccountDomainService(
+            ILogger<AccountDomainService> logger,
             IDailyTaskApi dailyTaskApi,
             BiliCookie cookie,
-            IOptionsMonitor<Dictionary<string, int>> dicOptions)
+            IOptionsMonitor<Dictionary<string, int>> dicOptions,
+            IUserInfoApi userInfoApi
+            )
         {
             _logger = logger;
             _dailyTaskApi = dailyTaskApi;
             _cookie = cookie;
+            _userInfoApi = userInfoApi;
             _expDic = dicOptions.Get(Constants.OptionsNames.ExpDictionaryName);
         }
 
@@ -38,7 +43,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// <returns></returns>
         public UserInfo LoginByCookie()
         {
-            BiliApiResponse<UserInfo> apiResponse = _dailyTaskApi.LoginByCookie().GetAwaiter().GetResult();
+            BiliApiResponse<UserInfo> apiResponse = _userInfoApi.LoginByCookie().GetAwaiter().GetResult();
 
             if (apiResponse.Code != 0 || !apiResponse.Data.IsLogin)
             {

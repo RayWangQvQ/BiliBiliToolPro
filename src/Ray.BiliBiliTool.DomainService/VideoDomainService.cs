@@ -65,7 +65,7 @@ namespace Ray.BiliBiliTool.DomainService
             int[] arr = { 1, 3, 4, 5, 160, 22, 119 };
             int rid = arr[new Random().Next(arr.Length - 1)];
 
-            BiliApiResponse<List<RankingInfo>> apiResponse = _dailyTaskApi.GetRegionRankingVideos(rid, 3).GetAwaiter().GetResult();
+            BiliApiResponse<List<RankingInfo>> apiResponse = _videoApi.GetRegionRankingVideos(rid, 3).GetAwaiter().GetResult();
             _logger.LogDebug("获取分区:{rid}的{day}日top10榜单成功", rid, 3);
             RankingInfo data = apiResponse.Data[new Random().Next(apiResponse.Data.Count)];
 
@@ -75,7 +75,7 @@ namespace Ray.BiliBiliTool.DomainService
         public UpVideoInfo GetRandomVideoOfUp(long upId, int total)
         {
             int pageNum = new Random().Next(1, total + 1);
-            BiliApiResponse<SearchUpVideosResponse> re = _dailyTaskApi.SearchVideosByUpId(upId, 1, pageNum).GetAwaiter().GetResult();
+            BiliApiResponse<SearchUpVideosResponse> re = _videoApi.SearchVideosByUpId(upId, 1, pageNum).GetAwaiter().GetResult();
 
             if (re.Code != 0)
             {
@@ -93,7 +93,7 @@ namespace Ray.BiliBiliTool.DomainService
         public int GetVideoCountOfUp(long upId)
         {
             //todo:通过获取分页实现的，有待改善
-            BiliApiResponse<SearchUpVideosResponse> re = _dailyTaskApi.SearchVideosByUpId(upId, 1, 1).GetAwaiter().GetResult();
+            BiliApiResponse<SearchUpVideosResponse> re = _videoApi.SearchVideosByUpId(upId, 1, 1).GetAwaiter().GetResult();
             if (re.Code != 0)
             {
                 throw new Exception(re.Message);
@@ -129,7 +129,7 @@ namespace Ray.BiliBiliTool.DomainService
         public void WatchVideo(VideoInfoDto videoInfo)
         {
             int playedTime = new Random().Next(5, videoInfo.SecondsLength ?? 15);
-            BiliApiResponse apiResponse = _dailyTaskApi.UploadVideoHeartbeat(videoInfo.Aid, playedTime)
+            BiliApiResponse apiResponse = _videoApi.UploadVideoHeartbeat(videoInfo.Aid, playedTime)
                 .GetAwaiter().GetResult();
 
             if (apiResponse.Code == 0)
@@ -149,7 +149,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// <param name="aid">视频aid</param>
         public void ShareVideo(VideoInfoDto videoInfo)
         {
-            BiliApiResponse apiResponse = _dailyTaskApi.ShareVideo(videoInfo.Aid, _biliBiliCookie.BiliJct)
+            BiliApiResponse apiResponse = _videoApi.ShareVideo(videoInfo.Aid, _biliBiliCookie.BiliJct)
                 .GetAwaiter().GetResult();
 
             if (apiResponse.Code == 0)
