@@ -18,8 +18,12 @@ namespace Ray.Serilog.Sinks.CoolPushBatched
             _apiUrl = new Uri($"{Host}/{sKey}");
         }
 
-        public async Task<HttpResponseMessage> PushMessageAsync(string message)
+        public override string Name => "酷推";
+
+        public override HttpResponseMessage PushMessage(string message)
         {
+            base.PushMessage(message);
+
             /*
             var dic = new Dictionary<string, string>
             {
@@ -30,7 +34,7 @@ namespace Ray.Serilog.Sinks.CoolPushBatched
 
             var content = new StringContent(message, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PostAsync(_apiUrl, content);
+            var response = _httpClient.PostAsync(_apiUrl, content).GetAwaiter().GetResult();
             return response;
         }
     }

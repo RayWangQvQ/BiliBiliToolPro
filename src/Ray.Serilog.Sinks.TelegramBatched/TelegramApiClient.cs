@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Ray.Serilog.Sinks.Batched;
+using Serilog.Debugging;
 
 namespace Ray.Serilog.Sinks.TelegramBatched
 {
@@ -31,6 +32,7 @@ namespace Ray.Serilog.Sinks.TelegramBatched
         {
             if (string.IsNullOrWhiteSpace(botToken))
             {
+                SelfLog.WriteLine("The bot token mustn't be empty.");
                 throw new ArgumentException("The bot token mustn't be empty.", nameof(botToken));
             }
 
@@ -40,11 +42,14 @@ namespace Ray.Serilog.Sinks.TelegramBatched
             this._httpClient.Timeout = TimeSpan.FromSeconds(timeoutSeconds);
         }
 
-        public async Task<HttpResponseMessage> PushMessageAsync(string message)
+        public override string Name => "Telegram";
+
+        public override HttpResponseMessage PushMessage(string message)
         {
+            base.PushMessage(message);
             var json = new { chat_id = _chatId, text = message, parse_mode = "HTML" }.ToJson();
             var content = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await this._httpClient.PostAsync(this._apiUrl, content);
+            var response = this._httpClient.PostAsync(this._apiUrl, content).GetAwaiter().GetResult();
             return response;
         }
     }

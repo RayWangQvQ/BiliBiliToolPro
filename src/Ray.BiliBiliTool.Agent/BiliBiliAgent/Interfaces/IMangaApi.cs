@@ -5,7 +5,7 @@ using Refit;
 namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
 {
     /// <summary>
-    /// 漫画接口
+    /// 漫画相关接口
     /// </summary>
     public interface IMangaApi : IBiliBiliApi
     {
@@ -16,7 +16,6 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         /// <returns></returns>
         [Post("/twirp/activity.v1.Activity/ClockIn?platform={platform}")]
         Task<BiliApiResponse> ClockIn(string platform);
-
 
         /// <summary>
         /// 获取会员漫画奖励

@@ -17,6 +17,7 @@ using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Extensions;
 using Ray.BiliBiliTool.Infrastructure;
 using Serilog;
+using Serilog.Debugging;
 
 namespace Ray.BiliBiliTool.Console
 {
@@ -80,6 +81,7 @@ namespace Ray.BiliBiliTool.Console
                 Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(hostBuilderContext.Configuration)
                 .CreateLogger();
+                SelfLog.Enable(x => System.Console.WriteLine(x ?? ""));
             }).UseSerilog();
 
             //DI容器:

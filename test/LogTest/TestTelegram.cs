@@ -29,7 +29,7 @@ namespace LogTest
         public void Test2()
         {
             TelegramApiClient client = new TelegramApiClient(_botToken, _chatId);
-            var result = client.PushMessageAsync(LogConstants.Msg).Result;
+            var result = client.PushMessage(LogConstants.Msg);
             Debug.WriteLine(result.Content.ReadAsStringAsync().Result);
 
             System.Console.ReadLine();

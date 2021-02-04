@@ -8,6 +8,9 @@ using Refit;
 
 namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
 {
+    /// <summary>
+    /// 关注相关接口
+    /// </summary>
     public interface IRelationApi : IBiliBiliApi
     {
         /// <summary>
@@ -23,7 +26,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         Task<BiliApiResponse<GetFollowingsResponse>> GetFollowings(string vmid, int pn = 1, int ps = 50, string order = "desc", string order_type = "attention");
 
         /// <summary>
-        /// 
+        /// 获取特别关注列表
         /// </summary>
         /// <param name="pn"></param>
         /// <param name="ps"></param>

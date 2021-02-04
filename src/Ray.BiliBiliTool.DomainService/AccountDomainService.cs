@@ -6,7 +6,6 @@ using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Config;
-using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 
 namespace Ray.BiliBiliTool.DomainService
@@ -18,17 +17,22 @@ namespace Ray.BiliBiliTool.DomainService
     {
         private readonly ILogger<AccountDomainService> _logger;
         private readonly IDailyTaskApi _dailyTaskApi;
+        private readonly IUserInfoApi _userInfoApi;
         private readonly BiliCookie _cookie;
         private readonly Dictionary<string, int> _expDic;
 
-        public AccountDomainService(ILogger<AccountDomainService> logger,
+        public AccountDomainService(
+            ILogger<AccountDomainService> logger,
             IDailyTaskApi dailyTaskApi,
             BiliCookie cookie,
-            IOptionsMonitor<Dictionary<string, int>> dicOptions)
+            IOptionsMonitor<Dictionary<string, int>> dicOptions,
+            IUserInfoApi userInfoApi
+            )
         {
             _logger = logger;
             _dailyTaskApi = dailyTaskApi;
             _cookie = cookie;
+            _userInfoApi = userInfoApi;
             _expDic = dicOptions.Get(Constants.OptionsNames.ExpDictionaryName);
         }
 
@@ -38,7 +42,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// <returns></returns>
         public UserInfo LoginByCookie()
         {
-            BiliApiResponse<UserInfo> apiResponse = _dailyTaskApi.LoginByCookie().GetAwaiter().GetResult();
+            BiliApiResponse<UserInfo> apiResponse = _userInfoApi.LoginByCookie().GetAwaiter().GetResult();
 
             if (apiResponse.Code != 0 || !apiResponse.Data.IsLogin)
             {
@@ -58,13 +62,13 @@ namespace Ray.BiliBiliTool.DomainService
 
             if (useInfo.Level_info.Current_level < 6)
             {
-                _logger.LogInformation("如每日做满65点经验，距离升级到Lv{0}还有: {1}天",
+                _logger.LogInformation("如每日做满65点经验，距离升级到 Lv{0} 还有: {1}天",
                     useInfo.Level_info.Current_level + 1,
                     (useInfo.Level_info.GetNext_expLong() - useInfo.Level_info.Current_exp) / Constants.EveryDayExp);
             }
             else
             {
-                _logger.LogInformation("当前等级Lv6，经验值为：{0}", useInfo.Level_info.Current_exp);
+                _logger.LogInformation("您已是 Lv6 的大佬了，当前经验：{0}，无敌是多么寂寞~", useInfo.Level_info.Current_exp);
             }
 
             return useInfo;

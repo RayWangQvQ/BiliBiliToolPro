@@ -4,11 +4,18 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Serilog.Debugging;
 
 namespace Ray.Serilog.Sinks.Batched
 {
-    public interface IPushService
+    public abstract class IPushService
     {
-        Task<HttpResponseMessage> PushMessageAsync(string message);
+        public abstract string Name { get; }
+
+        public virtual HttpResponseMessage PushMessage(string message)
+        {
+            SelfLog.WriteLine($"开始推送到:{Name}");
+            return new HttpResponseMessage();
+        }
     }
 }
