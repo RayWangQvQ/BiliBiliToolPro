@@ -12,10 +12,10 @@ namespace Ray.Serilog.Sinks.Batched
     {
         public abstract string Name { get; }
 
-        public virtual Task<HttpResponseMessage> PushMessageAsync(string message)
+        public virtual HttpResponseMessage PushMessage(string message)
         {
             SelfLog.WriteLine($"开始推送到:{Name}");
-            return Task.FromResult(new HttpResponseMessage());
+            return new HttpResponseMessage();
         }
     }
 }

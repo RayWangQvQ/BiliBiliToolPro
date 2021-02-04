@@ -40,7 +40,7 @@ namespace LogTest
             var msg9 = "ℹ 版本号：\"1.0.18\"\r\n\r\nℹ 开源地址：\"https://github.com/RayWangQvQ/BiliBiliTool\"\r\n\r\nℹ 当前环境：\"Development\" \r\n\r\n\r\nℹ -----开始每日任务-----\r\n\r\n\r\nℹ ---开始【\"登录\"】---\r\n\r\nℹ 登录成功，用户名: \"在*楼\"\r\n\r\nℹ 硬币余额: 672.4\r\n\r\n";
 
             CoolPushApiClient client = new CoolPushApiClient(_key);
-            var result = client.PushMessageAsync(msg8).Result;
+            var result = client.PushMessage(msg8);
             Debug.WriteLine(result.Content.ReadAsStringAsync().Result);
 
             System.Console.ReadLine();

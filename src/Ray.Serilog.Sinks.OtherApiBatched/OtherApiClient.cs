@@ -24,13 +24,13 @@ namespace Ray.Serilog.Sinks.OtherApiBatched
 
         public override string Name => "自定义";
 
-        public override async Task<HttpResponseMessage> PushMessageAsync(string message)
+        public override HttpResponseMessage PushMessage(string message)
         {
-            await base.PushMessageAsync(message);
+            base.PushMessage(message);
             message = message.ToJson();
             var json = _json.Replace(_placeholder, message);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await this._httpClient.PostAsync(_apiUri, content);
+            var response = this._httpClient.PostAsync(_apiUri, content).GetAwaiter().GetResult();
             return response;
         }
     }

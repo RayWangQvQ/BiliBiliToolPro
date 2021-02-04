@@ -47,16 +47,16 @@ namespace Ray.Serilog.Sinks.Batched
                     {
                         waitingBatch.Enqueue(item);
                     }
-                    EmitBatchAsync(waitingBatch).Wait();
+                    EmitBatch(waitingBatch);
                 }
             }
             catch (Exception ex)
             {
-                SelfLog.WriteLine("Exception while emitting periodic batch from {0}: {1}", this, ex);
+                SelfLog.WriteLine("Exception while emitting periodic batch from {0}: {1}", this, ex.Message);
             }
         }
 
-        protected virtual async Task EmitBatchAsync(IEnumerable<LogEvent> events)
+        protected virtual void EmitBatch(IEnumerable<LogEvent> events)
         {
             if (_sendBatchesAsOneMessages)
             {
@@ -82,7 +82,7 @@ namespace Ray.Serilog.Sinks.Batched
                 }
 
                 var messageToSend = sb.ToString();
-                await PushMessage(messageToSend);
+                PushMessage(messageToSend);
             }
             else
             {
@@ -91,17 +91,17 @@ namespace Ray.Serilog.Sinks.Batched
                     var message = this._formatProvider != null
                                       ? logEvent.RenderMessage(_formatProvider)
                                       : RenderMessage(logEvent);
-                    await PushMessage(message);
+                    PushMessage(message);
                 }
             }
         }
 
         protected abstract IPushService PushService { get; }
 
-        protected virtual async Task PushMessage(string message)
+        protected virtual void PushMessage(string message)
         {
             //SelfLog.WriteLine($"Trying to send message: '{message}'.");
-            var result = await PushService.PushMessageAsync(message);
+            var result = PushService.PushMessage(message);
             if (result != null)
             {
                 SelfLog.WriteLine($"Response status: {result.StatusCode}.");

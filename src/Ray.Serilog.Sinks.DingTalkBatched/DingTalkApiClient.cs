@@ -18,12 +18,12 @@ namespace Ray.Serilog.Sinks.DingTalkBatched
 
         public override string Name => "钉钉";
 
-        public override async Task<HttpResponseMessage> PushMessageAsync(string message)
+        public override HttpResponseMessage PushMessage(string message)
         {
-            await base.PushMessageAsync(message);
+            base.PushMessage(message);
             var json = new { msgtype = "markdown", markdown = new { title = "Ray.BiliBiliTool任务日报", text = message } }.ToJson();
             var content = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await _httpClient.PostAsync(_apiUrl, content);
+            var response = _httpClient.PostAsync(_apiUrl, content).GetAwaiter().GetResult();
             return response;
         }
     }

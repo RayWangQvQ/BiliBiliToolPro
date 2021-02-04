@@ -23,16 +23,16 @@ namespace Ray.Serilog.Sinks.ServerChanBatched
 
         public override string Name => "Server酱";
 
-        public override async Task<HttpResponseMessage> PushMessageAsync(string message)
+        public override HttpResponseMessage PushMessage(string message)
         {
-            await base.PushMessageAsync(message);
+            base.PushMessage(message);
             var dic = new Dictionary<string, string>
             {
                 {"text", _title},
                 {"desp", message}
             };
             var content = new FormUrlEncodedContent(dic);
-            var response = await _httpClient.PostAsync(_apiUrl, content);
+            var response = _httpClient.PostAsync(_apiUrl, content).GetAwaiter().GetResult();
             return response;
         }
     }

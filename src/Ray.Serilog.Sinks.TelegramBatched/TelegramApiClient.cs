@@ -44,12 +44,12 @@ namespace Ray.Serilog.Sinks.TelegramBatched
 
         public override string Name => "Telegram";
 
-        public override async Task<HttpResponseMessage> PushMessageAsync(string message)
+        public override HttpResponseMessage PushMessage(string message)
         {
-            await base.PushMessageAsync(message);
+            base.PushMessage(message);
             var json = new { chat_id = _chatId, text = message, parse_mode = "HTML" }.ToJson();
             var content = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await this._httpClient.PostAsync(this._apiUrl, content);
+            var response = this._httpClient.PostAsync(this._apiUrl, content).GetAwaiter().GetResult();
             return response;
         }
     }
