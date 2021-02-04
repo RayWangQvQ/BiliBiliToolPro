@@ -22,8 +22,11 @@ namespace Ray.Serilog.Sinks.OtherApiBatched
             _apiUri = new Uri(apiUrl);
         }
 
-        public async Task<HttpResponseMessage> PushMessageAsync(string message)
+        public override string Name => "自定义";
+
+        public override async Task<HttpResponseMessage> PushMessageAsync(string message)
         {
+            await base.PushMessageAsync(message);
             message = message.ToJson();
             var json = _json.Replace(_placeholder, message);
             var content = new StringContent(json, Encoding.UTF8, "application/json");

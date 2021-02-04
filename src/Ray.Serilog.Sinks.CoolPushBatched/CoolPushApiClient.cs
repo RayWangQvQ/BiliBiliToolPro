@@ -18,8 +18,12 @@ namespace Ray.Serilog.Sinks.CoolPushBatched
             _apiUrl = new Uri($"{Host}/{sKey}");
         }
 
-        public async Task<HttpResponseMessage> PushMessageAsync(string message)
+        public override string Name => "酷推";
+
+        public override async Task<HttpResponseMessage> PushMessageAsync(string message)
         {
+            await base.PushMessageAsync(message);
+
             /*
             var dic = new Dictionary<string, string>
             {

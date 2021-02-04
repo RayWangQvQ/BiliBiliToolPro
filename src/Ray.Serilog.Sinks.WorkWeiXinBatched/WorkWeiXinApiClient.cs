@@ -18,8 +18,12 @@ namespace Ray.Serilog.Sinks.WorkWeiXinBatched
             _apiUrl = new Uri(webHookUrl);
         }
 
-        public async Task<HttpResponseMessage> PushMessageAsync(string message)
+        public override string Name => "企业微信";
+
+        public override async Task<HttpResponseMessage> PushMessageAsync(string message)
         {
+            await base.PushMessageAsync(message);
+
             var json = new { msgtype = "markdown", markdown = new { content = message } }.ToJson();
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             var response = await _httpClient.PostAsync(_apiUrl, content);

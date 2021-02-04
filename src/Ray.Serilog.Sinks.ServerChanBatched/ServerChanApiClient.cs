@@ -21,8 +21,11 @@ namespace Ray.Serilog.Sinks.ServerChanBatched
             _apiUrl = new Uri($"{Host}/{scKey}.send");
         }
 
-        public async Task<HttpResponseMessage> PushMessageAsync(string message)
+        public override string Name => "Server酱";
+
+        public override async Task<HttpResponseMessage> PushMessageAsync(string message)
         {
+            await base.PushMessageAsync(message);
             var dic = new Dictionary<string, string>
             {
                 {"text", _title},

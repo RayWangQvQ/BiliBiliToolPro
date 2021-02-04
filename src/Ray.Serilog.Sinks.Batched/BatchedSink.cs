@@ -100,11 +100,23 @@ namespace Ray.Serilog.Sinks.Batched
 
         protected virtual async Task PushMessage(string message)
         {
-            SelfLog.WriteLine($"Trying to send message: '{message}'.");
+            //SelfLog.WriteLine($"Trying to send message: '{message}'.");
             var result = await PushService.PushMessageAsync(message);
             if (result != null)
             {
-                SelfLog.WriteLine($"Response status: '{result.StatusCode}'.");
+                SelfLog.WriteLine($"Response status: {result.StatusCode}.");
+                try
+                {
+                    var content = result.Content.ReadAsStringAsync()
+                        .GetAwaiter().GetResult()
+                        .Replace("{", "{{")
+                        .Replace("}", "}}");
+                    SelfLog.WriteLine($"Response content: {content}.");
+                }
+                catch (Exception e)
+                {
+                    SelfLog.WriteLine(e.Message);
+                }
             }
         }
 
