@@ -52,10 +52,22 @@ namespace Ray.BiliBiliTool.DomainService
         {
             var result = false;
 
-            if (!_dailyTaskOptions.IsExchangeSilver2Coin)
+            if (_dailyTaskOptions.DayOfExchangeSilver2Coin == 0)
             {
-                _logger.LogInformation("已配置为跳过兑换任务");
-                return result;
+                _logger.LogInformation("已配置为不进行兑换，跳过兑换任务");
+                return false;
+            }
+
+            int targetDay = _dailyTaskOptions.DayOfExchangeSilver2Coin == -2
+                ? DateTime.Today.Day
+                : _dailyTaskOptions.DayOfExchangeSilver2Coin == -1
+                    ? DateTime.Today.LastDayOfMonth().Day
+                    : _dailyTaskOptions.DayOfExchangeSilver2Coin;
+
+            if (DateTime.Today.Day != targetDay)
+            {
+                _logger.LogInformation("目标兑换日期为{targetDay}号，今天是{day}号，跳过兑换任务", targetDay, DateTime.Today.Day);
+                return false;
             }
 
             var response = _liveApi.ExchangeSilver2Coin().GetAwaiter().GetResult();

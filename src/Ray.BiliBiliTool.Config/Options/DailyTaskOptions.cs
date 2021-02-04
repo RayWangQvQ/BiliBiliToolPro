@@ -43,9 +43,9 @@ namespace Ray.BiliBiliTool.Config.Options
         public int DayOfReceiveVipPrivilege { get; set; } = -1;
 
         /// <summary>
-        /// 是否开启直播中心银瓜子兑换硬币
+        /// 每月几号执行银瓜子兑换硬币[-1,31]，-1表示不指定，默认每月1号；-2表示每天；0表示不进行兑换
         /// </summary>
-        public bool IsExchangeSilver2Coin { get; set; } = true;
+        public int DayOfExchangeSilver2Coin { get; set; } = -1;
 
         /// <summary>
         /// 执行客户端操作时的平台 [ios,android]
@@ -63,8 +63,10 @@ namespace Ray.BiliBiliTool.Config.Options
                 var array = SupportUpIds.Split(',');
                 foreach (var item in array)
                 {
-                    if (int.TryParse(item.Trim(), out int upId))
+                    if (long.TryParse(item.Trim(), out long upId))
                         re.Add(upId);
+                    else
+                        re.Add(long.MinValue);
                 }
                 return re;
             }

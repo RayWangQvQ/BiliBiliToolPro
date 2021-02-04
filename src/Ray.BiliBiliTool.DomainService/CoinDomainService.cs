@@ -1,18 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Text;
-using System.Text.Json;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Ray.BiliBiliTool.Agent;
-using Ray.BiliBiliTool.Agent.BiliBiliAgent;
-using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
-using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
-using Ray.BiliBiliTool.Config;
-using Ray.BiliBiliTool.Config.Options;
+﻿using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.DomainService.Interfaces;
-using Ray.BiliBiliTool.Infrastructure.Helpers;
 
 namespace Ray.BiliBiliTool.DomainService
 {
@@ -21,21 +8,14 @@ namespace Ray.BiliBiliTool.DomainService
     /// </summary>
     public class CoinDomainService : ICoinDomainService
     {
-        private readonly ILogger<CoinDomainService> _logger;
-        private readonly IHttpClientFactory _httpClientFactory;
-        private readonly BiliBiliCookieOptions _biliBiliCookieOptions;
         private readonly IAccountApi _accountApi;
         private readonly IDailyTaskApi _dailyTaskApi;
 
-        public CoinDomainService(ILogger<CoinDomainService> logger,
-            IHttpClientFactory httpClientFactory,
-            IOptionsMonitor<BiliBiliCookieOptions> biliBiliCookieOptions,
+        public CoinDomainService(
             IAccountApi accountApi,
-            IDailyTaskApi dailyTaskApi)
+            IDailyTaskApi dailyTaskApi
+            )
         {
-            _logger = logger;
-            _httpClientFactory = httpClientFactory;
-            _biliBiliCookieOptions = biliBiliCookieOptions.CurrentValue;
             _accountApi = accountApi;
             _dailyTaskApi = dailyTaskApi;
         }
