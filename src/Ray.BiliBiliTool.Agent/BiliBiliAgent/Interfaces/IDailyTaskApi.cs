@@ -14,6 +14,8 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         /// 获取每日任务的完成情况
         /// </summary>
         /// <returns></returns>
+        [Header("Referer", "https://account.bilibili.com/account/home")]
+        [Header("Origin", "https://account.bilibili.com")]
         [HttpGet("/x/member/web/exp/reward")]
         Task<BiliApiResponse<DailyTaskInfo>> GetDailyTaskRewardInfo();
 

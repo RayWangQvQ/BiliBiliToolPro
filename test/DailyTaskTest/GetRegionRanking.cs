@@ -1,3 +1,4 @@
+using System;
 using Microsoft.Extensions.DependencyInjection;
 using Ray.BiliBiliTool.Console;
 using Ray.BiliBiliTool.DomainService.Interfaces;
@@ -8,6 +9,12 @@ namespace GetRegionRankingTest
 {
     public class GetRegionRanking
     {
+        public GetRegionRanking()
+        {
+            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
+            Program.CreateHost(new string[] { });
+        }
+
         [Fact]
         public void Test1()
         {

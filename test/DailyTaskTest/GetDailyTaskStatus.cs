@@ -5,16 +5,21 @@ using Ray.BiliBiliTool.Console;
 using Microsoft.Extensions.DependencyInjection;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 using Ray.BiliBiliTool.Infrastructure;
+using System;
 
 namespace GetDailyTaskStatusTest
 {
     public class GetDailyTaskStatus
     {
+        public GetDailyTaskStatus()
+        {
+            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
+            Program.CreateHost(new string[] { });
+        }
+
         [Fact]
         public void Test1()
         {
-            Program.CreateHost(new string[] { });
-
             using (var scope = Global.ServiceProviderRoot.CreateScope())
             {
                 var dailyTaskService = scope.ServiceProvider.GetRequiredService<IAccountDomainService>();

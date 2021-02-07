@@ -62,14 +62,11 @@ namespace Ray.BiliBiliTool.DomainService
         /// <returns></returns>
         public Tuple<string, string> GetRandomVideoOfRegion()
         {
-            int[] arr = { 1, 3, 4, 5, 160, 22, 119 };
-            int rid = arr[new Random().Next(arr.Length - 1)];
+            var apiResponse = _videoApi.GetRegionRankingVideosV2().GetAwaiter().GetResult();
+            _logger.LogDebug("获取排行榜成功");
+            RankingInfo data = apiResponse.Data.List[new Random().Next(apiResponse.Data.List.Count)];
 
-            BiliApiResponse<List<RankingInfo>> apiResponse = _videoApi.GetRegionRankingVideos(rid, 3).GetAwaiter().GetResult();
-            _logger.LogDebug("获取分区:{rid}的{day}日top10榜单成功", rid, 3);
-            RankingInfo data = apiResponse.Data[new Random().Next(apiResponse.Data.Count)];
-
-            return Tuple.Create(data.Aid, data.Title);
+            return Tuple.Create(data.Aid.ToString(), data.Title);
         }
 
         public UpVideoInfo GetRandomVideoOfUp(long upId, int total)
@@ -92,8 +89,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// <returns></returns>
         public int GetVideoCountOfUp(long upId)
         {
-            //todo:通过获取分页实现的，有待改善
-            BiliApiResponse<SearchUpVideosResponse> re = _videoApi.SearchVideosByUpId(upId, 1, 1).GetAwaiter().GetResult();
+            BiliApiResponse<SearchUpVideosResponse> re = _videoApi.SearchVideosByUpId(upId).GetAwaiter().GetResult();
             if (re.Code != 0)
             {
                 throw new Exception(re.Message);
