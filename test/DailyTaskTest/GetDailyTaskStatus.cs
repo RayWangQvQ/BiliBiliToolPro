@@ -13,7 +13,7 @@ namespace GetDailyTaskStatusTest
         [Fact]
         public void Test1()
         {
-            Program.Init(new string[] { });
+            Program.CreateHost(new string[] { });
 
             using (var scope = Global.ServiceProviderRoot.CreateScope())
             {

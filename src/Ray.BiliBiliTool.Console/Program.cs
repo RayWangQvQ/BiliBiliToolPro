@@ -1,19 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net.Http;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.Extensions;
-using Ray.BiliBiliTool.Application.Contracts;
 using Ray.BiliBiliTool.Application.Extensions;
-using Ray.BiliBiliTool.Config;
 using Ray.BiliBiliTool.Config.Extensions;
-using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Extensions;
 using Ray.BiliBiliTool.Infrastructure;
 using Serilog;
@@ -25,20 +18,31 @@ namespace Ray.BiliBiliTool.Console
     {
         public static void Main(string[] args)
         {
-            Init(args);
+            IHost host = CreateHost(args);
 
-            StartRun();
-
-            //如果配置了“1”就立即关闭，否则保持窗口以便查看日志信息
-            if (Global.ConfigurationRoot["CloseConsoleWhenEnd"] == "1") return;
-            else System.Console.ReadLine();
+            try
+            {
+                Log.Information("Starting console host.");
+                host.Run();
+            }
+            catch (Exception ex)
+            {
+                Log.Fatal(ex, "Host terminated unexpectedly!");
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
         }
 
-        /// <summary>
-        /// 初始化系统
-        /// </summary>
-        /// <param name="args"></param>
-        public static void Init(string[] args)
+        public static IHost CreateHost(string[] args)
+        {
+            IHost host = CreateHostBuilder(args).UseConsoleLifetime().Build();
+            Global.ServiceProviderRoot = host.Services;
+            return host;
+        }
+
+        internal static IHostBuilder CreateHostBuilder(string[] args)
         {
             IHostBuilder hostBuilder = new HostBuilder();
 
@@ -55,10 +59,14 @@ namespace Ray.BiliBiliTool.Console
             hostBuilder.ConfigureAppConfiguration((hostBuilderContext, configurationBuilder) =>
             {
                 Global.HostingEnvironment = hostBuilderContext.HostingEnvironment;
+
+                //json文件：
                 configurationBuilder.AddJsonFile("appsettings.json", false, true)
                     .AddJsonFile($"appsettings.{hostBuilderContext.HostingEnvironment.EnvironmentName}.json", true, true)
                     .AddJsonFile("exp.json", false, true)
                     .AddJsonFile("donateCoinCanContinueStatus.json", false, true);
+
+                //用户机密：
                 if (hostBuilderContext.HostingEnvironment.IsDevelopment())
                 {
                     //Assembly assembly = Assembly.Load(new AssemblyName(hostBuilderContext.HostingEnvironment.ApplicationName));
@@ -66,7 +74,11 @@ namespace Ray.BiliBiliTool.Console
                     if (assembly != null)
                         configurationBuilder.AddUserSecrets(assembly, true);
                 }
+
+                //环境变量：
                 configurationBuilder.AddExcludeEmptyEnvironmentVariables("Ray_");
+
+                //命令行：
                 if (args != null && args.Length > 0)
                 {
                     configurationBuilder.AddCommandLine(args, hostBuilderContext.Configuration
@@ -89,68 +101,16 @@ namespace Ray.BiliBiliTool.Console
             {
                 Global.ConfigurationRoot = (IConfigurationRoot)hostContext.Configuration;
 
+                //HostedService：
+                services.AddHostedService<BiliBiliToolHostedService>();
+
                 services.AddBiliBiliConfigs(hostContext.Configuration);
                 services.AddBiliBiliClientApi(hostContext.Configuration);
                 services.AddDomainServices();
                 services.AddAppServices();
             });
 
-            IHost host = hostBuilder.UseConsoleLifetime().Build();
-
-            Global.ServiceProviderRoot = host.Services;
-        }
-
-        /// <summary>
-        /// 开始运行
-        /// </summary>
-        private static void StartRun()
-        {
-            using IServiceScope serviceScope = Global.ServiceProviderRoot.CreateScope();
-            IServiceProvider di = serviceScope.ServiceProvider;
-
-            ILogger<Program> logger = di.GetRequiredService<ILogger<Program>>();
-            LogAppInfo(logger);
-
-            try
-            {
-                BiliCookie biliBiliCookie = di.GetRequiredService<BiliCookie>();
-
-                IDailyTaskAppService dailyTask = di.GetRequiredService<IDailyTaskAppService>();
-
-                dailyTask.DoDailyTask();
-            }
-            catch (Exception ex)
-            {
-                logger.LogError("程序异常终止，原因：{msg}", ex.Message);
-                throw;
-                //Environment.Exit(1);
-            }
-            finally
-            {
-                logger.LogInformation("开始推送");
-            }
-        }
-
-        /// <summary>
-        /// 打印应用信息
-        /// </summary>
-        /// <param name="logger"></param>
-        private static void LogAppInfo(Microsoft.Extensions.Logging.ILogger logger)
-        {
-            logger.LogInformation(
-                "版本号：Ray.BiliBiliTool-v{version}",
-                typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-                    ?.InformationalVersion ?? "未知");
-            logger.LogInformation("开源地址：{url}", Constants.SourceCodeUrl);
-            logger.LogInformation("当前环境：{env}", Global.HostingEnvironment.EnvironmentName ?? "无");
-            try
-            {
-                logger.LogInformation("当前IP：{ip} \r\n", new HttpClient().GetAsync("http://api.ipify.org/").Result.Content.ReadAsStringAsync().Result);
-            }
-            catch (Exception)
-            {
-                //Environment.Exit(1);
-            }
+            return hostBuilder;
         }
     }
 }

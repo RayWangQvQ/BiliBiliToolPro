@@ -14,7 +14,7 @@ namespace DailyTaskTest
         public AddCoinsForVideo()
         {
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
-            Program.Init(new string[] { });
+            Program.CreateHost(new string[] { });
         }
 
         [Fact]
