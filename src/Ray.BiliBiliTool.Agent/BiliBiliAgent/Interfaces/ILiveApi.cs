@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
-using Refit;
+using WebApiClientCore.Attributes;
 
 namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
 {
@@ -13,21 +13,21 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         /// 直播签到
         /// </summary>
         /// <returns></returns>
-        [Get("/xlive/web-ucenter/v1/sign/DoSign")]
+        [HttpGet("/xlive/web-ucenter/v1/sign/DoSign")]
         Task<BiliApiResponse<LiveSignResponse>> Sign();
 
         /// <summary>
         /// 银瓜子兑换硬币
         /// </summary>
         /// <returns></returns>
-        [Get("/pay/v1/Exchange/silver2coin")]
+        [HttpGet("/pay/v1/Exchange/silver2coin")]
         Task<BiliApiResponse> ExchangeSilver2Coin();
 
         /// <summary>
         /// 获取银瓜子余额
         /// </summary>
         /// <returns></returns>
-        [Get("/pay/v1/Exchange/getStatus")]
+        [HttpGet("/pay/v1/Exchange/getStatus")]
         Task<BiliApiResponse<ExchangeSilverStatusResponse>> GetExchangeSilverStatus();
     }
 }

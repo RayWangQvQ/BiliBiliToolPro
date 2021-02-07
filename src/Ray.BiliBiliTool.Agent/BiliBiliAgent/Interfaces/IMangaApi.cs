@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
-using Refit;
+using WebApiClientCore.Attributes;
 
 namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
 {
@@ -14,7 +14,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         /// </summary>
         /// <param name="platform"></param>
         /// <returns></returns>
-        [Post("/twirp/activity.v1.Activity/ClockIn?platform={platform}")]
+        [HttpPost("/twirp/activity.v1.Activity/ClockIn?platform={platform}")]
         Task<BiliApiResponse> ClockIn(string platform);
 
         /// <summary>
@@ -22,7 +22,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         /// </summary>
         /// <param name="reason_id"></param>
         /// <returns></returns>
-        [Post("/twirp/user.v1.User/GetVipReward?reason_id={reason_id}")]
+        [HttpPost("/twirp/user.v1.User/GetVipReward?reason_id={reason_id}")]
         Task<BiliApiResponse<MangaVipRewardResponse>> ReceiveMangaVipReward(int reason_id);
 
     }

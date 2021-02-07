@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
-using Refit;
+using WebApiClientCore.Attributes;
 
 namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
 {
@@ -22,7 +22,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         /// <param name="order"></param>
         /// <param name="order_type"></param>
         /// <returns></returns>
-        [Get("/followings?vmid={vmid}&pn={pn}&ps={ps}&order={order}&order_type={order_type}")]
+        [HttpGet("/followings?vmid={vmid}&pn={pn}&ps={ps}&order={order}&order_type={order_type}")]
         Task<BiliApiResponse<GetFollowingsResponse>> GetFollowings(string vmid, int pn = 1, int ps = 50, string order = "desc", string order_type = "attention");
 
         /// <summary>
@@ -31,7 +31,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         /// <param name="pn"></param>
         /// <param name="ps"></param>
         /// <returns></returns>
-        [Get("/tag?tagid=-10&pn={pn}&ps={ps}")]
+        [HttpGet("/tag?tagid=-10&pn={pn}&ps={ps}")]
         Task<BiliApiResponse<List<UpInfo>>> GetSpecialFollowings(int pn = 1, int ps = 50);
     }
 }

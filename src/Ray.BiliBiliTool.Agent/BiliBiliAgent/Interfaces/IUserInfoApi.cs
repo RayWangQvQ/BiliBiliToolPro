@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
-using Refit;
+using WebApiClientCore.Attributes;
 
 namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
 {
@@ -14,7 +14,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         /// 登录
         /// </summary>
         /// <returns></returns>
-        [Get("/x/web-interface/nav")]
+        [HttpGet("/x/web-interface/nav")]
         Task<BiliApiResponse<UserInfo>> LoginByCookie();
     }
 }

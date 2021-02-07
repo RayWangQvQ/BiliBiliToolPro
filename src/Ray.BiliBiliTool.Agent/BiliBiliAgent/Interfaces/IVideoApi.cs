@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
-using Refit;
+using WebApiClientCore.Attributes;
 
 namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
 {
@@ -15,7 +15,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         /// </summary>
         /// <param name="aid"></param>
         /// <returns></returns>
-        [Get("/x/web-interface/view?aid={aid}")]
+        [HttpGet("/x/web-interface/view?aid={aid}")]
         Task<BiliApiResponse<VideoDetail>> GetVideoDetail(string aid);
 
         /// <summary>
@@ -24,7 +24,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         /// <param name="rid"></param>
         /// <param name="day"></param>
         /// <returns></returns>
-        [Get("/x/web-interface/ranking/region?rid={rid}&day={day}")]
+        [HttpGet("/x/web-interface/ranking/region?rid={rid}&day={day}")]
         Task<BiliApiResponse<List<RankingInfo>>> GetRegionRankingVideos(int rid, int day);
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         /// <param name="pageNumber"></param>
         /// <param name="keyword"></param>
         /// <returns></returns>
-        [Get("/x/space/arc/search?mid={upId}&ps={pageSize}&tid=0&pn={pageNumber}&keyword={keyword}&order=pubdate&jsonp=jsonp")]
+        [HttpGet("/x/space/arc/search?mid={upId}&ps={pageSize}&tid=0&pn={pageNumber}&keyword={keyword}&order=pubdate&jsonp=jsonp")]
         Task<BiliApiResponse<SearchUpVideosResponse>> SearchVideosByUpId(long upId, int pageSize = 20, int pageNumber = 1, string keyword = "");
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         /// </summary>
         /// <param name="aid"></param>
         /// <returns></returns>
-        [Get("/x/web-interface/archive/coins?aid={aid}")]
+        [HttpGet("/x/web-interface/archive/coins?aid={aid}")]
         Task<BiliApiResponse<DonatedCoinsForVideo>> GetDonatedCoinsForVideo(string aid);
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         /// <param name="select_like"></param>
         /// <param name="csrf"></param>
         /// <returns></returns>
-        [Post("/x/web-interface/coin/add?aid={aid}&multiply={multiply}&select_like={select_like}&cross_domain=true&csrf={csrf}")]
+        [HttpPost("/x/web-interface/coin/add?aid={aid}&multiply={multiply}&select_like={select_like}&cross_domain=true&csrf={csrf}")]
         Task<BiliApiResponse> AddCoinForVideo(string aid, int multiply, int select_like, string csrf);
 
         /// <summary>
@@ -63,14 +63,14 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         /// <param name="aid"></param>
         /// <param name="csrf"></param>
         /// <returns></returns>
-        [Post("/x/web-interface/share/add?aid={aid}&csrf={csrf}")]
+        [HttpPost("/x/web-interface/share/add?aid={aid}&csrf={csrf}")]
         Task<BiliApiResponse> ShareVideo(string aid, string csrf);
 
         /// <summary>
         /// 上传视频观看进度
         /// </summary>
         /// <returns></returns>
-        [Post("/x/click-interface/web/heartbeat?aid={aid}&played_time={playedTime}")]
+        [HttpPost("/x/click-interface/web/heartbeat?aid={aid}&played_time={playedTime}")]
         Task<BiliApiResponse> UploadVideoHeartbeat(string aid, int playedTime);
     }
 }

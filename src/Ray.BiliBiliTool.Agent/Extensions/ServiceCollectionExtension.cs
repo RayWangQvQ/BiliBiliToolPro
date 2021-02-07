@@ -8,7 +8,6 @@ using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Agent.HttpClientDelegatingHandlers;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.Infrastructure;
-using Refit;
 
 namespace Ray.BiliBiliTool.Agent.Extensions
 {
@@ -34,16 +33,6 @@ namespace Ray.BiliBiliTool.Agent.Extensions
                 .WithTransientLifetime()
             );
 
-            services.AddHttpClient();
-            services.AddHttpClient("BiliBiliWithCookie",
-                (sp, c) =>
-                {
-                    c.DefaultRequestHeaders.Add("Cookie",
-                        sp.GetRequiredService<BiliCookie>().ToString());
-                    c.DefaultRequestHeaders.Add("User-Agent",
-                        sp.GetRequiredService<IOptionsMonitor<SecurityOptions>>().CurrentValue.UserAgent);
-                });
-
             //bilibli
             services.AddBiliBiliClientApi<IDailyTaskApi>("https://api.bilibili.com");
             services.AddBiliBiliClientApi<IMangaApi>("https://manga.bilibili.com");
@@ -67,19 +56,27 @@ namespace Ray.BiliBiliTool.Agent.Extensions
         private static IServiceCollection AddBiliBiliClientApi<TInterface>(this IServiceCollection services, string host)
             where TInterface : class
         {
-            var settings = new RefitSettings(new SystemTextJsonContentSerializer(JsonSerializerOptionsBuilder.DefaultOptions));
-
-            services.AddRefitClient<TInterface>(settings)
+            var uri = new Uri(host);
+            services
+                .AddHttpApi<TInterface>(o =>
+                {
+                    o.HttpHost = uri;
+                    o.UseDefaultUserAgent = false;
+                })
                 .ConfigureHttpClient((sp, c) =>
                 {
-                    c.DefaultRequestHeaders.Add("Cookie",
-                        sp.GetRequiredService<BiliCookie>().ToString());
                     c.DefaultRequestHeaders.Add("User-Agent",
                         sp.GetRequiredService<IOptionsMonitor<SecurityOptions>>().CurrentValue.UserAgent);
-                    c.BaseAddress = new Uri(host);
                 })
-                .AddHttpMessageHandler<IntervalDelegatingHandler>()
-                .AddHttpMessageHandler<LogDelegatingHandler>();
+                .ConfigurePrimaryHttpMessageHandler(sp =>
+                {
+                    var handler = new HttpClientHandler
+                    {
+                        CookieContainer = sp.GetRequiredService<BiliCookie>().CreateCookieContainer(uri)
+                    };
+                    return handler;
+                })
+                .AddHttpMessageHandler<IntervalDelegatingHandler>();
 
             return services;
         }

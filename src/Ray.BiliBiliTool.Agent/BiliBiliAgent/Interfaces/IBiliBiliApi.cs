@@ -1,12 +1,12 @@
-﻿using Refit;
+﻿using Ray.BiliBiliTool.Agent.Attributes;
+using WebApiClientCore.Attributes;
 
 namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
 {
-    [Headers(
-    "Accept:application/json, text/plain, */*",
-    "Referer:https://www.bilibili.com/",
-    "Connection:keep-alive"
-    )]
+    [Header("Accept", "application/json, text/plain, */*")]
+    [Header("Referer", "https://www.bilibili.com/")]
+    [Header("Connection", "keep-alive")]
+    [LogFilter]
     public interface IBiliBiliApi
     {
     }
