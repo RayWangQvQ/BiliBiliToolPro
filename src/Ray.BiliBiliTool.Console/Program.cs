@@ -22,7 +22,6 @@ namespace Ray.BiliBiliTool.Console
 
             try
             {
-                Log.Information("Starting console host.");
                 host.Run();
             }
             catch (Exception ex)

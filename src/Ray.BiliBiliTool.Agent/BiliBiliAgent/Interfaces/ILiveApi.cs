@@ -7,6 +7,9 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
     /// <summary>
     /// 直播相关接口
     /// </summary>
+    [Header("Host", "api.live.bilibili.com")]
+    [Header("Referer", "https://link.bilibili.com/")]
+    [Header("Origin", "https://link.bilibili.com")]
     public interface ILiveApi : IBiliBiliApi
     {
         /// <summary>
@@ -20,6 +23,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         /// 银瓜子兑换硬币
         /// </summary>
         /// <returns></returns>
+        [Header("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")]
         [HttpGet("/pay/v1/Exchange/silver2coin")]
         Task<BiliApiResponse> ExchangeSilver2Coin();
 

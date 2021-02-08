@@ -8,6 +8,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
     /// <summary>
     /// BiliBili每日任务相关接口
     /// </summary>
+    [Header("Host", "api.bilibili.com")]
     public interface IDailyTaskApi : IBiliBiliApi
     {
         /// <summary>
@@ -23,6 +24,8 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         /// 获取通过投币已获取的经验值
         /// </summary>
         /// <returns></returns>
+        [Header("Referer", "https://www.bilibili.com/")]
+        [Header("Origin", "https://www.bilibili.com")]
         [HttpGet("/x/web-interface/coin/today/exp")]
         Task<BiliApiResponse<int>> GetDonateCoinExp();
 

@@ -4,7 +4,7 @@ using Ray.BiliBiliTool.DomainService.Interfaces;
 using Ray.BiliBiliTool.Infrastructure;
 using Xunit;
 
-namespace MangaSignTest
+namespace DailyTaskTest
 {
     public class MangaSign
     {

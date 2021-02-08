@@ -17,6 +17,13 @@ namespace Ray.BiliBiliTool.Agent.Attributes
 {
     public class LogFilterAttribute : LoggingFilterAttribute
     {
+        private readonly bool _logError;
+
+        public LogFilterAttribute(bool logError = true)
+        {
+            _logError = logError;
+        }
+
         protected override Task WriteLogAsync(ApiResponseContext context, LogMessage logMessage)
         {
             ILoggerFactory service = context.HttpContext.ServiceProvider.GetService<ILoggerFactory>();
@@ -38,7 +45,12 @@ namespace Ray.BiliBiliTool.Agent.Attributes
             if (logMessage.Exception == null)
                 logger.LogDebug(logMessage.ToString());//修改为Debug等级
             else
-                logger.LogError(logMessage.ToString());
+            {
+                if (_logError)
+                    logger.LogError(logMessage.ToString());
+                else
+                    logger.LogDebug(logMessage.ToString());
+            }
 
             return Task.CompletedTask;
         }

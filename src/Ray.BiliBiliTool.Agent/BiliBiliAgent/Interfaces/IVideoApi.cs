@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using WebApiClientCore.Attributes;
@@ -8,6 +9,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
     /// <summary>
     /// 视频相关接口
     /// </summary>
+    [Header("Host", "api.bilibili.com")]
     public interface IVideoApi : IBiliBiliApi
     {
         /// <summary>
@@ -27,6 +29,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         [Header("Referer", "https://www.bilibili.com/")]
         [Header("Origin", "https://www.bilibili.com")]
         [HttpGet("/x/web-interface/ranking/region?rid={rid}&day={day}")]
+        [Obsolete]
         Task<BiliApiResponse<List<RankingInfo>>> GetRegionRankingVideos(int rid, int day);
 
         /// <summary>
@@ -52,13 +55,29 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         Task<BiliApiResponse<SearchUpVideosResponse>> SearchVideosByUpId(long upId, int pageSize = 30, int pageNumber = 1, string keyword = "");
 
         /// <summary>
-        /// 获取当前用户对<paramref name="aid"/>视频的投币信息
+        /// 分享视频
         /// </summary>
-        /// <param name="aid"></param>
+        /// <param name="request"></param>
         /// <returns></returns>
-        [HttpGet("/x/web-interface/archive/coins?aid={aid}")]
-        Task<BiliApiResponse<DonatedCoinsForVideo>> GetDonatedCoinsForVideo(string aid);
+        [Header("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")]
+        [Header("Referer", "https://www.bilibili.com/")]
+        [Header("Origin", "https://www.bilibili.com")]
+        [HttpPost("/x/web-interface/share/add")]
+        Task<BiliApiResponse> ShareVideo([FormContent] ShareVideoRequest request);
 
+        /// <summary>
+        /// 上传视频观看进度
+        /// 每15秒上报一次
+        /// </summary>
+        /// <returns></returns>
+        //[Header("Content-Length", "186")]
+        [Header("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")]
+        [Header("Referer", "https://www.bilibili.com/")]
+        [Header("Origin", "https://www.bilibili.com")]
+        [HttpPost("/x/click-interface/web/heartbeat?aid={aid}&played_time={playedTime}")]
+        Task<BiliApiResponse> UploadVideoHeartbeat([FormContent] UploadVideoHeartbeatRequest request);
+
+        #region 投币相关
         /// <summary>
         /// 为视频投币
         /// </summary>
@@ -67,23 +86,20 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         /// <param name="select_like"></param>
         /// <param name="csrf"></param>
         /// <returns></returns>
+        [Header("Content-Type", "application/x-www-form-urlencoded")]
+        [Header("Referer", "https://www.bilibili.com/")]
+        [Header("Origin", "https://www.bilibili.com")]
         [HttpPost("/x/web-interface/coin/add?aid={aid}&multiply={multiply}&select_like={select_like}&cross_domain=true&csrf={csrf}")]
-        Task<BiliApiResponse> AddCoinForVideo(string aid, int multiply, int select_like, string csrf);
+        Task<BiliApiResponse> AddCoinForVideo([FormContent] AddCoinRequest request);
 
         /// <summary>
-        /// 分享视频
+        /// 获取当前用户对<paramref name="aid"/>视频的投币信息
         /// </summary>
         /// <param name="aid"></param>
-        /// <param name="csrf"></param>
         /// <returns></returns>
-        [HttpPost("/x/web-interface/share/add?aid={aid}&csrf={csrf}")]
-        Task<BiliApiResponse> ShareVideo(string aid, string csrf);
-
-        /// <summary>
-        /// 上传视频观看进度
-        /// </summary>
-        /// <returns></returns>
-        [HttpPost("/x/click-interface/web/heartbeat?aid={aid}&played_time={playedTime}")]
-        Task<BiliApiResponse> UploadVideoHeartbeat(string aid, int playedTime);
+        [Header("Referer", "https://www.bilibili.com/")]
+        [HttpGet("/x/web-interface/archive/coins")]
+        Task<BiliApiResponse<DonatedCoinsForVideo>> GetDonatedCoinsForVideo(GetAlreadyDonatedCoinsRequest request);
+        #endregion
     }
 }

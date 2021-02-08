@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Ray.BiliBiliTool.Agent.Attributes;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using WebApiClientCore.Attributes;
 
@@ -7,6 +8,8 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
     /// <summary>
     /// 漫画相关接口
     /// </summary>
+    [Header("Origin", "https://manga.bilibili.com")]
+    [Header("Host", "manga.bilibili.com")]
     public interface IMangaApi : IBiliBiliApi
     {
         /// <summary>
@@ -14,6 +17,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         /// </summary>
         /// <param name="platform"></param>
         /// <returns></returns>
+        [LogFilter(false)]
         [HttpPost("/twirp/activity.v1.Activity/ClockIn?platform={platform}")]
         Task<BiliApiResponse> ClockIn(string platform);
 

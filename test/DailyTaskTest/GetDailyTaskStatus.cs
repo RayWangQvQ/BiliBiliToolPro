@@ -1,13 +1,13 @@
-using System.Text.Json;
+using System;
 using System.Diagnostics;
-using Xunit;
-using Ray.BiliBiliTool.Console;
+using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
+using Ray.BiliBiliTool.Console;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 using Ray.BiliBiliTool.Infrastructure;
-using System;
+using Xunit;
 
-namespace GetDailyTaskStatusTest
+namespace DailyTaskTest
 {
     public class GetDailyTaskStatus
     {

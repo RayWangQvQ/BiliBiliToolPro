@@ -52,21 +52,21 @@ namespace Ray.BiliBiliTool.DomainService
         /// <returns></returns>
         public VideoDetail GetVideoDetail(string aid)
         {
-            var re = _videoApi.GetVideoDetail(aid).GetAwaiter().GetResult();
+            var re = _videoApi.GetVideoDetail(aid)
+                .GetAwaiter().GetResult();
             return re.Data;
         }
 
         /// <summary>
-        /// 获取随机视频
+        /// 从排行榜获取随机视频
         /// </summary>
         /// <returns></returns>
-        public Tuple<string, string> GetRandomVideoOfRegion()
+        public RankingInfo GetRandomVideoOfRanking()
         {
             var apiResponse = _videoApi.GetRegionRankingVideosV2().GetAwaiter().GetResult();
             _logger.LogDebug("获取排行榜成功");
             RankingInfo data = apiResponse.Data.List[new Random().Next(apiResponse.Data.List.Count)];
-
-            return Tuple.Create(data.Aid.ToString(), data.Title);
+            return data;
         }
 
         public UpVideoInfo GetRandomVideoOfUp(long upId, int total)
@@ -116,7 +116,7 @@ namespace Ray.BiliBiliTool.DomainService
             if (!dailyTaskStatus.Share)
                 ShareVideo(targetVideo);
             else
-                _logger.LogInformation("今天已经分享过了，不要再分享啦");
+                _logger.LogInformation("今天已经分享过了，不用再分享啦");
         }
 
         /// <summary>
@@ -124,18 +124,45 @@ namespace Ray.BiliBiliTool.DomainService
         /// </summary>
         public void WatchVideo(VideoInfoDto videoInfo)
         {
-            int playedTime = new Random().Next(5, videoInfo.SecondsLength ?? 15);
-            BiliApiResponse apiResponse = _videoApi.UploadVideoHeartbeat(videoInfo.Aid, playedTime)
+            videoInfo.Duration = videoInfo.Duration ?? 15;
+            int max = videoInfo.Duration < 15 ? videoInfo.Duration.Value : 15;
+            int playedTime = new Random().Next(1, max);
+
+            var request = new UploadVideoHeartbeatRequest
+            {
+                Aid = long.Parse(videoInfo.Aid),
+                Bvid = videoInfo.Bvid,
+                Cid = videoInfo.Cid,
+
+                Mid = long.Parse(_biliBiliCookie.UserId),
+                Csrf = _biliBiliCookie.BiliJct,
+            };
+
+            //开始上报一次
+            BiliApiResponse apiResponse1 = _videoApi.UploadVideoHeartbeat(request)
                 .GetAwaiter().GetResult();
 
-            if (apiResponse.Code == 0)
+            if (apiResponse1.Code != 0)
+            {
+                _logger.LogError("视频播放失败，原因：{msg}", apiResponse1.Message);
+                return;
+            }
+
+            //结束上报一次
+            request.Played_time = playedTime;
+            request.Realtime = playedTime;
+            request.Real_played_time = playedTime;
+            BiliApiResponse apiResponse2 = _videoApi.UploadVideoHeartbeat(request)
+                .GetAwaiter().GetResult();
+
+            if (apiResponse2.Code == 0)
             {
                 _expDic.TryGetValue("每日观看视频", out int exp);
                 _logger.LogInformation("视频播放成功，已观看到第{playedTime}秒，经验+{exp} √", playedTime, exp);
             }
             else
             {
-                _logger.LogError("视频播放失败，原因：{msg}", apiResponse.Message);
+                _logger.LogError("视频播放失败，原因：{msg}", apiResponse2.Message);
             }
         }
 
@@ -145,7 +172,8 @@ namespace Ray.BiliBiliTool.DomainService
         /// <param name="aid">视频aid</param>
         public void ShareVideo(VideoInfoDto videoInfo)
         {
-            BiliApiResponse apiResponse = _videoApi.ShareVideo(videoInfo.Aid, _biliBiliCookie.BiliJct)
+            var request = new ShareVideoRequest(long.Parse(videoInfo.Aid), _biliBiliCookie.BiliJct);
+            BiliApiResponse apiResponse = _videoApi.ShareVideo(request)
                 .GetAwaiter().GetResult();
 
             if (apiResponse.Code == 0)
@@ -171,11 +199,15 @@ namespace Ray.BiliBiliTool.DomainService
             if (video != null) return video;
 
             //然后从排行榜中取
-            Tuple<string, string> t = GetRandomVideoOfRegion();
+            RankingInfo t = GetRandomVideoOfRanking();
             return new VideoInfoDto
             {
-                Aid = t.Item1,
-                Title = t.Item2,
+                Aid = t.Aid.ToString(),
+                Bvid = t.Bvid,
+                Cid = t.Cid,
+                Copyright = t.Copyright,
+                Duration = t.Duration,
+                Title = t.Title,
             };
         }
 
@@ -190,7 +222,9 @@ namespace Ray.BiliBiliTool.DomainService
             }
 
             //关注列表
-            BiliApiResponse<GetFollowingsResponse> result = _relationApi.GetFollowings(_biliBiliCookie.UserId).GetAwaiter().GetResult();
+            var request = new GetFollowingsRequest(long.Parse(_biliBiliCookie.UserId));
+            BiliApiResponse<GetFollowingsResponse> result = _relationApi.GetFollowings(request)
+                .GetAwaiter().GetResult();
             if (result.Data.Total > 0)
             {
                 VideoInfoDto video = GetRandomVideoOfUps(result.Data.List.Select(x => x.Mid).ToList());
@@ -219,8 +253,11 @@ namespace Ray.BiliBiliTool.DomainService
                 return new VideoInfoDto
                 {
                     Aid = video.Aid.ToString(),
+                    Bvid = video.Bvid,
+                    //Cid=,
+                    //Copyright=
                     Title = video.Title,
-                    SecondsLength = video.SecondsLength
+                    Duration = video.Duration
                 };
             }
 

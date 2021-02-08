@@ -4,7 +4,8 @@ using WebApiClientCore.Attributes;
 namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
 {
     [Header("Accept", "application/json, text/plain, */*")]
-    [Header("Accept-Encoding", "gzip, deflate, br")]
+    //[Header("Accept-Encoding", "gzip, deflate, br")]
+    [Header("Accept-Encoding", "deflate, br")]
     [Header("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6")]
 
     [Header("Sec-Fetch-Dest", "empty")]
@@ -12,7 +13,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
     [Header("Sec-Fetch-Site", "same-site")]
 
     [Header("Connection", "keep-alive")]
-    [Header("Host", "api.bilibili.com")]
+    //[Header("Host", "api.bilibili.com")]
 
     [LogFilter]
     public interface IBiliBiliApi

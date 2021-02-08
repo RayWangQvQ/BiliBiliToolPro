@@ -19,10 +19,10 @@ namespace Ray.BiliBiliTool.DomainService.Interfaces
         VideoDetail GetVideoDetail(string aid);
 
         /// <summary>
-        /// 获取一个随机视频aid
+        /// 从排行榜获取一个随机视频
         /// </summary>
         /// <returns></returns>
-        Tuple<string, string> GetRandomVideoOfRegion();
+        RankingInfo GetRandomVideoOfRanking();
 
         /// <summary>
         /// 从某个指定UP下获取随机视频

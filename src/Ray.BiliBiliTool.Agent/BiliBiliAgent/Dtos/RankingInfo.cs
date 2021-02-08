@@ -16,6 +16,8 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos
 
         public string Bvid { get; set; }
 
+        public long Cid { get; set; }
+
         public string Title { get; set; }
 
         /// <summary>
@@ -24,5 +26,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos
         /// <sample>2：转载</sample>
         /// </summary>
         public int Copyright { get; set; }
+
+        public int Duration { get; set; }
     }
 }
