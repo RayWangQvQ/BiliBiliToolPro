@@ -36,7 +36,9 @@ namespace Ray.BiliBiliTool.Console
 
         public static IHost CreateHost(string[] args)
         {
-            IHost host = CreateHostBuilder(args).UseConsoleLifetime().Build();
+            IHost host = CreateHostBuilder(args)
+                .UseConsoleLifetime()
+                .Build();
             Global.ServiceProviderRoot = host.Services;
             return host;
         }

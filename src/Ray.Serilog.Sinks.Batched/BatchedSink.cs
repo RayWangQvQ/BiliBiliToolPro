@@ -111,7 +111,7 @@ namespace Ray.Serilog.Sinks.Batched
                         .GetAwaiter().GetResult()
                         .Replace("{", "{{")
                         .Replace("}", "}}");
-                    SelfLog.WriteLine($"Response content: {content}.");
+                    SelfLog.WriteLine($"Response content: {content}.\r\n");
                 }
                 catch (Exception e)
                 {

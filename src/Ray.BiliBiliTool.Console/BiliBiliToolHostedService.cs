@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Reflection;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
@@ -17,16 +14,19 @@ namespace Ray.BiliBiliTool.Console
 {
     public class BiliBiliToolHostedService : IHostedService
     {
+        private readonly IHostApplicationLifetime _applicationLifetime;
         private readonly ILogger<BiliBiliToolHostedService> _logger;
         private readonly BiliCookie _biliBiliCookie;
         private readonly IDailyTaskAppService _dailyTaskAppService;
 
         public BiliBiliToolHostedService(
-            ILogger<BiliBiliToolHostedService> logger
+            IHostApplicationLifetime applicationLifetime
+            , ILogger<BiliBiliToolHostedService> logger
             , BiliCookie biliBiliCookie
             , IDailyTaskAppService dailyTaskAppService
             )
         {
+            _applicationLifetime = applicationLifetime;
             _logger = logger;
             _biliBiliCookie = biliBiliCookie;
             _dailyTaskAppService = dailyTaskAppService;
@@ -55,8 +55,11 @@ namespace Ray.BiliBiliTool.Console
             {
                 logger.LogInformation("开始推送");
 
-                //如果配置了“1”就立即关闭，否则保持窗口以便查看日志信息
-                if (Global.ConfigurationRoot["CloseConsoleWhenEnd"] == "1") Environment.Exit(1);
+                if (Global.ConfigurationRoot["CloseConsoleWhenEnd"] == "1")
+                {
+                    _logger.LogInformation("正在自动关闭应用...");
+                    _applicationLifetime.StopApplication();
+                }
             }
             return Task.CompletedTask;
         }
