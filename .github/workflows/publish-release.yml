@@ -1,7 +1,7 @@
 name: Publish release
 
 on:
-  workflow_dispatch: # 手动触发
+  workflow_dispatch:
     inputs:
       version:
         description: '版本号'
