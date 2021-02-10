@@ -12,13 +12,13 @@ namespace DailyTaskTest
         public ReceiveVipPrivilege()
         {
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
-            Program.Init(null);
+            Program.CreateHost(null);
         }
 
         [Fact]
         public void Test1()
         {
-            Program.Init(new string[] { });
+            Program.CreateHost(new string[] { });
 
             using (var scope = Global.ServiceProviderRoot.CreateScope())
             {

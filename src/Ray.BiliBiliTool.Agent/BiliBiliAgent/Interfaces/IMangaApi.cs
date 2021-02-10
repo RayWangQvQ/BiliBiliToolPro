@@ -1,12 +1,15 @@
 ﻿using System.Threading.Tasks;
+using Ray.BiliBiliTool.Agent.Attributes;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
-using Refit;
+using WebApiClientCore.Attributes;
 
 namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
 {
     /// <summary>
     /// 漫画相关接口
     /// </summary>
+    [Header("Origin", "https://manga.bilibili.com")]
+    [Header("Host", "manga.bilibili.com")]
     public interface IMangaApi : IBiliBiliApi
     {
         /// <summary>
@@ -14,7 +17,8 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         /// </summary>
         /// <param name="platform"></param>
         /// <returns></returns>
-        [Post("/twirp/activity.v1.Activity/ClockIn?platform={platform}")]
+        [LogFilter(false)]
+        [HttpPost("/twirp/activity.v1.Activity/ClockIn?platform={platform}")]
         Task<BiliApiResponse> ClockIn(string platform);
 
         /// <summary>
@@ -22,7 +26,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         /// </summary>
         /// <param name="reason_id"></param>
         /// <returns></returns>
-        [Post("/twirp/user.v1.User/GetVipReward?reason_id={reason_id}")]
+        [HttpPost("/twirp/user.v1.User/GetVipReward?reason_id={reason_id}")]
         Task<BiliApiResponse<MangaVipRewardResponse>> ReceiveMangaVipReward(int reason_id);
 
     }

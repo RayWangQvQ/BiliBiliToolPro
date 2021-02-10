@@ -32,7 +32,8 @@ namespace Ray.BiliBiliTool.DomainService
         /// </summary>
         public void LiveSign()
         {
-            var response = _liveApi.Sign().GetAwaiter().GetResult();
+            var response = _liveApi.Sign()
+                .GetAwaiter().GetResult();
 
             if (response.Code == 0)
             {

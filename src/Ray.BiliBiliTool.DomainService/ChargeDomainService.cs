@@ -78,18 +78,18 @@ namespace Ray.BiliBiliTool.DomainService
             if (_dailyTaskOptions.AutoChargeUpId.IsNullOrEmpty() | _dailyTaskOptions.AutoChargeUpId == "-1")
                 targetUpId = _cookie.UserId;
 
+            var request = new ChargeRequest(couponBalance, long.Parse(targetUpId), _cookie.BiliJct);
+
             //BiliApiResponse<ChargeResponse> response = _chargeApi.Charge(decimal.ToInt32(couponBalance * 10), _dailyTaskOptions.AutoChargeUpId, _cookieOptions.UserId, _cookieOptions.BiliJct).Result;
-            BiliApiResponse<ChargeV2Response> response = _chargeApi.ChargeV2(couponBalance, targetUpId, targetUpId, _cookie.BiliJct).GetAwaiter().GetResult();
+            BiliApiResponse<ChargeV2Response> response = _chargeApi.ChargeV2(request)
+                .GetAwaiter().GetResult();
 
             if (response.Code == 0)
             {
                 if (response.Data.Status == 4)
                 {
                     _logger.LogInformation("充电成功，经验+{exp} √", couponBalance);
-                    _logger.LogInformation("本次充值了: {num}个B币，送的B币券没有浪费哦", couponBalance);
-
-                    if (_dailyTaskOptions.AutoChargeUpId == "220893216")
-                        _logger.LogInformation("这是一条彩蛋消息，看到它说明您选择了为开发者充电。个人维护开源不易，感谢您的贡献！如需更改充电对象，请参考配置说明文档进行修改~");
+                    _logger.LogInformation("本次为{upId}充值了: {num}个B币，送的B币券没有浪费哦", targetUpId, couponBalance);
 
                     //获取充电留言token
                     ChargeComments(response.Data.Order_no);
@@ -109,9 +109,10 @@ namespace Ray.BiliBiliTool.DomainService
         /// 充电后留言
         /// </summary>
         /// <param name="token"></param>
-        public void ChargeComments(string token)
+        public void ChargeComments(string orderNum)
         {
-            _chargeApi.ChargeComment(token, _dailyTaskOptions.ChargeComment ?? "", _cookie.BiliJct);
+            var request = new ChargeCommentRequest(orderNum, _dailyTaskOptions.ChargeComment ?? "", _cookie.BiliJct);
+            _chargeApi.ChargeComment(request);
         }
     }
 }

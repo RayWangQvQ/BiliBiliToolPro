@@ -7,9 +7,8 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
-    <PackageReference Include="Refit" Version="5.2.4" />
-    <PackageReference Include="Refit.HttpClientFactory" Version="5.2.4" />
     <PackageReference Include="Scrutor" Version="3.3.0" />
+    <PackageReference Include="WebApiClientCore" Version="2.0.0" />
   </ItemGroup>
 
   <ItemGroup>

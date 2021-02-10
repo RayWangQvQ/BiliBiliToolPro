@@ -17,7 +17,7 @@ namespace LogTest
         public TestWorkWeiXin()
         {
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
-            Program.Init(new string[] { });
+            Program.CreateHost(new string[] { });
 
             _key = Global.ConfigurationRoot["Serilog:WriteTo:4:Args:webHookUrl"];
         }

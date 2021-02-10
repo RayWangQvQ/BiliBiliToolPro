@@ -14,7 +14,7 @@ namespace DailyTaskTest
         public AddCoinsForVideo()
         {
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
-            Program.Init(new string[] { });
+            Program.CreateHost(new string[] { });
         }
 
         [Fact]
@@ -53,21 +53,6 @@ namespace DailyTaskTest
                 var service = scope.ServiceProvider.GetRequiredService<IDonateCoinDomainService>();
 
                 service.DoAddCoinForVideo("543318157", 1, true);
-            }
-
-            Assert.True(true);
-        }
-
-        [Fact]
-        public void GetVideoInfo()
-        {
-            using (var scope = Global.ServiceProviderRoot.CreateScope())
-            {
-                var service = scope.ServiceProvider.GetRequiredService<IVideoApi>();
-
-                //var re = service.GetVideoDetail("246364184").Result;//×ÔÖÆ
-                var re = service.GetVideoDetail("373987080").Result;//×ªÔØ
-
             }
 
             Assert.True(true);

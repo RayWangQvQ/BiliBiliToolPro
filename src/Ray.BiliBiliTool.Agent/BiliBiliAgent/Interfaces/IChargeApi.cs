@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
-using Refit;
+using WebApiClientCore.Attributes;
 
 namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
 {
     /// <summary>
     /// 充电相关接口
     /// </summary>
+    [Header("Host", "api.bilibili.com")]
     public interface IChargeApi : IBiliBiliApi
     {
         /// <summary>
@@ -19,7 +20,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         /// <param name="oid">充电来源代码(空间充电：充电对象用户UID;视频充电：稿件avID)</param>
         /// <param name="csrf"></param>
         /// <returns></returns>
-        [Post("/x/ugcpay/trade/elec/pay/quick?elec_num={elec_num}&up_mid={up_mid}&otype=up&oid={oid}&csrf={csrf}")]
+        [HttpPost("/x/ugcpay/trade/elec/pay/quick?elec_num={elec_num}&up_mid={up_mid}&otype=up&oid={oid}&csrf={csrf}")]
         [Obsolete]
         Task<BiliApiResponse<ChargeResponse>> Charge(int elec_num, string up_mid, string oid, string csrf);
 
@@ -31,8 +32,11 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         /// <param name="oid">对方来源代码(空间充电：充电对象用户UID;视频充电：稿件avID)</param>
         /// <param name="csrf">自己的bili_jct</param>
         /// <returns></returns>
-        [Post("/x/ugcpay/web/v2/trade/elec/pay/quick?is_bp_remains_prior=true&bp_num={bp_num}&up_mid={up_mid}&otype=up&oid={oid}&csrf={csrf}")]
-        Task<BiliApiResponse<ChargeV2Response>> ChargeV2(decimal bp_num, string up_mid, string oid, string csrf);
+        [Header("Content-Type", "application/x-www-form-urlencoded")]
+        [Header("Referer", "https://www.bilibili.com/")]
+        [Header("Origin", "https://www.bilibili.com")]
+        [HttpPost("/x/ugcpay/web/v2/trade/elec/pay/quick")]
+        Task<BiliApiResponse<ChargeV2Response>> ChargeV2([FormContent] ChargeRequest request);
 
         /// <summary>
         /// 充电后留言
@@ -42,8 +46,11 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         /// <param name="oid"></param>
         /// <param name="csrf"></param>
         /// <returns></returns>
-        [Post("/x/ugcpay/trade/elec/message?order_id={order_id}&message={message}&csrf={csrf}")]
-        Task<BiliApiResponse<ChargeResponse>> ChargeComment(string order_id, string message, string csrf);
+        [Header("Content-Type", "application/x-www-form-urlencoded")]
+        [Header("Referer", "https://www.bilibili.com/")]
+        [Header("Origin", "https://www.bilibili.com")]
+        [HttpPost("/x/ugcpay/trade/elec/message")]
+        Task<BiliApiResponse<ChargeResponse>> ChargeComment([FormContent] ChargeCommentRequest request);
 
     }
 }

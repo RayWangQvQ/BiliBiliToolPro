@@ -1,23 +1,23 @@
+using System;
 using System.Diagnostics;
-using Microsoft.Extensions.DependencyInjection;
-using Ray.BiliBiliTool.Console;
-using Ray.BiliBiliTool.DomainService.Interfaces;
-using Xunit;
-using System.Text.Json;
-using Ray.BiliBiliTool.Infrastructure;
 using System.Net.Http;
+using System.Text.Json;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Config.Options;
-using System;
+using Ray.BiliBiliTool.Console;
+using Ray.BiliBiliTool.DomainService.Interfaces;
+using Ray.BiliBiliTool.Infrastructure;
+using Xunit;
 
-namespace LoginTest
+namespace DailyTaskTest
 {
     public class Login
     {
         public Login()
         {
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
-            Program.Init(new string[] { });
+            Program.CreateHost(new string[] { });
         }
 
         [Fact]
@@ -37,7 +37,7 @@ namespace LoginTest
         [Fact]
         public void Test2()
         {
-            Program.Init(new string[] { });
+            Program.CreateHost(new string[] { });
 
             using (var scope = Global.ServiceProviderRoot.CreateScope())
             {
