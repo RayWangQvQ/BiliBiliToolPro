@@ -4,14 +4,14 @@ using Ray.BiliBiliTool.DomainService.Interfaces;
 using Ray.BiliBiliTool.Infrastructure;
 using Xunit;
 
-namespace MangaSignTest
+namespace DailyTaskTest
 {
     public class MangaSign
     {
         [Fact]
         public void Test1()
         {
-            Program.Init(new string[] { });
+            Program.CreateHost(new string[] { });
 
             using (var scope = Global.ServiceProviderRoot.CreateScope())
             {

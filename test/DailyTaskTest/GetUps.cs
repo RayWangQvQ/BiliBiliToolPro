@@ -1,30 +1,42 @@
+using System;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
-using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.Console;
-using Ray.BiliBiliTool.DomainService.Interfaces;
 using Ray.BiliBiliTool.Infrastructure;
 using Xunit;
 
-namespace WatchVideoTest
+namespace DailyTaskTest
 {
     public class GetUps
     {
+        public GetUps()
+        {
+            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
+            Program.CreateHost(new string[] { });
+        }
+
         [Fact]
         public void GetFollowings()
         {
-            Program.Init(new string[] { });
+            Program.CreateHost(new string[] { });
 
             using (var scope = Global.ServiceProviderRoot.CreateScope())
             {
                 var cookie = scope.ServiceProvider.GetRequiredService<BiliCookie>();
                 var api = scope.ServiceProvider.GetRequiredService<IRelationApi>();
 
-                var re = api.GetFollowings(cookie.UserId, 1, 100).Result;
-                var re2 = api.GetFollowings(cookie.UserId, 1, 200).Result;
-                var re3 = api.GetFollowings(cookie.UserId, 1, int.MaxValue).Result;
+                var request = new GetFollowingsRequest(long.Parse(cookie.UserId));
+
+                request.Ps = 100;
+                var re = api.GetFollowings(request).Result;
+
+                request.Ps = 200;
+                var re2 = api.GetFollowings(request).Result;
+
+                request.Ps = int.MaxValue;
+                var re3 = api.GetFollowings(request).Result;
 
                 Assert.True(re.Code == 0);
             }
@@ -33,13 +45,15 @@ namespace WatchVideoTest
         [Fact]
         public void GetSpecialFollowings()
         {
-            Program.Init(new string[] { });
+            Program.CreateHost(new string[] { });
 
             using (var scope = Global.ServiceProviderRoot.CreateScope())
             {
                 var api = scope.ServiceProvider.GetRequiredService<IRelationApi>();
+                var cookie = scope.ServiceProvider.GetRequiredService<BiliCookie>();
 
-                var re = api.GetSpecialFollowings(1, int.MaxValue).Result;
+                var request = new GetSpecialFollowingsRequest(long.Parse(cookie.UserId));
+                var re = api.GetSpecialFollowings(request).Result;
 
                 Assert.True(re.Code == 0);
             }

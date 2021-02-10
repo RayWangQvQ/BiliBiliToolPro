@@ -9,10 +9,11 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Config;
 using Ray.BiliBiliTool.Config.Options;
+using Ray.BiliBiliTool.Infrastructure;
 
 namespace Ray.BiliBiliTool.Agent
 {
-    public class BiliCookie
+    public class BiliCookie : CookieInfo
     {
         private readonly ILogger<BiliCookie> _logger;
         private readonly IConfiguration _configuration;
@@ -20,7 +21,7 @@ namespace Ray.BiliBiliTool.Agent
 
         public BiliCookie(ILogger<BiliCookie> logger,
             IOptionsMonitor<BiliBiliCookieOptions> optionsMonitor,
-            IConfiguration configuration)
+            IConfiguration configuration) : base(optionsMonitor.CurrentValue.CookieStr)
         {
             _logger = logger;
             _configuration = configuration;
@@ -42,29 +43,25 @@ namespace Ray.BiliBiliTool.Agent
                     if (str.IsNullOrEmpty()) continue;
                     var list = str.Split('=').ToList();
                     if (list.Count >= 2)
-                        CookieDic[list[0].Trim()] = list[1].Trim();
+                        CookieDictionary[list[0].Trim()] = list[1].Trim();
                 }
             }
 
-            if (CookieDic.TryGetValue(GetPropertyDescription(nameof(UserId)), out string userId))
+            if (CookieDictionary.TryGetValue(GetPropertyDescription(nameof(UserId)), out string userId))
             {
                 UserId = userId;
             }
-            if (CookieDic.TryGetValue(GetPropertyDescription(nameof(BiliJct)), out string jct))
+            if (CookieDictionary.TryGetValue(GetPropertyDescription(nameof(BiliJct)), out string jct))
             {
                 BiliJct = jct;
             }
-            if (CookieDic.TryGetValue(GetPropertyDescription(nameof(SessData)), out string sess))
+            if (CookieDictionary.TryGetValue(GetPropertyDescription(nameof(SessData)), out string sess))
             {
                 SessData = sess;
             }
 
             Check();
         }
-
-        public Dictionary<string, string> CookieDic = new Dictionary<string, string>();
-
-        public string CookieStr { get; set; }
 
         [Description("DedeUserID")]
         public string UserId { get; set; }

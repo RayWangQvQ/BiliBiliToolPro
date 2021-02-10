@@ -79,7 +79,8 @@ namespace Ray.BiliBiliTool.DomainService
                 return;
             }
 
-            var response = _mangaApi.ReceiveMangaVipReward(reason_id).GetAwaiter().GetResult();
+            var response = _mangaApi.ReceiveMangaVipReward(reason_id)
+                .GetAwaiter().GetResult();
             if (response.Code == 0)
             {
                 _logger.LogInformation($"大会员成功领取{response.Data.Amount}张漫读劵");

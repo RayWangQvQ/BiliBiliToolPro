@@ -34,7 +34,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos
         /// <summary>
         /// 视频时长的秒数
         /// </summary>
-        public int? SecondsLength
+        public int? Duration
         {
             get
             {

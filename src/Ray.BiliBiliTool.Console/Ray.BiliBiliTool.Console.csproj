@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <Import Project="..\..\common.props" />
+
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
-    <Authors>Ray</Authors>
-    <Version>1.1.6</Version>
     <UserSecretsId>3cc5407e-fe0e-4df6-a127-7385c75abd8a</UserSecretsId>
   </PropertyGroup>
 
@@ -53,8 +53,6 @@
     <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="5.0.0" />
-    <PackageReference Include="Refit" Version="5.2.4" />
-    <PackageReference Include="Refit.HttpClientFactory" Version="5.2.4" />
     <PackageReference Include="Serilog.AspNetCore" Version="3.4.0" />
     <PackageReference Include="System.Collections" Version="4.3.0" />
   </ItemGroup>

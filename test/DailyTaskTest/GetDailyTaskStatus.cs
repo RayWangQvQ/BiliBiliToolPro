@@ -1,20 +1,25 @@
-using System.Text.Json;
+using System;
 using System.Diagnostics;
-using Xunit;
-using Ray.BiliBiliTool.Console;
+using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
+using Ray.BiliBiliTool.Console;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 using Ray.BiliBiliTool.Infrastructure;
+using Xunit;
 
-namespace GetDailyTaskStatusTest
+namespace DailyTaskTest
 {
     public class GetDailyTaskStatus
     {
+        public GetDailyTaskStatus()
+        {
+            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
+            Program.CreateHost(new string[] { });
+        }
+
         [Fact]
         public void Test1()
         {
-            Program.Init(new string[] { });
-
             using (var scope = Global.ServiceProviderRoot.CreateScope())
             {
                 var dailyTaskService = scope.ServiceProvider.GetRequiredService<IAccountDomainService>();

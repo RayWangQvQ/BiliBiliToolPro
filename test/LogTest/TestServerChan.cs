@@ -17,7 +17,7 @@ namespace LogTest
         public TestServerChan()
         {
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
-            Program.Init(new string[] { });
+            Program.CreateHost(new string[] { });
 
             _scKey = Global.ConfigurationRoot["Serilog:WriteTo:6:Args:scKey"]; ;
         }

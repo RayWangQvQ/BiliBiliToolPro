@@ -7,14 +7,14 @@ using Ray.BiliBiliTool.DomainService.Interfaces;
 using Ray.BiliBiliTool.Infrastructure;
 using Xunit;
 
-namespace WatchVideoTest
+namespace DailyTaskTest
 {
     public class WatchAndShareVideo
     {
         public WatchAndShareVideo()
         {
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
-            Program.Init(new string[] { });
+            Program.CreateHost(new string[] { });
         }
 
         [Fact]
@@ -43,7 +43,7 @@ namespace WatchVideoTest
 
                 var dailyTaskStatus = account.GetDailyTaskStatus();
 
-                var aid = dailyTaskService.GetRandomVideoOfRegion().Item1;
+                var aid = dailyTaskService.GetRandomVideoOfRanking().Aid.ToString();
                 dailyTaskService.ShareVideo(new VideoInfoDto { Aid = aid });
 
                 Assert.True(true);

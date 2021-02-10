@@ -1,0 +1,7 @@
+<Project>
+  <PropertyGroup>
+    <Authors>Ray</Authors>
+    <Version>1.2.0</Version>
+    <NoWarn>$(NoWarn);CS1591;CS0436</NoWarn>
+  </PropertyGroup>
+</Project>
