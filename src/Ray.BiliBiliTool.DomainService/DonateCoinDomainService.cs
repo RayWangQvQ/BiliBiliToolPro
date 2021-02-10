@@ -156,7 +156,7 @@ namespace Ray.BiliBiliTool.DomainService
                 result = _videoApi.AddCoinForVideo(request)
                     .GetAwaiter().GetResult();
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }
