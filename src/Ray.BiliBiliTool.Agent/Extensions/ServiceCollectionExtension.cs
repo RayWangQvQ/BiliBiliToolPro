@@ -39,9 +39,10 @@ namespace Ray.BiliBiliTool.Agent.Extensions
             services.AddBiliBiliClientApi<IAccountApi>("https://account.bilibili.com");
             services.AddBiliBiliClientApi<ILiveApi>("https://api.live.bilibili.com");
             services.AddBiliBiliClientApi<IRelationApi>("https://api.bilibili.com");
-            services.AddBiliBiliClientApi<IVideoApi>("https://api.bilibili.com");
             services.AddBiliBiliClientApi<IChargeApi>("https://api.bilibili.com");
             services.AddBiliBiliClientApi<IUserInfoApi>("https://api.bilibili.com");
+            services.AddBiliBiliClientApi<IVideoApi>("https://api.bilibili.com");
+            services.AddBiliBiliClientApi<IVideoWithoutCookieApi>("https://api.bilibili.com", false);
 
             return services;
         }
@@ -53,11 +54,11 @@ namespace Ray.BiliBiliTool.Agent.Extensions
         /// <param name="services"></param>
         /// <param name="host"></param>
         /// <returns></returns>
-        private static IServiceCollection AddBiliBiliClientApi<TInterface>(this IServiceCollection services, string host)
+        private static IServiceCollection AddBiliBiliClientApi<TInterface>(this IServiceCollection services, string host, bool withCookie = true)
             where TInterface : class
         {
             var uri = new Uri(host);
-            services
+            var handler = services
                 .AddHttpApi<TInterface>(o =>
                 {
                     o.HttpHost = uri;
@@ -68,15 +69,17 @@ namespace Ray.BiliBiliTool.Agent.Extensions
                     c.DefaultRequestHeaders.Add("User-Agent",
                         sp.GetRequiredService<IOptionsMonitor<SecurityOptions>>().CurrentValue.UserAgent);
                 })
-                .ConfigurePrimaryHttpMessageHandler(sp =>
+                .AddHttpMessageHandler<IntervalDelegatingHandler>();
+
+            if (withCookie)
+                handler.ConfigurePrimaryHttpMessageHandler(sp =>
                 {
                     var handler = new HttpClientHandler
                     {
                         CookieContainer = sp.GetRequiredService<BiliCookie>().CreateCookieContainer(uri)
                     };
                     return handler;
-                })
-                .AddHttpMessageHandler<IntervalDelegatingHandler>();
+                });
 
             return services;
         }

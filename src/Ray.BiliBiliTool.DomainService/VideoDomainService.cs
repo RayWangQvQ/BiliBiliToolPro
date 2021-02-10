@@ -25,6 +25,7 @@ namespace Ray.BiliBiliTool.DomainService
         private readonly Dictionary<string, int> _expDic;
         private readonly IRelationApi _relationApi;
         private readonly IVideoApi _videoApi;
+        private readonly IVideoWithoutCookieApi _videoWithoutCookieApi;
 
         public VideoDomainService(
             ILogger<VideoDomainService> logger,
@@ -33,13 +34,15 @@ namespace Ray.BiliBiliTool.DomainService
             IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
             IOptionsMonitor<Dictionary<string, int>> dicOptions,
             IRelationApi relationApi,
-            IVideoApi videoApi
+            IVideoApi videoApi,
+            IVideoWithoutCookieApi videoWithoutCookieApi
             )
         {
             _logger = logger;
             _dailyTaskApi = dailyTaskApi;
             _relationApi = relationApi;
             _videoApi = videoApi;
+            _videoWithoutCookieApi = videoWithoutCookieApi;
             _biliBiliCookie = biliBiliCookie;
             _expDic = dicOptions.Get(Constants.OptionsNames.ExpDictionaryName);
             _dailyTaskOptions = dailyTaskOptions.CurrentValue;
@@ -52,7 +55,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// <returns></returns>
         public VideoDetail GetVideoDetail(string aid)
         {
-            var re = _videoApi.GetVideoDetail(aid)
+            var re = _videoWithoutCookieApi.GetVideoDetail(aid)
                 .GetAwaiter().GetResult();
             return re.Data;
         }
@@ -63,7 +66,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// <returns></returns>
         public RankingInfo GetRandomVideoOfRanking()
         {
-            var apiResponse = _videoApi.GetRegionRankingVideosV2().GetAwaiter().GetResult();
+            var apiResponse = _videoWithoutCookieApi.GetRegionRankingVideosV2().GetAwaiter().GetResult();
             _logger.LogDebug("获取排行榜成功");
             RankingInfo data = apiResponse.Data.List[new Random().Next(apiResponse.Data.List.Count)];
             return data;
@@ -72,7 +75,7 @@ namespace Ray.BiliBiliTool.DomainService
         public UpVideoInfo GetRandomVideoOfUp(long upId, int total)
         {
             int pageNum = new Random().Next(1, total + 1);
-            BiliApiResponse<SearchUpVideosResponse> re = _videoApi.SearchVideosByUpId(upId, 1, pageNum).GetAwaiter().GetResult();
+            BiliApiResponse<SearchUpVideosResponse> re = _videoWithoutCookieApi.SearchVideosByUpId(upId, 1, pageNum).GetAwaiter().GetResult();
 
             if (re.Code != 0)
             {
@@ -89,7 +92,8 @@ namespace Ray.BiliBiliTool.DomainService
         /// <returns></returns>
         public int GetVideoCountOfUp(long upId)
         {
-            BiliApiResponse<SearchUpVideosResponse> re = _videoApi.SearchVideosByUpId(upId).GetAwaiter().GetResult();
+            BiliApiResponse<SearchUpVideosResponse> re = _videoWithoutCookieApi.SearchVideosByUpId(upId)
+                .GetAwaiter().GetResult();
             if (re.Code != 0)
             {
                 throw new Exception(re.Message);

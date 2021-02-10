@@ -50,7 +50,7 @@ namespace DailyTaskTest
         {
             using (var scope = Global.ServiceProviderRoot.CreateScope())
             {
-                var service = scope.ServiceProvider.GetRequiredService<IVideoApi>();
+                var service = scope.ServiceProvider.GetRequiredService<IVideoWithoutCookieApi>();
 
                 //var re = service.GetVideoDetail("246364184").Result;//зджЦ
                 var re = service.GetVideoDetail("373987080").Result;//зЊди
