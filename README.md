@@ -216,9 +216,9 @@ bilibli_tool
 
 Ⅱ. **编辑文件内容，填入相关配置**
 
-`docker-compose.yml`的文件内容请拷贝 [默认docker-compose.yml](sample/docker-compose.yml) 内容。其中 `image`（镜像名称）默认是我的，如果要使用自己创建的，请更换为自己创建的镜像名称。`environment` 下可以通过环境变量自由添加自定义配置，其中Cookie是必填的，所以请至少填入Cookie并保存。
+`docker-compose.yml`的文件内容请拷贝 [默认docker-compose.yml](docker/sample/docker-compose.yml) 内容。其中 `image`（镜像名称）默认是我的，如果要使用自己创建的，请更换为自己创建的镜像名称。`environment` 下可以通过环境变量自由添加自定义配置，其中Cookie是必填的，所以请至少填入Cookie并保存。
 
-`my_crontab`的文件内容请拷贝 [默认my_crontab](sample/my_crontab) 内容。
+`my_crontab`的文件内容请拷贝 [默认my_crontab](docker/sample/my_crontab) 内容。
 
 Ⅲ. **启动并运行容器**
 
