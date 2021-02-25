@@ -90,11 +90,15 @@ BiliBiliTool 就是收集了一系列的 B 站开放api，通过每日自动运�
 
 ### 1.2. 第二步：配置 Cookie 并运行 BiliBiliTool
 
-运行 BiliBiliTool 有两种方式，一是通过 Github 的 Actions 实现线上的每天自动运行，二是通过下载Release包到本地或服务器运行。
+运行 BiliBiliTool 主要有三种方式，一是通过 Github 的 Actions 实现线上的每天自动运行，二是通过下载Release包到本地或服务器运行，三是使用docker容器化运行。
 
 对于熟悉 Github 的朋友，推荐使用方式一 Github Actions，可以实现线上的每天自动运行，不需自己动手，一劳永逸。
 
 对于没有 Github 账号的、或者想先快速运行一下尝个鲜、或是要部署到自己服务器的朋友，可以跳转到方式二 Release 包运行，操作简单快速。
+
+对于熟悉docker的朋友，可以跳转到方式三 docker容器化运行。
+
+以下三种方式任选一种适合自己的即可。
 
 #### 1.2.1. 运行方式一：Github Actions 线上定时自动运行（推荐）
 
