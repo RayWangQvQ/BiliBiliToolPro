@@ -1,16 +1,23 @@
 #!/bin/bash
-#https://stackoverflow.com/questions/3856747/check-whether-a-certain-file-type-extension-exists-in-directory
+set -e
 
-# if no configs are found, copy the template to configs directory
-configs=(`find /bilibili/config -maxdepth 1 -name "*.json"`)
-if [ ${#configs[@]} -eq 0 ]; then 
-	cp /bilibili/template.json /bilibili/config
+echo "尝试首次运行"
+/bin/bash /app/job.sh
+
+
+echo "配置cron定时任务"
+myarray=(`find /app -maxdepth 1 -name "custom_crontab"`)
+if [ ${#myarray[@]} -gt 0 ]; then 
+	echo "检测到自定义了cron定时任务，使用自定义配置"
+	cp /app/custom_crontab /etc/cron.d/bilicron
+else
+	echo "使用默认cron定时任务配置"
+	cp /app/crontab /etc/cron.d/bilicron
 fi
 
-echo Starting first run
-/bin/bash /bilibili/job.sh
+chmod 0644 /etc/cron.d/bilicron
+crontab /etc/cron.d/bilicron
+touch /var/log/cron.log
 
-echo By default, Bilibilitool will run at 15:00 every day for each config file
-echo To configure scheduling, run \'docker exec -it CONTAINER_NAME crontab -e\' and edit
-
+echo "启动定时任务，开启每日定时运行"
 cron && tail -f /var/log/cron.log

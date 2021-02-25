@@ -39,6 +39,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ray.BiliBiliTool.DomainServ
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F3DE0D72-426B-4AD9-B3ED-3343CF4223F1}"
 	ProjectSection(SolutionItems) = preProject
+		.dockerignore = .dockerignore
 		.editorconfig = .editorconfig
 		.gitignore = .gitignore
 		clean.cmd = clean.cmd
@@ -69,7 +70,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker", "docker", "{A93210
 		docker\entry.sh = docker\entry.sh
 		docker\job.sh = docker\job.sh
 		docker\README.md = docker\README.md
-		docker\template.json = docker\template.json
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ray.Serilog.Sinks.TelegramBatched", "src\Ray.Serilog.Sinks.TelegramBatched\Ray.Serilog.Sinks.TelegramBatched.csproj", "{CBBB7AB9-382E-47EA-A535-16D4930CBA98}"
@@ -87,6 +87,12 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ray.Serilog.Sinks.CoolPushBatched", "src\Ray.Serilog.Sinks.CoolPushBatched\Ray.Serilog.Sinks.CoolPushBatched.csproj", "{FD68D999-43F6-4840-9EB7-4D71AC0A2A21}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ray.Serilog.Sinks.OtherApiBatched", "src\Ray.Serilog.Sinks.OtherApiBatched\Ray.Serilog.Sinks.OtherApiBatched.csproj", "{1F247ACA-12D3-4E71-B874-DE35DC042E68}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sample", "sample", "{2F1CB892-336C-4672-8A0A-FBAEB4B9EA8A}"
+	ProjectSection(SolutionItems) = preProject
+		docker\sample\docker-compose.yml = docker\sample\docker-compose.yml
+		docker\sample\my_crontab = docker\sample\my_crontab
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -202,6 +208,7 @@ Global
 		{99C07B4B-5CDE-4911-AE38-2F907F492657} = {4BAFC980-7A73-45C3-9460-8B8CCB87939B}
 		{FD68D999-43F6-4840-9EB7-4D71AC0A2A21} = {4BAFC980-7A73-45C3-9460-8B8CCB87939B}
 		{1F247ACA-12D3-4E71-B874-DE35DC042E68} = {4BAFC980-7A73-45C3-9460-8B8CCB87939B}
+		{2F1CB892-336C-4672-8A0A-FBAEB4B9EA8A} = {A93210FD-27B6-40E4-B08D-391F96CA2754}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {197319DA-1148-4A99-847C-8B270B6A29AB}
