@@ -1,0 +1,26 @@
+services:
+  bilibili_tool:
+    image: zai7lou/bilibili_tool
+    container_name: bilibili_tool
+    restart: always
+    volumes:
+      - ./Logs:/app/Logs
+      - ./my_crontab:/app/custom_crontab
+    tty: true
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - Ray_Security__IsSkipDailyTask=false
+      # Cookie字符串（必填）：
+      - Ray_BiliBiliCookie__CookieStr=
+      # UA：
+      - Ray_Security__UserAgent=
+      # 开始运行前随机随眠最大分钟数：
+      - Ray_Security__RandomSleepMaxMin=
+      # 调用接口间的间隔秒数：
+      - Ray_Security__IntervalSecondsBetweenRequestApi=
+      # 目标投币数量：
+      - Ray_DailyTaskConfig__NumberOfCoins=
+      # 企业微信推送地址：
+      - Ray_Serilog__WriteTo__4__Args__webHookUrl=
+      # Server酱推送scKey：
+      - Ray_Serilog__WriteTo__6__Args__scKey=
