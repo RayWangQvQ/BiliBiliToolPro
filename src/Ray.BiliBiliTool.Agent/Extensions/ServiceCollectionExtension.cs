@@ -4,6 +4,8 @@ using System.Net.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Polly;
+using Polly.Extensions.Http;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Agent.HttpClientDelegatingHandlers;
 using Ray.BiliBiliTool.Config.Options;
@@ -69,7 +71,8 @@ namespace Ray.BiliBiliTool.Agent.Extensions
                     c.DefaultRequestHeaders.Add("User-Agent",
                         sp.GetRequiredService<IOptionsMonitor<SecurityOptions>>().CurrentValue.UserAgent);
                 })
-                .AddHttpMessageHandler<IntervalDelegatingHandler>();
+                .AddHttpMessageHandler<IntervalDelegatingHandler>()
+                .AddPolicyHandler(GetRetryPolicy());
 
             if (withCookie)
                 handler.ConfigurePrimaryHttpMessageHandler(sp =>
@@ -117,6 +120,15 @@ namespace Ray.BiliBiliTool.Agent.Extensions
             }
 
             return services;
+        }
+
+        static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
+        {
+            return HttpPolicyExtensions
+                .HandleTransientHttpError()
+                .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.NotFound)
+                .WaitAndRetryAsync(1, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2,
+                                                                            retryAttempt)));
         }
     }
 }
