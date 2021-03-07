@@ -41,5 +41,18 @@ namespace DailyTaskTest
                 Assert.True(true);
             }
         }
+
+        [Fact]
+        public void Check()
+        {
+            using (var scope = Global.ServiceProviderRoot.CreateScope())
+            {
+                var api = scope.ServiceProvider.GetRequiredService<ILiveApi>();
+
+                var re = api.CheckTianXuan(22566984).Result;
+
+                Assert.True(true);
+            }
+        }
     }
 }
