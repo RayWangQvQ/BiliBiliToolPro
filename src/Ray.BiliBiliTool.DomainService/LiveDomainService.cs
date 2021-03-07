@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Ray.BiliBiliTool.Agent;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Interfaces;
@@ -16,14 +18,19 @@ namespace Ray.BiliBiliTool.DomainService
     {
         private readonly ILogger<LiveDomainService> _logger;
         private readonly ILiveApi _liveApi;
+        private readonly BiliCookie _biliCookie;
         private readonly DailyTaskOptions _dailyTaskOptions;
+
+        private List<ListItemDto> _targetTianXuanList = new List<ListItemDto>();
 
         public LiveDomainService(ILogger<LiveDomainService> logger,
             ILiveApi liveApi,
-            IOptionsMonitor<DailyTaskOptions> dailyTaskOptions)
+            IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
+            BiliCookie biliCookie)
         {
             _logger = logger;
             _liveApi = liveApi;
+            _biliCookie = biliCookie;
             _dailyTaskOptions = dailyTaskOptions.CurrentValue;
         }
 
@@ -86,6 +93,83 @@ namespace Ray.BiliBiliTool.DomainService
             _logger.LogInformation("当前银瓜子余额: {0}", queryStatus.Data.Silver);
 
             return result;
+        }
+
+        public void TianXuan()
+        {
+            //获取直播的分区
+            List<AreaDto> areaList = _liveApi.GetAreaList()
+                .GetAwaiter().GetResult()
+                .Data.Data;
+
+            //遍历分区
+            int count = 0;
+            foreach (var area in areaList)
+            {
+                _logger.LogInformation("正在扫描分区：{area}", area.Name);
+
+                //每个分区下搜索5页
+                for (int i = 1; i < 6; i++)
+                {
+                    var reData = _liveApi.GetList(area.Id, i)
+                        .GetAwaiter().GetResult()
+                        .Data;
+                    foreach (var item in reData.List ?? new List<ListItemDto>())
+                    {
+                        if (item.Pendant_info == null || item.Pendant_info.Count == 0) continue;
+                        var suc = item.Pendant_info.TryGetValue("2", out var pendant);
+                        if (!suc) continue;
+                        if (pendant.Pendent_id != 504) continue;
+
+                        _targetTianXuanList.Add(item);
+                        count++;
+
+                        TryJoinTianXuan(item);
+                    }
+                    if (reData.Has_more != 1) break;
+                }
+            }
+            if (count == 0) _logger.LogInformation("未搜索到直播间");
+        }
+
+        public void TryJoinTianXuan(ListItemDto target)
+        {
+            _logger.LogInformation("开始检查直播间：{name}({id})", target.Title, target.Roomid);
+
+            CheckTianXuanDto check = _liveApi.CheckTianXuan(target.Roomid)
+                .GetAwaiter().GetResult()
+                .Data;
+
+            _logger.LogInformation("奖励：{name}，条件：{text}", check.Award_name, check.Require_text);
+
+            if (check.Status != 1)
+            {
+                _logger.LogInformation("已开奖，跳过");
+                return;
+            }
+
+            if (check.Gift_price != 0)
+            {
+                _logger.LogInformation("需要赠送礼物才能参与，跳过");
+                return;
+            }
+
+            var request = new JoinTianXuanRequest
+            {
+                Id = check.Id,
+                gift_id = check.Gift_id,
+                gift_num = check.Gift_num,
+                csrf = _biliCookie.BiliJct
+            };
+            var re = _liveApi.Join(request)
+                .GetAwaiter().GetResult();
+            if (re.Code == 0)
+            {
+                _logger.LogInformation("参与抽奖成功!");
+                return;
+            }
+
+            _logger.LogInformation("参与抽奖失败，原因：{msg}", re.Message);
         }
     }
 }

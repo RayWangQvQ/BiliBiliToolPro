@@ -18,6 +18,6 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live
 
         public int Goods_id { get; set; }
 
-        public int New_order_id { get; set; }
+        public string New_order_id { get; set; }
     }
 }

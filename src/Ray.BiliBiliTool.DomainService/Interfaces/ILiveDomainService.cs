@@ -19,5 +19,10 @@ namespace Ray.BiliBiliTool.DomainService.Interfaces
         /// </summary>
         /// <returns></returns>
         bool ExchangeSilver2Coin();
+
+        /// <summary>
+        /// 天选抽奖
+        /// </summary>
+        void TianXuan();
     }
 }

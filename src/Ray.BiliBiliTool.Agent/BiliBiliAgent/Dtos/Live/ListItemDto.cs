@@ -42,6 +42,11 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live
 
         public string Area_name { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <sample>1：百人成就</sample>
+        /// <sample>2：天选时刻、新星主播</sample>
         public Dictionary<string, PendantInfo> Pendant_info { get; set; }
     }
 
@@ -50,7 +55,9 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live
         /// <summary>
         /// Id
         /// </summary>
-        /// <sample>504为天选</sample>
+        /// <sample>504：天选</sample>
+        /// <sample>426：百人成就</sample>
+        /// <sample>397：新星主播</sample>
         public int Pendent_id { get; set; }
 
         /// <summary>

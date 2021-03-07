@@ -78,6 +78,8 @@ namespace Ray.BiliBiliTool.Application
             ReceiveMangaVipReward(userInfo);
             Charge(userInfo);
 
+            TianXuan();
+
             _logger.LogInformation("-----全部任务已执行结束-----\r\n");
         }
 
@@ -192,6 +194,15 @@ namespace Ray.BiliBiliTool.Application
         private void ReceiveMangaVipReward(UserInfo userInfo)
         {
             _mangaDomainService.ReceiveMangaVipReward(1, userInfo);
+        }
+
+        /// <summary>
+        /// 天选时刻抽奖
+        /// </summary>
+        [TaskInterceptor("直播中心天选时刻抽奖", false)]
+        private void TianXuan()
+        {
+            _liveDomainService.TianXuan();
         }
     }
 }

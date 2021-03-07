@@ -34,7 +34,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live
         /// 
         /// </summary>
         /// <sample>8u0w3cesz1o0</sample>
-        public string visit_id { get; set; }
+        public string visit_id { get; set; } = "8u0w3cesz1o0";//todo
 
         public string platform { get; set; } = "pc";
     }
