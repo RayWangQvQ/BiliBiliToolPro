@@ -9,6 +9,7 @@ using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Application.Contracts;
 using Ray.BiliBiliTool.Config;
 using Ray.BiliBiliTool.Infrastructure;
+using Ray.BiliBiliTool.Infrastructure.Helpers;
 
 namespace Ray.BiliBiliTool.Console
 {
@@ -78,17 +79,10 @@ namespace Ray.BiliBiliTool.Console
             logger.LogInformation(
                 "版本号：Ray.BiliBiliTool-v{version}",
                 typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-                    ?.InformationalVersion ?? "未知");
+                    ?.InformationalVersion);
             logger.LogInformation("开源地址：{url}", Constants.SourceCodeUrl);
-            logger.LogInformation("当前环境：{env}", Global.HostingEnvironment.EnvironmentName ?? "无");
-            try
-            {
-                logger.LogInformation("当前IP：{ip} \r\n", new HttpClient().GetAsync("http://api.ipify.org/").Result.Content.ReadAsStringAsync().Result);
-            }
-            catch (Exception)
-            {
-                //Environment.Exit(1);
-            }
+            logger.LogInformation("当前环境：{env}", Global.HostingEnvironment.EnvironmentName);
+            logger.LogInformation("当前IP：{ip} \r\n", IpHelper.GetIp());
         }
     }
 }
