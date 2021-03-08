@@ -49,12 +49,12 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         /// <param name="parentAreaId"></param>
         /// <param name="page"></param>
         /// <param name="areaId"></param>
-        /// <param name="sortType"></param>
+        /// <param name="sortType">sort_type_124</param>
         /// <returns></returns>
         [Header("Referer", "https://live.bilibili.com/")]
         [Header("Origin", "https://live.bilibili.com")]
         [HttpGet("/xlive/web-interface/v1/second/getList?platform=web&parent_area_id={parentAreaId}&area_id={areaId}&sort_type={sortType}&page={page}")]
-        Task<BiliApiResponse<GetListResponse>> GetList(int parentAreaId, int page, int areaId = 0, string sortType = "sort_type_124");
+        Task<BiliApiResponse<GetListResponse>> GetList(int parentAreaId, int page, int areaId = 0, string sortType = "");
         //todo:Cookie比nav接口多了两项：Hm_lvt_8a6e55dbd2870f0f5bc9194cddf32a02、Hm_lvt_9e2a88dc69e0e55c353597501d2a4bbc
 
         /// <summary>

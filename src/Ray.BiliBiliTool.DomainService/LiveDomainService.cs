@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -106,12 +107,13 @@ namespace Ray.BiliBiliTool.DomainService
             int count = 0;
             foreach (var area in areaList)
             {
-                _logger.LogInformation("正在扫描分区：{area}", area.Name);
+                _logger.LogInformation("正在扫描分区：{area}...", area.Name);
 
+                string defaultSort = "";
                 //每个分区下搜索5页
                 for (int i = 1; i < 6; i++)
                 {
-                    var reData = _liveApi.GetList(area.Id, i)
+                    var reData = _liveApi.GetList(area.Id, i, sortType: defaultSort)
                         .GetAwaiter().GetResult()
                         .Data;
                     foreach (var item in reData.List ?? new List<ListItemDto>())
@@ -127,7 +129,9 @@ namespace Ray.BiliBiliTool.DomainService
                         TryJoinTianXuan(item);
                     }
                     if (reData.Has_more != 1) break;
+                    defaultSort = reData.New_tags.FirstOrDefault()?.Sort_type ?? "";
                 }
+                defaultSort = "";
             }
             if (count == 0) _logger.LogInformation("未搜索到直播间");
         }
