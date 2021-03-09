@@ -19,18 +19,21 @@ namespace Ray.BiliBiliTool.Console
         private readonly ILogger<BiliBiliToolHostedService> _logger;
         private readonly BiliCookie _biliBiliCookie;
         private readonly IDailyTaskAppService _dailyTaskAppService;
+        private readonly ILiveTaskAppService _liveTaskAppService;
 
         public BiliBiliToolHostedService(
             IHostApplicationLifetime applicationLifetime
             , ILogger<BiliBiliToolHostedService> logger
             , BiliCookie biliBiliCookie
             , IDailyTaskAppService dailyTaskAppService
+            , ILiveTaskAppService liveTaskAppService
             )
         {
             _applicationLifetime = applicationLifetime;
             _logger = logger;
             _biliBiliCookie = biliBiliCookie;
             _dailyTaskAppService = dailyTaskAppService;
+            _liveTaskAppService = liveTaskAppService;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -40,17 +43,13 @@ namespace Ray.BiliBiliTool.Console
 
             try
             {
-                BiliCookie biliBiliCookie = _biliBiliCookie;
-
-                IDailyTaskAppService dailyTask = _dailyTaskAppService;
-
-                dailyTask.DoDailyTask();
+                _dailyTaskAppService.DoDailyTask();
+                //_liveTaskAppService.DoLotteryTask();
             }
             catch (Exception ex)
             {
                 logger.LogError("程序异常终止，原因：{msg}", ex.Message);
                 throw;
-                //Environment.Exit(1);
             }
             finally
             {
