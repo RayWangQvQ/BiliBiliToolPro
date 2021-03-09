@@ -107,7 +107,7 @@ namespace Ray.BiliBiliTool.DomainService
             int count = 0;
             foreach (var area in areaList)
             {
-                _logger.LogInformation("正在扫描分区：{area}...", area.Name);
+                _logger.LogInformation("正在扫描分区：{area}...\r\n", area.Name);
 
                 string defaultSort = "";
                 //每个分区下搜索5页
@@ -148,13 +148,13 @@ namespace Ray.BiliBiliTool.DomainService
 
             if (check.Status != 1)
             {
-                _logger.LogInformation("已开奖，跳过");
+                _logger.LogInformation("已开奖，跳过\r\n");
                 return;
             }
 
             if (check.Gift_price != 0)
             {
-                _logger.LogInformation("需要赠送礼物才能参与，跳过");
+                _logger.LogInformation("需要赠送礼物才能参与，跳过\r\n");
                 return;
             }
 
@@ -169,11 +169,11 @@ namespace Ray.BiliBiliTool.DomainService
                 .GetAwaiter().GetResult();
             if (re.Code == 0)
             {
-                _logger.LogInformation("参与抽奖成功!");
+                _logger.LogInformation("参与抽奖成功!\r\n");
                 return;
             }
 
-            _logger.LogInformation("参与抽奖失败，原因：{msg}", re.Message);
+            _logger.LogInformation("参与抽奖失败，原因：{msg}\r\n", re.Message);
         }
     }
 }
