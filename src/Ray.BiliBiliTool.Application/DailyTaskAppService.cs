@@ -10,7 +10,7 @@ using Ray.BiliBiliTool.DomainService.Interfaces;
 
 namespace Ray.BiliBiliTool.Application
 {
-    public class DailyTaskAppService : IDailyTaskAppService
+    public class DailyTaskAppService : AppService, IDailyTaskAppService
     {
         private readonly ILogger<DailyTaskAppService> _logger;
         private readonly IAccountDomainService _loginDomainService;
@@ -48,22 +48,11 @@ namespace Ray.BiliBiliTool.Application
             _securityOptions = securityOptions.CurrentValue;
         }
 
-        public void DoDailyTask()
+        public override string TaskName => "Daily";
+
+        public override void DoTask()
         {
-            if (_securityOptions.IsSkipDailyTask)
-            {
-                _logger.LogWarning("已配置为跳过每日任务\r\n");
-                return;
-            }
-
             _logger.LogInformation("-----开始每日任务-----\r\n");
-
-            if (_securityOptions.RandomSleepMaxMin > 0)
-            {
-                int randomMin = new Random().Next(1, ++_securityOptions.RandomSleepMaxMin);
-                _logger.LogInformation("随机休眠{min}分钟 \r\n", randomMin);
-                Thread.Sleep(randomMin * 1000 * 60);
-            }
 
             UserInfo userInfo = Login();
             DailyTaskInfo dailyTaskInfo = GetDailyTaskStatus();
@@ -78,9 +67,7 @@ namespace Ray.BiliBiliTool.Application
             ReceiveMangaVipReward(userInfo);
             Charge(userInfo);
 
-            TianXuan();
-
-            _logger.LogInformation("-----全部任务已执行结束-----\r\n");
+            _logger.LogInformation("-----每日任务全部已执行结束-----\r\n");
         }
 
         /// <summary>
@@ -194,15 +181,6 @@ namespace Ray.BiliBiliTool.Application
         private void ReceiveMangaVipReward(UserInfo userInfo)
         {
             _mangaDomainService.ReceiveMangaVipReward(1, userInfo);
-        }
-
-        /// <summary>
-        /// 天选时刻抽奖
-        /// </summary>
-        [TaskInterceptor("直播中心天选时刻抽奖", false)]
-        private void TianXuan()
-        {
-            _liveDomainService.TianXuan();
         }
     }
 }

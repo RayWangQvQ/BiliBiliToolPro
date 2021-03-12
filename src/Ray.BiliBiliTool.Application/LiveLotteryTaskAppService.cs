@@ -14,18 +14,19 @@ using Ray.BiliBiliTool.DomainService.Interfaces;
 
 namespace Ray.BiliBiliTool.Application
 {
-    public class LiveTaskAppService : ILiveTaskAppService
+    public class LiveLotteryTaskAppService : AppService, ILiveLotteryTaskAppService
     {
-        private readonly ILogger<LiveTaskAppService> _logger;
+        private readonly ILogger<LiveLotteryTaskAppService> _logger;
         private readonly ILiveDomainService _liveDomainService;
         private readonly SecurityOptions _securityOptions;
         private readonly IAccountDomainService _accountDomainService;
 
-        public LiveTaskAppService(
+        public LiveLotteryTaskAppService(
             ILiveDomainService liveDomainService,
             IOptionsMonitor<SecurityOptions> securityOptions,
-            ILogger<LiveTaskAppService> logger,
-            IAccountDomainService accountDomainService)
+            ILogger<LiveLotteryTaskAppService> logger,
+            IAccountDomainService accountDomainService
+            )
         {
             _liveDomainService = liveDomainService;
             _securityOptions = securityOptions.CurrentValue;
@@ -33,37 +34,19 @@ namespace Ray.BiliBiliTool.Application
             _accountDomainService = accountDomainService;
         }
 
-        public void DoLotteryTask()
+        public override string TaskName => "LiveLottery";
+
+
+        public override void DoTask()
         {
-            if (_securityOptions.IsSkipDailyTask)
-            {
-                _logger.LogWarning("已配置为跳过任务\r\n");
-                return;
-            }
-
-            if (_securityOptions.RandomSleepMaxMin > 0)
-            {
-                int randomMin = new Random().Next(1, ++_securityOptions.RandomSleepMaxMin);
-                _logger.LogInformation("随机休眠{min}分钟 \r\n", randomMin);
-                Thread.Sleep(randomMin * 1000 * 60);
-            }
-
-            UserInfo userInfo = Login();
-
+            LogUserInfo();
             LotteryTianXuan();
         }
 
-        /// <summary>
-        /// 登录
-        /// </summary>
-        /// <returns></returns>
-        [TaskInterceptor("登录")]
-        private UserInfo Login()
+        [TaskInterceptor("打印用户信息")]
+        private void LogUserInfo()
         {
             UserInfo userInfo = _accountDomainService.LoginByCookie();
-            if (userInfo == null) throw new Exception("登录失败，请检查Cookie");//终止流程
-
-            return userInfo;
         }
 
         [TaskInterceptor("天选时刻抽奖")]

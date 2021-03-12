@@ -9,5 +9,8 @@ namespace Ray.BiliBiliTool.Application.Contracts
     /// </summary>
     public interface IAppService
     {
+        string TaskName { get; }
+
+        void DoTask();
     }
 }
