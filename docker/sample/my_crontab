@@ -1,1 +1,2 @@
-0 15 * * * root /bin/bash /app/job.sh >> /var/log/cron.log
+0 15 * * * /app/Ray.BiliBiliTool.Console -runTasks=Daily -closeConsoleWhenEnd=1 >> /var/log/cron.log
+0 23 * * * /app/Ray.BiliBiliTool.Console -runTasks=LiveLottery -closeConsoleWhenEnd=1 >> /var/log/cron.log

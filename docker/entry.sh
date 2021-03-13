@@ -2,7 +2,7 @@
 set -e
 
 echo "尝试首次运行"
-/bin/bash /app/job.sh
+/app/Ray.BiliBiliTool.Console -runTasks=Daily -closeConsoleWhenEnd=1
 
 
 echo "配置cron定时任务"
