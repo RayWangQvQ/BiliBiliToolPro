@@ -161,9 +161,9 @@ namespace Ray.BiliBiliTool.DomainService
             var request = new JoinTianXuanRequest
             {
                 Id = check.Id,
-                gift_id = check.Gift_id,
-                gift_num = check.Gift_num,
-                csrf = _biliCookie.BiliJct
+                Gift_id = check.Gift_id,
+                Gift_num = check.Gift_num,
+                Csrf = _biliCookie.BiliJct
             };
             var re = _liveApi.Join(request)
                 .GetAwaiter().GetResult();

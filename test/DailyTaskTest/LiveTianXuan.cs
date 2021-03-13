@@ -7,6 +7,7 @@ using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Console;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 using Ray.BiliBiliTool.Infrastructure;
+using Ray.BiliBiliTool.Infrastructure.Helpers;
 using Xunit;
 
 namespace DailyTaskTest
@@ -92,6 +93,13 @@ namespace DailyTaskTest
                 api.TianXuan();
                 Assert.True(true);
             }
+        }
+
+        [Fact]
+        public void GetRandomVisitId()
+        {
+            var r = new RandomHelper();
+            var re = r.GenerateCode(10);
         }
     }
 }
