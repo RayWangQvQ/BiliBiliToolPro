@@ -10,6 +10,7 @@ on:
 jobs:
   build:
     name: publish relesae
+    if: ${{ github.repository == 'RayWangQvQ/BiliBiliTool' }}
     runs-on: ubuntu-latest
     
     steps:

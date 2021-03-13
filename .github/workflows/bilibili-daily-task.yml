@@ -88,4 +88,4 @@ jobs:
         Ray_Serilog__WriteTo__0__Args__outputTemplate: ${{secrets.CONSOLELOGTEMPLATE}} 
       run: |
         cd ./src/Ray.BiliBiliTool.Console/bin/Publish/net5-dependent
-        dotnet Ray.BiliBiliTool.Console.dll -runTasks=daily -closeConsoleWhenEnd=1 ${{secrets.OTHERCONFIGS}}
+        dotnet Ray.BiliBiliTool.Console.dll -runTasks=Daily -closeConsoleWhenEnd=1 ${{secrets.OTHERCONFIGS}}
