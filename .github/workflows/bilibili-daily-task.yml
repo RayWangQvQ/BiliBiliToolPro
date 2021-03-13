@@ -48,12 +48,6 @@ jobs:
       env:
         ASPNETCORE_ENVIRONMENT: ${{secrets.ENV}} # 运行环境
         Ray_BiliBiliCookie__CookieStr: ${{secrets.COOKIESTR}}
-        Ray_BiliBiliCookie__UserId: ${{secrets.USERID}} # 已过时
-        Ray_BiliBiliCookie__DedeUserID: ${{secrets.DEDEUSERID}} # 已过时
-        Ray_BiliBiliCookie__SessData: ${{secrets.SESSDATA}} # 已过时
-        Ray_BiliBiliCookie__BiliJct: ${{secrets.BILIJCT}} # 已过时
-        Ray_BiliBiliCookie__Bili_jct: ${{secrets.BILI_JCT}} # 已过时
-        Ray_BiliBiliCookie__OtherCookies: ${{secrets.OTHERCOOKIES}} # 已过时
         Ray_Serilog__WriteTo__3__Args__botToken: ${{secrets.PUSHTGTOKEN}} # Telegram
         Ray_Serilog__WriteTo__3__Args__chatId: ${{secrets.PUSHTGCHATID}}
         Ray_Serilog__WriteTo__3__Args__containsTrigger: ${{secrets.PUSHTGTRIGGER}}
@@ -94,4 +88,4 @@ jobs:
         Ray_Serilog__WriteTo__0__Args__outputTemplate: ${{secrets.CONSOLELOGTEMPLATE}} 
       run: |
         cd ./src/Ray.BiliBiliTool.Console/bin/Publish/net5-dependent
-        dotnet Ray.BiliBiliTool.Console.dll -closeConsoleWhenEnd=1 ${{secrets.OTHERCONFIGS}}
+        dotnet Ray.BiliBiliTool.Console.dll -runTasks=daily -closeConsoleWhenEnd=1 ${{secrets.OTHERCONFIGS}}
