@@ -3,6 +3,8 @@
   "CommandLineMappings": {
     "-cookieStr": "BiliBiliCookie:CookieStr",
 
+    "-runTasks": "RunTasks",
+
     "-userId": "BiliBiliCookie:UserId",
     "-sessData": "BiliBiliCookie:SessData",
     "-biliJct": "BiliBiliCookie:BiliJct",
