@@ -60,6 +60,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{61613EF4-3644-42D4-A620-70547291FB38}"
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\bilibili-daily-task.yml = .github\workflows\bilibili-daily-task.yml
+		.github\workflows\live-lottery-task.yml = .github\workflows\live-lottery-task.yml
 		.github\workflows\publish-release.yml = .github\workflows\publish-release.yml
 		.github\workflows\repo-sync.yml = .github\workflows\repo-sync.yml
 	EndProjectSection

@@ -112,12 +112,12 @@ namespace Ray.BiliBiliTool.DomainService
                 _logger.LogInformation("获取随机视频：{title}", targetVideo.Title);
             }
 
-            if (!dailyTaskStatus.Watch)
+            if (!dailyTaskStatus.Watch && _dailyTaskOptions.IsWatchVideo)
                 WatchVideo(targetVideo);
             else
                 _logger.LogInformation("今天已经观看过了，不需要再看啦");
 
-            if (!dailyTaskStatus.Share)
+            if (!dailyTaskStatus.Share && _dailyTaskOptions.IsShareVideo)
                 ShareVideo(targetVideo);
             else
                 _logger.LogInformation("今天已经分享过了，不用再分享啦");
