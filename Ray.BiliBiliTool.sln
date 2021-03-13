@@ -69,7 +69,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker", "docker", "{A93210
 	ProjectSection(SolutionItems) = preProject
 		docker\crontab = docker\crontab
 		docker\entry.sh = docker\entry.sh
-		docker\job.sh = docker\job.sh
 		docker\README.md = docker\README.md
 	EndProjectSection
 EndProject

@@ -73,9 +73,9 @@ namespace DailyTaskTest
                 var request = new JoinTianXuanRequest
                 {
                     Id = check.Id,
-                    gift_id = check.Gift_id,
-                    gift_num = check.Gift_num,
-                    csrf = scope.ServiceProvider.GetRequiredService<BiliCookie>().BiliJct
+                    Gift_id = check.Gift_id,
+                    Gift_num = check.Gift_num,
+                    Csrf = scope.ServiceProvider.GetRequiredService<BiliCookie>().BiliJct
                 };
                 var re = api.Join(request).Result;
 
