@@ -140,40 +140,54 @@ namespace Ray.BiliBiliTool.DomainService
         {
             _logger.LogInformation("开始检查直播间：{name}({id})", target.Title, target.Roomid);
 
-            CheckTianXuanDto check = _liveApi.CheckTianXuan(target.Roomid)
-                .GetAwaiter().GetResult()
-                .Data;
-
-            _logger.LogInformation("奖励：{name}，条件：{text}", check.Award_name, check.Require_text);
-
-            if (check.Status != 1)
+            try
             {
-                _logger.LogInformation("已开奖，跳过\r\n");
-                return;
+                CheckTianXuanDto check = _liveApi.CheckTianXuan(target.Roomid)
+                    .GetAwaiter().GetResult()
+                    .Data;
+
+                if (check == null)
+                {
+                    _logger.LogInformation("数据异常，跳过");
+                    return;
+                }
+
+                _logger.LogInformation("奖励：{name}，条件：{text}", check.Award_name, check.Require_text);
+
+                if (check.Status != 1)
+                {
+                    _logger.LogInformation("已开奖，跳过\r\n");
+                    return;
+                }
+
+                if (check.Gift_price != 0)
+                {
+                    _logger.LogInformation("需要赠送礼物才能参与，跳过\r\n");
+                    return;
+                }
+
+                var request = new JoinTianXuanRequest
+                {
+                    Id = check.Id,
+                    Gift_id = check.Gift_id,
+                    Gift_num = check.Gift_num,
+                    Csrf = _biliCookie.BiliJct
+                };
+                var re = _liveApi.Join(request)
+                    .GetAwaiter().GetResult();
+                if (re.Code == 0)
+                {
+                    _logger.LogInformation("参与抽奖成功!\r\n");
+                    return;
+                }
+
+                _logger.LogInformation("参与抽奖失败，原因：{msg}\r\n", re.Message);
             }
-
-            if (check.Gift_price != 0)
+            catch (Exception ex)
             {
-                _logger.LogInformation("需要赠送礼物才能参与，跳过\r\n");
-                return;
+                _logger.LogWarning("发生异常：{msg}，{detail}\r\n", ex.Message, ex);
+                //ignore
             }
-
-            var request = new JoinTianXuanRequest
-            {
-                Id = check.Id,
-                Gift_id = check.Gift_id,
-                Gift_num = check.Gift_num,
-                Csrf = _biliCookie.BiliJct
-            };
-            var re = _liveApi.Join(request)
-                .GetAwaiter().GetResult();
-            if (re.Code == 0)
-            {
-                _logger.LogInformation("参与抽奖成功!\r\n");
-                return;
-            }
-
-            _logger.LogInformation("参与抽奖失败，原因：{msg}\r\n", re.Message);
         }
     }
 }
