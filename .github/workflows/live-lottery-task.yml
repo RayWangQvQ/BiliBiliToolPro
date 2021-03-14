@@ -1,4 +1,4 @@
-name: bilibili-daily-task
+name: live-lottery-task
 
 
 on:
@@ -75,17 +75,8 @@ jobs:
         Ray_Security__UserAgent: ${{secrets.USERAGENT}}
         Ray_Security__WebProxy: ${{secrets.WEBPROXY}}
         Ray_Security__RandomSleepMaxMin: ${{secrets.RANDOMSLEEPMAXMIN}}
-        Ray_DailyTaskConfig__NumberOfCoins: ${{secrets.NUMBEROFCOINS}}
-        Ray_DailyTaskConfig__SelectLike: ${{secrets.SELECTLIKE}}
-        Ray_DailyTaskConfig__SupportUpIds: ${{secrets.SUPPORTUPIDS}}
-        Ray_DailyTaskConfig__DayOfAutoCharge: ${{secrets.DAYOFAUTOCHARGE}}
-        Ray_DailyTaskConfig__AutoChargeUpId: ${{secrets.AUTOCHARGEUPID}}
-        Ray_DailyTaskConfig__ChargeComment: ${{secrets.CHARGECOMMENT}}
-        Ray_DailyTaskConfig__DayOfReceiveVipPrivilege: ${{secrets.DAYOFRECEIVEVIPPRIVILEGE}}
-        Ray_DailyTaskConfig__DayOfExchangeSilver2Coin: ${{secrets.DAYOFEXCHANGESILVER2COIN}}
-        Ray_DailyTaskConfig__DevicePlatform: ${{secrets.DEVICEPLATFORM}}
         Ray_Serilog__WriteTo__0__Args__restrictedToMinimumLevel: ${{secrets.CONSOLELOGLEVEL}}
         Ray_Serilog__WriteTo__0__Args__outputTemplate: ${{secrets.CONSOLELOGTEMPLATE}} 
       run: |
         cd ./src/Ray.BiliBiliTool.Console/bin/Publish/net5-dependent
-        dotnet Ray.BiliBiliTool.Console.dll -runTasks=Daily -closeConsoleWhenEnd=1 ${{secrets.OTHERCONFIGS}}
+        dotnet Ray.BiliBiliTool.Console.dll -runTasks=LiveLottery -closeConsoleWhenEnd=1 ${{secrets.OTHERCONFIGS}}

@@ -18,7 +18,7 @@ ENV TIME_ZONE=Asia/Shanghai
 COPY --from=build-env ./out .
 
 # copy scripts
-COPY ./docker/entry.sh ./docker/job.sh ./docker/crontab /app/
+COPY ./docker/entry.sh ./docker/crontab /app/
 
 RUN ln -fs /usr/share/zoneinfo/$TIME_ZONE /etc/localtime\
     && echo $TIME_ZONE > /etc/timezone\

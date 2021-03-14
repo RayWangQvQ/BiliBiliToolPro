@@ -2,7 +2,7 @@
 set -e
 
 echo "尝试首次运行"
-/bin/bash /app/job.sh
+/app/Ray.BiliBiliTool.Console -runTasks=Daily -closeConsoleWhenEnd=1
 
 
 echo "配置cron定时任务"
@@ -18,6 +18,10 @@ fi
 chmod 0644 /etc/cron.d/bilicron
 crontab /etc/cron.d/bilicron
 touch /var/log/cron.log
+
+# https://stackoverflow.com/questions/27771781/how-can-i-access-docker-set-environment-variables-from-a-cron-job
+echo "导入环境变量"
+printenv | grep -v "no_proxy" > /etc/environment
 
 echo "启动定时任务，开启每日定时运行"
 cron && tail -f /var/log/cron.log

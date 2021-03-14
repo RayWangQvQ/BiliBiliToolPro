@@ -1,59 +1,78 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Application.Contracts;
 using Ray.BiliBiliTool.Config;
+using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.Infrastructure;
+using Ray.BiliBiliTool.Infrastructure.Helpers;
 
 namespace Ray.BiliBiliTool.Console
 {
     public class BiliBiliToolHostedService : IHostedService
     {
         private readonly IHostApplicationLifetime _applicationLifetime;
+        private readonly IConfiguration _configuration;
         private readonly ILogger<BiliBiliToolHostedService> _logger;
         private readonly BiliCookie _biliBiliCookie;
-        private readonly IDailyTaskAppService _dailyTaskAppService;
+        private readonly IEnumerable<IAppService> _appServices;
+        private readonly SecurityOptions _securityOptions;
 
         public BiliBiliToolHostedService(
             IHostApplicationLifetime applicationLifetime
+            , IConfiguration configuration
             , ILogger<BiliBiliToolHostedService> logger
             , BiliCookie biliBiliCookie
-            , IDailyTaskAppService dailyTaskAppService
+            , IEnumerable<IAppService> appServices
+            , IOptionsMonitor<SecurityOptions> securityOptions
             )
         {
             _applicationLifetime = applicationLifetime;
+            _configuration = configuration;
             _logger = logger;
             _biliBiliCookie = biliBiliCookie;
-            _dailyTaskAppService = dailyTaskAppService;
+            _appServices = appServices.ToList();
+            _securityOptions = securityOptions.CurrentValue;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            var logger = _logger;
-            LogAppInfo(logger);
+            LogAppInfo();
 
             try
             {
-                BiliCookie biliBiliCookie = _biliBiliCookie;
+                var tasks = _configuration["RunTasks"]
+                    .Split("&", options: StringSplitOptions.RemoveEmptyEntries);
+                if (!tasks.Any()) return Task.CompletedTask;
 
-                IDailyTaskAppService dailyTask = _dailyTaskAppService;
+                if (CheckSkip()) return Task.CompletedTask;
 
-                dailyTask.DoDailyTask();
+                RandomSleep();
+
+                foreach (var task in tasks)
+                {
+                    var appService = _appServices.FirstOrDefault(x => x.TaskName == task);
+                    if (appService == null) _logger.LogWarning("任务不存在：{task}", task);
+                    appService?.DoTask();
+                }
             }
             catch (Exception ex)
             {
-                logger.LogError("程序异常终止，原因：{msg}", ex.Message);
+                _logger.LogError("程序异常终止，原因：{msg}", ex.Message);
                 throw;
-                //Environment.Exit(1);
             }
             finally
             {
-                logger.LogInformation("开始推送");
+                _logger.LogInformation("开始推送");
 
                 if (Global.ConfigurationRoot["CloseConsoleWhenEnd"] == "1")
                 {
@@ -73,21 +92,35 @@ namespace Ray.BiliBiliTool.Console
         /// 打印应用信息
         /// </summary>
         /// <param name="logger"></param>
-        private static void LogAppInfo(Microsoft.Extensions.Logging.ILogger logger)
+        private void LogAppInfo()
         {
-            logger.LogInformation(
+            _logger.LogInformation(
                 "版本号：Ray.BiliBiliTool-v{version}",
                 typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-                    ?.InformationalVersion ?? "未知");
-            logger.LogInformation("开源地址：{url}", Constants.SourceCodeUrl);
-            logger.LogInformation("当前环境：{env}", Global.HostingEnvironment.EnvironmentName ?? "无");
-            try
+                    ?.InformationalVersion);
+            _logger.LogInformation("开源地址：{url}", Constants.SourceCodeUrl);
+            _logger.LogInformation("当前环境：{env}", Global.HostingEnvironment.EnvironmentName);
+            _logger.LogInformation("当前IP：{ip} \r\n", IpHelper.GetIp());
+        }
+
+        public bool CheckSkip()
+        {
+            if (_securityOptions.IsSkipDailyTask)
             {
-                logger.LogInformation("当前IP：{ip} \r\n", new HttpClient().GetAsync("http://api.ipify.org/").Result.Content.ReadAsStringAsync().Result);
+                _logger.LogWarning("已配置为跳过任务\r\n");
+                return true;
             }
-            catch (Exception)
+
+            return false;
+        }
+
+        public void RandomSleep()
+        {
+            if (_securityOptions.RandomSleepMaxMin > 0)
             {
-                //Environment.Exit(1);
+                int randomMin = new Random().Next(1, ++_securityOptions.RandomSleepMaxMin);
+                _logger.LogInformation("随机休眠{min}分钟 \r\n", randomMin);
+                Thread.Sleep(randomMin * 1000 * 60);
             }
         }
     }

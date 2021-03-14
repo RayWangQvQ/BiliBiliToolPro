@@ -13,7 +13,6 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
     [Header("Sec-Fetch-Site", "same-site")]
 
     [Header("Connection", "keep-alive")]
-    //[Header("Host", "api.bilibili.com")]
 
     [LogFilter]
     public interface IBiliBiliApi

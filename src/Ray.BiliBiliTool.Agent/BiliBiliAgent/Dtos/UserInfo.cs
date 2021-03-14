@@ -47,7 +47,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos
             int s2 = (s1 + 1) / 2;
             for (int i = 0; i < Uname.Length; i++)
             {
-                if (i >= s2 && i < s1 + s2) sb.Append("*");
+                if (i >= s2 && i < s1 + s2) sb.Append("x");
                 else sb.Append(Uname[i]);
             }
 
