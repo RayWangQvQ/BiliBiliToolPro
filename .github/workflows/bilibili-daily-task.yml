@@ -11,7 +11,7 @@ on:
     
 
 jobs:
-  run-bilibili-tool:
+  run-daily-task:
 
     runs-on: ubuntu-latest
 
