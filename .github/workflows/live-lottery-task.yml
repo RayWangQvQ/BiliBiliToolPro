@@ -56,7 +56,7 @@ jobs:
     runs-on: ubuntu-latest
     # if: ${{ secrets.ISOPENLIVELOTTERYTASK != 'RayWangQvQ/BiliBiliTool' }}
     needs: pre-check
-    if: needs.pre-check.outputs.result=='true' # 发现job.if读取不到env或secrets，坑...https://github.com/actions/runner/issues/480
+    if: contains(needs.pre-check.outputs.result, 'true') # 发现job.if读取不到env或secrets，坑...https://github.com/actions/runner/issues/480
 
     environment: Production
 
