@@ -45,20 +45,9 @@ env:
 
 jobs:
 
-  pre-check:
-    runs-on: ubuntu-latest
-    outputs:
-      result: ${{ steps.check.outputs.result }}
-    steps:
-    - id: check
-      if: env.ISOPENLIVELOTTERYTASK=='true'
-      run: echo "::set-output name=result::开启"
-
   run-live-lottery:
     runs-on: ubuntu-latest
-    # if: ${{ secrets.ISOPENLIVELOTTERYTASK != 'RayWangQvQ/BiliBiliTool' }}
-    needs: pre-check
-    if: contains(needs.pre-check.outputs.result, '开启') # 发现job.if读取不到env或secrets，坑...https://github.com/actions/runner/issues/480
+    if: contains(env.IsOpenLiveLotteryTask, 'true') # 发现job.if读取不到env或secrets，坑...
 
     environment: Production
 
