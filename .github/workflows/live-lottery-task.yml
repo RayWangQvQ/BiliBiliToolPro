@@ -48,6 +48,9 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       result: ${{ secrets.ISOPENLIVELOTTERYTASK }}
+    steps:
+    - name: Check
+      run: echo "检测到开关配置为：${{ secrets.ISOPENLIVELOTTERYTASK }}"
 
   run-live-lottery:
     runs-on: ubuntu-latest
