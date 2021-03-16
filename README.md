@@ -260,7 +260,7 @@ dotnet Ray.BiliBiliTool.Console.dll -runTasks=Daily&LiveLottery
 | 任务名称 | Code | 功能 | 默认WorkFlow文件 | 备注 |
 | ---------- | -------------- | -------------- | -------------- | -------------- |
 | 每日任务 | Daily | 完成每日任务获取满额65点经验（登录、观看视频、分享视频、投币），以及漫画签到、直播签到、直播中心银瓜子兑换硬币、领取大会员权益、领取大会员漫画福利和充电等附属功能 | bilibili-daily-task.yml | |
-| 天选时刻抽奖 | LiveLottery | 直播中心天选时刻抽奖 | live-lottery-task.yml | 大部分抽奖都需要关注主播，介意的话不建议开启抽奖任务 |
+| 天选时刻抽奖 | LiveLottery | 直播中心天选时刻抽奖 | live-lottery-task.yml | 对应的GitHub Actions工作流默认是关闭的，需要添加key为`ISOPENLIVELOTTERYTASK`、值为`true`的secret来手动开启；大部分抽奖都需要关注主播，介意的话不建议开启抽奖任务 |
 
 ## 3. 个性化自定义配置
 
