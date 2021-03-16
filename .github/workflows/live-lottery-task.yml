@@ -45,9 +45,21 @@ env:
 
 jobs:
 
+  pre-check:
+    runs-on: ubuntu-latest
+    outputs:
+      result: ${{ steps.check.outputs.result }} # 不能直接传递secrets的值，否则会被skip，需要转一下
+    steps:
+    - id: check
+      if: env.IsOpenLiveLotteryTask=='true'
+      run: |
+        echo "::set-output name=result::开启"
+
   run-live-lottery:
     runs-on: ubuntu-latest
-    # if: contains(env.IsOpenLiveLotteryTask, 'true') # 发现job.if读取不到env或secrets，坑...
+    needs: pre-check
+    # if: env.IsOpenLiveLotteryTask=='true' # 这里job.if读取不到env或secrets，很坑...但是发现可以读到needs的outputs值
+    if: needs.pre-check.outputs.result=='开启'
 
     environment: Production
 
@@ -55,33 +67,28 @@ jobs:
 
     # 输出IP、设置服务器时区为东八区 
     - name: PreWork
-      if: contains(env.IsOpenLiveLotteryTask, 'true')
       run: |
         sudo curl ifconfig.me
         sudo timedatectl set-timezone 'Asia/Shanghai'
 
     # 检出
     - name: Checkout
-      if: contains(env.IsOpenLiveLotteryTask, 'true')
       uses: actions/checkout@v2
       
     # .Net 环境
     - name: Setup .NET
-      if: contains(env.IsOpenLiveLotteryTask, 'true')
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 5.0.x
 
     # 发布
     - name: Publish
-      if: contains(env.IsOpenLiveLotteryTask, 'true')
       run: |
         cd ./src/Ray.BiliBiliTool.Console
         dotnet publish --configuration Release --self-contained false --output ./bin/Publish/net5-dependent
        
     # 运行
     - name: Run APP
-      if: contains(env.IsOpenLiveLotteryTask, 'true')
       run: |
         cd ./src/Ray.BiliBiliTool.Console/bin/Publish/net5-dependent
         dotnet Ray.BiliBiliTool.Console.dll -runTasks=LiveLottery -closeConsoleWhenEnd=1 ${{secrets.OTHERCONFIGS}}
