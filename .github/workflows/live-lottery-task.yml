@@ -10,7 +10,7 @@ on:
     # 建议每个人通过设置 GitHub Environments 的方式来设定为自己的目标运行时间（详细设置方法见文档说明）
 
 env:
-  IsOpenLiveLotteryTask: ${{ssecrets.ISOPENLIVELOTTERYTASK}}
+  IsOpenLiveLotteryTask: ${{secrets.ISOPENLIVELOTTERYTASK}}
   ASPNETCORE_ENVIRONMENT: ${{secrets.ENV}} # 运行环境
   Ray_BiliBiliCookie__CookieStr: ${{secrets.COOKIESTR}}
   Ray_Serilog__WriteTo__3__Args__botToken: ${{secrets.PUSHTGTOKEN}} # Telegram
