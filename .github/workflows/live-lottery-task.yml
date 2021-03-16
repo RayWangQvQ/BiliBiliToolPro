@@ -51,7 +51,7 @@ jobs:
       result: ${{ steps.check.outputs.result }}
     steps:
     - id: check
-      if: secrets.ISOPENLIVELOTTERYTASK=='true'
+      if: env.ISOPENLIVELOTTERYTASK=='true'
       run: echo "::set-output name=result::开启"
 
   run-live-lottery:
