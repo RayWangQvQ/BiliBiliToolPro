@@ -48,16 +48,17 @@ jobs:
   pre-check:
     runs-on: ubuntu-latest
     outputs:
-      result: ${{ env.IsOpenLiveLotteryTask }}
+      result: ${{ steps.check.outputs.result }}
     steps:
-    - name: Check
-      run: echo "检测到开关配置为：${{ env.IsOpenLiveLotteryTask }}"
+    - id: check
+      if: secrets.ISOPENLIVELOTTERYTASK=='true'
+      run: echo "::set-output name=result::开启"
 
   run-live-lottery:
     runs-on: ubuntu-latest
     # if: ${{ secrets.ISOPENLIVELOTTERYTASK != 'RayWangQvQ/BiliBiliTool' }}
     needs: pre-check
-    if: contains(needs.pre-check.outputs.result, 'true') # 发现job.if读取不到env或secrets，坑...https://github.com/actions/runner/issues/480
+    if: contains(needs.pre-check.outputs.result, '开启') # 发现job.if读取不到env或secrets，坑...https://github.com/actions/runner/issues/480
 
     environment: Production
 
