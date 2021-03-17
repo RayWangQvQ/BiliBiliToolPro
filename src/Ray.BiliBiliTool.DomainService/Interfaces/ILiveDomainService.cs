@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live;
 
 namespace Ray.BiliBiliTool.DomainService.Interfaces
 {
@@ -24,5 +25,7 @@ namespace Ray.BiliBiliTool.DomainService.Interfaces
         /// 天选抽奖
         /// </summary>
         void TianXuan();
+
+        void TryJoinTianXuan(ListItemDto target);
     }
 }

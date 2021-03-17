@@ -19,6 +19,7 @@ namespace Ray.BiliBiliTool.DomainService
     {
         private readonly ILogger<LiveDomainService> _logger;
         private readonly ILiveApi _liveApi;
+        private readonly LiveLotteryTaskOptions _liveLotteryTaskOptions;
         private readonly BiliCookie _biliCookie;
         private readonly DailyTaskOptions _dailyTaskOptions;
 
@@ -27,10 +28,12 @@ namespace Ray.BiliBiliTool.DomainService
         public LiveDomainService(ILogger<LiveDomainService> logger,
             ILiveApi liveApi,
             IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
+            IOptionsMonitor<LiveLotteryTaskOptions> liveLotteryTaskOptions,
             BiliCookie biliCookie)
         {
             _logger = logger;
             _liveApi = liveApi;
+            _liveLotteryTaskOptions = liveLotteryTaskOptions.CurrentValue;
             _biliCookie = biliCookie;
             _dailyTaskOptions = dailyTaskOptions.CurrentValue;
         }
@@ -163,6 +166,13 @@ namespace Ray.BiliBiliTool.DomainService
                 if (check.Gift_price != 0)
                 {
                     _logger.LogInformation("需要赠送礼物才能参与，跳过\r\n");
+                    return;
+                }
+
+                //根据配置过滤
+                if (!check.AwardNameIsSatisfied(_liveLotteryTaskOptions.IncludeAwardNameList, _liveLotteryTaskOptions.ExcludeAwardNameList))
+                {
+                    _logger.LogInformation("不满足配置的筛选条件，跳过\r\n");
                     return;
                 }
 

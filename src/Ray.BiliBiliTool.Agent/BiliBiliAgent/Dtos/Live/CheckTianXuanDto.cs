@@ -67,5 +67,26 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live
         #endregion
 
         public int Send_gift_ensure { get; set; }
+
+        public bool AwardNameIsSatisfied(List<string> includeKeys, List<string> excludeKeys)
+        {
+            if (includeKeys != null && includeKeys.Any())
+            {
+                foreach (var item in includeKeys)
+                {
+                    if (!this.Award_name.Contains(item)) return false;
+                }
+            }
+
+            if (excludeKeys != null && excludeKeys.Any())
+            {
+                foreach (var item in excludeKeys)
+                {
+                    if (this.Award_name.Contains(item)) return false;
+                }
+            }
+
+            return true;
+        }
     }
 }
