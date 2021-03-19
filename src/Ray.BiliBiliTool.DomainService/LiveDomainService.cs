@@ -155,7 +155,7 @@ namespace Ray.BiliBiliTool.DomainService
                     return;
                 }
 
-                _logger.LogInformation("奖励：{name}，条件：{text}", check.Award_name, check.Require_text);
+                _logger.LogInformation("奖励：{name}；条件：{text}；赠礼：{gift}", check.Award_name, check.Require_text, check.GiftDesc);
 
                 if (check.Status != 1)
                 {

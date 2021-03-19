@@ -109,16 +109,14 @@ namespace DailyTaskTest
         {
             using (var scope = Global.ServiceProviderRoot.CreateScope())
             {
-                var api = scope.ServiceProvider.GetRequiredService<ILiveDomainService>();
                 var options = scope.ServiceProvider.GetRequiredService<IOptionsMonitor<LiveLotteryTaskOptions>>();
-
 
                 var check = new CheckTianXuanDto
                 {
                     Award_name = "ºì°ü"
                 };
                 var re = check.AwardNameIsSatisfied(options.CurrentValue.IncludeAwardNameList, options.CurrentValue.ExcludeAwardNameList);
-                Assert.True(true);
+                Assert.True(re);
             }
         }
     }

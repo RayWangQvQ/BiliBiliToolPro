@@ -40,7 +40,7 @@ namespace Ray.BiliBiliTool.Console
             _configuration = configuration;
             _logger = logger;
             _biliBiliCookie = biliBiliCookie;
-            _appServices = appServices.ToList();
+            _appServices = appServices;
             _securityOptions = securityOptions.CurrentValue;
         }
 

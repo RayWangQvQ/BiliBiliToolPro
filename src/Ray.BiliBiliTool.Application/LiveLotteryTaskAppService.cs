@@ -58,7 +58,7 @@ namespace Ray.BiliBiliTool.Application
             UserInfo userInfo = _accountDomainService.LoginByCookie();
         }
 
-        [TaskInterceptor("天选时刻抽奖")]
+        [TaskInterceptor("抽奖")]
         private void LotteryTianXuan()
         {
             _liveDomainService.TianXuan();

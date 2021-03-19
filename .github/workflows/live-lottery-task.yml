@@ -61,7 +61,7 @@ jobs:
     # if: env.IsOpenLiveLotteryTask=='true' # 这里job.if读取不到env或secrets，很坑...但是发现可以读到needs的outputs值
     if: needs.pre-check.outputs.result=='开启'
 
-    environment: Production
+    environment: LiveLottery
 
     steps:
 

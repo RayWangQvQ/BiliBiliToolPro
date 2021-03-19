@@ -64,20 +64,15 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live
         public int Gift_price { get; set; }
 
         public int Cur_gift_num { get; set; }
+
+        public string GiftDesc => $"价值{Gift_price}的{Gift_name}{Gift_num}个";
         #endregion
 
         public int Send_gift_ensure { get; set; }
 
         public bool AwardNameIsSatisfied(List<string> includeKeys, List<string> excludeKeys)
         {
-            if (includeKeys != null && includeKeys.Any())
-            {
-                foreach (var item in includeKeys)
-                {
-                    if (!this.Award_name.Contains(item)) return false;
-                }
-            }
-
+            //只要包含了排除的关键字，就排除
             if (excludeKeys != null && excludeKeys.Any())
             {
                 foreach (var item in excludeKeys)
@@ -86,7 +81,22 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live
                 }
             }
 
-            return true;
+            //遍历所有包含关键字，包含其一就确认，否则保持排除
+            bool isInclude = true;
+            if (includeKeys != null && includeKeys.Any())
+            {
+                isInclude = false;
+                foreach (var item in includeKeys)
+                {
+                    if (this.Award_name.Contains(item))
+                    {
+                        isInclude = true;
+                        break;
+                    }
+                }
+            }
+
+            return isInclude;
         }
     }
 }
