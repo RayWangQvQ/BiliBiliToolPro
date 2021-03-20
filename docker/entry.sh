@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-echo "尝试首次运行"
+echo "初始启动容器，尝试首次运行每日任务"
 /app/Ray.BiliBiliTool.Console -runTasks=Daily -closeConsoleWhenEnd=1
 
 

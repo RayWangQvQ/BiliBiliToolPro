@@ -12,8 +12,6 @@ namespace Ray.BiliBiliTool.Config.Options
 
         public string ExcludeAwardNames { get; set; }
 
-        public bool IsAutoUnfollow { get; set; }
-
         public List<string> IncludeAwardNameList =>
             IncludeAwardNames?.Split("|",
                     StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToList()

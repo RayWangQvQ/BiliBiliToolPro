@@ -132,7 +132,7 @@ namespace ConfigTest
 
             //手动赋值
             //RayConfiguration.Root["BiliBiliCookie:UserId"] = "123456";
-            options.CurrentValue.UserId = "123456";
+            //options.CurrentValue.UserId = "123456";
 
             Debug.WriteLine($"从Configuration读取：{Global.ConfigurationRoot["BiliBiliCookie:UserId"]}");
 

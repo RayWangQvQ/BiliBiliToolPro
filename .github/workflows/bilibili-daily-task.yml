@@ -7,7 +7,7 @@ on:
   schedule: # 计划任务触发
     - cron: '0 16 * * *' 
     # cron表达式，时区是UTC时间，比我们早8小时，如上所表示的是每天0点0分（24点整）
-    # 建议每个人通过设置 GitHub Environments 的方式来设定为自己的目标运行时间（详细设置方法见文档说明）
+    # 建议每个人通过设置名称为 Production 的 GitHub Environments 来设定为自己的目标运行时间（详细设置方法见文档说明）
     
 
 jobs:

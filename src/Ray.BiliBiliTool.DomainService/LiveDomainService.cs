@@ -141,7 +141,7 @@ namespace Ray.BiliBiliTool.DomainService
 
         public void TryJoinTianXuan(ListItemDto target)
         {
-            _logger.LogInformation("开始检查直播间：{name}({id})", target.Title, target.Roomid);
+            _logger.LogInformation("直播间：{name}({id})", target.Title, target.Roomid);
 
             try
             {
