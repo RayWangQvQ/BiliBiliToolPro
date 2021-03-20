@@ -290,8 +290,6 @@ dotnet Ray.BiliBiliTool.Console.dll -runTasks=Daily&LiveLottery
 
 ## 7. 捐赠支持
 
-[>>点击查看已捐赠列表和留言](https://hub.fastgit.org/RayWangQvQ/BiliBiliTool.Docs/blob/main/donate-list.md)
-
 个人维护开源不易
 
 如果觉得我写的程序对你小有帮助
@@ -310,7 +308,7 @@ dotnet Ray.BiliBiliTool.Console.dll -runTasks=Daily&LiveLottery
 
 当然，不改的话，也算是另一种捐赠支持作者的方式啦。
 
-感谢各位的支持~
+感谢支持~
 
 ## 8. API 参考
 
