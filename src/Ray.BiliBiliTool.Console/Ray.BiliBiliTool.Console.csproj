@@ -67,6 +67,7 @@
     <ProjectReference Include="..\Ray.Serilog.Sinks.CoolPushBatched\Ray.Serilog.Sinks.CoolPushBatched.csproj" />
     <ProjectReference Include="..\Ray.Serilog.Sinks.DingTalkBatched\Ray.Serilog.Sinks.DingTalkBatched.csproj" />
     <ProjectReference Include="..\Ray.Serilog.Sinks.OtherApiBatched\Ray.Serilog.Sinks.OtherApiBatched.csproj" />
+    <ProjectReference Include="..\Ray.Serilog.Sinks.PushPlus\Ray.Serilog.Sinks.PushPlus.csproj" />
     <ProjectReference Include="..\Ray.Serilog.Sinks.ServerChanBatched\Ray.Serilog.Sinks.ServerChanBatched.csproj" />
     <ProjectReference Include="..\Ray.Serilog.Sinks.TelegramBatched\Ray.Serilog.Sinks.TelegramBatched.csproj" />
     <ProjectReference Include="..\Ray.Serilog.Sinks.WorkWeiXinBatched\Ray.Serilog.Sinks.WorkWeiXinBatched.csproj" />
