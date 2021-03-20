@@ -28,13 +28,6 @@ namespace Ray.BiliBiliTool.Agent
             _options = optionsMonitor.CurrentValue;
 
             CookieStr = _options.CookieStr ?? "";
-            UserId = _options.UserId ?? "";
-            BiliJct = _options.BiliJct ?? "";
-            SessData = _options.SessData ?? "";
-            OtherCookies = _options.OtherCookies ?? "";
-
-            if (_options.DedeUserID.IsNotNullOrEmpty()) UserId = _options.DedeUserID;
-            if (_options.Bili_jct.IsNotNullOrEmpty()) BiliJct = _options.Bili_jct;
 
             if (CookieStr.IsNotNullOrEmpty())
             {
@@ -88,7 +81,6 @@ namespace Ray.BiliBiliTool.Agent
         {
             bool result = true;
             string msg = "配置项[{0}]为空，该项为必须配置，对应浏览器中Cookie中的[{1}]值";
-            string tips = "检测到已配置了[{0}]，已兼容使用[{1}]\r\n";
 
             //UserId为空，抛异常
             if (string.IsNullOrWhiteSpace(UserId))
@@ -100,12 +92,6 @@ namespace Ray.BiliBiliTool.Agent
             else if (!long.TryParse(UserId, out long uid))//不为空，但不能转换为long，警告
             {
                 _logger.LogWarning("UserId：{uid} 不能转换为long型，请确认配置的是正确的Cookie值", UserId);
-            }
-            //UserId为空，但DedeUserID有值，兼容使用
-            if (string.IsNullOrWhiteSpace(_configuration["BiliBiliCookie:UserID"])
-                && !string.IsNullOrWhiteSpace(_configuration["BiliBiliCookie:DedeUserID"]))
-            {
-                _logger.LogWarning(tips, "DEDEUSERID", "DEDEUSERID");
             }
 
             //SessData为空，抛异常
@@ -120,12 +106,6 @@ namespace Ray.BiliBiliTool.Agent
             {
                 _logger.LogWarning(msg, nameof(BiliJct), GetPropertyDescription(nameof(BiliJct)));
                 result = false;
-            }
-            //BiliJct为空，但Bili_jct有值，兼容使用
-            else if (string.IsNullOrWhiteSpace(_configuration["BiliBiliCookie:BiliJct"])
-                && !string.IsNullOrWhiteSpace(_configuration["BiliBiliCookie:Bili_jct"]))
-            {
-                _logger.LogWarning(tips, "BILI_JCT", "BILI_JCT");
             }
 
             if (!result)

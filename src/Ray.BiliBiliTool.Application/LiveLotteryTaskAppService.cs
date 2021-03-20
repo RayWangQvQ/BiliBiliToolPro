@@ -45,7 +45,7 @@ namespace Ray.BiliBiliTool.Application
         public override string TaskName => "LiveLottery";
 
 
-        [TaskInterceptor("天选时刻抽奖")]
+        [TaskInterceptor("天选时刻抽奖", TaskLevel.One)]
         public override void DoTask()
         {
             LogUserInfo();
@@ -55,10 +55,10 @@ namespace Ray.BiliBiliTool.Application
         [TaskInterceptor("打印用户信息")]
         private void LogUserInfo()
         {
-            UserInfo userInfo = _accountDomainService.LoginByCookie();
+            _accountDomainService.LoginByCookie();
         }
 
-        [TaskInterceptor("天选时刻抽奖")]
+        [TaskInterceptor("抽奖")]
         private void LotteryTianXuan()
         {
             _liveDomainService.TianXuan();

@@ -7,12 +7,14 @@ on:
   schedule: # 计划任务触发
     - cron: '0 16 * * *' 
     # cron表达式，时区是UTC时间，比我们早8小时，如上所表示的是每天0点0分（24点整）
-    # 建议每个人通过设置 GitHub Environments 的方式来设定为自己的目标运行时间（详细设置方法见文档说明）
+    # 建议每个人通过设置名称为 LiveLottery 的 GitHub Environments 来设定为自己的目标运行时间（详细设置方法见文档说明）
 
 env:
   IsOpenLiveLotteryTask: ${{secrets.ISOPENLIVELOTTERYTASK}}
   ASPNETCORE_ENVIRONMENT: ${{secrets.ENV}} # 运行环境
   Ray_BiliBiliCookie__CookieStr: ${{secrets.COOKIESTR}}
+  Ray_LiveLotteryTaskConfig__ExcludeAwardNames: ${{secrets.EXCLUDEAWARDNAMES}} # 天选抽奖指定排除关键字
+  Ray_LiveLotteryTaskConfig__IncludeAwardNames: ${{secrets.INCLUDEAWARDNAMES}} # 天选抽奖指定包含关键字
   Ray_Serilog__WriteTo__3__Args__botToken: ${{secrets.PUSHTGTOKEN}} # Telegram
   Ray_Serilog__WriteTo__3__Args__chatId: ${{secrets.PUSHTGCHATID}}
   Ray_Serilog__WriteTo__3__Args__containsTrigger: ${{secrets.PUSHTGTRIGGER}}
@@ -61,7 +63,7 @@ jobs:
     # if: env.IsOpenLiveLotteryTask=='true' # 这里job.if读取不到env或secrets，很坑...但是发现可以读到needs的outputs值
     if: needs.pre-check.outputs.result=='开启'
 
-    environment: Production
+    environment: LiveLottery
 
     steps:
 

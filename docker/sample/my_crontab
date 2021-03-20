@@ -1,2 +1,2 @@
 0 15 * * * /app/Ray.BiliBiliTool.Console -runTasks=Daily >> /var/log/cron.log
-0 23 * * * /app/Ray.BiliBiliTool.Console -runTasks=LiveLottery >> /var/log/cron.log
+0 22 * * * /app/Ray.BiliBiliTool.Console -runTasks=LiveLottery >> /var/log/cron.log

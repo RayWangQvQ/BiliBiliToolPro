@@ -1,9 +1,11 @@
 using System;
 using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
+using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.Console;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 using Ray.BiliBiliTool.Infrastructure;
@@ -100,6 +102,22 @@ namespace DailyTaskTest
         {
             var r = new RandomHelper();
             var re = r.GenerateCode(10);
+        }
+
+        [Fact]
+        public void FilterJoinTianXuan()
+        {
+            using (var scope = Global.ServiceProviderRoot.CreateScope())
+            {
+                var options = scope.ServiceProvider.GetRequiredService<IOptionsMonitor<LiveLotteryTaskOptions>>();
+
+                var check = new CheckTianXuanDto
+                {
+                    Award_name = "ºì°ü"
+                };
+                var re = check.AwardNameIsSatisfied(options.CurrentValue.IncludeAwardNameList, options.CurrentValue.ExcludeAwardNameList);
+                Assert.True(re);
+            }
         }
     }
 }

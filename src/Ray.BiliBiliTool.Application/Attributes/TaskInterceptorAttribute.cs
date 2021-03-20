@@ -15,11 +15,13 @@ namespace Ray.BiliBiliTool.Application.Attributes
     {
         private readonly ILogger _logger;
         private readonly string _taskName;
+        private readonly TaskLevel _taskLevel;
         private readonly bool _rethrowWhenException;
 
-        public TaskInterceptorAttribute(string taskName = null, bool rethrowWhenException = true)
+        public TaskInterceptorAttribute(string taskName = null, TaskLevel taskLevel = TaskLevel.Two, bool rethrowWhenException = true)
         {
             _taskName = taskName;
+            _taskLevel = taskLevel;
             _rethrowWhenException = rethrowWhenException;
 
             _logger = Global.ServiceProviderRoot.GetRequiredService<ILogger<TaskInterceptorAttribute>>();
@@ -28,15 +30,15 @@ namespace Ray.BiliBiliTool.Application.Attributes
         public override void OnEntry(MethodExecutionArgs arg)
         {
             if (_taskName == null) return;
-
-            _logger.LogInformation("---开始【{taskName}】---", _taskName);
+            string end = _taskLevel == TaskLevel.One ? "\r\n" : "";
+            _logger.LogInformation($"{GetDelimiter()}开始【{_taskName}】{GetDelimiter()}{end}");
         }
 
         public override void OnExit(MethodExecutionArgs arg)
         {
             if (_taskName == null) return;
 
-            _logger.LogInformation("---结束---\r\n");
+            _logger.LogInformation($"{GetDelimiter()}【{_taskName}】结束{GetDelimiter()}\r\n");
         }
 
         public override void OnException(MethodExecutionArgs arg)
@@ -51,5 +53,18 @@ namespace Ray.BiliBiliTool.Application.Attributes
             _logger.LogError("{task}失败，继续其他任务。失败信息:{msg}\r\n", _taskName, arg.Exception.Message);
             arg.FlowBehavior = FlowBehavior.Continue;
         }
+
+        private string GetDelimiter()
+        {
+            int count = (int)_taskLevel;
+            return new string('-', count);
+        }
+    }
+
+    public enum TaskLevel
+    {
+        One = 6,
+        Two = 4,
+        Three = 2,
     }
 }

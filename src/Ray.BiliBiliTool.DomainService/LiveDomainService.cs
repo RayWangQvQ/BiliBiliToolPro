@@ -19,6 +19,7 @@ namespace Ray.BiliBiliTool.DomainService
     {
         private readonly ILogger<LiveDomainService> _logger;
         private readonly ILiveApi _liveApi;
+        private readonly LiveLotteryTaskOptions _liveLotteryTaskOptions;
         private readonly BiliCookie _biliCookie;
         private readonly DailyTaskOptions _dailyTaskOptions;
 
@@ -27,10 +28,12 @@ namespace Ray.BiliBiliTool.DomainService
         public LiveDomainService(ILogger<LiveDomainService> logger,
             ILiveApi liveApi,
             IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
+            IOptionsMonitor<LiveLotteryTaskOptions> liveLotteryTaskOptions,
             BiliCookie biliCookie)
         {
             _logger = logger;
             _liveApi = liveApi;
+            _liveLotteryTaskOptions = liveLotteryTaskOptions.CurrentValue;
             _biliCookie = biliCookie;
             _dailyTaskOptions = dailyTaskOptions.CurrentValue;
         }
@@ -138,7 +141,7 @@ namespace Ray.BiliBiliTool.DomainService
 
         public void TryJoinTianXuan(ListItemDto target)
         {
-            _logger.LogInformation("开始检查直播间：{name}({id})", target.Title, target.Roomid);
+            _logger.LogInformation("直播间：{name}({id})", target.Title, target.Roomid);
 
             try
             {
@@ -152,7 +155,7 @@ namespace Ray.BiliBiliTool.DomainService
                     return;
                 }
 
-                _logger.LogInformation("奖励：{name}，条件：{text}", check.Award_name, check.Require_text);
+                _logger.LogInformation("奖励：{name}；条件：{text}；赠礼：{gift}", check.Award_name, check.Require_text, check.Gift_price > 0 ? check.GiftDesc : "无");
 
                 if (check.Status != 1)
                 {
@@ -163,6 +166,13 @@ namespace Ray.BiliBiliTool.DomainService
                 if (check.Gift_price != 0)
                 {
                     _logger.LogInformation("需要赠送礼物才能参与，跳过\r\n");
+                    return;
+                }
+
+                //根据配置过滤
+                if (!check.AwardNameIsSatisfied(_liveLotteryTaskOptions.IncludeAwardNameList, _liveLotteryTaskOptions.ExcludeAwardNameList))
+                {
+                    _logger.LogInformation("不满足配置的筛选条件，跳过\r\n");
                     return;
                 }
 
