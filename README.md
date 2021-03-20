@@ -257,10 +257,10 @@ dotnet Ray.BiliBiliTool.Console.dll -runTasks=Daily&LiveLottery
 
 划分的依据主要是根据功能需求，其次是触发频率（比如，有些每天只需运行一次，有些需要允许多次）。列表如下：
 
-| 任务名称 | Code | 功能 | 默认WorkFlow文件 | 备注 |
-| ---------- | -------------- | -------------- | -------------- | -------------- |
-| 每日任务 | Daily | 完成每日任务获取满额65点经验（登录、观看视频、分享视频、投币），以及漫画签到、直播签到、直播中心银瓜子兑换硬币、领取大会员权益、领取大会员漫画福利和充电等附属功能 | bilibili-daily-task.yml | |
-| 天选时刻抽奖 | LiveLottery | 直播中心天选时刻抽奖 | live-lottery-task.yml | 对应的GitHub Actions工作流默认是关闭的，需要添加key为`ISOPENLIVELOTTERYTASK`、值为`true`的secret来手动开启；大部分抽奖都需要关注主播，介意的话不建议开启抽奖任务 |
+| 任务名 | Code | 功能 | 默认WorkFlow文件 | GithHub Environments | 推荐运行频率 | 备注 |
+| ---------- | -------------- | -------------- | -------------- |-------------- | -------------- | -------------- |
+| 每日任务 | Daily | 完成每日任务获取满额65点经验（登录、观看视频、分享视频、投币），以及签到、领福利和充电等附属功能 | bilibili-daily-task.yml | Production(用于Actions设置延时) | 每天一次 | |
+| 天选时刻抽奖 | LiveLottery | 直播中心天选时刻抽奖 | live-lottery-task.yml | LiveLottery(用于Actions设置延时) | Docker或其他本地环境随意，Actions环境请保持每天运行0-4次内，避免被封 | 对应Actions工作流默认是关闭的，需要添加key为`ISOPENLIVELOTTERYTASK`、值为`true`的secret来手动开启；大部分抽奖都需要关注主播，介意的不要开启 |
 
 ## 3. 个性化自定义配置
 
