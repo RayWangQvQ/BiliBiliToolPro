@@ -300,11 +300,11 @@ dotnet Ray.BiliBiliTool.Console.dll -runTasks=Daily&LiveLottery
 
 （赞赏时记得留下【昵称】和【留言】~ 另外我发现很多留言想要进群或者加好友的，一定一定要记得留下微信号哈，微信赞赏页面是看不到微信号的）
 
-扫码赞赏：
+扫码自动赞赏 1 元：
 
 ![赞赏码](https://cdn.jsdelivr.net/gh/RayWangQvQ/BiliBiliTool.Docs@main/imgs/donate.jpg)
 
-另外，应用中的优先支持的UP主的配置项，默认是作者的UpId（只是作为了json配置文件的默认值，代码是干净的），需要更改的话，直接修改相应配置即可（secrets或环境变量等各种方式都行）。
+另外，应用中的优先支持的UP主的配置项，默认是作者的 UpId （只是作为了 json 配置文件的默认值，代码是干净的），需要更改的话，直接修改相应配置即可（secrets或环境变量等各种方式都行）。
 
 当然，不改的话，也算是另一种捐赠支持作者的方式啦。
 
