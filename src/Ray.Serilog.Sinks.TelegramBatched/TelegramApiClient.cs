@@ -47,7 +47,13 @@ namespace Ray.Serilog.Sinks.TelegramBatched
         public override HttpResponseMessage PushMessage(string message)
         {
             base.PushMessage(message);
-            var json = new { chat_id = _chatId, text = message, parse_mode = "HTML" }.ToJson();
+            var json = new
+            {
+                chat_id = _chatId,
+                text = message,
+                //text = message.Replace("\r\n", "\r\n"),
+                parse_mode = "HTML"
+            }.ToJson();
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             var response = this._httpClient.PostAsync(this._apiUrl, content).GetAwaiter().GetResult();
             return response;

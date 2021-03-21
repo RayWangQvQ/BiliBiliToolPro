@@ -21,8 +21,18 @@ namespace Ray.Serilog.Sinks.DingTalkBatched
         public override HttpResponseMessage PushMessage(string message)
         {
             base.PushMessage(message);
-            var json = new { msgtype = "markdown", markdown = new { title = "Ray.BiliBiliTool任务日报", text = message } }.ToJson();
+
+            var json = new
+            {
+                msgtype = "markdown",
+                markdown = new
+                {
+                    title = "Ray.BiliBiliTool任务日报",
+                    text = message.Replace("\r\n", "\r\n\r\n")
+                }
+            }.ToJson();
             var content = new StringContent(json, Encoding.UTF8, "application/json");
+
             var response = _httpClient.PostAsync(_apiUrl, content).GetAwaiter().GetResult();
             return response;
         }

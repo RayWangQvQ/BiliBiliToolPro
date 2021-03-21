@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Serilog.Core;
 using Serilog.Debugging;
 using Serilog.Events;
+using Serilog.Formatting;
+using Serilog.Formatting.Display;
 
 namespace Ray.Serilog.Sinks.Batched
 {
@@ -14,7 +17,7 @@ namespace Ray.Serilog.Sinks.Batched
         private readonly LogEventLevel _minimumLogEventLevel;
         private readonly Predicate<LogEvent> _predicate;
         private readonly bool _sendBatchesAsOneMessages;
-        private readonly IFormatProvider _formatProvider;
+        private readonly ITextFormatter _formatter;
 
         private readonly BoundedConcurrentQueue<LogEvent> _queue = new BoundedConcurrentQueue<LogEvent>();
 
@@ -22,13 +25,26 @@ namespace Ray.Serilog.Sinks.Batched
             Predicate<LogEvent> predicate,
             bool sendBatchesAsOneMessages,
             IFormatProvider formatProvider,
-            LogEventLevel minimumLogEventLevel
-            )
+            LogEventLevel minimumLogEventLevel)
+            : this(predicate, sendBatchesAsOneMessages, null, formatProvider, minimumLogEventLevel)
+        {
+        }
+
+        public BatchedSink(
+            Predicate<LogEvent> predicate,
+            bool sendBatchesAsOneMessages,
+            string outputTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}",
+            IFormatProvider formatProvider = null,
+            LogEventLevel minimumLogEventLevel = LogEventLevel.Verbose)
         {
             _predicate = predicate ?? (x => true);
             _minimumLogEventLevel = minimumLogEventLevel;
             _sendBatchesAsOneMessages = sendBatchesAsOneMessages;
-            _formatProvider = formatProvider;
+
+            outputTemplate = string.IsNullOrWhiteSpace(outputTemplate)
+                ? Constants.DefaultOutputTemplate
+                : outputTemplate;
+            _formatter = new MessageTemplateTextFormatter(outputTemplate, formatProvider);
         }
 
         public virtual void Emit(LogEvent logEvent)
@@ -61,25 +77,12 @@ namespace Ray.Serilog.Sinks.Batched
             if (_sendBatchesAsOneMessages)
             {
                 var sb = new StringBuilder();
-                var count = 0;
                 foreach (var logEvent in events)
                 {
-                    var message = this._formatProvider != null
-                                      ? logEvent.RenderMessage(_formatProvider)
-                                      : RenderMessage(logEvent);
-
-                    if (count == events.Count())
-                    {
-                        sb.AppendLine(message);
-                        sb.AppendLine(Environment.NewLine);
-                    }
-                    else
-                    {
-                        sb.AppendLine(message);
-                    }
-
-                    count++;
+                    string message = RenderMessage(logEvent);
+                    sb.Append(message);
                 }
+                sb.AppendLine(Environment.NewLine);
 
                 var messageToSend = sb.ToString();
                 PushMessage(messageToSend);
@@ -88,9 +91,7 @@ namespace Ray.Serilog.Sinks.Batched
             {
                 foreach (var logEvent in events)
                 {
-                    var message = this._formatProvider != null
-                                      ? logEvent.RenderMessage(_formatProvider)
-                                      : RenderMessage(logEvent);
+                    var message = RenderMessage(logEvent);
                     PushMessage(message);
                 }
             }
@@ -122,11 +123,21 @@ namespace Ray.Serilog.Sinks.Batched
 
         protected virtual string RenderMessage(LogEvent logEvent)
         {
-            var msg = $"{GetEmoji(logEvent)} {logEvent.RenderMessage()}";
+            string msg = "";
+            using (StringWriter stringWriter = new StringWriter())
+            {
+                this._formatter.Format(logEvent, (TextWriter)stringWriter);
+                msg = stringWriter.ToString();
+            }
+
+            msg = $"{GetEmoji(logEvent)} {msg}";
 
             if (msg.Contains("经验+") && msg.Contains("√"))
                 msg = msg.Replace('√', '✔');
 
+            return msg;
+
+            /*
             if (logEvent.Exception == null)
             {
                 return msg;
@@ -140,6 +151,7 @@ namespace Ray.Serilog.Sinks.Batched
             sb.AppendLine($"Stack Trace\n```{logEvent.Exception}```");
 
             return sb.ToString();
+            */
         }
 
         protected virtual string GetEmoji(LogEvent log)

@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Net.Http;
 using System.Text;
-using System.Threading.Tasks;
 using Ray.Serilog.Sinks.Batched;
 
-namespace Ray.Serilog.Sinks.CoolPushBatched
+namespace Ray.Serilog.Sinks.PushPlus
 {
     public class PushPlusApiClient : IPushService
     {
@@ -32,9 +31,10 @@ namespace Ray.Serilog.Sinks.CoolPushBatched
             {
                 token = _token,
                 title = "Ray.BiliBiliTool任务日报",
-                content = message,
+                content = message.Replace("\r\n", "<br>"),//换行有问题，这里使用<br/>替换\r\n
+                //content = message,
                 topic = _topic,
-                template= "markdown"
+                template = "html"
             }.ToJson();
 
             var content = new StringContent(json, Encoding.UTF8, "application/json");
