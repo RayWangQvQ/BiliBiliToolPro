@@ -31,14 +31,16 @@ namespace Ray.BiliBiliTool.Application.Attributes
         {
             if (_taskName == null) return;
             string end = _taskLevel == TaskLevel.One ? "\r\n" : "";
-            _logger.LogInformation($"{GetDelimiter()}开始【{_taskName}】{GetDelimiter()}{end}");
+            string delimiter = GetDelimiter();
+            _logger.LogInformation("{delimiter}开始【{taskName}】{delimiter}{end}", delimiter, _taskName, delimiter, end);
         }
 
         public override void OnExit(MethodExecutionArgs arg)
         {
             if (_taskName == null) return;
 
-            _logger.LogInformation($"{GetDelimiter()}【{_taskName}】结束{GetDelimiter()}\r\n");
+            string delimiter = GetDelimiter();
+            _logger.LogInformation("{delimiter}【{taskName}】结束{delimiter}\r\n", delimiter, _taskName, delimiter);
         }
 
         public override void OnException(MethodExecutionArgs arg)
@@ -63,8 +65,8 @@ namespace Ray.BiliBiliTool.Application.Attributes
 
     public enum TaskLevel
     {
-        One = 6,
-        Two = 4,
+        One = 5,
+        Two = 3,
         Three = 2,
     }
 }

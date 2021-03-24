@@ -33,7 +33,7 @@ namespace Ray.Serilog.Sinks.Batched
         public BatchedSink(
             Predicate<LogEvent> predicate,
             bool sendBatchesAsOneMessages,
-            string outputTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}",
+            string outputTemplate = "{Message:lj}{NewLine}{Exception}",
             IFormatProvider formatProvider = null,
             LogEventLevel minimumLogEventLevel = LogEventLevel.Verbose)
         {
