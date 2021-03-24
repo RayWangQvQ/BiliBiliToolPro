@@ -24,8 +24,16 @@ namespace Ray.Serilog.Sinks.WorkWeiXinBatched
         {
             base.PushMessage(message);
 
-            var json = new { msgtype = "markdown", markdown = new { content = message } }.ToJson();
+            var json = new
+            {
+                msgtype = "markdown",
+                markdown = new
+                {
+                    content = message.Replace("\r\n", "\r\n\r\n")
+                }
+            }.ToJson();
             var content = new StringContent(json, Encoding.UTF8, "application/json");
+
             var response = _httpClient.PostAsync(_apiUrl, content).GetAwaiter().GetResult();
             return response;
         }
