@@ -36,6 +36,9 @@ env:
   Ray_Serilog__WriteTo__8__Args__bodyJsonTemplate: ${{secrets.PUSHOTHERBODYJSONTEMPLATE}}
   Ray_Serilog__WriteTo__8__Args__containsTrigger: ${{secrets.PUSHOTHERTRIGGER}}
   Ray_Serilog__WriteTo__8__Args__restrictedToMinimumLevel: ${{secrets.PUSHOTHERLEVEL}}
+  Ray_Serilog__WriteTo__9__Args__token: ${{secrets.PUSHPLUSTOKEN}} # PushPlus
+  Ray_Serilog__WriteTo__9__Args__topic: ${{secrets.PUSHPLUSTOPIC}}
+  Ray_Serilog__WriteTo__9__Args__restrictedToMinimumLevel: ${{secrets.PUSHPLUSLEVEL}}
   Ray_Security__IsSkipDailyTask: ${{secrets.ISSKIPDAILYTASK}}
   Ray_Security__IntervalSecondsBetweenRequestApi: ${{secrets.INTERVALSECONDSBETWEENREQUESTAPI}}
   Ray_Security__IntervalMethodTypes: ${{secrets.INTERVALMETHODTYPES}}
