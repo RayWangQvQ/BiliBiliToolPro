@@ -29,6 +29,7 @@ namespace Ray.Serilog.Sinks.DingTalkBatched
                 {
                     title = "Ray.BiliBiliTool任务日报",
                     text = message.Replace("\r\n", "\r\n\r\n")
+                        .Replace(Environment.NewLine, "\r\n\r\n")
                 }
             }.ToJson();
             var content = new StringContent(json, Encoding.UTF8, "application/json");

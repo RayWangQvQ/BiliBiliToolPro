@@ -30,6 +30,7 @@ namespace Ray.Serilog.Sinks.WorkWeiXinBatched
                 markdown = new
                 {
                     content = message.Replace("\r\n", "\r\n\r\n")
+                        .Replace(Environment.NewLine, "\r\n\r\n")
                 }
             }.ToJson();
             var content = new StringContent(json, Encoding.UTF8, "application/json");

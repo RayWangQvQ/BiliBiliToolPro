@@ -29,7 +29,10 @@ namespace Ray.Serilog.Sinks.ServerChanBatched
             var dic = new Dictionary<string, string>
             {
                 {"text", _title},
-                {"desp", message.Replace("\r\n", "\r\n\r\n")}
+                {
+                    "desp", message.Replace("\r\n", "\r\n\r\n")
+                        .Replace(Environment.NewLine,"\r\n\r\n")
+                }
             };
             var content = new FormUrlEncodedContent(dic);
             var response = _httpClient.PostAsync(_apiUrl, content).GetAwaiter().GetResult();
