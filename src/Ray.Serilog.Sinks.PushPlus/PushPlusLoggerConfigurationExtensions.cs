@@ -13,8 +13,8 @@ namespace Ray.Serilog.Sinks.PushPlus
         public static LoggerConfiguration PushPlusBatched(
             this LoggerSinkConfiguration loggerSinkConfiguration,
             string token,
-            string topic,
-            string containsTrigger = null,
+            string topic = "",
+            string containsTrigger = Constants.DefaultContainsTrigger,
             bool sendBatchesAsOneMessages = true,
             string outputTemplate = Constants.DefaultOutputTemplate,
             IFormatProvider formatProvider = null,
@@ -26,8 +26,8 @@ namespace Ray.Serilog.Sinks.PushPlus
             if (outputTemplate == null)
                 throw new ArgumentNullException(nameof(outputTemplate));
 
-            Predicate<LogEvent> predicate = null;
-            if (containsTrigger.IsNotNullOrEmpty()) predicate = x => x.MessageTemplate.Text.Contains(containsTrigger);
+            if (containsTrigger.IsNullOrEmpty()) containsTrigger = Constants.DefaultContainsTrigger;
+            Predicate<LogEvent> predicate = x => x.MessageTemplate.Text.Contains(containsTrigger);
 
             return loggerSinkConfiguration.Sink(
                 new PushPlusBatchedSink(token,

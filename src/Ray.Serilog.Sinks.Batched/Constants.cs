@@ -10,5 +10,7 @@ namespace Ray.Serilog.Sinks.Batched
     {
         public const string DefaultOutputTemplate =
             "{Message:lj}{NewLine}{Exception}";
+
+        public const string DefaultContainsTrigger = "开始推送";
     }
 }

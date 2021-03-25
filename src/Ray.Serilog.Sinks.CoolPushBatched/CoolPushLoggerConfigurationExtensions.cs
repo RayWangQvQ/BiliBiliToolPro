@@ -1,4 +1,5 @@
 ﻿using System;
+using Ray.Serilog.Sinks.Batched;
 using Serilog;
 using Serilog.Configuration;
 using Serilog.Events;
@@ -10,28 +11,16 @@ namespace Ray.Serilog.Sinks.CoolPushBatched
         public static LoggerConfiguration CoolPushBatched(
             this LoggerSinkConfiguration loggerSinkConfiguration,
             string sKey,
-            string containsTrigger = null,
+            string containsTrigger = Constants.DefaultContainsTrigger,
             bool sendBatchesAsOneMessages = true,
             IFormatProvider formatProvider = null,
             LogEventLevel restrictedToMinimumLevel = LogEventLevel.Verbose
         )
         {
-            Predicate<LogEvent> predicate = null;
-            if (containsTrigger.IsNotNullOrEmpty()) predicate = x => x.MessageTemplate.Text.Contains(containsTrigger);
-            return loggerSinkConfiguration.CoolPushBatched(sKey, predicate, sendBatchesAsOneMessages, formatProvider, restrictedToMinimumLevel);
-        }
+            if (containsTrigger.IsNullOrEmpty()) containsTrigger = Constants.DefaultContainsTrigger;
+            Predicate<LogEvent> predicate = x => x.MessageTemplate.Text.Contains(containsTrigger);
 
-        public static LoggerConfiguration CoolPushBatched(
-            this LoggerSinkConfiguration loggerSinkConfiguration,
-            string sKey,
-            Predicate<LogEvent> triggerPredicate = null,
-            bool sendBatchesAsOneMessages = true,
-            IFormatProvider formatProvider = null,
-            LogEventLevel restrictedToMinimumLevel = LogEventLevel.Verbose
-            )
-        {
-            if (triggerPredicate == null) triggerPredicate = x => true;
-            return loggerSinkConfiguration.Sink(new CoolPushBatchedSink(sKey, triggerPredicate, sendBatchesAsOneMessages, formatProvider, restrictedToMinimumLevel), restrictedToMinimumLevel);
+            return loggerSinkConfiguration.Sink(new CoolPushBatchedSink(sKey, predicate, sendBatchesAsOneMessages, formatProvider, restrictedToMinimumLevel), restrictedToMinimumLevel);
         }
     }
 }
