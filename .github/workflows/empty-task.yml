@@ -1,21 +1,15 @@
-name: live-lottery-task
-
+name: empty-task
 
 on:
-  
   workflow_dispatch: # 手动触发
-  schedule: # 计划任务触发
-    - cron: '0 16 * * *' 
-    # cron表达式，时区是UTC时间，比我们早8小时，如上所表示的是每天0点0分（24点整）
-    # 建议每个人通过设置名称为 LiveLottery 的 GitHub Environments 来设定为自己的目标运行时间（详细设置方法见文档说明）
+    inputs:
+      tasks:
+        description: '任务'
+        required: true
 
 env:
-  IsOpenLiveLotteryTask: ${{secrets.ISOPENLIVELOTTERYTASK}}
   ASPNETCORE_ENVIRONMENT: ${{secrets.ENV}} # 运行环境
   Ray_BiliBiliCookie__CookieStr: ${{secrets.COOKIESTR}}
-  # 天选任务：
-  Ray_LiveLotteryTaskConfig__ExcludeAwardNames: ${{secrets.EXCLUDEAWARDNAMES}} # 天选抽奖指定排除关键字
-  Ray_LiveLotteryTaskConfig__IncludeAwardNames: ${{secrets.INCLUDEAWARDNAMES}} # 天选抽奖指定包含关键字
   # 推送：
   Ray_Serilog__WriteTo__3__Args__botToken: ${{secrets.PUSHTGTOKEN}} # Telegram
   Ray_Serilog__WriteTo__3__Args__chatId: ${{secrets.PUSHTGCHATID}}
@@ -48,37 +42,36 @@ env:
   Ray_Security__UserAgent: ${{secrets.USERAGENT}}
   Ray_Security__WebProxy: ${{secrets.WEBPROXY}}
   Ray_Security__RandomSleepMaxMin: ${{secrets.RANDOMSLEEPMAXMIN}}
-  # Console日志：
+  # 每日任务：
+  Ray_DailyTaskConfig__NumberOfCoins: ${{secrets.NUMBEROFCOINS}}
+  Ray_DailyTaskConfig__SelectLike: ${{secrets.SELECTLIKE}}
+  Ray_DailyTaskConfig__SupportUpIds: ${{secrets.SUPPORTUPIDS}}
+  Ray_DailyTaskConfig__DayOfAutoCharge: ${{secrets.DAYOFAUTOCHARGE}}
+  Ray_DailyTaskConfig__AutoChargeUpId: ${{secrets.AUTOCHARGEUPID}}
+  Ray_DailyTaskConfig__ChargeComment: ${{secrets.CHARGECOMMENT}}
+  Ray_DailyTaskConfig__DayOfReceiveVipPrivilege: ${{secrets.DAYOFRECEIVEVIPPRIVILEGE}}
+  Ray_DailyTaskConfig__DayOfExchangeSilver2Coin: ${{secrets.DAYOFEXCHANGESILVER2COIN}}
+  Ray_DailyTaskConfig__DevicePlatform: ${{secrets.DEVICEPLATFORM}}
   Ray_Serilog__WriteTo__0__Args__restrictedToMinimumLevel: ${{secrets.CONSOLELOGLEVEL}}
-  Ray_Serilog__WriteTo__0__Args__outputTemplate: ${{secrets.CONSOLELOGTEMPLATE}} 
+  Ray_Serilog__WriteTo__0__Args__outputTemplate: ${{secrets.CONSOLELOGTEMPLATE}}
+  # 天选任务：
+  Ray_LiveLotteryTaskConfig__ExcludeAwardNames: ${{secrets.EXCLUDEAWARDNAMES}} # 天选抽奖指定排除关键字
+  Ray_LiveLotteryTaskConfig__IncludeAwardNames: ${{secrets.INCLUDEAWARDNAMES}} # 天选抽奖指定包含关键字
 
 jobs:
+  run-daily-task:
 
-  pre-check:
     runs-on: ubuntu-latest
-    outputs:
-      result: ${{ steps.check.outputs.result }} # 不能直接传递secrets的值，否则会被skip，需要转一下
-    steps:
-    - id: check
-      if: env.IsOpenLiveLotteryTask=='true'
-      run: |
-        echo "::set-output name=result::开启"
-
-  run-live-lottery:
-    runs-on: ubuntu-latest
-    needs: pre-check
-    # if: env.IsOpenLiveLotteryTask=='true' # 这里job.if读取不到env或secrets，很坑...但是发现可以读到needs的outputs值
-    if: needs.pre-check.outputs.result=='开启'
-
-    environment: LiveLottery
 
     steps:
 
-    # 输出IP、设置服务器时区为东八区 
-    - name: PreWork
-      run: |
-        sudo curl ifconfig.me
-        sudo timedatectl set-timezone 'Asia/Shanghai'
+    # 输出IP
+    - name: IP
+      run: sudo curl ifconfig.me
+
+    # 设置服务器时区为东八区 
+    - name: Set time zone
+      run: sudo timedatectl set-timezone 'Asia/Shanghai'
 
     # 检出
     - name: Checkout
@@ -100,4 +93,4 @@ jobs:
     - name: Run APP
       run: |
         cd ./src/Ray.BiliBiliTool.Console/bin/Publish/net5-dependent
-        dotnet Ray.BiliBiliTool.Console.dll -runTasks=LiveLottery -closeConsoleWhenEnd=1 ${{secrets.OTHERCONFIGS}}
+        dotnet Ray.BiliBiliTool.Console.dll -runTasks=${{ github.event.inputs.tasks }} -closeConsoleWhenEnd=1

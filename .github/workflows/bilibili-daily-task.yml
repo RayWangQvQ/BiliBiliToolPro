@@ -12,6 +12,7 @@ on:
 env:
   ASPNETCORE_ENVIRONMENT: ${{secrets.ENV}} # 运行环境
   Ray_BiliBiliCookie__CookieStr: ${{secrets.COOKIESTR}}
+  # 推送：
   Ray_Serilog__WriteTo__3__Args__botToken: ${{secrets.PUSHTGTOKEN}} # Telegram
   Ray_Serilog__WriteTo__3__Args__chatId: ${{secrets.PUSHTGCHATID}}
   Ray_Serilog__WriteTo__3__Args__containsTrigger: ${{secrets.PUSHTGTRIGGER}}
@@ -36,12 +37,14 @@ env:
   Ray_Serilog__WriteTo__9__Args__token: ${{secrets.PUSHPLUSTOKEN}} # PushPlus
   Ray_Serilog__WriteTo__9__Args__topic: ${{secrets.PUSHPLUSTOPIC}}
   Ray_Serilog__WriteTo__9__Args__restrictedToMinimumLevel: ${{secrets.PUSHPLUSLEVEL}}
+  # 安全相关：
   Ray_Security__IsSkipDailyTask: ${{secrets.ISSKIPDAILYTASK}}
   Ray_Security__IntervalSecondsBetweenRequestApi: ${{secrets.INTERVALSECONDSBETWEENREQUESTAPI}}
   Ray_Security__IntervalMethodTypes: ${{secrets.INTERVALMETHODTYPES}}
   Ray_Security__UserAgent: ${{secrets.USERAGENT}}
   Ray_Security__WebProxy: ${{secrets.WEBPROXY}}
   Ray_Security__RandomSleepMaxMin: ${{secrets.RANDOMSLEEPMAXMIN}}
+  # 每日任务：
   Ray_DailyTaskConfig__NumberOfCoins: ${{secrets.NUMBEROFCOINS}}
   Ray_DailyTaskConfig__SelectLike: ${{secrets.SELECTLIKE}}
   Ray_DailyTaskConfig__SupportUpIds: ${{secrets.SUPPORTUPIDS}}
@@ -52,7 +55,7 @@ env:
   Ray_DailyTaskConfig__DayOfExchangeSilver2Coin: ${{secrets.DAYOFEXCHANGESILVER2COIN}}
   Ray_DailyTaskConfig__DevicePlatform: ${{secrets.DEVICEPLATFORM}}
   Ray_Serilog__WriteTo__0__Args__restrictedToMinimumLevel: ${{secrets.CONSOLELOGLEVEL}}
-  Ray_Serilog__WriteTo__0__Args__outputTemplate: ${{secrets.CONSOLELOGTEMPLATE}}     
+  Ray_Serilog__WriteTo__0__Args__outputTemplate: ${{secrets.CONSOLELOGTEMPLATE}}         
 
 jobs:
   run-daily-task:
