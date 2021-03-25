@@ -1,13 +1,11 @@
-name: bilibili-daily-task
-
+name: empty-task
 
 on:
-  
   workflow_dispatch: # 手动触发
-  schedule: # 计划任务触发
-    - cron: '0 16 * * *' 
-    # cron表达式，时区是UTC时间，比我们早8小时，如上所表示的是每天0点0分（24点整）
-    # 建议每个人通过设置名称为 Production 的 GitHub Environments 来设定为自己的目标运行时间（详细设置方法见文档说明）
+    inputs:
+      tasks:
+        description: '任务'
+        required: true
 
 env:
   ASPNETCORE_ENVIRONMENT: ${{secrets.ENV}} # 运行环境
@@ -49,14 +47,15 @@ env:
   Ray_DailyTaskConfig__DayOfExchangeSilver2Coin: ${{secrets.DAYOFEXCHANGESILVER2COIN}}
   Ray_DailyTaskConfig__DevicePlatform: ${{secrets.DEVICEPLATFORM}}
   Ray_Serilog__WriteTo__0__Args__restrictedToMinimumLevel: ${{secrets.CONSOLELOGLEVEL}}
-  Ray_Serilog__WriteTo__0__Args__outputTemplate: ${{secrets.CONSOLELOGTEMPLATE}}         
+  Ray_Serilog__WriteTo__0__Args__outputTemplate: ${{secrets.CONSOLELOGTEMPLATE}}
+  # 天选任务：
+  Ray_LiveLotteryTaskConfig__ExcludeAwardNames: ${{secrets.EXCLUDEAWARDNAMES}} # 天选抽奖指定排除关键字
+  Ray_LiveLotteryTaskConfig__IncludeAwardNames: ${{secrets.INCLUDEAWARDNAMES}} # 天选抽奖指定包含关键字
 
 jobs:
   run-daily-task:
 
     runs-on: ubuntu-latest
-
-    environment: Production
 
     steps:
 
@@ -88,4 +87,4 @@ jobs:
     - name: Run APP
       run: |
         cd ./src/Ray.BiliBiliTool.Console/bin/Publish/net5-dependent
-        dotnet Ray.BiliBiliTool.Console.dll -runTasks=Daily -closeConsoleWhenEnd=1 ${{secrets.OTHERCONFIGS}}
+        dotnet Ray.BiliBiliTool.Console.dll -runTasks=${{ github.event.inputs.tasks }} -closeConsoleWhenEnd=1

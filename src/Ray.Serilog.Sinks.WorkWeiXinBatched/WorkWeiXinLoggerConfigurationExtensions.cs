@@ -1,4 +1,5 @@
 ﻿using System;
+using Ray.Serilog.Sinks.Batched;
 using Ray.Serilog.Sinks.WorkWeiXinBatched;
 using Serilog;
 using Serilog.Configuration;
@@ -11,28 +12,16 @@ namespace Ray.Serilog.Sinks.WorkWeiXinBatched
         public static LoggerConfiguration WorkWeiXinBatched(
             this LoggerSinkConfiguration loggerSinkConfiguration,
             string webHookUrl,
-            string containsTrigger = null,
+            string containsTrigger = Constants.DefaultContainsTrigger,
             bool sendBatchesAsOneMessages = true,
             IFormatProvider formatProvider = null,
             LogEventLevel restrictedToMinimumLevel = LogEventLevel.Verbose
         )
         {
-            Predicate<LogEvent> predicate = null;
-            if (containsTrigger.IsNotNullOrEmpty()) predicate = x => x.MessageTemplate.Text.Contains(containsTrigger);
-            return loggerSinkConfiguration.WorkWeiXinBatched(webHookUrl, predicate, sendBatchesAsOneMessages, formatProvider, restrictedToMinimumLevel);
-        }
+            if (containsTrigger.IsNullOrEmpty()) containsTrigger = Constants.DefaultContainsTrigger;
+            Predicate<LogEvent> predicate = x => x.MessageTemplate.Text.Contains(containsTrigger);
 
-        public static LoggerConfiguration WorkWeiXinBatched(
-            this LoggerSinkConfiguration loggerSinkConfiguration,
-            string webHookUrl,
-            Predicate<LogEvent> triggerPredicate = null,
-            bool sendBatchesAsOneMessages = true,
-            IFormatProvider formatProvider = null,
-            LogEventLevel restrictedToMinimumLevel = LogEventLevel.Verbose
-            )
-        {
-            if (triggerPredicate == null) triggerPredicate = x => true;
-            return loggerSinkConfiguration.Sink(new WorkWeiXinBatchedSink(webHookUrl, triggerPredicate, sendBatchesAsOneMessages, formatProvider, restrictedToMinimumLevel), restrictedToMinimumLevel);
+            return loggerSinkConfiguration.Sink(new WorkWeiXinBatchedSink(webHookUrl, predicate, sendBatchesAsOneMessages, formatProvider, restrictedToMinimumLevel), restrictedToMinimumLevel);
         }
     }
 }

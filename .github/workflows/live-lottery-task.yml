@@ -13,35 +13,36 @@ env:
   IsOpenLiveLotteryTask: ${{secrets.ISOPENLIVELOTTERYTASK}}
   ASPNETCORE_ENVIRONMENT: ${{secrets.ENV}} # 运行环境
   Ray_BiliBiliCookie__CookieStr: ${{secrets.COOKIESTR}}
+  # 天选任务：
   Ray_LiveLotteryTaskConfig__ExcludeAwardNames: ${{secrets.EXCLUDEAWARDNAMES}} # 天选抽奖指定排除关键字
   Ray_LiveLotteryTaskConfig__IncludeAwardNames: ${{secrets.INCLUDEAWARDNAMES}} # 天选抽奖指定包含关键字
+  # 推送：
   Ray_Serilog__WriteTo__3__Args__botToken: ${{secrets.PUSHTGTOKEN}} # Telegram
   Ray_Serilog__WriteTo__3__Args__chatId: ${{secrets.PUSHTGCHATID}}
-  Ray_Serilog__WriteTo__3__Args__containsTrigger: ${{secrets.PUSHTGTRIGGER}}
   Ray_Serilog__WriteTo__3__Args__restrictedToMinimumLevel: ${{secrets.PUSHTGLEVEL}}
   Ray_Serilog__WriteTo__4__Args__webHookUrl: ${{secrets.PUSHWEIXINURL}} # 企业微信
-  Ray_Serilog__WriteTo__4__Args__containsTrigger: ${{secrets.PUSHWEIXINTRIGGER}}
   Ray_Serilog__WriteTo__4__Args__restrictedToMinimumLevel: ${{secrets.PUSHWEIXINLEVEL}}
   Ray_Serilog__WriteTo__5__Args__webHookUrl: ${{secrets.PUSHDINGURL}} # 钉钉
-  Ray_Serilog__WriteTo__5__Args__containsTrigger: ${{secrets.PUSHDINGTRIGGER}}
   Ray_Serilog__WriteTo__5__Args__restrictedToMinimumLevel: ${{secrets.PUSHDINGLEVEL}}
   Ray_Serilog__WriteTo__6__Args__scKey: ${{secrets.PUSHSCKEY}} # Server酱
-  Ray_Serilog__WriteTo__6__Args__containsTrigger: ${{secrets.PUSHSERVERTRIGGER}}
   Ray_Serilog__WriteTo__6__Args__restrictedToMinimumLevel: ${{secrets.PUSHSERVERLEVEL}}
   Ray_Serilog__WriteTo__7__Args__sKey: ${{secrets.PUSHCOOLSKEY}} # 酷推
-  Ray_Serilog__WriteTo__7__Args__containsTrigger: ${{secrets.PUSHCOOLTRIGGER}}
   Ray_Serilog__WriteTo__7__Args__restrictedToMinimumLevel: ${{secrets.PUSHCOOLLEVEL}}
   Ray_Serilog__WriteTo__8__Args__api: ${{secrets.PUSHOTHERAPI}} # 自定义api
   Ray_Serilog__WriteTo__8__Args__placeholder: ${{secrets.PUSHOTHERPLACEHOLDER}}
   Ray_Serilog__WriteTo__8__Args__bodyJsonTemplate: ${{secrets.PUSHOTHERBODYJSONTEMPLATE}}
-  Ray_Serilog__WriteTo__8__Args__containsTrigger: ${{secrets.PUSHOTHERTRIGGER}}
   Ray_Serilog__WriteTo__8__Args__restrictedToMinimumLevel: ${{secrets.PUSHOTHERLEVEL}}
+  Ray_Serilog__WriteTo__9__Args__token: ${{secrets.PUSHPLUSTOKEN}} # PushPlus
+  Ray_Serilog__WriteTo__9__Args__topic: ${{secrets.PUSHPLUSTOPIC}}
+  Ray_Serilog__WriteTo__9__Args__restrictedToMinimumLevel: ${{secrets.PUSHPLUSLEVEL}}
+  # 安全相关：
   Ray_Security__IsSkipDailyTask: ${{secrets.ISSKIPDAILYTASK}}
   Ray_Security__IntervalSecondsBetweenRequestApi: ${{secrets.INTERVALSECONDSBETWEENREQUESTAPI}}
   Ray_Security__IntervalMethodTypes: ${{secrets.INTERVALMETHODTYPES}}
   Ray_Security__UserAgent: ${{secrets.USERAGENT}}
   Ray_Security__WebProxy: ${{secrets.WEBPROXY}}
   Ray_Security__RandomSleepMaxMin: ${{secrets.RANDOMSLEEPMAXMIN}}
+  # Console日志：
   Ray_Serilog__WriteTo__0__Args__restrictedToMinimumLevel: ${{secrets.CONSOLELOGLEVEL}}
   Ray_Serilog__WriteTo__0__Args__outputTemplate: ${{secrets.CONSOLELOGTEMPLATE}} 
 

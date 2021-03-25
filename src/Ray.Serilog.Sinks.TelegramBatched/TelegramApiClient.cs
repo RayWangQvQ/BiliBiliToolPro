@@ -51,7 +51,6 @@ namespace Ray.Serilog.Sinks.TelegramBatched
             {
                 chat_id = _chatId,
                 text = message,
-                //text = message.Replace("\r\n", "\r\n"),
                 parse_mode = "HTML"
             }.ToJson();
             var content = new StringContent(json, Encoding.UTF8, "application/json");

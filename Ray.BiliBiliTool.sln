@@ -62,6 +62,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\auto-close-pr.yml = .github\workflows\auto-close-pr.yml
 		.github\workflows\bilibili-daily-task.yml = .github\workflows\bilibili-daily-task.yml
+		.github\workflows\empty-task.yml = .github\workflows\empty-task.yml
 		.github\workflows\live-lottery-task.yml = .github\workflows\live-lottery-task.yml
 		.github\workflows\publish-release.yml = .github\workflows\publish-release.yml
 		.github\workflows\repo-sync.yml = .github\workflows\repo-sync.yml
@@ -96,7 +97,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sample", "sample", "{2F1CB8
 		docker\sample\my_crontab = docker\sample\my_crontab
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ray.Serilog.Sinks.PushPlus", "src\Ray.Serilog.Sinks.PushPlus\Ray.Serilog.Sinks.PushPlus.csproj", "{1B980E9F-3E39-47E0-89DA-B27CEE521179}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ray.Serilog.Sinks.PushPlus", "src\Ray.Serilog.Sinks.PushPlus\Ray.Serilog.Sinks.PushPlus.csproj", "{1B980E9F-3E39-47E0-89DA-B27CEE521179}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -116,7 +116,7 @@ namespace Ray.Serilog.Sinks.Batched
                 }
                 catch (Exception e)
                 {
-                    SelfLog.WriteLine(e.Message);
+                    SelfLog.WriteLine(e.Message + "\r\n");
                 }
             }
         }
