@@ -31,7 +31,7 @@ namespace Ray.Serilog.Sinks.PushPlus
             {
                 token = _token,
                 title = "Ray.BiliBiliTool任务日报",
-                content = message.Replace("\r\n", "<br>"),//换行有问题，这里使用<br/>替换\r\n
+                content = message.Replace("\r\n", "<br/>"),//换行有问题，这里使用<br/>替换\r\n
                 //content = message,
                 topic = _topic,
                 template = "html"
