@@ -15,7 +15,13 @@ namespace Ray.Serilog.Sinks.Batched
         public virtual HttpResponseMessage PushMessage(string message)
         {
             SelfLog.WriteLine($"开始推送到:{Name}");
+
             return new HttpResponseMessage();
+        }
+
+        public virtual string BuildMsg(string msg)
+        {
+            return msg;
         }
     }
 }

@@ -26,10 +26,17 @@ namespace LogTest
         public void Test2()
         {
             ServerChanApiClient client = new ServerChanApiClient(_scKey);
-            var result = client.PushMessage(LogConstants.Msg);
+
+            string msg = LogConstants.Msg2;
+
+            var result = client.PushMessage(msg);
             Debug.WriteLine(result.Content.ReadAsStringAsync().Result);
 
             System.Console.ReadLine();
+
+            /*
+             * server酱的换行有问题，一个newline换不了，要两个
+             */
         }
     }
 }

@@ -26,10 +26,12 @@ namespace LogTest
         public void Test2()
         {
             WorkWeiXinApiClient client = new WorkWeiXinApiClient(_key);
-            var result = client.PushMessage(LogConstants.Msg);
-            Debug.WriteLine(result.Content.ReadAsStringAsync().Result);
 
-            System.Console.ReadLine();
+            //string msg = LogConstants.Msg;
+            string msg = LogConstants.Msg2;
+
+            var result = client.PushMessage(msg);
+            Debug.WriteLine(result.Content.ReadAsStringAsync().Result);
         }
     }
 }

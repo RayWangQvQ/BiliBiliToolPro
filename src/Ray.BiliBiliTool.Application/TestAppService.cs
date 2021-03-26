@@ -36,7 +36,7 @@ namespace Ray.BiliBiliTool.Application
         public override string TaskName => "Test";
 
 
-        [TaskInterceptor("测试Cookie", TaskLevel.One)]
+        [TaskInterceptor("测试Cookie")]
         public override void DoTask()
         {
             _accountDomainService.LoginByCookie();
