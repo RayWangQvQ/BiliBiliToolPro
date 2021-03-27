@@ -30,7 +30,8 @@ namespace Ray.Serilog.Sinks.PushPlus
             Predicate<LogEvent> predicate = x => x.MessageTemplate.Text.Contains(containsTrigger);
 
             return loggerSinkConfiguration.Sink(
-                new PushPlusBatchedSink(token,
+                new PushPlusBatchedSink(
+                    token,
                     topic,
                     predicate,
                     sendBatchesAsOneMessages,

@@ -32,10 +32,15 @@ namespace Ray.Serilog.Sinks.CoolPushBatched
             var content = new FormUrlEncodedContent(dic);
             */
 
-            var content = new StringContent(message.Replace("\r\n", "<br/>"), Encoding.UTF8, "application/json");
+            var content = new StringContent(BuildMsg(message), Encoding.UTF8, "application/json");
 
             var response = _httpClient.PostAsync(_apiUrl, content).GetAwaiter().GetResult();
             return response;
+        }
+
+        public override string BuildMsg(string msg)
+        {
+            return msg.Replace(Environment.NewLine, Environment.NewLine + Environment.NewLine);
         }
     }
 }

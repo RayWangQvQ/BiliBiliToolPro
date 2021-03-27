@@ -25,7 +25,7 @@ namespace LogTest
         [Fact]
         public void Test2()
         {
-            ServerChanApiClient client = new ServerChanApiClient(_scKey);
+            var client = new ServerChanApiClient(_scKey);
 
             string msg = LogConstants.Msg2;
 

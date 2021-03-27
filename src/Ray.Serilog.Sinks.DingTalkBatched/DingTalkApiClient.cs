@@ -8,6 +8,8 @@ namespace Ray.Serilog.Sinks.DingTalkBatched
 {
     public class DingTalkApiClient : IPushService
     {
+        //https://developers.dingtalk.com/document/app/overview-of-group-robots
+
         private readonly Uri _apiUrl;
         private readonly HttpClient _httpClient = new HttpClient();
 
@@ -24,11 +26,11 @@ namespace Ray.Serilog.Sinks.DingTalkBatched
 
             var json = new
             {
-                msgtype = "markdown",
+                msgtype = DingMsgType.markdown.ToString(),
                 markdown = new
                 {
                     title = "Ray.BiliBiliTool任务日报",
-                    text = message.Replace("\r\n", "\r\n\r\n")
+                    text = BuildMsg(message)
                 }
             }.ToJson();
             var content = new StringContent(json, Encoding.UTF8, "application/json");
@@ -36,5 +38,25 @@ namespace Ray.Serilog.Sinks.DingTalkBatched
             var response = _httpClient.PostAsync(_apiUrl, content).GetAwaiter().GetResult();
             return response;
         }
+
+        public override string BuildMsg(string msg)
+        {
+            //return msg.Replace(Environment.NewLine, "<br/>");//无效
+            return msg.Replace(Environment.NewLine, Environment.NewLine + Environment.NewLine);
+            //return msg.Replace(Environment.NewLine, "\n\n");//文档里是\n
+
+            /*
+             * 只能换1行
+             */
+        }
+    }
+
+    public enum DingMsgType
+    {
+        text,
+        markdown,
+        actionCard,
+        feedCard,
+        empty
     }
 }

@@ -35,8 +35,6 @@ namespace LogTest
             var result = client.PushMessage(msg);
             Debug.WriteLine(result.Content.ReadAsStringAsync().Result);
 
-            System.Console.ReadLine();
-
             /*
              * 如果指定markdown，星号会导致推送失败
              */

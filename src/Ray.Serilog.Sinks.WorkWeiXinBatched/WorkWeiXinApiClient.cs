@@ -29,7 +29,7 @@ namespace Ray.Serilog.Sinks.WorkWeiXinBatched
 
             var json = new
             {
-                msgtype = WorkWeiXinMsgType.Markdown.ToString().ToLower(),
+                msgtype = WorkWeiXinMsgType.markdown.ToString(),
                 markdown = new
                 {
                     content = BuildMsg(message)
@@ -50,10 +50,10 @@ namespace Ray.Serilog.Sinks.WorkWeiXinBatched
 
     public enum WorkWeiXinMsgType
     {
-        Text,
-        Markdown,
-        Image,
-        News,
-        File
+        text,
+        markdown,
+        image,
+        news,
+        file
     }
 }

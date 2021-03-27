@@ -9,6 +9,8 @@ namespace Ray.Serilog.Sinks.ServerChanBatched
 {
     public class ServerChanApiClient : IPushService
     {
+        //http://sc.ftqq.com/9.version
+
         private const string Host = "http://sc.ftqq.com";
 
         private readonly Uri _apiUrl;
@@ -29,11 +31,21 @@ namespace Ray.Serilog.Sinks.ServerChanBatched
             var dic = new Dictionary<string, string>
             {
                 {"text", _title},
-                {"desp", message}
+                {"desp", BuildMsg(message)}
             };
             var content = new FormUrlEncodedContent(dic);
             var response = _httpClient.PostAsync(_apiUrl, content).GetAwaiter().GetResult();
             return response;
+        }
+
+        public override string BuildMsg(string msg)
+        {
+            //return msg.Replace(Environment.NewLine, "<br/>");//无效
+            return msg.Replace(Environment.NewLine, Environment.NewLine + Environment.NewLine);
+
+            /*
+             * 只能换1行
+             */
         }
     }
 }
