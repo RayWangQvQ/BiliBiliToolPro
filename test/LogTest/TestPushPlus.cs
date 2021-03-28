@@ -15,6 +15,8 @@ namespace LogTest
     public class TestPushPlus
     {
         private string _token;
+        private string _channel;
+        private string _webhook;
 
         public TestPushPlus()
         {
@@ -22,12 +24,17 @@ namespace LogTest
             Program.CreateHost(new string[] { });
 
             _token = Global.ConfigurationRoot["Serilog:WriteTo:9:Args:token"];
+            _channel = Global.ConfigurationRoot["Serilog:WriteTo:9:Args:channel"];
+            _webhook = Global.ConfigurationRoot["Serilog:WriteTo:9:Args:webhook"];
         }
 
         [Fact]
         public void Test2()
         {
-            var client = new PushPlusApiClient(_token);
+            var client = new PushPlusApiClient(
+                _token,
+                channel: _channel,
+                webhook: _webhook);
 
             var msg = LogConstants.Msg2;
 
