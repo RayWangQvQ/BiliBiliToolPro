@@ -44,6 +44,7 @@ namespace Ray.Serilog.Sinks.WorkWeiXinBatched
 
         /*
          * 不能用<br/>换行
+         * 可以多行换行
          */
     }
 
