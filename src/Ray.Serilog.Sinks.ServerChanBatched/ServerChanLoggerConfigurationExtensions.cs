@@ -11,6 +11,7 @@ namespace Ray.Serilog.Sinks.ServerChanBatched
         public static LoggerConfiguration ServerChanBatched(
             this LoggerSinkConfiguration loggerSinkConfiguration,
             string scKey,
+            string turboScKey,
             string containsTrigger = Constants.DefaultContainsTrigger,
             bool sendBatchesAsOneMessages = true,
             IFormatProvider formatProvider = null,
@@ -20,7 +21,7 @@ namespace Ray.Serilog.Sinks.ServerChanBatched
             if (containsTrigger.IsNullOrEmpty()) containsTrigger = Constants.DefaultContainsTrigger;
             Predicate<LogEvent> predicate = x => x.MessageTemplate.Text.Contains(containsTrigger);
 
-            return loggerSinkConfiguration.Sink(new ServerChanBatchedSink(scKey, predicate, sendBatchesAsOneMessages, formatProvider, restrictedToMinimumLevel), restrictedToMinimumLevel);
+            return loggerSinkConfiguration.Sink(new ServerChanBatchedSink(scKey, turboScKey, predicate, sendBatchesAsOneMessages, formatProvider, restrictedToMinimumLevel), restrictedToMinimumLevel);
         }
     }
 }

@@ -9,6 +9,8 @@ namespace Ray.Serilog.Sinks.TelegramBatched
 {
     public class TelegramApiClient : IPushService
     {
+        //https://core.telegram.org/bots/api#available-methods
+
         private readonly string _chatId;
         private const string TelegramBotApiUrl = "https://api.telegram.org/bot";
 
@@ -51,11 +53,18 @@ namespace Ray.Serilog.Sinks.TelegramBatched
             {
                 chat_id = _chatId,
                 text = message,
-                parse_mode = "HTML"
+                parse_mode = TeleMsgType.HTML.ToString()
             }.ToJson();
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             var response = this._httpClient.PostAsync(this._apiUrl, content).GetAwaiter().GetResult();
             return response;
         }
+    }
+
+    public enum TeleMsgType
+    {
+        MarkdownV2,
+        HTML,
+        Markdown,
     }
 }

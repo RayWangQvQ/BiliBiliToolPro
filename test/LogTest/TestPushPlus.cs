@@ -14,21 +14,31 @@ namespace LogTest
 {
     public class TestPushPlus
     {
-        private string _scKey;
+        private string _token;
+        private string _channel;
+        private string _webhook;
 
         public TestPushPlus()
         {
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
             Program.CreateHost(new string[] { });
 
-            //_scKey = Global.ConfigurationRoot["Serilog:WriteTo:6:Args:scKey"];
+            _token = Global.ConfigurationRoot["Serilog:WriteTo:9:Args:token"];
+            _channel = Global.ConfigurationRoot["Serilog:WriteTo:9:Args:channel"];
+            _webhook = Global.ConfigurationRoot["Serilog:WriteTo:9:Args:webhook"];
         }
 
         [Fact]
         public void Test2()
         {
-            var client = new PushPlusApiClient("");
-            var result = client.PushMessage(LogConstants.Msg.Replace("\r\n","<br/>"));
+            var client = new PushPlusApiClient(
+                _token,
+                channel: _channel,
+                webhook: _webhook);
+
+            var msg = LogConstants.Msg2;
+
+            var result = client.PushMessage(msg);
             Debug.WriteLine(result.Content.ReadAsStringAsync().Result);
 
             System.Console.ReadLine();

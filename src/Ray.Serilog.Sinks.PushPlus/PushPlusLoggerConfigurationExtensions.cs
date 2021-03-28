@@ -14,6 +14,8 @@ namespace Ray.Serilog.Sinks.PushPlus
             this LoggerSinkConfiguration loggerSinkConfiguration,
             string token,
             string topic = "",
+            string channel = "",
+            string webhook = "",
             string containsTrigger = Constants.DefaultContainsTrigger,
             bool sendBatchesAsOneMessages = true,
             string outputTemplate = Constants.DefaultOutputTemplate,
@@ -30,8 +32,11 @@ namespace Ray.Serilog.Sinks.PushPlus
             Predicate<LogEvent> predicate = x => x.MessageTemplate.Text.Contains(containsTrigger);
 
             return loggerSinkConfiguration.Sink(
-                new PushPlusBatchedSink(token,
+                new PushPlusBatchedSink(
+                    token,
                     topic,
+                    channel,
+                    webhook,
                     predicate,
                     sendBatchesAsOneMessages,
                     outputTemplate,

@@ -9,10 +9,14 @@ namespace Ray.Serilog.Sinks.PushPlus
     {
         private readonly string _token;
         private readonly string _topic;
+        private readonly string _channel;
+        private readonly string _webhook;
 
         public PushPlusBatchedSink(
             string token,
             string topic,
+            string channel,
+            string webhook,
             Predicate<LogEvent> predicate,
             bool sendBatchesAsOneMessages,
             string outputTemplate,
@@ -23,6 +27,8 @@ namespace Ray.Serilog.Sinks.PushPlus
         {
             _token = token;
             _topic = topic;
+            _channel = channel;
+            _webhook = webhook;
         }
 
         public override void Emit(LogEvent logEvent)
@@ -31,7 +37,11 @@ namespace Ray.Serilog.Sinks.PushPlus
             base.Emit(logEvent);
         }
 
-        protected override IPushService PushService => new PushPlusApiClient(_token, _topic);
+        protected override IPushService PushService => new PushPlusApiClient(
+            _token,
+            _topic,
+            channel: _channel,
+            webhook: _webhook);
 
         public override void Dispose()
         {

@@ -76,7 +76,7 @@ namespace Ray.BiliBiliTool.DomainService
 
             //投币前硬币余额
             decimal coinBalance = _coinDomainService.GetCoinBalance();
-            _logger.LogInformation("投币前余额为 : {coinBalance}", coinBalance);
+            _logger.LogInformation("【投币前余额】 : {coinBalance}", coinBalance);
 
             if (coinBalance <= 0)
             {
@@ -100,16 +100,18 @@ namespace Ray.BiliBiliTool.DomainService
                 Tuple<string, string> video = TryGetCanDonatedVideo();
                 if (video == null) continue;
 
-                _logger.LogDebug("正在为视频“{title}”投币", video.Item2);
+                _logger.LogInformation("【视频】：{title}", video.Item2);
 
                 bool re = DoAddCoinForVideo(video.Item1, 1, _dailyTaskOptions.SelectLike, video.Item2);
                 if (re) success++;
             }
 
             if (success == needCoins)
-                _logger.LogInformation("投币任务完成，余额为: {money}", _accountApi.GetCoinBalance().GetAwaiter().GetResult().Data.Money ?? 0);
+                _logger.LogInformation("投币任务完成");
             else
                 _logger.LogInformation("投币尝试超过10次，已终止");
+
+            _logger.LogInformation("【硬币余额】：{coin}", _accountApi.GetCoinBalance().GetAwaiter().GetResult().Data.Money ?? 0);
         }
 
         /// <summary>
@@ -164,19 +166,19 @@ namespace Ray.BiliBiliTool.DomainService
             if (result.Code == 0)
             {
                 _expDic.TryGetValue("每日投币", out int exp);
-                _logger.LogInformation("为“{title}”投币成功，经验+{exp} √", title, exp);
+                _logger.LogInformation("投币成功，经验+{exp} √", exp);
                 return true;
             }
 
             if (_donateContinueStatusDic.Any(x => x.Key == result.Code.ToString()))
             {
-                _logger.LogError("尝试为“{title}”投币失败，原因：{msg}", title, result.Message);
+                _logger.LogError("投币失败，原因：{msg}", result.Message);
                 return false;
             }
 
             else
             {
-                string errorMsg = $"投币发生未预计异常。接口返回：{result.Message}";
+                string errorMsg = $"投币发生未预计异常：{result.Message}";
                 _logger.LogError(errorMsg);
                 throw new Exception(errorMsg);
             }
@@ -205,14 +207,17 @@ namespace Ray.BiliBiliTool.DomainService
                 ? Constants.MaxNumberOfDonateCoins
                 : configCoins;
 
+            _logger.LogInformation("【今日已投】：{already}枚", alreadyCoins);
+            _logger.LogInformation("【目标欲投】：{already}枚", targetCoins);
+
             if (targetCoins > alreadyCoins)
             {
                 int needCoins = targetCoins - alreadyCoins;
-                _logger.LogInformation("今日已投{already}枚硬币，目标是投{target}枚，还需再投{need}枚", alreadyCoins, targetCoins, needCoins);
+                _logger.LogInformation("【还需再投】：{need}枚", needCoins);
                 return needCoins;
             }
 
-            _logger.LogInformation("今日已投{already}枚硬币，已完成投币任务，不需要再投啦~", alreadyCoins);
+            _logger.LogInformation("已完成投币任务，不需要再投啦~");
             return 0;
         }
 

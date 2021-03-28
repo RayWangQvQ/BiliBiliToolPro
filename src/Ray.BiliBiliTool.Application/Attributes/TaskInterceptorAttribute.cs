@@ -30,9 +30,9 @@ namespace Ray.BiliBiliTool.Application.Attributes
         public override void OnEntry(MethodExecutionArgs arg)
         {
             if (_taskName == null) return;
-            string end = _taskLevel == TaskLevel.One ? "\r\n" : "";
+            string end = _taskLevel == TaskLevel.One ? Environment.NewLine : "";
             string delimiter = GetDelimiter();
-            _logger.LogInformation("{delimiter}开始【{taskName}】{delimiter}{end}", delimiter, _taskName, delimiter, end);
+            _logger.LogInformation(delimiter + "开始 {taskName} " + delimiter + end, _taskName);
         }
 
         public override void OnExit(MethodExecutionArgs arg)
@@ -40,7 +40,9 @@ namespace Ray.BiliBiliTool.Application.Attributes
             if (_taskName == null) return;
 
             string delimiter = GetDelimiter();
-            _logger.LogInformation("{delimiter}【{taskName}】结束{delimiter}\r\n", delimiter, _taskName, delimiter);
+            var s = new string('-', _taskName.Length);
+
+            _logger.LogInformation(delimiter + s + "结束" + s + delimiter + Environment.NewLine);
         }
 
         public override void OnException(MethodExecutionArgs arg)
@@ -52,7 +54,7 @@ namespace Ray.BiliBiliTool.Application.Attributes
                 return;
             }
 
-            _logger.LogError("{task}失败，继续其他任务。失败信息:{msg}\r\n", _taskName, arg.Exception.Message);
+            _logger.LogError("{task}失败，继续其他任务。失败信息:{msg}" + Environment.NewLine, _taskName, arg.Exception.Message);
             arg.FlowBehavior = FlowBehavior.Continue;
         }
 

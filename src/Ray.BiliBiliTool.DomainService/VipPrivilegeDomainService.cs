@@ -40,7 +40,15 @@ namespace Ray.BiliBiliTool.DomainService
         {
             if (_dailyTaskOptions.DayOfReceiveVipPrivilege == 0)
             {
-                _logger.LogInformation("已配置为不进行自动领取会员权益，跳过领取任务");
+                _logger.LogInformation("已配置为关闭，跳过");
+                return false;
+            }
+
+            //大会员类型
+            int vipType = userInfo.GetVipType();
+            if (vipType != 2)
+            {
+                _logger.LogInformation("普通会员和月度大会员每月不赠送B币券，不需要领取权益喽");
                 return false;
             }
 
@@ -48,29 +56,21 @@ namespace Ray.BiliBiliTool.DomainService
                 ? 1
                 : _dailyTaskOptions.DayOfReceiveVipPrivilege;
 
+            _logger.LogInformation("【目标领取日期】：{targetDay}号", targetDay);
+            _logger.LogInformation("【今天】：{day}号", DateTime.Today.Day);
+
             if (DateTime.Today.Day != targetDay
                 && DateTime.Today.Day != DateTime.Today.LastDayOfMonth().Day)
             {
-                _logger.LogInformation("目标领取日期为{targetDay}号，今天是{day}号，跳过领取任务", targetDay, DateTime.Today.Day);
+                _logger.LogInformation("跳过");
                 return false;
             }
 
-            //大会员类型
-            int vipType = userInfo.GetVipType();
+            var suc1 = ReceiveVipPrivilege(1);
+            var suc2 = ReceiveVipPrivilege(2);
 
-            if (vipType == 2)
-            {
-                var suc1 = ReceiveVipPrivilege(1);
-                var suc2 = ReceiveVipPrivilege(2);
-
-                if (suc1 | suc2) return true;
-                return false;
-            }
-            else
-            {
-                _logger.LogInformation("普通会员和月度大会员每月不赠送B币券，所以不需要领取权益喽");
-                return false;
-            }
+            if (suc1 | suc2) return true;
+            return false;
         }
 
         #region private
@@ -85,14 +85,17 @@ namespace Ray.BiliBiliTool.DomainService
                 .GetAwaiter().GetResult();
 
             var name = GetPrivilegeName(type);
+            _logger.LogInformation("【领取】：{name}", name);
+
             if (response.Code == 0)
             {
-                _logger.LogInformation($"{name}成功");
+                _logger.LogInformation("【结果】：成功");
                 return true;
             }
             else
             {
-                _logger.LogInformation($"{name}失败，原因: {response.Message}");
+                _logger.LogInformation("【结果】：失败");
+                _logger.LogInformation("【原因】: {msg}", response.Message);
                 return false;
             }
         }
@@ -107,10 +110,10 @@ namespace Ray.BiliBiliTool.DomainService
             switch (type)
             {
                 case 1:
-                    return "领取年度大会员每月赠送的B币券";
+                    return "年度大会员每月赠送的B币券";
 
                 case 2:
-                    return "领取大会员福利/权益";
+                    return "大会员福利/权益";
             }
 
             return "";

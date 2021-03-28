@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -10,6 +11,8 @@ namespace Ray.Serilog.Sinks.WorkWeiXinBatched
 {
     public class WorkWeiXinApiClient : IPushService
     {
+        //https://work.weixin.qq.com/api/doc/90000/90136/91770
+
         private readonly Uri _apiUrl;
         private readonly HttpClient _httpClient = new HttpClient();
 
@@ -26,17 +29,32 @@ namespace Ray.Serilog.Sinks.WorkWeiXinBatched
 
             var json = new
             {
-                msgtype = "markdown",
+                msgtype = WorkWeiXinMsgType.markdown.ToString(),
                 markdown = new
                 {
-                    content = message.Replace("\r\n", "\r\n\r\n")
-                        .Replace(Environment.NewLine, "\r\n\r\n")
+                    content = BuildMsg(message)
                 }
             }.ToJson();
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var response = _httpClient.PostAsync(_apiUrl, content).GetAwaiter().GetResult();
             return response;
+
         }
+
+        /*
+         * 不能用<br/>换行
+         * 可以多行换行
+         */
+    }
+
+
+    public enum WorkWeiXinMsgType
+    {
+        text,
+        markdown,
+        image,
+        news,
+        file
     }
 }

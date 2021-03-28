@@ -19,21 +19,18 @@ namespace Ray.BiliBiliTool.DomainService
         private readonly IDailyTaskApi _dailyTaskApi;
         private readonly IUserInfoApi _userInfoApi;
         private readonly BiliCookie _cookie;
-        private readonly Dictionary<string, int> _expDic;
 
         public AccountDomainService(
             ILogger<AccountDomainService> logger,
             IDailyTaskApi dailyTaskApi,
             BiliCookie cookie,
-            IOptionsMonitor<Dictionary<string, int>> dicOptions,
             IUserInfoApi userInfoApi
-            )
+        )
         {
             _logger = logger;
             _dailyTaskApi = dailyTaskApi;
             _cookie = cookie;
             _userInfoApi = userInfoApi;
-            _expDic = dicOptions.Get(Constants.OptionsNames.ExpDictionaryName);
         }
 
         /// <summary>
@@ -55,20 +52,18 @@ namespace Ray.BiliBiliTool.DomainService
             //获取到UserId
             _cookie.UserId = useInfo.Mid.ToString();
 
-            _expDic.TryGetValue("每日登录", out int exp);
-            _logger.LogInformation("登录成功，经验+{exp} √", exp);
-            _logger.LogInformation("用户名: {0}", useInfo.GetFuzzyUname());
-            _logger.LogInformation("硬币余额: {0}", useInfo.Money ?? 0);
+            _logger.LogInformation("【用户名】: {0}", useInfo.GetFuzzyUname());
+            _logger.LogInformation("【硬币余额】: {0}", useInfo.Money ?? 0);
 
             if (useInfo.Level_info.Current_level < 6)
             {
-                _logger.LogInformation("如每日做满65点经验，距离升级到 Lv{0} 还有: {1}天",
+                _logger.LogInformation("【距升级 Lv{0}】: {1}天（如每日做满65点经验）",
                     useInfo.Level_info.Current_level + 1,
                     (useInfo.Level_info.GetNext_expLong() - useInfo.Level_info.Current_exp) / Constants.EveryDayExp);
             }
             else
             {
-                _logger.LogInformation("您已是 Lv6 的大佬了，当前经验：{0}，无敌是多么寂寞~", useInfo.Level_info.Current_exp);
+                _logger.LogInformation("【当前经验】：{0} （您已是 Lv6 的大佬了，无敌是多么寂寞~）", useInfo.Level_info.Current_exp);
             }
 
             return useInfo;

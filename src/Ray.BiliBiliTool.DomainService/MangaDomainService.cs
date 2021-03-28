@@ -43,17 +43,19 @@ namespace Ray.BiliBiliTool.DomainService
             {
                 //ignore
                 //重复签到会报400异常,这里忽略掉
-                _logger.LogInformation("今日已签到过，无法重复签到");
+                _logger.LogInformation("【签到结果】：失败");
+                _logger.LogInformation("【原因】：今日已签到过，无法重复签到");
                 return;
             }
 
             if (response.Code == 0)
             {
-                _logger.LogInformation("完成漫画签到");
+                _logger.LogInformation("【签到结果】：成功");
             }
             else
             {
-                _logger.LogInformation("漫画签到异常");
+                _logger.LogInformation("【签到结果】：失败");
+                _logger.LogInformation("【原因】:{msg}", response.Message);
             }
         }
 
@@ -64,18 +66,20 @@ namespace Ray.BiliBiliTool.DomainService
         /// 这里为方便直接取1，为领取漫读劵，暂时不取其他的值</param>
         public void ReceiveMangaVipReward(int reason_id, UserInfo userInfo)
         {
+            if (userInfo.GetVipType() == 0)
+            {
+                _logger.LogInformation("不是会员，跳过");
+                return;
+            }
+
             int day = DateTime.Today.Day;
 
             if (day != _dailyTaskOptions.DayOfReceiveVipPrivilege)
             {
                 //一个月执行一次就行
-                _logger.LogInformation("目标领取日期为{target}号，今天是{day}号，跳过领取任务", _dailyTaskOptions.DayOfReceiveVipPrivilege, day);
-                return;
-            }
-
-            if (userInfo.GetVipType() == 0)
-            {
-                _logger.LogInformation("不是会员或会员已过期，跳过领取任务");
+                _logger.LogInformation("【目标日期】：{target}号", _dailyTaskOptions.DayOfReceiveVipPrivilege);
+                _logger.LogInformation("【今天】：{day}号", day);
+                _logger.LogInformation("跳过");
                 return;
             }
 
@@ -83,11 +87,13 @@ namespace Ray.BiliBiliTool.DomainService
                 .GetAwaiter().GetResult();
             if (response.Code == 0)
             {
-                _logger.LogInformation($"大会员成功领取{response.Data.Amount}张漫读劵");
+                _logger.LogInformation("【领取结果】：成功");
+                _logger.LogInformation($"【获取】：{response.Data.Amount}张漫读劵");
             }
             else
             {
-                _logger.LogInformation($"大会员领取漫读劵失败，原因为:{response.Message}");
+                _logger.LogInformation("【领取结果】：失败");
+                _logger.LogInformation("【原因】:{msg}", response.Message);
             }
         }
     }

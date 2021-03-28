@@ -29,10 +29,11 @@ namespace LogTest
         public void Test2()
         {
             TelegramApiClient client = new TelegramApiClient(_botToken, _chatId);
-            var result = client.PushMessage(LogConstants.Msg);
-            Debug.WriteLine(result.Content.ReadAsStringAsync().Result);
 
-            System.Console.ReadLine();
+            string msg = LogConstants.Msg2;
+
+            var result = client.PushMessage(msg);
+            Debug.WriteLine(result.Content.ReadAsStringAsync().Result);
 
             /*
              * 如果指定markdown，星号会导致推送失败

@@ -28,8 +28,11 @@ namespace LogTest
         [Fact]
         public void Test2()
         {
-            DingTalkApiClient client = new DingTalkApiClient(_key);
-            var result = client.PushMessage(LogConstants.Msg);
+            var client = new DingTalkApiClient(_key);
+
+            var msg = LogConstants.Msg2 + "开始推送";
+
+            var result = client.PushMessage(msg);
             Debug.WriteLine(result.Content.ReadAsStringAsync().Result);
 
             System.Console.ReadLine();

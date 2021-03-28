@@ -25,6 +25,7 @@ env:
   Ray_Serilog__WriteTo__5__Args__webHookUrl: ${{secrets.PUSHDINGURL}} # 钉钉
   Ray_Serilog__WriteTo__5__Args__restrictedToMinimumLevel: ${{secrets.PUSHDINGLEVEL}}
   Ray_Serilog__WriteTo__6__Args__scKey: ${{secrets.PUSHSCKEY}} # Server酱
+  Ray_Serilog__WriteTo__6__Args__turboScKey: ${{secrets.PUSHSERVERTSCKEY}}
   Ray_Serilog__WriteTo__6__Args__restrictedToMinimumLevel: ${{secrets.PUSHSERVERLEVEL}}
   Ray_Serilog__WriteTo__7__Args__sKey: ${{secrets.PUSHCOOLSKEY}} # 酷推
   Ray_Serilog__WriteTo__7__Args__restrictedToMinimumLevel: ${{secrets.PUSHCOOLLEVEL}}
