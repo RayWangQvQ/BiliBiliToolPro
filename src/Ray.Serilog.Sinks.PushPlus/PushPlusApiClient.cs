@@ -15,15 +15,39 @@ namespace Ray.Serilog.Sinks.PushPlus
         private readonly HttpClient _httpClient = new HttpClient();
         private readonly string _token;
         private readonly string _topic;
+        private readonly string _channel;
+        private readonly string _webhook;
 
-        public PushPlusApiClient(string token, string topic = null)
+        public PushPlusApiClient(
+            string token,
+            string topic = null,
+            string channel = "",
+            string webhook = ""
+            )
         {
             _apiUrl = new Uri(Host);
             _token = token;
             _topic = topic;
+            _channel = channel;
+            _webhook = webhook;
         }
 
         public override string Name => "PushPlus";
+
+        private PushPlusChannelType ChannelType
+        {
+            get
+            {
+                var re = PushPlusChannelType.wechat;
+
+                if (_channel.IsNullOrEmpty()) return re;
+
+                bool suc = Enum.TryParse<PushPlusChannelType>(_channel, true, out PushPlusChannelType channel);
+                if (suc) re = channel;
+
+                return re;
+            }
+        }
 
         public override HttpResponseMessage PushMessage(string message)
         {
@@ -32,8 +56,10 @@ namespace Ray.Serilog.Sinks.PushPlus
             var json = new
             {
                 token = _token,
-                channel = PushPlusChannelType.wechat.ToString(),
+
                 topic = _topic,
+                channel = this.ChannelType.ToString(),
+                webhook = _webhook,
 
                 title = "Ray.BiliBiliTool任务日报",
                 content = BuildMsg(message),//换行有问题，这里使用<br/>替换\r\n
