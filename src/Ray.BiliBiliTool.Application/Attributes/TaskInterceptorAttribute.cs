@@ -32,7 +32,7 @@ namespace Ray.BiliBiliTool.Application.Attributes
             if (_taskName == null) return;
             string end = _taskLevel == TaskLevel.One ? Environment.NewLine : "";
             string delimiter = GetDelimiter();
-            _logger.LogInformation(delimiter + "开始【{taskName}】" + delimiter + end, _taskName);
+            _logger.LogInformation(delimiter + "开始 {taskName} " + delimiter + end, _taskName);
         }
 
         public override void OnExit(MethodExecutionArgs arg)
@@ -40,7 +40,9 @@ namespace Ray.BiliBiliTool.Application.Attributes
             if (_taskName == null) return;
 
             string delimiter = GetDelimiter();
-            _logger.LogInformation(delimiter + "【{taskName}】结束" + delimiter + Environment.NewLine, _taskName);
+            var s = new string('-', _taskName.Length);
+
+            _logger.LogInformation(delimiter + s + "结束" + s + delimiter + Environment.NewLine);
         }
 
         public override void OnException(MethodExecutionArgs arg)

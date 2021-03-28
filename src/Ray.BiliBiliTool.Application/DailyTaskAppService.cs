@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Application.Attributes;
 using Ray.BiliBiliTool.Application.Contracts;
+using Ray.BiliBiliTool.Config;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 
@@ -23,9 +25,11 @@ namespace Ray.BiliBiliTool.Application
         private readonly DailyTaskOptions _dailyTaskOptions;
         private readonly ICoinDomainService _coinDomainService;
         private readonly SecurityOptions _securityOptions;
+        private readonly Dictionary<string, int> _expDic;
 
         public DailyTaskAppService(
             ILogger<DailyTaskAppService> logger,
+            IOptionsMonitor<Dictionary<string, int>> dicOptions,
             IAccountDomainService loginDomainService,
             IVideoDomainService videoDomainService,
             IDonateCoinDomainService donateCoinDomainService,
@@ -39,6 +43,7 @@ namespace Ray.BiliBiliTool.Application
         )
         {
             _logger = logger;
+            _expDic = dicOptions.Get(Constants.OptionsNames.ExpDictionaryName);
             _loginDomainService = loginDomainService;
             _videoDomainService = videoDomainService;
             _donateCoinDomainService = donateCoinDomainService;
@@ -56,17 +61,22 @@ namespace Ray.BiliBiliTool.Application
         [TaskInterceptor("每日任务", TaskLevel.One)]
         public override void DoTask()
         {
+            //每日任务赚经验：
             UserInfo userInfo = Login();
             DailyTaskInfo dailyTaskInfo = GetDailyTaskStatus();
-
             WatchAndShareVideo(dailyTaskInfo);
             AddCoinsForVideo();
-            MangaSign();
+
+            //签到：
             LiveSign();
+            MangaSign();
+
             ExchangeSilver2Coin();
 
+            //领福利：
             ReceiveVipPrivilege(ref userInfo);
             ReceiveMangaVipReward(userInfo);
+
             Charge(userInfo);
         }
 
@@ -79,6 +89,9 @@ namespace Ray.BiliBiliTool.Application
         {
             UserInfo userInfo = _loginDomainService.LoginByCookie();
             if (userInfo == null) throw new Exception("登录失败，请检查Cookie");//终止流程
+
+            _expDic.TryGetValue("每日登录", out int exp);
+            _logger.LogInformation("登录成功，经验+{exp} √", exp);
 
             return userInfo;
         }
@@ -119,7 +132,7 @@ namespace Ray.BiliBiliTool.Application
         /// <summary>
         /// 直播中心签到
         /// </summary>
-        [TaskInterceptor("直播中心签到", rethrowWhenException: false)]
+        [TaskInterceptor("直播签到", rethrowWhenException: false)]
         private void LiveSign()
         {
             _liveDomainService.LiveSign();
@@ -128,7 +141,7 @@ namespace Ray.BiliBiliTool.Application
         /// <summary>
         /// 直播中心的银瓜子兑换硬币
         /// </summary>
-        [TaskInterceptor("直播中心银瓜子兑换硬币", rethrowWhenException: false)]
+        [TaskInterceptor("银瓜子兑换硬币", rethrowWhenException: false)]
         private void ExchangeSilver2Coin()
         {
             var success = _liveDomainService.ExchangeSilver2Coin();
@@ -136,13 +149,13 @@ namespace Ray.BiliBiliTool.Application
 
             //如果兑换成功，则打印硬币余额
             var coinBalance = _coinDomainService.GetCoinBalance();
-            _logger.LogInformation("当前硬币余额: {0}", coinBalance);
+            _logger.LogInformation("【硬币余额】: {0}", coinBalance);
         }
 
         /// <summary>
         /// 每月领取大会员福利
         /// </summary>
-        [TaskInterceptor("每月领取大会员福利", rethrowWhenException: false)]
+        [TaskInterceptor("领取大会员福利", rethrowWhenException: false)]
         private void ReceiveVipPrivilege(ref UserInfo userInfo)
         {
             var suc = _vipPrivilegeDomainService.ReceiveVipPrivilege(userInfo);
@@ -164,7 +177,7 @@ namespace Ray.BiliBiliTool.Application
         /// <summary>
         /// 每月为自己充电
         /// </summary>
-        [TaskInterceptor("每月使用快过期的B币充电", rethrowWhenException: false)]
+        [TaskInterceptor("B币券充电", rethrowWhenException: false)]
         private void Charge(UserInfo userInfo)
         {
             _chargeDomainService.Charge(userInfo);
@@ -182,7 +195,7 @@ namespace Ray.BiliBiliTool.Application
         /// <summary>
         /// 每月获取大会员漫画权益
         /// </summary>
-        [TaskInterceptor("每月领取大会员漫画权益", rethrowWhenException: false)]
+        [TaskInterceptor("领取大会员漫画权益", rethrowWhenException: false)]
         private void ReceiveMangaVipReward(UserInfo userInfo)
         {
             _mangaDomainService.ReceiveMangaVipReward(1, userInfo);

@@ -36,32 +36,14 @@ namespace Ray.BiliBiliTool.DomainService
         }
 
         /// <summary>
-        /// 月底自动给自己充电
+        /// 月底自动己充电
         /// 仅充会到期的B币券，低于2的时候不会充
         /// </summary>
         public void Charge(UserInfo userInfo)
         {
             if (_dailyTaskOptions.DayOfAutoCharge == 0)
             {
-                _logger.LogInformation("已配置为不进行自动充电，跳过充电任务");
-                return;
-            }
-
-            int targetDay = _dailyTaskOptions.DayOfAutoCharge == -1
-                ? DateTime.Today.LastDayOfMonth().Day
-                : _dailyTaskOptions.DayOfAutoCharge;
-
-            if (DateTime.Today.Day != targetDay)
-            {
-                _logger.LogInformation("目标充电日期为{targetDay}号，今天是{today}号，跳过充电任务", targetDay, DateTime.Today.Day);
-                return;
-            }
-
-            //B币券余额
-            decimal couponBalance = userInfo.Wallet.Coupon_balance;
-            if (couponBalance < 2)
-            {
-                _logger.LogInformation("B币小于2，无法充电");
+                _logger.LogInformation("已配置为关闭，跳过");
                 return;
             }
 
@@ -69,7 +51,29 @@ namespace Ray.BiliBiliTool.DomainService
             int vipType = userInfo.GetVipType();
             if (vipType != 2)
             {
-                _logger.LogInformation("不是年度大会员或已过期，不进行B币券自动充电");
+                _logger.LogInformation("不是年度大会员，跳过");
+                return;
+            }
+
+            int targetDay = _dailyTaskOptions.DayOfAutoCharge == -1
+                ? DateTime.Today.LastDayOfMonth().Day
+                : _dailyTaskOptions.DayOfAutoCharge;
+
+            _logger.LogInformation("【目标日期】：{targetDay}号", targetDay);
+            _logger.LogInformation("【今天】：{today}号", DateTime.Today.Day);
+
+            if (DateTime.Today.Day != targetDay)
+            {
+                _logger.LogInformation("跳过");
+                return;
+            }
+
+            //B币券余额
+            decimal couponBalance = userInfo.Wallet.Coupon_balance;
+            _logger.LogInformation("【B币券】：{couponBalance}", couponBalance);
+            if (couponBalance < 2)
+            {
+                _logger.LogInformation("余额小于2，无法充电");
                 return;
             }
 
@@ -77,6 +81,8 @@ namespace Ray.BiliBiliTool.DomainService
             //如果没有配置或配了-1，则为自己充电
             if (_dailyTaskOptions.AutoChargeUpId.IsNullOrEmpty() | _dailyTaskOptions.AutoChargeUpId == "-1")
                 targetUpId = _cookie.UserId;
+
+            _logger.LogDebug("【目标Up】：{up}", targetUpId);
 
             var request = new ChargeRequest(couponBalance, long.Parse(targetUpId), _cookie.BiliJct);
 
@@ -88,20 +94,24 @@ namespace Ray.BiliBiliTool.DomainService
             {
                 if (response.Data.Status == 4)
                 {
-                    _logger.LogInformation("充电成功，经验+{exp} √", couponBalance);
-                    _logger.LogInformation("本次为{upId}充值了: {num}个B币，送的B币券没有浪费哦", targetUpId, couponBalance);
+                    _logger.LogInformation("【充电结果】：成功");
+                    _logger.LogInformation("【充值个数】: {num}个B币", couponBalance);
+                    _logger.LogInformation("经验+{exp} √", couponBalance);
+                    _logger.LogInformation("在过期前使用成功，赠送的B币券没有浪费哦~", targetUpId, couponBalance);
 
-                    //获取充电留言token
+                    //充电留言
                     ChargeComments(response.Data.Order_no);
                 }
                 else
                 {
-                    _logger.LogError("充电失败了啊 原因：{reason}", response.ToJson());
+                    _logger.LogInformation("【充电结果】：失败");
+                    _logger.LogError("【原因】：{reason}", response.ToJson());
                 }
             }
             else
             {
-                _logger.LogError("充电失败了啊 原因：{reason}", response.Message);
+                _logger.LogInformation("【充电结果】：失败");
+                _logger.LogError("【原因】：{reason}", response.Message);
             }
         }
 
@@ -111,8 +121,11 @@ namespace Ray.BiliBiliTool.DomainService
         /// <param name="token"></param>
         public void ChargeComments(string orderNum)
         {
-            var request = new ChargeCommentRequest(orderNum, _dailyTaskOptions.ChargeComment ?? "", _cookie.BiliJct);
-            _chargeApi.ChargeComment(request);
+            var comment = _dailyTaskOptions.ChargeComment ?? "";
+            var request = new ChargeCommentRequest(orderNum, comment, _cookie.BiliJct);
+            _chargeApi.ChargeComment(request).GetAwaiter().GetResult();
+
+            _logger.LogInformation("【留言】：{comment}", comment);
         }
     }
 }
