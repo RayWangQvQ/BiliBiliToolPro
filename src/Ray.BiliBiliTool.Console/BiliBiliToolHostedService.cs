@@ -100,14 +100,14 @@ namespace Ray.BiliBiliTool.Console
                     ?.InformationalVersion);
             _logger.LogInformation("当前IP  ：{ip} ", IpHelper.GetIp());
             //_logger.LogInformation("当前环境：{env}", Global.HostingEnvironment.EnvironmentName);
-            _logger.LogInformation("开源地址：{url} \r\n", Constants.SourceCodeUrl);
+            _logger.LogInformation("开源地址： {url}" + Environment.NewLine, Constants.SourceCodeUrl);
         }
 
         public bool CheckSkip()
         {
             if (_securityOptions.IsSkipDailyTask)
             {
-                _logger.LogWarning("已配置为跳过任务\r\n");
+                _logger.LogWarning("已配置为跳过任务" + Environment.NewLine);
                 return true;
             }
 
@@ -119,7 +119,7 @@ namespace Ray.BiliBiliTool.Console
             if (_securityOptions.RandomSleepMaxMin > 0)
             {
                 int randomMin = new Random().Next(1, ++_securityOptions.RandomSleepMaxMin);
-                _logger.LogInformation("随机休眠{min}分钟 \r\n", randomMin);
+                _logger.LogInformation("随机休眠{min}分钟" + Environment.NewLine, randomMin);
                 Thread.Sleep(randomMin * 1000 * 60);
             }
         }
