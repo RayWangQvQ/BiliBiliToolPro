@@ -48,13 +48,13 @@ namespace Ray.BiliBiliTool.DomainService
 
             if (response.Code == 0)
             {
-                _logger.LogInformation("【签到结果】：成功");
-                _logger.LogInformation("【本次获取】：{text},{special}", response.Data.Text, response.Data.SpecialText);
+                _logger.LogInformation("【签到结果】成功");
+                _logger.LogInformation("【本次获取】{text},{special}", response.Data.Text, response.Data.SpecialText);
             }
             else
             {
-                _logger.LogInformation("【签到结果】：失败");
-                _logger.LogInformation("【原因】：{msg}", response.Message);
+                _logger.LogInformation("【签到结果】失败");
+                _logger.LogInformation("【原因】{msg}", response.Message);
             }
         }
 
@@ -78,8 +78,8 @@ namespace Ray.BiliBiliTool.DomainService
                     ? DateTime.Today.LastDayOfMonth().Day
                     : _dailyTaskOptions.DayOfExchangeSilver2Coin;
 
-            _logger.LogInformation("【目标兑换日期】：{targetDay}号", targetDay);
-            _logger.LogInformation("【今天】：{day}号", DateTime.Today.Day);
+            _logger.LogInformation("【目标兑换日期】{targetDay}号", targetDay);
+            _logger.LogInformation("【今天】{day}号", DateTime.Today.Day);
 
             if (DateTime.Today.Day != targetDay)
             {
@@ -91,16 +91,16 @@ namespace Ray.BiliBiliTool.DomainService
             if (response.Code == 0)
             {
                 result = true;
-                _logger.LogInformation("【兑换结果】：成功");
+                _logger.LogInformation("【兑换结果】成功");
             }
             else
             {
-                _logger.LogInformation("【兑换结果】：失败");
-                _logger.LogInformation("【原因】：{0}", response.Message);
+                _logger.LogInformation("【兑换结果】失败");
+                _logger.LogInformation("【原因】{0}", response.Message);
             }
 
             var queryStatus = _liveApi.GetExchangeSilverStatus().GetAwaiter().GetResult();
-            _logger.LogInformation("【银瓜子余额】: {0}", queryStatus.Data.Silver);
+            _logger.LogInformation("【银瓜子余额】 {0}", queryStatus.Data.Silver);
 
             return result;
         }
@@ -116,7 +116,7 @@ namespace Ray.BiliBiliTool.DomainService
             int count = 0;
             foreach (var area in areaList)
             {
-                _logger.LogInformation("【扫描分区】：{area}..." + Environment.NewLine, area.Name);
+                _logger.LogInformation("【扫描分区】{area}..." + Environment.NewLine, area.Name);
 
                 string defaultSort = "";
                 //每个分区下搜索5页
@@ -147,7 +147,7 @@ namespace Ray.BiliBiliTool.DomainService
 
         public void TryJoinTianXuan(ListItemDto target)
         {
-            _logger.LogInformation("【直播间】：{name}({id})", target.Title, target.Roomid);
+            _logger.LogInformation("【直播间】{name}({id})", target.Title, target.Roomid);
 
             try
             {
@@ -167,9 +167,9 @@ namespace Ray.BiliBiliTool.DomainService
                     return;
                 }
 
-                _logger.LogInformation("【奖励】：{name}", check.Award_name);
-                _logger.LogInformation("【条件】：{text}", check.Require_text);
-                _logger.LogInformation("【赠礼】：{gift}", check.Gift_price > 0 ? check.GiftDesc : "无");
+                _logger.LogInformation("【奖励】{name}", check.Award_name);
+                _logger.LogInformation("【条件】{text}", check.Require_text);
+                _logger.LogInformation("【赠礼】{gift}", check.Gift_price > 0 ? check.GiftDesc : "无");
 
                 if (check.Gift_price != 0)
                 {
@@ -195,16 +195,16 @@ namespace Ray.BiliBiliTool.DomainService
                     .GetAwaiter().GetResult();
                 if (re.Code == 0)
                 {
-                    _logger.LogInformation("【参与抽奖】：成功 √" + Environment.NewLine);
+                    _logger.LogInformation("【参与抽奖】成功 √" + Environment.NewLine);
                     return;
                 }
 
-                _logger.LogInformation("【参与抽奖】：失败");
-                _logger.LogInformation("【原因】：{msg}" + Environment.NewLine, re.Message);
+                _logger.LogInformation("【参与抽奖】失败");
+                _logger.LogInformation("【原因】{msg}" + Environment.NewLine, re.Message);
             }
             catch (Exception ex)
             {
-                _logger.LogWarning("【异常】：{msg}，{detail}" + Environment.NewLine, ex.Message, ex);
+                _logger.LogWarning("【异常】{msg}，{detail}" + Environment.NewLine, ex.Message, ex);
                 //ignore
             }
         }

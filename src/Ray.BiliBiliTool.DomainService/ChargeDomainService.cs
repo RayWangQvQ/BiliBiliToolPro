@@ -59,8 +59,8 @@ namespace Ray.BiliBiliTool.DomainService
                 ? DateTime.Today.LastDayOfMonth().Day
                 : _dailyTaskOptions.DayOfAutoCharge;
 
-            _logger.LogInformation("【目标日期】：{targetDay}号", targetDay);
-            _logger.LogInformation("【今天】：{today}号", DateTime.Today.Day);
+            _logger.LogInformation("【目标日期】{targetDay}号", targetDay);
+            _logger.LogInformation("【今天】{today}号", DateTime.Today.Day);
 
             if (DateTime.Today.Day != targetDay)
             {
@@ -70,7 +70,7 @@ namespace Ray.BiliBiliTool.DomainService
 
             //B币券余额
             decimal couponBalance = userInfo.Wallet.Coupon_balance;
-            _logger.LogInformation("【B币券】：{couponBalance}", couponBalance);
+            _logger.LogInformation("【B币券】{couponBalance}", couponBalance);
             if (couponBalance < 2)
             {
                 _logger.LogInformation("余额小于2，无法充电");
@@ -82,7 +82,7 @@ namespace Ray.BiliBiliTool.DomainService
             if (_dailyTaskOptions.AutoChargeUpId.IsNullOrEmpty() | _dailyTaskOptions.AutoChargeUpId == "-1")
                 targetUpId = _cookie.UserId;
 
-            _logger.LogDebug("【目标Up】：{up}", targetUpId);
+            _logger.LogDebug("【目标Up】{up}", targetUpId);
 
             var request = new ChargeRequest(couponBalance, long.Parse(targetUpId), _cookie.BiliJct);
 
@@ -94,8 +94,8 @@ namespace Ray.BiliBiliTool.DomainService
             {
                 if (response.Data.Status == 4)
                 {
-                    _logger.LogInformation("【充电结果】：成功");
-                    _logger.LogInformation("【充值个数】: {num}个B币", couponBalance);
+                    _logger.LogInformation("【充电结果】成功");
+                    _logger.LogInformation("【充值个数】 {num}个B币", couponBalance);
                     _logger.LogInformation("经验+{exp} √", couponBalance);
                     _logger.LogInformation("在过期前使用成功，赠送的B币券没有浪费哦~", targetUpId, couponBalance);
 
@@ -104,14 +104,14 @@ namespace Ray.BiliBiliTool.DomainService
                 }
                 else
                 {
-                    _logger.LogInformation("【充电结果】：失败");
-                    _logger.LogError("【原因】：{reason}", response.ToJson());
+                    _logger.LogInformation("【充电结果】失败");
+                    _logger.LogError("【原因】{reason}", response.ToJson());
                 }
             }
             else
             {
-                _logger.LogInformation("【充电结果】：失败");
-                _logger.LogError("【原因】：{reason}", response.Message);
+                _logger.LogInformation("【充电结果】失败");
+                _logger.LogError("【原因】{reason}", response.Message);
             }
         }
 
@@ -125,7 +125,7 @@ namespace Ray.BiliBiliTool.DomainService
             var request = new ChargeCommentRequest(orderNum, comment, _cookie.BiliJct);
             _chargeApi.ChargeComment(request).GetAwaiter().GetResult();
 
-            _logger.LogInformation("【留言】：{comment}", comment);
+            _logger.LogInformation("【留言】{comment}", comment);
         }
     }
 }

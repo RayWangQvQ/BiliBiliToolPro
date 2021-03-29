@@ -100,7 +100,7 @@ namespace Ray.BiliBiliTool.DomainService
                 Tuple<string, string> video = TryGetCanDonatedVideo();
                 if (video == null) continue;
 
-                _logger.LogInformation("【视频】：{title}", video.Item2);
+                _logger.LogInformation("【视频】{title}", video.Item2);
 
                 bool re = DoAddCoinForVideo(video.Item1, 1, _dailyTaskOptions.SelectLike, video.Item2);
                 if (re) success++;
@@ -111,7 +111,7 @@ namespace Ray.BiliBiliTool.DomainService
             else
                 _logger.LogInformation("投币尝试超过10次，已终止");
 
-            _logger.LogInformation("【硬币余额】：{coin}", _accountApi.GetCoinBalance().GetAwaiter().GetResult().Data.Money ?? 0);
+            _logger.LogInformation("【硬币余额】{coin}", _accountApi.GetCoinBalance().GetAwaiter().GetResult().Data.Money ?? 0);
         }
 
         /// <summary>
@@ -207,13 +207,13 @@ namespace Ray.BiliBiliTool.DomainService
                 ? Constants.MaxNumberOfDonateCoins
                 : configCoins;
 
-            _logger.LogInformation("【今日已投】：{already}枚", alreadyCoins);
-            _logger.LogInformation("【目标欲投】：{already}枚", targetCoins);
+            _logger.LogInformation("【今日已投】{already}枚", alreadyCoins);
+            _logger.LogInformation("【目标欲投】{already}枚", targetCoins);
 
             if (targetCoins > alreadyCoins)
             {
                 int needCoins = targetCoins - alreadyCoins;
-                _logger.LogInformation("【还需再投】：{need}枚", needCoins);
+                _logger.LogInformation("【还需再投】{need}枚", needCoins);
                 return needCoins;
             }
 

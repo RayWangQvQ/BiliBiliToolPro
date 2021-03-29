@@ -52,18 +52,18 @@ namespace Ray.BiliBiliTool.DomainService
             //获取到UserId
             _cookie.UserId = useInfo.Mid.ToString();
 
-            _logger.LogInformation("【用户名】: {0}", useInfo.GetFuzzyUname());
-            _logger.LogInformation("【硬币余额】: {0}", useInfo.Money ?? 0);
+            _logger.LogInformation("【用户名】 {0}", useInfo.GetFuzzyUname());
+            _logger.LogInformation("【硬币余额】 {0}", useInfo.Money ?? 0);
 
             if (useInfo.Level_info.Current_level < 6)
             {
-                _logger.LogInformation("【距升级 Lv{0}】: {1}天（如每日做满65点经验）",
+                _logger.LogInformation("【距升级 Lv{0}】 {1}天（如每日做满65点经验）",
                     useInfo.Level_info.Current_level + 1,
                     (useInfo.Level_info.GetNext_expLong() - useInfo.Level_info.Current_exp) / Constants.EveryDayExp);
             }
             else
             {
-                _logger.LogInformation("【当前经验】：{0} （您已是 Lv6 的大佬了，无敌是多么寂寞~）", useInfo.Level_info.Current_exp);
+                _logger.LogInformation("【当前经验】{0} （您已是 Lv6 的大佬了，无敌是多么寂寞~）", useInfo.Level_info.Current_exp);
             }
 
             return useInfo;

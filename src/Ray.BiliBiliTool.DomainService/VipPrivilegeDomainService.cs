@@ -56,8 +56,8 @@ namespace Ray.BiliBiliTool.DomainService
                 ? 1
                 : _dailyTaskOptions.DayOfReceiveVipPrivilege;
 
-            _logger.LogInformation("【目标领取日期】：{targetDay}号", targetDay);
-            _logger.LogInformation("【今天】：{day}号", DateTime.Today.Day);
+            _logger.LogInformation("【目标领取日期】{targetDay}号", targetDay);
+            _logger.LogInformation("【今天】{day}号", DateTime.Today.Day);
 
             if (DateTime.Today.Day != targetDay
                 && DateTime.Today.Day != DateTime.Today.LastDayOfMonth().Day)
@@ -85,17 +85,17 @@ namespace Ray.BiliBiliTool.DomainService
                 .GetAwaiter().GetResult();
 
             var name = GetPrivilegeName(type);
-            _logger.LogInformation("【领取】：{name}", name);
+            _logger.LogInformation("【领取】{name}", name);
 
             if (response.Code == 0)
             {
-                _logger.LogInformation("【结果】：成功");
+                _logger.LogInformation("【结果】成功");
                 return true;
             }
             else
             {
-                _logger.LogInformation("【结果】：失败");
-                _logger.LogInformation("【原因】: {msg}", response.Message);
+                _logger.LogInformation("【结果】失败");
+                _logger.LogInformation("【原因】 {msg}", response.Message);
                 return false;
             }
         }

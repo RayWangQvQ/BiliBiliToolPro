@@ -43,19 +43,19 @@ namespace Ray.BiliBiliTool.DomainService
             {
                 //ignore
                 //重复签到会报400异常,这里忽略掉
-                _logger.LogInformation("【签到结果】：失败");
-                _logger.LogInformation("【原因】：今日已签到过，无法重复签到");
+                _logger.LogInformation("【签到结果】失败");
+                _logger.LogInformation("【原因】今日已签到过，无法重复签到");
                 return;
             }
 
             if (response.Code == 0)
             {
-                _logger.LogInformation("【签到结果】：成功");
+                _logger.LogInformation("【签到结果】成功");
             }
             else
             {
-                _logger.LogInformation("【签到结果】：失败");
-                _logger.LogInformation("【原因】:{msg}", response.Message);
+                _logger.LogInformation("【签到结果】失败");
+                _logger.LogInformation("【原因】{msg}", response.Message);
             }
         }
 
@@ -77,8 +77,8 @@ namespace Ray.BiliBiliTool.DomainService
             if (day != _dailyTaskOptions.DayOfReceiveVipPrivilege)
             {
                 //一个月执行一次就行
-                _logger.LogInformation("【目标日期】：{target}号", _dailyTaskOptions.DayOfReceiveVipPrivilege);
-                _logger.LogInformation("【今天】：{day}号", day);
+                _logger.LogInformation("【目标日期】{target}号", _dailyTaskOptions.DayOfReceiveVipPrivilege);
+                _logger.LogInformation("【今天】{day}号", day);
                 _logger.LogInformation("跳过");
                 return;
             }
@@ -87,13 +87,13 @@ namespace Ray.BiliBiliTool.DomainService
                 .GetAwaiter().GetResult();
             if (response.Code == 0)
             {
-                _logger.LogInformation("【领取结果】：成功");
-                _logger.LogInformation($"【获取】：{response.Data.Amount}张漫读劵");
+                _logger.LogInformation("【领取结果】成功");
+                _logger.LogInformation($"【获取】{response.Data.Amount}张漫读劵");
             }
             else
             {
-                _logger.LogInformation("【领取结果】：失败");
-                _logger.LogInformation("【原因】:{msg}", response.Message);
+                _logger.LogInformation("【领取结果】失败");
+                _logger.LogInformation("【原因】{msg}", response.Message);
             }
         }
     }

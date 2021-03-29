@@ -109,7 +109,7 @@ namespace Ray.BiliBiliTool.DomainService
             if (!dailyTaskStatus.Watch || !dailyTaskStatus.Share)
             {
                 targetVideo = GetRandomVideoForWatchAndShare();
-                _logger.LogInformation("【随机视频】：{title}", targetVideo.Title);
+                _logger.LogInformation("【随机视频】{title}", targetVideo.Title);
             }
 
             if (!dailyTaskStatus.Watch && _dailyTaskOptions.IsWatchVideo)

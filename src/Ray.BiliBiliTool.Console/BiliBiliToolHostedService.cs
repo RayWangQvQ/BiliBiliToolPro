@@ -95,12 +95,12 @@ namespace Ray.BiliBiliTool.Console
         private void LogAppInfo()
         {
             _logger.LogInformation(
-                "【版本号】：Ray.BiliBiliTool-v{version}",
+                "【版本号】Ray.BiliBiliTool-v{version}",
                 typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
                     ?.InformationalVersion);
-            _logger.LogInformation("【当前IP】：{ip} ", IpHelper.GetIp());
+            _logger.LogInformation("【当前IP】{ip} ", IpHelper.GetIp());
             //_logger.LogInformation("当前环境：{env}", Global.HostingEnvironment.EnvironmentName);
-            _logger.LogInformation("【开源地址】： {url}" + Environment.NewLine, Constants.SourceCodeUrl);
+            _logger.LogInformation("【开源地址】 {url}" + Environment.NewLine, Constants.SourceCodeUrl);
         }
 
         public bool CheckSkip()
