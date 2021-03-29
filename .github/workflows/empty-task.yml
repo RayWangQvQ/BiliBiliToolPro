@@ -29,6 +29,8 @@ env:
   Ray_Serilog__WriteTo__8__Args__restrictedToMinimumLevel: ${{secrets.PUSHOTHERLEVEL}}
   Ray_Serilog__WriteTo__9__Args__token: ${{secrets.PUSHPLUSTOKEN}} # PushPlus
   Ray_Serilog__WriteTo__9__Args__topic: ${{secrets.PUSHPLUSTOPIC}}
+  Ray_Serilog__WriteTo__9__Args__channel: ${{secrets.PUSHPLUSCHANNEL}}
+  Ray_Serilog__WriteTo__9__Args__webhook: ${{secrets.PUSHPLUSWEBHOOK}}
   Ray_Serilog__WriteTo__9__Args__restrictedToMinimumLevel: ${{secrets.PUSHPLUSLEVEL}}
   # 安全相关：
   Ray_Security__IsSkipDailyTask: ${{secrets.ISSKIPDAILYTASK}}
