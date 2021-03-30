@@ -6,7 +6,7 @@ using Ray.Serilog.Sinks.Batched;
 
 namespace Ray.Serilog.Sinks.OtherApiBatched
 {
-    public class OtherApiClient : IPushService
+    public class OtherApiClient : PushService
     {
         private readonly Uri _apiUri;
         private readonly string _json;
@@ -22,14 +22,16 @@ namespace Ray.Serilog.Sinks.OtherApiBatched
             _apiUri = new Uri(apiUrl);
         }
 
-        public override string Name => "自定义";
-
-        public override HttpResponseMessage PushMessage(string message)
+        public override string ClientName => "自定义";
+        public override string BuildMsg()
         {
-            base.PushMessage(message);
-            message = message.ToJson();
-            var json = _json.Replace(_placeholder, message);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var json = _json.Replace(_placeholder, Msg.ToJson());
+            return json;
+        }
+
+        public override HttpResponseMessage DoSend()
+        {
+            var content = new StringContent(Msg, Encoding.UTF8, "application/json");
             var response = this._httpClient.PostAsync(_apiUri, content).GetAwaiter().GetResult();
             return response;
         }

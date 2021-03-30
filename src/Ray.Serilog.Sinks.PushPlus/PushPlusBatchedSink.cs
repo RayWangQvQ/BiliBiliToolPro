@@ -37,7 +37,7 @@ namespace Ray.Serilog.Sinks.PushPlus
             base.Emit(logEvent);
         }
 
-        protected override IPushService PushService => new PushPlusApiClient(
+        protected override PushService PushService => new PushPlusApiClient(
             _token,
             _topic,
             channel: _channel,

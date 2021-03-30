@@ -26,7 +26,7 @@ namespace Ray.Serilog.Sinks.DingTalkBatched
             base.Emit(logEvent);
         }
 
-        protected override IPushService PushService => new DingTalkApiClient(_webHookUrl);
+        protected override PushService PushService => new DingTalkApiClient(_webHookUrl);
 
         public override void Dispose()
         {

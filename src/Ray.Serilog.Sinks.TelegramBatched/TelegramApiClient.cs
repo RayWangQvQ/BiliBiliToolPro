@@ -7,7 +7,7 @@ using Serilog.Debugging;
 
 namespace Ray.Serilog.Sinks.TelegramBatched
 {
-    public class TelegramApiClient : IPushService
+    public class TelegramApiClient : PushService
     {
         //https://core.telegram.org/bots/api#available-methods
 
@@ -44,20 +44,27 @@ namespace Ray.Serilog.Sinks.TelegramBatched
             this._httpClient.Timeout = TimeSpan.FromSeconds(timeoutSeconds);
         }
 
-        public override string Name => "Telegram";
+        public override string ClientName => "Telegram机器人";
 
-        public override HttpResponseMessage PushMessage(string message)
+        public override HttpResponseMessage DoSend()
         {
-            base.PushMessage(message);
             var json = new
             {
                 chat_id = _chatId,
-                text = message,
+                text = Msg,
                 parse_mode = TeleMsgType.HTML.ToString()
             }.ToJson();
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             var response = this._httpClient.PostAsync(this._apiUrl, content).GetAwaiter().GetResult();
             return response;
+        }
+
+        public override string BuildMsg()
+        {
+            //附加标题
+            Msg = $"<b>{Title}</b>{Environment.NewLine}{Environment.NewLine}{Msg}";
+
+            return base.BuildMsg();
         }
     }
 

@@ -5,7 +5,7 @@ using Ray.Serilog.Sinks.Batched;
 
 namespace Ray.Serilog.Sinks.PushPlus
 {
-    public class PushPlusApiClient : IPushService
+    public class PushPlusApiClient : PushService
     {
         //http://www.pushplus.plus/doc/
 
@@ -32,7 +32,7 @@ namespace Ray.Serilog.Sinks.PushPlus
             _webhook = webhook;
         }
 
-        public override string Name => "PushPlus";
+        public override string ClientName => "PushPlus";
 
         private PushPlusChannelType ChannelType
         {
@@ -49,10 +49,8 @@ namespace Ray.Serilog.Sinks.PushPlus
             }
         }
 
-        public override HttpResponseMessage PushMessage(string message)
+        public override HttpResponseMessage DoSend()
         {
-            base.PushMessage(message);
-
             var json = new
             {
                 token = _token,
@@ -61,8 +59,8 @@ namespace Ray.Serilog.Sinks.PushPlus
                 channel = this.ChannelType.ToString(),
                 webhook = _webhook,
 
-                title = "Ray.BiliBiliTool任务日报",
-                content = BuildMsg(message),//换行有问题，这里使用<br/>替换\r\n
+                title = Title,
+                content = Msg,
 
                 template = PushPlusMsgType.html.ToString()
             }.ToJson();
@@ -73,9 +71,9 @@ namespace Ray.Serilog.Sinks.PushPlus
             return response;
         }
 
-        public override string BuildMsg(string msg)
+        public override string BuildMsg()
         {
-            return msg.Replace(Environment.NewLine, "<br/>");
+            return Msg.Replace(Environment.NewLine, "<br/>");
 
             /*
              * 公众号预览可以正常换行，但是详情页换行失败，需要使用<br/>实现

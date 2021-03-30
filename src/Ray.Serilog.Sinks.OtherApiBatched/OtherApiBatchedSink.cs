@@ -35,7 +35,7 @@ namespace Ray.Serilog.Sinks.OtherApiBatched
             base.Emit(logEvent);
         }
 
-        protected override IPushService PushService => new OtherApiClient(_api, _jsonTemplate, _placeholder);
+        protected override PushService PushService => new OtherApiClient(_api, _jsonTemplate, _placeholder);
 
         public override void Dispose()
         {

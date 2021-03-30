@@ -25,7 +25,7 @@ namespace Ray.Serilog.Sinks.CoolPushBatched
             base.Emit(logEvent);
         }
 
-        protected override IPushService PushService => new CoolPushApiClient(_sKey);
+        protected override PushService PushService => new CoolPushApiClient(_sKey);
 
         public override void Dispose()
         {

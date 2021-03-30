@@ -34,7 +34,7 @@ namespace Ray.Serilog.Sinks.TelegramBatched
             base.Emit(logEvent);
         }
 
-        protected override IPushService PushService => new TelegramApiClient(_botToken, _chatId, 5);
+        protected override PushService PushService => new TelegramApiClient(_botToken, _chatId, 5);
 
         public override void Dispose()
         {

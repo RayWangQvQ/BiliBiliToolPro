@@ -97,12 +97,12 @@ namespace Ray.Serilog.Sinks.Batched
             }
         }
 
-        protected abstract IPushService PushService { get; }
+        protected abstract PushService PushService { get; }
 
-        protected virtual void PushMessage(string message)
+        protected virtual void PushMessage(string message, string title = "Ray.BiliBiliTool任务推送")
         {
             //SelfLog.WriteLine($"Trying to send message: '{message}'.");
-            var result = PushService.PushMessage(message);
+            var result = PushService.PushMessage(message, title);
             if (result != null)
             {
                 SelfLog.WriteLine($"Response status: {result.StatusCode}.");

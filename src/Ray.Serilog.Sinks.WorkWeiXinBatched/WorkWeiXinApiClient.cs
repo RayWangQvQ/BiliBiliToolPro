@@ -9,7 +9,7 @@ using Ray.Serilog.Sinks.Batched;
 
 namespace Ray.Serilog.Sinks.WorkWeiXinBatched
 {
-    public class WorkWeiXinApiClient : IPushService
+    public class WorkWeiXinApiClient : PushService
     {
         //https://work.weixin.qq.com/api/doc/90000/90136/91770
 
@@ -21,31 +21,36 @@ namespace Ray.Serilog.Sinks.WorkWeiXinBatched
             _apiUrl = new Uri(webHookUrl);
         }
 
-        public override string Name => "企业微信";
+        public override string ClientName => "企业微信机器人";
 
-        public override HttpResponseMessage PushMessage(string message)
+        public override string BuildMsg()
         {
-            base.PushMessage(message);
+            //附加标题
+            Msg = $"## {Title} {Environment.NewLine}{Msg}";
 
+            return base.BuildMsg();
+
+            /*
+             * 不能用<br/>换行
+             * 可以多行换行
+             */
+        }
+
+        public override HttpResponseMessage DoSend()
+        {
             var json = new
             {
                 msgtype = WorkWeiXinMsgType.markdown.ToString(),
                 markdown = new
                 {
-                    content = BuildMsg(message)
+                    content = Msg
                 }
             }.ToJson();
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var response = _httpClient.PostAsync(_apiUrl, content).GetAwaiter().GetResult();
             return response;
-
         }
-
-        /*
-         * 不能用<br/>换行
-         * 可以多行换行
-         */
     }
 
 

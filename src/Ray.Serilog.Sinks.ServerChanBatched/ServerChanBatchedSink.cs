@@ -29,7 +29,7 @@ namespace Ray.Serilog.Sinks.ServerChanBatched
             base.Emit(logEvent);
         }
 
-        protected override IPushService PushService
+        protected override PushService PushService
         {
             get
             {

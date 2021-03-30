@@ -6,7 +6,7 @@ using Ray.Serilog.Sinks.Batched;
 
 namespace Ray.Serilog.Sinks.CoolPushBatched
 {
-    public class CoolPushApiClient : IPushService
+    public class CoolPushApiClient : PushService
     {
         private const string Host = "https://push.xuthus.cc/send";
 
@@ -18,29 +18,21 @@ namespace Ray.Serilog.Sinks.CoolPushBatched
             _apiUrl = new Uri($"{Host}/{sKey}");
         }
 
-        public override string Name => "酷推";
-
-        public override HttpResponseMessage PushMessage(string message)
+        public override string ClientName => "酷推";
+        public override string BuildMsg()
         {
-            base.PushMessage(message);
+            //附加标题
+            Msg = Title + Environment.NewLine + Msg;
 
-            /*
-            var dic = new Dictionary<string, string>
-            {
-                {"c", message}
-            };
-            var content = new FormUrlEncodedContent(dic);
-            */
+            return Msg.Replace(Environment.NewLine, Environment.NewLine + Environment.NewLine);
+        }
 
-            var content = new StringContent(BuildMsg(message), Encoding.UTF8, "application/json");
+        public override HttpResponseMessage DoSend()
+        {
+            var content = new StringContent(Msg, Encoding.UTF8, "application/json");
 
             var response = _httpClient.PostAsync(_apiUrl, content).GetAwaiter().GetResult();
             return response;
-        }
-
-        public override string BuildMsg(string msg)
-        {
-            return msg.Replace(Environment.NewLine, Environment.NewLine + Environment.NewLine);
         }
     }
 }

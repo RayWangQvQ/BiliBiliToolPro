@@ -6,7 +6,7 @@ using Ray.Serilog.Sinks.Batched;
 
 namespace Ray.Serilog.Sinks.DingTalkBatched
 {
-    public class DingTalkApiClient : IPushService
+    public class DingTalkApiClient : PushService
     {
         //https://developers.dingtalk.com/document/app/overview-of-group-robots
 
@@ -18,36 +18,36 @@ namespace Ray.Serilog.Sinks.DingTalkBatched
             _apiUrl = new Uri(webHookUrl);
         }
 
-        public override string Name => "钉钉";
-
-        public override HttpResponseMessage PushMessage(string message)
+        public override string ClientName => "钉钉机器人";
+        public override string BuildMsg()
         {
-            base.PushMessage(message);
+            //附加标题
+            Msg = $"## {Title} {Environment.NewLine}{Msg}";
 
+            return Msg.Replace(Environment.NewLine, Environment.NewLine + Environment.NewLine);
+
+            /*
+             * <br/>换行无效
+             * 文档里是\n换行
+             * 只能换1行
+             */
+        }
+
+        public override HttpResponseMessage DoSend()
+        {
             var json = new
             {
                 msgtype = DingMsgType.markdown.ToString(),
                 markdown = new
                 {
-                    title = "Ray.BiliBiliTool任务日报",
-                    text = BuildMsg(message)
+                    title = Title,
+                    text = Msg
                 }
             }.ToJson();
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var response = _httpClient.PostAsync(_apiUrl, content).GetAwaiter().GetResult();
             return response;
-        }
-
-        public override string BuildMsg(string msg)
-        {
-            //return msg.Replace(Environment.NewLine, "<br/>");//无效
-            return msg.Replace(Environment.NewLine, Environment.NewLine + Environment.NewLine);
-            //return msg.Replace(Environment.NewLine, "\n\n");//文档里是\n
-
-            /*
-             * 只能换1行
-             */
         }
     }
 
