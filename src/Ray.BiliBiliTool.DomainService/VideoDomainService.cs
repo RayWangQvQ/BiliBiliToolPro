@@ -106,19 +106,41 @@ namespace Ray.BiliBiliTool.DomainService
         {
             VideoInfoDto targetVideo = null;
 
+            //至少有一项未完成，获取视频
             if (!dailyTaskStatus.Watch || !dailyTaskStatus.Share)
             {
                 targetVideo = GetRandomVideoForWatchAndShare();
                 _logger.LogInformation("【随机视频】{title}", targetVideo.Title);
             }
 
+            bool watched = false;
+            //观看
             if (!dailyTaskStatus.Watch && _dailyTaskOptions.IsWatchVideo)
+            {
                 WatchVideo(targetVideo);
+                watched = true;
+            }
             else
                 _logger.LogInformation("今天已经观看过了，不需要再看啦");
 
+            //分享
             if (!dailyTaskStatus.Share && _dailyTaskOptions.IsShareVideo)
+            {
+                //如果没有打开观看过，则分享前先打开视频
+                if (!watched)
+                {
+                    try
+                    {
+                        OpenVideo(targetVideo);
+                    }
+                    catch (Exception e)
+                    {
+                        //ignore
+                        _logger.LogError("打开视频异常：{msg}", e.Message);
+                    }
+                }
                 ShareVideo(targetVideo);
+            }
             else
                 _logger.LogInformation("今天已经分享过了，不用再分享啦");
         }
@@ -128,6 +150,10 @@ namespace Ray.BiliBiliTool.DomainService
         /// </summary>
         public void WatchVideo(VideoInfoDto videoInfo)
         {
+            //开始上报一次
+            OpenVideo(videoInfo);
+
+            //结束上报一次
             videoInfo.Duration = videoInfo.Duration ?? 15;
             int max = videoInfo.Duration < 15 ? videoInfo.Duration.Value : 15;
             int playedTime = new Random().Next(1, max);
@@ -137,36 +163,24 @@ namespace Ray.BiliBiliTool.DomainService
                 Aid = long.Parse(videoInfo.Aid),
                 Bvid = videoInfo.Bvid,
                 Cid = videoInfo.Cid,
-
                 Mid = long.Parse(_biliBiliCookie.UserId),
                 Csrf = _biliBiliCookie.BiliJct,
+
+                Played_time = playedTime,
+                Realtime = playedTime,
+                Real_played_time = playedTime,
             };
-
-            //开始上报一次
-            BiliApiResponse apiResponse1 = _videoApi.UploadVideoHeartbeat(request)
+            BiliApiResponse apiResponse = _videoApi.UploadVideoHeartbeat(request)
                 .GetAwaiter().GetResult();
 
-            if (apiResponse1.Code != 0)
-            {
-                _logger.LogError("视频播放失败，原因：{msg}", apiResponse1.Message);
-                return;
-            }
-
-            //结束上报一次
-            request.Played_time = playedTime;
-            request.Realtime = playedTime;
-            request.Real_played_time = playedTime;
-            BiliApiResponse apiResponse2 = _videoApi.UploadVideoHeartbeat(request)
-                .GetAwaiter().GetResult();
-
-            if (apiResponse2.Code == 0)
+            if (apiResponse.Code == 0)
             {
                 _expDic.TryGetValue("每日观看视频", out int exp);
                 _logger.LogInformation("视频播放成功，已观看到第{playedTime}秒，经验+{exp} √", playedTime, exp);
             }
             else
             {
-                _logger.LogError("视频播放失败，原因：{msg}", apiResponse2.Message);
+                _logger.LogError("视频播放失败，原因：{msg}", apiResponse.Message);
             }
         }
 
@@ -188,6 +202,39 @@ namespace Ray.BiliBiliTool.DomainService
             else
             {
                 _logger.LogError("视频分享失败，原因: {msg}", apiResponse.Message);
+            }
+        }
+
+        /// <summary>
+        /// 模拟打开视频播放（初始上报一次进度）
+        /// </summary>
+        /// <param name="videoInfo"></param>
+        /// <returns></returns>
+        private bool OpenVideo(VideoInfoDto videoInfo)
+        {
+            var request = new UploadVideoHeartbeatRequest
+            {
+                Aid = long.Parse(videoInfo.Aid),
+                Bvid = videoInfo.Bvid,
+                Cid = videoInfo.Cid,
+
+                Mid = long.Parse(_biliBiliCookie.UserId),
+                Csrf = _biliBiliCookie.BiliJct,
+            };
+
+            //开始上报一次
+            BiliApiResponse apiResponse = _videoApi.UploadVideoHeartbeat(request)
+                .GetAwaiter().GetResult();
+
+            if (apiResponse.Code == 0)
+            {
+                _logger.LogDebug("打开视频成功");
+                return true;
+            }
+            else
+            {
+                _logger.LogError("视频打开失败，原因：{msg}", apiResponse.Message);
+                return false;
             }
         }
 
