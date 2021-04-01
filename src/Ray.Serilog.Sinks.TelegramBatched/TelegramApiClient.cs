@@ -59,12 +59,12 @@ namespace Ray.Serilog.Sinks.TelegramBatched
             return response;
         }
 
-        public override string BuildMsg()
+        public override void BuildMsg()
         {
             //附加标题
             Msg = $"<b>{Title}</b>{Environment.NewLine}{Environment.NewLine}{Msg}";
 
-            return base.BuildMsg();
+            base.BuildMsg();
         }
     }
 

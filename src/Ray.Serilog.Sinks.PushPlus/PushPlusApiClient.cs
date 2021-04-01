@@ -3,7 +3,7 @@ using System.Net.Http;
 using System.Text;
 using Ray.Serilog.Sinks.Batched;
 
-namespace Ray.Serilog.Sinks.PushPlus
+namespace Ray.Serilog.Sinks.PushPlusBatched
 {
     public class PushPlusApiClient : PushService
     {
@@ -49,6 +49,8 @@ namespace Ray.Serilog.Sinks.PushPlus
             }
         }
 
+        protected override string NewLineStr => "<br/>";
+
         public override HttpResponseMessage DoSend()
         {
             var json = new
@@ -69,15 +71,6 @@ namespace Ray.Serilog.Sinks.PushPlus
 
             var response = _httpClient.PostAsync(_apiUrl, content).GetAwaiter().GetResult();
             return response;
-        }
-
-        public override string BuildMsg()
-        {
-            return Msg.Replace(Environment.NewLine, "<br/>");
-
-            /*
-             * 公众号预览可以正常换行，但是详情页换行失败，需要使用<br/>实现
-             */
         }
     }
 

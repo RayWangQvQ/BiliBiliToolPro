@@ -19,18 +19,19 @@ namespace Ray.Serilog.Sinks.DingTalkBatched
         }
 
         public override string ClientName => "钉钉机器人";
-        public override string BuildMsg()
+
+        /// <summary>
+        /// <br/>换行无效
+        /// 文档里是\n换行
+        /// 只能换1行
+        /// </summary>
+        protected override string NewLineStr => Environment.NewLine + Environment.NewLine;
+
+        public override void BuildMsg()
         {
             //附加标题
             Msg = $"## {Title} {Environment.NewLine}{Msg}";
-
-            return Msg.Replace(Environment.NewLine, Environment.NewLine + Environment.NewLine);
-
-            /*
-             * <br/>换行无效
-             * 文档里是\n换行
-             * 只能换1行
-             */
+            base.BuildMsg();
         }
 
         public override HttpResponseMessage DoSend()

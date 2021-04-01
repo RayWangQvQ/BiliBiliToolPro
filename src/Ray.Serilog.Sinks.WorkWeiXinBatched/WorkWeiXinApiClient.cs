@@ -23,17 +23,19 @@ namespace Ray.Serilog.Sinks.WorkWeiXinBatched
 
         public override string ClientName => "企业微信机器人";
 
-        public override string BuildMsg()
+        /// <summary>
+        /// 换行符
+        /// （经测试，使用\r\n可以正常换多行，使用\n仅可以换单行）
+        /// 不能用<br/>换行
+        /// </summary>
+        protected override string NewLineStr => "\r\n";
+
+        public override void BuildMsg()
         {
             //附加标题
-            Msg = $"## {Title} {Environment.NewLine}{Msg}";
+            Msg = $"## {Title} {Environment.NewLine}{Environment.NewLine}{Msg}";
 
-            return base.BuildMsg();
-
-            /*
-             * 不能用<br/>换行
-             * 可以多行换行
-             */
+            base.BuildMsg();
         }
 
         public override HttpResponseMessage DoSend()

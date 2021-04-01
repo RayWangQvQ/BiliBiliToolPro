@@ -19,6 +19,8 @@ namespace Ray.Serilog.Sinks.Batched
 
         public string Title { get; set; }
 
+        protected virtual string NewLineStr { get; }
+
         public virtual HttpResponseMessage PushMessage(string message, string title = "")
         {
             this.Msg = message;
@@ -26,7 +28,7 @@ namespace Ray.Serilog.Sinks.Batched
 
             SelfLog.WriteLine($"开始推送到:{ClientName}");
 
-            this.Msg = BuildMsg();
+            BuildMsg();
 
             return DoSend();
         }
@@ -35,9 +37,11 @@ namespace Ray.Serilog.Sinks.Batched
         /// 构建消息
         /// </summary>
         /// <returns></returns>
-        public virtual string BuildMsg()
+        public virtual void BuildMsg()
         {
-            return this.Msg;
+            //如果指定换行符，则替换；不指定，不替换
+            if (!string.IsNullOrEmpty(NewLineStr))
+                this.Msg = Msg.Replace(Environment.NewLine, this.NewLineStr);
         }
 
         /// <summary>

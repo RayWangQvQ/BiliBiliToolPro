@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using Ray.BiliBiliTool.Console;
 using Ray.BiliBiliTool.Infrastructure;
 using Ray.Serilog.Sinks.CoolPushBatched;
-using Ray.Serilog.Sinks.PushPlus;
+using Ray.Serilog.Sinks.PushPlusBatched;
 using Ray.Serilog.Sinks.ServerChanBatched;
 using Xunit;
 

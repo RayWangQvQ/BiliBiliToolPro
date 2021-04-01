@@ -19,12 +19,15 @@ namespace Ray.Serilog.Sinks.CoolPushBatched
         }
 
         public override string ClientName => "酷推";
-        public override string BuildMsg()
+
+        protected override string NewLineStr => Environment.NewLine + Environment.NewLine;
+
+        public override void BuildMsg()
         {
             //附加标题
             Msg = Title + Environment.NewLine + Msg;
 
-            return Msg.Replace(Environment.NewLine, Environment.NewLine + Environment.NewLine);
+            base.BuildMsg();
         }
 
         public override HttpResponseMessage DoSend()

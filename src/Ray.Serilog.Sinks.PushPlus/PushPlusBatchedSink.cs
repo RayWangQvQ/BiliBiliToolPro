@@ -1,9 +1,8 @@
 ﻿using System;
 using Ray.Serilog.Sinks.Batched;
 using Serilog.Events;
-using Serilog.Formatting;
 
-namespace Ray.Serilog.Sinks.PushPlus
+namespace Ray.Serilog.Sinks.PushPlusBatched
 {
     public class PushPlusBatchedSink : BatchedSink
     {

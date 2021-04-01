@@ -23,21 +23,18 @@ namespace Ray.Serilog.Sinks.ServerChanBatched
 
         public override string ClientName => "Server酱Turbo版";
 
-        public override string BuildMsg()
-        {
-            //return msg.Replace(Environment.NewLine, "<br/>");//无效
-            return Msg.Replace(Environment.NewLine, Environment.NewLine + Environment.NewLine);
-
-            /*
-             * 只能换1行
-             */
-        }
+        /// <summary>
+        /// 需要两个才可以换行
+        /// 只能换单行
+        /// <br/>无效
+        /// </summary>
+        protected override string NewLineStr => Environment.NewLine + Environment.NewLine;
 
         public override HttpResponseMessage DoSend()
         {
             var dic = new Dictionary<string, string>
             {
-                {"title", Title},
+                {"title", Title},//标题必填
                 {"desp", Msg}
             };
             var content = new FormUrlEncodedContent(dic);

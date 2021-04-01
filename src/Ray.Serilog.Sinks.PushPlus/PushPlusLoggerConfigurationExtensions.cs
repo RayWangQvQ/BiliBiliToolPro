@@ -3,10 +3,8 @@ using Ray.Serilog.Sinks.Batched;
 using Serilog;
 using Serilog.Configuration;
 using Serilog.Events;
-using Serilog.Formatting;
-using Serilog.Formatting.Display;
 
-namespace Ray.Serilog.Sinks.PushPlus
+namespace Ray.Serilog.Sinks.PushPlusBatched
 {
     public static class PushPlusLoggerConfigurationExtensions
     {

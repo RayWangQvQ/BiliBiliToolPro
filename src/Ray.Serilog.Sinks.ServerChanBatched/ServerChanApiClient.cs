@@ -22,15 +22,19 @@ namespace Ray.Serilog.Sinks.ServerChanBatched
         }
 
         public override string ClientName => "Server酱";
-        public override string BuildMsg()
+
+        /// <summary>
+        /// 需要两个才可以换行
+        /// 只能换单行
+        /// <br/>无效
+        /// </summary>
+        protected override string NewLineStr => Environment.NewLine + Environment.NewLine;
+
+        public override void BuildMsg()
         {
-            //return msg.Replace(Environment.NewLine, "<br/>");//无效
-            Msg = Msg.Replace(Environment.NewLine, Environment.NewLine + Environment.NewLine);
+            Msg += $"{Environment.NewLine}### 检测到当前为老版Server酱,即将失效,建议更换其他推送方式或更新至Server酱Turbo版";
 
-
-            Msg += $"{Environment.NewLine}{Environment.NewLine}### 检测到当前为老版Server酱,即将失效,建议更换其他推送方式或更新至Server酱Turbo版";
-
-            return Msg;
+            base.BuildMsg();
         }
 
         public override HttpResponseMessage DoSend()
