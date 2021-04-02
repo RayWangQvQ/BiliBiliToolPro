@@ -1,11 +1,11 @@
 ---
-name: Feature request（需求）
+name: Feature request（建议）
 about: 建议或需求
-title: "【建议】请清晰地描述你的建议内容"
-labels: 需求/feature
+title: "【建议】请在标题中清晰地概述你的建议"
+labels: 建议/enhancement
 assignees: ''
 
 ---
 
 建议内容：
-（提issue前请确认没有其他人提过相同的，重复提交会被删除，严重的会进行拉黑处理！）
+（提issue前请先确认没有其他人提过相同的议题）
