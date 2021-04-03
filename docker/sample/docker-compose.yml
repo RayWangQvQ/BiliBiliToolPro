@@ -1,3 +1,5 @@
+version: '3.9'
+
 services:
   bilibili_tool:
     image: zai7lou/bilibili_tool
@@ -31,5 +33,12 @@ services:
 
       # 企业微信推送地址：
       - Ray_Serilog__WriteTo__4__Args__webHookUrl=
+      # 钉钉：
+      - Ray_Serilog__WriteTo__5__Args__webHookUrl=
+      # PushPlus推送：
+      - Ray_Serilog__WriteTo__9__Args__token=
+      - Ray_Serilog__WriteTo__9__Args__topic=
+      - Ray_Serilog__WriteTo__9__Args__channel=
+      - Ray_Serilog__WriteTo__9__Args__webhook=
       # Server酱推送scKey：
-      - Ray_Serilog__WriteTo__6__Args__scKey=
+      - Ray_Serilog__WriteTo__6__Args__turboScKey=
