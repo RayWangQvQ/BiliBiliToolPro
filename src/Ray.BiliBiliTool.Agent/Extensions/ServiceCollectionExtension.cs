@@ -36,13 +36,13 @@ namespace Ray.BiliBiliTool.Agent.Extensions
             );
 
             //bilibli
+            services.AddBiliBiliClientApi<IUserInfoApi>("https://api.bilibili.com");
             services.AddBiliBiliClientApi<IDailyTaskApi>("https://api.bilibili.com");
             services.AddBiliBiliClientApi<IMangaApi>("https://manga.bilibili.com");
             services.AddBiliBiliClientApi<IAccountApi>("https://account.bilibili.com");
             services.AddBiliBiliClientApi<ILiveApi>("https://api.live.bilibili.com");
             services.AddBiliBiliClientApi<IRelationApi>("https://api.bilibili.com");
             services.AddBiliBiliClientApi<IChargeApi>("https://api.bilibili.com");
-            services.AddBiliBiliClientApi<IUserInfoApi>("https://api.bilibili.com");
             services.AddBiliBiliClientApi<IVideoApi>("https://api.bilibili.com");
             services.AddBiliBiliClientApi<IVideoWithoutCookieApi>("https://api.bilibili.com", false);
 

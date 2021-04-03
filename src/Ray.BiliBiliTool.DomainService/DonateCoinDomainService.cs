@@ -273,13 +273,20 @@ namespace Ray.BiliBiliTool.DomainService
         /// <returns></returns>
         private Tuple<string, string> TryGetCanDonateVideoByRegion(int tryCount)
         {
-            for (int i = 0; i < tryCount; i++)
+            try
             {
-                var video = _videoDomainService.GetRandomVideoOfRanking();
-                if (!IsCanDonate(video.Aid.ToString())) continue;
-                return Tuple.Create<string, string>(video.Aid.ToString(), video.Title);
+                for (int i = 0; i < tryCount; i++)
+                {
+                    var video = _videoDomainService.GetRandomVideoOfRanking();
+                    if (!IsCanDonate(video.Aid.ToString())) continue;
+                    return Tuple.Create<string, string>(video.Aid.ToString(), video.Title);
+                }
             }
-
+            catch (Exception e)
+            {
+                //ignore
+                _logger.LogWarning("异常：{msg}", e);
+            }
             return null;
         }
 
@@ -293,35 +300,43 @@ namespace Ray.BiliBiliTool.DomainService
         {
             if (upIds == null || upIds.Count == 0) return null;
 
-            //尝试tryCount次
-            for (int i = 1; i <= tryCount; i++)
+            try
             {
-                //获取随机Up主Id
-                long randomUpId = upIds[new Random().Next(0, upIds.Count)];
-
-                if (randomUpId == 0 || randomUpId == long.MinValue) continue;
-
-                if (randomUpId.ToString() == _biliBiliCookie.UserId)
+                //尝试tryCount次
+                for (int i = 1; i <= tryCount; i++)
                 {
-                    _logger.LogDebug("不能为自己投币");
-                    continue;
+                    //获取随机Up主Id
+                    long randomUpId = upIds[new Random().Next(0, upIds.Count)];
+
+                    if (randomUpId == 0 || randomUpId == long.MinValue) continue;
+
+                    if (randomUpId.ToString() == _biliBiliCookie.UserId)
+                    {
+                        _logger.LogDebug("不能为自己投币");
+                        continue;
+                    }
+
+                    //该up的视频总数
+                    if (!_upVideoCountDicCatch.TryGetValue(randomUpId, out int videoCount))
+                    {
+                        videoCount = _videoDomainService.GetVideoCountOfUp(randomUpId);
+                        _upVideoCountDicCatch.Add(randomUpId, videoCount);
+                    }
+                    if (videoCount == 0) continue;
+
+                    UpVideoInfo videoInfo = _videoDomainService.GetRandomVideoOfUp(randomUpId, videoCount);
+                    _logger.LogDebug("获取到视频{aid}({title})", videoInfo.Aid, videoInfo.Title);
+
+                    //检查是否可以投
+                    if (!IsCanDonate(videoInfo.Aid.ToString())) continue;
+
+                    return Tuple.Create(videoInfo.Aid.ToString(), videoInfo.Title);
                 }
-
-                //该up的视频总数
-                if (!_upVideoCountDicCatch.TryGetValue(randomUpId, out int videoCount))
-                {
-                    videoCount = _videoDomainService.GetVideoCountOfUp(randomUpId);
-                    _upVideoCountDicCatch.Add(randomUpId, videoCount);
-                }
-                if (videoCount == 0) continue;
-
-                UpVideoInfo videoInfo = _videoDomainService.GetRandomVideoOfUp(randomUpId, videoCount);
-                _logger.LogDebug("获取到视频{aid}({title})", videoInfo.Aid, videoInfo.Title);
-
-                //检查是否可以投
-                if (!IsCanDonate(videoInfo.Aid.ToString())) continue;
-
-                return Tuple.Create(videoInfo.Aid.ToString(), videoInfo.Title);
+            }
+            catch (Exception e)
+            {
+                //ignore
+                _logger.LogWarning("异常：{msg}", e);
             }
 
             return null;
@@ -334,26 +349,35 @@ namespace Ray.BiliBiliTool.DomainService
         /// <returns></returns>
         private bool IsDonatedLessThenLimitCoinsForVideo(string aid)
         {
-            //获取已投币数量
-            if (!_alreadyDonatedCoinCountCatch.TryGetValue(aid, out int multiply))
+            try
             {
-                multiply = _videoApi.GetDonatedCoinsForVideo(new GetAlreadyDonatedCoinsRequest(long.Parse(aid)))
-                    .GetAwaiter().GetResult()
-                    .Data.Multiply;
-                _alreadyDonatedCoinCountCatch.TryAdd(aid, multiply);
+                //获取已投币数量
+                if (!_alreadyDonatedCoinCountCatch.TryGetValue(aid, out int multiply))
+                {
+                    multiply = _videoApi.GetDonatedCoinsForVideo(new GetAlreadyDonatedCoinsRequest(long.Parse(aid)))
+                        .GetAwaiter().GetResult()
+                        .Data.Multiply;
+                    _alreadyDonatedCoinCountCatch.TryAdd(aid, multiply);
+                }
+
+                _logger.LogDebug("已为Av{aid}投过{num}枚硬币", aid, multiply);
+
+                if (multiply >= 2) return false;
+
+                //获取该视频可投币数量
+                int limitCoinNum = _videoDomainService.GetVideoDetail(aid).Copyright == 1
+                    ? 2 //原创，最多可投2枚
+                    : 1;//转载，最多可投1枚
+                _logger.LogDebug("该视频的最大投币数为{num}", limitCoinNum);
+
+                return multiply < limitCoinNum;
             }
-
-            _logger.LogDebug("已为Av{aid}投过{num}枚硬币", aid, multiply);
-
-            if (multiply >= 2) return false;
-
-            //获取该视频可投币数量
-            int limitCoinNum = _videoDomainService.GetVideoDetail(aid).Copyright == 1
-                ? 2 //原创，最多可投2枚
-                : 1;//转载，最多可投1枚
-            _logger.LogDebug("该视频的最大投币数为{num}", limitCoinNum);
-
-            return multiply < limitCoinNum;
+            catch (Exception e)
+            {
+                //ignore
+                _logger.LogWarning("异常：{mag}", e);
+                return false;
+            }
         }
 
         /// <summary>
