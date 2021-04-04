@@ -5,6 +5,7 @@ using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Relation;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.Console;
@@ -35,6 +36,30 @@ namespace DailyTaskTest
                     .GetAwaiter().GetResult();
 
                 Debug.WriteLine(JsonSerializer.Serialize(tags));
+            }
+        }
+
+
+        [Fact]
+        public void CreateTag()
+        {
+            using (var scope = Global.ServiceProviderRoot.CreateScope())
+            {
+                var api = scope.ServiceProvider.GetRequiredService<IRelationApi>();
+                var cookie = scope.ServiceProvider.GetRequiredService<BiliCookie>();
+
+                string referer = string.Format(RelationApiConstant.GetTagsReferer, cookie.UserId);
+
+                var request = new CreateTagRequest
+                {
+                    Tag = "≤‚ ‘",
+                    Csrf = cookie.BiliJct
+                };
+
+                var re = api.CreateTag(request, referer)
+                    .GetAwaiter().GetResult();
+
+                Debug.WriteLine(JsonSerializer.Serialize(re));
             }
         }
     }

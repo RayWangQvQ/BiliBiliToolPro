@@ -42,6 +42,15 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         [AppendHeader("Sec-Fetch-Dest", "script")]
         [HttpGet("/x/relation/tags?jsonp=jsonp")]
         Task<BiliApiResponse<List<TagDto>>> GetTags([AppendHeader("Referer")] string referer = RelationApiConstant.GetTagsReferer);
+
+        /// <summary>
+        /// 添加关注分组（tag）
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [AppendHeader("Origin", "https://space.bilibili.com")]
+        [HttpPost("/x/relation/tag/create?cross_domain=true")]
+        Task<BiliApiResponse<CreateTagResponse>> CreateTag([FormContent] CreateTagRequest request, [AppendHeader("Referer")] string referer = RelationApiConstant.GetTagsReferer);
     }
 
     public class RelationApiConstant
