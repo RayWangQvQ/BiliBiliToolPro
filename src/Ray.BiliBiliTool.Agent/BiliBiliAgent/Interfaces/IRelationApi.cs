@@ -13,8 +13,8 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
     /// <summary>
     /// 关注相关接口
     /// </summary>
-    [Header("Host", "api.bilibili.com")]
-    [Header("Referer", "https://space.bilibili.com/")]
+    [AppendHeader("Host", "api.bilibili.com", AppendHeaderType.AddIfNotExist)]
+    [AppendHeader("Referer", "https://space.bilibili.com/", AppendHeaderType.AddIfNotExist)]
     public interface IRelationApi : IBiliBiliApi
     {
         /// <summary>
@@ -38,10 +38,10 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         /// 获取关注分组
         /// </summary>
         /// <returns></returns>
-        [Header("Sec-Fetch-Mode", "no-cors")]
-        [Header("Sec-Fetch-Dest", "script")]
+        [AppendHeader("Sec-Fetch-Mode", "no-cors")]
+        [AppendHeader("Sec-Fetch-Dest", "script")]
         [HttpGet("/x/relation/tags?jsonp=jsonp")]
-        Task<BiliApiResponse<List<TagDto>>> GetTags([Header("Referer")] string referer = RelationApiConstant.GetTagsReferer);
+        Task<BiliApiResponse<List<TagDto>>> GetTags([AppendHeader("Referer")] string referer = RelationApiConstant.GetTagsReferer);
     }
 
     public class RelationApiConstant
