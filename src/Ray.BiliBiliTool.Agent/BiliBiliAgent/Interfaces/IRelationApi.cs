@@ -50,7 +50,18 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         /// <returns></returns>
         [AppendHeader("Origin", "https://space.bilibili.com")]
         [HttpPost("/x/relation/tag/create?cross_domain=true")]
-        Task<BiliApiResponse<CreateTagResponse>> CreateTag([FormContent] CreateTagRequest request, [AppendHeader("Referer")] string referer = RelationApiConstant.GetTagsReferer);
+        Task<BiliApiResponse<CreateTagResponse>> CreateTag([FormContent] CreateTagRequest request,
+            [AppendHeader("Referer")] string referer = RelationApiConstant.GetTagsReferer);
+
+        /// <summary>
+        /// 批量拷贝关注up到某指定分组
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [AppendHeader("Origin", "https://space.bilibili.com")]
+        [HttpPost("/x/relation/tags/copyUsers")]
+        Task<BiliApiResponse> CopyUpsToGroup([FormContent] CopyUserToGroupRequest request,
+            [AppendHeader("Referer")] string referer = RelationApiConstant.CopyReferer);
     }
 
     public class RelationApiConstant
@@ -60,5 +71,11 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         /// {0}为UserId
         /// </summary>
         public const string GetTagsReferer = "https://space.bilibili.com/{0}/fans/follow";
+
+        /// <summary>
+        /// CopyUpsToGroup接口中的Referer
+        /// {0}为UserId
+        /// </summary>
+        public const string CopyReferer = "https://space.bilibili.com/{0}/fans/follow?tagid=-1";
     }
 }
