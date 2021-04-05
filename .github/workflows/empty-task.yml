@@ -8,6 +8,7 @@ on:
         required: true
 
 env:
+  CloseConsoleWhenEnd: 1,
   ASPNETCORE_ENVIRONMENT: ${{secrets.ENV}} # 运行环境
   Ray_BiliBiliCookie__CookieStr: ${{secrets.COOKIESTR}}
   # 推送：
@@ -54,6 +55,7 @@ env:
   # 天选任务：
   Ray_LiveLotteryTaskConfig__ExcludeAwardNames: ${{secrets.EXCLUDEAWARDNAMES}} # 天选抽奖指定排除关键字
   Ray_LiveLotteryTaskConfig__IncludeAwardNames: ${{secrets.INCLUDEAWARDNAMES}} # 天选抽奖指定包含关键字
+  Ray_LiveLotteryTaskConfig__AutoGroupFollowings: ${{secrets.AUTOGROUPFOLLOWINGS}} # 抽奖结束后是否将关注主播自动分组
 
 jobs:
   run-daily-task:
@@ -90,4 +92,4 @@ jobs:
     - name: Run APP
       run: |
         cd ./src/Ray.BiliBiliTool.Console/bin/Publish/net5-dependent
-        dotnet Ray.BiliBiliTool.Console.dll -runTasks=${{ github.event.inputs.tasks }} -closeConsoleWhenEnd=1
+        dotnet Ray.BiliBiliTool.Console.dll -runTasks=${{ github.event.inputs.tasks }}

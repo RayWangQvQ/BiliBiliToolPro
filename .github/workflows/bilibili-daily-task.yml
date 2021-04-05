@@ -10,6 +10,7 @@ on:
     # 建议每个人通过设置名称为 Production 的 GitHub Environments 来设定为自己的目标运行时间（详细设置方法见文档说明）
 
 env:
+  CloseConsoleWhenEnd: 1,
   ASPNETCORE_ENVIRONMENT: ${{secrets.ENV}} # 运行环境
   Ray_BiliBiliCookie__CookieStr: ${{secrets.COOKIESTR}}
   # 推送：
@@ -91,4 +92,4 @@ jobs:
     - name: Run APP
       run: |
         cd ./src/Ray.BiliBiliTool.Console/bin/Publish/net5-dependent
-        dotnet Ray.BiliBiliTool.Console.dll -runTasks=Daily -closeConsoleWhenEnd=1 ${{secrets.OTHERCONFIGS}}
+        dotnet Ray.BiliBiliTool.Console.dll -runTasks=Daily ${{secrets.OTHERCONFIGS}}

@@ -21,5 +21,8 @@ namespace Ray.BiliBiliTool.Config.Options
             ExcludeAwardNames?.Split("|",
                     StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToList()
             ?? new List<string>();
+
+
+        public bool AutoGroupFollowings { get; set; } = true;
     }
 }

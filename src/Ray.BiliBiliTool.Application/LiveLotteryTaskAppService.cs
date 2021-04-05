@@ -50,6 +50,7 @@ namespace Ray.BiliBiliTool.Application
         {
             LogUserInfo();
             LotteryTianXuan();
+            AutoGroupFollowings();
         }
 
         [TaskInterceptor("打印用户信息")]
@@ -62,6 +63,19 @@ namespace Ray.BiliBiliTool.Application
         private void LotteryTianXuan()
         {
             _liveDomainService.TianXuan();
+        }
+
+        [TaskInterceptor("自动分组关注的主播")]
+        private void AutoGroupFollowings()
+        {
+            if (_liveLotteryTaskOptions.AutoGroupFollowings)
+            {
+                _liveDomainService.GroupFollowing();
+            }
+            else
+            {
+                _logger.LogInformation("配置未开启，跳过");
+            }
         }
     }
 }
