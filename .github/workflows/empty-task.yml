@@ -8,6 +8,7 @@ on:
         required: true
 
 env:
+  CloseConsoleWhenEnd: 1,
   ASPNETCORE_ENVIRONMENT: ${{secrets.ENV}} # 运行环境
   Ray_BiliBiliCookie__CookieStr: ${{secrets.COOKIESTR}}
   # 推送：
@@ -90,4 +91,4 @@ jobs:
     - name: Run APP
       run: |
         cd ./src/Ray.BiliBiliTool.Console/bin/Publish/net5-dependent
-        dotnet Ray.BiliBiliTool.Console.dll -runTasks=${{ github.event.inputs.tasks }} -closeConsoleWhenEnd=1
+        dotnet Ray.BiliBiliTool.Console.dll -runTasks=${{ github.event.inputs.tasks }}

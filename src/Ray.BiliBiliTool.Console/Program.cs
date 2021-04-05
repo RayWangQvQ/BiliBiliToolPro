@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -31,6 +32,8 @@ namespace Ray.BiliBiliTool.Console
             finally
             {
                 Log.CloseAndFlush();
+                if (Global.ConfigurationRoot["CloseConsoleWhenEnd"] != "1")
+                    Task.Delay(10 * 1000 * 60).Wait();//停留10分钟，用于查看console窗口的异常信息
             }
         }
 
