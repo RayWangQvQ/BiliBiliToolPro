@@ -28,7 +28,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live
     {
         public int Roomid { get; set; }
 
-        public int Uid { get; set; }
+        public long Uid { get; set; }
 
         public string Title { get; set; }
 

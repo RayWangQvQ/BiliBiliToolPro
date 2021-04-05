@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -62,6 +63,21 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         [HttpPost("/x/relation/tags/copyUsers")]
         Task<BiliApiResponse> CopyUpsToGroup([FormContent] CopyUserToGroupRequest request,
             [AppendHeader("Referer")] string referer = RelationApiConstant.CopyReferer);
+    }
+
+    public enum FollowingsOrderType
+    {
+        /// <summary>
+        /// 最常访问频率倒序
+        /// </summary>
+        [DefaultValue("attention")]
+        AttentionDesc,
+
+        /// <summary>
+        /// 关注时间倒序
+        /// </summary>
+        [DefaultValue("")]
+        TimeDesc
     }
 
     public class RelationApiConstant

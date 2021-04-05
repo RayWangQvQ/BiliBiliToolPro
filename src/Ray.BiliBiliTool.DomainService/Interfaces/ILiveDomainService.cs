@@ -27,5 +27,7 @@ namespace Ray.BiliBiliTool.DomainService.Interfaces
         void TianXuan();
 
         void TryJoinTianXuan(ListItemDto target);
+
+        void GroupFollowing();
     }
 }
