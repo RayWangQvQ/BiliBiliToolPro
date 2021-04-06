@@ -9,7 +9,7 @@ on:
 
 env:
   ASPNETCORE_ENVIRONMENT: ${{secrets.ENV}} # 运行环境
-  Ray_CloseConsoleWhenEnd: 1,
+  Ray_CloseConsoleWhenEnd: 1
   Ray_BiliBiliCookie__CookieStr: ${{secrets.COOKIESTR}}
   # 推送：
   Ray_Serilog__WriteTo__3__Args__botToken: ${{secrets.PUSHTGTOKEN}} # Telegram
