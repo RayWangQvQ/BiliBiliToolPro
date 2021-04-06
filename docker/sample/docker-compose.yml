@@ -10,8 +10,8 @@ services:
       - ./my_crontab:/app/custom_crontab
     tty: true
     environment:
-      - CloseConsoleWhenEnd=1
       - ASPNETCORE_ENVIRONMENT=Production
+      - Ray_CloseConsoleWhenEnd=1
       - Ray_Security__IsSkipDailyTask=false
 
       # Cookie字符串（必填）：

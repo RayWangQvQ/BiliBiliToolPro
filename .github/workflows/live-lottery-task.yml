@@ -10,9 +10,9 @@ on:
     # 建议每个人通过设置名称为 LiveLottery 的 GitHub Environments 来设定为自己的目标运行时间（详细设置方法见文档说明）
 
 env:
-  CloseConsoleWhenEnd: 1,
   IsOpenLiveLotteryTask: ${{secrets.ISOPENLIVELOTTERYTASK}} #是否开启该GitHub工作流
   ASPNETCORE_ENVIRONMENT: ${{secrets.ENV}} # 运行环境
+  Ray_CloseConsoleWhenEnd: 1,
   Ray_BiliBiliCookie__CookieStr: ${{secrets.COOKIESTR}}
   # 天选任务：
   Ray_LiveLotteryTaskConfig__ExcludeAwardNames: ${{secrets.EXCLUDEAWARDNAMES}} # 天选抽奖指定排除关键字
