@@ -13,8 +13,18 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos
             Mid = userId;
         }
 
+        public GetSpecialFollowingsRequest(long userId, int tagId)
+        {
+            Mid = userId;
+            Tagid = tagId;
+        }
+
         public long Mid { get; set; }
 
+        /// <summary>
+        /// TagId
+        /// </summary>
+        /// <sample>-10:特别关注</sample>
         public int Tagid { get; set; } = -10;
 
         public int Pn { get; set; } = 1;

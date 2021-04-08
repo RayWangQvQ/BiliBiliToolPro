@@ -243,7 +243,7 @@ namespace Ray.BiliBiliTool.DomainService
         {
             //获取特别关注列表
             var request = new GetSpecialFollowingsRequest(long.Parse(_biliBiliCookie.UserId));
-            BiliApiResponse<List<UpInfo>> specials = _relationApi.GetSpecialFollowings(request)
+            BiliApiResponse<List<UpInfo>> specials = _relationApi.GetFollowingsByTag(request)
                 .GetAwaiter().GetResult();
             if (specials.Data == null || specials.Data.Count == 0) return null;
 

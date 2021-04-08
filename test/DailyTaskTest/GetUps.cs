@@ -53,7 +53,7 @@ namespace DailyTaskTest
                 var cookie = scope.ServiceProvider.GetRequiredService<BiliCookie>();
 
                 var request = new GetSpecialFollowingsRequest(long.Parse(cookie.UserId));
-                var re = api.GetSpecialFollowings(request).Result;
+                var re = api.GetFollowingsByTag(request).Result;
 
                 Assert.True(re.Code == 0);
             }

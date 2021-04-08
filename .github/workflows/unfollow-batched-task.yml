@@ -1,10 +1,13 @@
-name: empty-task
+name: unfollow-batched-task
 
 on:
   workflow_dispatch: # 手动触发
     inputs:
-      tasks:
-        description: '任务'
+      group:
+        description: '分组名称'
+        required: true
+      count:
+        description: '目标取关个数（-1表示全部）'
         required: true
 
 env:
@@ -40,25 +43,9 @@ env:
   Ray_Security__UserAgent: ${{secrets.USERAGENT}}
   Ray_Security__WebProxy: ${{secrets.WEBPROXY}}
   Ray_Security__RandomSleepMaxMin: ${{secrets.RANDOMSLEEPMAXMIN}}
-  # 每日任务：
-  Ray_DailyTaskConfig__NumberOfCoins: ${{secrets.NUMBEROFCOINS}}
-  Ray_DailyTaskConfig__SelectLike: ${{secrets.SELECTLIKE}}
-  Ray_DailyTaskConfig__SupportUpIds: ${{secrets.SUPPORTUPIDS}}
-  Ray_DailyTaskConfig__DayOfAutoCharge: ${{secrets.DAYOFAUTOCHARGE}}
-  Ray_DailyTaskConfig__AutoChargeUpId: ${{secrets.AUTOCHARGEUPID}}
-  Ray_DailyTaskConfig__ChargeComment: ${{secrets.CHARGECOMMENT}}
-  Ray_DailyTaskConfig__DayOfReceiveVipPrivilege: ${{secrets.DAYOFRECEIVEVIPPRIVILEGE}}
-  Ray_DailyTaskConfig__DayOfExchangeSilver2Coin: ${{secrets.DAYOFEXCHANGESILVER2COIN}}
-  Ray_DailyTaskConfig__DevicePlatform: ${{secrets.DEVICEPLATFORM}}
-  Ray_Serilog__WriteTo__0__Args__restrictedToMinimumLevel: ${{secrets.CONSOLELOGLEVEL}}
-  Ray_Serilog__WriteTo__0__Args__outputTemplate: ${{secrets.CONSOLELOGTEMPLATE}}
-  # 天选任务：
-  Ray_LiveLotteryTaskConfig__ExcludeAwardNames: ${{secrets.EXCLUDEAWARDNAMES}} # 天选抽奖指定排除关键字
-  Ray_LiveLotteryTaskConfig__IncludeAwardNames: ${{secrets.INCLUDEAWARDNAMES}} # 天选抽奖指定包含关键字
-  Ray_LiveLotteryTaskConfig__AutoGroupFollowings: ${{secrets.AUTOGROUPFOLLOWINGS}} # 抽奖结束后是否将关注主播自动分组
   # 批量取关任务：
-  Ray_UnfollowBatchedTaskConfig__GroupName: ${{secrets.UNFOLLOWGROUPNAME}}
-  Ray_UnfollowBatchedTaskConfig__Count: ${{secrets.UNFOLLOWCOUNT}}
+  Ray_UnfollowBatchedTaskConfig__GroupName: ${{ github.event.inputs.group }}
+  Ray_UnfollowBatchedTaskConfig__Count: ${{ github.event.inputs.count }}
 
 jobs:
   run-daily-task:

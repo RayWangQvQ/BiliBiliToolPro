@@ -33,7 +33,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         [Header("Pragma", "no-cache")]
         [JsonReturn(EnsureMatchAcceptContentType = false)]
         [HttpGet("/x/relation/tag")]
-        Task<BiliApiResponse<List<UpInfo>>> GetSpecialFollowings(GetSpecialFollowingsRequest request);
+        Task<BiliApiResponse<List<UpInfo>>> GetFollowingsByTag(GetSpecialFollowingsRequest request);
 
         /// <summary>
         /// 获取关注分组
@@ -63,6 +63,15 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         [HttpPost("/x/relation/tags/copyUsers")]
         Task<BiliApiResponse> CopyUpsToGroup([FormContent] CopyUserToGroupRequest request,
             [AppendHeader("Referer")] string referer = RelationApiConstant.CopyReferer);
+
+        /// <summary>
+        /// 修改关系
+        /// </summary>
+        /// <returns></returns>
+        [AppendHeader("Origin", "https://space.bilibili.com")]
+        [HttpPost("/x/relation/modify")]
+        Task<BiliApiResponse> ModifyRelation([FormContent] ModifyRelationRequest request,
+            [AppendHeader("Referer")] string referer = RelationApiConstant.ModifyReferer);
     }
 
     public enum FollowingsOrderType
@@ -93,5 +102,10 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         /// {0}为UserId
         /// </summary>
         public const string CopyReferer = "https://space.bilibili.com/{0}/fans/follow?tagid=-1";
+
+        /// <summary>
+        /// ModifyRelation接口种的Referer
+        /// </summary>
+        public const string ModifyReferer = "https://space.bilibili.com/{0}/fans/follow?tagid={1}";
     }
 }
