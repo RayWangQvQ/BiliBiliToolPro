@@ -48,7 +48,7 @@ env:
   Ray_UnfollowBatchedTaskConfig__Count: ${{ github.event.inputs.count }}
 
 jobs:
-  run-daily-task:
+  run-task:
 
     runs-on: ubuntu-latest
 
@@ -82,4 +82,4 @@ jobs:
     - name: Run APP
       run: |
         cd ./src/Ray.BiliBiliTool.Console/bin/Publish/net5-dependent
-        dotnet Ray.BiliBiliTool.Console.dll -runTasks=${{ github.event.inputs.tasks }}
+        dotnet Ray.BiliBiliTool.Console.dll -runTasks=UnfollowBatched

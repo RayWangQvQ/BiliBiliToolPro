@@ -61,7 +61,7 @@ env:
   Ray_UnfollowBatchedTaskConfig__Count: ${{secrets.UNFOLLOWCOUNT}}
 
 jobs:
-  run-daily-task:
+  run-task:
 
     runs-on: ubuntu-latest
 
