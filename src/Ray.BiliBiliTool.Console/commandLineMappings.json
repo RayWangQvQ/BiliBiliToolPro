@@ -17,6 +17,9 @@
     "-excludeAwardNames": "LiveLotteryTaskConfig:ExcludeAwardNames",
     "-includeAwardNames": "LiveLotteryTaskConfig:INCLUDEAWARDNAMES",
 
+    "-unfollowGroup": "UnfollowBatchedTaskConfig:GroupName",
+    "-unfollowCount": "UnfollowBatchedTaskConfig:Count",
+
     "-intervalSecondsBetweenRequestApi": "Security:IntervalSecondsBetweenRequestApi",
     "-intervalMethodTypes": "Security:IntervalMethodTypes",
 
