@@ -77,7 +77,6 @@ namespace DailyTaskTest
                 var ups = api.GetFollowings(new GetFollowingsRequest(long.Parse(cookie.UserId), FollowingsOrderType.TimeDesc))
                     .GetAwaiter().GetResult();
                 var followingIds = ups.Data.List.Take(2).Select(x => x.Mid);
-                var fids = string.Join(",", followingIds);
 
                 string referer = string.Format(RelationApiConstant.GetTagsReferer, cookie.UserId);
 
@@ -85,12 +84,7 @@ namespace DailyTaskTest
                 var groups = api.GetTags(referer).GetAwaiter().GetResult();
                 int tagId = groups.Data.Find(x => x.Name == "ÌìÑ¡Ê±¿Ì")?.Tagid ?? 0;
 
-                var re = api.CopyUpsToGroup(new CopyUserToGroupRequest
-                {
-                    Fids = fids,
-                    Csrf = cookie.BiliJct,
-                    Tagids = tagId.ToString()
-                }, referer)
+                var re = api.CopyUpsToGroup(new CopyUserToGroupRequest(followingIds.ToList(), tagId.ToString(), cookie.BiliJct), referer)
                     .GetAwaiter().GetResult();
 
                 Debug.WriteLine(JsonSerializer.Serialize(re));

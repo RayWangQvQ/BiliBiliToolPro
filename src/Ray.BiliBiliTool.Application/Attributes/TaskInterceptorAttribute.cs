@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
 using MethodBoundaryAspect.Fody.Attributes;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,7 +32,7 @@ namespace Ray.BiliBiliTool.Application.Attributes
         {
             if (_taskName == null) return;
             string end = _taskLevel == TaskLevel.One ? Environment.NewLine : "";
-            string delimiter = GetDelimiter();
+            string delimiter = GetDelimiters();
             _logger.LogInformation(delimiter + "开始 {taskName} " + delimiter + end, _taskName);
         }
 
@@ -39,10 +40,10 @@ namespace Ray.BiliBiliTool.Application.Attributes
         {
             if (_taskName == null) return;
 
-            string delimiter = GetDelimiter();
-            var s = new string('-', _taskName.Length);
+            string delimiter = GetDelimiters();
+            var append = new string(GetDelimiter(), _taskName.Length);
 
-            _logger.LogInformation(delimiter + s + "结束" + s + delimiter + Environment.NewLine);
+            _logger.LogInformation(delimiter + append + "结束" + append + delimiter + Environment.NewLine);
         }
 
         public override void OnException(MethodExecutionArgs arg)
@@ -58,17 +59,39 @@ namespace Ray.BiliBiliTool.Application.Attributes
             arg.FlowBehavior = FlowBehavior.Continue;
         }
 
-        private string GetDelimiter()
+        private string GetDelimiters()
         {
-            int count = (int)_taskLevel;
-            return new string('-', count);
+            char delimiter = GetDelimiter();
+
+            int count = Convert.ToInt32(_taskLevel.DefaultValue());
+            return new string(delimiter, count);
+        }
+
+        private char GetDelimiter()
+        {
+            switch (_taskLevel)
+            {
+                case TaskLevel.One:
+                    return '=';
+                case TaskLevel.Two:
+                    return '-';
+                case TaskLevel.Three:
+                    return '-';
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(_taskLevel), _taskLevel, null);
+            }
         }
     }
 
     public enum TaskLevel
     {
-        One = 5,
-        Two = 3,
-        Three = 2,
+        [DefaultValue(5)]
+        One,
+
+        [DefaultValue(3)]
+        Two,
+
+        [DefaultValue(2)]
+        Three,
     }
 }
