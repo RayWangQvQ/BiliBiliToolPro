@@ -42,9 +42,10 @@ namespace Ray.BiliBiliTool.DomainService
         }
 
         /// <summary>
-        /// 本次成功参与的天选
+        /// 本次通过天选关注的主播
         /// </summary>
-        private List<ListItemDto> _tianXuanSuccessed = new List<ListItemDto>();
+        private List<ListItemDto> _tianXuanFollowed = new List<ListItemDto>();
+
         /// <summary>
         /// 开始抽奖前最后一个关注的up
         /// </summary>
@@ -123,7 +124,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// </summary>
         public void TianXuan()
         {
-            _tianXuanSuccessed = new List<ListItemDto>();
+            _tianXuanFollowed = new List<ListItemDto>();
 
             if (_liveLotteryTaskOptions.AutoGroupFollowings)
             {
@@ -174,7 +175,7 @@ namespace Ray.BiliBiliTool.DomainService
 
         public void TryJoinTianXuan(ListItemDto target)
         {
-            _logger.LogInformation("【直播间】{name}({id})", target.Title, target.Roomid);
+            _logger.LogInformation("【房间】{name}", target.ShortTitle);
 
             try
             {
@@ -188,28 +189,29 @@ namespace Ray.BiliBiliTool.DomainService
                     return;
                 }
 
-                if (check.Status != 1)
+                if (check.Status != TianXuanStatus.Enable)
                 {
                     _logger.LogInformation("已开奖，跳过" + Environment.NewLine);
                     return;
                 }
 
-                _logger.LogInformation("【奖励】{name}", check.Award_name);
-                _logger.LogInformation("【条件】{text}", check.Require_text);
-                _logger.LogInformation("【赠礼】{gift}", check.Gift_price > 0 ? check.GiftDesc : "无");
-
-                if (check.Gift_price != 0)
-                {
-                    _logger.LogInformation("需赠送礼物，跳过" + Environment.NewLine);
-                    return;
-                }
-
+                _logger.LogInformation("【奖品】{name}", check.Award_name);
                 //根据配置过滤
                 if (!check.AwardNameIsSatisfied(_liveLotteryTaskOptions.IncludeAwardNameList, _liveLotteryTaskOptions.ExcludeAwardNameList))
                 {
                     _logger.LogInformation("不满足配置的筛选条件，跳过" + Environment.NewLine);
                     return;
                 }
+
+                if (check.Gift_price > 0)
+                {
+                    _logger.LogInformation("【赠礼】{gift}", check.GiftDesc);
+                    _logger.LogInformation("需赠送礼物，跳过" + Environment.NewLine);
+                    return;
+                }
+
+                if (check.Require_type != RequireType.None)
+                    _logger.LogInformation("【条件】{text}", check.Require_text);
 
                 var request = new JoinTianXuanRequest
                 {
@@ -222,12 +224,14 @@ namespace Ray.BiliBiliTool.DomainService
                     .GetAwaiter().GetResult();
                 if (re.Code == 0)
                 {
-                    _logger.LogInformation("【参与抽奖】成功 √" + Environment.NewLine);
-                    _tianXuanSuccessed.AddIfNotExist(target, x => x.Uid == target.Uid);
+                    _logger.LogInformation("【主播】{name}({id})", target.Uname, target.Uid);
+                    _logger.LogInformation("【抽奖】成功 √" + Environment.NewLine);
+                    if (check.Require_type == RequireType.Follow)
+                        _tianXuanFollowed.AddIfNotExist(target, x => x.Uid == target.Uid);
                     return;
                 }
 
-                _logger.LogInformation("【参与抽奖】失败");
+                _logger.LogInformation("【抽奖】失败");
                 _logger.LogInformation("【原因】{msg}" + Environment.NewLine, re.Message);
             }
             catch (Exception ex)
@@ -242,17 +246,17 @@ namespace Ray.BiliBiliTool.DomainService
         /// </summary>
         public void GroupFollowing()
         {
-            if (!_tianXuanSuccessed.Any())
+            if (!_tianXuanFollowed.Any())
             {
                 _logger.LogInformation("未关注主播");
                 return;
             }
-            _logger.LogInformation("【成功抽奖的主播】{ups}",
-                string.Join("，", _tianXuanSuccessed.Select(x => x.Uname)));
+            _logger.LogInformation("【抽奖的主播】{ups}",
+                string.Join("，", _tianXuanFollowed.Select(x => x.Uname)));
 
             //目标分组up集合
             List<ListItemDto> targetUps = GetNeedGroup();
-            _logger.LogInformation("【将要自动分组的主播】{ups}",
+            _logger.LogInformation("【将自动分组】{ups}",
                 string.Join("，", targetUps.Select(x => x.Uname)));
 
             if (!targetUps.Any())
@@ -261,7 +265,7 @@ namespace Ray.BiliBiliTool.DomainService
             }
 
             //目标分组Id
-            long targetGroupId = GetTianXuanGroupId();
+            long targetGroupId = GetOrCreateTianXuanGroupId();
 
             //执行批量分组
             var referer = string.Format(RelationApiConstant.CopyReferer, _biliCookie.UserId);
@@ -297,6 +301,10 @@ namespace Ray.BiliBiliTool.DomainService
             return followings.Data.List.FirstOrDefault()?.Mid ?? 0;
         }
 
+        /// <summary>
+        /// 获取本次需要自动分组的主播
+        /// </summary>
+        /// <returns></returns>
         private List<ListItemDto> GetNeedGroup()
         {
             List<long> addUpIds = new List<long>();
@@ -306,12 +314,10 @@ namespace Ray.BiliBiliTool.DomainService
                 .GetFollowings(new GetFollowingsRequest(long.Parse(_biliCookie.UserId), FollowingsOrderType.TimeDesc))
                 .GetAwaiter().GetResult();
 
-            bool find = false;
             foreach (UpInfo item in followings.Data.List)
             {
                 if (item.Mid == _lastFollowUpId)
                 {
-                    find = true;
                     break;
                 }
 
@@ -320,7 +326,7 @@ namespace Ray.BiliBiliTool.DomainService
 
             //和成功抽奖的主播取交集
             List<ListItemDto> target = new List<ListItemDto>();
-            foreach (var listItemDto in _tianXuanSuccessed)
+            foreach (var listItemDto in _tianXuanFollowed)
             {
                 if (addUpIds.Contains(listItemDto.Uid))
                     target.Add(listItemDto);
@@ -329,7 +335,11 @@ namespace Ray.BiliBiliTool.DomainService
             return target;
         }
 
-        private long GetTianXuanGroupId()
+        /// <summary>
+        /// 获取或创建天选时刻分组
+        /// </summary>
+        /// <returns></returns>
+        private long GetOrCreateTianXuanGroupId()
         {
             //获取天选分组Id，没有就创建
             long groupId = 0;
@@ -338,7 +348,7 @@ namespace Ray.BiliBiliTool.DomainService
             var tianXuanGroup = groups.Data.FirstOrDefault(x => x.Name == "天选时刻");
             if (tianXuanGroup == null)
             {
-                _logger.LogInformation("名称为“天选时刻”的分组，不存在，尝试创建...");
+                _logger.LogInformation("“天选时刻”分组不存在，尝试创建...");
                 //创建一个
                 var createRe = _relationApi.CreateTag(new CreateTagRequest { Tag = "天选时刻", Csrf = _biliCookie.BiliJct })
                     .GetAwaiter().GetResult();
@@ -347,7 +357,7 @@ namespace Ray.BiliBiliTool.DomainService
             }
             else
             {
-                _logger.LogInformation("名称为“天选时刻”的分组已存在");
+                _logger.LogInformation("“天选时刻”分组已存在");
                 groupId = tianXuanGroup.Tagid;
             }
 

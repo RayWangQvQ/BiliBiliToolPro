@@ -15,9 +15,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live
         /// <summary>
         /// 状态
         /// </summary>
-        /// <sample>1：可参与抽奖</sample>
-        /// <sample>2：已出结果</sample>
-        public int Status { get; set; }
+        public TianXuanStatus Status { get; set; }
 
         /// <summary>
         /// 奖励名称
@@ -39,10 +37,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live
         /// <summary>
         /// 要求条件类型
         /// </summary>
-        /// <sample>1：关注主播</sample>
-        /// <sample>2：粉丝勋章级数要求</sample>
-        /// <sample>3：成为主播的提督舰长等</sample>
-        public int Require_type { get; set; }
+        public RequireType? Require_type { get; set; }
 
         /// <summary>
         /// 要求值
@@ -98,5 +93,47 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live
 
             return isInclude;
         }
+    }
+
+    /// <summary>
+    /// 天选抽奖状态
+    /// </summary>
+    public enum TianXuanStatus
+    {
+        /// <summary>
+        /// 可参与抽奖
+        /// </summary>
+        Enable = 1,
+
+        /// <summary>
+        /// 已结束
+        /// </summary>
+        End = 2
+    }
+
+    /// <summary>
+    /// 天选抽奖条件
+    /// </summary>
+    public enum RequireType
+    {
+        /// <summary>
+        /// 无
+        /// </summary>
+        None = 0,
+
+        /// <summary>
+        /// 关注主播
+        /// </summary>
+        Follow = 1,
+
+        /// <summary>
+        /// 粉丝勋章级数要求
+        /// </summary>
+        FansLevel = 2,
+
+        /// <summary>
+        /// 至少成为提督舰长等
+        /// </summary>
+        TiDuOrJianZhang = 3
     }
 }

@@ -132,8 +132,10 @@ namespace Ray.BiliBiliTool.DomainService
             int totalPage = (int)Math.Ceiling(total / (double)20);
 
             //从最后一页开始获取
-            var req = new GetSpecialFollowingsRequest(long.Parse(_cookie.UserId), tagId.Value);
-            req.Pn = totalPage;
+            var req = new GetSpecialFollowingsRequest(long.Parse(_cookie.UserId), tagId.Value)
+            {
+                Pn = totalPage
+            };
             List<UpInfo> followings = _relationApi.GetFollowingsByTag(req)
                 .GetAwaiter().GetResult()
                 .Data;
@@ -196,6 +198,11 @@ namespace Ray.BiliBiliTool.DomainService
             _logger.LogInformation("【分组下剩余】{count}人", tag?.Count ?? 0);
         }
 
+        /// <summary>
+        /// 获取分组（标签）
+        /// </summary>
+        /// <param name="groupName"></param>
+        /// <returns></returns>
         private TagDto GetTag(string groupName)
         {
             string getTagsReferer = string.Format(RelationApiConstant.GetTagsReferer, _cookie.UserId);

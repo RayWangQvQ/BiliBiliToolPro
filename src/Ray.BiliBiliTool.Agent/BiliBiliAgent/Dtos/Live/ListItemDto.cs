@@ -32,6 +32,16 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live
 
         public string Title { get; set; }
 
+        public string ShortTitle
+        {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(Title) || Title.Length <= 5) return Title;
+
+                return Title.Substring(0, 5) + "...";
+            }
+        }
+
         public string Uname { get; set; }
 
         public int Parent_id { get; set; }
