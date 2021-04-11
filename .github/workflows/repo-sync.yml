@@ -1,3 +1,5 @@
+# 自动同步上游仓库
+
 name: repo-sync
 
 on:

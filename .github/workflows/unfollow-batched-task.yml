@@ -1,3 +1,5 @@
+# 批量取关
+
 name: unfollow-batched-task
 
 on:

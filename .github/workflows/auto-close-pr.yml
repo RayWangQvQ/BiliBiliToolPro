@@ -1,3 +1,5 @@
+# 自动关闭不规范PR
+
 name: Autocloser
 on: pull_request_target
 jobs:

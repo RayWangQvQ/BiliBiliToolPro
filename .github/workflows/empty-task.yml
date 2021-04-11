@@ -4,7 +4,7 @@ on:
   workflow_dispatch: # 手动触发
     inputs:
       tasks:
-        description: '任务'
+        description: '任务Code'
         required: true
 
 env:
