@@ -1,11 +1,11 @@
 #!/bin/bash
 set -e
 
-echo "初始启动容器，尝试首次运行每日任务"
-/app/Ray.BiliBiliTool.Console -runTasks=Daily -closeConsoleWhenEnd=1
+# https://stackoverflow.com/questions/27771781/how-can-i-access-docker-set-environment-variables-from-a-cron-job
+echo "[step 1/4]导入环境变量"
+printenv | grep -v "no_proxy" > /etc/environment
 
-
-echo "配置cron定时任务"
+echo "[step 2/4]配置cron定时任务"
 myarray=(`find /app -maxdepth 1 -name "custom_crontab"`)
 if [ ${#myarray[@]} -gt 0 ]; then 
 	echo "检测到自定义了cron定时任务，使用自定义配置"
@@ -15,13 +15,13 @@ else
 	cp /app/crontab /etc/cron.d/bilicron
 fi
 
+echo "[step 3/4]启动定时任务，开启每日定时运行"
 chmod 0644 /etc/cron.d/bilicron
 crontab /etc/cron.d/bilicron
 touch /var/log/cron.log
+cron
 
-# https://stackoverflow.com/questions/27771781/how-can-i-access-docker-set-environment-variables-from-a-cron-job
-echo "导入环境变量"
-printenv | grep -v "no_proxy" > /etc/environment
+echo "[step 4/4]初始启动容器，尝试测试Cookie"
+/app/Ray.BiliBiliTool.Console -runTasks=Test -closeConsoleWhenEnd=1
 
-echo "启动定时任务，开启每日定时运行"
-cron && tail -f /var/log/cron.log
+tail -f /var/log/cron.log

@@ -4,7 +4,7 @@ services:
   bilibili_tool:
     image: zai7lou/bilibili_tool
     container_name: bilibili_tool
-    restart: always
+    # restart: always
     volumes:
       - ./Logs:/app/Logs
       - ./my_crontab:/app/custom_crontab
