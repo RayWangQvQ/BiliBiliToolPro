@@ -20,25 +20,19 @@ namespace Ray.BiliBiliTool.Application
     {
         private readonly ILogger<LiveLotteryTaskAppService> _logger;
         private readonly IConfiguration _configuration;
-        private readonly ILiveDomainService _liveDomainService;
-        private readonly LiveLotteryTaskOptions _liveLotteryTaskOptions;
         private readonly SecurityOptions _securityOptions;
         private readonly UnfollowBatchedTaskOptions _unfollowBatchedTaskOptions;
         private readonly IAccountDomainService _accountDomainService;
 
         public UnfollowBatchedTaskAppService(
             IConfiguration configuration,
-            ILiveDomainService liveDomainService,
             IOptionsMonitor<SecurityOptions> securityOptions,
-            IOptionsMonitor<LiveLotteryTaskOptions> liveLotteryTaskOptions,
             IOptionsMonitor<UnfollowBatchedTaskOptions> unfollwBatchedTaskOptions,
             ILogger<LiveLotteryTaskAppService> logger,
             IAccountDomainService accountDomainService
             )
         {
             _configuration = configuration;
-            _liveDomainService = liveDomainService;
-            _liveLotteryTaskOptions = liveLotteryTaskOptions.CurrentValue;
             _securityOptions = securityOptions.CurrentValue;
             _logger = logger;
             _accountDomainService = accountDomainService;
