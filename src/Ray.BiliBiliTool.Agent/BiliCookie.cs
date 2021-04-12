@@ -16,18 +16,12 @@ namespace Ray.BiliBiliTool.Agent
     public class BiliCookie : CookieInfo
     {
         private readonly ILogger<BiliCookie> _logger;
-        private readonly IConfiguration _configuration;
-        private readonly BiliBiliCookieOptions _options;
 
         public BiliCookie(ILogger<BiliCookie> logger,
-            IOptionsMonitor<BiliBiliCookieOptions> optionsMonitor,
-            IConfiguration configuration) : base(optionsMonitor.CurrentValue.CookieStr)
+            CookieStrFactory cookieStrFactory)
+            : base(cookieStrFactory.Create())
         {
             _logger = logger;
-            _configuration = configuration;
-            _options = optionsMonitor.CurrentValue;
-
-            CookieStr = _options.CookieStr ?? "";
 
             if (CookieStr.IsNotNullOrEmpty())
             {
@@ -36,19 +30,19 @@ namespace Ray.BiliBiliTool.Agent
                     if (str.IsNullOrEmpty()) continue;
                     var list = str.Split('=').ToList();
                     if (list.Count >= 2)
-                        CookieDictionary[list[0].Trim()] = list[1].Trim();
+                        CookieItemDictionary[list[0].Trim()] = list[1].Trim();
                 }
             }
 
-            if (CookieDictionary.TryGetValue(GetPropertyDescription(nameof(UserId)), out string userId))
+            if (CookieItemDictionary.TryGetValue(GetPropertyDescription(nameof(UserId)), out string userId))
             {
                 UserId = userId;
             }
-            if (CookieDictionary.TryGetValue(GetPropertyDescription(nameof(BiliJct)), out string jct))
+            if (CookieItemDictionary.TryGetValue(GetPropertyDescription(nameof(BiliJct)), out string jct))
             {
                 BiliJct = jct;
             }
-            if (CookieDictionary.TryGetValue(GetPropertyDescription(nameof(SessData)), out string sess))
+            if (CookieItemDictionary.TryGetValue(GetPropertyDescription(nameof(SessData)), out string sess))
             {
                 SessData = sess;
             }

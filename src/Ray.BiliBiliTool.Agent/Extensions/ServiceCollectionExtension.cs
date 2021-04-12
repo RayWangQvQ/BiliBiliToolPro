@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using Microsoft.Extensions.Configuration;
@@ -22,7 +24,25 @@ namespace Ray.BiliBiliTool.Agent.Extensions
         /// <returns></returns>
         public static IServiceCollection AddBiliBiliClientApi(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddSingleton<BiliCookie>();
+            //Cookie
+            services.AddSingleton<CookieStrFactory>(sp =>
+            {
+                var list = new List<string>();
+                var config = sp.GetRequiredService<IConfiguration>();
+
+                //兼容老版
+                var old = config["BiliBiliCookie:CookieStr"];
+                if (!string.IsNullOrWhiteSpace(old)) list.Add(old);
+
+                var configList = config.GetSection("BiliBiliCookies")
+                    .Get<List<string>>()
+                    .Where(x => !string.IsNullOrWhiteSpace(x))
+                    .ToList();
+                list.AddRange(configList);
+
+                return new CookieStrFactory(list);
+            });
+            services.AddScoped<BiliCookie>();
 
             //全局代理
             services.SetGlobalProxy(configuration);
