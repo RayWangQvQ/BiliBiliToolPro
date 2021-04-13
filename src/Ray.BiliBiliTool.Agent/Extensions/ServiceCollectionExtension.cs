@@ -97,11 +97,11 @@ namespace Ray.BiliBiliTool.Agent.Extensions
             if (withCookie)
                 handler.ConfigurePrimaryHttpMessageHandler(sp =>
                 {
-                    var handler = new HttpClientHandler
+                    var httpClientHandler = new HttpClientHandler
                     {
                         CookieContainer = sp.GetRequiredService<BiliCookie>().CreateCookieContainer(uri)
                     };
-                    return handler;
+                    return httpClientHandler;
                 });
 
             return services;

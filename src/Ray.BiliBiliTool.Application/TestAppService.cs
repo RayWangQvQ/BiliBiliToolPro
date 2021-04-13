@@ -33,9 +33,6 @@ namespace Ray.BiliBiliTool.Application
             _accountDomainService = accountDomainService;
         }
 
-        public override string TaskName => "Test";
-
-
         [TaskInterceptor("测试Cookie")]
         public override void DoTask()
         {

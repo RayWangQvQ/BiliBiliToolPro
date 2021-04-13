@@ -45,7 +45,7 @@ namespace Ray.BiliBiliTool.Console.HostedServices
                 for (int i = 0; i < _cookieStrFactory.Count; i++)
                 {
                     _cookieStrFactory.CurrentNum = i + 1;
-                    _logger.LogInformation("开始账号 {num} ：" + Environment.NewLine, _cookieStrFactory.CurrentNum);
+                    _logger.LogInformation("账号 {num} ：" + Environment.NewLine, _cookieStrFactory.CurrentNum);
 
                     try
                     {
@@ -85,11 +85,12 @@ namespace Ray.BiliBiliTool.Console.HostedServices
         {
             using (var scope = _serviceProvider.CreateScope())
             {
-                var appServices = scope.ServiceProvider.GetRequiredService<IEnumerable<IAppService>>();
                 foreach (var task in tasks)
                 {
-                    var appService = appServices.FirstOrDefault(x => x.TaskName == task);
-                    if (appService == null) _logger.LogWarning("任务不存在：{task}", task);
+                    var type = AppTaskTypeFactory.Create(task);
+                    if (type == null) _logger.LogWarning("任务不存在：{task}", task);
+
+                    var appService = (IAppService)scope.ServiceProvider.GetRequiredService(type);
                     appService?.DoTask();
                 }
             }
