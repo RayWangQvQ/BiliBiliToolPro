@@ -61,12 +61,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{61613EF4-3644-42D4-A620-70547291FB38}"
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\auto-close-pr.yml = .github\workflows\auto-close-pr.yml
-		.github\workflows\bilibili-daily-task.yml = .github\workflows\bilibili-daily-task.yml
 		.github\workflows\empty-task.yml = .github\workflows\empty-task.yml
-		.github\workflows\live-lottery-task.yml = .github\workflows\live-lottery-task.yml
 		.github\workflows\publish-release.yml = .github\workflows\publish-release.yml
 		.github\workflows\repo-sync.yml = .github\workflows\repo-sync.yml
-		.github\workflows\unfollow-batched-task.yml = .github\workflows\unfollow-batched-task.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker", "docker", "{A93210FD-27B6-40E4-B08D-391F96CA2754}"
@@ -99,6 +96,13 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ray.Serilog.Sinks.TelegramBatched", "src\Ray.Serilog.Sinks\Ray.Serilog.Sinks.TelegramBatched\Ray.Serilog.Sinks.TelegramBatched.csproj", "{566DE314-E766-4C75-B8A8-27EDBB8F06D8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ray.Serilog.Sinks.WorkWeiXinBatched", "src\Ray.Serilog.Sinks\Ray.Serilog.Sinks.WorkWeiXinBatched\Ray.Serilog.Sinks.WorkWeiXinBatched.csproj", "{F2AFCE4C-42A2-4EB1-873B-7C9EB062C002}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "bak", "bak", "{B84166E2-0BA6-4614-8DC4-77AE3A34218D}"
+	ProjectSection(SolutionItems) = preProject
+		bak\bilibili-daily-task.yml = bak\bilibili-daily-task.yml
+		bak\live-lottery-task.yml = bak\live-lottery-task.yml
+		bak\unfollow-batched-task.yml = bak\unfollow-batched-task.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -220,6 +224,7 @@ Global
 		{0BF3E821-AFD3-4AE4-A155-BA04F3269327} = {4BAFC980-7A73-45C3-9460-8B8CCB87939B}
 		{566DE314-E766-4C75-B8A8-27EDBB8F06D8} = {4BAFC980-7A73-45C3-9460-8B8CCB87939B}
 		{F2AFCE4C-42A2-4EB1-873B-7C9EB062C002} = {4BAFC980-7A73-45C3-9460-8B8CCB87939B}
+		{B84166E2-0BA6-4614-8DC4-77AE3A34218D} = {F3DE0D72-426B-4AD9-B3ED-3343CF4223F1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {197319DA-1148-4A99-847C-8B270B6A29AB}
