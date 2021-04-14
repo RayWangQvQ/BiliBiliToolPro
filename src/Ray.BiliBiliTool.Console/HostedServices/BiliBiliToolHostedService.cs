@@ -87,7 +87,7 @@ namespace Ray.BiliBiliTool.Console.HostedServices
             {
                 foreach (var task in tasks)
                 {
-                    var type = AppTaskTypeFactory.Create(task);
+                    var type = TaskTypeFactory.Create(task);
                     if (type == null) _logger.LogWarning("任务不存在：{task}", task);
 
                     var appService = (IAppService)scope.ServiceProvider.GetRequiredService(type);

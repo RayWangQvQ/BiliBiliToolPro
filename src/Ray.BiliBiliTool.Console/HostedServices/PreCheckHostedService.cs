@@ -11,6 +11,9 @@ using Ray.BiliBiliTool.Infrastructure;
 
 namespace Ray.BiliBiliTool.Console.HostedServices
 {
+    /// <summary>
+    /// 前置检查
+    /// </summary>
     public class PreCheckHostedService : IHostedService
     {
         private readonly ILogger<PreCheckHostedService> _logger;
@@ -33,7 +36,7 @@ namespace Ray.BiliBiliTool.Console.HostedServices
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            //任务
+            //目标任务
             var tasks = _configuration["RunTasks"]
                 .Split("&", options: StringSplitOptions.RemoveEmptyEntries);
             _logger.LogInformation("【任务】{tasks}", _configuration["RunTasks"]);

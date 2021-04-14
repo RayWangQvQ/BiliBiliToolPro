@@ -9,6 +9,9 @@ using Ray.BiliBiliTool.Infrastructure.Helpers;
 
 namespace Ray.BiliBiliTool.Console.HostedServices
 {
+    /// <summary>
+    /// 打印应用信息
+    /// </summary>
     public class LogAppInfoHostedService : IHostedService
     {
         private readonly ILogger<LogAppInfoHostedService> _logger;

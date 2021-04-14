@@ -8,6 +8,9 @@ using Ray.BiliBiliTool.Config.Options;
 
 namespace Ray.BiliBiliTool.Console.HostedServices
 {
+    /// <summary>
+    /// 应用启动后的随机睡眠
+    /// </summary>
     public class RandomSleepHostedService : IHostedService
     {
         private readonly ILogger<RandomSleepHostedService> _logger;

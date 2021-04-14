@@ -80,7 +80,7 @@ namespace Ray.BiliBiliTool.Agent.Extensions
             where TInterface : class
         {
             var uri = new Uri(host);
-            var handler = services
+            IHttpClientBuilder httpClientBuilder = services
                 .AddHttpApi<TInterface>(o =>
                 {
                     o.HttpHost = uri;
@@ -95,7 +95,7 @@ namespace Ray.BiliBiliTool.Agent.Extensions
                 .AddPolicyHandler(GetRetryPolicy());
 
             if (withCookie)
-                handler.ConfigurePrimaryHttpMessageHandler(sp =>
+                httpClientBuilder.ConfigurePrimaryHttpMessageHandler(sp =>
                 {
                     var httpClientHandler = new HttpClientHandler
                     {

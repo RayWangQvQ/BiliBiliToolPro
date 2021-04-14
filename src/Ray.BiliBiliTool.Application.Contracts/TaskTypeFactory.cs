@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace Ray.BiliBiliTool.Application.Contracts
 {
-    public class AppTaskTypeFactory
+    public class TaskTypeFactory
     {
         private static Dictionary<string, Type> _dic = new Dictionary<string, Type>();
 
-        static AppTaskTypeFactory()
+        static TaskTypeFactory()
         {
             Assembly assembly = Assembly.GetExecutingAssembly();
             var types = assembly.GetTypes()
