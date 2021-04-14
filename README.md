@@ -216,8 +216,8 @@ dotnet Ray.BiliBiliTool.Console.dll -runTasks=Daily&LiveLottery
 
 | 任务名 | Code | 功能 | 默认WorkFlow文件 | GithHub Environments | 推荐运行频率 | 备注 |
 | :----: | :----: | :----: | :----: | :----: | :----: | :----: |
-| 每日任务 | Daily | 完成每日任务获取满额65点经验（登录、观看视频、分享视频、投币），以及签到、领福利和充电等附属功能 | bilibili-daily-task.yml | Production(用于Actions设置延时) | 每天一次 | |
-| 天选时刻抽奖 | LiveLottery | 直播中心天选时刻抽奖 | live-lottery-task.yml | LiveLottery(用于Actions设置延时) | Docker或其他本地环境随意，Actions环境请保持每天运行0-4次内，避免被封 | 对应Actions工作流默认是关闭的，需要添加key为`ISOPENLIVELOTTERYTASK`、值为`true`的secret来手动开启；大部分抽奖都需要关注主播，介意的不要开启 |
+| 每日任务 | Daily | 完成每日任务获取满额65点经验（登录、观看视频、分享视频、投币），以及签到、领福利和充电等附属功能 | bilibili-daily-task.yml | Production | 每天一次 | |
+| 天选时刻抽奖 | LiveLottery | 直播中心天选时刻抽奖 | live-lottery-task.yml | LiveLottery | 建议每天运行0-4次内 | 对应Actions工作流默认是关闭的，需要添加key为`ISOPENLIVELOTTERYTASK`、值为`true`的secret来手动开启；大部分抽奖都需要关注主播，介意的不要开启 |
 | 批量取关 | UnfollowBatched | 批量取关指定分组下的所有关注（主要用于清理天选抽奖而产生的关注） | unfollow-batched-task.yml | 无 | 需要时手动运行 | 需要通过配置指定2个参数：`GroupName`（分组名称，如`天选时刻`）和`Count`（目标取关个数，-1表示全部），应用会倒序从后往前取关指定个数 |
 | 测试Cookie | Test | 测试Cookie是否正常 | 无，可以使用empty-task.yml来运行 | 无 | 需要时手动运行 | 主要用于调试 |
 | 空模板 | 无（只用于 GitHub Actions ） | 用于 GitHub Actions 运行指定的任意任务 | empty-task.yml | 无 | 需要时手动运行 | 需要通过配置指定要运行的任务Code（多个使用英文逗号分隔），主要用于调试 |
