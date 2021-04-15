@@ -80,8 +80,8 @@ jobs:
         cd ./src/Ray.BiliBiliTool.Console
         dotnet publish --configuration Release --self-contained false --output ./bin/Publish/net5-dependent
        
-    # 运行
-    - name: Run APP
+    # 测试运行
+    - name: Test APP
       run: |
         cd ./src/Ray.BiliBiliTool.Console/bin/Publish/net5-dependent
         dotnet Ray.BiliBiliTool.Console.dll -runTasks=UnfollowBatched
