@@ -25,7 +25,7 @@ BiliBiliTool
 - [1. 如何使用](#1-如何使用)
     - [1.1. 第一步：获取自己的 Cookie](#11-第一步获取自己的-cookie)
     - [1.2. 第二步：配置 Cookie 并运行 BiliBiliTool](#12-第二步配置-cookie-并运行-bilibilitool)
-        - [1.2.1. 运行方式一：xxx](#121-运行方式一xxx)
+        - [1.2.1. 运行方式一：Github Actions 运行](#121-运行方式一github-actions-运行)
         - [1.2.2. 运行方式二：下载程序包到本地或服务器运行](#122-运行方式二下载程序包到本地或服务器运行)
         - [1.2.3. 运行方式三：docker容器化运行（推荐）](#123-运行方式三docker容器化运行推荐)
 - [2. 功能任务说明](#2-功能任务说明)
@@ -88,9 +88,9 @@ BiliBiliTool 就是收集了一系列api，通过每日自动运行程序，依�
 
 ### 1.2. 第二步：配置 Cookie 并运行 BiliBiliTool
 
-运行 BiliBiliTool 主要有三种方式，一是xxx，二是通过下载Release包到本地或服务器运行，三是使用docker容器化运行。
+运行 BiliBiliTool 主要有三种方式，一是Github Actions，二是通过下载Release包到本地或服务器运行，三是使用docker容器化运行。
 
-对于熟悉 xxx 的朋友，推荐使用方式一，可以实现线上的每天自动运行，不需自己动手，一劳永逸。
+对于熟悉 GitHub 的朋友，推荐使用方式一，可以实现线上的每天自动运行，不需自己动手，一劳永逸。
 
 对于想先快速运行一下尝个鲜、或是要部署到自己服务器的朋友，可以跳转到方式二 Release 包运行，操作简单快速。
 
@@ -98,9 +98,47 @@ BiliBiliTool 就是收集了一系列api，通过每日自动运行程序，依�
 
 以下三种方式任选一种适合自己的即可。
 
-#### 1.2.1. 运行方式一：xxx
+#### 1.2.1. 运行方式一：Github Actions 运行
 
-暂时删除该方式，避避风头。
+GA 是微软（巨硬）收购 G 站之后新增的内置 CI/CD 方案，其核心就是一个可以运行脚本的小型服务器。
+
+有了它，我们就可以实现每天线上自动运行我们的应用程序，通过配置还可以实现版本的自动同步更新。
+
+<details>
+
+Ⅰ. **首先点击本页面右上角的 fork 按钮，复刻本项目到自己的仓库**
+
+Ⅱ. **进入自己 fork 的仓库，点击 Settings-> Secrets-> New Secrets， 添加 1 个 Secrets，其名称为`COOKIESTR`，值为刚才我们保存的 `cookie 字符串`。它们将作为配置项，在应用启动时传入程序。**
+
+![Secrets图示](https://cdn.jsdelivr.net/gh/RayWangQvQ/BiliBiliTool.Docs@main/imgs/git-secrets.png)
+
+![添加CookieStr图示](https://cdn.jsdelivr.net/gh/RayWangQvQ/BiliBiliTool.Docs@main/imgs/git-secrets-add-cookie.png)
+
+
+Ⅲ. **开启 Actions 并触发每日自动执行**
+
+刚 Fork 完，所有 Actions 都是默认关闭的，都配置好后，需要手动点击 Enable 开启 Actions。开启后请手动执行一次工作流，验证是否可以正常工作，操作步骤如下图所示：
+
+![Actions图示](https://cdn.jsdelivr.net/gh/RayWangQvQ/BiliBiliTool.Docs@main/imgs/run-workflow.png)
+
+运行结束后，请查看运行日志：
+
+![Actions日志图示](https://cdn.jsdelivr.net/gh/RayWangQvQ/BiliBiliTool.Docs@main/imgs/github-actions-log-1.png)
+![Actions日志图示](https://cdn.jsdelivr.net/gh/RayWangQvQ/BiliBiliTool.Docs@main/imgs/github-actions-log-2.png)
+
+Actions 的执行策略默认是每天 0 点整触发运行，如要设置为指定的运行时间，请详见下面**常见问题**章节中的《**Actions 如何修改定时任务的执行时间？**》
+
+**建议每个人都设置下每日执行时间！不要使用默认时间！最好也不要设定在整点，错开峰值，避免 G 站的同一个IP在相同时间去请求 B 站接口，导致 IP 被禁！**
+
+**应用运行后，会进行0到30分钟的随机睡眠，是为了使每天定时运行时间在范围内波动。刚开始如果需要频繁调试，建议使用empty-task.yml来调试，或者参考下面的个性化自定义配置章节，将睡眠配置为1分钟，避免每次测试都需要等待半小时**
+
+如果配置了推送，执行成功后接收端会收到推送消息，推送效果如下所示：
+
+![微信推送图示](https://cdn.jsdelivr.net/gh/RayWangQvQ/BiliBiliTool.Docs@main/imgs/wechat-push.png)
+
+目前默认支持**Telegram推送、企业微信推送、钉钉推送、PushPlus推送、Server酱推送和酷推QQ推送**，如果需要推送到其他端，也可以配置为任意的可以接受消息的Api地址，关于如何配置推送请详见下面的**个性化自定义配置**章节。
+
+</details>
 
 #### 1.2.2. 运行方式二：下载程序包到本地或服务器运行
 
