@@ -32,5 +32,10 @@ FROM base AS final
 WORKDIR /app
 ENV TIME_ZONE=Asia/Shanghai
 COPY --from=publish /app/publish .
-COPY ./docker/entry.sh ./docker/crontab /app/
+COPY ../../docker/entry.sh ../../docker/crontab /app/
+RUN ln -fs /usr/share/zoneinfo/$TIME_ZONE /etc/localtime \
+    && echo $TIME_ZONE > /etc/timezone \
+    && apt-get update \
+    && apt-get install -y cron tzdata \
+    && apt-get clean
 ENTRYPOINT ["/bin/bash", "-c", "/app/entry.sh"]
