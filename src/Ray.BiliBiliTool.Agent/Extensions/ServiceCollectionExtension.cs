@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Polly;
 using Polly.Extensions.Http;
@@ -42,7 +43,7 @@ namespace Ray.BiliBiliTool.Agent.Extensions
 
                 return new CookieStrFactory(list);
             });
-            services.AddScoped<BiliCookie>();
+            services.AddTransient<BiliCookie>();
 
             //全局代理
             services.SetGlobalProxy(configuration);
@@ -95,13 +96,10 @@ namespace Ray.BiliBiliTool.Agent.Extensions
                 .AddPolicyHandler(GetRetryPolicy());
 
             if (withCookie)
-                httpClientBuilder.ConfigurePrimaryHttpMessageHandler(sp =>
+                httpClientBuilder.ConfigureHttpClient((sp, c) =>
                 {
-                    var httpClientHandler = new HttpClientHandler
-                    {
-                        CookieContainer = sp.GetRequiredService<BiliCookie>().CreateCookieContainer(uri)
-                    };
-                    return httpClientHandler;
+                    var ck = sp.GetRequiredService<BiliCookie>();
+                    c.DefaultRequestHeaders.Add("Cookie", ck.CookieStr);
                 });
 
             return services;
