@@ -39,7 +39,7 @@ namespace Ray.BiliBiliTool.Console.HostedServices
             //目标任务
             var tasks = _configuration["RunTasks"]
                 .Split("&", options: StringSplitOptions.RemoveEmptyEntries);
-            _logger.LogInformation("【任务】{tasks}", _configuration["RunTasks"]);
+            _logger.LogInformation("【目标任务】{tasks}", _configuration["RunTasks"]);
             if (!tasks.Any()) return Task.CompletedTask;
 
             //Cookie
