@@ -25,7 +25,7 @@ cron
 echo "=>完成"
 
 echo "[step 4/4]初始启动容器，尝试测试Cookie"
-/app/Ray.BiliBiliTool.Console -runTasks=Test -closeConsoleWhenEnd=1
+dotnet /app/Ray.BiliBiliTool.Console.dll -runTasks=Test -closeConsoleWhenEnd=1
 echo "=>完成"
 
 echo "[step 全部已完成]"
