@@ -15,7 +15,8 @@ services:
       - Ray_Security__IsSkipDailyTask=false
 
       # Cookie字符串（必填）：
-      - Ray_BiliBiliCookie__CookieStr=
+      - Ray_BiliBiliCookies__1=
+      - Ray_BiliBiliCookies__2=
 
       # UA：
       - Ray_Security__UserAgent=
