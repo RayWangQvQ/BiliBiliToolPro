@@ -15,13 +15,14 @@ namespace Ray.BiliBiliTool.Infrastructure
 
             CookieItemList = CookieStr.Split(";")
                 .Select(x => x.Trim())
-                .Where(x => x.IsNotNullOrEmpty())
+                .Where(x => !string.IsNullOrWhiteSpace(x))
                 .ToList();
 
             foreach (var item in CookieItemList)
             {
                 var list = item.Split('=');
-                CookieItemDictionary.TryAdd(list[0].Trim(), list[1].Trim());
+                if (list.Length >= 2)
+                    CookieItemDictionary.TryAdd(list[0].Trim(), list[1].Trim());
             }
         }
 
@@ -40,6 +41,11 @@ namespace Ray.BiliBiliTool.Infrastructure
             }
 
             return cookieContainer;
+        }
+
+        public virtual void Check()
+        {
+            if (string.IsNullOrWhiteSpace(CookieStr)) throw new Exception("Cookie字符串为空");
         }
     }
 }

@@ -2,6 +2,7 @@
   //命令行启动时的参数映射
   "CommandLineMappings": {
     "-cookieStr": "BiliBiliCookie:CookieStr",
+    "-cookieStr1": "BiliBiliCookies:1",
 
     "-runTasks": "RunTasks",
 

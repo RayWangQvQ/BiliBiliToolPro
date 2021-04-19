@@ -27,7 +27,7 @@ namespace Ray.BiliBiliTool.Infrastructure
             else return false;
         }
 
-        public string Create()
+        public string GetCurrentCookieStr()
         {
             if (!Any()) throw new Exception($"第 {CurrentNum} 个cookie字符串不存在");
 
