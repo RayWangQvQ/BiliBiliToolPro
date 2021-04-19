@@ -157,7 +157,7 @@ Actions 的执行策略默认是每天 0 点整触发运行，如要设置为指
 
 请下载 `net-dependent.zip` 文件，本文件依赖本地运行库（runtime-dependent），所以文件包非常小（不到1M）。
 
-P.S.这里的运行环境指的是 `ASP.NET Core Runtime 5.0.0`与`.NET Runtime 5.0.0` ，安装方法可详见 [常见问题](https://github.com/RayWangQvQ/BiliBiliTool.Docs/blob/main/questions.md) 中的 **本地或服务器如何安装.net环境**
+P.S.这里的运行环境指的是 `.NET Runtime 5.0.0` ，安装方法可详见 [常见问题](https://github.com/RayWangQvQ/BiliBiliTool.Docs/blob/main/questions.md) 中的 **本地或服务器如何安装.net环境**
 
 * 如果不希望安装或不知如何安装.net运行环境：
 
@@ -230,6 +230,8 @@ bilibli_tool
 可以进入容器查看详细运行日志，当前目录也会生成日志文件。
 
 每次容器启动会去测试一遍Cookie，其他任务由设定的cron来指定定时触发，如需修改定时运行时间，请修改`my_crontab`中的cron表达式，然后再次执行启动容器命令。
+
+其他信息见 [docker/README.md](docker/README.md)
 
 </details>
 
