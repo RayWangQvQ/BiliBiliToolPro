@@ -39,9 +39,6 @@ namespace Ray.BiliBiliTool.Application
             _unfollowBatchedTaskOptions = unfollwBatchedTaskOptions.CurrentValue;
         }
 
-        public override string TaskName => "UnfollowBatched";
-
-
         [TaskInterceptor("批量取关", TaskLevel.One)]
         public override void DoTask()
         {

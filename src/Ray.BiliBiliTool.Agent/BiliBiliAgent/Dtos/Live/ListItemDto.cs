@@ -36,9 +36,9 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live
         {
             get
             {
-                if (string.IsNullOrWhiteSpace(Title) || Title.Length <= 5) return Title;
+                if (string.IsNullOrWhiteSpace(Title) || Title.Length <= 10) return Title;
 
-                return Title.Substring(0, 5) + "...";
+                return Title.Substring(0, 7) + "...";
             }
         }
 

@@ -13,33 +13,39 @@ namespace Ray.BiliBiliTool.Infrastructure
         {
             CookieStr = cookieStr ?? "";
 
-            CookieStrList = CookieStr.Split(";")
+            CookieItemList = CookieStr.Split(";")
                 .Select(x => x.Trim())
-                .Where(x => x.IsNotNullOrEmpty())
+                .Where(x => !string.IsNullOrWhiteSpace(x))
                 .ToList();
 
-            foreach (var item in CookieStrList)
+            foreach (var item in CookieItemList)
             {
                 var list = item.Split('=');
-                CookieDictionary.TryAdd(list[0].Trim(), list[1].Trim());
+                if (list.Length >= 2)
+                    CookieItemDictionary.TryAdd(list[0].Trim(), list[1].Trim());
             }
         }
 
         public string CookieStr { get; set; }
 
-        public List<string> CookieStrList { get; set; }
+        public List<string> CookieItemList { get; set; }
 
-        public Dictionary<string, string> CookieDictionary { get; set; } = new Dictionary<string, string>();
+        public Dictionary<string, string> CookieItemDictionary { get; set; } = new Dictionary<string, string>();
 
         public virtual CookieContainer CreateCookieContainer(Uri uri)
         {
             var cookieContainer = new CookieContainer();
-            foreach (var item in CookieStrList)
+            foreach (var item in CookieItemList)
             {
                 cookieContainer.SetCookies(uri, item);
             }
 
             return cookieContainer;
+        }
+
+        public virtual void Check()
+        {
+            if (string.IsNullOrWhiteSpace(CookieStr)) throw new Exception("Cookie字符串为空");
         }
     }
 }

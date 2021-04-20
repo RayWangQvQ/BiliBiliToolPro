@@ -14,8 +14,6 @@ namespace Ray.BiliBiliTool.Application
 {
     public abstract class AppService : IAppService
     {
-        public abstract string TaskName { get; }
-
         public abstract void DoTask();
     }
 }

@@ -175,8 +175,7 @@ namespace Ray.BiliBiliTool.DomainService
 
         public void TryJoinTianXuan(ListItemDto target)
         {
-            _logger.LogInformation("【房间】{name}", target.ShortTitle);
-
+            _logger.LogDebug("【房间】{name}", target.Title);
             try
             {
                 CheckTianXuanDto check = _liveApi.CheckTianXuan(target.Roomid)
@@ -185,33 +184,42 @@ namespace Ray.BiliBiliTool.DomainService
 
                 if (check == null)
                 {
-                    _logger.LogInformation("数据异常，跳过");
+                    _logger.LogDebug("数据异常，跳过");
                     return;
                 }
 
                 if (check.Status != TianXuanStatus.Enable)
                 {
-                    _logger.LogInformation("已开奖，跳过" + Environment.NewLine);
+                    _logger.LogDebug("已开奖，跳过" + Environment.NewLine);
                     return;
                 }
 
-                _logger.LogInformation("【奖品】{name}", check.Award_name);
                 //根据配置过滤
                 if (!check.AwardNameIsSatisfied(_liveLotteryTaskOptions.IncludeAwardNameList, _liveLotteryTaskOptions.ExcludeAwardNameList))
                 {
-                    _logger.LogInformation("不满足配置的筛选条件，跳过" + Environment.NewLine);
+                    _logger.LogDebug("不满足配置的筛选条件，跳过" + Environment.NewLine);
                     return;
                 }
 
+                //是否需要赠礼
                 if (check.Gift_price > 0)
                 {
-                    _logger.LogInformation("【赠礼】{gift}", check.GiftDesc);
-                    _logger.LogInformation("需赠送礼物，跳过" + Environment.NewLine);
+                    _logger.LogDebug("【赠礼】{gift}", check.GiftDesc);
+                    _logger.LogDebug("需赠送礼物，跳过" + Environment.NewLine);
                     return;
                 }
 
-                if (check.Require_type != RequireType.None)
-                    _logger.LogInformation("【条件】{text}", check.Require_text);
+                //条件
+                if (check.Require_type != RequireType.None && check.Require_type != RequireType.Follow)
+                {
+                    _logger.LogDebug("【条件】{text}", check.Require_text);
+                    _logger.LogDebug("要求粉丝勋章，跳过");
+                    return;
+                }
+
+                _logger.LogInformation("【房间】{name}", target.ShortTitle);
+                _logger.LogInformation("【主播】{name}({id})", target.Uname, target.Uid);
+                _logger.LogInformation("【奖品】{name}【条件】{text}", check.Award_name, check.Require_text);
 
                 var request = new JoinTianXuanRequest
                 {
@@ -224,7 +232,6 @@ namespace Ray.BiliBiliTool.DomainService
                     .GetAwaiter().GetResult();
                 if (re.Code == 0)
                 {
-                    _logger.LogInformation("【主播】{name}({id})", target.Uname, target.Uid);
                     _logger.LogInformation("【抽奖】成功 √" + Environment.NewLine);
                     if (check.Require_type == RequireType.Follow)
                         _tianXuanFollowed.AddIfNotExist(target, x => x.Uid == target.Uid);

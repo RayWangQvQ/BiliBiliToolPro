@@ -31,10 +31,11 @@ BiliBiliTool
 - [2. 功能任务说明](#2-功能任务说明)
 - [3. 个性化自定义配置](#3-个性化自定义配置)
 - [4. 常见问题](#4-常见问题)
-- [5. 版本发布及更新](#5-版本发布及更新)
-- [6. 贡献代码](#6-贡献代码)
-- [7. 捐赠支持](#7-捐赠支持)
-- [8. API 参考](#8-api-参考)
+- [5. 多账号支持](#5-多账号支持)
+- [6. 版本发布及更新](#6-版本发布及更新)
+- [7. 贡献代码](#7-贡献代码)
+- [8. 捐赠支持](#8-捐赠支持)
+- [9. API 参考](#9-api-参考)
 
 <!-- /TOC -->
 
@@ -53,6 +54,7 @@ BiliBiliTool
 - **月底在 B 币券过期前进行充电（支持指定想要支持的up主，如果没有喜欢的up，也可以为自己充个电啊，做个用爱为自己发电的人~）**
 - **直播中心天选时刻自动参与抽奖**
 - **批量取关**
+- **支持多账号**
 - **理论上支持所有远端的日志推送（默认支持推送到Telegram、企业微信、钉钉、PushPlus、Server酱、钉钉、酷推，另外也支持自定义推送到任意api）**
 
 **另外，通过结合 GitHub Actions，可以实现每天线上自动运行，只要部署一次，小助手就会在背后一直默默地帮我们完成我们预先布置的任务。**
@@ -157,7 +159,7 @@ Actions 的执行策略默认是每天 0 点整触发运行，如要设置为指
 
 请下载 `net-dependent.zip` 文件，本文件依赖本地运行库（runtime-dependent），所以文件包非常小（不到1M）。
 
-P.S.这里的运行环境指的是 `ASP.NET Core Runtime 5.0.0`与`.NET Runtime 5.0.0` ，安装方法可详见 [常见问题](https://github.com/RayWangQvQ/BiliBiliTool.Docs/blob/main/questions.md) 中的 **本地或服务器如何安装.net环境**
+P.S.这里的运行环境指的是 `.NET Runtime 5.0.0` ，安装方法可详见 [常见问题](https://github.com/RayWangQvQ/BiliBiliTool.Docs/blob/main/questions.md) 中的 **本地或服务器如何安装.net环境**
 
 * 如果不希望安装或不知如何安装.net运行环境：
 
@@ -168,7 +170,7 @@ P.S.这里的运行环境指的是 `ASP.NET Core Runtime 5.0.0`与`.NET Runtime 
 
 Ⅱ. **解压并填写配置**
 
-下载并解压后，找到 appsettings.json 文件，使用记事本编辑，填入之前获取到的 Cookie 字符串，保存后关闭：
+下载并解压后，找到 appsettings.json 文件，使用记事本编辑，将之前获取到的 Cookie 字符串填入指定位置，保存后关闭：
 
 ![配置文件图示](https://cdn.jsdelivr.net/gh/RayWangQvQ/BiliBiliTool.Docs@main/imgs/appsettings-cookie.png)
 
@@ -231,6 +233,8 @@ bilibli_tool
 
 每次容器启动会去测试一遍Cookie，其他任务由设定的cron来指定定时触发，如需修改定时运行时间，请修改`my_crontab`中的cron表达式，然后再次执行启动容器命令。
 
+其他信息见 [docker/README.md](docker/README.md)
+
 </details>
 
 ## 2. 功能任务说明
@@ -270,9 +274,28 @@ dotnet Ray.BiliBiliTool.Console.dll -runTasks=Daily&LiveLottery
 
 [>>点击查看常见问题文档](https://hub.fastgit.org/RayWangQvQ/BiliBiliTool.Docs/blob/main/questions.md)
 
-_如果有问题或是发现了 bug，请先确认是否可以通过升级到最新版本解决，然后搜索文档（特别是配置说明文档和常见问题文档）和 issues，查看是否已有其他人遇到相同问题、是否已有解决方案，如果确认还未解决可以自己提交 issue，我会尽快确认并解决。（如何正确的提交issue，请详见下面**常见问题文档**）。_
+[issues（议题）](https://github.com/RayWangQvQ/BiliBiliTool/issues)板块可以用来提交**Bug**和**建议**；
 
-## 5. 版本发布及更新
+[discussions（讨论）](https://github.com/RayWangQvQ/BiliBiliTool/discussions)板块可以用来**提问**和**讨论**。
+
+大部分问题其实都可以在文档、议题和讨论中找到答案。
+
+所以如果你有疑问，
+
+* 请先确认是否可以通过升级到最新版本解决
+* 然后搜索文档（特别是配置说明文档和常见问题文档）、议题和讨论，查看是否已有其他人遇到相同问题、是否已有解决方案
+
+如果确认还未解决，可以自己提交 issue，或发布 discussions 与大家一起探讨，我会尽快确认并解决。
+
+（关于如何正确的提交issue，请详见**常见问题文档**）。
+
+## 5. 多账号支持
+
+对于 GitHub Actions 托管的，可以通过添加 Key 为 `COOKIESTR2` 和 `COOKIESTR3` 的 Secret ，来支持最多 3 个账号。
+
+对于其他本地或 docker 托管的，因配置项 `1BiliBiliCookies` 被设计为一个字符串数组，所以理论可以添加任意个数的账号。例如，使用环境变量配置的话，可以添加 Key 为 `Ray_BiliBiliCookies__2`、`Ray_BiliBiliCookies__3`、`Ray_BiliBiliCookies__4`...的环境变量，以此类推。
+
+## 6. 版本发布及更新
 
 当前正处于稳定的迭代开发中，正常情况下每 2 周会发布一个小版本，详细待更新和计划内容可参见 [projects](https://github.com/RayWangQvQ/BiliBiliTool/projects) 和 [issues](https://github.com/RayWangQvQ/BiliBiliTool/issues) 。
 
@@ -280,9 +303,9 @@ _如果有问题或是发现了 bug，请先确认是否可以通过升级到最
 
 建议每个人都开启自动同步更新，因为越新的版本功能越完善、对账号来说也越安全。
 
-也建议把右上角的 Star 和 Watch 都点一下，这样有重要更新时就会有邮件推送了。
+也建议把右上角的 Star 点一下，这样有重要更新时就会有邮件推送了。
 
-## 6. 贡献代码
+## 7. 贡献代码
 
 如果你有好的想法，欢迎向仓库贡献你的代码，贡献步骤：
 
@@ -294,7 +317,7 @@ _如果有问题或是发现了 bug，请先确认是否可以通过升级到最
 
 我会尽快进行代码审核，测试成功后会合并入 main 主分支，提前感谢您的贡献。
 
-## 7. 捐赠支持
+## 8. 捐赠支持
 
 个人维护开源不易
 
@@ -316,7 +339,7 @@ _如果有问题或是发现了 bug，请先确认是否可以通过升级到最
 
 感谢支持~
 
-## 8. API 参考
+## 9. API 参考
 - [www.bilibili.com](https://www.bilibili.com/)
 
 - [SocialSisterYi/bilibili-API-collect](https://github.com/SocialSisterYi/bilibili-API-collect)
