@@ -15,8 +15,7 @@ env:
   IsOpenLiveLotteryTask: ${{secrets.ISOPENLIVELOTTERYTASK}} #是否开启该GitHub工作流
   ASPNETCORE_ENVIRONMENT: ${{secrets.ENV}} # 运行环境
   Ray_CloseConsoleWhenEnd: 1
-  Ray_BiliBiliCookie__CookieStr: ${{secrets.COOKIESTR}}
-  Ray_BiliBiliCookies__1: ${{secrets.COOKIESTR1}}
+  Ray_BiliBiliCookies__1: ${{secrets.COOKIESTR}}
   Ray_BiliBiliCookies__2: ${{secrets.COOKIESTR2}}
   Ray_BiliBiliCookies__3: ${{secrets.COOKIESTR3}}
   # 天选任务：
