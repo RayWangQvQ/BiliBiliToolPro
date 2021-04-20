@@ -16,44 +16,27 @@ namespace Ray.BiliBiliTool.Agent
     public class BiliCookie : CookieInfo
     {
         private readonly ILogger<BiliCookie> _logger;
-        private readonly IConfiguration _configuration;
-        private readonly BiliBiliCookieOptions _options;
 
         public BiliCookie(ILogger<BiliCookie> logger,
-            IOptionsMonitor<BiliBiliCookieOptions> optionsMonitor,
-            IConfiguration configuration) : base(optionsMonitor.CurrentValue.CookieStr)
+            CookieStrFactory cookieStrFactory)
+            : base(cookieStrFactory.GetCurrentCookieStr())
         {
             _logger = logger;
-            _configuration = configuration;
-            _options = optionsMonitor.CurrentValue;
 
-            CookieStr = _options.CookieStr ?? "";
-
-            if (CookieStr.IsNotNullOrEmpty())
-            {
-                foreach (var str in CookieStr.Split(';'))
-                {
-                    if (str.IsNullOrEmpty()) continue;
-                    var list = str.Split('=').ToList();
-                    if (list.Count >= 2)
-                        CookieDictionary[list[0].Trim()] = list[1].Trim();
-                }
-            }
-
-            if (CookieDictionary.TryGetValue(GetPropertyDescription(nameof(UserId)), out string userId))
+            if (CookieItemDictionary.TryGetValue(GetPropertyDescription(nameof(UserId)), out string userId))
             {
                 UserId = userId;
             }
-            if (CookieDictionary.TryGetValue(GetPropertyDescription(nameof(BiliJct)), out string jct))
+            if (CookieItemDictionary.TryGetValue(GetPropertyDescription(nameof(BiliJct)), out string jct))
             {
                 BiliJct = jct;
             }
-            if (CookieDictionary.TryGetValue(GetPropertyDescription(nameof(SessData)), out string sess))
+            if (CookieItemDictionary.TryGetValue(GetPropertyDescription(nameof(SessData)), out string sess))
             {
                 SessData = sess;
             }
 
-            Check();
+            this.Check();
         }
 
         [Description("DedeUserID")]
@@ -69,42 +52,41 @@ namespace Ray.BiliBiliTool.Agent
         public string BiliJct { get; set; }
 
         /// <summary>
-        /// 其他Cookies
-        /// </summary>
-        public string OtherCookies { get; set; } = "";
-
-        /// <summary>
         /// 检查是否已配置
         /// </summary>
         /// <returns></returns>
-        public void Check()
+        public override void Check()
         {
+            base.Check();
+
+            if (CookieItemDictionary.Count == 0) throw new Exception("Cookie字符串格式异常，内部无等号");
+
             bool result = true;
-            string msg = "配置项[{0}]为空，该项为必须配置，对应浏览器中Cookie中的[{1}]值";
+            string msg = "Cookie字符串异常，无[{1}]项";
 
             //UserId为空，抛异常
             if (string.IsNullOrWhiteSpace(UserId))
             {
-                _logger.LogWarning(msg, nameof(UserId), GetPropertyDescription(nameof(UserId)));
+                _logger.LogWarning(msg, GetPropertyDescription(nameof(UserId)));
 
                 result = false;
             }
             else if (!long.TryParse(UserId, out long uid))//不为空，但不能转换为long，警告
             {
-                _logger.LogWarning("UserId：{uid} 不能转换为long型，请确认配置的是正确的Cookie值", UserId);
+                _logger.LogWarning("[{uidKey}]={uid} 不能转换为long型，请确认配置的是正确的Cookie值", GetPropertyDescription(nameof(UserId)), UserId);
             }
 
             //SessData为空，抛异常
             if (string.IsNullOrWhiteSpace(SessData))
             {
-                _logger.LogWarning(msg, nameof(SessData), GetPropertyDescription(nameof(SessData)));
+                _logger.LogWarning(msg, GetPropertyDescription(nameof(SessData)));
                 result = false;
             }
 
             //BiliJct为空，抛异常
             if (string.IsNullOrWhiteSpace(BiliJct))
             {
-                _logger.LogWarning(msg, nameof(BiliJct), GetPropertyDescription(nameof(BiliJct)));
+                _logger.LogWarning(msg, GetPropertyDescription(nameof(BiliJct)));
                 result = false;
             }
 
@@ -116,14 +98,7 @@ namespace Ray.BiliBiliTool.Agent
         {
             if (CookieStr.IsNotNullOrEmpty()) return CookieStr;
 
-            string re = (OtherCookies ?? "").Trim();
-            if (!re.EndsWith(";")) re += ";";
-
-            if (UserId.IsNotNullOrEmpty()) re += $" {GetPropertyDescription(nameof(UserId))}={UserId};";
-            if (SessData.IsNotNullOrEmpty()) re += $" {GetPropertyDescription(nameof(SessData))}={SessData};";
-            if (BiliJct.IsNotNullOrEmpty()) re += $" {GetPropertyDescription(nameof(BiliJct))}={BiliJct};";
-
-            return re;
+            return "";
         }
 
         private string GetPropertyDescription(string propertyName)

@@ -56,8 +56,6 @@ namespace Ray.BiliBiliTool.Application
             _securityOptions = securityOptions.CurrentValue;
         }
 
-        public override string TaskName => "Daily";
-
         [TaskInterceptor("每日任务", TaskLevel.One)]
         public override void DoTask()
         {

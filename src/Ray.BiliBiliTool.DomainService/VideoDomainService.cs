@@ -74,6 +74,8 @@ namespace Ray.BiliBiliTool.DomainService
 
         public UpVideoInfo GetRandomVideoOfUp(long upId, int total)
         {
+            if (total <= 0) return null;
+
             int pageNum = new Random().Next(1, total + 1);
             BiliApiResponse<SearchUpVideosResponse> re = _videoWithoutCookieApi.SearchVideosByUpId(upId, 1, pageNum).GetAwaiter().GetResult();
 
@@ -82,7 +84,7 @@ namespace Ray.BiliBiliTool.DomainService
                 throw new Exception(re.Message);
             }
 
-            return re.Data.List.Vlist.First();
+            return re.Data.List.Vlist.FirstOrDefault();
         }
 
         /// <summary>
@@ -301,6 +303,7 @@ namespace Ray.BiliBiliTool.DomainService
             if (count > 0)
             {
                 UpVideoInfo video = GetRandomVideoOfUp(upId, count);
+                if (video == null) return null;
                 return new VideoInfoDto
                 {
                     Aid = video.Aid.ToString(),

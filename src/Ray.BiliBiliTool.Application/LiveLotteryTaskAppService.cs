@@ -42,9 +42,6 @@ namespace Ray.BiliBiliTool.Application
             _accountDomainService = accountDomainService;
         }
 
-        public override string TaskName => "LiveLottery";
-
-
         [TaskInterceptor("天选时刻抽奖", TaskLevel.One)]
         public override void DoTask()
         {
