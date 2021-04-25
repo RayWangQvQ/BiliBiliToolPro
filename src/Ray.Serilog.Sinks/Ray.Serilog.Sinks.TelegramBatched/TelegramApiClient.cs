@@ -52,7 +52,8 @@ namespace Ray.Serilog.Sinks.TelegramBatched
             {
                 chat_id = _chatId,
                 text = Msg,
-                parse_mode = TeleMsgType.HTML.ToString()
+                parse_mode = TeleMsgType.HTML.ToString(),
+                disable_web_page_preview = true
             }.ToJson();
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             var response = this._httpClient.PostAsync(this._apiUrl, content).GetAwaiter().GetResult();
