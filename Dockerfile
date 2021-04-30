@@ -4,7 +4,7 @@ FROM mcr.microsoft.com/dotnet/runtime:5.0 AS base
 WORKDIR /app
 
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
-WORKDIR /src
+WORKDIR /code
 COPY ["src/Ray.BiliBiliTool.Console/Ray.BiliBiliTool.Console.csproj", "src/Ray.BiliBiliTool.Console/"]
 COPY ["src/Ray.BiliBiliTool.DomainService/Ray.BiliBiliTool.DomainService.csproj", "src/Ray.BiliBiliTool.DomainService/"]
 COPY ["src/Ray.BiliBiliTool.Config/Ray.BiliBiliTool.Config.csproj", "src/Ray.BiliBiliTool.Config/"]
@@ -22,7 +22,7 @@ COPY ["src/Ray.Serilog.Sinks/Ray.Serilog.Sinks.PushPlusBatched/Ray.Serilog.Sinks
 COPY ["src/Ray.Serilog.Sinks/Ray.Serilog.Sinks.ServerChanBatched/Ray.Serilog.Sinks.ServerChanBatched.csproj", "src/Ray.Serilog.Sinks/Ray.Serilog.Sinks.ServerChanBatched/"]
 RUN dotnet restore "src/Ray.BiliBiliTool.Console/Ray.BiliBiliTool.Console.csproj"
 COPY . .
-WORKDIR "/src/src/Ray.BiliBiliTool.Console"
+WORKDIR "/code/src/Ray.BiliBiliTool.Console"
 RUN dotnet build "Ray.BiliBiliTool.Console.csproj" -c Release -o /app/build
 
 FROM build AS publish
