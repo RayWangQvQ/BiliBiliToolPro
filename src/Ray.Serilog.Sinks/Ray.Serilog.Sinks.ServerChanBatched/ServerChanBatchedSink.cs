@@ -25,7 +25,7 @@ namespace Ray.Serilog.Sinks.ServerChanBatched
 
         public override void Emit(LogEvent logEvent)
         {
-            if (_scKey.IsNullOrEmpty()) return;
+            if (_scKey.IsNullOrEmpty() && _turboScKey.IsNullOrEmpty()) return;
             base.Emit(logEvent);
         }
 
