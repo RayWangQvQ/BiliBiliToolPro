@@ -328,7 +328,7 @@ Secret Value：`123abc`
 
 获取UP主的Id方法：打开bilibili，进入欲要选择的UP主主页，在url中和简介中，都可获得该UP主的Id，如下图所示：
 
-![UpId](/imgs/get-up-id.png)
+![UpId](imgs/get-up-id.png)
 
 <a id="markdown-334-dayofautocharge每月几号自动充电" name="334-dayofautocharge每月几号自动充电"></a>
 #### 3.3.4. DayOfAutoCharge（每月几号自动充电）
