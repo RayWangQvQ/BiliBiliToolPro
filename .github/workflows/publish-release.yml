@@ -34,11 +34,13 @@ jobs:
           dotnet publish --configuration Release --runtime linux-x64 --self-contained true -p:PublishTrimmed=true -o ./bin/Publish/linux-x64
           dotnet publish --configuration Release --runtime osx-x64 --self-contained true -p:PublishTrimmed=true -o ./bin/Publish/osx-x64
           cd ./bin/Publish
-          zip -q -r  bilibili-tool-v${{ github.event.inputs.version }}-net5-dependent.zip net5-dependent
-          zip -q -r  bilibili-tool-v${{ github.event.inputs.version }}-win-x86-x64.zip win-x86-x64
-          zip -q -r  bilibili-tool-v${{ github.event.inputs.version }}-linux-arm.zip linux-arm
-          zip -q -r  bilibili-tool-v${{ github.event.inputs.version }}-linux-x64.zip linux-x64
-          zip -q -r  bilibili-tool-v${{ github.event.inputs.version }}-osx-x64.zip osx-x64
+          zip -q -r bilibili-tool-v${{ github.event.inputs.version }}-net5-dependent.zip ./net5-dependent/
+          zip -q -r bilibili-tool-v${{ github.event.inputs.version }}-win-x86-x64.zip ./win-x86-x64/
+          zip -q -r bilibili-tool-v${{ github.event.inputs.version }}-linux-arm.zip ./linux-arm/
+          zip -q -r bilibili-tool-v${{ github.event.inputs.version }}-linux-x64.zip ./linux-x64/
+          zip -q -r bilibili-tool-v${{ github.event.inputs.version }}-osx-x64.zip ./osx-x64/
+          cp -r ../../../../tencentScf/bootstrap ../../../../tencentScf/index.sh ./linux-x64/
+          zip -q -r bilibili-tool-v${{ github.event.inputs.version }}-tencent-scf.zip ./linux-x64/
           
       - name: Create release info
         id: create_release
@@ -104,4 +106,15 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./src/Ray.BiliBiliTool.Console/bin/Publish/bilibili-tool-v${{ github.event.inputs.version }}-osx-x64.zip
           asset_name: bilibili-tool-v${{ github.event.inputs.version }}-osx-x64.zip
+          asset_content_type: application/zip
+
+      - name: Upload tencent-scf
+        id: upload-tencent-scf
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./src/Ray.BiliBiliTool.Console/bin/Publish/bilibili-tool-v${{ github.event.inputs.version }}-tencent-scf.zip
+          asset_name: bilibili-tool-v${{ github.event.inputs.version }}-tencent-scf.zip
           asset_content_type: application/zip
