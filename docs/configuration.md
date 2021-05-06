@@ -78,7 +78,7 @@
 
 <a id="markdown-12-方式二命令启动时通过命令行参数配置" name="12-方式二命令启动时通过命令行参数配置"></a>
 ### 1.2. 方式二：命令启动时通过命令行参数配置
-在使用命令行启动时，可使用`-key=value`的形式附加配置，所有可用的命令行参数均在 [命令行参数映射](https://github.com/RayWangQvQ/BiliBiliTool/blob/main/src/Ray.BiliBiliTool.Console/commandLineMappings.json) 文件中。
+在使用命令行启动时，可使用`-key=value`的形式附加配置，所有可用的命令行参数均在 [命令行参数映射](../src/Ray.BiliBiliTool.Console/commandLineMappings.json) 文件中。
 
 * 使用跨平台的依赖包
 
@@ -262,7 +262,7 @@ Secret Value：`123abc`
 
 获取浏览器中自己的UA的方法见下图：
 
-![获取User-Agent](https://github.com/RayWangQvQ/BiliBiliTool.Docs/blob/main/imgs/get-user-agent.png)
+![获取User-Agent](imgs/get-user-agent.png)
 
 
 <a id="markdown-326-webproxy代理" name="326-webproxy代理"></a>
@@ -457,7 +457,7 @@ v1.0.x仅支持推送到Server酱，v1.1.x之后重新定义了推送地概念�
 
 <a id="markdown-361-telegram机器人" name="361-telegram机器人"></a>
 #### 3.6.1. Telegram机器人
-![TG推送效果](/imgs/push-tg.png)
+![TG推送效果](imgs/push-tg.png)
 <a id="markdown-3611-bottoken" name="3611-bottoken"></a>
 ##### 3.6.1.1. botToken
 点击 https://core.telegram.org/api#bot-api 查看如何创建机器人并获取到机器人的botToken。
@@ -490,7 +490,7 @@ P.S.访问链接需要能访问“外网”，有vpn的挂vpn。
 #### 3.6.2. 企业微信机器人
 在群内添加机器人，获取到机器人的WebHook地址，添加到配置中。
 
-![企业微信推送效果](/imgs/push-workweixin.png)
+![企业微信推送效果](imgs/push-workweixin.png)
 
 <a id="markdown-3621-webhookurl" name="3621-webhookurl"></a>
 ##### 3.6.2.1. webHookUrl
@@ -508,7 +508,9 @@ P.S.访问链接需要能访问“外网”，有vpn的挂vpn。
 #### 3.6.3. 钉钉机器人
 在群内添加机器人，获取到机器人的WebHook地址，添加到配置中。
 
-![钉钉推送效果](/imgs/push-ding.png)
+机器人的安全策略，当前不支持加签，请使用关键字策略，推荐关键字：`Ray` 或 `BiliBili`
+
+![钉钉推送效果](imgs/push-ding.png)
 
 <a id="markdown-3631-webhookurl" name="3631-webhookurl"></a>
 ##### 3.6.3.1. webHookUrl
@@ -526,7 +528,7 @@ P.S.访问链接需要能访问“外网”，有vpn的挂vpn。
 #### 3.6.4. Server酱
 官网： http://sc.ftqq.com/9.version 
 
-![Server酱推送效果](/imgs/wechat-push.png)
+![Server酱推送效果](imgs/wechat-push.png)
 
 <a id="markdown-3641-turbosckeyserver酱sckey" name="3641-turbosckeyserver酱sckey"></a>
 ##### 3.6.4.1. TurboScKey（Server酱SCKEY）

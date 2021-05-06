@@ -25,16 +25,16 @@ BiliBiliTool
 - [1. 如何使用](#1-如何使用)
     - [1.1. 第一步：获取自己的 Cookie](#11-第一步获取自己的-cookie)
     - [1.2. 第二步：配置 Cookie 并运行 BiliBiliTool](#12-第二步配置-cookie-并运行-bilibilitool)
-        - [1.2.1. 运行方式一：xxx](#121-运行方式一xxx)
-        - [1.2.2. 运行方式三：下载程序包到本地或服务器运行](#122-运行方式三下载程序包到本地或服务器运行)
-        - [1.2.3. 运行方式三：腾讯云函数SCF](#123-运行方式三腾讯云函数scf)
-        - [1.2.4. 运行方式二：docker容器化运行（推荐）](#124-运行方式二docker容器化运行推荐)
+        - [1.2.1. 方式一：xxx](#121-方式一xxx)
+        - [1.2.2. 方式二：下载程序包到本地或服务器运行](#122-方式二下载程序包到本地或服务器运行)
+        - [1.2.3. 方式三：腾讯云函数SCF](#123-方式三腾讯云函数scf)
+        - [1.2.4. 方式四：docker容器化运行（推荐）](#124-方式四docker容器化运行推荐)
 - [2. 功能任务说明](#2-功能任务说明)
 - [3. 个性化自定义配置](#3-个性化自定义配置)
-- [4. 常见问题](#4-常见问题)
-- [5. 多账号支持](#5-多账号支持)
+- [4. 多账号支持](#4-多账号支持)
+- [5. 常见问题](#5-常见问题)
 - [6. 版本发布及更新](#6-版本发布及更新)
-- [7. 贡献代码](#7-贡献代码)
+- [7. 贡献](#7-贡献)
     - [7.1. 贡献代码](#71-贡献代码)
     - [7.2. 贡献文档](#72-贡献文档)
 - [8. 捐赠支持](#8-捐赠支持)
@@ -97,7 +97,7 @@ BiliBiliTool 就是收集了一系列api，通过每日自动运行程序，依�
 * Github Actions
 * 下载Release包到本地或服务器运行
 * 云函数部署
-* docker容器化运行。
+* docker容器化运行
 
 熟悉 GitHub 的朋友，推荐使用方式一，可以实现线上的每天自动运行，不需自己动手，一劳永逸。
 
@@ -109,12 +109,12 @@ BiliBiliTool 就是收集了一系列api，通过每日自动运行程序，依�
 
 以下 4 种方式任选一种适合自己的即可。
 
-#### 1.2.1. 运行方式一：xxx
+#### 1.2.1. 方式一：xxx
 暂时删掉该方式避避风头，详情见 [552号议题](https://github.com/RayWangQvQ/BiliBiliTool/issues/552)。
 
 也建议所有还在使用该方式运行的朋友，暂时先替换为下面的其他运行方式，避免造成不必要的损失。
 
-#### 1.2.2. 运行方式三：下载程序包到本地或服务器运行
+#### 1.2.2. 方式二：下载程序包到本地或服务器运行
 
 如果是 DotNet 开发者，直接 clone 源码然后 vs 打开解决方案，配置 Cookie 后即可直接本地进行运行和调试。
 
@@ -166,11 +166,11 @@ P.S.这里的运行环境指的是 `.NET Runtime 5.0.0` ，安装方法可详见
 
 </details>
 
-#### 1.2.3. 运行方式三：腾讯云函数SCF
+#### 1.2.3. 方式三：腾讯云函数SCF
 
 [>>腾讯云函数部署说明](tencentScf/README.md)
 
-#### 1.2.4. 运行方式二：docker容器化运行（推荐）
+#### 1.2.4. 方式四：docker容器化运行（推荐）
 
 [>>docker部署说明](docker/README.md)
 
@@ -215,9 +215,15 @@ dotnet Ray.BiliBiliTool.Console.dll -runTasks=Daily&LiveLottery
 
 [>>点击查看配置说明文档](docs/configuration.md)
 
-## 4. 常见问题
+## 4. 多账号支持
 
-[>>点击查看常见问题文档](docs/main/questions.md)
+对于 GitHub Actions 托管的，可以通过添加 Key 为 `COOKIESTR2` 和 `COOKIESTR3` 的 Secret ，来支持最多 3 个账号。
+
+对于其他本地或 docker 托管的，因配置项 `BiliBiliCookies` 被设计为一个字符串数组，所以理论可以添加任意个数的账号。例如，使用环境变量配置的话，可以添加 Key 为 `Ray_BiliBiliCookies__2`、`Ray_BiliBiliCookies__3`、`Ray_BiliBiliCookies__4`...的环境变量，以此类推。
+
+## 5. 常见问题
+
+[>>点击查看常见问题文档](docs/questions.md)
 
 [issues（议题）](https://github.com/RayWangQvQ/BiliBiliTool/issues)板块可以用来提交**Bug**和**建议**；
 
@@ -234,12 +240,6 @@ dotnet Ray.BiliBiliTool.Console.dll -runTasks=Daily&LiveLottery
 
 （关于如何正确的提交issue，请详见**常见问题文档**）。
 
-## 5. 多账号支持
-
-对于 GitHub Actions 托管的，可以通过添加 Key 为 `COOKIESTR2` 和 `COOKIESTR3` 的 Secret ，来支持最多 3 个账号。
-
-对于其他本地或 docker 托管的，因配置项 `BiliBiliCookies` 被设计为一个字符串数组，所以理论可以添加任意个数的账号。例如，使用环境变量配置的话，可以添加 Key 为 `Ray_BiliBiliCookies__2`、`Ray_BiliBiliCookies__3`、`Ray_BiliBiliCookies__4`...的环境变量，以此类推。
-
 ## 6. 版本发布及更新
 
 当前正处于稳定的迭代开发中，正常情况下每 2 周会发布一个小版本，详细待更新和计划内容可参见 [projects](https://github.com/RayWangQvQ/BiliBiliTool/projects) 和 [issues](https://github.com/RayWangQvQ/BiliBiliTool/issues) 。
@@ -250,7 +250,7 @@ dotnet Ray.BiliBiliTool.Console.dll -runTasks=Daily&LiveLottery
 
 也建议把右上角的 Star 点一下，这样有重要更新时就会有邮件推送了。
 
-## 7. 贡献代码
+## 7. 贡献
 
 ### 7.1. 贡献代码
 如果你有好的想法，欢迎向仓库贡献你的代码，贡献步骤：
