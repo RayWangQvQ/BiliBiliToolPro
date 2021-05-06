@@ -26,7 +26,7 @@
 #### 3.1.2. 云函数控制台新增函数服务
 Ⅰ.进入[云函数控制台](https://console.cloud.tencent.com/scf/)，单击左侧导航栏【函数服务】，进入“函数服务”页面。顶部地域选择一个靠近自己地址的，点击新建按钮。如下图：
 
-![tencent-scf-create.png](docs/imgs/tencent-scf-create.png)
+![tencent-scf-create.png](../docs/imgs/tencent-scf-create.png)
 
 Ⅱ.填写基本信息
 * 创建方式：选择自定义创建
@@ -39,14 +39,14 @@
 
 如下图：
 
-![tencent-scf-create-basic.png](docs/imgs/tencent-scf-create-basic.png)
+![tencent-scf-create-basic.png](../docs/imgs/tencent-scf-create-basic.png)
 
 Ⅲ.点击展开高级配置，在环境变量中添加配置，这里先加 2 个配置就行了，后续可以再添加其他的。
 * cookie 配置：key 为 `Ray_BiliBiliCookies__1` ， value 为之前浏览器抓取到的cookie字符串
 * 随机睡眠配置：key 为 `Ray_Security__RandomSleepMaxMin` ，value 为 `0` （为了方便测试，所以先关掉，后面测好之后再删掉该配置，或者自己改一个value值）
 如下图：
 
-![tencent-scf-create-env.png](docs/imgs/tencent-scf-create-env.png)
+![tencent-scf-create-env.png](../docs/imgs/tencent-scf-create-env.png)
 
 Ⅳ.继续下滚，找到执行配置模块，
 * 异步执行：勾选启用
@@ -54,23 +54,23 @@
 
 如下图：
 
-![tencent-scf-create-async.png](docs/imgs/tencent-scf-create-async.png)
+![tencent-scf-create-async.png](../docs/imgs/tencent-scf-create-async.png)
 
 Ⅴ.点击完成按钮，创建函数。（触发器配置先不用管，可以等测试完成后再添加）
 
 #### 3.1.3. 手动运行测试
 Ⅰ.成功创建函数后，会看到如下的函数管理页面，点击顶部函数代码 Tab 页，准备测试，如下图：
 
-![tencent-scf-test-1.png](docs/imgs/tencent-scf-test-1.png)
+![tencent-scf-test-1.png](../docs/imgs/tencent-scf-test-1.png)
 
 Ⅱ.下拉，找到测试按钮，点击运行测试，页面下方会同步显示日志。如果运行正常，则表示部署已成功。如下图:
 
-![tencent-scf-test-2](docs/imgs/tencent-scf-test-2.png)
+![tencent-scf-test-2](../docs/imgs/tencent-scf-test-2.png)
 
 #### 3.1.4. 配置触发器，设定运行时间和频率
 Ⅰ.点击左侧【触发管理】导航，点击“创建触发器”按钮，如下图：
 
-![tencent-scf-trigger-create.png](docs/imgs/tencent-scf-trigger-create.png)
+![tencent-scf-trigger-create.png](../docs/imgs/tencent-scf-trigger-create.png)
 
 Ⅱ.填写触发器信息
 * 触发方式：定时触发
@@ -82,7 +82,7 @@
 * 立即启用：勾选启用
 填完后点击提交按钮提交，即可完成。如下图：
 
-![tencent-scf-trigger-add.png](docs/imgs/tencent-scf-trigger-add.png)
+![tencent-scf-trigger-add.png](../docs/imgs/tencent-scf-trigger-add.png)
 
 这里的附加信息将作为runTasks（欲运行的任务编码）配置，通过命令行传入程序。想多个任务共用一个触发器的话，可以使用&号拼接任务编码，填入附加信息，如 `Daily&LiveLottery`
 
