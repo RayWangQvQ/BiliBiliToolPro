@@ -1,0 +1,26 @@
+#! /bin/bash
+set -euo pipefail
+
+FuncFile="$(echo $_HANDLER | cut -d. -f1).sh"
+echo "[step 1]初始化，开始加载函数文件 $FuncFile"
+source ./$FuncFile
+echo "=>完成"
+
+echo "[step 2]初始化完成，开始发送ready信号"
+curl -d " " -X POST -s "http://$SCF_RUNTIME_API:$SCF_RUNTIME_API_PORT/runtime/init/ready"
+echo "=>完成"
+
+echo "[step 3]开始循环监听处理事件调用"
+while true
+do
+ HEADERS="$(mktemp)"
+ echo "=>长轮询获取事件"
+ EVENT_DATA=$(curl -sS -LD "$HEADERS" -X GET -s "http://$SCF_RUNTIME_API:$SCF_RUNTIME_API_PORT/runtime/invocation/next")
+ echo "=>监听到事件：$EVENT_DATA"
+ echo "=>调用函数,开始处理事件"
+ $(echo "$_HANDLER" | cut -d. -f2) "$EVENT_DATA"
+ RESPONSE=$EVENT_DATA
+ echo "=>返回 $RESPONSE"
+ echo "=>推送函数处理结果"
+ curl -X POST -s "http://$SCF_RUNTIME_API:$SCF_RUNTIME_API_PORT/runtime/invocation/response"  -d "$RESPONSE"
+done
