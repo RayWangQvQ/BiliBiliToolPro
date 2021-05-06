@@ -41,6 +41,7 @@ jobs:
           zip -q -r bilibili-tool-v${{ github.event.inputs.version }}-osx-x64.zip ./osx-x64/*
           cp -r ../../../../tencentScf/bootstrap ../../../../tencentScf/index.sh ./linux-x64/
           cd ./linux-x64
+          chmod 755 index.sh bootstrap
           zip -q -r ../bilibili-tool-v${{ github.event.inputs.version }}-tencent-scf.zip ./*
           
       - name: Create release info
