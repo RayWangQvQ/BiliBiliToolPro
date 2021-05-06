@@ -26,14 +26,17 @@ BiliBiliTool
     - [1.1. 第一步：获取自己的 Cookie](#11-第一步获取自己的-cookie)
     - [1.2. 第二步：配置 Cookie 并运行 BiliBiliTool](#12-第二步配置-cookie-并运行-bilibilitool)
         - [1.2.1. 运行方式一：xxx](#121-运行方式一xxx)
-        - [1.2.2. 运行方式二：docker容器化运行（推荐）](#122-运行方式二docker容器化运行推荐)
-        - [1.2.3. 运行方式三：下载程序包到本地或服务器运行](#123-运行方式三下载程序包到本地或服务器运行)
+        - [1.2.2. 运行方式三：下载程序包到本地或服务器运行](#122-运行方式三下载程序包到本地或服务器运行)
+        - [1.2.3. 运行方式三：腾讯云函数SCF](#123-运行方式三腾讯云函数scf)
+        - [1.2.4. 运行方式二：docker容器化运行（推荐）](#124-运行方式二docker容器化运行推荐)
 - [2. 功能任务说明](#2-功能任务说明)
 - [3. 个性化自定义配置](#3-个性化自定义配置)
 - [4. 常见问题](#4-常见问题)
 - [5. 多账号支持](#5-多账号支持)
 - [6. 版本发布及更新](#6-版本发布及更新)
 - [7. 贡献代码](#7-贡献代码)
+    - [7.1. 贡献代码](#71-贡献代码)
+    - [7.2. 贡献文档](#72-贡献文档)
 - [8. 捐赠支持](#8-捐赠支持)
 - [9. API 参考](#9-api-参考)
 
@@ -84,69 +87,34 @@ BiliBiliTool 就是收集了一系列api，通过每日自动运行程序，依�
 - 浏览器打开并登录 [bilibili 网站](https://www.bilibili.com/)
 - 登录成功后，访问 `https://api.bilibili.com/x/web-interface/nav`，按 **F12** 打开"开发者工具"，按 **F5** 刷新一下
 - 在"开发者工具"面板中，点击 **网络（Network）**，在左侧的请求列表中，找到名称为 `nav` 的接口，点击它
-- 依次查找 **Headers** ——> **RequestHeader** ——> **cookie**，可以看到很长一串以英文分号分隔的字符串，复制整个这个cookie字符串（不要使用右键复制，请使用 Ctrl+C 复制，右键会进行 UrlDecode ），保存它们到记事本，待会儿会用到。
+- 依次查找 **Headers** ——> **RequestHeader** ——> **cookie**，可以看到很长一串以英文分号分隔的字符串，复制整个这个cookie字符串（不要使用右键复制，请使用 Ctrl+C 复制，部分浏览器右键可能会进行 UrlDecode ），保存它们到记事本，待会儿会用到。
 
-![获取Cookie图示](https://cdn.jsdelivr.net/gh/RayWangQvQ/BiliBiliTool.Docs@main/imgs/get-bilibili-web-cookie.jpg)
+![获取Cookie图示](docs/imgs/get-bilibili-web-cookie.jpg)
 
 ### 1.2. 第二步：配置 Cookie 并运行 BiliBiliTool
 
-运行 BiliBiliTool 主要有三种方式，一是Github Actions，二是通过下载Release包到本地或服务器运行，三是使用docker容器化运行。
+运行 BiliBiliTool 主要有 4 种方式：
+* Github Actions
+* 下载Release包到本地或服务器运行
+* 云函数部署
+* docker容器化运行。
 
-对于熟悉 GitHub 的朋友，推荐使用方式一，可以实现线上的每天自动运行，不需自己动手，一劳永逸。
+熟悉 GitHub 的朋友，推荐使用方式一，可以实现线上的每天自动运行，不需自己动手，一劳永逸。
 
-对于想先快速运行一下尝个鲜、或是要部署到自己服务器的朋友，可以跳转到方式二 Release 包运行，操作简单快速。
+想先快速运行一下尝个鲜、或是要部署到自己服务器的朋友，可以跳转到方式二 Release 包运行，操作简单快速。
 
-对于熟悉docker的朋友，可以跳转到方式三 docker容器化运行。
+云函数则可以作为 GitHub Actions 的替代平台，优点是触发器独立灵活、可以国内ip，缺点是日志浏览很不人性。
 
-以下三种方式任选一种适合自己的即可。
+熟悉docker的朋友，可以跳转到方式四 docker容器化运行，以后因为可能涉及到需要持久话的功能，Serverless就不太方便，所以有能力、有条件的话还是建议使用docker。
+
+以下 4 种方式任选一种适合自己的即可。
 
 #### 1.2.1. 运行方式一：xxx
 暂时删掉该方式避避风头，详情见 [552号议题](https://github.com/RayWangQvQ/BiliBiliTool/issues/552)。
 
 也建议所有还在使用该方式运行的朋友，暂时先替换为下面的其他运行方式，避免造成不必要的损失。
 
-#### 1.2.2. 运行方式二：docker容器化运行（推荐）
-请确认已安装了docker所需环境（docker和docker-compose）。
-
-Window系统推荐使用Docker Desktop，官方下载安装包，一路鼠标点下去就能装好，运行时也有可视化界面。
-
-部分功能（比如拉取镜像）可能网速会非常慢，大家懂的，有梯子的可以架起梯子。
-
-推荐使用 docker-compose 来运行镜像，步骤如下。
-
-<details>
-
-Ⅰ. **本地创建文件**
-
-在本地任意文件夹下，创建一个目录 `bilibli_tool` ,在其下新建`docker-compose.yml`文件和`my_crontab`文件，文件结构如下：
-
-```
-bilibli_tool
-├── docker-compose.yml
-└── my_crontab
-```
-
-Ⅱ. **编辑文件内容，填入相关配置**
-
-`docker-compose.yml`的文件内容请拷贝 [默认docker-compose.yml](docker/sample/docker-compose.yml) 内容。其中 `image`（镜像名称）默认是我的，如果要使用自己创建的，请更换为自己创建的镜像名称。`environment` 下可以通过环境变量自由添加自定义配置，其中Cookie是必填的，所以请至少填入Cookie并保存。
-
-`my_crontab`的文件内容请拷贝 [默认my_crontab](docker/sample/my_crontab) 内容，注意末尾有个换行不要丢了。
-
-Ⅲ. **启动并运行容器**
-
-在当前目录执行启动容器命令：`docker-compose up -d`
-
-提示成功的话，即表示容器启动成功。
-
-可以进入容器查看详细运行日志，当前目录也会生成日志文件。
-
-每次容器启动会去测试一遍Cookie，其他任务由设定的cron来指定定时触发，如需修改定时运行时间，请修改`my_crontab`中的cron表达式，然后再次执行启动容器命令。
-
-其他信息见 [docker/README.md](docker/README.md)
-
-</details>
-
-#### 1.2.3. 运行方式三：下载程序包到本地或服务器运行
+#### 1.2.2. 运行方式三：下载程序包到本地或服务器运行
 
 如果是 DotNet 开发者，直接 clone 源码然后 vs 打开解决方案，配置 Cookie 后即可直接本地进行运行和调试。
 
@@ -161,7 +129,7 @@ bilibli_tool
 
 请下载 `net-dependent.zip` 文件，本文件依赖本地运行库（runtime-dependent），所以文件包非常小（不到1M）。
 
-P.S.这里的运行环境指的是 `.NET Runtime 5.0.0` ，安装方法可详见 [常见问题](https://github.com/RayWangQvQ/BiliBiliTool.Docs/blob/main/questions.md) 中的 **本地或服务器如何安装.net环境**
+P.S.这里的运行环境指的是 `.NET Runtime 5.0.0` ，安装方法可详见 [常见问题](docs/questions.md) 中的 **本地或服务器如何安装.net环境**
 
 * 如果不希望安装或不知如何安装.net运行环境：
 
@@ -174,7 +142,7 @@ P.S.这里的运行环境指的是 `.NET Runtime 5.0.0` ，安装方法可详见
 
 下载并解压后，找到 appsettings.json 文件，使用记事本编辑，将之前获取到的 Cookie 字符串填入指定位置，保存后关闭：
 
-![配置文件图示](https://cdn.jsdelivr.net/gh/RayWangQvQ/BiliBiliTool.Docs@main/imgs/appsettings-cookie.png)
+![配置文件图示](docs/imgs/appsettings-cookie.png)
 
 Ⅲ. **运行**
 
@@ -192,16 +160,25 @@ P.S.这里的运行环境指的是 `.NET Runtime 5.0.0` ，安装方法可详见
 
 其他系统依此类推，运行结果图示如下：
 
-![运行图示](https://cdn.jsdelivr.net/gh/RayWangQvQ/BiliBiliTool.Docs@main/imgs/run-exe.png)
+![运行图示](docs/imgs/run-exe.png)
 
 除了修改配置文件，也可以通过添加环境变量或在启动命令后附加参数来实现配置，详细方法可参考下面的**配置说明**章节。
 
 </details>
 
+#### 1.2.3. 运行方式三：腾讯云函数SCF
+
+[>>腾讯云函数部署说明](tencentScf/README.md)
+
+#### 1.2.4. 运行方式二：docker容器化运行（推荐）
+
+[>>docker部署说明](docker/README.md)
+
+
 
 如果配置了推送，执行成功后接收端会收到推送消息，推送效果如下所示：
 
-![微信推送图示](https://cdn.jsdelivr.net/gh/RayWangQvQ/BiliBiliTool.Docs@main/imgs/wechat-push.png)
+![微信推送图示](docs/imgs/wechat-push.png)
 
 目前默认支持**PushPlus推送、企业微信推送、钉钉推送、Telegram推送、Server酱推送和酷推QQ推送**（以上顺序即为个人推荐的排序），如果需要推送到其他端，也可以配置为任意的可以接受消息的Api地址，关于如何配置推送请详见下面的**个性化自定义配置**章节。
 
@@ -236,11 +213,11 @@ dotnet Ray.BiliBiliTool.Console.dll -runTasks=Daily&LiveLottery
 
 ## 3. 个性化自定义配置
 
-[>>点击查看配置说明文档](https://github.com/RayWangQvQ/BiliBiliTool.Docs/blob/main/configuration.md)
+[>>点击查看配置说明文档](docs/configuration.md)
 
 ## 4. 常见问题
 
-[>>点击查看常见问题文档](https://hub.fastgit.org/RayWangQvQ/BiliBiliTool.Docs/blob/main/questions.md)
+[>>点击查看常见问题文档](docs/main/questions.md)
 
 [issues（议题）](https://github.com/RayWangQvQ/BiliBiliTool/issues)板块可以用来提交**Bug**和**建议**；
 
@@ -261,7 +238,7 @@ dotnet Ray.BiliBiliTool.Console.dll -runTasks=Daily&LiveLottery
 
 对于 GitHub Actions 托管的，可以通过添加 Key 为 `COOKIESTR2` 和 `COOKIESTR3` 的 Secret ，来支持最多 3 个账号。
 
-对于其他本地或 docker 托管的，因配置项 `1BiliBiliCookies` 被设计为一个字符串数组，所以理论可以添加任意个数的账号。例如，使用环境变量配置的话，可以添加 Key 为 `Ray_BiliBiliCookies__2`、`Ray_BiliBiliCookies__3`、`Ray_BiliBiliCookies__4`...的环境变量，以此类推。
+对于其他本地或 docker 托管的，因配置项 `BiliBiliCookies` 被设计为一个字符串数组，所以理论可以添加任意个数的账号。例如，使用环境变量配置的话，可以添加 Key 为 `Ray_BiliBiliCookies__2`、`Ray_BiliBiliCookies__3`、`Ray_BiliBiliCookies__4`...的环境变量，以此类推。
 
 ## 6. 版本发布及更新
 
@@ -275,6 +252,7 @@ dotnet Ray.BiliBiliTool.Console.dll -runTasks=Daily&LiveLottery
 
 ## 7. 贡献代码
 
+### 7.1. 贡献代码
 如果你有好的想法，欢迎向仓库贡献你的代码，贡献步骤：
 
 * 搜索查看 issue，确定是否已有人提过同类问题
@@ -285,7 +263,12 @@ dotnet Ray.BiliBiliTool.Console.dll -runTasks=Daily&LiveLottery
 
 我会尽快进行代码审核，测试成功后会合并入 main 主分支，提前感谢您的贡献。
 
+### 7.2. 贡献文档
+文档部分由于我个人精力有限（写文档比写代码累多了），所以有些地方写的很简略，有些地方甚至有遗漏和错别字，不能贡献代码的朋友也欢迎来一起维护文档，欢迎 PR 来纠正我，一样都算是对开源做贡献了。
+
 ## 8. 捐赠支持
+
+[>>捐赠留言及回复](docs/donate-list.md)
 
 个人维护开源不易
 
