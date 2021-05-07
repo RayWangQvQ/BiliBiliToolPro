@@ -24,11 +24,13 @@
 #### 3.1.1. 下载压缩包到本地
 点击[BiliBiliTool/release](https://github.com/RayWangQvQ/BiliBiliTool/releases)，选择最新版本的 `tencent-scf.zip` ，下载到本地
 #### 3.1.2. 云函数控制台新增函数服务
-Ⅰ.进入[云函数控制台](https://console.cloud.tencent.com/scf/)，单击左侧导航栏【函数服务】，进入“函数服务”页面。顶部地域选择一个靠近自己地址的，点击新建按钮。如下图：
+**Ⅰ.进入[云函数控制台](https://console.cloud.tencent.com/scf/)，单击左侧导航栏【函数服务】，进入“函数服务”页面。顶部地域选择一个靠近自己地址的，点击新建按钮。**
+
+如下图：
 
 ![tencent-scf-create.png](../docs/imgs/tencent-scf-create.png)
 
-Ⅱ.填写基本信息
+**Ⅱ.填写基本信息**
 * 创建方式：选择自定义创建
 * 函数名称：bilibili_tool
 * 地域：刚才已经选过了
@@ -41,14 +43,18 @@
 
 ![tencent-scf-create-basic.png](../docs/imgs/tencent-scf-create-basic.png)
 
-Ⅲ.点击展开高级配置，在环境变量中添加配置，这里先加 2 个配置就行了，后续可以再添加其他的。
-* cookie 配置：key 为 `Ray_BiliBiliCookies__1` ， value 为之前浏览器抓取到的cookie字符串
-* 随机睡眠配置：key 为 `Ray_Security__RandomSleepMaxMin` ，value 为 `0` （为了方便测试，所以先关掉，后面测好之后再删掉该配置，或者自己改一个value值）
+**Ⅲ.点击展开高级配置，添加配置**
+* 初始化超时时间：30
+* 执行超时时间：86400（会警告超范围，先不用管，下面开启异步之后就好了）
+* 环境变量（这里先加 2 个配置就行了，后续可以再添加其他的）：
+    * cookie 配置：key 为 `Ray_BiliBiliCookies__1` ， value 为之前浏览器抓取到的cookie字符串
+    * 随机睡眠配置：key 为 `Ray_Security__RandomSleepMaxMin` ，value 为 `0` （为了方便测试，所以先关掉，后面测好之后再删掉该配置，或者自己改一个value值）
+
 如下图：
 
 ![tencent-scf-create-env.png](../docs/imgs/tencent-scf-create-env.png)
 
-Ⅳ.继续下滚，找到执行配置模块，
+**Ⅳ.继续下滚，找到执行配置模块：**
 * 异步执行：勾选启用
 * 状态追踪：勾选启用
 
@@ -56,23 +62,31 @@
 
 ![tencent-scf-create-async.png](../docs/imgs/tencent-scf-create-async.png)
 
-Ⅴ.点击完成按钮，创建函数。（触发器配置先不用管，可以等测试完成后再添加）
+**Ⅴ.点击完成按钮，创建函数**
+
+触发器配置先不用管，可以等测试完成后再添加
 
 #### 3.1.3. 手动运行测试
-Ⅰ.成功创建函数后，会看到如下的函数管理页面，点击顶部函数代码 Tab 页，准备测试，如下图：
+**Ⅰ.成功创建函数后，会看到如下的函数管理页面，点击顶部函数代码 Tab 页，准备测试。**
+
+如下图：
 
 ![tencent-scf-test-1.png](../docs/imgs/tencent-scf-test-1.png)
 
-Ⅱ.下拉，找到测试按钮，点击运行测试，页面下方会同步显示日志。如果运行正常，则表示部署已成功。如下图:
+**Ⅱ.下拉，找到测试按钮，点击运行测试，页面下方会同步显示日志。如果运行正常，则表示部署已成功。**
+
+如下图:
 
 ![tencent-scf-test-2](../docs/imgs/tencent-scf-test-2.png)
 
 #### 3.1.4. 配置触发器，设定运行时间和频率
-Ⅰ.点击左侧【触发管理】导航，点击“创建触发器”按钮，如下图：
+**Ⅰ.点击左侧【触发管理】导航，点击“创建触发器”按钮**
+
+如下图：
 
 ![tencent-scf-trigger-create.png](../docs/imgs/tencent-scf-trigger-create.png)
 
-Ⅱ.填写触发器信息
+**Ⅱ.填写触发器信息**
 * 触发方式：定时触发
 * 定时任务名称：DailyTask
 * 触发周期：自定义触发周期
