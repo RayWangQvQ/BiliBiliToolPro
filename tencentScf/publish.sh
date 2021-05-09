@@ -2,10 +2,11 @@
 
 cd ../src/Ray.BiliBiliTool.Console
 
-dotnet publish --configuration Release --runtime linux-x64 --self-contained true -p:PublishTrimmed=true -o ./bin/Publish/tencent-scf
-cp -r ../../tencentScf/bootstrap ../../tencentScf/index.sh ./bin/Publish/tencent-scf/
+dotnet publish --configuration Release --runtime linux-x64 --self-contained true -p:PublishTrimmed=true -o ../../tencentScf/bin/publish
 
-cd ./bin/Publish/tencent-scf/
-zip -r ../tencent-scf.zip ./
+cd ../../tencentScf
+cp -r ./bootstrap ./index.sh ./bin/publish/
 
-pause
+cd ./bin/publish
+chmod 755 index.sh bootstrap
+zip -r ../tencent-scf.zip ./*
