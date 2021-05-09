@@ -9,4 +9,4 @@ cp -r ./bootstrap ./index.sh ./bin/publish/
 
 cd ./bin/publish
 chmod 755 index.sh bootstrap
-zip -r ../tencent-scf.zip ./*
+zip -r -q ../tencent-scf.zip ./*

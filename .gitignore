@@ -355,3 +355,4 @@ MigrationBackup/
 
 #
 .idea/
+tencentScf/.env
