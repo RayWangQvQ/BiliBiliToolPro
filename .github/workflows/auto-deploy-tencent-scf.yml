@@ -39,7 +39,8 @@ jobs:
       - name: deploy serverless
         run: |
           cd ./tencentScf
-          sudo sls deploy --debug
+          serverless login
+          sls deploy --debug
         env: # 环境变量
           STAGE: dev #您的部署环境
           SERVERLESS_PLATFORM_VENDOR: tencent #serverless海外默认为aws部署，配置为腾讯部署
