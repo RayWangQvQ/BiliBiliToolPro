@@ -39,7 +39,7 @@ jobs:
       - name: deploy serverless
         run: |
           cd ./tencentScf
-          serverless login
+          ./publish.sh
           sls deploy --debug
         env: # 环境变量
           STAGE: dev #您的部署环境
