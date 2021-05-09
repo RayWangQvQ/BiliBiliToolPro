@@ -31,15 +31,15 @@ jobs:
       - name: clone local repository
         uses: actions/checkout@v2
       - name: install serverless
-        run: npm install -g serverless
+        run: sudo npm install -g serverless
       - name: install dependency
-        run: npm install
+        run: sudo npm install
       - name: build
-        run: npm build
+        run: sudo npm build
       - name: deploy serverless
         run: |
           cd ./tencentScf
-          sls deploy --debug
+          sudo sls deploy --debug
         env: # 环境变量
           STAGE: dev #您的部署环境
           SERVERLESS_PLATFORM_VENDOR: tencent #serverless海外默认为aws部署，配置为腾讯部署
