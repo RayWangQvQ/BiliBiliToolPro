@@ -19,7 +19,7 @@ jobs:
     steps:
     - id: check
       run: |
-        [ ${{ env.IsAutoDeployTencentScf }} == true ] && echo "开启" || echo "关闭"
+        [ ${{ env.IsAutoDeployTencentScf }} == true ] && echo "::set-output name=result::开启" || echo "::set-output name=result::关闭"
 
   deploy:
     name: deploy serverless
