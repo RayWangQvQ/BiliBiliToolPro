@@ -11,7 +11,7 @@ inputs:
   src: ./bin/publish/
   handler: index.main_handler #入口
   runtime: CustomRuntime # 运行环境
-  region: ap-guangzhou # 函数所在区域
+  region: ${env:SCF_REGION} # 函数所在区域
   description: This is a function in ${app} application.
   memorySize: 128 # 内存大小，单位MB
   initTimeout: 30 # 初始化超时时间，单位秒
