@@ -39,7 +39,8 @@ jobs:
       - name: deploy serverless
         run: |
           cd ./tencentScf
-          sudo ./publish.sh
+          chmod 755 ./publish.sh
+          ./publish.sh
           sls deploy --debug
         env: # 环境变量
           STAGE: dev #您的部署环境
