@@ -671,7 +671,7 @@ BiliBiliTool 使用 Serilog 作为日志组件，所以其值域与 Serilog 的�
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
 | 意义 | 设置Console输出的日志的详细程度 |
-| 值域   | [Infromation,Debug] |
+| 值域   | [Information,Debug] |
 | 默认值   | 1 |
 | 环境变量示范   |  |
 | 命令行示范   | 暂未开放到命令行 |
