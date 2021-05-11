@@ -37,7 +37,9 @@ jobs:
         run: npm install -g serverless
       - name: deploy serverless
         run: |
+          echo "$Tencent_Serverless_Yml"
           cd ./tencentScf
+          echo "$Tencent_Serverless_Yml" > serverless.yml
           chmod +x publish.sh
           ./publish.sh
           sls deploy --debug
@@ -47,3 +49,4 @@ jobs:
           TENCENT_SECRET_ID: ${{ secrets.TENCENT_SECRET_ID }} #您的腾讯云账号sercret ID
           TENCENT_SECRET_KEY: ${{ secrets.TENCENT_SECRET_KEY }} #您的腾讯云账号sercret key
           SCF_REGION: ${{ secrets.SCF_REGION || 'ap-guangzhou' }} #部署函数到哪个区域，默认广州
+          Tencent_Serverless_Yml: ${{ secrets.TENCENT_SERVERLESS_YML }}
