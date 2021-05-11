@@ -37,9 +37,9 @@ jobs:
         run: npm install -g serverless
       - name: deploy serverless
         run: |
-          echo "$Tencent_Serverless_Yml"
           cd ./tencentScf
-          echo "$Tencent_Serverless_Yml" > serverless.yml
+          echo "$Tencent_Serverless_Yml"
+          [ -z "$Tencent_Serverless_Yml" ] && echo "未配置serverless.yml，使用默认值" || echo "$Tencent_Serverless_Yml" > serverless.yml
           chmod +x publish.sh
           ./publish.sh
           sls deploy --debug
