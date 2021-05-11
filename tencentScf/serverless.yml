@@ -1,30 +1,45 @@
-# serverless.yml
+# https://github.com/serverless-components/tencent-scf/blob/master/docs/configure.md
 
 #组件信息
-component: scf # (必选) 组件名称，在该实例中为scf
-name: bilibili_tool # (必选) 组件实例名称
+component: scf
+name: bilibili_tool
 
 #组件参数配置
 inputs:
-  name: ${name}_scf # 云函数名称，默认为 ${name}-${stage}-${app}
-  enableRoleAuth: false # 默认会尝试创建 SCF_QcsRole 角色，如果不需要配置成 false 即可
+  name: ${name}_scf
+  enableRoleAuth: false
   src: ./bin/publish/
-  handler: index.main_handler #入口
-  runtime: CustomRuntime # 运行环境
-  region: ${env:SCF_REGION} # 函数所在区域
+  handler: index.main_handler
+  runtime: CustomRuntime
+  region: ap-guangzhou # 函数所在区域，默认广州
   description: This is a function in ${app} application.
-  memorySize: 128 # 内存大小，单位MB
-  initTimeout: 30 # 初始化超时时间，单位秒
-  timeout: 86400 # 超时时间，单位秒
-  asyncRunEnable: true # 是否启用异步执行（长时间运行）
-  traceEnable: true # 是否状态追踪
-  events: #触发器
-    - timer: #签到
+  memorySize: 128
+  initTimeout: 30
+  timeout: 86400
+  asyncRunEnable: true
+  traceEnable: true
+  events: # 根据自己的需要修改
+    - timer: # 每日任务触发器
         parameters:
           name: DailyTask
-          cronExpression: "0 1 0 * * * *"
+          cronExpression: "0 30 12 * * * *"
           enable: true
           argument: Daily
-  environment: #  环境变量
-    variables: #  环境变量对象
-      Ray_BiliBiliCookies__1: 123
+    - timer: # 天选抽奖触发器
+        parameters:
+          name: LiveLotteryTask
+          cronExpression: "0 0 */4 * * * *"
+          enable: true
+          argument: LiveLottery
+    - timer: # 自动取关
+        parameters:
+          name: UnfollowBatchedTask
+          cronExpression: "0 0 0 * * MON *"
+          enable: true
+          argument: UnfollowBatched
+  environment:
+    variables: # 根据自己的需要修改
+      Ray_CloseConsoleWhenEnd: 1
+      Ray_BiliBiliCookies__1: 123 # cookie，必填
+      Ray_Security__UserAgent: abc # UA
+      Ray_Serilog__WriteTo__9__Args__token: xyz # PushPlus推送

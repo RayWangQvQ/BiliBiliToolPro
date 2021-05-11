@@ -61,6 +61,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{61613EF4-3644-42D4-A620-70547291FB38}"
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\auto-close-pr.yml = .github\workflows\auto-close-pr.yml
+		.github\workflows\auto-deploy-tencent-scf.yml = .github\workflows\auto-deploy-tencent-scf.yml
 		.github\workflows\bilibili-daily-task.yml = .github\workflows\bilibili-daily-task.yml
 		.github\workflows\empty-task.yml = .github\workflows\empty-task.yml
 		.github\workflows\live-lottery-task.yml = .github\workflows\live-lottery-task.yml
@@ -114,6 +115,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tencentScf", "tencentScf", 
 		tencentScf\publish.bat = tencentScf\publish.bat
 		tencentScf\publish.sh = tencentScf\publish.sh
 		tencentScf\README.md = tencentScf\README.md
+		tencentScf\serverless.yml = tencentScf\serverless.yml
 	EndProjectSection
 EndProject
 Global
