@@ -18,7 +18,7 @@ jobs:
     steps:
       - id: check
         run: |
-          [ ${{ env.IsAutoDeployTencentScf }} == true ] && echo "::set-output name=result::开启" || echo "::set-output name=result::关闭"
+          [ github.event_name == 'workflow_dispatch' -o ${{ env.IsAutoDeployTencentScf }} == true ] && echo "::set-output name=result::开启" || echo "::set-output name=result::关闭"
 
   deploy:
     name: deploy serverless
@@ -38,6 +38,10 @@ jobs:
       - name: deploy serverless
         run: |
           cd ./tencentScf
+          echo "开始配置云函数："
+          echo "$Tencent_Serverless_Yml"
+          [ -z "$Tencent_Serverless_Yml" ] && echo "未配置serverless.yml，使用默认值" || echo "$Tencent_Serverless_Yml" > serverless.yml
+          echo "开始部署"
           chmod +x publish.sh
           ./publish.sh
           sls deploy --debug
@@ -47,3 +51,4 @@ jobs:
           TENCENT_SECRET_ID: ${{ secrets.TENCENT_SECRET_ID }} #您的腾讯云账号sercret ID
           TENCENT_SECRET_KEY: ${{ secrets.TENCENT_SECRET_KEY }} #您的腾讯云账号sercret key
           SCF_REGION: ${{ secrets.SCF_REGION || 'ap-guangzhou' }} #部署函数到哪个区域，默认广州
+          Tencent_Serverless_Yml: ${{ secrets.TENCENT_SERVERLESS_YML }}
