@@ -88,7 +88,7 @@ Actions 使用 `Serverless Framework` 来部署，通过 `serverless.yml` 来配
 
 | 配置名称 | Name | Value |
 | :----: | :----: | :----: |
-| 定时自动部署 | `IsAutoDeployTencentScf` | true |
+| 定时自动部署 | `IS_AUTO_DEPLOY_TENCENT_SCF` | true |
 
 自动部署只是定时会将自己仓库的代码部署到云函数，想要自动更新，还需要开启仓库的自动同步，详见常见问题文档中的 《我 Fork 之后如何同步原作者的更新内容？》章节
 
