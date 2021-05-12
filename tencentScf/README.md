@@ -65,7 +65,7 @@ Actions 使用 `Serverless Framework` 来部署，通过 `serverless.yml` 来配
 
 配置步骤如下：
 
-**Ⅰ.拷贝或下载 [serverless.yml](../src/tencentScf/serverless.yml) 文件内容到本地文件中，开始编辑内容**
+**Ⅰ.拷贝或下载 [serverless.yml](./serverless.yml) 文件内容到本地文件中，开始编辑内容**
 
 其中主要需要改的是最下方的环境变量，这些环境变量在部署后会添加到云函数中（即云函数控制台看到的环境变量集合），它们将作为应用配置传入bilibili_tool
 
