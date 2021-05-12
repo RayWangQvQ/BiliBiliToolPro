@@ -29,6 +29,7 @@
 注册成功后，需要激活云函数 SCF 功能。因为会赠送免费额度，所以正常使用是免费的。
 
 ## 3. 部署
+以下两种方式任选一个适合自己需求的即可。
 ### 3.1. 方式一：Actions自动部署（推荐）
 该方式可以实现自动定期部署，保证代码始终的最新版本的。
 #### 3.1.1. 复刻本仓库到自己的GitHub仓库
@@ -46,7 +47,7 @@
 **Ⅱ.点击新建密钥按钮，创建一个密钥。复制并保存 `SecretId` 和 `SecretKey` 两项内容，待会儿会用到它们**
 
 如下图所示：
-![新建密钥](../docs/imags/tencent-scf-secret.png)
+![新建密钥](../docs/imgs/tencent-scf-secret.png)
 
 #### 3.1.3. 通过 Secrets 添加配置
 进入自己 fork 的仓库，点击 Settings-> Secrets-> New repository secret，添加如下 Secrets 作为配置：
