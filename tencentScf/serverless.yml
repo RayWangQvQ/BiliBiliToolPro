@@ -41,5 +41,3 @@ inputs:
     variables: # 根据自己的需要修改
       Ray_CloseConsoleWhenEnd: 1
       Ray_BiliBiliCookies__1: 123 # cookie，必填
-      Ray_Security__UserAgent: abc # UA
-      Ray_Serilog__WriteTo__9__Args__token: xyz # PushPlus推送
