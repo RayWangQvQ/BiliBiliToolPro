@@ -96,7 +96,7 @@ Actions 使用 `Serverless Framework` 来部署，通过 `serverless.yml` 来配
 在自己仓库页面，依次点击 Actions ——> auto-deploy-tencent-scf ——> Run workfolw ,手动触发部署工作流。
 
 如下图所示：
-[运行actions](../docs/imgs/tencent-scf-secret_yml.png)
+![运行actions](../docs/imgs/tencent-scf-actions.png)
 
 #### 3.1.5. 测试云函数
 如果部署成功，那么登录自己的腾讯云函数控制台，就可以看到对应的函数应用了。
