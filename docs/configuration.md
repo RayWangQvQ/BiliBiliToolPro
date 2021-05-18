@@ -7,7 +7,7 @@
 - [1. 配置方式](#1-配置方式)
     - [1.1. 方式一：修改配置文件](#11-方式一修改配置文件)
     - [1.2. 方式二：命令启动时通过命令行参数配置](#12-方式二命令启动时通过命令行参数配置)
-    - [1.3. 方式三：添加环境变量](#13-方式三添加环境变量)
+    - [1.3. 方式三：添加环境变量（推荐）](#13-方式三添加环境变量推荐)
     - [1.4. 方式四：托管在GitHub Actions上，使用GitHub Secrets配置](#14-方式四托管在github-actions上使用github-secrets配置)
 - [2. 优先级](#2-优先级)
 - [3. 详细配置说明](#3-详细配置说明)
@@ -56,8 +56,8 @@
             - [3.6.7.3. PushPlus的Channel](#3673-pushplus的channel)
             - [3.6.7.4. PushPlus的Webhook](#3674-pushplus的webhook)
     - [3.7. 日志相关](#37-日志相关)
-        - [3.7.1. 日志输出等级](#371-日志输出等级)
-        - [3.7.2. 日志输出样式](#372-日志输出样式)
+        - [3.7.1. Console日志输出等级](#371-console日志输出等级)
+        - [3.7.2. Console日志输出样式](#372-console日志输出样式)
 
 <!-- /TOC -->
 
@@ -74,7 +74,7 @@
 
 如果运行环境为生产环境，则`appsettings.Production.json`优先级高于`appsettings.json`，即`appsettings.Production.json`里的配置会覆盖默认配置（同样不是全部覆盖，`appsettings.Production.json`里加了几个就覆盖几个）。
 
-对于不是开发人员的大部分人来说，只需要关注`appsettings.Production.json`即可，因为非调试状态下运行的默认环境就是生产环境。此时如需自定义配置，推荐在`appsettings.Production.json`文件中进行修改（并且以后都只修改`appsettings.Production.json`文件，`appsettings.json`只作为默认模板而存在）
+对于不是开发人员的大部分人来说，只需要关注`appsettings.Production.json`即可，因为非调试状态下运行的默认环境就是生产环境。此时如需自定义配置，推荐在`appsettings.Production.json`文件中进行修改（并且以后都只修改`appsettings.Production.json`文件，`appsettings.json`只作为默认的全量模板而存在）
 
 <a id="markdown-12-方式二命令启动时通过命令行参数配置" name="12-方式二命令启动时通过命令行参数配置"></a>
 ### 1.2. 方式二：命令启动时通过命令行参数配置
@@ -104,22 +104,25 @@ Ray.BiliBiliTool.Console.exe -cookieStr=abc -numberOfCoins=5
 Ray.BiliBiliTool.Console -cookieStr=abc -numberOfCoins=5
 ```
 
-如映射文件所展示，支持使用命令行配置的配置项并不多，也不建议大量地使用该种方式进行配置。使用包运行地朋友，除了改配置文件和命令行参数配置外，还可以使用环境变量进行配置，这也是推荐的做法，如下。
+如映射文件所展示，支持使用命令行配置的配置项并不多，也不建议大量地使用该种方式进行配置。使用包运行的朋友，除了改配置文件和命令行参数配置外，还可以使用环境变量进行配置，这也是推荐的做法，如下。
 
-<a id="markdown-13-方式三添加环境变量" name="13-方式三添加环境变量"></a>
-### 1.3. 方式三：添加环境变量
+<a id="markdown-13-方式三添加环境变量推荐" name="13-方式三添加环境变量推荐"></a>
+### 1.3. 方式三：添加环境变量（推荐）
 
 所有的配置项均可以通过添加环境变量来进行配置，以Windows下依赖net5的系统为例：
 
 ```
+# 添加环境变量作为配置：
 set Ray_RunTasks=Daily
 set Ray_BiliBiliCookies__1=abc
 set Ray_BiliBiliCookies__2=efg
 set Ray_DailyTaskConfig__NumberOfCoins=3
+
+# 开始运行程序：
 dotnet Ray.BiliBiliTool.Console.dll
 ```
 
-注意区分单下划线和双下划线，linux系统使用export关键字代替set。
+注意区分单下划线和双下划线，linux系统使用 `export` 关键字代替 `set` 。
 
 <a id="markdown-14-方式四托管在github-actions上使用github-secrets配置" name="14-方式四托管在github-actions上使用github-secrets配置"></a>
 ### 1.4. 方式四：托管在GitHub Actions上，使用GitHub Secrets配置
@@ -238,7 +241,6 @@ Secret Value：`123abc`
 
 <a id="markdown-325-请求b站接口时头部传递的user-agent" name="325-请求b站接口时头部传递的user-agent"></a>
 #### 3.2.5. 请求B站接口时头部传递的User-Agent
-近期出现登录接口报错412（[#61](https://github.com/RayWangQvQ/BiliBiliTool/issues/61)）,有朋友发现通过修改UA可以暂时解决问题，所以开放为了配置。
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
@@ -292,13 +294,9 @@ Secret Value：`123abc`
 
 <a id="markdown-333-优先选择支持的up主id集合" name="333-优先选择支持的up主id集合"></a>
 #### 3.3.3. 优先选择支持的up主Id集合
-专门为强迫症的朋友准备的配置。有人觉得随机选择视频来观看、分享和投币，一则不是自己的真实意愿，二则担心会影响B站对个人的喜好猜测产生偏差，导致以后推荐的视频都并不是自己真正喜欢的。
+通过填入自己选择的up主ID，以后观看、分享和投币，都会优先从配置的up主下面挑选视频，如果没有找到,则会去你的**特别关注**列表中随机再获取，再然后会去**普通关注**列表中随机获取，最后会去排行榜中随机获取。
 
-所以就有这个配置，通过填入自己选择的up主ID，则以后观看、分享和投币，都会优先从配置的up主下面挑选视频，如果没有找到才去其他地方随机挑选视频。
-
-其优先等级是最高的，如果配置了，在投币或观看、分享视频时，会优先从配置的up主中随机获取视频。
-
-程序会最多尝试随机获取10次，如果10均未获取到可投币的视频（比如都已经投过，不能重复投了），则会去你的**特别关注**列表中随机再获取，再然后会去**普通关注**列表中随机获取，最后会去排行榜中随机获取。
+当前不再推荐使用该配置，建议通过添加到**特别关注**列表来实现优先支持。
 
 **注意：该配置的默认值是作者的upId，如需换掉的话，直接更改即可。**
 
@@ -331,7 +329,6 @@ Secret Value：`123abc`
 充电对象的upId，需要配合前一个DayOfAutoCharge配置项使用。-1表示不指定，默认为自己充电；其他Id则会尝试为配置的UpId充电。
 
 **注意：该配置的默认值是作者的upId，如果你已认证通过了创作身份（即可以为自己充电），则建议将其改为为自己充电（配置为-1即可），也可以配置为某个自己指定的创作者upId。
-当然我个人不阻止大佬们把Id配成我的，个人维护开源不易，感谢支持~**
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
@@ -439,7 +436,7 @@ v1.0.x仅支持推送到Server酱，v1.1.x之后重新定义了推送地概念�
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key |  |
+| 配置Key | `Serilog__WriteTo__3__Args__botToken` |
 | 意义 | 用于将日志输出到Telegram机器人 |
 | 值域   | 一串字符串 |
 | 默认值   | 空 |
@@ -454,10 +451,10 @@ P.S.访问链接需要能访问“外网”，有vpn的挂vpn。
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key |  |
+| 配置Key | `Serilog__WriteTo__3__Args__chatId` |
 | 值域   | 一串字符串 |
 | 默认值   | 空 |
-| 环境变量   |  |
+| 环境变量   | `Ray_Serilog__WriteTo__3__Args__chatId` |
 | 命令行示范   | 无 |
 | GitHub Secrets  | `PUSHTGCHATID`|
 
@@ -472,10 +469,10 @@ P.S.访问链接需要能访问“外网”，有vpn的挂vpn。
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key |  |
+| 配置Key | `Serilog__WriteTo__4__Args__webHookUrl` |
 | 值域   | 一串字符串 |
 | 默认值   | 空 |
-| 环境变量   |  |
+| 环境变量   | `Ray_Serilog__WriteTo__4__Args__webHookUrl` |
 | 命令行示范   | 无 |
 | GitHub Secrets  | `PUSHWEIXINURL`|
 
@@ -492,10 +489,10 @@ P.S.访问链接需要能访问“外网”，有vpn的挂vpn。
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key |  |
+| 配置Key | `Serilog__WriteTo__5__Args__webHookUrl` |
 | 值域   | 一串字符串 |
 | 默认值   | 空 |
-| 环境变量   |  |
+| 环境变量   | `Ray_Serilog__WriteTo__5__Args__webHookUrl` |
 | GitHub Secrets  | `PUSHDINGURL`|
 
 <a id="markdown-364-server酱" name="364-server酱"></a>
@@ -510,7 +507,7 @@ P.S.访问链接需要能访问“外网”，有vpn的挂vpn。
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key |  |
+| 配置Key | `Serilog__WriteTo__6__Args__turboScKey` |
 | 值域   | 一串字符串 |
 | 默认值   | 空 |
 | 环境变量   | `Ray_Serilog__WriteTo__6__Args__turboScKey=abcdefg` |
@@ -525,10 +522,10 @@ https://cp.xuthus.cc/
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key |  |
+| 配置Key | `Serilog__WriteTo__7__Args__sKey` |
 | 值域   | 一串字符串 |
 | 默认值   | 空 |
-| 环境变量   |  |
+| 环境变量   | `Ray_Serilog__WriteTo__7__Args__sKey` |
 | GitHub Secrets  | `PUSHCOOLSKEY` |
 
 <a id="markdown-366-推送到自定义api" name="366-推送到自定义api"></a>
@@ -539,30 +536,30 @@ https://cp.xuthus.cc/
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key |  |
+| 配置Key | `Serilog__WriteTo__8__Args__api` |
 | 值域   | 一串字符串 |
 | 默认值   | 空 |
-| 环境变量   |  |
+| 环境变量   | `Ray_Serilog__WriteTo__8__Args__api` |
 | GitHub Secrets  | `PUSHOTHERAPI` |
 <a id="markdown-3662-placeholder" name="3662-placeholder"></a>
 ##### 3.6.6.2. placeholder
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key |  |
+| 配置Key | `Serilog__WriteTo__8__Args__placeholder` |
 | 值域   | 一串字符串 |
 | 默认值   | 空 |
-| 环境变量   |  |
+| 环境变量   | `Ray_Serilog__WriteTo__8__Args__placeholder` |
 | GitHub Secrets  | `PUSHOTHERPLACEHOLDER` |
 <a id="markdown-3663-bodyjsontemplate" name="3663-bodyjsontemplate"></a>
 ##### 3.6.6.3. bodyJsonTemplate
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key |  |
+| 配置Key | `Serilog__WriteTo__8__Args__bodyJsonTemplate` |
 | 值域   | 一串字符串 |
 | 默认值   | 空 |
-| 环境变量   |  |
+| 环境变量   | `Ray_Serilog__WriteTo__8__Args__bodyJsonTemplate` |
 | GitHub Secrets  | `PUSHOTHERBODYJSONTEMPLATE` |
 
 <a id="markdown-367-pushplus推荐" name="367-pushplus推荐"></a>
@@ -575,7 +572,7 @@ https://cp.xuthus.cc/
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key |  |
+| 配置Key | `Serilog__WriteTo__9__Args__token` |
 | 值域   | 一串字符串 |
 | 默认值   | 空 |
 | 环境变量   | `Ray_Serilog__WriteTo__9__Args__token` |
@@ -587,7 +584,7 @@ https://cp.xuthus.cc/
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key |  |
+| 配置Key | `Serilog__WriteTo__9__Args__topic` |
 | 值域   | 一串字符串 |
 | 默认值   | 空 |
 | 环境变量   | `Ray_Serilog__WriteTo__9__Args__topic` |
@@ -599,7 +596,7 @@ https://cp.xuthus.cc/
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key |  |
+| 配置Key | `Serilog__WriteTo__9__Args__channel` |
 | 值域   | 一串字符串，[wechat,webhook,cp,sms,mail] |
 | 默认值   | 空 |
 | 环境变量   | `Ray_Serilog__WriteTo__9__Args__channel` |
@@ -613,7 +610,7 @@ webhook编码(不是地址)，在官网平台设定，仅在channel使用webhook
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key |  |
+| 配置Key | `Serilog__WriteTo__9__Args__webhook` |
 | 值域   | 一串字符串 |
 | 默认值   | 空 |
 | 环境变量   | `Ray_Serilog__WriteTo__9__Args__webhook` |
@@ -624,8 +621,8 @@ webhook编码(不是地址)，在官网平台设定，仅在channel使用webhook
 <a id="markdown-37-日志相关" name="37-日志相关"></a>
 ### 3.7. 日志相关
 
-<a id="markdown-371-日志输出等级" name="371-日志输出等级"></a>
-#### 3.7.1. 日志输出等级
+<a id="markdown-371-console日志输出等级" name="371-console日志输出等级"></a>
+#### 3.7.1. Console日志输出等级
 这里的日志等级指的是 Console 的等级，即 GitHub Actions 里和微信推送里看到的日志。
 
 为了美观， BiliBiliTool 默认只输出最低等级为 Information 的日志，保证只展示最精简的信息。
@@ -638,14 +635,14 @@ BiliBiliTool 使用 Serilog 作为日志组件，所以其值域与 Serilog 的�
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key |  |
+| 配置Key | `Serilog__WriteTo__0__Args__restrictedToMinimumLevel` |
 | 值域   | [Information,Debug] |
 | 默认值   | 1 |
-| 环境变量   |  |
+| 环境变量   | `Ray_Serilog__WriteTo__0__Args__restrictedToMinimumLevel` |
 | GitHub Secrets  | `CONSOLELOGLEVEL` |
 
-<a id="markdown-372-日志输出样式" name="372-日志输出样式"></a>
-#### 3.7.2. 日志输出样式
+<a id="markdown-372-console日志输出样式" name="372-console日志输出样式"></a>
+#### 3.7.2. Console日志输出样式
 这里的日志样式指的是 Console 的等级，即 GitHub Actions 里和微信推送里看到的日志。
 
 通过更改模板样式，可以指定日志输出的样式，比如不输出时间和等级，做到最精简的样式。
@@ -655,9 +652,9 @@ BiliBiliTool 使用 Serilog 作为日志组件，所以可以参考 Serilog 的�
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key |  |
+| 配置Key | `Serilog__WriteTo__0__Args__outputTemplate` |
 | 值域   | 字符串 |
 | 默认值   | `[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}` |
-| 环境变量   |  |
+| 环境变量   | `Ray_Serilog__WriteTo__0__Args__outputTemplate` |
 | GitHub Secrets  | `CONSOLELOGTEMPLATE` |
 
