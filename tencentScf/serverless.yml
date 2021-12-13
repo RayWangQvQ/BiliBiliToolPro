@@ -39,5 +39,4 @@ inputs:
           argument: UnfollowBatched
   environment:
     variables: # 根据自己的需要修改
-      Ray_CloseConsoleWhenEnd: 1
       Ray_BiliBiliCookies__1: 123 # cookie，必填
