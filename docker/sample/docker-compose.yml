@@ -11,7 +11,6 @@ services:
     tty: true
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-      - Ray_CloseConsoleWhenEnd=1
       - Ray_Security__IsSkipDailyTask=false
 
       # Cookie字符串（必填）：
