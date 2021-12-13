@@ -14,6 +14,6 @@ function main_handler () {
 	    echo "触发事件中未包含附加消息（任务编码）"
     fi
     echo "开始运行BiliBiliTool......"
-    ./Ray.BiliBiliTool.Console -closeConsoleWhenEnd=1 $runTasks
+    ./Ray.BiliBiliTool.Console $runTasks
     echo "函数结束"
 }

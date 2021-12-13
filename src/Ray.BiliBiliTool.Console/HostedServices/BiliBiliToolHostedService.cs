@@ -66,12 +66,8 @@ namespace Ray.BiliBiliTool.Console.HostedServices
             finally
             {
                 _logger.LogInformation("开始推送");
-
-                if (Global.ConfigurationRoot["CloseConsoleWhenEnd"] == "1")
-                {
-                    _logger.LogInformation("正在自动关闭应用...");
-                    _applicationLifetime.StopApplication();
-                }
+                _logger.LogInformation("正在自动关闭应用...");
+                _applicationLifetime.StopApplication();
             }
             return Task.CompletedTask;
         }

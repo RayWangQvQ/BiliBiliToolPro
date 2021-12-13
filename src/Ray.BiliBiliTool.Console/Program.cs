@@ -33,8 +33,6 @@ namespace Ray.BiliBiliTool.Console
             finally
             {
                 Log.CloseAndFlush();
-                if (Global.ConfigurationRoot["CloseConsoleWhenEnd"] != "1")
-                    Task.Delay(10 * 1000 * 60).Wait();//停留10分钟，用于查看console窗口的异常信息
             }
         }
 

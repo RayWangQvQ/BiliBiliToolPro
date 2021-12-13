@@ -53,9 +53,7 @@ namespace ConfigTest
         [Fact]
         public void Test1()
         {
-            Program.CreateHost(new string[] { "-closeConsoleWhenEnd=1" });
-
-            Debug.WriteLine(Global.ConfigurationRoot["CloseConsoleWhenEnd"]);
+            Program.CreateHost(new string[] { });
 
             string s = Global.ConfigurationRoot["BiliBiliCookie:UserId"];
             Debug.WriteLine(s);
@@ -87,7 +85,7 @@ namespace ConfigTest
         public void LoadPrefixConfigByEnvWithNoError()
         {
             Environment.SetEnvironmentVariable("Ray_BiliBiliCookie", "UserId: 123");
-            Program.CreateHost(new string[] { "-closeConsoleWhenEnd=1" });
+            Program.CreateHost(new string[] { });
 
             string result = Global.ConfigurationRoot["BiliBiliCookie"];
 
@@ -99,7 +97,7 @@ namespace ConfigTest
         public void LoadPrefixConfigByEnvWhenValueIsNullWithNoError2()
         {
             Environment.SetEnvironmentVariable("Ray_BiliBiliCookie", null);
-            Program.CreateHost(new string[] { "-closeConsoleWhenEnd=1" });
+            Program.CreateHost(new string[] { });
 
             string result = Global.ConfigurationRoot["BiliBiliCookie"];
 
@@ -110,7 +108,7 @@ namespace ConfigTest
         public void CoverConfigByEnvWithNoError()
         {
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Production");
-            Program.CreateHost(new string[] { "-closeConsoleWhenEnd=1" });
+            Program.CreateHost(new string[] { });
 
             string result = Global.ConfigurationRoot["IsPrd"];
 
