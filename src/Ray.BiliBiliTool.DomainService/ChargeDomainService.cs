@@ -97,7 +97,7 @@ namespace Ray.BiliBiliTool.DomainService
                     _logger.LogInformation("【充电结果】成功");
                     _logger.LogInformation("【充值个数】 {num}个B币", couponBalance);
                     _logger.LogInformation("经验+{exp} √", couponBalance);
-                    _logger.LogInformation("在过期前使用成功，赠送的B币券没有浪费哦~", targetUpId, couponBalance);
+                    _logger.LogInformation("在过期前使用成功，赠送的B币券没有浪费哦~");
 
                     //充电留言
                     ChargeComments(response.Data.Order_no);
