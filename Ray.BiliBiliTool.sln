@@ -116,6 +116,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "qinglong", "qinglong", "{1C6CC38A-A5D5-41EF-9072-70AEEEA211F7}"
 	ProjectSection(SolutionItems) = preProject
 		qinglong\extra.sh = qinglong\extra.sh
+		qinglong\README.md = qinglong\README.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DefaultTasks", "DefaultTasks", "{DE60A16C-CA3B-45E9-8A9D-0E91ACEBDEE0}"

@@ -8,13 +8,13 @@ BiliBiliTool
 
 </h1>
 
-[![GitHub Stars](https://img.shields.io/github/stars/RayWangQvQ/BiliBiliTool?style=flat-square)](https://github.com/RayWangQvQ/BiliBiliTool/stargazers)
-[![GitHub Forks](https://img.shields.io/github/forks/RayWangQvQ/BiliBiliTool?style=flat-square)](https://github.com/RayWangQvQ/BiliBiliTool/network)
-[![GitHub Issues](https://img.shields.io/github/issues/RayWangQvQ/BiliBiliTool?style=flat-square)](https://github.com/RayWangQvQ/BiliBiliTool/issues)
-[![GitHub Contributors](https://img.shields.io/github/contributors/RayWangQvQ/BiliBiliTool?style=flat-square)](https://github.com/RayWangQvQ/BiliBiliTool/graphs/contributors)
-[![GitHub All Releases](https://img.shields.io/github/downloads/RayWangQvQ/BiliBiliTool/total?style=flat-square)](https://github.com/RayWangQvQ/BiliBiliTool/releases)
-![GitHub Release (latest SemVer)](https://img.shields.io/github/v/release/RayWangQvQ/BiliBiliTool?style=flat-square)
-[![GitHub License](https://img.shields.io/github/license/RayWangQvQ/BiliBiliTool?style=flat-square)](https://github.com/RayWangQvQ/BiliBiliTool/blob/main/LICENSE)
+[![GitHub Stars](https://img.shields.io/github/stars/RayWangQvQ/BiliBiliToolPro?style=flat-square)](https://github.com/RayWangQvQ/BiliBiliToolPro/stargazers)
+[![GitHub Forks](https://img.shields.io/github/forks/RayWangQvQ/BiliBiliToolPro?style=flat-square)](https://github.com/RayWangQvQ/BiliBiliToolPro/network)
+[![GitHub Issues](https://img.shields.io/github/issues/RayWangQvQ/BiliBiliToolPro?style=flat-square)](https://github.com/RayWangQvQ/BiliBiliToolPro/issues)
+[![GitHub Contributors](https://img.shields.io/github/contributors/RayWangQvQ/BiliBiliToolPro?style=flat-square)](https://github.com/RayWangQvQ/BiliBiliToolPro/graphs/contributors)
+[![GitHub All Releases](https://img.shields.io/github/downloads/RayWangQvQ/BiliBiliToolPro/total?style=flat-square)](https://github.com/RayWangQvQ/BiliBiliToolPro/releases)
+![GitHub Release (latest SemVer)](https://img.shields.io/github/v/release/RayWangQvQ/BiliBiliToolPro?style=flat-square)
+[![GitHub License](https://img.shields.io/github/license/RayWangQvQ/BiliBiliToolPro?style=flat-square)](https://github.com/RayWangQvQ/BiliBiliToolPro/blob/main/LICENSE)
 
 </div>
 
@@ -64,7 +64,7 @@ BiliBiliTool
 
 ![运行图示](https://cdn.jsdelivr.net/gh/RayWangQvQ/BiliBiliTool.Docs@main/imgs/run-exe.png)
 
-**Github 仓库地址：[RayWangQvQ/BiliBiliTool](https://github.com/RayWangQvQ/BiliBiliTool)**
+**Github 仓库地址：[RayWangQvQ/BiliBiliTool](https://github.com/RayWangQvQ/BiliBiliToolPro)**
 
 **注意：**
 
@@ -93,11 +93,12 @@ BiliBiliTool 就是收集了一系列api，通过每日自动运行程序，依�
 
 ### 1.2. 第二步：配置 Cookie 并运行 BiliBiliTool
 
-运行 BiliBiliTool 主要有 4 种方式：
+运行 BiliBiliTool 主要有 5 种方式：
 * Github Actions
 * 下载Release包到本地或服务器运行
 * 云函数部署
 * docker容器化运行
+* 青龙运行
 
 熟悉 GitHub 的朋友，推荐使用方式一，可以实现线上的每天自动运行，不需自己动手，一劳永逸。
 
@@ -107,7 +108,9 @@ BiliBiliTool 就是收集了一系列api，通过每日自动运行程序，依�
 
 熟悉docker的朋友，可以跳转到方式四 docker容器化运行，以后因为可能涉及到需要持久话的功能，Serverless就不太方便，所以有能力、有条件的话还是建议使用docker。
 
-以下 4 种方式任选一种适合自己的即可。
+已经部署好了青龙面板跑其他自动任务的朋友，也可以直接在青龙面板中跑BiliBiliTool。
+
+以下 5 种方式任选一种适合自己的即可。
 
 #### 1.2.1. 方式一：xxx
 暂时删掉该方式避避风头，详情见 [552号议题](https://github.com/RayWangQvQ/BiliBiliTool/issues/552)。
@@ -123,13 +126,13 @@ BiliBiliTool 就是收集了一系列api，通过每日自动运行程序，依�
 
 Ⅰ. **下载应用文件**
 
-点击 [BiliBiliTool/release](https://github.com/RayWangQvQ/BiliBiliTool/releases)，下载已发布的最新版本。
+点击 [BiliBiliTool/release](https://github.com/RayWangQvQ/BiliBiliToolPro/releases)，下载已发布的最新版本。
 
-* 如果本地已安装 `.NET 5.0` 环境：
+* 如果本地已安装 `.NET 6.0` 环境：
 
 请下载 `net-dependent.zip` 文件，本文件依赖本地运行库（runtime-dependent），所以文件包非常小（不到1M）。
 
-P.S.这里的运行环境指的是 `.NET Runtime 5.0.0` ，安装方法可详见 [常见问题](docs/questions.md) 中的 **本地或服务器如何安装.net环境**
+P.S.这里的运行环境指的是 `.NET Runtime 6.0.0` ，安装方法可详见 [常见问题](docs/questions.md) 中的 **本地或服务器如何安装.net环境**
 
 * 如果不希望安装或不知如何安装.net运行环境：
 
@@ -174,6 +177,10 @@ P.S.这里的运行环境指的是 `.NET Runtime 5.0.0` ，安装方法可详见
 
 [>>docker部署说明](docker/README.md)
 
+#### 1.2.5. 方式五：青龙运行
+
+[>>青龙部署教程](qinglong/README.md)
+
 
 
 如果配置了推送，执行成功后接收端会收到推送消息，推送效果如下所示：
@@ -186,7 +193,7 @@ P.S.这里的运行环境指的是 `.NET Runtime 5.0.0` ，安装方法可详见
 这里的**任务**是指一组功能的集合，是工具每次运行的最小单位。工具启动后会根据我们输入的任务编码，运行相应的任务，如：
 
 ```
-dotnet Ray.BiliBiliTool.Console.dll -runTasks=Daily
+dotnet Ray.BiliBiliTool.Console.dll --runTasks=Daily
 ```
 
 程序启动后，会执行任务Code为 `Daily` 的`每日经验任务`。
@@ -194,7 +201,7 @@ dotnet Ray.BiliBiliTool.Console.dll -runTasks=Daily
 可以通过使用 `&` 符拼接多个任务，程序启动后会按顺序依次执行指定的任务集合，如
 
 ```
-dotnet Ray.BiliBiliTool.Console.dll -runTasks=Daily&LiveLottery
+dotnet Ray.BiliBiliTool.Console.dll --runTasks=Daily&LiveLottery
 ```
 
 会依次运行`每日任务`和`天选抽奖任务`。
@@ -225,9 +232,9 @@ dotnet Ray.BiliBiliTool.Console.dll -runTasks=Daily&LiveLottery
 
 [>>点击查看常见问题文档](docs/questions.md)
 
-[issues（议题）](https://github.com/RayWangQvQ/BiliBiliTool/issues)板块可以用来提交**Bug**和**建议**；
+[issues（议题）](https://github.com/RayWangQvQ/BiliBiliToolPro/issues)板块可以用来提交**Bug**和**建议**；
 
-[discussions（讨论）](https://github.com/RayWangQvQ/BiliBiliTool/discussions)板块可以用来**提问**和**讨论**。
+[discussions（讨论）](https://github.com/RayWangQvQ/BiliBiliToolPro/discussions)板块可以用来**提问**和**讨论**。
 
 大部分问题其实都可以在文档、议题和讨论中找到答案。
 
@@ -242,7 +249,7 @@ dotnet Ray.BiliBiliTool.Console.dll -runTasks=Daily&LiveLottery
 
 ## 6. 版本发布及更新
 
-当前正处于稳定的迭代开发中，正常情况下每 2 周会发布一个小版本，详细待更新和计划内容可参见 [projects](https://github.com/RayWangQvQ/BiliBiliTool/projects) 和 [issues](https://github.com/RayWangQvQ/BiliBiliTool/issues) 。
+当前正处于稳定的迭代开发中，正常情况下每 2 周会发布一个小版本，详细待更新和计划内容可参见 [projects](https://github.com/RayWangQvQ/BiliBiliToolPro/projects) 和 [issues](https://github.com/RayWangQvQ/BiliBiliTool/issues) 。
 
 关于新版本发布后，如何同步最新的内容到自己 Fork 的仓库，可参考**常见问题文档**中的 《**我 Fork 之后如何同步原作者的更新内容？**》章节。
 
