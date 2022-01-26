@@ -18,7 +18,7 @@ jobs:
     steps:
       - id: check
         run: |
-          [ github.event_name == 'workflow_dispatch' -o ${{ env.IsAutoDeployTencentScf }} == true ] && echo "::set-output name=result::开启" || echo "::set-output name=result::关闭"
+          [ ${{ github.event_name }} == 'workflow_dispatch' -o true == "${{ env.IsAutoDeployTencentScf }}" ] && echo "::set-output name=result::开启" || echo "::set-output name=result::关闭"
 
   deploy:
     name: deploy serverless

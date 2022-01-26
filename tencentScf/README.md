@@ -65,7 +65,7 @@ Actions 使用 `Serverless Framework` 来部署，通过 `serverless.yml` 来配
 
 配置步骤如下：
 
-**Ⅰ.拷贝或下载 [serverless.yml](../src/tencentScf/serverless.yml) 文件内容到本地文件中，开始编辑内容**
+**Ⅰ.拷贝或下载 [serverless.yml](./serverless.yml) 文件内容到本地文件中，开始编辑内容**
 
 其中主要需要改的是最下方的环境变量，这些环境变量在部署后会添加到云函数中（即云函数控制台看到的环境变量集合），它们将作为应用配置传入bilibili_tool
 
@@ -88,7 +88,7 @@ Actions 使用 `Serverless Framework` 来部署，通过 `serverless.yml` 来配
 
 | 配置名称 | Name | Value |
 | :----: | :----: | :----: |
-| 定时自动部署 | `IsAutoDeployTencentScf` | true |
+| 定时自动部署 | `IS_AUTO_DEPLOY_TENCENT_SCF` | true |
 
 自动部署只是定时会将自己仓库的代码部署到云函数，想要自动更新，还需要开启仓库的自动同步，详见常见问题文档中的 《我 Fork 之后如何同步原作者的更新内容？》章节
 
@@ -96,7 +96,7 @@ Actions 使用 `Serverless Framework` 来部署，通过 `serverless.yml` 来配
 在自己仓库页面，依次点击 Actions ——> auto-deploy-tencent-scf ——> Run workfolw ,手动触发部署工作流。
 
 如下图所示：
-[运行actions](../docs/imgs/tencent-scf-secret_yml.png)
+![运行actions](../docs/imgs/tencent-scf-actions.png)
 
 #### 3.1.5. 测试云函数
 如果部署成功，那么登录自己的腾讯云函数控制台，就可以看到对应的函数应用了。
