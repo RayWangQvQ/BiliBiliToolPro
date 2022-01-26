@@ -5,7 +5,7 @@ on: pull_request_target
 jobs:
   autoclose:
     runs-on: ubuntu-latest
-    if: github.repository == 'RayWangQvQ/BiliBiliTool'
+    if: github.repository == 'RayWangQvQ/BiliBiliToolPro'
     steps:
     - uses: roots/issue-closer@v1.1
       with:

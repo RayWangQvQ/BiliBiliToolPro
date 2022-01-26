@@ -1,7 +1,35 @@
 {
   //命令行启动时的参数映射
   "CommandLineMappings": {
-    "-cookieStr": "BiliBiliCookie:CookieStr",
+    "--cookieStr1": "BiliBiliCookies:1",
+
+    "--runTasks": "RunTasks",
+
+    "--numberOfCoins": "DailyTaskConfig:NumberOfCoins",
+    "--selectLike": "DailyTaskConfig:SelectLike",
+    "--supportUpIds": "DailyTaskConfig:SupportUpIds",
+    "--dayOfAutoCharge": "DailyTaskConfig:DayOfAutoCharge",
+    "--autoChargeUpId": "DailyTaskConfig:AutoChargeUpId",
+    "--dayOfReceiveVipPrivilege": "DailyTaskConfig:DayOfReceiveVipPrivilege",
+    "--isExchangeSilver2Coin": "DailyTaskConfig:IsExchangeSilver2Coin",
+    "--devicePlatform": "DailyTaskConfig:DevicePlatform",
+
+    "--excludeAwardNames": "LiveLotteryTaskConfig:ExcludeAwardNames",
+    "--includeAwardNames": "LiveLotteryTaskConfig:INCLUDEAWARDNAMES",
+
+    "--unfollowGroup": "UnfollowBatchedTaskConfig:GroupName",
+    "--unfollowCount": "UnfollowBatchedTaskConfig:Count",
+
+    "--intervalSecondsBetweenRequestApi": "Security:IntervalSecondsBetweenRequestApi",
+    "--intervalMethodTypes": "Security:IntervalMethodTypes",
+
+    "--pushScKey": "Serilog:WriteTo:6:Args:scKey",
+
+    "--proxy": "WebProxy",
+
+
+
+
     "-cookieStr1": "BiliBiliCookies:1",
 
     "-runTasks": "RunTasks",

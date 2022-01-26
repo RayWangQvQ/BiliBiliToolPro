@@ -58,10 +58,6 @@ jobs:
 
     steps:
 
-    # 输出IP
-    - name: IP
-      run: sudo curl ifconfig.me
-
     # 设置服务器时区为东八区 
     - name: Set time zone
       run: sudo timedatectl set-timezone 'Asia/Shanghai'
@@ -74,7 +70,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 5.0.x
+        dotnet-version: 6.0.x
 
     # 发布
     - name: Publish
@@ -85,5 +81,5 @@ jobs:
     # 测试运行
     - name: Test APP
       run: |
-        cd ./src/Ray.BiliBiliTool.Console/bin/Publish/net5-dependent
-        dotnet Ray.BiliBiliTool.Console.dll -runTasks=UnfollowBatched
+        cd ./src/Ray.BiliBiliTool.Console
+        dotnet run -runTasks=UnfollowBatched
