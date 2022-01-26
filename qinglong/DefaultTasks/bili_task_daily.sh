@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 # bili每日任务
-# cron 0 9 * * * bili_task_test.sh
+# cron 0 9 * * * bili_task_daily.sh
 
 dotnet run --project /ql/repo/raywangqvq_bilibilitoolpro/src/Ray.BiliBiliTool.Console Production -runTasks=Daily
