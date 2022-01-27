@@ -45,7 +45,7 @@ namespace Ray.BiliBiliTool.Console
         {
             try
             {
-                _logger.LogInformation("BiliBiliToolPro 开始运行...{newLine}", Environment.NewLine + Environment.NewLine);
+                _logger.LogInformation("BiliBiliToolPro 开始运行...{newLine}", Environment.NewLine);
 
                 var pass = PreCheck();
                 if (!pass) return Task.CompletedTask;
@@ -78,10 +78,10 @@ namespace Ray.BiliBiliTool.Console
             }
             finally
             {
-                _logger.LogInformation("开始推送");
-                //_logger.LogInformation("正在自动关闭应用...");
-
                 LogAppInfo();
+
+                _logger.LogInformation("开始推送");
+                _logger.LogInformation("运行结束");
                 _applicationLifetime.StopApplication();
             }
             return Task.CompletedTask;
