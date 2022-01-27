@@ -115,7 +115,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tencentScf", "tencentScf", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "qinglong", "qinglong", "{1C6CC38A-A5D5-41EF-9072-70AEEEA211F7}"
 	ProjectSection(SolutionItems) = preProject
+		qinglong\dotnet-install.sh = qinglong\dotnet-install.sh
 		qinglong\extra.sh = qinglong\extra.sh
+		qinglong\ray-dotnet-install.sh = qinglong\ray-dotnet-install.sh
 		qinglong\README.md = qinglong\README.md
 	EndProjectSection
 EndProject
