@@ -8,7 +8,6 @@ using Microsoft.Extensions.Hosting;
 using Ray.BiliBiliTool.Agent.Extensions;
 using Ray.BiliBiliTool.Application.Extensions;
 using Ray.BiliBiliTool.Config.Extensions;
-using Ray.BiliBiliTool.Console.HostedServices;
 using Ray.BiliBiliTool.DomainService.Extensions;
 using Ray.BiliBiliTool.Infrastructure;
 using Serilog;
@@ -104,10 +103,6 @@ namespace Ray.BiliBiliTool.Console
             {
                 Global.ConfigurationRoot = (IConfigurationRoot)hostContext.Configuration;
 
-                //HostedService：
-                services.AddHostedService<LogAppInfoHostedService>();
-                services.AddHostedService<PreCheckHostedService>();
-                services.AddHostedService<RandomSleepHostedService>();
                 services.AddHostedService<BiliBiliToolHostedService>();
 
                 services.AddBiliBiliConfigs(hostContext.Configuration);

@@ -1,16 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Application.Contracts;
+using Ray.BiliBiliTool.Config;
+using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.Infrastructure;
 
-namespace Ray.BiliBiliTool.Console.HostedServices
+namespace Ray.BiliBiliTool.Console
 {
     public class BiliBiliToolHostedService : IHostedService
     {
@@ -19,6 +23,7 @@ namespace Ray.BiliBiliTool.Console.HostedServices
         private readonly IConfiguration _configuration;
         private readonly ILogger<BiliBiliToolHostedService> _logger;
         private readonly CookieStrFactory _cookieStrFactory;
+        private readonly SecurityOptions _securityOptions;
 
         public BiliBiliToolHostedService(
             IHostApplicationLifetime applicationLifetime
@@ -26,19 +31,27 @@ namespace Ray.BiliBiliTool.Console.HostedServices
             , IConfiguration configuration
             , ILogger<BiliBiliToolHostedService> logger
             , CookieStrFactory cookieStrFactory
-        )
+            , IOptionsMonitor<SecurityOptions> securityOptions)
         {
             _applicationLifetime = applicationLifetime;
             _serviceProvider = serviceProvider;
             _configuration = configuration;
             _logger = logger;
             _cookieStrFactory = cookieStrFactory;
+            _securityOptions = securityOptions.CurrentValue;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
             try
             {
+                _logger.LogInformation("BiliBiliToolPro 开始运行...");
+
+                var pass = PreCheck();
+                if(!pass) return Task.CompletedTask;
+
+                RandomSleep();
+
                 var tasks = _configuration["RunTasks"]
                     .Split("&", options: StringSplitOptions.RemoveEmptyEntries);
 
@@ -66,7 +79,9 @@ namespace Ray.BiliBiliTool.Console.HostedServices
             finally
             {
                 _logger.LogInformation("开始推送");
-                _logger.LogInformation("正在自动关闭应用...");
+                //_logger.LogInformation("正在自动关闭应用...");
+
+                LogAppInfo();
                 _applicationLifetime.StopApplication();
             }
             return Task.CompletedTask;
@@ -74,6 +89,40 @@ namespace Ray.BiliBiliTool.Console.HostedServices
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
+            return Task.CompletedTask;
+        }
+
+        private bool PreCheck()
+        {
+            //目标任务
+            _logger.LogInformation("【目标任务】{tasks}", _configuration["RunTasks"]);
+            var tasks = _configuration["RunTasks"]
+                .Split("&", options: StringSplitOptions.RemoveEmptyEntries);
+            if (!tasks.Any()) return false;
+
+            //Cookie
+            _logger.LogInformation("【账号个数】{count}个" + Environment.NewLine, _cookieStrFactory.Count);
+            if (_cookieStrFactory.Count == 0) return false;
+
+            //是否跳过
+            if (_securityOptions.IsSkipDailyTask)
+            {
+                _logger.LogWarning("已配置为跳过任务" + Environment.NewLine);
+                return false;
+            }
+
+            return true;
+        }
+
+        private Task RandomSleep()
+        {
+            if (_securityOptions.RandomSleepMaxMin > 0)
+            {
+                int randomMin = new Random().Next(1, ++_securityOptions.RandomSleepMaxMin);
+                _logger.LogInformation("随机休眠{min}分钟" + Environment.NewLine, randomMin);
+                Thread.Sleep(randomMin * 1000 * 60);
+            }
+
             return Task.CompletedTask;
         }
 
@@ -90,6 +139,17 @@ namespace Ray.BiliBiliTool.Console.HostedServices
                     appService?.DoTask();
                 }
             }
+        }
+
+        private void LogAppInfo()
+        {
+            _logger.LogInformation(
+                "{newLine}--------------- Ray.BiliBiliTool-v{version} in {env} env.",
+                Environment.NewLine,
+                typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion,
+                Global.HostingEnvironment.EnvironmentName);
+            //_logger.LogInformation("【当前IP】{ip} ", IpHelper.GetIp());
+            _logger.LogInformation("开源 by {url}" + Environment.NewLine, Constants.SourceCodeUrl);
         }
     }
 }
