@@ -45,10 +45,10 @@ namespace Ray.BiliBiliTool.Console
         {
             try
             {
-                _logger.LogInformation("BiliBiliToolPro 开始运行...");
+                _logger.LogInformation("BiliBiliToolPro 开始运行...{newLine}", Environment.NewLine + Environment.NewLine);
 
                 var pass = PreCheck();
-                if(!pass) return Task.CompletedTask;
+                if (!pass) return Task.CompletedTask;
 
                 RandomSleep();
 

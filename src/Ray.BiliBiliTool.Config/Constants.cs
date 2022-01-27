@@ -16,7 +16,7 @@ namespace Ray.BiliBiliTool.Config
         /// <summary>
         /// 开源地址
         /// </summary>
-        public static string SourceCodeUrl = "github.com/RayWangQvQ/BiliBiliToolPro";
+        public static string SourceCodeUrl = "https://github.com/RayWangQvQ/BiliBiliToolPro";
 
         public static class OptionsNames
         {

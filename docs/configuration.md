@@ -417,7 +417,7 @@ Secret Value：`123abc`
 | ---------- | -------------- |
 | 配置Key | `Ray_UnfollowBatchedTaskConfig__Count` |
 | 值域   | 数字，[-1,+]，-1表示全部 |
-| 默认值   | 2 |
+| 默认值   | 5 |
 | 环境变量   | `Ray_UnfollowBatchedTaskConfig__Count` |
 | GitHub Secrets  | 无，在unfollow-batched-task.yml工作流中通过input输入 |
 
