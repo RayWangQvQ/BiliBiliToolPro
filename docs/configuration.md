@@ -9,6 +9,7 @@
     - [1.2. 方式二：命令启动时通过命令行参数配置](#12-方式二命令启动时通过命令行参数配置)
     - [1.3. 方式三：添加环境变量（推荐）](#13-方式三添加环境变量推荐)
     - [1.4. 方式四：托管在GitHub Actions上，使用GitHub Secrets配置](#14-方式四托管在github-actions上使用github-secrets配置)
+    - [1.5. 方式五：托管在青龙面板上，使用面板的配置文件页配置](#15-方式五托管在青龙面板上使用面板的配置文件页配置)
 - [2. 优先级](#2-优先级)
 - [3. 详细配置说明](#3-详细配置说明)
     - [3.1. Cookie字符串](#31-cookie字符串)
@@ -31,9 +32,11 @@
         - [3.4.1. 根据关键字排除奖品](#341-根据关键字排除奖品)
         - [3.4.2. 根据关键字指定奖品](#342-根据关键字指定奖品)
         - [3.4.3. 天选抽奖后是否自动分组关注的主播](#343-天选抽奖后是否自动分组关注的主播)
+        - [3.4.4. 天选筹抽奖主播Uid黑名单](#344-天选筹抽奖主播uid黑名单)
     - [3.5. 批量取关相关](#35-批量取关相关)
         - [3.5.1. 想要批量取关的分组名称](#351-想要批量取关的分组名称)
         - [3.5.2. 批量取关的人数](#352-批量取关的人数)
+        - [3.5.3. 取关白名单](#353-取关白名单)
     - [3.6. 推送相关](#36-推送相关)
         - [3.6.1. Telegram机器人](#361-telegram机器人)
             - [3.6.1.1. botToken](#3611-bottoken)
@@ -139,16 +142,26 @@ Secret Value：`123abc`
 
 ![添加GitHub Secrets](imgs/git-secrets.png)
 
+<a id="markdown-15-方式五托管在青龙面板上使用面板的配置文件页配置" name="15-方式五托管在青龙面板上使用面板的配置文件页配置"></a>
+### 1.5. 方式五：托管在青龙面板上，使用面板的配置文件页配置
+青龙面板配置，其本质还是通过环境变量进行配置。Linux使用export关键字来添加环境变量，青龙面板中的`配置文件`页面可以用来保存这些export指令。
+
+例如，配置Cookie和推送：
+
+```
+export Ray_BiliBiliCookies__1="_uuid=abc..."
+export Ray_Serilog__WriteTo__9__Args__token="abcde"
+```
+
+当然，Cookie还可以在青龙面板的`环境变量`页配置，名称是`Ray_BiliBiliCookies__1`或`Ray_BiliBiliCookies__2`，指就是对应的CK。好处是可以方便地通过点击禁用或开启来管理多账号。
+
+
 <a id="markdown-2-优先级" name="2-优先级"></a>
 ## 2. 优先级
 
 以上 4 种配置源，其优先级由低到高依次是：json文件 < 环境变量(和Github Secrets) < 命令行。
 
-即，如果既在配置文件中写入了配置值，又在命令行启动时使用命令行参数指定了配置值，则最后会使用命令行的。
-
-**对于使用 Github Action 线上运行的朋友，建议只使用 Secrets 进行配置。** 因为 Fork 项目后，不会拷贝源仓库中的 Secrets，可自由的在自己的仓库中进行私人配置。当有新版本发布时，同步仓库会很顺滑，不会影响到已配置的值。
-
-当然， Fork 之后自己改了 appsettings.json 文件再提交，也是可以实现配置的。但是一则你的配置值将被暴露出来（别人可通过访问你的仓库里的配置查看到值），二是以后如果需要 PR 源仓库的更新到自己仓库，则要注意保留自己的修改不要被同步操作覆盖。
+高优先级的配置会覆盖低优先级的配置。
 
 <a id="markdown-3-详细配置说明" name="3-详细配置说明"></a>
 ## 3. 详细配置说明
@@ -396,6 +409,18 @@ Secret Value：`123abc`
 | 环境变量   | `Ray_LiveLotteryTaskConfig__AutoGroupFollowings` |
 | GitHub Secrets  | `AUTOGROUPFOLLOWINGS`  Value: `true`|
 
+<a id="markdown-344-天选筹抽奖主播uid黑名单" name="344-天选筹抽奖主播uid黑名单"></a>
+#### 3.4.4. 天选筹抽奖主播Uid黑名单
+
+不想参与抽奖的主播Upid集合，多个用英文逗号分隔，配置后不会参加黑名单中的主播的抽奖活动。默认值是目前已知的中奖后拒绝发奖的Up，后期还会继续补充，也反映反馈。
+|   TITLE   | CONTENT   |
+| ---------- | -------------- |
+| 配置Key | `LiveLotteryTaskConfig__DenyUids` |
+| 值域   | 字符串，如"65566781,1277481241" |
+| 默认值   | "65566781,1277481241,1643654862,603676925" |
+| 环境变量   | `Ray_LiveLotteryTaskConfig__DenyUids` |
+| GitHub Secrets  | `LIVELOTTERYDENYUIDS`  Value: `65566781,1277481241,1643654862,603676925`|
+
 <a id="markdown-35-批量取关相关" name="35-批量取关相关"></a>
 ### 3.5. 批量取关相关
 
@@ -420,6 +445,17 @@ Secret Value：`123abc`
 | 默认值   | 5 |
 | 环境变量   | `Ray_UnfollowBatchedTaskConfig__Count` |
 | GitHub Secrets  | 无，在unfollow-batched-task.yml工作流中通过input输入 |
+
+<a id="markdown-353-取关白名单" name="353-取关白名单"></a>
+#### 3.5.3. 取关白名单
+
+|   TITLE   | CONTENT   |
+| ---------- | -------------- |
+| 配置Key | `Ray_UnfollowBatchedTaskConfig__RetainUids` |
+| 值域   | 字符串，多个使用英文逗号分隔 |
+| 默认值   | 108569350 |
+| 环境变量   | `Ray_UnfollowBatchedTaskConfig__RetainUids` |
+| GitHub Secrets  | `UNFOLLOWBATCHEDRETAINUIDS` |
 
 <a id="markdown-36-推送相关" name="36-推送相关"></a>
 ### 3.6. 推送相关

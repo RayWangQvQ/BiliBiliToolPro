@@ -1,4 +1,4 @@
-![2233](https://cdn.jsdelivr.net/gh/RayWangQvQ/BiliBiliTool.Docs@main/imgs/2233.png)
+![2233](docs/imgs/2233.png)
 
 <div align="center">
 
@@ -29,6 +29,7 @@ BiliBiliTool
         - [1.2.2. 方式二：下载程序包到本地或服务器运行](#122-方式二下载程序包到本地或服务器运行)
         - [1.2.3. 方式三：腾讯云函数SCF](#123-方式三腾讯云函数scf)
         - [1.2.4. 方式四：docker容器化运行（推荐）](#124-方式四docker容器化运行推荐)
+        - [1.2.5. 方式五：青龙运行](#125-方式五青龙运行)
 - [2. 功能任务说明](#2-功能任务说明)
 - [3. 个性化自定义配置](#3-个性化自定义配置)
 - [4. 多账号支持](#4-多账号支持)
@@ -42,9 +43,7 @@ BiliBiliTool
 
 <!-- /TOC -->
 
-**BiliBiliTool 是一个 B 站自动执行任务的工具，当我们忘记做 B 站的某项任务时，它会像一个小助手一样，按照我们预先吩咐她的命令，在指定时间、按照指定频率，帮助我们自动完成计划的任务。**
-
-比如，当我们忘记领取自己的大会员福利时，她会帮助我们在月初自动领取；当我们忘记完成每日任务时，她会辅助我们自动完成所有任务，获取每日的满额65点经验值，快速升级 Lv6 ；当然我们也可以用她来支持我们喜欢的up主，拒绝白嫖~
+**BiliBiliTool 是一个自动执行任务的工具，当我们忘记做某项任务时，它会像一个小助手一样，按照我们预先吩咐她的命令，在指定时间、按照指定频率，帮助我们自动完成计划的任务。**
 
 详细功能如下：
 
@@ -62,9 +61,9 @@ BiliBiliTool
 
 还有其他一些辅助小功能，大家可以自己去自由探索~
 
-![运行图示](https://cdn.jsdelivr.net/gh/RayWangQvQ/BiliBiliTool.Docs@main/imgs/run-exe.png)
+![运行图示](docs/imgs/run-exe.png)
 
-**Github 仓库地址：[RayWangQvQ/BiliBiliTool](https://github.com/RayWangQvQ/BiliBiliToolPro)**
+**Github 仓库地址：[RayWangQvQ/BiliBiliToolPro](https://github.com/RayWangQvQ/BiliBiliToolPro)**
 
 **注意：**
 
@@ -76,9 +75,7 @@ _（如果图片挂了，是因为 GitHub 的服务器在国外，经常会刷�
 
 ## 1. 如何使用
 
-BiliBiliTool 实现自动完成任务的原理，是通过调用一系列 B 站开放的api实现的。
-
-BiliBiliTool 就是收集了一系列api，通过每日自动运行程序，依次调用接口，来实现各任务的。
+BiliBiliTool 实现自动完成任务的原理，是通过调用一系列开放的api实现的。
 
 **要使用 BiliBiliTool，我们只需要做两步：获取自己的 Cookie 作为配置，然后将其输入 BiliBiliTool 并运行即可。**
 
@@ -289,7 +286,7 @@ dotnet Ray.BiliBiliTool.Console.dll --runTasks=Daily&LiveLottery
 
 **☟☟☟ 扫码自动赞赏 1 元：☟☟☟**
 
-![赞赏码](https://cdn.jsdelivr.net/gh/RayWangQvQ/BiliBiliTool.Docs@main/imgs/donate.jpg)
+![赞赏码](docs/imgs/donate.jpg)
 
 另外，应用中的优先支持的UP主的配置项，默认是作者的 UpId （只是作为了 json 配置文件的默认值，代码是干净的），需要更改的话，直接修改相应配置即可（secrets或环境变量等各种方式都行）。
 
