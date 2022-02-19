@@ -178,6 +178,13 @@ namespace Ray.BiliBiliTool.DomainService
             _logger.LogDebug("【房间】{name}", target.Title);
             try
             {
+                //黑名单
+                if (_liveLotteryTaskOptions.DenyUidList.Contains(target.Uid.ToString()))
+                {
+                    _logger.LogDebug("黑名单，跳过");
+                    return;
+                }
+
                 CheckTianXuanDto check = _liveApi.CheckTianXuan(target.Roomid)
                     .GetAwaiter().GetResult()
                     .Data;

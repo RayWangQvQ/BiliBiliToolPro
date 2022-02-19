@@ -24,5 +24,12 @@ namespace Ray.BiliBiliTool.Config.Options
 
 
         public bool AutoGroupFollowings { get; set; } = true;
+
+        public string DenyUids { get; set; }
+
+        public List<string> DenyUidList =>
+            DenyUids?.Split(",",
+                    StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToList()
+            ?? new List<string>();
     }
 }
