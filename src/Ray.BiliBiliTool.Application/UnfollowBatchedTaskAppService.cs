@@ -42,8 +42,7 @@ namespace Ray.BiliBiliTool.Application
         [TaskInterceptor("批量取关", TaskLevel.One)]
         public override void DoTask()
         {
-            _accountDomainService.UnfollowBatched(_unfollowBatchedTaskOptions.GroupName,
-                _unfollowBatchedTaskOptions.Count);
+            _accountDomainService.UnfollowBatched();
         }
     }
 }

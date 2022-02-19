@@ -8,6 +8,7 @@ using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Relation;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Config;
+using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 
 namespace Ray.BiliBiliTool.DomainService
@@ -21,6 +22,7 @@ namespace Ray.BiliBiliTool.DomainService
         private readonly IDailyTaskApi _dailyTaskApi;
         private readonly IUserInfoApi _userInfoApi;
         private readonly IRelationApi _relationApi;
+        private readonly UnfollowBatchedTaskOptions _unfollowBatchedTaskOptions;
         private readonly BiliCookie _cookie;
 
         public AccountDomainService(
@@ -28,7 +30,8 @@ namespace Ray.BiliBiliTool.DomainService
             IDailyTaskApi dailyTaskApi,
             BiliCookie cookie,
             IUserInfoApi userInfoApi,
-            IRelationApi relationApi
+            IRelationApi relationApi,
+            IOptionsMonitor<UnfollowBatchedTaskOptions> unfollowBatchedTaskOptions
         )
         {
             _logger = logger;
@@ -36,6 +39,7 @@ namespace Ray.BiliBiliTool.DomainService
             _cookie = cookie;
             _userInfoApi = userInfoApi;
             _relationApi = relationApi;
+            _unfollowBatchedTaskOptions = unfollowBatchedTaskOptions.CurrentValue;
         }
 
         /// <summary>
@@ -102,12 +106,12 @@ namespace Ray.BiliBiliTool.DomainService
         /// </summary>
         /// <param name="groupName"></param>
         /// <param name="count"></param>
-        public void UnfollowBatched(string groupName, int count)
+        public void UnfollowBatched()
         {
-            _logger.LogInformation("【分组名】{group}", groupName);
+            _logger.LogInformation("【分组名】{group}", _unfollowBatchedTaskOptions.GroupName);
 
             //根据分组名称获取tag
-            TagDto tag = GetTag(groupName);
+            TagDto tag = GetTag(_unfollowBatchedTaskOptions.GroupName);
             int? tagId = tag?.Tagid;
             int total = tag?.Count ?? 0;
 
@@ -122,7 +126,7 @@ namespace Ray.BiliBiliTool.DomainService
                 _logger.LogWarning("分组下不存在up");
                 return;
             }
-
+            int count = _unfollowBatchedTaskOptions.Count;
             if (count == -1) count = total;
 
             _logger.LogInformation("【分组下共有】{count}人", total);
@@ -174,6 +178,12 @@ namespace Ray.BiliBiliTool.DomainService
                 _logger.LogInformation("【序号】{num}", i);
                 _logger.LogInformation("【UP】{up}", info.Uname);
 
+                if (_unfollowBatchedTaskOptions.RetainUidList.Contains(info.Mid.ToString()))
+                {
+                    _logger.LogInformation("【取关结果】白名单，跳过" + Environment.NewLine);
+                    continue;
+                }
+
                 string modifyReferer = string.Format(RelationApiConstant.ModifyReferer, _cookie.UserId, tagId);
                 var modifyReq = new ModifyRelationRequest(info.Mid, _cookie.BiliJct);
                 var re = _relationApi.ModifyRelation(modifyReq, modifyReferer)
@@ -194,7 +204,7 @@ namespace Ray.BiliBiliTool.DomainService
             _logger.LogInformation("【本次共取关】{count}人", success);
 
             //计算剩余
-            tag = GetTag(groupName);
+            tag = GetTag(_unfollowBatchedTaskOptions.GroupName);
             _logger.LogInformation("【分组下剩余】{count}人", tag?.Count ?? 0);
         }
 

@@ -11,5 +11,12 @@ namespace Ray.BiliBiliTool.Config.Options
         public string GroupName { get; set; }
 
         public int Count { get; set; } = 0;
+
+        public string RetainUids { get; set; }
+
+        public List<string> RetainUidList =>
+            RetainUids?.Split(",",
+                    StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToList()
+            ?? new List<string>();
     }
 }

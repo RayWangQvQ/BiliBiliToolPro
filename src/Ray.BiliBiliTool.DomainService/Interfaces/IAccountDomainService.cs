@@ -25,8 +25,6 @@ namespace Ray.BiliBiliTool.DomainService.Interfaces
         /// <summary>
         /// 批量取关
         /// </summary>
-        /// <param name="groupName"></param>
-        /// <param name="count"></param>
-        void UnfollowBatched(string groupName, int count);
+        void UnfollowBatched();
     }
 }

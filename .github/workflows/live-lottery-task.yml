@@ -22,6 +22,7 @@ env:
   Ray_LiveLotteryTaskConfig__ExcludeAwardNames: ${{secrets.EXCLUDEAWARDNAMES}} # 天选抽奖指定排除关键字
   Ray_LiveLotteryTaskConfig__IncludeAwardNames: ${{secrets.INCLUDEAWARDNAMES}} # 天选抽奖指定包含关键字
   Ray_LiveLotteryTaskConfig__AutoGroupFollowings: ${{secrets.AUTOGROUPFOLLOWINGS}} # 抽奖结束后是否将关注主播自动分组
+  Ray_LiveLotteryTaskConfig__DenyUids: ${{secrets.LIVELOTTERYDENYUIDS}} # 天选筹抽奖主播Uid黑名单
   # 推送：
   Ray_Serilog__WriteTo__3__Args__botToken: ${{secrets.PUSHTGTOKEN}} # Telegram
   Ray_Serilog__WriteTo__3__Args__chatId: ${{secrets.PUSHTGCHATID}}

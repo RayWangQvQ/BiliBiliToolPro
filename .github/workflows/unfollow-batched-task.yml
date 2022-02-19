@@ -50,6 +50,7 @@ env:
   # 批量取关任务：
   Ray_UnfollowBatchedTaskConfig__GroupName: ${{ github.event.inputs.group }}
   Ray_UnfollowBatchedTaskConfig__Count: ${{ github.event.inputs.count }}
+  Ray_UnfollowBatchedTaskConfig__RetainUids: ${{secrets.UNFOLLOWBATCHEDRETAINUIDS}}
 
 jobs:
   run-task:
