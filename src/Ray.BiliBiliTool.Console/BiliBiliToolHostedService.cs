@@ -144,12 +144,14 @@ namespace Ray.BiliBiliTool.Console
         private void LogAppInfo()
         {
             _logger.LogInformation(
-                "{newLine}--------------- Ray.BiliBiliTool-v{version} in {env} env.",
+                "{newLine}--------------- RayBiliBiliToolPro-v{version} in {env} env.{newLine}开源 by {url}",
                 Environment.NewLine,
                 typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion,
-                Global.HostingEnvironment.EnvironmentName);
+                Global.HostingEnvironment.EnvironmentName,
+                Environment.NewLine,
+                Constants.SourceCodeUrl
+                );
             //_logger.LogInformation("【当前IP】{ip} ", IpHelper.GetIp());
-            _logger.LogInformation("开源 by {url}" + Environment.NewLine, Constants.SourceCodeUrl);
         }
     }
 }
