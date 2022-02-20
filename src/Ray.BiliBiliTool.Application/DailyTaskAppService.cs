@@ -147,7 +147,7 @@ namespace Ray.BiliBiliTool.Application
 
             //如果兑换成功，则打印硬币余额
             var coinBalance = _coinDomainService.GetCoinBalance();
-            _logger.LogInformation("【硬币余额】 {0}", coinBalance);
+            _logger.LogInformation("【硬币余额】 {coin}", coinBalance);
         }
 
         /// <summary>

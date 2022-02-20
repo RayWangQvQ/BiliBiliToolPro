@@ -219,7 +219,7 @@ export Ray_Serilog__WriteTo__9__Args__token="abcde"
 | ---------- | -------------- |
 | 配置Key | `Security__RandomSleepMaxMin` |
 | 值域   | 数字 |
-| 默认值   | 10 |
+| 默认值   | 20 |
 | 环境变量 | `Ray_Security__RandomSleepMaxMin` |
 | GitHub Secrets | `RANDOMSLEEPMAXMIN`|
 
@@ -235,7 +235,7 @@ export Ray_Serilog__WriteTo__9__Args__token="abcde"
 | ---------- | -------------- |
 | 配置Key | `Security__IntervalSecondsBetweenRequestApi` |
 | 值域   | [0,+] |
-| 默认值   | 3 |
+| 默认值   | 20 |
 | 环境变量   | `Ray_Security__IntervalSecondsBetweenRequestApi` |
 | GitHub Secrets | `INTERVALSECONDSBETWEENREQUESTAPI` |
 

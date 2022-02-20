@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live;
 using WebApiClientCore.Attributes;
@@ -29,6 +30,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         [Header("Origin", "https://link.bilibili.com")]
         [Header("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")]
         [HttpGet("/pay/v1/Exchange/silver2coin")]
+        [Obsolete]
         Task<BiliApiResponse> ExchangeSilver2Coin();
 
         /// <summary>
@@ -38,7 +40,28 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         [Header("Referer", "https://link.bilibili.com/")]
         [Header("Origin", "https://link.bilibili.com")]
         [HttpGet("/pay/v1/Exchange/getStatus")]
+        [Obsolete]
         Task<BiliApiResponse<ExchangeSilverStatusResponse>> GetExchangeSilverStatus();
+
+        /// <summary>
+        /// 银瓜子兑换硬币
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        //[Header("Referer", "https://link.bilibili.com/p/center/index?visit_id=1ddo4yl01q00")]
+        [Header("Content-Type", "application/x-www-form-urlencoded")]
+        [Header("Origin", "https://link.bilibili.com")]
+        [HttpPost("/xlive/revenue/v1/wallet/silver2coin")]
+        Task<BiliApiResponse<Silver2CoinResponse>> Silver2Coin([FormContent]Silver2CoinRequest request);
+
+        /// <summary>
+        /// 获取直播中心钱包状态
+        /// </summary>
+        /// <returns></returns>
+        //[Header("Referer", "https://link.bilibili.com/p/center/index?visit_id=1ddo4yl01q00")]
+        [Header("Origin", "https://link.bilibili.com")]
+        [HttpGet("/xlive/revenue/v1/wallet/getStatus")]
+        Task<BiliApiResponse<LiveWalletStatusResponse>> GetLiveWalletStatus();
 
         [HttpGet("/xlive/web-interface/v1/index/getWebAreaList?source_id=2")]
         Task<BiliApiResponse<GetArteaListResponse>> GetAreaList();

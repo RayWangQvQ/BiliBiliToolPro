@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
@@ -55,6 +56,9 @@ namespace Ray.BiliBiliTool.Console
 
                 Environment.SetEnvironmentVariable(HostDefaults.EnvironmentKey, Environment.GetEnvironmentVariable(Global.EnvironmentKey));
                 hostConfigurationBuilder.AddEnvironmentVariables();
+
+                var hostCmdArgs= args.ToList().Where(x=>x.StartsWith("--")).ToArray();
+                hostConfigurationBuilder.AddCommandLine(hostCmdArgs);//没指定mapping，则命令行入参必须是--形式，因为-会去寻找mapping
             });
 
             //应用配置:
