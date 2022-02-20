@@ -7,6 +7,7 @@ name: bilibili_tool
 #组件参数配置
 inputs:
   name: ${name}_scf
+  namespace: default
   enableRoleAuth: false
   src: ./bin/publish/
   handler: index.main_handler
