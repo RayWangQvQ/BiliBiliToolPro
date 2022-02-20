@@ -124,6 +124,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "qinglong", "qinglong", "{1C
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DefaultTasks", "DefaultTasks", "{DE60A16C-CA3B-45E9-8A9D-0E91ACEBDEE0}"
 	ProjectSection(SolutionItems) = preProject
+		qinglong\DefaultTasks\bili_dev_task_daily.sh = qinglong\DefaultTasks\bili_dev_task_daily.sh
+		qinglong\DefaultTasks\bili_dev_task_liveLottery.sh = qinglong\DefaultTasks\bili_dev_task_liveLottery.sh
+		qinglong\DefaultTasks\bili_dev_task_test.sh = qinglong\DefaultTasks\bili_dev_task_test.sh
+		qinglong\DefaultTasks\bili_dev_task_unfollowBatched.sh = qinglong\DefaultTasks\bili_dev_task_unfollowBatched.sh
 		qinglong\DefaultTasks\bili_task_daily.sh = qinglong\DefaultTasks\bili_task_daily.sh
 		qinglong\DefaultTasks\bili_task_liveLottery.sh = qinglong\DefaultTasks\bili_task_liveLottery.sh
 		qinglong\DefaultTasks\bili_task_test.sh = qinglong\DefaultTasks\bili_task_test.sh
