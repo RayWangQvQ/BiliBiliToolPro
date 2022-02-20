@@ -356,3 +356,6 @@ MigrationBackup/
 #
 .idea/
 tencentScf/.env
+
+# UnitTest's config file
+test/BiliAgentTest/appsettings.Production.json

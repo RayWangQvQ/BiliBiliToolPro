@@ -100,20 +100,27 @@ namespace Ray.BiliBiliTool.DomainService
                 return false;
             }
 
-            var response = _liveApi.ExchangeSilver2Coin().GetAwaiter().GetResult();
+            BiliApiResponse<LiveWalletStatusResponse> queryStatus = _liveApi.GetLiveWalletStatus().GetAwaiter().GetResult();
+            _logger.LogInformation("【银瓜子余额】 {silver}", queryStatus.Data.Silver);
+            _logger.LogInformation("【硬币余额】 {coin}", queryStatus.Data.Coin);
+            _logger.LogInformation("【今日剩余兑换次数】 {left}", queryStatus.Data.Silver_2_coin_left);
+
+            if (queryStatus.Data.Silver_2_coin_left <= 0) return false;
+
+            _logger.LogInformation("开始尝试兑换...");
+            Silver2CoinRequest request = new(_biliCookie.BiliJct);
+            var response = _liveApi.Silver2Coin(request).GetAwaiter().GetResult();
             if (response.Code == 0)
             {
                 result = true;
-                _logger.LogInformation("【兑换结果】成功");
+                _logger.LogInformation("【兑换结果】成功兑换 {coin} 枚硬币", response.Data.Coin);
+                _logger.LogInformation("【银瓜子余额】 {silver}", response.Data.Silver);
             }
             else
             {
                 _logger.LogInformation("【兑换结果】失败");
-                _logger.LogInformation("【原因】{0}", response.Message);
+                _logger.LogInformation("【原因】{reason}", response.Message);
             }
-
-            var queryStatus = _liveApi.GetExchangeSilverStatus().GetAwaiter().GetResult();
-            _logger.LogInformation("【银瓜子余额】 {0}", queryStatus.Data.Silver);
 
             return result;
         }
