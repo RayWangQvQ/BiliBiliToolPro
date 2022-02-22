@@ -11,3 +11,5 @@
 - [青龙面板](https://github.com/whyour/qinglong)新增拉取dev先行版功能
 ## 0.0.4
 - 【#15】修复`Actions`部署到腾讯云函数时的偶发异常
+## 0.0.5
+- 优化日志格式

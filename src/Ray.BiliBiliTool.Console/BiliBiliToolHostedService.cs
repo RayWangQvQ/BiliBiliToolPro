@@ -144,8 +144,8 @@ namespace Ray.BiliBiliTool.Console
         private void LogAppInfo()
         {
             _logger.LogInformation(
-                "{newLine}--------------- RayBiliBiliToolPro-v{version} in {env} env.{newLine}开源 by {url}",
-                Environment.NewLine,
+                "{newLine}------------- RayBiliBiliToolPro-v{version} in {env} env.{newLine}开源 by {url}",
+                Environment.NewLine + Environment.NewLine + Environment.NewLine + Environment.NewLine,
                 typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion,
                 Global.HostingEnvironment.EnvironmentName,
                 Environment.NewLine,
