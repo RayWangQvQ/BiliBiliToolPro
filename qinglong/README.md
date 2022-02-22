@@ -11,8 +11,10 @@
     - [1.3.登录青龙面板并添加相应配置](#13登录青龙面板并添加相应配置)
     - [1.4.在青龙面板中添加拉库定时任务](#14在青龙面板中添加拉库定时任务)
 - [2.先行版](#2先行版)
+- [3.GitHub加速](#3github加速)
 
 <!-- /TOC -->
+
 ## 1.步骤
 
 ### 1.1.安装 `dotnet` 环境
@@ -58,7 +60,7 @@ abc为你抓取到的真实cookie字符串。
 ```
 名称：拉取Bili库
 命令：ql repo https://github.com/raywangqvq/bilibilitoolpro.git "bili_task_"
-定时规则：8 8 * * 1,3,5
+定时规则：2 2 28 * *
 ```
 
 点击确定。
@@ -75,3 +77,6 @@ abc为你抓取到的真实cookie字符串。
 develop分支的代码会超前于默认的main分支，包含当前正在开发的新功能。
 
 想提前体验新功能的朋友可以尝试切换先行版，但同时也意味着稳定性会相应降低（其实是相当于在帮我内测测试bug了~🤨）。
+
+## 3.GitHub加速
+拉库时，如果服务器在国内，访问GitHub速度慢，可以在仓库地址前加上 `https://ghproxy.com/` 进行加速, 如：`ql repo https://ghproxy.com/https://github.com/raywangqvq/bilibilitoolpro.git "bili_task_"`
