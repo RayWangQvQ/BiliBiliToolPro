@@ -80,7 +80,7 @@ namespace Ray.BiliBiliTool.Console
             {
                 LogAppInfo();
 
-                _logger.LogInformation("开始推送");
+                _logger.LogInformation("·开始推送·{task}·{user}", _configuration["RunTasks"],"");
                 _logger.LogInformation("运行结束");
                 _applicationLifetime.StopApplication();
             }
@@ -144,8 +144,9 @@ namespace Ray.BiliBiliTool.Console
         private void LogAppInfo()
         {
             _logger.LogInformation(
-                "{newLine}------------- RayBiliBiliToolPro-v{version} in {env} env.{newLine}开源 by {url}",
-                Environment.NewLine + Environment.NewLine + Environment.NewLine + Environment.NewLine,
+                "{newLine}---------------------------------------{newLine} RayBiliBiliToolPro-v{version} in {env} env.{newLine}开源 by {url}",
+                Environment.NewLine + Environment.NewLine,
+                Environment.NewLine + Environment.NewLine,
                 typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion,
                 Global.HostingEnvironment.EnvironmentName,
                 Environment.NewLine,
