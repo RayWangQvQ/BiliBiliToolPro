@@ -80,7 +80,7 @@ namespace Ray.BiliBiliTool.Console
             {
                 LogAppInfo();
 
-                _logger.LogInformation("开始推送");
+                _logger.LogInformation("·开始推送·{task}·{user}", _configuration["RunTasks"],"");
                 _logger.LogInformation("运行结束");
                 _applicationLifetime.StopApplication();
             }
