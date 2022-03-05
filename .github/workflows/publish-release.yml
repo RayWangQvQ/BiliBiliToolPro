@@ -27,14 +27,14 @@ jobs:
       - name: Publish and zip
         run: |
           cd ./src/Ray.BiliBiliTool.Console
-          dotnet publish --configuration Release --self-contained false -o ./bin/Publish/net5-dependent
-          echo "dotnet Ray.BiliBiliTool.Console.dll" > ./bin/Publish/net5-dependent/start.bat
+          dotnet publish --configuration Release --self-contained false -o ./bin/Publish/dotnet-dependent
+          echo "dotnet Ray.BiliBiliTool.Console.dll" > ./bin/Publish/dotnet-dependent/start.bat
           dotnet publish --configuration Release --runtime win-x86 --self-contained true -p:PublishTrimmed=true -o ./bin/Publish/win-x86-x64
           dotnet publish --configuration Release --runtime linux-arm --self-contained true -p:PublishTrimmed=true -o ./bin/Publish/linux-arm
           dotnet publish --configuration Release --runtime linux-x64 --self-contained true -p:PublishTrimmed=true -o ./bin/Publish/linux-x64
           dotnet publish --configuration Release --runtime osx-x64 --self-contained true -p:PublishTrimmed=true -o ./bin/Publish/osx-x64
           cd ./bin/Publish
-          zip -q -r bilibili-tool-pro-v${{ github.event.inputs.version }}-net5-dependent.zip ./net5-dependent/*
+          zip -q -r bilibili-tool-pro-v${{ github.event.inputs.version }}-dotnet-dependent.zip ./dotnet-dependent/*
           zip -q -r bilibili-tool-pro-v${{ github.event.inputs.version }}-win-x86-x64.zip ./win-x86-x64/*
           zip -q -r bilibili-tool-pro-v${{ github.event.inputs.version }}-linux-arm.zip ./linux-arm/*
           zip -q -r bilibili-tool-pro-v${{ github.event.inputs.version }}-linux-x64.zip ./linux-x64/*
@@ -62,8 +62,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./src/Ray.BiliBiliTool.Console/bin/Publish/bilibili-tool-pro-v${{ github.event.inputs.version }}-net5-dependent.zip
-          asset_name: bilibili-tool-pro-v${{ github.event.inputs.version }}-net5-dependent.zip
+          asset_path: ./src/Ray.BiliBiliTool.Console/bin/Publish/bilibili-tool-pro-v${{ github.event.inputs.version }}-dotnet-dependent.zip
+          asset_name: bilibili-tool-pro-v${{ github.event.inputs.version }}-dotnet-dependent.zip
           asset_content_type: application/zip
           
       - name: Upload win-x86-x64
