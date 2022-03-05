@@ -41,7 +41,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		CHANGELOG.md = CHANGELOG.md
 		clean.cmd = clean.cmd
 		common.props = common.props
-		DockerBuild.cmd = DockerBuild.cmd
 		Dockerfile = Dockerfile
 		LICENSE = LICENSE
 		publish.bat = publish.bat
@@ -138,6 +137,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ISSUE_TEMPLATE", "ISSUE_TEM
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BiliAgentTest", "test\BiliAgentTest\BiliAgentTest.csproj", "{F6B8ED3A-5428-4D26-8172-8B41FBF0C4CF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{75A9CC5C-DF92-4D72-A14C-625AA902855B}"
+	ProjectSection(SolutionItems) = preProject
+		docker\build\buildAndPushImage_multiArch.cmd = docker\build\buildAndPushImage_multiArch.cmd
+		docker\build\buildImage.cmd = docker\build\buildImage.cmd
+		docker\build\buildImage_amd64.cmd = docker\build\buildImage_amd64.cmd
+		docker\build\buildImage_arm64.cmd = docker\build\buildImage_arm64.cmd
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -253,6 +260,7 @@ Global
 		{DE60A16C-CA3B-45E9-8A9D-0E91ACEBDEE0} = {1C6CC38A-A5D5-41EF-9072-70AEEEA211F7}
 		{830361B7-BCC1-4853-879A-761B0FD86826} = {73DD457B-E06E-45ED-A6BA-7E3C02F8BDF1}
 		{F6B8ED3A-5428-4D26-8172-8B41FBF0C4CF} = {E9BDDCBE-A57D-4E3B-8252-708088386ADF}
+		{75A9CC5C-DF92-4D72-A14C-625AA902855B} = {A93210FD-27B6-40E4-B08D-391F96CA2754}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {197319DA-1148-4A99-847C-8B270B6A29AB}
