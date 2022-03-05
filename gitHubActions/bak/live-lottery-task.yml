@@ -22,6 +22,7 @@ env:
   Ray_LiveLotteryTaskConfig__ExcludeAwardNames: ${{secrets.EXCLUDEAWARDNAMES}} # 天选抽奖指定排除关键字
   Ray_LiveLotteryTaskConfig__IncludeAwardNames: ${{secrets.INCLUDEAWARDNAMES}} # 天选抽奖指定包含关键字
   Ray_LiveLotteryTaskConfig__AutoGroupFollowings: ${{secrets.AUTOGROUPFOLLOWINGS}} # 抽奖结束后是否将关注主播自动分组
+  Ray_LiveLotteryTaskConfig__DenyUids: ${{secrets.LIVELOTTERYDENYUIDS}} # 天选筹抽奖主播Uid黑名单
   # 推送：
   Ray_Serilog__WriteTo__3__Args__botToken: ${{secrets.PUSHTGTOKEN}} # Telegram
   Ray_Serilog__WriteTo__3__Args__chatId: ${{secrets.PUSHTGCHATID}}
@@ -91,16 +92,10 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 5.0.x
+        dotnet-version: 6.0.x
 
-    # 发布
-    - name: Publish
-      run: |
-        cd ./src/Ray.BiliBiliTool.Console
-        dotnet publish --configuration Release --self-contained false --output ./bin/Publish/net5-dependent
-       
     # 测试运行
     - name: Test APP
       run: |
-        cd ./src/Ray.BiliBiliTool.Console/bin/Publish/net5-dependent
-        dotnet Ray.BiliBiliTool.Console.dll -runTasks=LiveLottery ${{secrets.OTHERCONFIGS}}
+        cd ./src/Ray.BiliBiliTool.Console
+        dotnet run --runTasks=LiveLottery
