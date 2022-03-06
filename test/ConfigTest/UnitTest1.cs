@@ -20,7 +20,9 @@ namespace ConfigTest
         [Fact]
         public void WebProxyTest()
         {
-            string proxyAddress = "user:password@host:port";
+            Program.CreateHost(new string[] { });
+            string proxyAddress = Global.ConfigurationRoot["Security:WebProxy"];
+
             if (proxyAddress.IsNotNullOrEmpty())
             {
                 WebProxy webProxy = new WebProxy();
