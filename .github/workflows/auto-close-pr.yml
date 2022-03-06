@@ -1,14 +1,30 @@
 # 自动关闭不规范PR
+name: AutocloserPR
+on:
+  pull_request_target:
+    types: [opened, edited]
 
-name: Autocloser
-on: pull_request_target
 jobs:
-  autoclose:
+  Autoclose:
     runs-on: ubuntu-latest
     if: github.repository == 'RayWangQvQ/BiliBiliToolPro'
     steps:
     - uses: roots/issue-closer@v1.1
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
-        pr-close-message: "This PR was automatically closed because it did not follow the PR template."
+        pr-close-message: "This PR was automatically closed because it did not meet the requirements."
         pr-pattern: ".*请问您是否明白：【yes】 -->.*"
+
+  checkTargetBranch:
+    runs-on: ubuntu-latest
+    needs: Autoclose
+    steps:
+      - uses: Vankka/pr-target-branch-action@v1.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          target: main
+          change-to: development
+          comment: |
+              Your PR was set to `main`, but PRs should be sent to `development`
+              The base branch of this PR has been automatically changed to `development`, please check that there are no merge conflicts.

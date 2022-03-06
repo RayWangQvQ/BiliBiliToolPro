@@ -15,3 +15,5 @@
 - 优化推送日志，在标题中显示运行的任务名称
 - 新增`CodeQL`workflows，用于检测代码
 - 新增`Publish image`workflows，用于发布镜像
+- 新增`no-toxic-comments.yml`，用于检测评论
+- 更新`auto-close-pr.yml`，用于修正PR的目标到`develop`
