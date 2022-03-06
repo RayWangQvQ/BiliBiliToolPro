@@ -14,3 +14,4 @@
 ## 0.0.5
 - 优化推送日志，在标题中显示运行的任务
 - 新增`CodeQL`workflows，用于检测代码
+- 新增`Publish image`workflows，用于发布镜像
