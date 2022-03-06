@@ -2,9 +2,9 @@ version: '3.9'
 
 services:
   bilibili_tool:
-    image: zai7lou/bilibili_tool
-    container_name: bilibili_tool
-    # restart: always
+    image: zai7lou/bilibili_tool_pro
+    container_name: bilibili_tool_pro
+    restart: always
     volumes:
       - ./Logs:/app/Logs
       - ./my_crontab:/app/custom_crontab
