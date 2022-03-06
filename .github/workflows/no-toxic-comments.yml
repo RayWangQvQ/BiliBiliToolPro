@@ -1,0 +1,13 @@
+name: Check Toxic Comments
+on: [issue_comment, pull_request_review]
+
+jobs:
+  toxic_check:
+    runs-on: ubuntu-latest
+    name: Safe space
+    steps:
+      - uses: actions/checkout@v2
+      - name: Safe space - action step
+        uses: charliegerard/safe-space@master
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
