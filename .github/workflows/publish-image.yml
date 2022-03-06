@@ -55,4 +55,4 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: zai7lou/bilibili_tool_pro:${GITHUB_REF#refs/tags/}
+          tags: zai7lou/bilibili_tool_pro:${{ GITHUB_REF#refs/tags/ }}
