@@ -4,16 +4,14 @@ name: bilibili-daily-task
 
 
 on:
-  
   workflow_dispatch: # 手动触发
   schedule: # 计划任务触发
     - cron: '0 16 * * *' 
-    # cron表达式，时区是UTC时间，比我们早8小时，如上所表示的是每天0点0分（24点整）
+    # cron表达式，时区是UTC时间，比我们早8小时，如上所表示的是每天0点0分（16+8=24点整）
     # 建议每个人通过设置名称为 Production 的 GitHub Environments 来设定为自己的目标运行时间（详细设置方法见文档说明）
 
 env:
   ASPNETCORE_ENVIRONMENT: ${{secrets.ENV}} # 运行环境
-  Ray_CloseConsoleWhenEnd: 1
   Ray_BiliBiliCookies__1: ${{secrets.COOKIESTR}}
   Ray_BiliBiliCookies__2: ${{secrets.COOKIESTR2}}
   Ray_BiliBiliCookies__3: ${{secrets.COOKIESTR3}}
@@ -60,17 +58,25 @@ env:
   Ray_Serilog__WriteTo__0__Args__outputTemplate: ${{secrets.CONSOLELOGTEMPLATE}}         
 
 jobs:
+
+  pre-check:
+    runs-on: ubuntu-latest
+    outputs:
+      result: ${{ steps.check.outputs.result }} # 不能直接传递secrets的值，否则会被skip，需要转一下
+    steps:
+    - id: check
+      if: env.IsOpenDailyTask=='true'
+      run: |
+        echo "::set-output name=result::开启"
+
   run-daily-task:
 
     runs-on: ubuntu-latest
-
     environment: Production
+    needs: pre-check
+    if: needs.pre-check.outputs.result=='开启'
 
     steps:
-
-    # 输出IP
-    - name: IP
-      run: sudo curl ifconfig.me
 
     # 设置服务器时区为东八区 
     - name: Set time zone
@@ -84,16 +90,10 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 5.0.x
-
-    # 发布
-    - name: Publish
-      run: |
-        cd ./src/Ray.BiliBiliTool.Console
-        dotnet publish --configuration Release --self-contained false --output ./bin/Publish/net5-dependent
-       
+        dotnet-version: 6.0.x
+ 
     # 测试运行
     - name: Test APP
       run: |
-        cd ./src/Ray.BiliBiliTool.Console/bin/Publish/net5-dependent
-        dotnet Ray.BiliBiliTool.Console.dll -runTasks=Daily ${{secrets.OTHERCONFIGS}}
+        cd ./src/Ray.BiliBiliTool.Console
+        dotnet run --runTasks=Daily

@@ -11,3 +11,7 @@
 - [青龙面板](https://github.com/whyour/qinglong)新增拉取dev先行版功能
 ## 0.0.4
 - 【#15】修复`Actions`部署到腾讯云函数时的偶发异常
+## 0.0.5
+- 优化推送日志，在标题中显示运行的任务
+- 新增`CodeQL`workflows，用于检测代码
+- 新增`Publish image`workflows，用于发布镜像
