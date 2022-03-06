@@ -48,6 +48,13 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - 
+        name: GetTagName
+        id: getTag
+        run: |
+          DOCKER_IMAGE_TAG="zai7lou/bilibili_tool_pro:${GITHUB_REF#refs/tags/},zai7lou/bilibili_tool_pro:latest"
+          echo "docker image tag: $DOCKER_IMAGE_TAG"
+          echo "::set-output name=tag::$DOCKER_IMAGE_TAG"
       -
         name: Build and push
         uses: docker/build-push-action@v2
@@ -55,4 +62,4 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: zai7lou/bilibili_tool_pro:${{ GITHUB_REF#refs/tags/ }}
+          tags: ${{ steps.getTag.outputs.tag }}
