@@ -17,3 +17,5 @@
 - 新增`Publish image`workflows，用于发布镜像
 - 新增`no-toxic-comments.yml`，用于检测评论
 - 更新`auto-close-pr.yml`，用于修正PR的目标到`develop`
+## 0.0.6
+- 更新docker镜像的构建

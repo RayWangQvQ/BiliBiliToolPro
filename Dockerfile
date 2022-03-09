@@ -34,14 +34,15 @@ ENV TIME_ZONE=Asia/Shanghai
 COPY --from=publish /app/publish .
 COPY ./docker/entry.sh ./docker/crontab /app/
 RUN ln -fs /usr/share/zoneinfo/$TIME_ZONE /etc/localtime \
-    && echo $TIME_ZONE > /etc/timezone
-RUN cp /etc/apt/sources.list /etc/apt/sources.list.bak \
+    && echo $TIME_ZONE > /etc/timezone \
+    && cp /etc/apt/sources.list /etc/apt/sources.list.bak \
 	&& sed -i 's/deb.debian.org/mirrors.163.com/g' /etc/apt/sources.list \
 	&& sed -i 's/security.debian.org/mirrors.163.com/g' /etc/apt/sources.list \
-	&& apt-get clean
-RUN apt-get update \
+	&& apt-get clean \ 
+    && apt-get update \
     && apt-get install -y cron tzdata tofrodos \
-    && apt-get clean
-RUN fromdos /app/entry.sh \
+    && apt-get clean \ 
+    && fromdos /app/entry.sh \
+    && chmod +x /app/entry.sh \
     && fromdos /app/crontab
 ENTRYPOINT ["/bin/bash", "-c", "/app/entry.sh"]
