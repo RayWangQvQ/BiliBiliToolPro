@@ -68,7 +68,9 @@ namespace Ray.BiliBiliTool.Console
                         if (isNotifySingle)
                         {
                             LogAppInfo();
-                            _logger.LogInformation("·开始推送·{task}·{user}", $"{_configuration["RunTasks"]}任务", $"账号【{_cookieStrFactory.CurrentNum}】");
+
+                            var accountName = _cookieStrFactory.Count > 1 ? $"账号【{_cookieStrFactory.CurrentNum}】" : "";
+                            _logger.LogInformation("·开始推送·{task}·{user}", $"{_configuration["RunTasks"]}任务", accountName);
                         }
                     }
                     catch (Exception e)
