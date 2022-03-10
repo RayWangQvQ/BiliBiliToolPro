@@ -73,7 +73,7 @@ namespace Ray.Serilog.Sinks.Batched
             }
         }
 
-        protected virtual void EmitBatch(IEnumerable<LogEvent> events,string pushTitle="")
+        protected virtual void EmitBatch(IEnumerable<LogEvent> events, string pushTitle = "")
         {
             if (_sendBatchesAsOneMessages)
             {
@@ -180,7 +180,7 @@ namespace Ray.Serilog.Sinks.Batched
         {
             var title = "BiliBiliTool推送";
 
-            var msg = RenderMessage(triggerLogEvent).Replace("\r\n","");
+            var msg = RenderMessage(triggerLogEvent).Replace(Environment.NewLine, "");
             var list = msg.Split('·').ToList();
 
             for (int i = 2; i < list.Count; i++)
