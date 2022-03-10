@@ -19,3 +19,4 @@
 - 更新`auto-close-pr.yml`，用于修正PR的目标到`develop`
 ## 0.0.6
 - 更新docker镜像的构建
+- 【#12】新增配置`Notification:IsSingleAccountSingleNotify`，支持开启每个账号单独推送消息
