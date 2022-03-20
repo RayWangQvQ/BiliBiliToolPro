@@ -21,3 +21,4 @@
 - 更新docker镜像的构建
 - 【#12】新增配置`Notification:IsSingleAccountSingleNotify`，支持开启每个账号单独推送消息
 - publish-release.yml新增手动输入tag功能
+## 0.0.7
