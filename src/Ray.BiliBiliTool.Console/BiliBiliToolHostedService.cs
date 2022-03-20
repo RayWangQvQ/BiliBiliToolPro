@@ -43,6 +43,8 @@ namespace Ray.BiliBiliTool.Console
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
+            var isNotifySingle = _configuration.GetSection("Notification:IsSingleAccountSingleNotify").Get<bool>();
+
             try
             {
                 _logger.LogInformation("BiliBiliToolPro 开始运行...{newLine}", Environment.NewLine);
@@ -63,6 +65,13 @@ namespace Ray.BiliBiliTool.Console
                     try
                     {
                         DoTasks(tasks);
+                        if (isNotifySingle)
+                        {
+                            LogAppInfo();
+
+                            var accountName = _cookieStrFactory.Count > 1 ? $"账号【{_cookieStrFactory.CurrentNum}】" : "";
+                            _logger.LogInformation("·开始推送·{task}·{user}", $"{_configuration["RunTasks"]}任务", accountName);
+                        }
                     }
                     catch (Exception e)
                     {
@@ -78,9 +87,11 @@ namespace Ray.BiliBiliTool.Console
             }
             finally
             {
-                LogAppInfo();
-
-                _logger.LogInformation("·开始推送·{task}·{user}", _configuration["RunTasks"],"");
+                if (!isNotifySingle)
+                {
+                    LogAppInfo();
+                    _logger.LogInformation("·开始推送·{task}·{user}", $"{_configuration["RunTasks"]}任务", "");
+                }
                 _logger.LogInformation("运行结束");
                 _applicationLifetime.StopApplication();
             }

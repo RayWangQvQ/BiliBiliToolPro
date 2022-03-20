@@ -38,26 +38,27 @@
         - [3.5.2. 批量取关的人数](#352-批量取关的人数)
         - [3.5.3. 取关白名单](#353-取关白名单)
     - [3.6. 推送相关](#36-推送相关)
-        - [3.6.1. Telegram机器人](#361-telegram机器人)
-            - [3.6.1.1. botToken](#3611-bottoken)
-            - [3.6.1.2. chatId](#3612-chatid)
-        - [3.6.2. 企业微信机器人](#362-企业微信机器人)
-            - [3.6.2.1. webHookUrl](#3621-webhookurl)
-        - [3.6.3. 钉钉机器人](#363-钉钉机器人)
+        - [3.6.1. 是否开启每个账号单独推送消息](#361-是否开启每个账号单独推送消息)
+        - [3.6.2. Telegram机器人](#362-telegram机器人)
+            - [3.6.2.1. botToken](#3621-bottoken)
+            - [3.6.2.2. chatId](#3622-chatid)
+        - [3.6.3. 企业微信机器人](#363-企业微信机器人)
             - [3.6.3.1. webHookUrl](#3631-webhookurl)
-        - [3.6.4. Server酱](#364-server酱)
-            - [3.6.4.1. TurboScKey（Server酱SCKEY）](#3641-turbosckeyserver酱sckey)
-        - [3.6.5. 酷推](#365-酷推)
-            - [3.6.5.1. sKey](#3651-skey)
-        - [3.6.6. 推送到自定义Api](#366-推送到自定义api)
-            - [3.6.6.1. api](#3661-api)
-            - [3.6.6.2. placeholder](#3662-placeholder)
-            - [3.6.6.3. bodyJsonTemplate](#3663-bodyjsontemplate)
-        - [3.6.7. PushPlus[推荐]](#367-pushplus推荐)
-            - [3.6.7.1. PushPlus的Token](#3671-pushplus的token)
-            - [3.6.7.2. PushPlus的Topic](#3672-pushplus的topic)
-            - [3.6.7.3. PushPlus的Channel](#3673-pushplus的channel)
-            - [3.6.7.4. PushPlus的Webhook](#3674-pushplus的webhook)
+        - [3.6.4. 钉钉机器人](#364-钉钉机器人)
+            - [3.6.4.1. webHookUrl](#3641-webhookurl)
+        - [3.6.5. Server酱](#365-server酱)
+            - [3.6.5.1. TurboScKey（Server酱SCKEY）](#3651-turbosckeyserver酱sckey)
+        - [3.6.6. 酷推](#366-酷推)
+            - [3.6.6.1. sKey](#3661-skey)
+        - [3.6.7. 推送到自定义Api](#367-推送到自定义api)
+            - [3.6.7.1. api](#3671-api)
+            - [3.6.7.2. placeholder](#3672-placeholder)
+            - [3.6.7.3. bodyJsonTemplate](#3673-bodyjsontemplate)
+        - [3.6.8. PushPlus[推荐]](#368-pushplus推荐)
+            - [3.6.8.1. PushPlus的Token](#3681-pushplus的token)
+            - [3.6.8.2. PushPlus的Topic](#3682-pushplus的topic)
+            - [3.6.8.3. PushPlus的Channel](#3683-pushplus的channel)
+            - [3.6.8.4. PushPlus的Webhook](#3684-pushplus的webhook)
     - [3.7. 日志相关](#37-日志相关)
         - [3.7.1. Console日志输出等级](#371-console日志输出等级)
         - [3.7.2. Console日志输出样式](#372-console日志输出样式)
@@ -463,11 +464,22 @@ v1.0.x仅支持推送到Server酱，v1.1.x之后重新定义了推送地概念�
 
 配置多个，多个端均会收到日志消息。推荐Telegram、企业微信、Server酱。
 
-<a id="markdown-361-telegram机器人" name="361-telegram机器人"></a>
-#### 3.6.1. Telegram机器人
+<a id="markdown-361-是否开启每个账号单独推送消息" name="361-是否开启每个账号单独推送消息"></a>
+#### 3.6.1. 是否开启每个账号单独推送消息
+|   TITLE   | CONTENT   |
+| ---------- | -------------- |
+| 配置Key | `Notification:IsSingleAccountSingleNotify` |
+| 意义 | 开启后，每个账号会单独推送消息。否则多账号合并只推送一条消息 |
+| 值域   | [true,false] |
+| 默认值   | true |
+| 环境变量   | `Ray_Notification__IsSingleAccountSingleNotify` |
+| GitHub Secrets  | |
+
+<a id="markdown-362-telegram机器人" name="362-telegram机器人"></a>
+#### 3.6.2. Telegram机器人
 ![TG推送效果](imgs/push-tg.png)
-<a id="markdown-3611-bottoken" name="3611-bottoken"></a>
-##### 3.6.1.1. botToken
+<a id="markdown-3621-bottoken" name="3621-bottoken"></a>
+##### 3.6.2.1. botToken
 点击 https://core.telegram.org/api#bot-api 查看如何创建机器人并获取到机器人的botToken。
 
 |   TITLE   | CONTENT   |
@@ -479,8 +491,8 @@ v1.0.x仅支持推送到Server酱，v1.1.x之后重新定义了推送地概念�
 | 环境变量   |  |
 | GitHub Secrets  | `PUSHTGTOKEN`|
 
-<a id="markdown-3612-chatid" name="3612-chatid"></a>
-##### 3.6.1.2. chatId
+<a id="markdown-3622-chatid" name="3622-chatid"></a>
+##### 3.6.2.2. chatId
 点击 https://api.telegram.org/bot{TOKEN}/getUpdates 获取到与机器人的chatId（需要用上面获取到的Token替换进链接里的{TOKEN}后访问）
 
 P.S.访问链接需要能访问“外网”，有vpn的挂vpn。
@@ -494,14 +506,14 @@ P.S.访问链接需要能访问“外网”，有vpn的挂vpn。
 | 命令行示范   | 无 |
 | GitHub Secrets  | `PUSHTGCHATID`|
 
-<a id="markdown-362-企业微信机器人" name="362-企业微信机器人"></a>
-#### 3.6.2. 企业微信机器人
+<a id="markdown-363-企业微信机器人" name="363-企业微信机器人"></a>
+#### 3.6.3. 企业微信机器人
 在群内添加机器人，获取到机器人的WebHook地址，添加到配置中。
 
 ![企业微信推送效果](imgs/push-workweixin.png)
 
-<a id="markdown-3621-webhookurl" name="3621-webhookurl"></a>
-##### 3.6.2.1. webHookUrl
+<a id="markdown-3631-webhookurl" name="3631-webhookurl"></a>
+##### 3.6.3.1. webHookUrl
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
@@ -512,16 +524,16 @@ P.S.访问链接需要能访问“外网”，有vpn的挂vpn。
 | 命令行示范   | 无 |
 | GitHub Secrets  | `PUSHWEIXINURL`|
 
-<a id="markdown-363-钉钉机器人" name="363-钉钉机器人"></a>
-#### 3.6.3. 钉钉机器人
+<a id="markdown-364-钉钉机器人" name="364-钉钉机器人"></a>
+#### 3.6.4. 钉钉机器人
 在群内添加机器人，获取到机器人的WebHook地址，添加到配置中。
 
 机器人的安全策略，当前不支持加签，请使用关键字策略，推荐关键字：`Ray` 或 `BiliBili`
 
 ![钉钉推送效果](imgs/push-ding.png)
 
-<a id="markdown-3631-webhookurl" name="3631-webhookurl"></a>
-##### 3.6.3.1. webHookUrl
+<a id="markdown-3641-webhookurl" name="3641-webhookurl"></a>
+##### 3.6.4.1. webHookUrl
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
@@ -531,14 +543,14 @@ P.S.访问链接需要能访问“外网”，有vpn的挂vpn。
 | 环境变量   | `Ray_Serilog__WriteTo__5__Args__webHookUrl` |
 | GitHub Secrets  | `PUSHDINGURL`|
 
-<a id="markdown-364-server酱" name="364-server酱"></a>
-#### 3.6.4. Server酱
+<a id="markdown-365-server酱" name="365-server酱"></a>
+#### 3.6.5. Server酱
 官网： http://sc.ftqq.com/9.version 
 
 ![Server酱推送效果](imgs/wechat-push.png)
 
-<a id="markdown-3641-turbosckeyserver酱sckey" name="3641-turbosckeyserver酱sckey"></a>
-##### 3.6.4.1. TurboScKey（Server酱SCKEY）
+<a id="markdown-3651-turbosckeyserver酱sckey" name="3651-turbosckeyserver酱sckey"></a>
+##### 3.6.5.1. TurboScKey（Server酱SCKEY）
 获取方式请参考官网。
 
 |   TITLE   | CONTENT   |
@@ -549,11 +561,11 @@ P.S.访问链接需要能访问“外网”，有vpn的挂vpn。
 | 环境变量   | `Ray_Serilog__WriteTo__6__Args__turboScKey=abcdefg` |
 | GitHub Secrets  | `PUSHSERVERTSCKEY` |
 
-<a id="markdown-365-酷推" name="365-酷推"></a>
-#### 3.6.5. 酷推
+<a id="markdown-366-酷推" name="366-酷推"></a>
+#### 3.6.6. 酷推
 https://cp.xuthus.cc/
-<a id="markdown-3651-skey" name="3651-skey"></a>
-##### 3.6.5.1. sKey
+<a id="markdown-3661-skey" name="3661-skey"></a>
+##### 3.6.6.1. sKey
 该平台可能还在完善当中，对接时我发现其接口定义不规范，且机器人容易被封，所以不推荐使用，且不接受提酷推推送相关bug。
 
 |   TITLE   | CONTENT   |
@@ -564,11 +576,11 @@ https://cp.xuthus.cc/
 | 环境变量   | `Ray_Serilog__WriteTo__7__Args__sKey` |
 | GitHub Secrets  | `PUSHCOOLSKEY` |
 
-<a id="markdown-366-推送到自定义api" name="366-推送到自定义api"></a>
-#### 3.6.6. 推送到自定义Api
+<a id="markdown-367-推送到自定义api" name="367-推送到自定义api"></a>
+#### 3.6.7. 推送到自定义Api
 这是我简单封装了一个通用的推送接口，可以推送到任意的api地址，如果有自己的机器人或自己的用于接受日志的api，可以根据需要自定义配置。
-<a id="markdown-3661-api" name="3661-api"></a>
-##### 3.6.6.1. api
+<a id="markdown-3671-api" name="3671-api"></a>
+##### 3.6.7.1. api
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
@@ -577,8 +589,8 @@ https://cp.xuthus.cc/
 | 默认值   | 空 |
 | 环境变量   | `Ray_Serilog__WriteTo__8__Args__api` |
 | GitHub Secrets  | `PUSHOTHERAPI` |
-<a id="markdown-3662-placeholder" name="3662-placeholder"></a>
-##### 3.6.6.2. placeholder
+<a id="markdown-3672-placeholder" name="3672-placeholder"></a>
+##### 3.6.7.2. placeholder
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
@@ -587,8 +599,8 @@ https://cp.xuthus.cc/
 | 默认值   | 空 |
 | 环境变量   | `Ray_Serilog__WriteTo__8__Args__placeholder` |
 | GitHub Secrets  | `PUSHOTHERPLACEHOLDER` |
-<a id="markdown-3663-bodyjsontemplate" name="3663-bodyjsontemplate"></a>
-##### 3.6.6.3. bodyJsonTemplate
+<a id="markdown-3673-bodyjsontemplate" name="3673-bodyjsontemplate"></a>
+##### 3.6.7.3. bodyJsonTemplate
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
@@ -598,12 +610,12 @@ https://cp.xuthus.cc/
 | 环境变量   | `Ray_Serilog__WriteTo__8__Args__bodyJsonTemplate` |
 | GitHub Secrets  | `PUSHOTHERBODYJSONTEMPLATE` |
 
-<a id="markdown-367-pushplus推荐" name="367-pushplus推荐"></a>
-#### 3.6.7. PushPlus[推荐]
+<a id="markdown-368-pushplus推荐" name="368-pushplus推荐"></a>
+#### 3.6.8. PushPlus[推荐]
 官网： http://www.pushplus.plus/doc/ 
 
-<a id="markdown-3671-pushplus的token" name="3671-pushplus的token"></a>
-##### 3.6.7.1. PushPlus的Token
+<a id="markdown-3681-pushplus的token" name="3681-pushplus的token"></a>
+##### 3.6.8.1. PushPlus的Token
 获取方式请参考官网。
 
 |   TITLE   | CONTENT   |
@@ -614,8 +626,8 @@ https://cp.xuthus.cc/
 | 环境变量   | `Ray_Serilog__WriteTo__9__Args__token` |
 | GitHub Secrets  | `PUSHPLUSTOKEN` |
 
-<a id="markdown-3672-pushplus的topic" name="3672-pushplus的topic"></a>
-##### 3.6.7.2. PushPlus的Topic
+<a id="markdown-3682-pushplus的topic" name="3682-pushplus的topic"></a>
+##### 3.6.8.2. PushPlus的Topic
 获取方式请参考官网。
 
 |   TITLE   | CONTENT   |
@@ -626,8 +638,8 @@ https://cp.xuthus.cc/
 | 环境变量   | `Ray_Serilog__WriteTo__9__Args__topic` |
 | GitHub Secrets  | `PUSHPLUSTOPIC` |
 
-<a id="markdown-3673-pushplus的channel" name="3673-pushplus的channel"></a>
-##### 3.6.7.3. PushPlus的Channel
+<a id="markdown-3683-pushplus的channel" name="3683-pushplus的channel"></a>
+##### 3.6.8.3. PushPlus的Channel
 获取方式请参考官网。
 
 |   TITLE   | CONTENT   |
@@ -638,8 +650,8 @@ https://cp.xuthus.cc/
 | 环境变量   | `Ray_Serilog__WriteTo__9__Args__channel` |
 | GitHub Secrets  | `PUSHPLUSCHANNEL` |
 
-<a id="markdown-3674-pushplus的webhook" name="3674-pushplus的webhook"></a>
-##### 3.6.7.4. PushPlus的Webhook
+<a id="markdown-3684-pushplus的webhook" name="3684-pushplus的webhook"></a>
+##### 3.6.8.4. PushPlus的Webhook
 获取方式请参考官网。
 
 webhook编码(不是地址)，在官网平台设定，仅在channel使用webhook渠道和CP渠道时需要填写

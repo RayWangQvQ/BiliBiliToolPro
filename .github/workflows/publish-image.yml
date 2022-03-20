@@ -1,6 +1,11 @@
 name: Publish image
 
 on:
+  workflow_dispatch:
+    inputs:
+      manualTag:
+        description: 'tag'
+        required: true
   release:
     types: [published]
 
@@ -25,17 +30,35 @@ jobs:
       - name: Check the value
         run: |
           echo ${{ steps.step_one.outputs.hasToken }}
-          echo "GITHUB_REF: $GITHUB_REF"
-          echo "GITHUB_REF#refs/tags/: ${GITHUB_REF#refs/tags/}"
+          ##echo "GITHUB_REF: $GITHUB_REF"
+          ##echo "GITHUB_REF#refs/tags/: ${GITHUB_REF#refs/tags/}"
+          echo "github.event.release.tag_name: ${{ github.event.release.tag_name }}"
+          echo "github.event.inputs.manualTag: ${{ github.event.inputs.manualTag }}"
+
         
   Publish2DockerHub:
     runs-on: ubuntu-latest
     needs: CheckDockerToken
     if: "contains(needs.CheckDockerToken.outputs.hasToken, 'true')"
     steps:
+      - 
+        name: GetRepoTag
+        id: getRepoTag
+        run: |
+          RepoTag=""
+          if [ "${{ github.event.release.tag_name }}" ] ; then
+            RepoTag=${{ github.event.release.tag_name }}
+          fi
+          if [ "${{ github.event.inputs.manualTag }}" ] ; then
+            RepoTag=${{ github.event.inputs.manualTag }}
+          fi
+          echo "repo tag: $RepoTag"
+          echo "::set-output name=repoTag::$RepoTag"
       -
         name: Checkout
         uses: actions/checkout@v2
+        with:
+          ref: ${{ steps.getRepoTag.outputs.repoTag }}
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v1
@@ -49,12 +72,17 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
       - 
-        name: GetTagName
-        id: getTag
+        name: GetDockerTagNames
+        id: getDockerTags
         run: |
-          DOCKER_IMAGE_TAG="zai7lou/bilibili_tool_pro:${GITHUB_REF#refs/tags/},zai7lou/bilibili_tool_pro:latest"
-          echo "docker image tag: $DOCKER_IMAGE_TAG"
-          echo "::set-output name=tag::$DOCKER_IMAGE_TAG"
+          DOCKER_IMAGE_TAG="zai7lou/bilibili_tool_pro:${{ steps.getRepoTag.outputs.repoTag }},zai7lou/bilibili_tool_pro:latest"
+          DOCKER_IMAGE_LATEST_TAG=",zai7lou/bilibili_tool_pro:latest"
+          if [ "${{ github.event.inputs.manualTag }}" ] ; then
+            DOCKER_IMAGE_LATEST_TAG=""
+          fi
+          DOCKER_IMAGE_TAGS=$DOCKER_IMAGE_TAG$DOCKER_IMAGE_LATEST_TAG
+          echo "docker image tag: $DOCKER_IMAGE_TAGS"
+          echo "::set-output name=dockerTags::$DOCKER_IMAGE_TAGS"
       -
         name: Build and push
         uses: docker/build-push-action@v2
@@ -62,4 +90,4 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ steps.getTag.outputs.tag }}
+          tags: ${{ steps.getDockerTags.outputs.dockerTags }}

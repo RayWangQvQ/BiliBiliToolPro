@@ -18,6 +18,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.inputs.version }}
     
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
@@ -51,7 +53,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.event.inputs.version }}
-          release_name: BiliBiliTool-V${{ github.event.inputs.version }}
+          release_name: BiliBiliToolPro-V${{ github.event.inputs.version }}
           draft: true
           prerelease: false
 

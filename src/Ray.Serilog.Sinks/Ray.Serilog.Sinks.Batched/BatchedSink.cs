@@ -73,7 +73,7 @@ namespace Ray.Serilog.Sinks.Batched
             }
         }
 
-        protected virtual void EmitBatch(IEnumerable<LogEvent> events,string pushTitle="")
+        protected virtual void EmitBatch(IEnumerable<LogEvent> events, string pushTitle = "")
         {
             if (_sendBatchesAsOneMessages)
             {
@@ -131,7 +131,7 @@ namespace Ray.Serilog.Sinks.Batched
                 msg = stringWriter.ToString();
             }
 
-            msg = $"{GetEmoji(logEvent)} {msg}";
+            //msg = $"{GetEmoji(logEvent)} {msg}";
 
             if (msg.Contains("经验+") && msg.Contains("√"))
                 msg = msg.Replace('√', '✔');
@@ -180,12 +180,14 @@ namespace Ray.Serilog.Sinks.Batched
         {
             var title = "BiliBiliTool推送";
 
-            var msg = RenderMessage(triggerLogEvent);
+            var msg = RenderMessage(triggerLogEvent).Replace(Environment.NewLine, "");
             var list = msg.Split('·').ToList();
 
-            if (!string.IsNullOrWhiteSpace(list[2])) title += $"-{list[2]}任务";
-
-            if (!string.IsNullOrWhiteSpace(list[3])) title += $"-账号【{list[3]}】";
+            for (int i = 2; i < list.Count; i++)
+            {
+                if (!string.IsNullOrWhiteSpace(list[i]))
+                    title += $"-{list[i]}";
+            }
 
             return title;
         }
