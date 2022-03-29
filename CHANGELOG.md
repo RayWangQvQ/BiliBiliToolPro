@@ -23,3 +23,4 @@
 - publish-release.yml新增手动输入tag功能
 ## 0.0.7
 - 【#44】兼容青龙最新版本（v2.12.0），修复因青龙调整目录结构导致的bug
+- 更新`publish-image.yml`，只有`release`时才打`latest tag`，手动运行时不打`latest tag`
