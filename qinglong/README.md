@@ -37,7 +37,7 @@ echo -e "\n-------set up dot net env finish-------"
 ```
 
 ### 1.2.重启青龙容器
-重启青龙容器，或在宿主机中执行 `docker exec -it qinglong bash /ql/config/extra.sh`，其中 `qinglong` 是你的容器名。
+重启青龙容器，或在宿主机中执行 `docker exec -it qinglong bash /ql/data/config/extra.sh`，其中 `qinglong` 是你的容器名。
 
 ### 1.3.登录青龙面板并添加相应配置
 访问青龙面板并登录（通常面板地址为 `ip:5700` ），然后进入`配置文件`页面。

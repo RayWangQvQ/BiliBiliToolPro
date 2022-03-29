@@ -2,4 +2,7 @@
 # new Env("bili天选时刻[dev先行版]")
 # cron 0 13 * * * bili_dev_task_liveLottery.sh
 
-dotnet run --project /ql/repo/raywangqvq_bilibilitoolpro_develop/src/Ray.BiliBiliTool.Console --ENVIRONMENT=Production --runTasks=LiveLottery
+cd "$(find /ql -type d -name "repo" -print)"
+cd "$(find . -type d -name "raywangqvq_bilibilitoolpro_develop" -print)"
+
+dotnet run --project ./src/Ray.BiliBiliTool.Console --ENVIRONMENT=Production --runTasks=LiveLottery

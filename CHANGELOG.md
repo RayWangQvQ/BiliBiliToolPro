@@ -22,3 +22,4 @@
 - 【#12】新增配置`Notification:IsSingleAccountSingleNotify`，支持开启每个账号单独推送消息
 - publish-release.yml新增手动输入tag功能
 ## 0.0.7
+- 【#44】兼容青龙最新版本（v2.12.0），修复因青龙调整目录结构导致的bug
