@@ -71,7 +71,7 @@ BiliBiliTool
 - **所有代码都是开源且透明的，任何人均可查看，程序不会保存或滥用任何用户的个人信息**
 - **应用内几乎所有功能都开放为了配置（如任务开关、日期、upId等），请仔细阅读配置文档，自己对自己的配置负责**
 
-_（如果图片挂了，是因为 GitHub 的服务器在国外，经常会刷不出，有梯子的可以架起梯子，没有的也可以先参考 [我的博客](https://www.cnblogs.com/RayWang/p/13909784.html)，但博客内容不保证最新)_
+_（如果图片挂了，请自己架梯子，没有的也可以先参考 [我的博客](https://www.cnblogs.com/RayWang/p/13909784.html)，但内容不保证最新)_
 
 ## 1. 如何使用
 
@@ -156,7 +156,12 @@ P.S.这里的运行环境指的是 `.NET Runtime 6.0.0` ，安装方法可详见
 
 对于已安装.net环境，且使用的是依赖包，同上，可在终端中执行命令：`dotnet Ray.BiliBiliTool.Console.dll`
 
-对于使用独立包的，可在终端中执行命令：`Ray.BiliBiliTool.Console`。
+对于使用独立包的，可在终端中执行命令：
+
+```
+chmod +x ./Ray.BiliBiliTool.Console
+Ray.BiliBiliTool.Console
+```
 
 其他系统依此类推，运行结果图示如下：
 

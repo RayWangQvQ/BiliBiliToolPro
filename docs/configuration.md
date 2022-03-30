@@ -59,6 +59,8 @@
             - [3.6.8.2. PushPlus的Topic](#3682-pushplus的topic)
             - [3.6.8.3. PushPlus的Channel](#3683-pushplus的channel)
             - [3.6.8.4. PushPlus的Webhook](#3684-pushplus的webhook)
+        - [3.6.9. Microsoft Teams](#369-microsoft-teams)
+            - [3.6.9.1. Microsoft Teams的Webhook](#3691-microsoft-teams的webhook)
     - [3.7. 日志相关](#37-日志相关)
         - [3.7.1. Console日志输出等级](#371-console日志输出等级)
         - [3.7.2. Console日志输出样式](#372-console日志输出样式)
@@ -664,6 +666,25 @@ webhook编码(不是地址)，在官网平台设定，仅在channel使用webhook
 | 环境变量   | `Ray_Serilog__WriteTo__9__Args__webhook` |
 | 命令行示范   |  |
 | GitHub Secrets  | `PUSHPLUSWEBHOOK` |
+
+<a id="markdown-369-microsoft-teams" name="369-microsoft-teams"></a>
+#### 3.6.9. Microsoft Teams
+
+官网： https://docs.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook
+
+<a id="markdown-3691-microsoft-teams的webhook" name="3691-microsoft-teams的webhook"></a>
+##### 3.6.9.1. Microsoft Teams的Webhook
+
+webhook的完整地址，在Teams的Channel中获取，详细获取方式请参考官网。
+
+|   TITLE   | CONTENT   |
+| ---------- | -------------- |
+| 配置Key | `Serilog__WriteTo__10__Args__webhook` |
+| 值域   | 一串字符串 |
+| 默认值   | 空 |
+| 环境变量   | `Serilog__WriteTo__10__Args__webhook` |
+| 命令行示范   |  |
+| GitHub Secrets  |  |
 
 
 <a id="markdown-37-日志相关" name="37-日志相关"></a>
