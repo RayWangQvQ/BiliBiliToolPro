@@ -30,9 +30,9 @@ DOTNET_FILE=dotnet-sdk.tar.gz
 apk add bash icu-libs krb5-libs libgcc libintl libssl1.1 libstdc++ zlib
 
 wget -O $DOTNET_FILE $DOWNLOAD_URL
+export DOTNET_ROOT=/home/dotnet
 mkdir -p "$DOTNET_ROOT" && tar zxf "$DOTNET_FILE" -C "$DOTNET_ROOT"
 
-export DOTNET_ROOT=/home/dotnet
 export PATH=$PATH:$DOTNET_ROOT
 ln -s /home/dotnet/dotnet /usr/local/bin
 
