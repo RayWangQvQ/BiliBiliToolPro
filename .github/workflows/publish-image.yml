@@ -4,8 +4,15 @@ on:
   workflow_dispatch:
     inputs:
       manualTag:
-        description: 'tag'
+        description: 'Manual Tag'
         required: true
+      manualWithLatestTag:
+        description: 'Manual With Latest Tag'
+        required: true
+        default: 'true'
+        options:
+        - true
+        - false
   release:
     types: [published]
 
@@ -77,7 +84,7 @@ jobs:
         run: |
           DOCKER_IMAGE_TAG="zai7lou/bilibili_tool_pro:${{ steps.getRepoTag.outputs.repoTag }}"
           DOCKER_IMAGE_LATEST_TAG=",zai7lou/bilibili_tool_pro:latest"
-          if [ "${{ github.event.inputs.manualTag }}" ] ; then
+          if [ "${{ github.event.inputs.manualTag }}" ] $$ [ "${{ github.event.inputs.manualTag }}" == "false" ] ; then
             DOCKER_IMAGE_LATEST_TAG=""
           fi
           DOCKER_IMAGE_TAGS=$DOCKER_IMAGE_TAG$DOCKER_IMAGE_LATEST_TAG

@@ -31,3 +31,4 @@
 - 【#47】青龙安装dotnet环境，支持arm架构服务器
 ## 0.0.10
 - 【#62】codeql-analysis.yml可以指定检查的文件类型
+- 【#61】publish-image.yml手动打镜像时支持指定是否打latest的tag
