@@ -24,7 +24,7 @@
 
 ```
 # 安装 dotnet 环境
-sh -c "$(wget https://ghproxy.com/https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/qinglong/ray-dotnet-install.sh -O -)"
+sh -c "$(wget https://ghproxy.com/https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/qinglong/ray-dotnet-install.sh -O -)"
 ```
 
 ### 1.2.重启青龙容器
