@@ -33,3 +33,4 @@
 - 【#62】codeql-analysis.yml可以指定检查的文件类型
 - 【#61】publish-image.yml手动打镜像时支持指定是否打latest的tag
 - 【#32】新增企业微信的应用推送，实现微信接受推送消息
+- 优化日志格式
