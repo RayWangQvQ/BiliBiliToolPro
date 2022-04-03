@@ -20,6 +20,8 @@ COPY ["src/Ray.Serilog.Sinks/Ray.Serilog.Sinks.OtherApiBatched/Ray.Serilog.Sinks
 COPY ["src/Ray.Serilog.Sinks/Ray.Serilog.Sinks.DingTalkBatched/Ray.Serilog.Sinks.DingTalkBatched.csproj", "src/Ray.Serilog.Sinks/Ray.Serilog.Sinks.DingTalkBatched/"]
 COPY ["src/Ray.Serilog.Sinks/Ray.Serilog.Sinks.PushPlusBatched/Ray.Serilog.Sinks.PushPlusBatched.csproj", "src/Ray.Serilog.Sinks/Ray.Serilog.Sinks.PushPlusBatched/"]
 COPY ["src/Ray.Serilog.Sinks/Ray.Serilog.Sinks.ServerChanBatched/Ray.Serilog.Sinks.ServerChanBatched.csproj", "src/Ray.Serilog.Sinks/Ray.Serilog.Sinks.ServerChanBatched/"]
+COPY ["src/Ray.Serilog.Sinks/Ray.Serilog.Sinks.MicrosoftTeamsBatched/Ray.Serilog.Sinks.MicrosoftTeamsBatched.csproj", "src/Ray.Serilog.Sinks/Ray.Serilog.Sinks.MicrosoftTeamsBatched/"]
+COPY ["src/Ray.Serilog.Sinks/Ray.Serilog.Sinks.WorkWeiXinAppBatched/Ray.Serilog.Sinks.WorkWeiXinAppBatched.csproj", "src/Ray.Serilog.Sinks/Ray.Serilog.Sinks.WorkWeiXinAppBatched/"]
 RUN dotnet restore "src/Ray.BiliBiliTool.Console/Ray.BiliBiliTool.Console.csproj"
 COPY . .
 WORKDIR "/code/src/Ray.BiliBiliTool.Console"

@@ -1,10 +1,9 @@
-﻿using System;
-using Ray.Serilog.Sinks.Batched;
+﻿using Ray.Serilog.Sinks.Batched;
 using Serilog;
 using Serilog.Configuration;
 using Serilog.Events;
 
-namespace Ray.Serilog.Sinks.MicrosoftTeams
+namespace Ray.Serilog.Sinks.MicrosoftTeamsBatched
 {
     public static class MicrosoftTeamsConfigurationExtensions
     {
