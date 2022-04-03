@@ -60,7 +60,7 @@ namespace Ray.BiliBiliTool.Console
                 for (int i = 0; i < _cookieStrFactory.Count; i++)
                 {
                     _cookieStrFactory.CurrentNum = i + 1;
-                    _logger.LogInformation("账号 {num} ：" + Environment.NewLine, _cookieStrFactory.CurrentNum);
+                    _logger.LogInformation("========= 账号 {num} =========" + Environment.NewLine, _cookieStrFactory.CurrentNum);
 
                     try
                     {
@@ -155,13 +155,13 @@ namespace Ray.BiliBiliTool.Console
         private void LogAppInfo()
         {
             _logger.LogInformation(
-                "{newLine}---------------------------------------{newLine} RayBiliBiliToolPro-v{version} in {env} env.{newLine}开源 by {url}",
+                "{newLine}========================{newLine} v{version} in {env} env.{newLine}开源 by {url}",
                 Environment.NewLine + Environment.NewLine,
                 Environment.NewLine + Environment.NewLine,
                 typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion,
                 Global.HostingEnvironment.EnvironmentName,
                 Environment.NewLine,
-                Constants.SourceCodeUrl
+                Constants.SourceCodeUrl + Environment.NewLine
                 );
             //_logger.LogInformation("【当前IP】{ip} ", IpHelper.GetIp());
         }

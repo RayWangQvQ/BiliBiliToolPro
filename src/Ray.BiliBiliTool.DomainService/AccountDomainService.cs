@@ -72,7 +72,8 @@ namespace Ray.BiliBiliTool.DomainService
             }
             else
             {
-                _logger.LogInformation("【当前经验】{0} （您已是 Lv6 的大佬了，无敌是多么寂寞~）", useInfo.Level_info.Current_exp);
+                _logger.LogInformation("【当前经验】{0}", useInfo.Level_info.Current_exp);
+                _logger.LogInformation("您已是 Lv6 的大佬了，无敌是多么寂寞~");
             }
 
             return useInfo;

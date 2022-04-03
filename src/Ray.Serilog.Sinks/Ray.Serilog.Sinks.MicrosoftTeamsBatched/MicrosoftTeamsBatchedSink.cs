@@ -1,8 +1,7 @@
-﻿using System;
-using Ray.Serilog.Sinks.Batched;
+﻿using Ray.Serilog.Sinks.Batched;
 using Serilog.Events;
 
-namespace Ray.Serilog.Sinks.MicrosoftTeams
+namespace Ray.Serilog.Sinks.MicrosoftTeamsBatched
 {
     public class MicrosoftTeamsBatchedSink : BatchedSink
     {
