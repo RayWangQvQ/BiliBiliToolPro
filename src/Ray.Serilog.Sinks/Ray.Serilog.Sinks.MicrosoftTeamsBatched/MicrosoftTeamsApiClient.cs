@@ -1,9 +1,7 @@
-﻿using System;
-using System.Net.Http;
-using System.Text;
+﻿using System.Text;
 using Ray.Serilog.Sinks.Batched;
 
-namespace Ray.Serilog.Sinks.MicrosoftTeams
+namespace Ray.Serilog.Sinks.MicrosoftTeamsBatched
 {
     public class MicrosoftTeamsApiClient : PushService
     {
