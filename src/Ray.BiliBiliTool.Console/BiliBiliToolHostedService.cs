@@ -161,7 +161,7 @@ namespace Ray.BiliBiliTool.Console
                 typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion,
                 Global.HostingEnvironment.EnvironmentName,
                 Environment.NewLine,
-                Constants.SourceCodeUrl
+                Constants.SourceCodeUrl + Environment.NewLine
                 );
             //_logger.LogInformation("【当前IP】{ip} ", IpHelper.GetIp());
         }
