@@ -494,7 +494,7 @@ v1.0.x仅支持推送到Server酱，v1.1.x之后重新定义了推送地概念�
 | 意义 | 用于将日志输出到Telegram机器人 |
 | 值域   | 一串字符串 |
 | 默认值   | 空 |
-| 环境变量   |  |
+| 环境变量   | Ray_Serilog__WriteTo__3__Args__botToken |
 | GitHub Secrets  | `PUSHTGTOKEN`|
 
 <a id="markdown-3622-chatid" name="3622-chatid"></a>
