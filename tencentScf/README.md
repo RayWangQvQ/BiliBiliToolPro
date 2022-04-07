@@ -68,14 +68,9 @@ Actions 使用 `Serverless Framework` 来部署，通过 `serverless.yml` 来配
 
 **Ⅰ.拷贝或下载 [serverless.yml](./serverless.yml) 文件内容到本地文件中，开始编辑内容**
 
-其中主要需要改的是最下方的环境变量，这些环境变量在部署后会添加到云函数中（即云函数控制台看到的环境变量集合），它们将作为应用配置传入bilibili_tool
+其中主要需要改的是最下方的环境变量，这些环境变量在部署后会添加到云函数中（即云函数控制台看到的环境变量集合），它们将作为应用配置传入 bilibili_tool
 
-其中 cookie 是必填项，其他应用配置的也可以通过添加相应的环境变量实现，建议自己添加UA、推送等配置。（配置信息请参考[配置说明文档](../docs/configuration.md)）
-
-<details>
-<summary>新增配置时注意 <a alt="yaml 的格式" href="https://www.runoob.com/w3cnote/yaml-intro.html">yaml 的格式</a></summary>
-
-比如你需要增加一个环境变量，可以在最下方添加内容应该是（注意缩进问题）：
+例如，你需要增加一个**环境变量**，在最下方添加内容应该是（注意缩进问题）：
 
 ```yaml
   environment:
@@ -85,8 +80,12 @@ Actions 使用 `Serverless Framework` 来部署，通过 `serverless.yml` 来配
       Ray_Security__IntervalSecondsBetweenRequestApi: 20
 ```
 
-</details>
+注意：其中 cookie 是必填项，其他应用配置的也可以通过添加相应的环境变量实现，建议自己添加UA、推送等配置。（更多配置项请参考[配置说明文档](../docs/configuration.md)，仅用于参考环境变量，请只关注表格中的`环境变量`一项，并参照上面的方式添加）
 
+> 如果你不熟悉 yml 或者部署时遇到格式问题，建议花几分钟阅读 [YAML 入门教程](https://www.runoob.com/w3cnote/yaml-intro.html)  
+> 常犯错误：  
+> Q：我在 Github Secrets 中添加了 `NUMBEROFCOINS`，值为 2，为啥投币数量还是 5。  
+> A：所有自定义配置项（环境变量） _不能通过 Github Secrets 添加_，只能写在 `serverless.yml` 中。你应该参考上面的例子添加环境变量 `Ray_DailyTaskConfig__NumberOfCoins`。
 
 其他 `serverless.yml` 可选配置内容请参考[官方说明](https://github.com/serverless-components/tencent-scf/blob/master/docs/configure.md)
 
