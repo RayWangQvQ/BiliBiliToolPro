@@ -494,7 +494,7 @@ v1.0.x仅支持推送到Server酱，v1.1.x之后重新定义了推送地概念�
 | 意义 | 用于将日志输出到Telegram机器人 |
 | 值域   | 一串字符串 |
 | 默认值   | 空 |
-| 环境变量   |  |
+| 环境变量   | Ray_Serilog__WriteTo__3__Args__botToken |
 | GitHub Secrets  | `PUSHTGTOKEN`|
 
 <a id="markdown-3622-chatid" name="3622-chatid"></a>
@@ -686,7 +686,7 @@ webhook的完整地址，在Teams的Channel中获取，详细获取方式请参�
 | 配置Key | `Serilog__WriteTo__10__Args__webhook` |
 | 值域   | 一串字符串 |
 | 默认值   | 空 |
-| 环境变量   | `Serilog__WriteTo__10__Args__webhook` |
+| 环境变量   | `Ray_Serilog__WriteTo__10__Args__webhook` |
 | 命令行示范   |  |
 | GitHub Secrets  |  |
 
@@ -707,7 +707,7 @@ webhook的完整地址，在Teams的Channel中获取，详细获取方式请参�
 | 配置Key | `Serilog:WriteTo:11:Args:corpId` |
 | 值域   | 一串字符串 |
 | 默认值   | 空 |
-| 环境变量   | `Serilog__WriteTo__11__Args__corpId` |
+| 环境变量   | `Ray_Serilog__WriteTo__11__Args__corpId` |
 | 命令行示范   |  |
 | GitHub Secrets  |  |
 
@@ -719,7 +719,7 @@ webhook的完整地址，在Teams的Channel中获取，详细获取方式请参�
 | 配置Key | `Serilog:WriteTo:11:Args:agentId` |
 | 值域   | 一串字符串 |
 | 默认值   | 空 |
-| 环境变量   | `Serilog__WriteTo__11__Args__agentId` |
+| 环境变量   | `Ray_Serilog__WriteTo__11__Args__agentId` |
 | 命令行示范   |  |
 | GitHub Secrets  |  |
 
@@ -731,7 +731,7 @@ webhook的完整地址，在Teams的Channel中获取，详细获取方式请参�
 | 配置Key | `Serilog:WriteTo:11:Args:secret` |
 | 值域   | 一串字符串 |
 | 默认值   | 空 |
-| 环境变量   | `Serilog__WriteTo__11__Args__secret` |
+| 环境变量   | `Ray_Serilog__WriteTo__11__Args__secret` |
 | 命令行示范   |  |
 | GitHub Secrets  |  |
 
