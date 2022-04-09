@@ -179,7 +179,7 @@ export Ray_Serilog__WriteTo__9__Args__token="abcde"
 
 | TITLE | CONTENT | 示例 |
 | ---------- | -------------- | -------------- |
-| 配置Key | `BiliBiliCookies__1` | |
+| 配置Key | `BiliBiliCookies:1` | |
 | 值域   | 字符串，英文分号分隔，来自浏览器抓取 | |
 | 默认值   | 空 | |
 | 环境变量 | `Ray_BiliBiliCookies__1` | Windows：`set Ray_BiliBiliCookies__1=abc=123;def=456;` Linux:`export Ray_BiliBiliCookies__1=abc=123;def=456;` |
@@ -187,7 +187,7 @@ export Ray_Serilog__WriteTo__9__Args__token="abcde"
 
 |   TITLE   | CONTENT   | 示例 |
 | ---------- | -------------- | -------------- |
-| 配置Key | `BiliBiliCookies__2` | |
+| 配置Key | `BiliBiliCookies:2` | |
 | 值域   | 字符串，英文分号分隔，来自浏览器抓取 | |
 | 默认值   | 空 | |
 | 环境变量  | `Ray_BiliBiliCookies__2` | Windows：`set Ray_BiliBiliCookies__2=abc=123;def=456;` Linux:`export Ray_BiliBiliCookies__2=abc=123;def=456;` |
@@ -206,7 +206,7 @@ export Ray_Serilog__WriteTo__9__Args__token="abcde"
 
 |   TITLE   | CONTENT   | 示例 |
 | ---------- | -------------- | -------------- |
-| 配置Key | `Security__IsSkipDailyTask` | |
+| 配置Key | `Security:IsSkipDailyTask` | |
 | 值域   | [true,false] | |
 | 默认值   | false | |
 | 环境变量 | `Ray_Security__IsSkipDailyTask` | `set Ray_Security__IsSkipDailyTask=true` |
@@ -224,7 +224,7 @@ export Ray_Serilog__WriteTo__9__Args__token="abcde"
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key | `Security__RandomSleepMaxMin` |
+| 配置Key | `Security:RandomSleepMaxMin` |
 | 值域   | 数字 |
 | 默认值   | 20 |
 | 环境变量 | `Ray_Security__RandomSleepMaxMin` |
@@ -240,7 +240,7 @@ export Ray_Serilog__WriteTo__9__Args__token="abcde"
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key | `Security__IntervalSecondsBetweenRequestApi` |
+| 配置Key | `Security:IntervalSecondsBetweenRequestApi` |
 | 值域   | [0,+] |
 | 默认值   | 20 |
 | 环境变量   | `Ray_Security__IntervalSecondsBetweenRequestApi` |
@@ -253,7 +253,7 @@ export Ray_Serilog__WriteTo__9__Args__token="abcde"
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key | `Security__IntervalMethodTypes` |
+| 配置Key | `Security:IntervalMethodTypes` |
 | 值域   | [GET,POST]，多个以英文逗号分隔 |
 | 默认值   | POST |
 | 环境变量   | `Ray_Security__IntervalMethodTypes` |
@@ -264,7 +264,7 @@ export Ray_Serilog__WriteTo__9__Args__token="abcde"
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key | `Security__UserAgent` |
+| 配置Key | `Security:UserAgent` |
 | 值域   | 字符串，可以F12从自己的浏览器获取 |
 | 默认值   | Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.66 Safari/537.36 Edg/87.0.664.41 |
 | 环境变量   | `Ray_Security__UserAgent` |
@@ -281,7 +281,7 @@ export Ray_Serilog__WriteTo__9__Args__token="abcde"
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key | `Security__WebProxy` |
+| 配置Key | `Security:WebProxy` |
 | 值域   | 字符串，形如：user:password@host:port |
 | 默认值   | 无 |
 | 环境变量   | `Ray_Security__WebProxy` |
@@ -295,7 +295,7 @@ export Ray_Serilog__WriteTo__9__Args__token="abcde"
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key | `DailyTaskConfig__NumberOfCoins` |
+| 配置Key | `DailyTaskConfig:NumberOfCoins` |
 | 值域   | [0,5]，为安全考虑，程序内部还会做验证，最大不能超过5 |
 | 默认值   | 5 |
 | 环境变量   | `Ray_DailyTaskConfig__NumberOfCoins` |
@@ -306,7 +306,7 @@ export Ray_Serilog__WriteTo__9__Args__token="abcde"
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key | `DailyTaskConfig__SelectLike` |
+| 配置Key | `DailyTaskConfig:SelectLike` |
 | 值域   | [true,false] |
 | 默认值   | false |
 | 环境变量   | `Ray_DailyTaskConfig__SelectLike` |
@@ -322,7 +322,7 @@ export Ray_Serilog__WriteTo__9__Args__token="abcde"
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key | `DailyTaskConfig__SupportUpIds` |
+| 配置Key | `DailyTaskConfig:SupportUpIds` |
 | 值域   | up主ID，多个用英文逗号分隔，默认是作者本人的UpId，如需删除可以配置为空格字符串或“-1”，也可以配置为其他人的UpId |
 | 默认值   | 作者的upId |
 | 环境变量   | `Ray_DailyTaskConfig__SupportUpIds` |
@@ -338,7 +338,7 @@ export Ray_Serilog__WriteTo__9__Args__token="abcde"
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key | `DailyTaskConfig__DayOfAutoCharge` |
+| 配置Key | `DailyTaskConfig:DayOfAutoCharge` |
 | 值域   | [-1,31]，-1表示不指定，默认月底最后一天；0表示不充电 |
 | 默认值   | -1 |
 | 环境变量   | `Ray_DailyTaskConfig__DayOfAutoCharge` |
@@ -352,7 +352,7 @@ export Ray_Serilog__WriteTo__9__Args__token="abcde"
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key | `DailyTaskConfig__AutoChargeUpId` |
+| 配置Key | `DailyTaskConfig:AutoChargeUpId` |
 | 值域   | up的Id字符串，默认是作者本人的UpId；-1表示不指定，为自己充电；其他Id则会尝试为配置的UpId充电 |
 | 默认值   | 作者的upId |
 | 环境变量   | `Ray_DailyTaskConfig__AutoChargeUpId` |
@@ -363,7 +363,7 @@ export Ray_Serilog__WriteTo__9__Args__token="abcde"
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key | `DailyTaskConfig__DayOfReceiveVipPrivilege` |
+| 配置Key | `DailyTaskConfig:DayOfReceiveVipPrivilege` |
 | 值域   | [-1,31]，-1表示不指定，默认每月1号；0表示不领取 |
 | 默认值   | 1 |
 | 环境变量   | `Ray_DailyTaskConfig__DayOfReceiveVipPrivilege` |
@@ -374,7 +374,7 @@ export Ray_Serilog__WriteTo__9__Args__token="abcde"
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key | `DailyTaskConfig__DayOfExchangeSilver2Coin` |
+| 配置Key | `DailyTaskConfig:DayOfExchangeSilver2Coin` |
 | 值域   | [-1,31]，-1表示不指定，默认每月最后一天；-2表示每天；0表示不进行兑换 |
 | 默认值   | -1 |
 | 环境变量   | `Ray_DailyTaskConfig__DayOfExchangeSilver2Coin` |
@@ -388,7 +388,7 @@ export Ray_Serilog__WriteTo__9__Args__token="abcde"
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key | `LiveLotteryTaskConfig__ExcludeAwardNames` |
+| 配置Key | `LiveLotteryTaskConfig:ExcludeAwardNames` |
 | 值域   | 一串字符串，多个关键字使用`\|`符号隔开 |
 | 默认值   | `舰\|船\|航海\|代金券\|自拍\|照\|写真\|图` |
 | 环境变量   | `Ray_LiveLotteryTaskConfig__ExcludeAwardNames` |
@@ -399,7 +399,7 @@ export Ray_Serilog__WriteTo__9__Args__token="abcde"
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key | `LiveLotteryTaskConfig__IncludeAwardNames` |
+| 配置Key | `LiveLotteryTaskConfig:IncludeAwardNames` |
 | 值域   | 一串字符串，多个关键字使用`\|`符号隔开 |
 | 默认值   | 空 |
 | 环境变量   | `Ray_LiveLotteryTaskConfig__IncludeAwardNames` |
@@ -410,7 +410,7 @@ export Ray_Serilog__WriteTo__9__Args__token="abcde"
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key | `LiveLotteryTaskConfig__AutoGroupFollowings` |
+| 配置Key | `LiveLotteryTaskConfig:AutoGroupFollowings` |
 | 值域   | [true,false] |
 | 默认值   | true |
 | 环境变量   | `Ray_LiveLotteryTaskConfig__AutoGroupFollowings` |
@@ -422,7 +422,7 @@ export Ray_Serilog__WriteTo__9__Args__token="abcde"
 不想参与抽奖的主播Upid集合，多个用英文逗号分隔，配置后不会参加黑名单中的主播的抽奖活动。默认值是目前已知的中奖后拒绝发奖的Up，后期还会继续补充，也反映反馈。
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key | `LiveLotteryTaskConfig__DenyUids` |
+| 配置Key | `LiveLotteryTaskConfig:DenyUids` |
 | 值域   | 字符串，如"65566781,1277481241" |
 | 默认值   | "65566781,1277481241,1643654862,603676925" |
 | 环境变量   | `Ray_LiveLotteryTaskConfig__DenyUids` |
@@ -436,7 +436,7 @@ export Ray_Serilog__WriteTo__9__Args__token="abcde"
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key | `UnfollowBatchedTaskConfig__GroupName` |
+| 配置Key | `UnfollowBatchedTaskConfig:GroupName` |
 | 值域   | 字符串 |
 | 默认值   | 天选时刻 |
 | 环境变量   | `Ray_UnfollowBatchedTaskConfig__GroupName` |
@@ -447,7 +447,7 @@ export Ray_Serilog__WriteTo__9__Args__token="abcde"
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key | `Ray_UnfollowBatchedTaskConfig__Count` |
+| 配置Key | `UnfollowBatchedTaskConfig:Count` |
 | 值域   | 数字，[-1,+]，-1表示全部 |
 | 默认值   | 5 |
 | 环境变量   | `Ray_UnfollowBatchedTaskConfig__Count` |
@@ -458,7 +458,7 @@ export Ray_Serilog__WriteTo__9__Args__token="abcde"
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key | `Ray_UnfollowBatchedTaskConfig__RetainUids` |
+| 配置Key | `UnfollowBatchedTaskConfig:RetainUids` |
 | 值域   | 字符串，多个使用英文逗号分隔 |
 | 默认值   | 108569350 |
 | 环境变量   | `Ray_UnfollowBatchedTaskConfig__RetainUids` |
@@ -472,6 +472,7 @@ v1.0.x仅支持推送到Server酱，v1.1.x之后重新定义了推送地概念�
 
 <a id="markdown-361-是否开启每个账号单独推送消息" name="361-是否开启每个账号单独推送消息"></a>
 #### 3.6.1. 是否开启每个账号单独推送消息
+
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
 | 配置Key | `Notification:IsSingleAccountSingleNotify` |
@@ -483,14 +484,17 @@ v1.0.x仅支持推送到Server酱，v1.1.x之后重新定义了推送地概念�
 
 <a id="markdown-362-telegram机器人" name="362-telegram机器人"></a>
 #### 3.6.2. Telegram机器人
+
 ![TG推送效果](imgs/push-tg.png)
+
 <a id="markdown-3621-bottoken" name="3621-bottoken"></a>
 ##### 3.6.2.1. botToken
+
 点击 https://core.telegram.org/api#bot-api 查看如何创建机器人并获取到机器人的botToken。
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key | `Serilog__WriteTo__3__Args__botToken` |
+| 配置Key | `Serilog:WriteTo:3:Args:botToken` |
 | 意义 | 用于将日志输出到Telegram机器人 |
 | 值域   | 一串字符串 |
 | 默认值   | 空 |
@@ -505,7 +509,7 @@ P.S.访问链接需要能访问“外网”，有vpn的挂vpn。
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key | `Serilog__WriteTo__3__Args__chatId` |
+| 配置Key | `Serilog:WriteTo:3:Args:chatId` |
 | 值域   | 一串字符串 |
 | 默认值   | 空 |
 | 环境变量   | `Ray_Serilog__WriteTo__3__Args__chatId` |
@@ -514,6 +518,7 @@ P.S.访问链接需要能访问“外网”，有vpn的挂vpn。
 
 <a id="markdown-363-企业微信机器人" name="363-企业微信机器人"></a>
 #### 3.6.3. 企业微信机器人
+
 在群内添加机器人，获取到机器人的WebHook地址，添加到配置中。
 
 ![企业微信推送效果](imgs/push-workweixin.png)
@@ -523,7 +528,7 @@ P.S.访问链接需要能访问“外网”，有vpn的挂vpn。
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key | `Serilog__WriteTo__4__Args__webHookUrl` |
+| 配置Key | `Serilog:WriteTo:4:Args:webHookUrl` |
 | 值域   | 一串字符串 |
 | 默认值   | 空 |
 | 环境变量   | `Ray_Serilog__WriteTo__4__Args__webHookUrl` |
@@ -532,6 +537,7 @@ P.S.访问链接需要能访问“外网”，有vpn的挂vpn。
 
 <a id="markdown-364-钉钉机器人" name="364-钉钉机器人"></a>
 #### 3.6.4. 钉钉机器人
+
 在群内添加机器人，获取到机器人的WebHook地址，添加到配置中。
 
 机器人的安全策略，当前不支持加签，请使用关键字策略，推荐关键字：`Ray` 或 `BiliBili`
@@ -543,7 +549,7 @@ P.S.访问链接需要能访问“外网”，有vpn的挂vpn。
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key | `Serilog__WriteTo__5__Args__webHookUrl` |
+| 配置Key | `Serilog:WriteTo:5:Args:webHookUrl` |
 | 值域   | 一串字符串 |
 | 默认值   | 空 |
 | 环境变量   | `Ray_Serilog__WriteTo__5__Args__webHookUrl` |
@@ -561,7 +567,7 @@ P.S.访问链接需要能访问“外网”，有vpn的挂vpn。
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key | `Serilog__WriteTo__6__Args__turboScKey` |
+| 配置Key | `Serilog:WriteTo:6:Args:turboScKey` |
 | 值域   | 一串字符串 |
 | 默认值   | 空 |
 | 环境变量   | `Ray_Serilog__WriteTo__6__Args__turboScKey=abcdefg` |
@@ -576,7 +582,7 @@ https://cp.xuthus.cc/
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key | `Serilog__WriteTo__7__Args__sKey` |
+| 配置Key | `Serilog:WriteTo:7:Args:sKey` |
 | 值域   | 一串字符串 |
 | 默认值   | 空 |
 | 环境变量   | `Ray_Serilog__WriteTo__7__Args__sKey` |
@@ -590,7 +596,7 @@ https://cp.xuthus.cc/
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key | `Serilog__WriteTo__8__Args__api` |
+| 配置Key | `Serilog:WriteTo:8:Args:api` |
 | 值域   | 一串字符串 |
 | 默认值   | 空 |
 | 环境变量   | `Ray_Serilog__WriteTo__8__Args__api` |
@@ -600,7 +606,7 @@ https://cp.xuthus.cc/
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key | `Serilog__WriteTo__8__Args__placeholder` |
+| 配置Key | `Serilog:WriteTo:8:Args:placeholder` |
 | 值域   | 一串字符串 |
 | 默认值   | 空 |
 | 环境变量   | `Ray_Serilog__WriteTo__8__Args__placeholder` |
@@ -610,7 +616,7 @@ https://cp.xuthus.cc/
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key | `Serilog__WriteTo__8__Args__bodyJsonTemplate` |
+| 配置Key | `Serilog:WriteTo:8:Args:bodyJsonTemplate` |
 | 值域   | 一串字符串 |
 | 默认值   | 空 |
 | 环境变量   | `Ray_Serilog__WriteTo__8__Args__bodyJsonTemplate` |
@@ -618,15 +624,17 @@ https://cp.xuthus.cc/
 
 <a id="markdown-368-pushplus推荐" name="368-pushplus推荐"></a>
 #### 3.6.8. PushPlus[推荐]
+
 官网： http://www.pushplus.plus/doc/ 
 
 <a id="markdown-3681-pushplus的token" name="3681-pushplus的token"></a>
 ##### 3.6.8.1. PushPlus的Token
+
 获取方式请参考官网。
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key | `Serilog__WriteTo__9__Args__token` |
+| 配置Key | `Serilog:WriteTo:9:Args:token` |
 | 值域   | 一串字符串 |
 | 默认值   | 空 |
 | 环境变量   | `Ray_Serilog__WriteTo__9__Args__token` |
@@ -634,11 +642,12 @@ https://cp.xuthus.cc/
 
 <a id="markdown-3682-pushplus的topic" name="3682-pushplus的topic"></a>
 ##### 3.6.8.2. PushPlus的Topic
+
 获取方式请参考官网。
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key | `Serilog__WriteTo__9__Args__topic` |
+| 配置Key | `Serilog:WriteTo:9:Args:topic` |
 | 值域   | 一串字符串 |
 | 默认值   | 空 |
 | 环境变量   | `Ray_Serilog__WriteTo__9__Args__topic` |
@@ -646,11 +655,12 @@ https://cp.xuthus.cc/
 
 <a id="markdown-3683-pushplus的channel" name="3683-pushplus的channel"></a>
 ##### 3.6.8.3. PushPlus的Channel
+
 获取方式请参考官网。
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key | `Serilog__WriteTo__9__Args__channel` |
+| 配置Key | `Serilog:WriteTo:9:Args:channel` |
 | 值域   | 一串字符串，[wechat,webhook,cp,sms,mail] |
 | 默认值   | 空 |
 | 环境变量   | `Ray_Serilog__WriteTo__9__Args__channel` |
@@ -658,13 +668,14 @@ https://cp.xuthus.cc/
 
 <a id="markdown-3684-pushplus的webhook" name="3684-pushplus的webhook"></a>
 ##### 3.6.8.4. PushPlus的Webhook
+
 获取方式请参考官网。
 
 webhook编码(不是地址)，在官网平台设定，仅在channel使用webhook渠道和CP渠道时需要填写
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key | `Serilog__WriteTo__9__Args__webhook` |
+| 配置Key | `Serilog:WriteTo:9:Args:webhook` |
 | 值域   | 一串字符串 |
 | 默认值   | 空 |
 | 环境变量   | `Ray_Serilog__WriteTo__9__Args__webhook` |
@@ -683,7 +694,7 @@ webhook的完整地址，在Teams的Channel中获取，详细获取方式请参�
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key | `Serilog__WriteTo__10__Args__webhook` |
+| 配置Key | `Serilog:WriteTo:10:Args:webhook` |
 | 值域   | 一串字符串 |
 | 默认值   | 空 |
 | 环境变量   | `Ray_Serilog__WriteTo__10__Args__webhook` |
@@ -753,7 +764,7 @@ BiliBiliTool 使用 Serilog 作为日志组件，所以其值域与 Serilog 的�
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key | `Serilog__WriteTo__0__Args__restrictedToMinimumLevel` |
+| 配置Key | `Serilog:WriteTo:0:Args:restrictedToMinimumLevel` |
 | 值域   | [Information,Debug] |
 | 默认值   | 1 |
 | 环境变量   | `Ray_Serilog__WriteTo__0__Args__restrictedToMinimumLevel` |
@@ -770,7 +781,7 @@ BiliBiliTool 使用 Serilog 作为日志组件，所以可以参考 Serilog 的�
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
-| 配置Key | `Serilog__WriteTo__0__Args__outputTemplate` |
+| 配置Key | `Serilog:WriteTo:0:Args:outputTemplate` |
 | 值域   | 字符串 |
 | 默认值   | `[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}` |
 | 环境变量   | `Ray_Serilog__WriteTo__0__Args__outputTemplate` |
