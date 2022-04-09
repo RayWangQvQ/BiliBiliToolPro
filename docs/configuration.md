@@ -8,8 +8,8 @@
     - [1.1. 方式一：修改配置文件](#11-方式一修改配置文件)
     - [1.2. 方式二：命令启动时通过命令行参数配置](#12-方式二命令启动时通过命令行参数配置)
     - [1.3. 方式三：添加环境变量（推荐）](#13-方式三添加环境变量推荐)
-    - [1.4. 方式四：托管在GitHub Actions上，使用GitHub Secrets配置](#14-方式四托管在github-actions上使用github-secrets配置)
-    - [1.5. 方式五：托管在青龙面板上，使用面板的配置文件页配置](#15-方式五托管在青龙面板上使用面板的配置文件页配置)
+    - [1.4. ~~方式四：托管在GitHub Actions上，使用GitHub Secrets配置~~](#14-方式四托管在github-actions上使用github-secrets配置)
+    - [1.5. 方式五：托管在青龙面板上，使用面板的环境变量页或配置文件页进行配置](#15-方式五托管在青龙面板上使用面板的环境变量页或配置文件页进行配置)
 - [2. 优先级](#2-优先级)
 - [3. 详细配置说明](#3-详细配置说明)
     - [3.1. Cookie字符串](#31-cookie字符串)
@@ -135,23 +135,42 @@ dotnet Ray.BiliBiliTool.Console.dll
 注意区分单下划线和双下划线，linux系统使用 `export` 关键字代替 `set` 。
 
 <a id="markdown-14-方式四托管在github-actions上使用github-secrets配置" name="14-方式四托管在github-actions上使用github-secrets配置"></a>
-### 1.4. 方式四：托管在GitHub Actions上，使用GitHub Secrets配置
+### 1.4. ~~方式四：托管在GitHub Actions上，使用GitHub Secrets配置~~
 
-使用GitHub Actions，可以通过添加Secret实现配置。
+已废除，当前不支持使用`GitHub Action`直接运行应用，`GitHub Action`只用于部署
 
-比如，配置微信推送的SCKEY，可以添加如下Secret：
+<details>
 
-Secret Name：`PUSHSCKEY`
+~~使用GitHub Actions，可以通过添加Secret实现配置。~~
 
-Secret Value：`123abc`
+~~比如，配置微信推送的SCKEY，可以添加如下Secret：~~
 
-这些 Secrets 会通过 workflow 里的yml脚本映射为环境变量，在应用启动时作为环境变量配置源传入程序当中，所以使用 GitHub Secrets 配置的本质是使用环境变量配置。
+~~Secret Name：`PUSHSCKEY`~~
+
+~~Secret Value：`123abc`~~
+
+~~这些 Secrets 会通过 workflow 里的yml脚本映射为环境变量，在应用启动时作为环境变量配置源传入程序当中，所以使用 GitHub Secrets 配置的本质是使用环境变量配置。~~
 
 ![添加GitHub Secrets](imgs/git-secrets.png)
 
-<a id="markdown-15-方式五托管在青龙面板上使用面板的配置文件页配置" name="15-方式五托管在青龙面板上使用面板的配置文件页配置"></a>
-### 1.5. 方式五：托管在青龙面板上，使用面板的配置文件页配置
-青龙面板配置，其本质还是通过环境变量进行配置。Linux使用export关键字来添加环境变量，青龙面板中的`配置文件`页面可以用来保存这些export指令。
+</details>
+
+<a id="markdown-15-方式五托管在青龙面板上使用面板的环境变量页或配置文件页进行配置" name="15-方式五托管在青龙面板上使用面板的环境变量页或配置文件页进行配置"></a>
+### 1.5. 方式五：托管在青龙面板上，使用面板的环境变量页或配置文件页进行配置
+
+青龙面板配置，其本质还是通过环境变量进行配置，有如下两种方式。
+
+- 环境变量页[推荐]
+
+例如：
+
+名称：`Ray_BiliBiliCookies__1`
+
+值：`abcde`
+
+![qinglong-env.png](imgs/qinglong-env.png)
+
+- 配置文件页
 
 例如，配置Cookie和推送：
 
@@ -160,8 +179,9 @@ export Ray_BiliBiliCookies__1="_uuid=abc..."
 export Ray_Serilog__WriteTo__9__Args__token="abcde"
 ```
 
-当然，Cookie还可以在青龙面板的`环境变量`页配置，名称是`Ray_BiliBiliCookies__1`或`Ray_BiliBiliCookies__2`，指就是对应的CK。好处是可以方便地通过点击禁用或开启来管理多账号。
+![qinglong-config.png](imgs/qinglong-config.png)
 
+配置文件页添加、修改配置，需要重启青龙容器使之生效，环境变量页则可以立即生效，所以推荐使用环境变量页配置。
 
 <a id="markdown-2-优先级" name="2-优先级"></a>
 ## 2. 优先级
