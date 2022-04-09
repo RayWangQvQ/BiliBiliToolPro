@@ -60,7 +60,7 @@ namespace Ray.BiliBiliTool.Console
                 for (int i = 0; i < _cookieStrFactory.Count; i++)
                 {
                     _cookieStrFactory.CurrentNum = i + 1;
-                    _logger.LogInformation("========= 账号 {num} =========" + Environment.NewLine, _cookieStrFactory.CurrentNum);
+                    _logger.LogInformation("######### 账号 {num} #########{newLine}", _cookieStrFactory.CurrentNum, Environment.NewLine);
 
                     try
                     {
@@ -112,13 +112,13 @@ namespace Ray.BiliBiliTool.Console
             if (!tasks.Any()) return false;
 
             //Cookie
-            _logger.LogInformation("【账号个数】{count}个" + Environment.NewLine, _cookieStrFactory.Count);
+            _logger.LogInformation("【账号个数】{count}个{newLine}", _cookieStrFactory.Count, Environment.NewLine);
             if (_cookieStrFactory.Count == 0) return false;
 
             //是否跳过
             if (_securityOptions.IsSkipDailyTask)
             {
-                _logger.LogWarning("已配置为跳过任务" + Environment.NewLine);
+                _logger.LogWarning("已配置为跳过任务{newLine}", Environment.NewLine);
                 return false;
             }
 
@@ -130,7 +130,7 @@ namespace Ray.BiliBiliTool.Console
             if (_securityOptions.RandomSleepMaxMin > 0)
             {
                 int randomMin = new Random().Next(1, ++_securityOptions.RandomSleepMaxMin);
-                _logger.LogInformation("随机休眠{min}分钟" + Environment.NewLine, randomMin);
+                _logger.LogInformation("随机休眠{min}分钟{newLine}", randomMin, Environment.NewLine);
                 Thread.Sleep(randomMin * 1000 * 60);
             }
 
@@ -139,16 +139,18 @@ namespace Ray.BiliBiliTool.Console
 
         private void DoTasks(string[] tasks)
         {
-            using (var scope = _serviceProvider.CreateScope())
+            using var scope = _serviceProvider.CreateScope();
+            foreach (var task in tasks)
             {
-                foreach (var task in tasks)
+                var type = TaskTypeFactory.Create(task);
+                if (type == null)
                 {
-                    var type = TaskTypeFactory.Create(task);
-                    if (type == null) _logger.LogWarning("任务不存在：{task}", task);
-
-                    var appService = (IAppService)scope.ServiceProvider.GetRequiredService(type);
-                    appService?.DoTask();
+                    _logger.LogWarning("任务不存在：{task}", task);
+                    continue;
                 }
+
+                var appService = (IAppService)scope.ServiceProvider.GetRequiredService(type);
+                appService?.DoTask();
             }
         }
 
