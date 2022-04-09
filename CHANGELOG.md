@@ -25,12 +25,15 @@
 - 【#44】兼容青龙最新版本（v2.12.0），修复因青龙调整目录结构导致的bug
 - 更新`publish-image.yml`，只有`release`时才打`latest tag`，手动运行时不打`latest tag`
 ## 0.0.8
-- 【#55】新增日志推送端：Microsoft Teams
+- 【#55】新增日志推送端：`Microsoft Teams`
 - 【#27】更新README
 ## 0.0.9
-- 【#47】青龙安装dotnet环境，支持arm架构服务器
+- 【#47】青龙安装`dotnet`环境，支持arm架构服务器
 ## 0.1.0
-- 【#62】codeql-analysis.yml可以指定检查的文件类型
-- 【#61】publish-image.yml手动打镜像时支持指定是否打latest的tag
+- 【#62】`codeql-analysis.yml`可以指定检查的文件类型
+- 【#61】`publish-image.yml`手动打镜像时支持指定是否打latest的tag
 - 【#32】新增企业微信的应用推送，实现微信接受推送消息
 - 优化日志格式
+## 0.1.1
+- 【#54】优化青龙shell脚本读取仓库目录方式，解决青龙新老版本切换导致出现多个repo目录的bug
+- 【#82】【#85】合并外部PR，更新了文档
