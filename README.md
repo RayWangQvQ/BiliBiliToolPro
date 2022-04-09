@@ -39,7 +39,7 @@ BiliBiliTool
     - [7.1. 贡献代码](#71-贡献代码)
     - [7.2. 贡献文档](#72-贡献文档)
 - [8. 捐赠支持](#8-捐赠支持)
-- [9. API 参考](#9-api-参考)
+- [9. 其他](#9-其他)
 
 <!-- /TOC -->
 
@@ -299,9 +299,18 @@ dotnet Ray.BiliBiliTool.Console.dll --runTasks=Daily&LiveLottery
 
 感谢支持~
 
-## 9. API 参考
+## 9. 其他
+
+`API`参考：
+
 - [www.bilibili.com](https://www.bilibili.com/)
 
 - [SocialSisterYi/bilibili-API-collect](https://github.com/SocialSisterYi/bilibili-API-collect)
 
 - [JunzhouLiu/BILIBILI-HELPER](https://github.com/JunzhouLiu/BILIBILI-HELPER)
+
+感谢`JetBrain`提供的免费证书支持：
+
+Thanks to `JetBrain` for the free certificate support:
+
+![ReSharper logo](https://resources.jetbrains.com/storage/products/company/brand/logos/ReSharper.svg)
