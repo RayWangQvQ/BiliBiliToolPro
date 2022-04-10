@@ -352,10 +352,9 @@ MigrationBackup/
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
 
-
 #
 .idea/
 tencentScf/.env
 
-# UnitTest's config file
-test/BiliAgentTest/appsettings.Production.json
+# vs code
+.vscode
