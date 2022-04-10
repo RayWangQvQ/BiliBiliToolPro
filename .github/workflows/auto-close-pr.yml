@@ -12,7 +12,7 @@ jobs:
     - uses: roots/issue-closer@v1.1
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
-        pr-close-message: "This PR was automatically closed because it did not meet the requirements."
+        pr-close-message: "This PR was automatically closed because it did not meet the requirements, please check the requirements."
         pr-pattern: ".*请问您是否明白：【yes】 -->.*"
 
   checkTargetBranch:
@@ -24,7 +24,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           target: main
-          change-to: development
+          change-to: develop
           comment: |
-              Your PR was set to `main`, but PRs should be sent to `development`
-              The base branch of this PR has been automatically changed to `development`, please check that there are no merge conflicts.
+              Your PR was set to `main`, but PRs should be sent to `develop`
+              The base branch of this PR has been automatically changed to `develop`, please check that there are no merge conflicts.
