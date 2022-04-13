@@ -122,7 +122,7 @@ Actions 使用 `Serverless Framework` 来部署，通过 `serverless.yml` 来配
 ### 3.2. 方式二：上传zip包部署
 该方式比较简单直观，但是代码是上传是固定版本，想更新的话需要再次手动上传。
 #### 3.2.1. 下载压缩包到本地
-点击[BiliBiliTool/release](https://github.com/RayWangQvQ/BiliBiliTool/releases)，选择最新版本的 `tencent-scf.zip` ，下载到本地
+点击[BiliBiliToolPro/release](https://github.com/RayWangQvQ/BiliBiliToolPro/releases)，选择最新版本的 `tencent-scf.zip` ，下载到本地
 #### 3.2.2. 云函数控制台新增函数服务
 **Ⅰ.进入[云函数控制台](https://console.cloud.tencent.com/scf/)，单击左侧导航栏【函数服务】，进入“函数服务”页面。顶部地域选择一个靠近自己地址的，点击新建按钮。**
 
