@@ -209,10 +209,17 @@ Actions 使用 `Serverless Framework` 来部署，通过 `serverless.yml` 来配
 ## 5. 关于日志
 
 **Ⅰ.腾讯云关于CLS日志的免费额度说明如下：**
+
 ![Tencent-log-docs-1.png](../docs/imgs/Tencent-log-docs-1.png)
+
 **Ⅱ.实测每日运行函数日志花费如图：**
+
 ![Tencent-log-bill-1.png](../docs/imgs/Tencent-log-bill-1.png)
-**Ⅲ.如果需要完全白嫖(即不需要任何费用)的话，可以切至[腾讯云日志服务页](https://console.cloud.tencent.com/cls/overview)**
+
+**Ⅲ.如果需要完全白嫖(即不需要任何费用)的话，可以切至[腾讯云日志服务页](https://console.cloud.tencent.com/cls/overview)*
+
 **Ⅳ.点击侧边栏的日志主题日志主题，如图所示：**
+
 ![Tencent-logpage-1.png](../docs/imgs/Tencent-logpage-1.png)
+
 **Ⅴ.点击删除，则将删除此日志主题，云函数因为无法定位到日志集，就不会产生额外费用。**
