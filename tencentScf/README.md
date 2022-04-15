@@ -205,3 +205,8 @@ Actions 使用 `Serverless Framework` 来部署，通过 `serverless.yml` 来配
 如下图:
 
 ![tencent-scf-test-2](../docs/imgs/tencent-scf-test-2.png)
+
+## 5. 关于日志
+
+腾讯云关于CLS日志的免费额度说明如下：
+![Tencent-log-docs-1.png](../docs/imgs/Tencent-log-docs-1.png)
