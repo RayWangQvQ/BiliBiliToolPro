@@ -40,3 +40,4 @@
 - 感谢`JetBrain`提供免费的证书支持
 ## 0.1.2
 - 修复`auto-close-pr.yml`分支错误的bug
+- 【#107】新增自动检测并关闭长时无状态issues的actions：no-response.yml

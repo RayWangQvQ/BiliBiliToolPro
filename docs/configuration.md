@@ -80,14 +80,11 @@
 
 默认有3个配置文件：`appsettings.json`、`appsettings.Development.json`、`appsettings.Production.json`，分别对应默认、开发与生产环境。
 
-如果运行环境为开发环境，则`appsettings.Development.json`优先级高于`appsettings.json`，即`appsettings.Development.json`里的配置会覆盖默认配置（不是全部覆盖，`appsettings.Development.json`里加了几个就覆盖几个）；
-
-如果运行环境为生产环境，则`appsettings.Production.json`优先级高于`appsettings.json`，即`appsettings.Production.json`里的配置会覆盖默认配置（同样不是全部覆盖，`appsettings.Production.json`里加了几个就覆盖几个）。
-
-对于不是开发人员的大部分人来说，只需要关注`appsettings.Production.json`即可，因为非调试状态下运行的默认环境就是生产环境。此时如需自定义配置，推荐在`appsettings.Production.json`文件中进行修改（并且以后都只修改`appsettings.Production.json`文件，`appsettings.json`只作为默认的全量模板而存在）
+对于不是开发人员的大部分人来说，只需要关注`appsettings.Production.json`即可。
 
 <a id="markdown-12-方式二命令启动时通过命令行参数配置" name="12-方式二命令启动时通过命令行参数配置"></a>
 ### 1.2. 方式二：命令启动时通过命令行参数配置
+
 在使用命令行启动时，可使用`-key=value`的形式附加配置，所有可用的命令行参数均在 [命令行参数映射](../src/Ray.BiliBiliTool.Console/commandLineMappings.json) 文件中。
 
 * 使用跨平台的依赖包
@@ -195,7 +192,8 @@ export Ray_Serilog__WriteTo__9__Args__token="abcde"
 
 <a id="markdown-31-cookie字符串" name="31-cookie字符串"></a>
 ### 3.1. Cookie字符串
-没有它，程序的运行就没有意义，所以它是必填项。
+
+必填。
 
 | TITLE | CONTENT | 示例 |
 | ---------- | -------------- | -------------- |
@@ -232,13 +230,11 @@ export Ray_Serilog__WriteTo__9__Args__token="abcde"
 | 环境变量 | `Ray_Security__IsSkipDailyTask` | `set Ray_Security__IsSkipDailyTask=true` |
 | GitHub Secrets | `ISSKIPDAILYTASK` | Name:`ISSKIPDAILYTASK`  Value: `true`|
 
-若想要彻底关闭，即Actions不运行，点击Actions进入Workflows列表，点击相应任务（如`bilibili-daily-task.yml`）的Workflow，在搜索框右侧有一个三个点的设置按钮，点击按钮后，在弹出的下拉列表里选中`Disable workflow`项即可。
-
 <a id="markdown-322-随机睡眠的最大时长" name="322-随机睡眠的最大时长"></a>
 #### 3.2.2. 随机睡眠的最大时长
-用于设置程序启动后，随机睡眠时间的最大上限值，单位为分钟。
 
-默认为10，即程序每天运行后会随机睡眠1到10分钟。这样可以避免程序每天准点地在同一时间运行，太像机器。
+用于设置程序启动后，随机睡眠时间的最大上限值，单位为分钟。
+这样可以避免程序每天准点地在同一时间运行太像机器。
 
 配置为0则不进行睡眠。
 
@@ -252,11 +248,8 @@ export Ray_Serilog__WriteTo__9__Args__token="abcde"
 
 <a id="markdown-323-两次调用b站api之间的间隔秒数" name="323-两次调用b站api之间的间隔秒数"></a>
 #### 3.2.3. 两次调用B站Api之间的间隔秒数
-因为有朋友反馈，程序在1到2秒内连续调用B站的Api过快，担心会被B站的安全策略检测到，影响自己的账号安全。
 
-所以我添加这个安全策略的配置，可以设置两次Api请求之间的最短时间间隔。
-
-举例来说，之前的5次投币可能是在1秒之内完成的，现在通过配置间隔时间，可以将其变为投币一次后，经过4到5秒才会投下一个，提升程序的演技，让它表现的就像真人在投币一样，骗过BiliBili~ 
+用于设置两次Api请求之间的最短时间间隔，避免程序在1到2秒内连续调用B站的Api过快。
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
@@ -334,9 +327,8 @@ export Ray_Serilog__WriteTo__9__Args__token="abcde"
 
 <a id="markdown-333-优先选择支持的up主id集合" name="333-优先选择支持的up主id集合"></a>
 #### 3.3.3. 优先选择支持的up主Id集合
-通过填入自己选择的up主ID，以后观看、分享和投币，都会优先从配置的up主下面挑选视频，如果没有找到,则会去你的**特别关注**列表中随机再获取，再然后会去**普通关注**列表中随机获取，最后会去排行榜中随机获取。
 
-当前不再推荐使用该配置，建议通过添加到**特别关注**列表来实现优先支持。
+通过填入自己选择的up主ID，以后观看、分享和投币，都会优先从配置的up主下面挑选视频，如果没有找到,则会去你的**特别关注**列表中随机再获取，再然后会去**普通关注**列表中随机获取，最后会去排行榜中随机获取。
 
 **注意：该配置的默认值是作者的upId，如需换掉的话，直接更改即可。**
 
@@ -354,6 +346,7 @@ export Ray_Serilog__WriteTo__9__Args__token="abcde"
 
 <a id="markdown-334-每月几号自动充电" name="334-每月几号自动充电"></a>
 #### 3.3.4. 每月几号自动充电
+
 使用大会员免费赠送的B币券自动充电，如不使用，每个月结束会自动失效。没有B币券或B币券余额不足2，不会进行充电。
 
 |   TITLE   | CONTENT   |
@@ -366,9 +359,10 @@ export Ray_Serilog__WriteTo__9__Args__token="abcde"
 
 <a id="markdown-335-充电对象" name="335-充电对象"></a>
 #### 3.3.5. 充电对象
+
 充电对象的upId，需要配合前一个DayOfAutoCharge配置项使用。-1表示不指定，默认为自己充电；其他Id则会尝试为配置的UpId充电。
 
-**注意：该配置的默认值是作者的upId，如果你已认证通过了创作身份（即可以为自己充电），则建议将其改为为自己充电（配置为-1即可），也可以配置为某个自己指定的创作者upId。
+注意：该配置的默认值是作者的upId，如果你已认证通过了创作身份（即可以为自己充电），则建议将其改为为自己充电（配置为-1即可），也可以配置为某个自己指定的创作者upId。
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
