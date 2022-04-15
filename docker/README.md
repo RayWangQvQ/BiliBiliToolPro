@@ -18,9 +18,11 @@
 
 请确认已安装了docker所需环境（[docker](https://docs.docker.com/get-docker/)和[docker compose](https://docs.docker.com/compose/cli-command/)）。
 
+> Compose V2 将 compose 功能集成到 Docker 平台中，使用 docker compose 命令而不必使用 docker-compose，具体参考上面文档。
+
 Window系统推荐使用Docker Desktop，官方下载安装包，一路鼠标点下去就能装好，运行时也有可视化页面。
 
-安装完成后，请执行`docker --version`检查`docker`是否安装成功，请执行`docker compose --version`检查`docker compose`是否安装成功。
+安装完成后，请执行`docker --version`检查`docker`是否安装成功，请执行`docker-compose version`检查`docker-compose`是否安装成功。
 
 ### 1.2. 良好的网络
 
@@ -31,10 +33,10 @@ Window系统推荐使用Docker Desktop，官方下载安装包，一路鼠标点
 推荐使用 docker-compose 来运行容器，步骤如下：
 
 ### 2.1. 本地创建文件
-在本地任意文件夹下，创建一个目录 `bilibli_tool` ,在其下新建`docker-compose.yml`文件和`my_crontab`文件，文件结构如下：
+在本地任意文件夹下，创建一个目录 `bilibili_tool` ,在其下新建`docker-compose.yml`文件和`my_crontab`文件，文件结构如下：
 
 ```
-bilibli_tool
+bilibili_tool
 ├── docker-compose.yml
 └── my_crontab
 ```
@@ -45,7 +47,7 @@ bilibli_tool
 `my_crontab`的文件内容请拷贝 [默认my_crontab](../docker/sample/my_crontab) 内容，注意末尾有个换行不要丢了。
 
 ### 2.3. 启动并运行容器
-在当前目录（有docker-compose.yml的目录）执行启动容器命令：`docker compose up -d`。
+在当前目录（有docker-compose.yml的目录）执行启动容器命令：`docker-compose up -d`。
 
 提示成功的话，即表示容器启动成功。
 
