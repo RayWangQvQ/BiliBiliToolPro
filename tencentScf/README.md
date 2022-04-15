@@ -219,7 +219,7 @@ Actions 使用 `Serverless Framework` 来部署，通过 `serverless.yml` 来配
 
 **Ⅲ.如果需要完全白嫖(即不需要任何费用)的话，可以切至[腾讯云日志服务页](https://console.cloud.tencent.com/cls/overview)**
 
-**Ⅳ.点击侧边栏的日志主题日志主题，如图所示：**
+**Ⅳ.点击侧边栏的日志主题，并找到云函数所在地域，如图所示：**
 
 ![Tencent-logpage-1.png](../docs/imgs/Tencent-logpage-1.png)
 
