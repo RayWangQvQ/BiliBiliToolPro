@@ -42,3 +42,4 @@
 - 修复`auto-close-pr.yml`分支错误的bug
 - 【#107】新增自动检测并关闭长时无状态issues的actions：no-response.yml
 - 【#73】【#105】【#108】更新、纠正文档内容
+- HostConfiguration，删除了CommandLine配置源，推荐只使用环境变量，同时更新青龙shell脚本内配置
