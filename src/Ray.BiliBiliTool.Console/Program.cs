@@ -52,13 +52,8 @@ namespace Ray.BiliBiliTool.Console
             //承载系统自身的配置：
             hostBuilder.ConfigureHostConfiguration(hostConfigurationBuilder =>
             {
-                hostConfigurationBuilder.AddJsonFile("commandLineMappings.json", false, false);
-
                 Environment.SetEnvironmentVariable(HostDefaults.EnvironmentKey, Environment.GetEnvironmentVariable(Global.EnvironmentKey));
                 hostConfigurationBuilder.AddEnvironmentVariables();
-
-                var hostCmdArgs= args.ToList().Where(x=>x.StartsWith("--")).ToArray();
-                hostConfigurationBuilder.AddCommandLine(hostCmdArgs);//没指定mapping，则命令行入参必须是--形式，因为-会去寻找mapping
             });
 
             //应用配置:
@@ -77,8 +72,7 @@ namespace Ray.BiliBiliTool.Console
                 {
                     //Assembly assembly = Assembly.Load(new AssemblyName(hostBuilderContext.HostingEnvironment.ApplicationName));
                     Assembly assembly = typeof(Program).Assembly;
-                    if (assembly != null)
-                        configurationBuilder.AddUserSecrets(assembly, true);
+                    configurationBuilder.AddUserSecrets(assembly, true);
                 }
 
                 //环境变量：
