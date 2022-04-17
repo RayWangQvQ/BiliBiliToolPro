@@ -21,13 +21,15 @@
         - [3.2.5. 请求B站接口时头部传递的User-Agent](#325-请求b站接口时头部传递的user-agent)
         - [3.2.6. WebProxy（代理）](#326-webproxy代理)
     - [3.3. 每日任务相关](#33-每日任务相关)
-        - [3.3.1. 每日投币数量](#331-每日投币数量)
-        - [3.3.2. 投币时是否同时点赞](#332-投币时是否同时点赞)
-        - [3.3.3. 优先选择支持的up主Id集合](#333-优先选择支持的up主id集合)
-        - [3.3.4. 每月几号自动充电](#334-每月几号自动充电)
-        - [3.3.5. 充电对象](#335-充电对象)
-        - [3.3.6. 每月几号自动领取会员权益](#336-每月几号自动领取会员权益)
-        - [3.3.7. 每月几号进行直播中心银瓜子兑换硬币](#337-每月几号进行直播中心银瓜子兑换硬币)
+        - [3.3.1. 是否开启观看视频任务](#331-是否开启观看视频任务)
+        - [3.3.2. 是否开启分享视频任务](#332-是否开启分享视频任务)
+        - [3.3.3. 每日投币数量](#333-每日投币数量)
+        - [3.3.4. 投币时是否同时点赞](#334-投币时是否同时点赞)
+        - [3.3.5. 优先选择支持的up主Id集合](#335-优先选择支持的up主id集合)
+        - [3.3.6. 每月几号自动充电](#336-每月几号自动充电)
+        - [3.3.7. 充电对象](#337-充电对象)
+        - [3.3.8. 每月几号自动领取会员权益](#338-每月几号自动领取会员权益)
+        - [3.3.9. 每月几号进行直播中心银瓜子兑换硬币](#339-每月几号进行直播中心银瓜子兑换硬币)
     - [3.4. 天选时刻抽奖相关](#34-天选时刻抽奖相关)
         - [3.4.1. 根据关键字排除奖品](#341-根据关键字排除奖品)
         - [3.4.2. 根据关键字指定奖品](#342-根据关键字指定奖品)
@@ -290,6 +292,7 @@ export Ray_Serilog__WriteTo__9__Args__token="abcde"
 
 <a id="markdown-326-webproxy代理" name="326-webproxy代理"></a>
 #### 3.2.6. WebProxy（代理）
+
 支持需要账户密码的代理。
 
 |   TITLE   | CONTENT   |
@@ -302,8 +305,32 @@ export Ray_Serilog__WriteTo__9__Args__token="abcde"
 
 <a id="markdown-33-每日任务相关" name="33-每日任务相关"></a>
 ### 3.3. 每日任务相关
-<a id="markdown-331-每日投币数量" name="331-每日投币数量"></a>
-#### 3.3.1. 每日投币数量
+
+<a id="markdown-331-是否开启观看视频任务" name="331-是否开启观看视频任务"></a>
+#### 3.3.1. 是否开启观看视频任务
+
+|   TITLE   | CONTENT   |
+| ---------- | -------------- |
+| 配置Key | `DailyTaskConfig:IsWatchVideo` |
+| 值域   | [true,false] |
+| 默认值   | true |
+| 环境变量   | `Ray_DailyTaskConfig__IsWatchVideo` |
+| GitHub Secrets  |  |
+
+<a id="markdown-332-是否开启分享视频任务" name="332-是否开启分享视频任务"></a>
+#### 3.3.2. 是否开启分享视频任务
+
+|   TITLE   | CONTENT   |
+| ---------- | -------------- |
+| 配置Key | `DailyTaskConfig:IsShareVideo` |
+| 值域   | [true,false] |
+| 默认值   | true |
+| 环境变量   | `Ray_DailyTaskConfig__IsShareVideo` |
+| GitHub Secrets  |  |
+
+<a id="markdown-333-每日投币数量" name="333-每日投币数量"></a>
+#### 3.3.3. 每日投币数量
+
 每天投币的总目标数量，因为投币获取经验只与次数有关，所以程序每次投币只会投1个，也就是说该配置也表示每日投币次数。
 
 |   TITLE   | CONTENT   |
@@ -314,8 +341,8 @@ export Ray_Serilog__WriteTo__9__Args__token="abcde"
 | 环境变量   | `Ray_DailyTaskConfig__NumberOfCoins` |
 | GitHub Secrets  | `NUMBEROFCOINS` |
 
-<a id="markdown-332-投币时是否同时点赞" name="332-投币时是否同时点赞"></a>
-#### 3.3.2. 投币时是否同时点赞
+<a id="markdown-334-投币时是否同时点赞" name="334-投币时是否同时点赞"></a>
+#### 3.3.4. 投币时是否同时点赞
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
@@ -325,8 +352,8 @@ export Ray_Serilog__WriteTo__9__Args__token="abcde"
 | 环境变量   | `Ray_DailyTaskConfig__SelectLike` |
 | GitHub Secrets  | `SELECTLIKE` |
 
-<a id="markdown-333-优先选择支持的up主id集合" name="333-优先选择支持的up主id集合"></a>
-#### 3.3.3. 优先选择支持的up主Id集合
+<a id="markdown-335-优先选择支持的up主id集合" name="335-优先选择支持的up主id集合"></a>
+#### 3.3.5. 优先选择支持的up主Id集合
 
 通过填入自己选择的up主ID，以后观看、分享和投币，都会优先从配置的up主下面挑选视频，如果没有找到,则会去你的**特别关注**列表中随机再获取，再然后会去**普通关注**列表中随机获取，最后会去排行榜中随机获取。
 
@@ -344,8 +371,8 @@ export Ray_Serilog__WriteTo__9__Args__token="abcde"
 
 ![UpId](imgs/get-up-id.png)
 
-<a id="markdown-334-每月几号自动充电" name="334-每月几号自动充电"></a>
-#### 3.3.4. 每月几号自动充电
+<a id="markdown-336-每月几号自动充电" name="336-每月几号自动充电"></a>
+#### 3.3.6. 每月几号自动充电
 
 使用大会员免费赠送的B币券自动充电，如不使用，每个月结束会自动失效。没有B币券或B币券余额不足2，不会进行充电。
 
@@ -357,8 +384,8 @@ export Ray_Serilog__WriteTo__9__Args__token="abcde"
 | 环境变量   | `Ray_DailyTaskConfig__DayOfAutoCharge` |
 | GitHub Secrets  | `DAYOFAUTOCHARGE` |
 
-<a id="markdown-335-充电对象" name="335-充电对象"></a>
-#### 3.3.5. 充电对象
+<a id="markdown-337-充电对象" name="337-充电对象"></a>
+#### 3.3.7. 充电对象
 
 充电对象的upId，需要配合前一个DayOfAutoCharge配置项使用。-1表示不指定，默认为自己充电；其他Id则会尝试为配置的UpId充电。
 
@@ -372,8 +399,8 @@ export Ray_Serilog__WriteTo__9__Args__token="abcde"
 | 环境变量   | `Ray_DailyTaskConfig__AutoChargeUpId` |
 | GitHub Secrets  | `AUTOCHARGEUPID` |
 
-<a id="markdown-336-每月几号自动领取会员权益" name="336-每月几号自动领取会员权益"></a>
-#### 3.3.6. 每月几号自动领取会员权益
+<a id="markdown-338-每月几号自动领取会员权益" name="338-每月几号自动领取会员权益"></a>
+#### 3.3.8. 每月几号自动领取会员权益
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
@@ -383,8 +410,8 @@ export Ray_Serilog__WriteTo__9__Args__token="abcde"
 | 环境变量   | `Ray_DailyTaskConfig__DayOfReceiveVipPrivilege` |
 | GitHub Secrets  | `DAYOFRECEIVEVIPPRIVILEGE` |
 
-<a id="markdown-337-每月几号进行直播中心银瓜子兑换硬币" name="337-每月几号进行直播中心银瓜子兑换硬币"></a>
-#### 3.3.7. 每月几号进行直播中心银瓜子兑换硬币
+<a id="markdown-339-每月几号进行直播中心银瓜子兑换硬币" name="339-每月几号进行直播中心银瓜子兑换硬币"></a>
+#### 3.3.9. 每月几号进行直播中心银瓜子兑换硬币
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
