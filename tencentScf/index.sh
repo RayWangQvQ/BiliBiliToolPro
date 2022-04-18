@@ -9,7 +9,7 @@ function main_handler () {
     then
         eventMsg=$(echo $EVENT_DATA | grep -Po 'Message[" :]+\K[^"]+')
         echo "触发事件中的附加消息（任务编码）为：$eventMsg"
-        runTasks="-runTasks=$eventMsg"
+        runTasks="--runTasks=$eventMsg"
     else
 	    echo "触发事件中未包含附加消息（任务编码）"
     fi
