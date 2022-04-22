@@ -41,3 +41,14 @@ inputs:
   environment:
     variables: # 根据自己的需要修改
       Ray_BiliBiliCookies__1: 123 # cookie，必填
+      Ray_Security__RandomSleepMaxMin: 10
+      Ray_Security__IntervalSecondsBetweenRequestApi: 30
+      Ray_Security__UserAgent:
+      Ray_DailyTaskConfig__IsWatchVideo: true
+      Ray_DailyTaskConfig__IsShareVideo: true
+      Ray_DailyTaskConfig__NumberOfCoins: 0
+      Ray_DailyTaskConfig__SupportUpIds: 667526012
+      Ray_DailyTaskConfig__DayOfAutoCharge: 0
+      Ray_DailyTaskConfig__DayOfReceiveVipPrivilege: 1
+      Ray_DailyTaskConfig__DayOfExchangeSilver2Coin: 0
+      Ray_Notification__IsSingleAccountSingleNotify: SCT104912T2637vKGYGFcxXw8S4XqgMENz
