@@ -83,4 +83,4 @@ jobs:
     - name: Test APP
       run: |
         cd ./src/Ray.BiliBiliTool.Console
-        dotnet run -runTasks=UnfollowBatched
+        dotnet run --runTasks=UnfollowBatched
