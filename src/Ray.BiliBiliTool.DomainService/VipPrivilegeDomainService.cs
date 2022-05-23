@@ -18,17 +18,19 @@ namespace Ray.BiliBiliTool.DomainService
         private readonly IDailyTaskApi _dailyTaskApi;
         private readonly DailyTaskOptions _dailyTaskOptions;
         private readonly BiliCookie _biliBiliCookie;
+        private readonly ReceiveVipPrivilegeOptions _receiveVipPrivilegeOptionsce;
 
         public VipPrivilegeDomainService(
             ILogger<VipPrivilegeDomainService> logger,
             IDailyTaskApi dailyTaskApi,
             BiliCookie biliBiliCookieOptions,
-            IOptionsMonitor<DailyTaskOptions> dailyTaskOptions
-            )
+            IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
+            IOptionsMonitor<ReceiveVipPrivilegeOptions> receiveVipPrivilegeOptionsce)
         {
             _logger = logger;
             _dailyTaskApi = dailyTaskApi;
             _dailyTaskOptions = dailyTaskOptions.CurrentValue;
+            _receiveVipPrivilegeOptionsce = receiveVipPrivilegeOptionsce.CurrentValue;
             _biliBiliCookie = biliBiliCookieOptions;
         }
 
@@ -38,7 +40,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// <param name="useInfo"></param>
         public bool ReceiveVipPrivilege(UserInfo userInfo)
         {
-            if (_dailyTaskOptions.DayOfReceiveVipPrivilege == 0)
+            if (!_receiveVipPrivilegeOptionsce.IsEnable)
             {
                 _logger.LogInformation("已配置为关闭，跳过");
                 return false;
@@ -52,6 +54,7 @@ namespace Ray.BiliBiliTool.DomainService
                 return false;
             }
 
+            /*
             int targetDay = _dailyTaskOptions.DayOfReceiveVipPrivilege == -1
                 ? 1
                 : _dailyTaskOptions.DayOfReceiveVipPrivilege;
@@ -65,6 +68,7 @@ namespace Ray.BiliBiliTool.DomainService
                 _logger.LogInformation("跳过");
                 return false;
             }
+            */
 
             var suc1 = ReceiveVipPrivilege(1);
             var suc2 = ReceiveVipPrivilege(2);
