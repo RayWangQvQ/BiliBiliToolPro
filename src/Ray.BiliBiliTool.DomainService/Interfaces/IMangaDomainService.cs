@@ -16,6 +16,11 @@ namespace Ray.BiliBiliTool.DomainService.Interfaces
         void MangaSign();
 
         /// <summary>
+        /// 阅读
+        /// </summary>
+        void MangaRead();
+
+        /// <summary>
         /// 获取大会员权益
         /// </summary>
         /// <param name="reason_id"></param>

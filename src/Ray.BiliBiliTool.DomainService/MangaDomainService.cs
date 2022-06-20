@@ -60,6 +60,24 @@ namespace Ray.BiliBiliTool.DomainService
         }
 
         /// <summary>
+        /// 漫画阅读
+        /// </summary>
+        public void MangaRead()
+        {
+            BiliApiResponse response = _mangaApi.ReadManga(_dailyTaskOptions.DevicePlatform).GetAwaiter().GetResult();
+
+            if (response.Code == 0)
+            {
+                _logger.LogInformation("【漫画阅读】成功, 阅读漫画为：堀与宫村");
+            }
+            else
+            {
+                _logger.LogInformation("【漫画阅读】失败");
+                _logger.LogInformation("【原因】{msg}", response.Message);
+            }
+        }
+
+        /// <summary>
         /// 获取大会员漫画权益
         /// </summary>
         /// <param name="reason_id">权益号，由https://api.bilibili.com/x/vip/privilege/my得到权益号数组，取值范围为数组中的整数
