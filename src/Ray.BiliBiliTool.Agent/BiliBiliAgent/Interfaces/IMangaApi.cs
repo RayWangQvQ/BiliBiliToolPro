@@ -22,12 +22,19 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         Task<BiliApiResponse> ClockIn(string platform);
 
         /// <summary>
+        /// 漫画阅读
+        /// </summary>
+        /// <param name="platform"></param>
+        /// <returns></returns>
+        [HttpPost("/twirp/bookshelf.v1.Bookshelf/AddHistory?platform={platform}&comic_id=27355&ep_id=381662")]
+        Task<BiliApiResponse> ReadManga(string platform);
+
+        /// <summary>
         /// 获取会员漫画奖励
         /// </summary>
         /// <param name="reason_id"></param>
         /// <returns></returns>
         [HttpPost("/twirp/user.v1.User/GetVipReward?reason_id={reason_id}")]
         Task<BiliApiResponse<MangaVipRewardResponse>> ReceiveMangaVipReward(int reason_id);
-
     }
 }

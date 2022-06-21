@@ -68,7 +68,7 @@ namespace Ray.BiliBiliTool.Application
             //签到：
             LiveSign();
             MangaSign();
-
+            MangaRead();
             ExchangeSilver2Coin();
 
             //领福利：
@@ -188,6 +188,15 @@ namespace Ray.BiliBiliTool.Application
         private void MangaSign()
         {
             _mangaDomainService.MangaSign();
+        }
+
+        /// <summary>
+        /// 漫画阅读
+        /// </summary>
+        [TaskInterceptor("漫画阅读", rethrowWhenException: false)]
+        private void MangaRead()
+        {
+            _mangaDomainService.MangaRead();
         }
 
         /// <summary>
