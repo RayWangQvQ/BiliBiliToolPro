@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -9,7 +10,7 @@ namespace Ray.BiliBiliTool.DomainService.Interfaces
     /// </summary>
     public interface IDonateCoinDomainService : IDomainService
     {
-        void AddCoinsForVideos();
+        void AddCoinsForVideos(UserInfo userInfo);
 
         Tuple<string, string> TryGetCanDonatedVideo();
 
