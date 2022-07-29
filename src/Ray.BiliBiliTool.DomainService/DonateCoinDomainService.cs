@@ -69,8 +69,13 @@ namespace Ray.BiliBiliTool.DomainService
         /// <summary>
         /// 完成投币任务
         /// </summary>
-        public void AddCoinsForVideos()
+        public void AddCoinsForVideos(UserInfo userInfo)
         {
+            if(userInfo.Level_info.Current_level >= 6)
+            {
+                _logger.LogInformation("【投币】 : 你已经是6级大佬了，不需要投币");
+                return;
+            }
             int needCoins = GetNeedDonateCoinNum();
             if (needCoins <= 0) return;
 
