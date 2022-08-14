@@ -108,7 +108,12 @@ sh -c "$(wget https://ghproxy.com/https://raw.githubusercontent.com/RayWangQvQ/B
 
 ### 2.1 订阅管理
 
+```
 分支：develop
+白名单：bili_dev_task_.+\.sh
+```
+
+其他同上。
 
 ### 2.2 定时任务拉库
 
