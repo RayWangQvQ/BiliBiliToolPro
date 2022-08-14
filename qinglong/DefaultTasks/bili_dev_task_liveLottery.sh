@@ -8,7 +8,7 @@ dir_shell=$QL_DIR/shell
 bili_repo="raywangqvq_bilibilitoolpro_develop"
 
 echo "repo目录: $dir_repo"
-bili_repo_dir="$(find $dir_repo -type d -name $bili_repo | head -1)"
+bili_repo_dir="$(find $dir_repo -type d -iname $bili_repo | head -1)"
 echo -e "bili仓库目录: $bili_repo_dir\n"
 
 cd $bili_repo_dir
