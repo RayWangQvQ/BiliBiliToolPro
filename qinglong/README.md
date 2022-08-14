@@ -12,7 +12,11 @@
     - [1.3. 登录青龙面板并修改配置](#13-登录青龙面板并修改配置)
     - [1.4. 添加bili配置](#14-添加bili配置)
     - [1.5. 在青龙面板中添加拉库定时任务](#15-在青龙面板中添加拉库定时任务)
+        - [1.5.1 订阅管理](#151-订阅管理)
+        - [1.5.2 定时任务拉库](#152-定时任务拉库)
 - [2. 先行版](#2-先行版)
+    - [2.1 订阅管理](#21-订阅管理)
+    - [2.2 定时任务拉库](#22-定时任务拉库)
 - [3. GitHub加速](#3-github加速)
 
 <!-- /TOC -->
@@ -44,21 +48,45 @@ sh -c "$(wget https://ghproxy.com/https://raw.githubusercontent.com/RayWangQvQ/B
 青龙面板，`环境变量`页，添加环境变量：
 
 ```
-名称：Ray_BiliBiliCookies__0
+名称：Ray_BiliBiliCookies__1
 值：abc
 ```
 
-`abc`为你抓取到的真实cookie字符串。
+```
+名称：Ray_BiliBiliCookies__2
+值：defg
+```
+
+`abc`、`defg`为你抓取到的真实cookie字符串。
 
 ![qinglong-env.png](../docs/imgs/qinglong-env.png)
 
 
 ### 1.5. 在青龙面板中添加拉库定时任务
+
+两种方式：
+#### 1.5.1 订阅管理
+
+```
+名称：Bilibili
+类型：公开仓库
+链接：https://github.com/RayWangQvQ/BiliBiliToolPro.git
+定时类型：crontab
+定时规则：2 2 28 * *
+白名单：bili_task_.+\.sh
+文件后缀：sh
+```
+
+没提到的不要动。
+
+保存后，点击运行按钮，运行拉库。
+
+#### 1.5.2 定时任务拉库
 青龙面板，`定时任务`页，右上角`添加任务`，填入以下信息：
 
 ```
 名称：拉取Bili库
-命令：ql repo https://github.com/raywangqvq/bilibilitoolpro.git "bili_task_"
+命令：ql repo https://github.com/RayWangQvQ/BiliBiliToolPro.git "bili_task_"
 定时规则：2 2 28 * *
 ```
 
@@ -71,11 +99,20 @@ sh -c "$(wget https://ghproxy.com/https://raw.githubusercontent.com/RayWangQvQ/B
 ![qinglong-tasks.png](../docs/imgs/qinglong-tasks.png)
 
 ## 2. 先行版
-修改拉库命令为`ql repo https://github.com/raywangqvq/bilibilitoolpro.git "bili_dev_task_" "" "" "develop"`可改为拉取develop分支的代码。
 
-develop分支的代码会超前于默认的main分支，包含当前正在开发的新功能。
+青龙拉库时可以指定分支，develop分支的代码会超前于默认的main分支，包含当前正在开发的新功能。
 
 想提前体验新功能的朋友可以尝试切换先行版，但同时也意味着稳定性会相应降低（其实是相当于在帮我内测测试bug了~🤨）。
 
+方式有两种：
+
+### 2.1 订阅管理
+
+分支：develop
+
+### 2.2 定时任务拉库
+
+修改拉库命令为`ql repo https://github.com/RayWangQvQ/BiliBiliToolPro.git "bili_dev_task_" "" "" "develop"`
+
 ## 3. GitHub加速
-拉库时，如果服务器在国内，访问GitHub速度慢，可以在仓库地址前加上 `https://ghproxy.com/` 进行加速, 如：`ql repo https://ghproxy.com/https://github.com/raywangqvq/bilibilitoolpro.git "bili_task_"`
+拉库时，如果服务器在国内，访问GitHub速度慢，可以在仓库地址前加上 `https://ghproxy.com/` 进行加速, 如：`ql repo https://ghproxy.com/https://github.com/RayWangQvQ/BiliBiliToolPro.git "bili_task_"`
