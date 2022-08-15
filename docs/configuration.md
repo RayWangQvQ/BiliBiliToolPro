@@ -611,7 +611,7 @@ P.S.访问链接需要能访问“外网”，有vpn的挂vpn。
 | 配置Key | `Serilog:WriteTo:6:Args:turboScKey` |
 | 值域   | 一串字符串 |
 | 默认值   | 空 |
-| 环境变量   | `Ray_Serilog__WriteTo__6__Args__turboScKey=abcdefg` |
+| 环境变量   | `Ray_Serilog__WriteTo__6__Args__turboScKey` |
 | GitHub Secrets  | `PUSHSERVERTSCKEY` |
 
 <a id="markdown-366-酷推" name="366-酷推"></a>
