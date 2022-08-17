@@ -22,7 +22,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.VipTask
                 logger.LogInformation("-{title}", moduleItem.module_title);
                 foreach (var commonTaskItem in moduleItem.common_task_item)
                 {
-                    logger.LogInformation("--{title}：{status}",
+                    logger.LogInformation("---{title}：{status}",
                         commonTaskItem.title,
                         commonTaskItem.state == 3 ? "√" : "X");
                 }
@@ -51,7 +51,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.VipTask
 
         public List<Histtory> Histories { get; set; } = new List<Histtory>();
 
-        public Histtory TodayHistory => Histories.FirstOrDefault(x => x.Day.Date.Equals(DateTime.Today.Date));
+        public Histtory TodayHistory => Histories.FirstOrDefault(x => x.Is_today);
 
         public bool IsTodaySigned => TodayHistory?.Signed == true;
     }
@@ -91,5 +91,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.VipTask
         public bool Signed { get; set; }
 
         public int Score { get; set; }
+
+        public bool Is_today { get; set; }
     }
 }

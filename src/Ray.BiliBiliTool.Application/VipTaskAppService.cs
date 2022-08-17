@@ -19,23 +19,17 @@ namespace Ray.BiliBiliTool.Application
     {
         private readonly ILogger<VipTaskAppService> _logger;
         private readonly IConfiguration _configuration;
-        private readonly SecurityOptions _securityOptions;
         private readonly IVipTaskApi _vipApi;
-        private readonly BiliCookie _cookie;
 
         public VipTaskAppService(
             IConfiguration configuration,
-            IOptionsMonitor<SecurityOptions> securityOptions,
             ILogger<VipTaskAppService> logger,
-            IVipTaskApi vipApi,
-            BiliCookie cookie
+            IVipTaskApi vipApi
             )
         {
             _configuration = configuration;
-            _securityOptions = securityOptions.CurrentValue;
             _logger = logger;
             _vipApi = vipApi;
-            _cookie = cookie;
         }
 
         [TaskInterceptor("大会员大积分", TaskLevel.One)]
@@ -98,8 +92,8 @@ namespace Ray.BiliBiliTool.Application
             if (infoResult.Code != 0) throw new Exception(infoResult.ToJson());
             info = infoResult.Data;
 
+            _logger.LogInformation("今日可获得签到积分：{score}", info.Task_info.Sing_task_item.TodayHistory?.Score);
             _logger.LogInformation(info.Task_info.Sing_task_item.IsTodaySigned ? "签到成功" : "签到失败");
-            _logger.LogInformation("今日获得签到积分：{score}", info.Task_info.Sing_task_item.TodayHistory?.Score);
             _logger.LogInformation("累计签到{count}天", info.Task_info.Sing_task_item.Count);
 
             return info;
@@ -108,9 +102,7 @@ namespace Ray.BiliBiliTool.Application
         [TaskInterceptor("福利任务", TaskLevel.Two, false)]
         private VipTaskInfo Bonus(VipTaskInfo info)
         {
-            var bonusTask = info.Task_info.Modules.First(x => x.module_title == "福利任务")
-                .common_task_item
-                .First(x => x.task_code == "bonus");
+            var bonusTask = GetTarget(info);
 
             //如果状态不等于3，则做
             if (bonusTask.state == 3)
@@ -135,22 +127,25 @@ namespace Ray.BiliBiliTool.Application
                 var infoResult = _vipApi.GetTaskList().Result;
                 if (infoResult.Code != 0) throw new Exception(infoResult.ToJson());
                 info = infoResult.Data;
-                bonusTask = info.Task_info.Modules.First(x => x.module_title == "福利任务")
-                    .common_task_item
-                    .First(x => x.task_code == "bonus");
+                bonusTask = GetTarget(info);
 
                 _logger.LogInformation("确认：{re}", bonusTask.state == 3 && bonusTask.complete_times >= 1);
             }
 
             return info;
+
+            CommonTaskItem GetTarget(VipTaskInfo info)
+            {
+                return info.Task_info.Modules.First(x => x.module_title == "福利任务")
+                    .common_task_item
+                    .First(x => x.task_code == "bonus");
+            }
         }
 
         [TaskInterceptor("体验任务", TaskLevel.Two, false)]
         private VipTaskInfo Privilege(VipTaskInfo info)
         {
-            var privilegeTask = info.Task_info.Modules.First(x => x.module_title == "体验任务")
-                .common_task_item
-                .First(x => x.task_code == "privilege");
+            var privilegeTask = GetTarget(info);
 
             //如果状态不等于3，则做
             if (privilegeTask.state == 3)
@@ -175,11 +170,16 @@ namespace Ray.BiliBiliTool.Application
                 var infoResult = _vipApi.GetTaskList().Result;
                 if (infoResult.Code != 0) throw new Exception(infoResult.ToJson());
                 info = infoResult.Data;
-                privilegeTask = info.Task_info.Modules.First(x => x.module_title == "体验任务")
-                    .common_task_item
-                    .First(x => x.task_code == "privilege");
+                privilegeTask = GetTarget(info);
 
                 _logger.LogInformation("确认：{re}", privilegeTask.state == 3 && privilegeTask.complete_times >= 1);
+            }
+
+            CommonTaskItem GetTarget(VipTaskInfo info)
+            {
+                return info.Task_info.Modules.First(x => x.module_title == "体验任务")
+                    .common_task_item
+                    .First(x => x.task_code == "privilege");
             }
 
             return info;
@@ -283,7 +283,6 @@ namespace Ray.BiliBiliTool.Application
             return info;
         }
 
-
         [TaskInterceptor("观看任意正片内容", TaskLevel.Two, false)]
         private VipTaskInfo ViewVideo(VipTaskInfo info)
         {
@@ -315,7 +314,6 @@ namespace Ray.BiliBiliTool.Application
 
             return info;
         }
-
 
         [TaskInterceptor("购买单点付费影片（仅领取）", TaskLevel.Two, false)]
         private VipTaskInfo BuyVipVideo(VipTaskInfo info)
