@@ -12,6 +12,7 @@ using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Application.Attributes;
 using Ray.BiliBiliTool.Application.Contracts;
 using Ray.BiliBiliTool.Config.Options;
+using Ray.BiliBiliTool.DomainService.Interfaces;
 
 namespace Ray.BiliBiliTool.Application
 {
@@ -20,21 +21,26 @@ namespace Ray.BiliBiliTool.Application
         private readonly ILogger<VipBigPointAppService> _logger;
         private readonly IConfiguration _configuration;
         private readonly IVipBigPointApi _vipApi;
+        private readonly IAccountDomainService _loginDomainService;
 
         public VipBigPointAppService(
             IConfiguration configuration,
             ILogger<VipBigPointAppService> logger,
-            IVipBigPointApi vipApi
+            IVipBigPointApi vipApi,
+            IAccountDomainService loginDomainService
             )
         {
             _configuration = configuration;
             _logger = logger;
             _vipApi = vipApi;
+            _loginDomainService = loginDomainService;
         }
 
         [TaskInterceptor("大会员大积分", TaskLevel.One)]
         public override void DoTask()
         {
+            GetUserInfo();
+
             var re = _vipApi.GetTaskList().Result;
 
             if (re.Code != 0) throw new Exception(re.ToJson());
@@ -71,6 +77,13 @@ namespace Ray.BiliBiliTool.Application
             taskInfo = BuyVipMall(taskInfo);
 
             taskInfo.LogInfo(_logger);
+        }
+
+        [TaskInterceptor("测试Cookie")]
+        private void GetUserInfo()
+        {
+            UserInfo userInfo = _loginDomainService.LoginByCookie();
+            if (userInfo == null) throw new Exception("登录失败，请检查Cookie");//终止流程
         }
 
         [TaskInterceptor("签到", TaskLevel.Two, false)]
