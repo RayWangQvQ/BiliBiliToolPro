@@ -8,9 +8,9 @@ namespace Ray.BiliBiliTool.Application.Contracts
     /// <summary>
     /// 每日自动任务
     /// </summary>
-    [Description("VipTask")]
+    [Description("VipBigPoint")]
 
-    public interface IVipTaskAppService : IAppService
+    public interface IVipBigPointAppService : IAppService
     {
     }
 }

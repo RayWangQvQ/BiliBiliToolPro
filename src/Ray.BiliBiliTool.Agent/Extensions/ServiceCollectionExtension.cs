@@ -67,7 +67,7 @@ namespace Ray.BiliBiliTool.Agent.Extensions
             services.AddBiliBiliClientApi<IVideoApi>("https://api.bilibili.com");
             services.AddBiliBiliClientApi<IVideoWithoutCookieApi>("https://api.bilibili.com", false);
 
-            services.AddBiliBiliClientApi<IVipTaskApi>("https://api.bilibili.com");
+            services.AddBiliBiliClientApi<IVipBigPointApi>("https://api.bilibili.com");
 
             return services;
         }

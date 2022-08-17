@@ -15,16 +15,16 @@ using Ray.BiliBiliTool.Config.Options;
 
 namespace Ray.BiliBiliTool.Application
 {
-    public class VipTaskAppService : AppService, IVipTaskAppService
+    public class VipBigPointAppService : AppService, IVipBigPointAppService
     {
-        private readonly ILogger<VipTaskAppService> _logger;
+        private readonly ILogger<VipBigPointAppService> _logger;
         private readonly IConfiguration _configuration;
-        private readonly IVipTaskApi _vipApi;
+        private readonly IVipBigPointApi _vipApi;
 
-        public VipTaskAppService(
+        public VipBigPointAppService(
             IConfiguration configuration,
-            ILogger<VipTaskAppService> logger,
-            IVipTaskApi vipApi
+            ILogger<VipBigPointAppService> logger,
+            IVipBigPointApi vipApi
             )
         {
             _configuration = configuration;
