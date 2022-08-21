@@ -18,9 +18,9 @@
 <!-- /TOC -->
 ## 1. 前期工作
 
-### 1.1. docker环境
+### 1.1. Docker环境
 
-请确认已安装了docker所需环境（[docker](https://docs.docker.com/get-docker/)和[docker compose](https://docs.docker.com/compose/cli-command/)）。
+请确认已安装了Docker所需环境（[Docker](https://docs.docker.com/get-docker/)和[Docker Compose](https://docs.docker.com/compose/cli-command/)）。
 
 Window系统推荐使用Docker Desktop，官方下载安装包，一路鼠标点下去就能装好，运行时也有可视化页面。
 
