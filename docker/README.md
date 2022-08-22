@@ -42,6 +42,7 @@ Window系统推荐使用Docker Desktop，官方下载安装包，一路鼠标点
 # 下载项目里面的模板，`my_crontab`文件以及`docker-compose.yml`文件
 
 # 如需修改定时运行时间，请修改`my_crontab`中的cron表达式，然后再次执行启动容器命令。
+# 或考虑配置`Ray_Crontab`环境变量
 wget https://github.com/RayWangQvQ/BiliBiliToolPro/blob/main/docker/sample/my_crontab
 
 # 根据 docker-compose.yaml 里面的注释编辑所需配置，`environment` 下可以通过环境变量自由添加自定义配置，其中Cookie是必填的，所以请至少填入Cookie并保存。
