@@ -8,7 +8,10 @@ echo "=>完成"
 
 echo "[step 2/4]配置cron定时任务"
 echo "BASH_ENV=/etc/cron.env" > /etc/cron.d/bilicron
-if [ -e "/app/custon_crontab" ]; then 
+if ! [ -z $Ray_Crontab ]; then
+	echo "=>检测到对应的环境变量，使用其值作为配置"
+	echo $Ray_Crontab >> /etc/cron.d/bilicron
+elif [ -e "/app/custon_crontab" ]; then 
 	echo "=>检测到自定义了cron定时任务，使用自定义配置"
 	cat /app/custom_crontab >> /etc/cron.d/bilicron
 else
