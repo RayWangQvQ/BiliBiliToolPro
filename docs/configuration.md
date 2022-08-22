@@ -643,6 +643,7 @@ https://cp.xuthus.cc/
 | 默认值   | 空 |
 | 环境变量   | `Ray_Serilog__WriteTo__8__Args__api` |
 | GitHub Secrets  | `PUSHOTHERAPI` |
+
 <a id="markdown-3672-placeholder" name="3672-placeholder"></a>
 ##### 3.6.7.2. placeholder
 
@@ -653,6 +654,7 @@ https://cp.xuthus.cc/
 | 默认值   | 空 |
 | 环境变量   | `Ray_Serilog__WriteTo__8__Args__placeholder` |
 | GitHub Secrets  | `PUSHOTHERPLACEHOLDER` |
+
 <a id="markdown-3673-bodyjsontemplate" name="3673-bodyjsontemplate"></a>
 ##### 3.6.7.3. bodyJsonTemplate
 
