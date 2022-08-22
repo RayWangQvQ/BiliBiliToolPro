@@ -8,8 +8,7 @@ echo "=>完成"
 
 echo "[step 2/4]配置cron定时任务"
 echo "BASH_ENV=/etc/cron.env" > /etc/cron.d/bilicron
-myarray=(`find /app -maxdepth 1 -name "custom_crontab"`)
-if [ ${#myarray[@]} -gt 0 ]; then 
+if [ -e "/app/custon_crontab" ]; then 
 	echo "=>检测到自定义了cron定时任务，使用自定义配置"
 	cat /app/custom_crontab >> /etc/cron.d/bilicron
 else
