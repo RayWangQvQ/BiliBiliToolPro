@@ -14,10 +14,12 @@ namespace Ray.Serilog.Sinks.TelegramBatched
     {
         private readonly string _botToken;
         private readonly string _chatId;
+        private readonly string _proxy;
 
         public TelegramBatchedSink(
             string botToken,
             string chatId,
+            string proxy,
             Predicate<LogEvent> predicate,
             bool sendBatchesAsOneMessages,
             IFormatProvider formatProvider,
@@ -26,6 +28,7 @@ namespace Ray.Serilog.Sinks.TelegramBatched
         {
             _botToken = botToken;
             _chatId = chatId;
+            _proxy = proxy;
         }
 
         public override void Emit(LogEvent logEvent)
@@ -34,7 +37,7 @@ namespace Ray.Serilog.Sinks.TelegramBatched
             base.Emit(logEvent);
         }
 
-        protected override PushService PushService => new TelegramApiClient(_botToken, _chatId, 5);
+        protected override PushService PushService => new TelegramApiClient(_botToken, _chatId, _proxy, 5);
 
         public override void Dispose()
         {
