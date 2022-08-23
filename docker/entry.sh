@@ -3,17 +3,20 @@ set -e
 
 # https://stackoverflow.com/questions/27771781/how-can-i-access-docker-set-environment-variables-from-a-cron-job
 echo "[step 1/4]导入环境变量"
-printenv | grep -v "no_proxy" > /etc/environment
+declare -p | grep -v "no_proxy" > /etc/cron.env
 echo "=>完成"
 
 echo "[step 2/4]配置cron定时任务"
-myarray=(`find /app -maxdepth 1 -name "custom_crontab"`)
-if [ ${#myarray[@]} -gt 0 ]; then 
+echo "BASH_ENV=/etc/cron.env" > /etc/cron.d/bilicron
+if ! [ -z $Ray_Crontab ]; then
+	echo "=>检测到对应的环境变量，使用其值作为配置"
+	echo $Ray_Crontab >> /etc/cron.d/bilicron
+elif [ -e "/app/custom_crontab" ]; then 
 	echo "=>检测到自定义了cron定时任务，使用自定义配置"
-	cp /app/custom_crontab /etc/cron.d/bilicron
+	cat /app/custom_crontab >> /etc/cron.d/bilicron
 else
 	echo "=>使用默认cron定时任务配置"
-	cp /app/crontab /etc/cron.d/bilicron
+	cat /app/crontab >> /etc/cron.d/bilicron
 fi
 echo "=>完成"
 

@@ -270,7 +270,7 @@ dotnet Ray.BiliBiliTool.Console.dll --runTasks=Daily&LiveLottery
 
 * 确认没有同类 issue 后，自己可新建 issue，描述问题或建议
 
-* 如果想自己解决，请 fork 仓库后，在**devlop 分支**进行编码开发，完成后**提交 pr 到 devlop 分支**，并标注解决的 issue 编号
+* 如果想自己解决，请 fork 仓库后，在**develop 分支**进行编码开发，完成后**提交 pr 到 develop 分支**，并标注解决的 issue 编号
 
 我会尽快进行代码审核，测试成功后会合并入 main 主分支，提前感谢您的贡献。
 
