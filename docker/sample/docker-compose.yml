@@ -4,10 +4,9 @@ services:
   bilibili_tool:
     image: zai7lou/bilibili_tool_pro
     container_name: bilibili_tool_pro
-    restart: always
+    # restart: always
     volumes:
       - ./Logs:/app/Logs
-      - ./my_crontab:/app/custom_crontab
     tty: true
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
@@ -16,6 +15,12 @@ services:
       # Cookie字符串（必填）：
       - Ray_BiliBiliCookies__1=
       - Ray_BiliBiliCookies__2=
+
+      # 定时任务
+      - Ray_DailyTaskConfig__Cron=
+      - Ray_LiveLotteryTaskConfig__Cron=
+      - Ray_UnfollowBatchedTaskConfig__Cron=
+      - Ray_VipBigPointConfig__Cron=
 
       # UA：
       - Ray_Security__UserAgent=

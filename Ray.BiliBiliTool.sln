@@ -75,7 +75,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sample", "sample", "{2F1CB892-336C-4672-8A0A-FBAEB4B9EA8A}"
 	ProjectSection(SolutionItems) = preProject
 		docker\sample\docker-compose.yml = docker\sample\docker-compose.yml
-		docker\sample\my_crontab = docker\sample\my_crontab
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ray.Serilog.Sinks.Batched", "src\Ray.Serilog.Sinks\Ray.Serilog.Sinks.Batched\Ray.Serilog.Sinks.Batched.csproj", "{46EF6150-5D68-46B5-AA89-4198185FAF1A}"
