@@ -53,7 +53,7 @@ wget https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/src/Ray.B
 wget https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/docker/sample/docker-compose.yml
 
 # 启动
-docker-compose up -d
+docker compose up -d
 
 # 查看启动日志
 docker logs -f bilibili_tool_pro
@@ -63,22 +63,24 @@ docker logs -f bilibili_tool_pro
 
 根据 docker-compose.yaml 里面的注释编辑所需配置，`environment` 下可以通过环境变量自由添加自定义配置，其中Cookie是必填的，所以请至少填入Cookie并保存。
 
-保存后，重新运行下`docker-compose up -d`
+保存后，重新运行下`docker compose up -d`
 
 最终文件结构如下：
 
+```
 bili
 ├── appsettings.json
 └── docker-compose.yml
+```
 
 ### 2.3. 其他命令参考
 
 ```
 # 启动 docker-compose
-docker-compose up -d
+docker compose up -d
 
 # 停止 docker-compose
-docker-compose stop
+docker compose stop
 
 # 查看实时日志
 docker logs -f bilibili_tool_pro
@@ -87,7 +89,7 @@ docker logs -f bilibili_tool_pro
 docker exec -it bilibili_tool_pro /bin/bash
 
 # 手动更新容器
-docker-compose pull && docker-compose up -d
+docker compose pull && docker compose up -d
 ```
 
 ## 3. 方式二：Docker指令
