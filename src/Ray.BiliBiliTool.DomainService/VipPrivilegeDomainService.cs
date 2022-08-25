@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
@@ -47,8 +46,8 @@ namespace Ray.BiliBiliTool.DomainService
             }
 
             //大会员类型
-            int vipType = userInfo.GetVipType();
-            if (vipType != 2)
+            VipType vipType = userInfo.GetVipType();
+            if (vipType != VipType.Annual)
             {
                 _logger.LogInformation("普通会员和月度大会员每月不赠送B币券，不需要领取权益喽");
                 return false;

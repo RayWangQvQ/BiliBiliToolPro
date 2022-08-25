@@ -44,6 +44,7 @@
         - [3.6.2. Telegram机器人](#362-telegram机器人)
             - [3.6.2.1. botToken](#3621-bottoken)
             - [3.6.2.2. chatId](#3622-chatid)
+            - [3.6.2.3. proxy](#3623-proxy)
         - [3.6.3. 企业微信机器人](#363-企业微信机器人)
             - [3.6.3.1. webHookUrl](#3631-webhookurl)
         - [3.6.4. 钉钉机器人](#364-钉钉机器人)
@@ -70,6 +71,7 @@
     - [3.7. 日志相关](#37-日志相关)
         - [3.7.1. Console日志输出等级](#371-console日志输出等级)
         - [3.7.2. Console日志输出样式](#372-console日志输出样式)
+        - [3.7.3. crontab相关](#373-crontab相关)
 
 <!-- /TOC -->
 
@@ -557,6 +559,20 @@ P.S.访问链接需要能访问“外网”，有vpn的挂vpn。
 | 命令行示范   | 无 |
 | GitHub Secrets  | `PUSHTGCHATID`|
 
+<a id="markdown-3623-proxy" name="3623-proxy"></a>
+##### 3.6.2.3. proxy
+
+使用代理
+
+|   TITLE   | CONTENT   |
+| ---------- | -------------- |
+| 配置Key | `Serilog:WriteTo:3:Args:proxy` |
+| 值域   | 一串字符串，格式为user:password@host:port |
+| 默认值   | 空 |
+| 环境变量   | `Ray_Serilog__WriteTo__3__Args__proxy` |
+| 命令行示范   | 无 |
+| GitHub Secrets  | ``|
+
 <a id="markdown-363-企业微信机器人" name="363-企业微信机器人"></a>
 #### 3.6.3. 企业微信机器人
 
@@ -642,6 +658,7 @@ https://cp.xuthus.cc/
 | 默认值   | 空 |
 | 环境变量   | `Ray_Serilog__WriteTo__8__Args__api` |
 | GitHub Secrets  | `PUSHOTHERAPI` |
+
 <a id="markdown-3672-placeholder" name="3672-placeholder"></a>
 ##### 3.6.7.2. placeholder
 
@@ -652,6 +669,7 @@ https://cp.xuthus.cc/
 | 默认值   | 空 |
 | 环境变量   | `Ray_Serilog__WriteTo__8__Args__placeholder` |
 | GitHub Secrets  | `PUSHOTHERPLACEHOLDER` |
+
 <a id="markdown-3673-bodyjsontemplate" name="3673-bodyjsontemplate"></a>
 ##### 3.6.7.3. bodyJsonTemplate
 
@@ -828,3 +846,21 @@ BiliBiliTool 使用 Serilog 作为日志组件，所以可以参考 Serilog 的�
 | 环境变量   | `Ray_Serilog__WriteTo__0__Args__outputTemplate` |
 | GitHub Secrets  | `CONSOLELOGTEMPLATE` |
 
+<a id="markdown-373-crontab相关" name="373-crontab相关"></a>
+#### 3.7.3. crontab相关
+适用于 [方式四：docker容器化运行（推荐）](../docker/README.md)，用于配置定时任务，效果与 `my_crontab` 文件相同，且优先级高于 `my_crontab`。
+
+使用例：
+```yaml
+environment:
+  Ray_BiliBiliCookies: somecookies
+  Ray_Crontab: |
+    0 15 * * * dotnet /app/Ray.BiliBiliTool.Console.dll --runTasks=Daily >> /var/log/cron.log
+    0 22 * * * dotnet /app/Ray.BiliBiliTool.Console.dll --runTasks=LiveLottery >> /var/log/cron.log
+```
+
+|   TITLE   | CONTENT   |
+| ---------- | -------------- |
+| 值域   | 一串字符串 |
+| 默认值   | 空 |
+| 环境变量   | `Ray_Crontab` |

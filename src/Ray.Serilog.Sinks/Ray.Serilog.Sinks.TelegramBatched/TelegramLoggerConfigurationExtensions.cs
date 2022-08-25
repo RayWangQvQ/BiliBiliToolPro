@@ -12,6 +12,7 @@ namespace Ray.Serilog.Sinks.TelegramBatched
             this LoggerSinkConfiguration loggerSinkConfiguration,
             string botToken,
             string chatId,
+            string proxy,
             string containsTrigger = Constants.DefaultContainsTrigger,
             bool sendBatchesAsOneMessages = true,
             IFormatProvider formatProvider = null,
@@ -21,7 +22,7 @@ namespace Ray.Serilog.Sinks.TelegramBatched
             if (containsTrigger.IsNullOrEmpty()) containsTrigger = Constants.DefaultContainsTrigger;
             Predicate<LogEvent> predicate = x => x.MessageTemplate.Text.Contains(containsTrigger);
 
-            return loggerSinkConfiguration.Sink(new TelegramBatchedSink(botToken, chatId, predicate, sendBatchesAsOneMessages, formatProvider, restrictedToMinimumLevel), restrictedToMinimumLevel);
+            return loggerSinkConfiguration.Sink(new TelegramBatchedSink(botToken, chatId, proxy, predicate, sendBatchesAsOneMessages, formatProvider, restrictedToMinimumLevel), restrictedToMinimumLevel);
         }
     }
 }

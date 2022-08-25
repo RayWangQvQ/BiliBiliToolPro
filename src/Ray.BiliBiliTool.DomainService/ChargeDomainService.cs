@@ -48,8 +48,8 @@ namespace Ray.BiliBiliTool.DomainService
             }
 
             //大会员类型
-            int vipType = userInfo.GetVipType();
-            if (vipType != 2)
+            VipType vipType = userInfo.GetVipType();
+            if (vipType != VipType.Annual)
             {
                 _logger.LogInformation("不是年度大会员，跳过");
                 return;

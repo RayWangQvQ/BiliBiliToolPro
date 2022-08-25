@@ -75,7 +75,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sample", "sample", "{2F1CB892-336C-4672-8A0A-FBAEB4B9EA8A}"
 	ProjectSection(SolutionItems) = preProject
 		docker\sample\docker-compose.yml = docker\sample\docker-compose.yml
-		docker\sample\my_crontab = docker\sample\my_crontab
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ray.Serilog.Sinks.Batched", "src\Ray.Serilog.Sinks\Ray.Serilog.Sinks.Batched\Ray.Serilog.Sinks.Batched.csproj", "{46EF6150-5D68-46B5-AA89-4198185FAF1A}"
@@ -151,6 +150,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ray.Serilog.Sinks.WorkWeiXinAppBatched", "src\Ray.Serilog.Sinks\Ray.Serilog.Sinks.WorkWeiXinAppBatched\Ray.Serilog.Sinks.WorkWeiXinAppBatched.csproj", "{099C4E10-1114-495C-A664-63A15E77B31A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ray.Serilog.Sinks.MicrosoftTeamsBatched", "src\Ray.Serilog.Sinks\Ray.Serilog.Sinks.MicrosoftTeamsBatched\Ray.Serilog.Sinks.MicrosoftTeamsBatched.csproj", "{FB9A43DE-00F0-42C4-BF92-AF61D752CCA2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ray.Serilog.Sinks.GotifyBatched", "src\Ray.Serilog.Sinks\Ray.Serilog.Sinks.GotifyBatched\Ray.Serilog.Sinks.GotifyBatched.csproj", "{B00FF75D-4C48-45ED-9A24-5C0D383317EE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -238,6 +239,10 @@ Global
 		{FB9A43DE-00F0-42C4-BF92-AF61D752CCA2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FB9A43DE-00F0-42C4-BF92-AF61D752CCA2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FB9A43DE-00F0-42C4-BF92-AF61D752CCA2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B00FF75D-4C48-45ED-9A24-5C0D383317EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B00FF75D-4C48-45ED-9A24-5C0D383317EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B00FF75D-4C48-45ED-9A24-5C0D383317EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B00FF75D-4C48-45ED-9A24-5C0D383317EE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -277,6 +282,7 @@ Global
 		{75A9CC5C-DF92-4D72-A14C-625AA902855B} = {A93210FD-27B6-40E4-B08D-391F96CA2754}
 		{099C4E10-1114-495C-A664-63A15E77B31A} = {4BAFC980-7A73-45C3-9460-8B8CCB87939B}
 		{FB9A43DE-00F0-42C4-BF92-AF61D752CCA2} = {4BAFC980-7A73-45C3-9460-8B8CCB87939B}
+		{B00FF75D-4C48-45ED-9A24-5C0D383317EE} = {4BAFC980-7A73-45C3-9460-8B8CCB87939B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {197319DA-1148-4A99-847C-8B270B6A29AB}

@@ -32,9 +32,9 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos
         /// 会员状态
         /// <para>只有VipStatus为1的时候获取到VipType才是有效的</para>
         /// </summary>
-        public int VipStatus { get; set; }
+        public VipStatus VipStatus { get; set; }
 
-        public int VipType { get; set; }//todo:是否可以改为枚举
+        public VipType VipType { get; set; }
 
         /// <summary>
         /// 获取隐私处理后的用户名
@@ -62,16 +62,16 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos
         /// <para>1:月会员</para>
         /// <para>2:年会员</para>
         /// </returns>
-        public int GetVipType()
+        public VipType GetVipType()
         {
-            if (VipStatus == 1)
+            if (VipStatus == VipStatus.Enable)
             {
                 //只有VipStatus为1的时候获取到VipType才是有效的。
                 return VipType;
             }
             else
             {
-                return 0;
+                return VipType.None;
             }
         }
     }

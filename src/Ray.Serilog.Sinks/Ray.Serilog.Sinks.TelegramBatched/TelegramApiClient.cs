@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ namespace Ray.Serilog.Sinks.TelegramBatched
         //https://core.telegram.org/bots/api#available-methods
 
         private readonly string _chatId;
+        private readonly string _proxy;
         private const string TelegramBotApiUrl = "https://api.telegram.org/bot";
 
         /// <summary>
@@ -25,12 +27,12 @@ namespace Ray.Serilog.Sinks.TelegramBatched
         private readonly HttpClient _httpClient = new HttpClient();
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TelegramClient"/> class.
+        /// Initializes a new instance of the <see cref="TelegramApiClient"/> class.
         /// </summary>
         /// <param name="botToken">The Telegram bot token.</param>
         /// <param name="timeoutSeconds">The timeout seconds.</param>
         /// <exception cref="ArgumentException">Thrown if the bot token is null or empty.</exception>
-        public TelegramApiClient(string botToken, string chatId, int timeoutSeconds = 10)
+        public TelegramApiClient(string botToken, string chatId, string proxy="", int timeoutSeconds = 10)
         {
             if (string.IsNullOrWhiteSpace(botToken))
             {
@@ -39,8 +41,21 @@ namespace Ray.Serilog.Sinks.TelegramBatched
             }
 
             _chatId = chatId;
+            _proxy = proxy;
 
             this._apiUrl = new Uri($"{TelegramBotApiUrl}{botToken}/sendMessage");
+
+            if (proxy.IsNotNullOrEmpty())
+            {
+                var webProxy = GetWebProxy(proxy);
+                var proxyHttpClientHandler = new HttpClientHandler
+                {
+                    Proxy = webProxy,
+                    UseProxy = true,
+                };
+                _httpClient = new HttpClient(proxyHttpClientHandler);
+            }
+
             this._httpClient.Timeout = TimeSpan.FromSeconds(timeoutSeconds);
         }
 
@@ -48,6 +63,8 @@ namespace Ray.Serilog.Sinks.TelegramBatched
 
         public override HttpResponseMessage DoSend()
         {
+            SelfLog.WriteLine($"使用代理：{_proxy.IsNotNullOrEmpty()}");
+
             var json = new
             {
                 chat_id = _chatId,
@@ -66,6 +83,32 @@ namespace Ray.Serilog.Sinks.TelegramBatched
             Msg = $"<b>{Title}</b>{Environment.NewLine}{Environment.NewLine}{Msg}";
 
             base.BuildMsg();
+        }
+
+        private WebProxy GetWebProxy(string proxyAddress)
+        {
+            //todo:抽象到公共方法库
+            WebProxy webProxy;
+
+            //user:password@host:port http proxy only .Tested with tinyproxy-1.11.0-rc1
+            if (proxyAddress.Contains("@"))
+            {
+                string userPass = proxyAddress.Split("@")[0];
+                string address = proxyAddress.Split("@")[1];
+
+                string proxyUser = userPass.Split(":")[0];
+                string proxyPass = userPass.Split(":")[1];
+
+                var credentials = new NetworkCredential(proxyUser, proxyPass);
+
+                webProxy = new WebProxy(address, true,null, credentials);
+            }
+            else
+            {
+                webProxy = new WebProxy(proxyAddress, true);
+            }
+
+            return webProxy;
         }
     }
 
