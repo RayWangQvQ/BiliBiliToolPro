@@ -3,14 +3,16 @@
 
 - [1. 前期工作](#1-前期工作)
     - [1.1. Docker环境](#11-docker环境)
-	- [1.2. 须知](#12-须知)
-- [2. Docker Compose版](#2-docker-compose版推荐)
+    - [1.2. 须知](#12-须知)
+- [2. Docker-Compose版(推荐)](#2-docker-compose版推荐)
+    - [2.1. 启动](#21-启动)
+    - [2.2. 修改bili下的docker-compose.yml，填入cookie](#22-修改bili下的docker-composeyml填入cookie)
+    - [2.3. 其他命令参考](#23-其他命令参考)
 - [3. Docker版](#3-docker版)
-	- [3.1. Docker启动](#31-docker启动)
-	- [3.2. 通过Watchtower手动更新容器](#32-通过watchtower手动更新容器)
+    - [3.1. Docker启动](#31-docker启动)
+    - [3.2. 使用Watchtower更新容器](#32-使用watchtower更新容器)
 - [4. 自己构建镜像（非必须）](#4-自己构建镜像非必须)
 - [5. 其他](#5-其他)
-
 
 <!-- /TOC -->
 ## 1. 前期工作
@@ -35,23 +37,39 @@ Window系统推荐使用Docker Desktop，官方下载安装包，一路鼠标点
 
 
 ## 2. Docker-Compose版(推荐) 
-在本地路径下，创建并进入目录 `bilibili_tool` 
 
+### 2.1. 启动
 ```
-# 下载项目里面的模板，`my_crontab`文件以及`docker-compose.yml`文件
+# 创建目录
+mkdir bili
+cd bili
 
-# 如需修改定时运行时间，请修改`my_crontab`中的cron表达式，然后再次执行启动容器命令。
-# 或考虑配置`Ray_Crontab`环境变量
-wget https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/docker/sample/my_crontab
-
-# 根据 docker-compose.yaml 里面的注释编辑所需配置，`environment` 下可以通过环境变量自由添加自定义配置，其中Cookie是必填的，所以请至少填入Cookie并保存。
+# 下载
+wget https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/src/Ray.BiliBiliTool.Console/appsettings.json
 wget https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/docker/sample/docker-compose.yml
 
-最终文件结构如下：
-bilibili_tool
-├── docker-compose.yml
-└── my_crontab
+# 启动
+docker-compose up -d
 
+# 查看启动日志
+docker logs -f bilibili_tool_pro
+```
+
+### 2.2. 修改bili下的docker-compose.yml，填入cookie
+
+根据 docker-compose.yaml 里面的注释编辑所需配置，`environment` 下可以通过环境变量自由添加自定义配置，其中Cookie是必填的，所以请至少填入Cookie并保存。
+
+保存后，重新运行下`docker-compose up -d`
+
+最终文件结构如下：
+
+bili
+├── appsettings.json
+└── docker-compose.yml
+
+### 2.3. 其他命令参考
+
+```
 # 启动 docker-compose
 docker-compose up -d
 
@@ -66,9 +84,7 @@ docker exec -it bilibili_tool_pro /bin/bash
 
 # 手动更新容器
 docker-compose pull && docker-compose up -d
-
 ```
-
 
 ## 3. Docker版
 

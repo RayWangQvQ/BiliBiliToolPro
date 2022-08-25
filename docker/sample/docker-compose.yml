@@ -17,15 +17,15 @@ services:
       - Ray_BiliBiliCookies__2=
 
       # 定时任务
-      - Ray_DailyTaskConfig__Cron=
-      - Ray_LiveLotteryTaskConfig__Cron=
-      - Ray_UnfollowBatchedTaskConfig__Cron=
-      - Ray_VipBigPointConfig__Cron=
+      - Ray_DailyTaskConfig__Cron=0 15 * * *
+      - Ray_LiveLotteryTaskConfig__Cron=0 22 * * *
+      - Ray_UnfollowBatchedTaskConfig__Cron=0 6 1 * *
+      - Ray_VipBigPointConfig__Cron=7 1 * * *
 
       # UA：
       - Ray_Security__UserAgent=
       # 开始运行前随机随眠最大分钟数：
-      - Ray_Security__RandomSleepMaxMin=
+      - Ray_Security__RandomSleepMaxMin=2
       # 调用接口间的间隔秒数：
       - Ray_Security__IntervalSecondsBetweenRequestApi=
 
