@@ -53,3 +53,4 @@
 - 合并PR（#256），重构docker运行是cron构建方式，并优化读取环境变量的方式（@syrinka）
 - Feature(#65)：新增TG推送配置并使用代理功能
 - Feature(#240)：新增gotify推送
+- Feature：更新、优化docker部署文档

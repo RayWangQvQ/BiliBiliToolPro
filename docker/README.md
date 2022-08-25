@@ -42,6 +42,7 @@ Window系统推荐使用Docker Desktop，官方下载安装包安装。
 ## 2. 方式一：Docker Compose(推荐) 
 
 ### 2.1. 启动
+
 ```
 # 创建目录
 mkdir bili
