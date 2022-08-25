@@ -61,12 +61,14 @@ namespace Ray.BiliBiliTool.DomainService
             //获取到UserId
             _cookie.UserId = useInfo.Mid.ToString();
 
-            _logger.LogInformation("【用户名】 {0}", useInfo.GetFuzzyUname());
-            _logger.LogInformation("【硬币余额】 {0}", useInfo.Money ?? 0);
+            _logger.LogInformation("【用户名】{0}", useInfo.GetFuzzyUname());
+            _logger.LogInformation("【会员类型】{0}", useInfo.VipType.Description());
+            _logger.LogInformation("【会员状态】{0}", useInfo.VipStatus.Description());
+            _logger.LogInformation("【硬币余额】{0}", useInfo.Money ?? 0);
 
             if (useInfo.Level_info.Current_level < 6)
             {
-                _logger.LogInformation("【距升级 Lv{0}】 {1}天（如每日做满65点经验）",
+                _logger.LogInformation("【距升级Lv{0}】{1}天（如每日做满65点经验）",
                     useInfo.Level_info.Current_level + 1,
                     (useInfo.Level_info.GetNext_expLong() - useInfo.Level_info.Current_exp) / Constants.EveryDayExp);
             }

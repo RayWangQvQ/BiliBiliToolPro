@@ -1,17 +1,13 @@
 ﻿using System;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.VipTask;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Application.Attributes;
 using Ray.BiliBiliTool.Application.Contracts;
-using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 
 namespace Ray.BiliBiliTool.Application
@@ -39,7 +35,13 @@ namespace Ray.BiliBiliTool.Application
         [TaskInterceptor("大会员大积分", TaskLevel.One)]
         public override void DoTask()
         {
-            GetUserInfo();
+            var ui = GetUserInfo();
+
+            if (ui.GetVipType() == VipType.None)
+            {
+                _logger.LogInformation("当前不是大会员或已过期，跳过任务");
+                return;
+            }
 
             var re = _vipApi.GetTaskList().Result;
 
@@ -80,10 +82,12 @@ namespace Ray.BiliBiliTool.Application
         }
 
         [TaskInterceptor("测试Cookie")]
-        private void GetUserInfo()
+        private UserInfo GetUserInfo()
         {
             UserInfo userInfo = _loginDomainService.LoginByCookie();
             if (userInfo == null) throw new Exception("登录失败，请检查Cookie");//终止流程
+
+            return userInfo;
         }
 
         [TaskInterceptor("签到", TaskLevel.Two, false)]
