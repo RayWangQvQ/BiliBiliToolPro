@@ -4,13 +4,14 @@
 - [1. 前期工作](#1-前期工作)
     - [1.1. Docker环境](#11-docker环境)
     - [1.2. 须知](#12-须知)
-- [2. Docker-Compose版(推荐)](#2-docker-compose版推荐)
+- [2. 方式一：Docker Compose(推荐)](#2-方式一docker-compose推荐)
     - [2.1. 启动](#21-启动)
     - [2.2. 修改bili下的docker-compose.yml，填入cookie](#22-修改bili下的docker-composeyml填入cookie)
     - [2.3. 其他命令参考](#23-其他命令参考)
-- [3. Docker版](#3-docker版)
+- [3. 方式二：Docker指令](#3-方式二docker指令)
     - [3.1. Docker启动](#31-docker启动)
-    - [3.2. 使用Watchtower更新容器](#32-使用watchtower更新容器)
+    - [3.2. 其他指令参考](#32-其他指令参考)
+    - [3.3. 使用Watchtower更新容器](#33-使用watchtower更新容器)
 - [4. 自己构建镜像（非必须）](#4-自己构建镜像非必须)
 - [5. 其他](#5-其他)
 
@@ -24,19 +25,21 @@
 Linux一键安装命令:
 `curl -fsSL https://get.docker.com | bash -s docker --mirror Aliyun`
 
-Window系统推荐使用Docker Desktop，官方下载安装包，一路鼠标点下去就能装好，运行时也有可视化页面。
+Window系统推荐使用Docker Desktop，官方下载安装包安装。
 
 安装完成后，请执行`docker --version`检查`Docker`是否安装成功，请执行`docker compose version`检查`Docker Compose`是否安装成功。
 
 ### 1.2. 须知
 
+- Docker有两种部署方式：使用`Docker Compose`或使用docker指令，选择其中一种即可
 
-每次容器启动会去跑一遍 Test 任务，用于测试 Cookie ，其他任务由设定的Cron来指定定时触发。
+- 以下章节，凡设计到下载GitHub文件的，如`wget https://raw.githubusercontent.com...`，需要有良好的互联网环境，如果是“局域网”，可以在地址前添加`https://ghproxy.com/`，比如更改为`wget https://ghproxy.com/https://raw.githubusercontent.com...`
 
-想手动运行某任务的话，[查看功能任务参数](https://github.com/RayWangQvQ/BiliBiliToolPro/tree/develop#2-功能任务说明) 请进入容器后输入命令来启动执行。
+- 每次容器启动会去跑一遍 Test 任务，用于测试 Cookie ，其他任务由设定的Cron来指定定时触发。
 
+- 想手动运行某任务的话，[查看功能任务参数](https://github.com/RayWangQvQ/BiliBiliToolPro/tree/develop#2-功能任务说明) 请进入容器后输入命令来启动执行。
 
-## 2. Docker-Compose版(推荐) 
+## 2. 方式一：Docker Compose(推荐) 
 
 ### 2.1. 启动
 ```
@@ -86,28 +89,30 @@ docker exec -it bilibili_tool_pro /bin/bash
 docker-compose pull && docker-compose up -d
 ```
 
-## 3. Docker版
+## 3. 方式二：Docker指令
 
 ### 3.1. Docker启动
+
 ```
-# 下载项目里面的模板，`my_crontab`文件以及`appsettings.json`文件
-
-# 如需修改定时运行时间，请修改`my_crontab`中的cron表达式，然后再次执行启动容器命令。
-wget https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/docker/sample/my_crontab
-
-# 根据 appsettings.json 里面的注释编辑所需配置 （暂定develop分支下载路径）
-wget https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/develop/docker/sample/appsettings.json
-
-# Docker启动命令，/root/bilibili_tool/为映射目录
-docker run -d --restart always --name="bilibili_tool_pro" \
-    -v /root/bilibili_tool/logs:/app/Logs \
-    -v /root/bilibili_tool/my_crontab:/app/custom_crontab \
-    -v /root/bilibili_tool/appsettings.json:/app/appsettings.json \
+# 生成并运行容器
+docker run -d --name="bilibili_tool_pro" \
+    -v /bilibili_tool/Logs:/app/Logs \
+    -e Ray_BiliBiliCookies__1="cookie" \
+    -e Ray_DailyTaskConfig__Cron="0 15 * * *" \
+    -e Ray_LiveLotteryTaskConfig__Cron="0 22 * * *" \
+    -e Ray_UnfollowBatchedTaskConfig__Cron="0 6 1 * *" \
+    -e Ray_VipBigPointConfig__Cron="7 1 * * *" \
     zai7lou/bilibili_tool_pro
 
 # 查看实时日志
 docker logs -f bilibili_tool_pro
+```
 
+其中，`cookie`需要替换为自己真实的cookie字符串
+
+### 3.2. 其他指令参考
+
+```
 # 启动容器
 docker start bilibili_tool_pro
 
@@ -119,10 +124,9 @@ docker rm bilibili_tool_pro
 
 # 进入容器
 docker exec -it bilibili_tool_pro /bin/bash
-
 ```
 
-### 3.2. 使用Watchtower更新容器
+### 3.3. 使用Watchtower更新容器
 ```
 docker run --rm \
     -v /var/run/docker.sock:/var/run/docker.sock \
