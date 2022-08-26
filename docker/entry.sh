@@ -9,12 +9,11 @@ echo "=>完成"
 
 echo "[step 2/4]配置cron定时任务"
 echo "BASH_ENV=/etc/cron.env" > /etc/cron.d/bilicron
-if [ -z "$Ray_Crontab$Ray_DailyTaskConfig__Cron$Ray_LiveLotteryTaskConfig__Cron$Ray_UnfollowBatchedTaskConfig__Cron$Ray_VipBigPointConfig__Cron" ]; then
+if [ -z "$Ray_DailyTaskConfig__Cron$Ray_LiveLotteryTaskConfig__Cron$Ray_UnfollowBatchedTaskConfig__Cron$Ray_VipBigPointConfig__Cron" ]; then
 	echo "=>使用默认cron定时任务配置"
 	cat /app/crontab >> /etc/cron.d/bilicron
 else
 	echo "=>检测到对应的环境变量，使用其值作为Cron配置"
-	echo "$Ray_Crontab" >> /etc/cron.d/bilicron
 	if ! [ -z "$Ray_DailyTaskConfig__Cron" ]; then
 		echo "$Ray_DailyTaskConfig__Cron dotnet /app/Ray.BiliBiliTool.Console.dll --runTasks=Daily >> /var/log/cron.log" >> /etc/cron.d/bilicron
 	fi
@@ -27,6 +26,9 @@ else
 	if ! [ -z "$Ray_VipBigPointConfig__Cron" ]; then
 		echo "$Ray_VipBigPointConfig__Cron dotnet /app/Ray.BiliBiliTool.Console.dll --runTasks=VipBigPoint >> /var/log/cron.log" >> /etc/cron.d/bilicron
 	fi
+fi
+if [ -z "$Ray_Crontab" ]; then
+	echo "$Ray_Crontab" >> /etc/cron.d/bilicron
 fi
 echo "=>完成"
 
