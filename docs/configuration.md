@@ -867,7 +867,7 @@ BiliBiliTool 使用 Serilog 作为日志组件，所以可以参考 Serilog 的�
 
 <a id="markdown-382-Crontab" name="382-Crontab"></a>
 #### 3.8.2 Crontab
-若该环境变量被设置，其值将直接追加在 cron 文件的末尾。
+若该环境变量被设置，其值将直接追加在 cron 文件的末尾，可用于设置额外的定时任务。
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
