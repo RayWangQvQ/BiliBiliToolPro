@@ -9,7 +9,7 @@ echo "=>完成"
 
 echo "[step 2/4]配置cron定时任务"
 echo "BASH_ENV=/etc/cron.env" > /etc/cron.d/bilicron
-if [ -z "$Ray_DailyTaskConfig__Cron$Ray_LiveLotteryTaskConfig__Cron$Ray_UnfollowBatchedTaskConfig__Cron$Ray_VipBigPointConfig__Cron" ]; then
+if [ -z "$Ray_Crontab$Ray_DailyTaskConfig__Cron$Ray_LiveLotteryTaskConfig__Cron$Ray_UnfollowBatchedTaskConfig__Cron$Ray_VipBigPointConfig__Cron" ]; then
 	echo "=>使用默认cron定时任务配置"
 	cat /app/crontab >> /etc/cron.d/bilicron
 else
