@@ -27,7 +27,7 @@ else
 		echo "$Ray_VipBigPointConfig__Cron dotnet /app/Ray.BiliBiliTool.Console.dll --runTasks=VipBigPoint >> /var/log/cron.log" >> /etc/cron.d/bilicron
 	fi
 fi
-if [ -z "$Ray_Crontab" ]; then
+if ! [ -z "$Ray_Crontab" ]; then
 	echo "=>检测到额外定时任务，追加到cron文件末尾"
 	echo "$Ray_Crontab" >> /etc/cron.d/bilicron
 fi
