@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup>
     <Authors>Ray</Authors>
-    <Version>0.2.1</Version>
+    <Version>0.2.2</Version>
     <NoWarn>$(NoWarn);CS1591;CS0436</NoWarn>
   </PropertyGroup>
 </Project>
