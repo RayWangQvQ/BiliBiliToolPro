@@ -27,21 +27,30 @@ else
 		echo "$Ray_VipBigPointConfig__Cron dotnet /app/Ray.BiliBiliTool.Console.dll --runTasks=VipBigPoint >> /var/log/cron.log" >> /etc/cron.d/bilicron
 	fi
 fi
-if ! [ -z "$Ray_Crontab" ]; then
-	echo "=>检测到额外定时任务，追加到cron文件末尾"
-	echo "$Ray_Crontab" >> /etc/cron.d/bilicron
-fi
-echo "=>完成"
 
-echo "[step 3/4]启动定时任务，开启每日定时运行"
 cat /etc/cron.d/bilicron
 chmod 0644 /etc/cron.d/bilicron
 crontab /etc/cron.d/bilicron
 touch /var/log/cron.log
+
+if ! [ -z "$Ray_Crontab" ]; then
+	echo "=>检测到自定义定时任务"
+	echo "BASH_ENV=/etc/cron.env" > /etc/cron.d/customcron
+	echo "$Ray_Crontab" >> /etc/cron.d/customcron
+
+	cat /etc/cron.d/customcron
+	chmod 0644 /etc/cron.d/customcron
+	crontab /etc/cron.d/customcron
+	touch /var/log/cron.log
+fi
+
+echo "=>完成"
+
+echo "[step 3/4]启动定时任务，开启每日定时运行"
 cron
 echo "=>完成"
 
-echo "[step 4/4]初始启动容器，尝试测试Cookie"
+echo "[step 4/4]初始运行，尝试测试Cookie"
 dotnet /app/Ray.BiliBiliTool.Console.dll --runTasks=Test
 echo "=>完成"
 
