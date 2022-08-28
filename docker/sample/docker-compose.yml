@@ -3,10 +3,11 @@ version: '3.9'
 services:
   bilibili_tool:
     image: zai7lou/bilibili_tool_pro
-    container_name: bilibili_tool_pro
+    container_name: bili
     # restart: always
     volumes:
       - ./Logs:/app/Logs
+      - ./appsettings.json:/app/appsettings.json
     tty: true
     environment:
       - ASPNETCORE_ENVIRONMENT: Production
