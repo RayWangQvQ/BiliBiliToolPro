@@ -6,6 +6,7 @@
     "--runTasks": "RunTasks",
 
     "--numberOfCoins": "DailyTaskConfig:NumberOfCoins",
+    "--coinsOfLv6": "DailyTaskConfig:CoinsOfLv6",
     "--selectLike": "DailyTaskConfig:SelectLike",
     "--supportUpIds": "DailyTaskConfig:SupportUpIds",
     "--dayOfAutoCharge": "DailyTaskConfig:DayOfAutoCharge",
@@ -35,6 +36,7 @@
     "-runTasks": "RunTasks",
 
     "-numberOfCoins": "DailyTaskConfig:NumberOfCoins",
+    "-coinsOfLv6": "DailyTaskConfig:CoinsOfLv6",
     "-selectLike": "DailyTaskConfig:SelectLike",
     "-supportUpIds": "DailyTaskConfig:SupportUpIds",
     "-dayOfAutoCharge": "DailyTaskConfig:DayOfAutoCharge",

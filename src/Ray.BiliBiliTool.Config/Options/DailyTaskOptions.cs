@@ -24,6 +24,12 @@ namespace Ray.BiliBiliTool.Config.Options
         public int NumberOfCoins { get; set; } = 5;
 
         /// <summary>
+        /// 达到六级后是否继续投币
+        /// </summary>
+        public bool CoinsOfLv6 { get; set; } = true;
+
+
+        /// <summary>
         /// 投币时是否点赞[false,true]
         /// </summary>
         public bool SelectLike { get; set; } = false;

@@ -63,7 +63,16 @@ namespace Ray.BiliBiliTool.Application
             UserInfo userInfo = Login();
             DailyTaskInfo dailyTaskInfo = GetDailyTaskStatus();
             WatchAndShareVideo(dailyTaskInfo);
-            AddCoinsForVideo();
+            if (! _dailyTaskOptions.CoinsOfLv6 && userInfo.Level_info.Current_level >= 6)
+            {
+                _logger.LogInformation("---开始 投币 ---");
+                _logger.LogInformation("已经为LV6大佬 开始白嫖");
+                _logger.LogInformation("-----结束-----");
+            }
+            else
+            {
+                AddCoinsForVideo();
+            }
 
             //签到：
             LiveSign();
