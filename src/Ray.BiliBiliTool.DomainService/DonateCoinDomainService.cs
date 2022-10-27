@@ -194,11 +194,13 @@ namespace Ray.BiliBiliTool.DomainService
         {
             //获取自定义配置投币数
             int configCoins = _dailyTaskOptions.NumberOfCoins;
+
             if (configCoins <= 0)
             {
                 _logger.LogInformation("已配置为跳过投币任务");
                 return configCoins;
             }
+            
 
             //已投的硬币
             int alreadyCoins = _coinDomainService.GetDonatedCoins();
