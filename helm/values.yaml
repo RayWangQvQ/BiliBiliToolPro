@@ -1,0 +1,62 @@
+# Default values for bilibili_tool.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: zai7lou/bilibili_tool_pro
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "0.2.1"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+env:
+  # cookie - required
+  - name: Ray_BiliBiliCookies__1
+    # past your cookie value
+    value: ""
+  # DailyTrigger - required
+  - name: Ray_DailyTaskConfig__Cron
+    value: "10 8 * * *"
+  
+  # Optional fields
+  - name: Ray_Security__IntervalSecondsBetweenRequestApi
+    value: "20"
+  - name: Ray_Security__RandomSleepMaxMin
+    value: "20"
+  #- name: Ray_LiveLotteryTaskConfig__Cron
+  #  value: ""
+  #- name: Ray_UnfollowBatchedTaskConfig__Cron
+  #  value: ""
+  #- name: Ray_VipBigPointConfig__Cron
+  #  value: ""
+
+volumes:
+  enabled: false
+  # if `enabled=true`, then path and name is required
+  path: "/tmp/Logs"
+  name: "bili-tool-vol"
+
+podAnnotations: {}
+
+resources:
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  limits:
+    cpu: 100m
+    memory: 180Mi
+  requests:
+    cpu: 100m
+    memory: 180Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
