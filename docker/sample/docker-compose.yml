@@ -32,6 +32,8 @@ services:
 
       # 目标投币数量：
       - Ray_DailyTaskConfig__NumberOfCoins:
+      # 达到六级后是否开始白嫖：
+      - Ray_DailyTaskConfig__SaveCoinsWhenLv6:
 
       # 天选抽奖指定排除关键字
       - Ray_LiveLotteryTaskConfig__ExcludeAwardNames:
