@@ -69,13 +69,8 @@ namespace Ray.BiliBiliTool.DomainService
         /// <summary>
         /// 完成投币任务
         /// </summary>
-        public void AddCoinsForVideos(UserInfo userInfo)
+        public void AddCoinsForVideos()
         {
-            if (_dailyTaskOptions.SaveCoinsWhenLv6 && userInfo.Level_info.Current_level >= 6)
-            {
-                _logger.LogInformation("已经为LV6大佬 开始白嫖");
-                return;
-            }
             int needCoins = GetNeedDonateCoinNum();
             if (needCoins <= 0) return;
 
