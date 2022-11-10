@@ -24,6 +24,12 @@ namespace Ray.BiliBiliTool.Config.Options
         public int NumberOfCoins { get; set; } = 5;
 
         /// <summary>
+        /// 达到六级后是否开始白嫖
+        /// </summary>
+        public bool SaveCoinsWhenLv6 { get; set; } = false;
+
+
+        /// <summary>
         /// 投币时是否点赞[false,true]
         /// </summary>
         public bool SelectLike { get; set; } = false;
