@@ -124,7 +124,12 @@ namespace Ray.BiliBiliTool.Application
         [TaskInterceptor("投币", rethrowWhenException: false)]
         private void AddCoinsForVideo(UserInfo userInfo)
         {
-            _donateCoinDomainService.AddCoinsForVideos(userInfo);
+            if (_dailyTaskOptions.SaveCoinsWhenLv6 && userInfo.Level_info.Current_level >= 6)
+            {
+                _logger.LogInformation("已经为LV6大佬，开始白嫖");
+                return;
+            }
+            _donateCoinDomainService.AddCoinsForVideos();
         }
 
         /// <summary>
