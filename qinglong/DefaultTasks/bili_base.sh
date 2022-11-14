@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# new Env("bili_base")
+# cron 0 0 1 1 * bili_base.sh
+
+dir_shell=$QL_DIR/shell
+. $dir_shell/share.sh
+
+## 安装dotnet
+apk add bash icu-libs krb5-libs libgcc libintl libssl1.1 libstdc++ zlib
+curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 6.0 --no-cdn
+ln -s ~/.dotnet/dotnet /usr/local/bin
+dotnet --version
+
+bili_repo="raywangqvq_bilibilitoolpro_develop"
+
+echo "repo目录: $dir_repo"
+bili_repo_dir="$(find $dir_repo -type d -iname $bili_repo | head -1)"
+echo -e "bili仓库目录: $bili_repo_dir\n"
+
+echo -e "清理缓存"
+cd $bili_repo_dir
+find . -type d -name "bin" -exec rm -rf {} \;
+find . -type d -name "obj" -exec rm -rf {} \;
