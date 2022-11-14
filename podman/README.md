@@ -16,7 +16,7 @@
 
 ### 1.1. Podman环境
 
-请确认已安装了Podman所需环境（[Docker](https://podman.io/)
+请确认已安装了Podman所需环境（[Podman](https://podman.io/)
 
 安装完成后，请执行`podman -v`检查是否安装成功，请执行`podman info`检查虚拟机环境是否正常。
 
