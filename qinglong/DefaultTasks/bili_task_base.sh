@@ -14,10 +14,11 @@ dotnet --version
 
 bili_repo="raywangqvq_bilibilitoolpro_develop"
 
-echo "repo目录: $dir_repo"
+echo -e "\nrepo目录: $dir_repo"
 bili_repo_dir="$(find $dir_repo -type d -iname $bili_repo | head -1)"
 echo -e "bili仓库目录: $bili_repo_dir\n"
 
-echo -e "清理缓存"
+echo -e "清理缓存...\n"
 cd $bili_repo_dir
-find . -type d -name "bin" -o -type d -name "obj" -exec rm -rf {} +
+find . -type d -name "bin" -exec rm -rf {} +
+find . -type d -name "obj" -exec rm -rf {} +
