@@ -46,7 +46,7 @@ BiliBiliTool
         - [1.2.2. 方式二：Docker或Podman容器化运行](#122-方式二docker或podman容器化运行)
         - [1.2.3. 方式三：下载程序包到本地或服务器运行](#123-方式三下载程序包到本地或服务器运行)
         - [1.2.4. 方式四：腾讯云函数SCF](#124-方式四腾讯云函数scf)
-        - [1.2.5. 方式五：GitHub Actions](#125-方式五github-actions)
+        - [1.2.5. 方式五：~~GitHub Actions~~](#125-方式五github-actions)
         - [1.2.6. 方式六：Chart部署](#126-方式六chart部署)
     - [1.3. 消息推动（可选）](#13-消息推动可选)
 - [2. 功能任务说明](#2-功能任务说明)
@@ -170,7 +170,7 @@ Ray.BiliBiliTool.Console
 [>>腾讯云函数部署说明](tencentScf/README.md)
 
 
-#### 1.2.5. 方式五：GitHub Actions
+#### 1.2.5. 方式五：~~GitHub Actions~~
 
 暂时删掉该方式避避风头。
 
