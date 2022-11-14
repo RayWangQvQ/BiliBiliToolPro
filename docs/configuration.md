@@ -71,7 +71,9 @@
     - [3.7. 日志相关](#37-日志相关)
         - [3.7.1. Console日志输出等级](#371-console日志输出等级)
         - [3.7.2. Console日志输出样式](#372-console日志输出样式)
-        - [3.7.3. crontab相关](#373-crontab相关)
+    - [3.8. 定时任务相关](#38-定时任务相关)
+        - [3.8.1. 定时任务](#381-定时任务)
+        - [3.8.2. Crontab](#382-Crontab)
 
 <!-- /TOC -->
 
@@ -846,11 +848,35 @@ BiliBiliTool 使用 Serilog 作为日志组件，所以可以参考 Serilog 的�
 | 环境变量   | `Ray_Serilog__WriteTo__0__Args__outputTemplate` |
 | GitHub Secrets  | `CONSOLELOGTEMPLATE` |
 
-<a id="markdown-373-crontab相关" name="373-crontab相关"></a>
-#### 3.7.3. crontab相关
-适用于 [方式四：docker容器化运行（推荐）](../docker/README.md)，用于配置定时任务，效果与 `my_crontab` 文件相同，且优先级高于 `my_crontab`。
+<a id="markdown-38-定时任务相关" name="38-定时任务相关"></a>
+#### 3.8. 定时任务相关
+适用于 [方式四：docker容器化运行（推荐）](../docker/README.md)，用于配置定时任务。
 
-使用例：
+<a id="markdown-381-定时任务" name="381-定时任务"></a>
+#### 3.8.1 定时任务
+以下环境变量的值应为有效的 [cron 表达式](https://docs.oracle.com/cd/E12058_01/doc/doc.1014/e12030/cron_expressions.htm)。
+
+当被设置时，对应定时任务将开启。
+
+|   环境变量   | 定时任务   |
+| ---------- | -------------- |
+| `Ray_DailyTaskConfig__Cron` | 每日任务 |
+| `Ray_LiveLotteryTaskConfig__Cron` | 天选时刻抽奖 |
+| `Ray_UnfollowBatchedTaskConfig__Cron` | 批量取关 |
+| `Ray_VipBigPointConfig__Cron` | 大会员大积分 |
+
+<a id="markdown-382-Crontab" name="382-Crontab"></a>
+#### 3.8.2 Crontab
+若该环境变量被设置，其值将直接追加在 cron 文件的末尾，可用于设置额外的定时任务。
+
+|   TITLE   | CONTENT   |
+| ---------- | -------------- |
+| 值域   | 一串字符串 |
+| 默认值   | 空 |
+| 环境变量   | `Ray_Crontab` |
+
+使用例
+
 ```yaml
 environment:
   Ray_BiliBiliCookies: somecookies
@@ -858,9 +884,3 @@ environment:
     0 15 * * * dotnet /app/Ray.BiliBiliTool.Console.dll --runTasks=Daily >> /var/log/cron.log
     0 22 * * * dotnet /app/Ray.BiliBiliTool.Console.dll --runTasks=LiveLottery >> /var/log/cron.log
 ```
-
-|   TITLE   | CONTENT   |
-| ---------- | -------------- |
-| 值域   | 一串字符串 |
-| 默认值   | 空 |
-| 环境变量   | `Ray_Crontab` |

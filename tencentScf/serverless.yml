@@ -38,6 +38,12 @@ inputs:
           cronExpression: "0 0 0 * * MON *"
           enable: true
           argument: UnfollowBatched
+    - timer: # 大会员积分
+        parameters:
+          name: VipBigPointTask
+          cronExpression: "0 07 01 * * * *"
+          enable: true
+          argument: VipBigPoint
   environment:
     variables: # 根据自己的需要修改
       Ray_BiliBiliCookies__1: 123 # cookie，必填

@@ -44,6 +44,7 @@ env:
   Ray_Security__RandomSleepMaxMin: ${{secrets.RANDOMSLEEPMAXMIN}}
   # 每日任务：
   Ray_DailyTaskConfig__NumberOfCoins: ${{secrets.NUMBEROFCOINS}}
+  Ray_DailyTaskConfig__SaveCoinsWhenLv6: ${{secrets.SAVECOINSWHENLV6}}
   Ray_DailyTaskConfig__SelectLike: ${{secrets.SELECTLIKE}}
   Ray_DailyTaskConfig__SupportUpIds: ${{secrets.SUPPORTUPIDS}}
   Ray_DailyTaskConfig__DayOfAutoCharge: ${{secrets.DAYOFAUTOCHARGE}}

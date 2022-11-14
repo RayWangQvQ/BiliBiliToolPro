@@ -56,7 +56,7 @@ wget https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/docker/sa
 docker compose up -d
 
 # 查看启动日志
-docker logs -f bilibili_tool_pro
+docker logs -f bili
 ```
 
 ### 2.2. 修改bili下的docker-compose.yml，填入cookie
@@ -83,10 +83,10 @@ docker compose up -d
 docker compose stop
 
 # 查看实时日志
-docker logs -f bilibili_tool_pro
+docker logs -f bili
 
 # 进入容器
-docker exec -it bilibili_tool_pro /bin/bash
+docker exec -it bili /bin/bash
 
 # 手动更新容器
 docker compose pull && docker compose up -d
@@ -98,8 +98,8 @@ docker compose pull && docker compose up -d
 
 ```
 # 生成并运行容器
-docker run -d --name="bilibili_tool_pro" \
-    -v /bilibili_tool/Logs:/app/Logs \
+docker run -d --name="bili" \
+    -v /bili/Logs:/app/Logs \
     -e Ray_BiliBiliCookies__1="cookie" \
     -e Ray_DailyTaskConfig__Cron="0 15 * * *" \
     -e Ray_LiveLotteryTaskConfig__Cron="0 22 * * *" \
@@ -108,7 +108,7 @@ docker run -d --name="bilibili_tool_pro" \
     zai7lou/bilibili_tool_pro
 
 # 查看实时日志
-docker logs -f bilibili_tool_pro
+docker logs -f bili
 ```
 
 其中，`cookie`需要替换为自己真实的cookie字符串
@@ -117,16 +117,16 @@ docker logs -f bilibili_tool_pro
 
 ```
 # 启动容器
-docker start bilibili_tool_pro
+docker start bili
 
 # 停止容器
-docker stop bilibili_tool_pro
+docker stop bili
 
 # 删除容器
-docker rm bilibili_tool_pro
+docker rm bili
 
 # 进入容器
-docker exec -it bilibili_tool_pro /bin/bash
+docker exec -it bili /bin/bash
 ```
 
 ### 3.3. 使用Watchtower更新容器
@@ -135,7 +135,7 @@ docker run --rm \
     -v /var/run/docker.sock:/var/run/docker.sock \
     containrrr/watchtower \
     --run-once --cleanup \
-    bilibili_tool_pro
+    bili
 ```
 
 ## 4. 自己构建镜像（非必须）
