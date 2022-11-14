@@ -20,5 +20,4 @@ echo -e "bili仓库目录: $bili_repo_dir\n"
 
 echo -e "清理缓存"
 cd $bili_repo_dir
-find . -type d -name "bin" -exec rm -rf {} \;
-find . -type d -name "obj" -exec rm -rf {} \;
+find . -type d -name "bin" -o -type d -name "obj" -exec rm -rf {} +
