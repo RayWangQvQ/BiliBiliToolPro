@@ -12,7 +12,7 @@ rm -f /usr/local/bin/dotnet
 ln -s ~/.dotnet/dotnet /usr/local/bin
 dotnet --version
 
-bili_repo="raywangqvq_bilibilitoolpro_develop"
+bili_repo="raywangqvq_bilibilitoolpro"
 
 echo -e "\nrepo目录: $dir_repo"
 bili_repo_dir="$(find $dir_repo -type d -iname $bili_repo | head -1)"

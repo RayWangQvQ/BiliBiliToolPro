@@ -5,7 +5,7 @@
 dir_shell=$QL_DIR/shell
 . $dir_shell/share.sh
 
-bili_repo="raywangqvq_bilibilitoolpro_develop"
+bili_repo="raywangqvq_bilibilitoolpro"
 
 echo -e "\nrepo目录: $dir_repo"
 bili_repo_dir="$(find $dir_repo -type d -iname $bili_repo | head -1)"
