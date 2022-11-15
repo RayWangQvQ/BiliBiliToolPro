@@ -17,7 +17,7 @@ echo "SHELL=/bin/bash" > $CRON_FILE
 echo "BASH_ENV=/etc/cron.env" >> $CRON_FILE
 if [ -z "$Ray_LiveLotteryTaskConfig__Cron$Ray_UnfollowBatchedTaskConfig__Cron$Ray_VipBigPointConfig__Cron" ]; then
 	echo "=>使用默认的定时任务配置"
-	cat /app/crontab >> $CRON_FILE
+	cat /app/scripts/crontab >> $CRON_FILE
 else
 	echo "=>使用用户指定的定时任务配置"
 	if ! [ -z "$Ray_DailyTaskConfig__Cron" ]; then
