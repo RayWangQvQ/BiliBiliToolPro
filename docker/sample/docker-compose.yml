@@ -10,44 +10,44 @@ services:
       - ./appsettings.json:/app/appsettings.json
     tty: true
     environment:
-      - ASPNETCORE_ENVIRONMENT: Production
-      - Ray_Security__IsSkipDailyTask: false
+      - ASPNETCORE_ENVIRONMENT=Production
+      - Ray_Security__IsSkipDailyTask=false
 
       # Cookie字符串（必填）：
-      - Ray_BiliBiliCookies__1:
-      - Ray_BiliBiliCookies__2:
+      - Ray_BiliBiliCookies__1=
+      - Ray_BiliBiliCookies__2=
 
       # 定时任务
-      - Ray_DailyTaskConfig__Cron: 0 15 * * *
-      - Ray_LiveLotteryTaskConfig__Cron: 0 22 * * *
-      - Ray_UnfollowBatchedTaskConfig__Cron: 0 6 1 * *
-      - Ray_VipBigPointConfig__Cron: 7 1 * * *
+      - Ray_DailyTaskConfig__Cron=0 15 * * *
+      - Ray_LiveLotteryTaskConfig__Cron=0 22 * * *
+      - Ray_UnfollowBatchedTaskConfig__Cron=0 6 1 * *
+      - Ray_VipBigPointConfig__Cron=7 1 * * *
 
       # UA：
-      - Ray_Security__UserAgent:
+      - Ray_Security__UserAgent=
       # 开始运行前随机随眠最大分钟数：
-      - Ray_Security__RandomSleepMaxMin: 2
+      - Ray_Security__RandomSleepMaxMin=2
       # 调用接口间的间隔秒数：
-      - Ray_Security__IntervalSecondsBetweenRequestApi:
+      - Ray_Security__IntervalSecondsBetweenRequestApi=
 
       # 目标投币数量：
-      - Ray_DailyTaskConfig__NumberOfCoins:
+      - Ray_DailyTaskConfig__NumberOfCoins=
       # 达到六级后是否开始白嫖：
-      - Ray_DailyTaskConfig__SaveCoinsWhenLv6:
+      - Ray_DailyTaskConfig__SaveCoinsWhenLv6=
 
       # 天选抽奖指定排除关键字
-      - Ray_LiveLotteryTaskConfig__ExcludeAwardNames:
+      - Ray_LiveLotteryTaskConfig__ExcludeAwardNames=
       # 天选抽奖指定包含关键字
-      - Ray_LiveLotteryTaskConfig__IncludeAwardNames:
+      - Ray_LiveLotteryTaskConfig__IncludeAwardNames=
 
       # 企业微信推送地址：
-      - Ray_Serilog__WriteTo__4__Args__webHookUrl:
+      - Ray_Serilog__WriteTo__4__Args__webHookUrl=
       # 钉钉：
-      - Ray_Serilog__WriteTo__5__Args__webHookUrl:
+      - Ray_Serilog__WriteTo__5__Args__webHookUrl=
       # PushPlus推送：
-      - Ray_Serilog__WriteTo__9__Args__token:
-      - Ray_Serilog__WriteTo__9__Args__topic:
-      - Ray_Serilog__WriteTo__9__Args__channel:
-      - Ray_Serilog__WriteTo__9__Args__webhook:
+      - Ray_Serilog__WriteTo__9__Args__token=
+      - Ray_Serilog__WriteTo__9__Args__topic=
+      - Ray_Serilog__WriteTo__9__Args__channel=
+      - Ray_Serilog__WriteTo__9__Args__webhook=
       # Server酱推送scKey：
-      - Ray_Serilog__WriteTo__6__Args__turboScKey:
+      - Ray_Serilog__WriteTo__6__Args__turboScKey=

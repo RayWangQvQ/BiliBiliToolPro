@@ -48,6 +48,8 @@ Window系统推荐使用Docker Desktop，官方下载安装包安装。
 mkdir bili
 cd bili
 
+docker pull zai7lou/bilibili_tool_pro
+
 # 下载
 wget https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/src/Ray.BiliBiliTool.Console/appsettings.json
 wget https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/docker/sample/docker-compose.yml
@@ -98,6 +100,7 @@ docker compose pull && docker compose up -d
 
 ```
 # 生成并运行容器
+docker pull zai7lou/bilibili_tool_pro
 docker run -d --name="bili" \
     -v /bili/Logs:/app/Logs \
     -e Ray_BiliBiliCookies__1="cookie" \
