@@ -28,10 +28,18 @@
 
 ```
 # 安装 dotnet 环境
-sh -c "$(wget https://ghproxy.com/https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/qinglong/ray-dotnet-install.sh -O -)"
+curl -sSL https://ghproxy.com/https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/qinglong/ray-dotnet-install.sh | bash /dev/stdin
 ```
 
 ![qinglong-extra.png](../docs/imgs/qinglong-extra.png)
+
+有人反馈国内服务器可能会出现下载缓慢的情况，如果下面一步运行时发现超时或异常，可以将上面指令改为：
+
+```
+curl -sSL https://ghproxy.com/https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/qinglong/ray-dotnet-install.sh | bash /dev/stdin --no-official
+```
+
+`--no-official`表示不会使用官方脚本去安装，而是通过手动下载二进制文件的形式来安装。
 
 ### 1.2. 重启青龙容器
 重启青龙容器，或在宿主机中执行 `docker exec -it qinglong bash /ql/data/config/extra.sh`，其中 `qinglong` 是你的容器名。
@@ -113,7 +121,7 @@ sh -c "$(wget https://ghproxy.com/https://raw.githubusercontent.com/RayWangQvQ/B
 白名单：bili_dev_task_.+\.sh
 ```
 
-其他同上。
+其他选项同上。
 
 ### 2.2 定时任务拉库
 
