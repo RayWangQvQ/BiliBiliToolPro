@@ -18,6 +18,8 @@
     - [2.1 订阅管理](#21-订阅管理)
     - [2.2 定时任务拉库](#22-定时任务拉库)
 - [3. GitHub加速](#3-github加速)
+- [4 常见问题](#4-常见问题)
+    - [4.1 Couldn't find a valid ICU package installed on the system](#41-couldnt-find-a-valid-icu-package-installed-on-the-system)
 
 <!-- /TOC -->
 
@@ -129,3 +131,14 @@ curl -sSL https://ghproxy.com/https://raw.githubusercontent.com/RayWangQvQ/BiliB
 
 ## 3. GitHub加速
 拉库时，如果服务器在国内，访问GitHub速度慢，可以在仓库地址前加上 `https://ghproxy.com/` 进行加速, 如：`ql repo https://ghproxy.com/https://github.com/RayWangQvQ/BiliBiliToolPro.git "bili_task_"`
+
+## 4 常见问题
+
+### 4.1 Couldn't find a valid ICU package installed on the system
+
+如 #266 ，需要在青龙面板的环境变量添加如下环境变量：
+
+```
+名称：DOTNET_SYSTEM_GLOBALIZATION_INVARIANT
+值：1
+```
