@@ -28,17 +28,20 @@ get_download_url_by_machine_architecture() {
 
 # 安装依赖
 install_dependency() {
+    echo "安装依赖..."
     apk add bash icu-libs krb5-libs libgcc libintl libssl1.1 libstdc++ zlib
 }
 
 # 通过官方脚本安装dotnet
 install_by_offical() {
+    echo "install by offical script..."
     curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 6.0 --no-cdn --verbose
 }
 
 # 通过vscode域自己下载二进制文件安装dotnet
 # https://dotnet.microsoft.com/zh-cn/download/dotnet/6.0
-install_by_vs() {
+install_by_binaries() {
+    echo "install by binaries..."
     DOWNLOAD_URL="$(get_download_url_by_machine_architecture)"
     DOTNET_FILE=dotnet-sdk.tar.gz
 
@@ -94,7 +97,7 @@ done
 install_dependency
 
 if [ "$no_official" = true ]; then
-    install_by_vs
+    install_by_binaries
 else
     install_by_offical
 fi
