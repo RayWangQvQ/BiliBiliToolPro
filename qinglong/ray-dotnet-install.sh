@@ -54,6 +54,7 @@ install_by_binaries() {
 
 # 创建软链接
 create_soft_link() {
+    echo "创建软链接..."
     rm -f /usr/local/bin/dotnet
     ln -s ~/.dotnet/dotnet /usr/local/bin
 }
@@ -101,6 +102,8 @@ if [ "$no_official" = true ]; then
 else
     install_by_offical
 fi
+
+create_soft_link
 
 dotnet --info
 
