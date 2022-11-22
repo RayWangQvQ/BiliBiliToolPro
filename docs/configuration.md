@@ -30,6 +30,7 @@
         - [3.3.7. 充电对象](#337-充电对象)
         - [3.3.8. 每月几号自动领取会员权益](#338-每月几号自动领取会员权益)
         - [3.3.9. 每月几号进行直播中心银瓜子兑换硬币](#339-每月几号进行直播中心银瓜子兑换硬币)
+        - [3.3.10. Lv6后开启硬币白嫖模式](#3310-lv6后开启硬币白嫖模式)
     - [3.4. 天选时刻抽奖相关](#34-天选时刻抽奖相关)
         - [3.4.1. 根据关键字排除奖品](#341-根据关键字排除奖品)
         - [3.4.2. 根据关键字指定奖品](#342-根据关键字指定奖品)
@@ -71,9 +72,9 @@
     - [3.7. 日志相关](#37-日志相关)
         - [3.7.1. Console日志输出等级](#371-console日志输出等级)
         - [3.7.2. Console日志输出样式](#372-console日志输出样式)
-    - [3.8. 定时任务相关](#38-定时任务相关)
-        - [3.8.1. 定时任务](#381-定时任务)
-        - [3.8.2. Crontab](#382-Crontab)
+        - [3.7.3. 定时任务相关](#373-定时任务相关)
+        - [3.7.4. 定时任务](#374-定时任务)
+        - [3.7.5. Crontab](#375-crontab)
 
 <!-- /TOC -->
 
@@ -424,6 +425,17 @@ export Ray_Serilog__WriteTo__9__Args__token="abcde"
 | 默认值   | -1 |
 | 环境变量   | `Ray_DailyTaskConfig__DayOfExchangeSilver2Coin` |
 | GitHub Secrets  | `DayOfExchangeSilver2Coin` |
+
+<a id="markdown-3310-lv6后开启硬币白嫖模式" name="3310-lv6后开启硬币白嫖模式"></a>
+#### 3.3.10. Lv6后开启硬币白嫖模式
+
+|   TITLE   | CONTENT   |
+| ---------- | -------------- |
+| 配置Key | `DailyTaskConfig:SaveCoinsWhenLv6` |
+| 值域   | [true,false]，true表示开启，Lv6的账号不会投币 |
+| 默认值   | false |
+| 环境变量   | `Ray_DailyTaskConfig__SaveCoinsWhenLv6` |
+| GitHub Secrets  |  |
 
 <a id="markdown-34-天选时刻抽奖相关" name="34-天选时刻抽奖相关"></a>
 ### 3.4. 天选时刻抽奖相关
@@ -848,12 +860,12 @@ BiliBiliTool 使用 Serilog 作为日志组件，所以可以参考 Serilog 的�
 | 环境变量   | `Ray_Serilog__WriteTo__0__Args__outputTemplate` |
 | GitHub Secrets  | `CONSOLELOGTEMPLATE` |
 
-<a id="markdown-38-定时任务相关" name="38-定时任务相关"></a>
-#### 3.8. 定时任务相关
+<a id="markdown-373-定时任务相关" name="373-定时任务相关"></a>
+#### 3.7.3. 定时任务相关
 适用于 [方式四：docker容器化运行（推荐）](../docker/README.md)，用于配置定时任务。
 
-<a id="markdown-381-定时任务" name="381-定时任务"></a>
-#### 3.8.1 定时任务
+<a id="markdown-374-定时任务" name="374-定时任务"></a>
+#### 3.7.4. 定时任务
 以下环境变量的值应为有效的 [cron 表达式](https://docs.oracle.com/cd/E12058_01/doc/doc.1014/e12030/cron_expressions.htm)。
 
 当被设置时，对应定时任务将开启。
@@ -865,8 +877,8 @@ BiliBiliTool 使用 Serilog 作为日志组件，所以可以参考 Serilog 的�
 | `Ray_UnfollowBatchedTaskConfig__Cron` | 批量取关 |
 | `Ray_VipBigPointConfig__Cron` | 大会员大积分 |
 
-<a id="markdown-382-Crontab" name="382-Crontab"></a>
-#### 3.8.2 Crontab
+<a id="markdown-375-crontab" name="375-crontab"></a>
+#### 3.7.5. Crontab
 若该环境变量被设置，其值将直接追加在 cron 文件的末尾，可用于设置额外的定时任务。
 
 |   TITLE   | CONTENT   |
