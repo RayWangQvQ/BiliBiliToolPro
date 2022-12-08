@@ -63,7 +63,7 @@ docker logs -f bili
 
 ### 2.2. 修改bili下的docker-compose.yml，填入cookie
 
-根据 docker-compose.yaml 里面的注释编辑所需配置，`environment` 下可以通过环境变量自由添加自定义配置，其中Cookie是必填的，所以请至少填入Cookie并保存。
+根据 docker-compose.yml 里面的注释编辑所需配置，`environment` 下可以通过环境变量自由添加自定义配置，其中Cookie是必填的，所以请至少填入Cookie并保存。
 
 保存后，重新运行下`docker compose up -d`
 
@@ -124,6 +124,9 @@ docker start bili
 
 # 停止容器
 docker stop bili
+
+# 重启容器
+docker restart bili
 
 # 删除容器
 docker rm bili
