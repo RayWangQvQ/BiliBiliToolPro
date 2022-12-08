@@ -43,10 +43,12 @@ namespace Ray.BiliBiliTool.Application
             var qrGenerator = new QRCodeGenerator();
             QRCodeData qrCodeData = qrGenerator.CreateQrCode(str, QRCodeGenerator.ECCLevel.L);
 
+            _logger.LogInformation("Graphic：");
             var qrCode = new AsciiQRCode(qrCodeData);
             var qrCodeStr = qrCode.GetGraphic(1);
             _logger.LogInformation(qrCodeStr);
 
+            Console.WriteLine("Console：");
             Print(qrCodeData);
         }
 
