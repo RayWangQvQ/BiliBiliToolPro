@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bilibilipro
+spec:
+  selector:
+    matchLabels:
+      app: bilibilipro
+  template:
+    metadata:
+      labels:
+        app: bilibilipro
+    spec:
+      containers:
+      - name: bilibilipro
+        image: zai7lou/bilibili_tool_pro:0.2.1
+        imagePullPolicy: IfNotPresent
+  

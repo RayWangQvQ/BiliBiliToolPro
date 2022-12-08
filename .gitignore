@@ -358,3 +358,10 @@ tencentScf/.env
 
 # vs code
 .vscode
+
+# krew
+krew/bilipro
+krew/cmd/kubectl-bilipro
+krew/kustomization.yaml
+bilipro
+kustomization.yaml
