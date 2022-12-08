@@ -59,13 +59,13 @@ namespace Ray.BiliBiliTool.Application
             {
                 _logger.LogInformation("等待扫描...");
 
-                //Task.Delay(5 * 1000).Wait();
+                Task.Delay(5 * 1000).Wait();
                 //Thread.Sleep(5 * 1000);
-                int j = 0;
-                while (j<100000*10000)
-                {
-                    j++;
-                }
+                //int j = 0;
+                //while (j<100000*10000)
+                //{
+                //    j++;
+                //}
 
                 var check = _passportApi.CheckQrCodeHasScaned(re.Data.Qrcode_key).Result;
                 if (check.Code != 0)
@@ -106,7 +106,7 @@ namespace Ray.BiliBiliTool.Application
             _logger.LogInformation(qrCodeStr);
 
             Console.WriteLine("Console：");
-            Print(qrCodeData);
+            //Print(qrCodeData);
         }
 
         private void Print(QRCodeData qrCodeData)
