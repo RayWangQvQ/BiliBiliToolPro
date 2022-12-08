@@ -65,6 +65,7 @@ namespace Ray.BiliBiliTool.Application
                 while (j<(10^5))
                 {
                     j++;
+                    Console.Write(j);
                 }
 
                 var check = _passportApi.CheckQrCodeHasScaned(re.Data.Qrcode_key).Result;
