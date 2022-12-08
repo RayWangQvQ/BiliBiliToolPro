@@ -69,6 +69,8 @@ namespace Ray.BiliBiliTool.Agent.Extensions
 
             services.AddBiliBiliClientApi<IVipBigPointApi>("https://api.bilibili.com");
 
+            services.AddBiliBiliClientApi<IPassportApi>("http://passport.bilibili.com", false);
+
             return services;
         }
 
