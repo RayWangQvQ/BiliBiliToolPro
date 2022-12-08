@@ -121,7 +121,7 @@ namespace Ray.BiliBiliTool.Console
 
             //Cookie
             _logger.LogInformation("【账号个数】{count}个{newLine}", _cookieStrFactory.Count, Environment.NewLine);
-            if (_cookieStrFactory.Count == 0) return false;
+            if (_cookieStrFactory.Count == 0 && !tasks.Contains("Login")) return false;
 
             //是否跳过
             if (_securityOptions.IsSkipDailyTask)
