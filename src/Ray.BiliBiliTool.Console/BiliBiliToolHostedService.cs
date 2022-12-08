@@ -57,26 +57,34 @@ namespace Ray.BiliBiliTool.Console
                 var tasks = _configuration["RunTasks"]
                     .Split("&", options: StringSplitOptions.RemoveEmptyEntries);
 
-                for (int i = 0; i < _cookieStrFactory.Count; i++)
+                if (tasks.Contains("Login"))
                 {
-                    _cookieStrFactory.CurrentNum = i + 1;
-                    _logger.LogInformation("######### 账号 {num} #########{newLine}", _cookieStrFactory.CurrentNum, Environment.NewLine);
+                    DoTasks(tasks);
+                }
 
-                    try
+                else
+                {
+                    for (int i = 0; i < _cookieStrFactory.Count; i++)
                     {
-                        DoTasks(tasks);
-                        if (isNotifySingle)
+                        _cookieStrFactory.CurrentNum = i + 1;
+                        _logger.LogInformation("######### 账号 {num} #########{newLine}", _cookieStrFactory.CurrentNum, Environment.NewLine);
+
+                        try
                         {
-                            LogAppInfo();
+                            DoTasks(tasks);
+                            if (isNotifySingle)
+                            {
+                                LogAppInfo();
 
-                            var accountName = _cookieStrFactory.Count > 1 ? $"账号【{_cookieStrFactory.CurrentNum}】" : "";
-                            _logger.LogInformation("·开始推送·{task}·{user}", $"{_configuration["RunTasks"]}任务", accountName);
+                                var accountName = _cookieStrFactory.Count > 1 ? $"账号【{_cookieStrFactory.CurrentNum}】" : "";
+                                _logger.LogInformation("·开始推送·{task}·{user}", $"{_configuration["RunTasks"]}任务", accountName);
+                            }
                         }
-                    }
-                    catch (Exception e)
-                    {
-                        //ignore
-                        _logger.LogWarning("异常：{msg}", e);
+                        catch (Exception e)
+                        {
+                            //ignore
+                            _logger.LogWarning("异常：{msg}", e);
+                        }
                     }
                 }
             }
