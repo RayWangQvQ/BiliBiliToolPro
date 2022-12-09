@@ -1,14 +1,22 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
+using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Polly;
 using QRCoder;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Application.Attributes;
 using Ray.BiliBiliTool.Application.Contracts;
+using Ray.BiliBiliTool.Infrastructure;
 
 namespace Ray.BiliBiliTool.Application
 {
@@ -16,27 +24,46 @@ namespace Ray.BiliBiliTool.Application
     {
         private readonly ILogger<LoginTaskAppService> _logger;
         private readonly IPassportApi _passportApi;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IConfiguration _configuration;
 
         public LoginTaskAppService(
             IConfiguration configuration,
             ILogger<LoginTaskAppService> logger,
-            IPassportApi passportApi
+            IPassportApi passportApi,
+            IHostingEnvironment hostingEnvironment
             )
         {
             _configuration = configuration;
             _logger = logger;
             _passportApi = passportApi;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         [TaskInterceptor("扫码登录", TaskLevel.One)]
         public override void DoTask()
         {
+            //扫码登录
+            var suc = QrCodeLogin(out CookieInfo cookieInfo);
+            if (!suc) return;
+
+            //更新cookie到json
+            AddOrUpdateCkToJson(cookieInfo);
+
+            //更新cookie到青龙env
+        }
+
+        [TaskInterceptor("二维码登录", TaskLevel.Two)]
+        protected bool QrCodeLogin(out CookieInfo cookieInfo)
+        {
+            var result = false;
+            cookieInfo = new CookieInfo("");
+
             var re = _passportApi.GenerateQrCode().Result;
             if (re.Code != 0)
             {
                 _logger.LogWarning("获取二维码失败：{msg}", re.ToJson());
-                return;
+                return result;
             }
 
             var url = re.Data.Url;
@@ -71,12 +98,84 @@ namespace Ray.BiliBiliTool.Application
                 if (check.Data.Code == 0)
                 {
                     _logger.LogInformation("扫描成功！");
-                    _logger.LogInformation(check.Data.Url);
+                    cookieInfo = GetCookieStr(check.Data.Url);
+                    result = true;
                     break;
                 }
 
                 _logger.LogInformation("{msg}", check.Data.Message + Environment.NewLine);
             }
+
+            return result;
+        }
+
+
+        [TaskInterceptor("添加到json", TaskLevel.Two)]
+        protected void AddOrUpdateCkToJson(CookieInfo ckInfo)
+        {
+            //读取json
+            var path = "appsettings.json";
+            var fileProvider = new PhysicalFileProvider(_hostingEnvironment.ContentRootPath);
+            IFileInfo fileInfo = fileProvider.GetFileInfo(path);
+
+            var json = "";
+            using (var stream = new FileStream(
+                fileInfo.PhysicalPath,
+                FileMode.Open))
+            {
+                using var reader = new StreamReader(stream);
+                json = reader.ReadToEnd();
+            }
+            
+
+            if (!json.Contains("BiliBiliCookies"))
+            {
+                _logger.LogInformation("不存在cookie，初始化并新增");
+
+                json = json.Remove(0);
+                var ck = @"{
+  ""BiliBiliCookies"": [
+    ""{0}""
+  ],
+";
+                json = string.Format(ck, ckInfo.CookieStr) + json;
+
+                using (var sw = new StreamWriter(fileInfo.PhysicalPath))
+                {
+                    sw.Write(json);
+                }
+                return;
+            }
+
+            ckInfo.CookieItemDictionary.TryGetValue("DedeUserID", out string userId);
+
+            if (!json.Contains($"DedeUserID={userId}"))
+            {
+                _logger.LogInformation("不存在cookie，新增");
+
+                var oldStr = "\"BiliBiliCookies\": [";
+                json = json.Replace(oldStr, $"{oldStr}{Environment.NewLine}\"{ckInfo.CookieStr}\",{Environment.NewLine}");
+                using (var sw = new StreamWriter(fileInfo.PhysicalPath))
+                {
+                    sw.Write(json);
+                }
+                return;
+            }
+
+            //todo:update
+            _logger.LogInformation("已存在该用户，更新cookie");
+            var listStr= SubstringSingle(json, "\"BiliBiliCookies\": \\[", "\\]");
+            var list = listStr.Split(Environment.NewLine).ToList();
+            var index= list.FindIndex(x => x.Contains(userId));
+            list[index] = $"\"{ckInfo.CookieStr}\",";
+            var newList = string.Join(Environment.NewLine,list);
+
+            json = json.Replace(listStr, newList);
+            using (var sw = new StreamWriter(fileInfo.PhysicalPath))
+            {
+                sw.Write(json);
+            }
+            return;
         }
 
         private void GenerateQrCode(string str)
@@ -158,6 +257,23 @@ namespace Ray.BiliBiliTool.Application
         {
             var encode = System.Web.HttpUtility.UrlEncode(str); ;
             return $"https://tool.lu/qrcode/basic.html?text={encode}";
+        }
+
+        private CookieInfo GetCookieStr(string url)
+        {
+            var ckStrList= url.Split('?')[1]
+                .Split("&gourl=")[0]
+                .Split('&')
+                .ToList();
+            return new CookieInfo(ckStrList);
+        }
+
+        public static string SubstringSingle(string source, string startStr, string endStr,string middleRegex="")
+        {
+            if (middleRegex.IsNullOrEmpty()) middleRegex = "[.\\s\\S]*?";
+            var regexStr = $"(?<=({startStr})){middleRegex}(?=({endStr}))";
+            Regex rg = new Regex(regexStr, RegexOptions.Multiline | RegexOptions.Singleline);
+            return rg.Match(source).Value;
         }
     }
 }
