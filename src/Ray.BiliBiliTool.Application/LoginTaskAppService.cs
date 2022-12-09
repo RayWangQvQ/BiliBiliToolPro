@@ -47,8 +47,9 @@ namespace Ray.BiliBiliTool.Application
             _logger.LogInformation("如果上方二维码显示异常，或扫描失败，请使用浏览器访问如下链接，查看高清在线二维码：");
             _logger.LogInformation(online + Environment.NewLine + Environment.NewLine);
 
-
-            for (int i = 0; i < 10; i++)
+            var waitTimes = 10;
+            _logger.LogInformation("我数到{num}，动作快点", waitTimes);
+            for (int i = 0; i < waitTimes; i++)
             {
                 _logger.LogInformation("等待扫描...");
 
@@ -59,12 +60,6 @@ namespace Ray.BiliBiliTool.Application
                 {
                     _logger.LogWarning("调用检查接口异常：{msg}", check.ToJson());
                     break;
-                }
-
-                if (check.Data.Code == 86101)//未扫描
-                {
-                    _logger.LogInformation("[{num}]：{msg}", i + 1, check.Data.Message + Environment.NewLine);
-                    continue;
                 }
 
                 if (check.Data.Code == 86038)//已失效
@@ -79,6 +74,8 @@ namespace Ray.BiliBiliTool.Application
                     _logger.LogInformation(check.Data.Url);
                     break;
                 }
+
+                _logger.LogInformation("[{num}]：{msg}", i + 1, check.Data.Message + Environment.NewLine);
             }
         }
 
@@ -92,7 +89,7 @@ namespace Ray.BiliBiliTool.Application
             //var qrCodeStr = qrCode.GetGraphic(1, drawQuietZones: false);
             //_logger.LogInformation(Environment.NewLine + qrCodeStr);
 
-            Console.WriteLine("Console：");
+            //Console.WriteLine("Console：");
             //Print(qrCodeData);
             PrintSmall(qrCodeData);
         }
@@ -126,42 +123,35 @@ namespace Ray.BiliBiliTool.Application
             //白白（"█"）
             //黑白（"▄"）
             //白黑（"▀"）
-            var dic = new Dictionary<string, string>()
+            var dic = new Dictionary<string, char>()
             {
-                {"11", " "},
-                {"00", "█"},
-                {"10", "▄"},
-                {"01", "▀"},
+                {"11", ' '},
+                {"00", '█'},
+                {"10", '▄'},
+                {"01", '▀'},
+                //{"01", '^'},//▼▔
             };
 
             var count = qrCodeData.ModuleMatrix.Count;
 
-            var list = new List<List<string>>();
+            var list = new List<string>();
             for (int rowNum = 0; rowNum < count; rowNum++)
             {
-                var rowStr = new List<string>();
+                var rowStr = "";
                 for (int colNum = 0; colNum < count; colNum++)
                 {
                     var num = qrCodeData.ModuleMatrix[colNum][rowNum] ? "1" : "0";
-                    var numDown = "1";
+                    var numDown = "0";
                     if (rowNum + 1 < count)
                         numDown = qrCodeData.ModuleMatrix[colNum][rowNum + 1] ? "1" : "0";
 
-                    rowStr.Add(dic[num + numDown]);
+                    rowStr += dic[num + numDown];
                 }
-
-                _logger.LogInformation(string.Join("", rowStr));
-
-                rowNum++;
                 list.Add(rowStr);
+                rowNum++;
             }
 
-            _logger.LogInformation("Console：");
-            foreach (var row in list)
-            {
-                Console.WriteLine(string.Join("", row));
-            }
-            Console.WriteLine();
+            _logger.LogInformation(Environment.NewLine + string.Join(Environment.NewLine, list));
         }
 
         private string GetOnlinePic(string str)
