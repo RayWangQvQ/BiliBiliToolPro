@@ -51,7 +51,7 @@ namespace Ray.BiliBiliTool.Application
             _logger.LogInformation("我数到{num}，动作快点", waitTimes);
             for (int i = 0; i < waitTimes; i++)
             {
-                _logger.LogInformation("等待扫描...");
+                _logger.LogInformation("[{num}]等待扫描...", i + 1);
 
                 Task.Delay(5 * 1000).Wait();
 
@@ -75,7 +75,7 @@ namespace Ray.BiliBiliTool.Application
                     break;
                 }
 
-                _logger.LogInformation("[{num}]：{msg}", i + 1, check.Data.Message + Environment.NewLine);
+                _logger.LogInformation("{msg}", check.Data.Message + Environment.NewLine);
             }
         }
 
@@ -128,7 +128,7 @@ namespace Ray.BiliBiliTool.Application
                 {"11", ' '},
                 {"00", '█'},
                 {"10", '▄'},
-                {"01", '▀'},
+                {"01", '▀'},//todo:win平台的cmd会显示？,是已知问题，待想办法解决
                 //{"01", '^'},//▼▔
             };
 
