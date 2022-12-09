@@ -1,21 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Encodings.Web;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using QRCoder;
-using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Application.Attributes;
 using Ray.BiliBiliTool.Application.Contracts;
-using Ray.BiliBiliTool.Config.Options;
-using Ray.BiliBiliTool.DomainService.Interfaces;
-using Ray.BiliBiliTool.Infrastructure.Enums;
 
 namespace Ray.BiliBiliTool.Application
 {
@@ -94,13 +84,13 @@ namespace Ray.BiliBiliTool.Application
             var qrGenerator = new QRCodeGenerator();
             QRCodeData qrCodeData = qrGenerator.CreateQrCode(str, QRCodeGenerator.ECCLevel.L);
 
-            _logger.LogInformation("Graphic：");
+            _logger.LogInformation("AsciiQRCode：");
             var qrCode = new AsciiQRCode(qrCodeData);
-            var qrCodeStr = qrCode.GetGraphic(1);
-            _logger.LogInformation(qrCodeStr);
+            var qrCodeStr = qrCode.GetGraphic(1, drawQuietZones: false);
+            _logger.LogInformation(Environment.NewLine + qrCodeStr);
 
-            Console.WriteLine("Console：");
-            Print(qrCodeData);
+            //Console.WriteLine("Console：");
+            //Print(qrCodeData);
         }
 
         private void Print(QRCodeData qrCodeData)
