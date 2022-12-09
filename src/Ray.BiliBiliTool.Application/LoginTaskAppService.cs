@@ -131,7 +131,6 @@ namespace Ray.BiliBiliTool.Application
                 {"11", " "},
                 {"00", "█"},
                 {"10", "▄"},
-                //{"01", "▀"},
                 {"01", "▀"},
             };
 
@@ -156,6 +155,13 @@ namespace Ray.BiliBiliTool.Application
                 rowNum++;
                 list.Add(rowStr);
             }
+
+            _logger.LogInformation("Console：");
+            foreach (var row in list)
+            {
+                Console.WriteLine(string.Join("", row));
+            }
+            Console.WriteLine();
         }
 
         private string GetOnlinePic(string str)
