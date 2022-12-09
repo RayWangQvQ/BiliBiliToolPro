@@ -1,4 +1,7 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -86,11 +89,12 @@ namespace Ray.BiliBiliTool.Application
 
             _logger.LogInformation("AsciiQRCode：");
             var qrCode = new AsciiQRCode(qrCodeData);
-            var qrCodeStr = qrCode.GetGraphic(1, drawQuietZones: false);
-            _logger.LogInformation(Environment.NewLine + qrCodeStr);
+            //var qrCodeStr = qrCode.GetGraphic(1, drawQuietZones: false);
+            //_logger.LogInformation(Environment.NewLine + qrCodeStr);
 
-            //Console.WriteLine("Console：");
+            Console.WriteLine("Console：");
             //Print(qrCodeData);
+            PrintSmall(qrCodeData);
         }
 
         private void Print(QRCodeData qrCodeData)
@@ -114,6 +118,44 @@ namespace Ray.BiliBiliTool.Application
             for (int i = 0; i < qrCodeData.ModuleMatrix.Count + 2; i++) Console.Write("　");//中文全角的空格符
 
             Console.WriteLine();
+        }
+
+        private void PrintSmall(QRCodeData qrCodeData)
+        {
+            //黑黑（" "）
+            //白白（"█"）
+            //黑白（"▄"）
+            //白黑（"▀"）
+            var dic = new Dictionary<string, string>()
+            {
+                {"11", " "},
+                {"00", "█"},
+                {"10", "▄"},
+                //{"01", "▀"},
+                {"01", "▀"},
+            };
+
+            var count = qrCodeData.ModuleMatrix.Count;
+
+            var list = new List<List<string>>();
+            for (int rowNum = 0; rowNum < count; rowNum++)
+            {
+                var rowStr = new List<string>();
+                for (int colNum = 0; colNum < count; colNum++)
+                {
+                    var num = qrCodeData.ModuleMatrix[colNum][rowNum] ? "1" : "0";
+                    var numDown = "1";
+                    if (rowNum + 1 < count)
+                        numDown = qrCodeData.ModuleMatrix[colNum][rowNum + 1] ? "1" : "0";
+
+                    rowStr.Add(dic[num + numDown]);
+                }
+
+                _logger.LogInformation(string.Join("", rowStr));
+
+                rowNum++;
+                list.Add(rowStr);
+            }
         }
 
         private string GetOnlinePic(string str)
