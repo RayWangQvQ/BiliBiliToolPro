@@ -2,18 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Text;
-using System.Text.Json;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
-using Microsoft.Extensions.FileSystemGlobbing.Internal;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Polly;
 using QRCoder;
+using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Application.Attributes;
 using Ray.BiliBiliTool.Application.Contracts;
@@ -45,7 +40,7 @@ namespace Ray.BiliBiliTool.Application
         public override void DoTask()
         {
             //扫码登录
-            var suc = QrCodeLogin(out CookieInfo cookieInfo);
+            var suc = QrCodeLogin(out BiliCookie cookieInfo);
             if (!suc) return;
 
             //更新cookie到json
@@ -55,10 +50,10 @@ namespace Ray.BiliBiliTool.Application
         }
 
         [TaskInterceptor("二维码登录", TaskLevel.Two)]
-        protected bool QrCodeLogin(out CookieInfo cookieInfo)
+        protected bool QrCodeLogin(out BiliCookie cookieInfo)
         {
             var result = false;
-            cookieInfo = new CookieInfo("");
+            cookieInfo = new BiliCookie(new List<string>(){""});
 
             var re = _passportApi.GenerateQrCode().Result;
             if (re.Code != 0)
@@ -99,7 +94,7 @@ namespace Ray.BiliBiliTool.Application
                 if (check.Data.Code == 0)
                 {
                     _logger.LogInformation("扫描成功！");
-                    cookieInfo = GetCookieStr(check.Data.Url);
+                    cookieInfo = GetCookie(check.Data.Url);
                     result = true;
                     break;
                 }
@@ -111,13 +106,16 @@ namespace Ray.BiliBiliTool.Application
         }
 
 
-        [TaskInterceptor("添加到json", TaskLevel.Two)]
+        [TaskInterceptor("添加ck到json配置文件", TaskLevel.Two)]
         protected void AddOrUpdateCkToJson(CookieInfo ckInfo)
         {
             //读取json
-            var path = "appsettings.json";
-            var fileProvider = new PhysicalFileProvider(_hostingEnvironment.ContentRootPath);
-            IFileInfo fileInfo = fileProvider.GetFileInfo(path);
+            var path = _hostingEnvironment.ContentRootPath;
+            var indexOfBin = path.LastIndexOf("bin");
+            if (indexOfBin != -1) path = path.Substring(0, indexOfBin);
+            var fileProvider = new PhysicalFileProvider(path);
+            IFileInfo fileInfo = fileProvider.GetFileInfo("appsettings.json");
+            _logger.LogInformation("目标json地址：{path}", fileInfo.PhysicalPath);
 
             string json;
             using (var stream = new FileStream(fileInfo.PhysicalPath, FileMode.Open))
@@ -146,6 +144,7 @@ namespace Ray.BiliBiliTool.Application
             }
 
             ckInfo.CookieItemDictionary.TryGetValue("DedeUserID", out string userId);
+            userId ??= ckInfo.CookieStr;
             var indexOfCkConfigEnd = lines.FindIndex(indexOfCkConfigKey, x => x.TrimStart().StartsWith("]"));
             var indexOfTargetCk = lines.FindIndex(indexOfCkConfigKey,
                 indexOfCkConfigEnd - indexOfCkConfigKey,
@@ -247,13 +246,17 @@ namespace Ray.BiliBiliTool.Application
             return $"https://tool.lu/qrcode/basic.html?text={encode}";
         }
 
-        private CookieInfo GetCookieStr(string url)
+        private BiliCookie GetCookie(string url)
         {
-            var ckStrList = url.Split('?')[1]
+            var ckItemList = url.Split('?')[1]
                 .Split("&gourl=")[0]
                 .Split('&')
                 .ToList();
-            return new CookieInfo(ckStrList);
+            var ckStr = string.Join(';', ckItemList);
+            var biliCk = new BiliCookie(new List<string>() { ckStr });
+
+            biliCk.Check();
+            return biliCk;
         }
 
         private void SaveJson(List<string> lines, IFileInfo fileInfo)

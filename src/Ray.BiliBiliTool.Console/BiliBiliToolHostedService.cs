@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -20,6 +19,7 @@ namespace Ray.BiliBiliTool.Console
     {
         private readonly IHostApplicationLifetime _applicationLifetime;
         private readonly IServiceProvider _serviceProvider;
+        private readonly IHostEnvironment _environment;
         private readonly IConfiguration _configuration;
         private readonly ILogger<BiliBiliToolHostedService> _logger;
         private readonly CookieStrFactory _cookieStrFactory;
@@ -28,6 +28,7 @@ namespace Ray.BiliBiliTool.Console
         public BiliBiliToolHostedService(
             IHostApplicationLifetime applicationLifetime
             , IServiceProvider serviceProvider
+            , IHostEnvironment environment
             , IConfiguration configuration
             , ILogger<BiliBiliToolHostedService> logger
             , CookieStrFactory cookieStrFactory
@@ -35,6 +36,7 @@ namespace Ray.BiliBiliTool.Console
         {
             _applicationLifetime = applicationLifetime;
             _serviceProvider = serviceProvider;
+            _environment = environment;
             _configuration = configuration;
             _logger = logger;
             _cookieStrFactory = cookieStrFactory;
@@ -100,6 +102,9 @@ namespace Ray.BiliBiliTool.Console
                     LogAppInfo();
                     _logger.LogInformation("·开始推送·{task}·{user}", $"{_configuration["RunTasks"]}任务", "");
                 }
+                //环境
+                _logger.LogInformation("运行环境：{env}", _environment.EnvironmentName);
+                _logger.LogInformation("应用目录：{path}{newLine}", _environment.ContentRootPath, Environment.NewLine);
                 _logger.LogInformation("运行结束");
                 _applicationLifetime.StopApplication();
             }
