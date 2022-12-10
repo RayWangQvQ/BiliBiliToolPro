@@ -6,14 +6,14 @@
     - [1.2. 须知](#12-须知)
 - [2. 方式一：Docker Compose(推荐)](#2-方式一docker-compose推荐)
     - [2.1. 启动](#21-启动)
-    - [2.2. 修改bili下的docker-compose.yml，填入cookie](#22-修改bili下的docker-composeyml填入cookie)
-    - [2.3. 其他命令参考](#23-其他命令参考)
+    - [2.2. 其他命令参考](#22-其他命令参考)
 - [3. 方式二：Docker指令](#3-方式二docker指令)
     - [3.1. Docker启动](#31-docker启动)
     - [3.2. 其他指令参考](#32-其他指令参考)
     - [3.3. 使用Watchtower更新容器](#33-使用watchtower更新容器)
-- [4. 自己构建镜像（非必须）](#4-自己构建镜像非必须)
-- [5. 其他](#5-其他)
+- [4. 登录](#4-登录)
+- [5. 自己构建镜像（非必须）](#5-自己构建镜像非必须)
+- [6. 其他](#6-其他)
 
 <!-- /TOC -->
 ## 1. 前期工作
@@ -52,6 +52,7 @@ docker pull zai7lou/bilibili_tool_pro
 
 # 下载
 wget https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/src/Ray.BiliBiliTool.Console/appsettings.json
+wget https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/docker/sample/cookies.json
 wget https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/docker/sample/docker-compose.yml
 
 # 启动
@@ -61,21 +62,16 @@ docker compose up -d
 docker logs -f bili
 ```
 
-### 2.2. 修改bili下的docker-compose.yml，填入cookie
-
-根据 docker-compose.yml 里面的注释编辑所需配置，`environment` 下可以通过环境变量自由添加自定义配置，其中Cookie是必填的，所以请至少填入Cookie并保存。
-
-保存后，重新运行下`docker compose up -d`
-
 最终文件结构如下：
 
 ```
 bili
 ├── appsettings.json
+├── cookies.json
 └── docker-compose.yml
 ```
 
-### 2.3. 其他命令参考
+### 2.2. 其他命令参考
 
 ```
 # 启动 docker-compose
@@ -103,7 +99,6 @@ docker compose pull && docker compose up -d
 docker pull zai7lou/bilibili_tool_pro
 docker run -d --name="bili" \
     -v /bili/Logs:/app/Logs \
-    -e Ray_BiliBiliCookies__1="cookie" \
     -e Ray_DailyTaskConfig__Cron="0 15 * * *" \
     -e Ray_LiveLotteryTaskConfig__Cron="0 22 * * *" \
     -e Ray_UnfollowBatchedTaskConfig__Cron="0 6 1 * *" \
@@ -144,7 +139,15 @@ docker run --rm \
     bili
 ```
 
-## 4. 自己构建镜像（非必须）
+## 4. 登录
+
+在宿主机运行`docker exec -it bili bash -c "dotnet Ray.BiliBiliTool.Console.dll --runTasks=Login"`
+
+扫码进行登录。
+
+![login](../docs/imgs/docker-login.png)
+
+## 5. 自己构建镜像（非必须）
 
 目前我提供和维护的镜像：`[zai7lou/bilibili_tool_pro](https://hub.docker.com/repository/docker/zai7lou/bilibili_tool_pro)`;
 
@@ -156,7 +159,7 @@ docker run --rm \
 
  `TARGET_NAME`为镜像名称和版本，可以自己起个名字
 
-## 5. 其他
+## 6. 其他
 
 代码编译和发布环境: mcr.microsoft.com/dotnet/sdk:6.0
 

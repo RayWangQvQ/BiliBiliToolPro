@@ -8,14 +8,11 @@ services:
     volumes:
       - ./Logs:/app/Logs
       - ./appsettings.json:/app/appsettings.json
+      - ./cookies.json:/app/cookies.json
     tty: true
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - Ray_Security__IsSkipDailyTask=false
-
-      # Cookie字符串（必填）：
-      - Ray_BiliBiliCookies__1=
-      - Ray_BiliBiliCookies__2=
 
       # 定时任务
       - Ray_DailyTaskConfig__Cron=0 15 * * *
