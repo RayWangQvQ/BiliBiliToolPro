@@ -365,3 +365,6 @@ krew/cmd/kubectl-bilipro
 krew/kustomization.yaml
 bilipro
 kustomization.yaml
+
+# cookie config
+cookies.json

@@ -85,6 +85,9 @@ namespace Ray.BiliBiliTool.Console
                         .GetSection("CommandLineMappings")
                         .Get<Dictionary<string, string>>());
                 }
+
+                //本地cookie存储文件
+                configurationBuilder.AddJsonFile("cookies.json", true, true);
             });
 
             //日志:

@@ -115,8 +115,10 @@ namespace Ray.BiliBiliTool.Application
             var indexOfBin = path.LastIndexOf("bin");
             if (indexOfBin != -1) path = path.Substring(0, indexOfBin);
             var fileProvider = new PhysicalFileProvider(path);
-            IFileInfo fileInfo = fileProvider.GetFileInfo("appsettings.json");
+            IFileInfo fileInfo = fileProvider.GetFileInfo("cookies.json");
             _logger.LogInformation("目标json地址：{path}", fileInfo.PhysicalPath);
+
+            if (!fileInfo.Exists) File.Create(fileInfo.PhysicalPath).Dispose();
 
             string json;
             using (var stream = new FileStream(fileInfo.PhysicalPath, FileMode.Open))
@@ -262,6 +264,9 @@ namespace Ray.BiliBiliTool.Application
 
         private void SaveJson(List<string> lines, IFileInfo fileInfo)
         {
+            lines.Insert(0,"{");
+            lines.Add("}");
+
             var newJson = string.Join(Environment.NewLine, lines);
 
             using (var sw = new StreamWriter(fileInfo.PhysicalPath))
