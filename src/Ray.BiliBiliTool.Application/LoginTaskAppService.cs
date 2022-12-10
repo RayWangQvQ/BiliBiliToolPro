@@ -139,7 +139,7 @@ namespace Ray.BiliBiliTool.Application
                 {
                     using (var sw = new StreamWriter(stream))
                     {
-                        sw.Write($"\{{Environment.NewLine}\}");
+                        sw.Write($"{{{Environment.NewLine}}}");
                     }
                 }
             }
