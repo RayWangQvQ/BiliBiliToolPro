@@ -200,8 +200,10 @@ namespace Ray.BiliBiliTool.Application
 
             if (!suc) return;
 
+            token = $"Bearer {token}";
+
             //查env
-            var re = _qingLongApi.GetEnvs("Ray_BiliBiliCookies__", $"Bearer {token}").Result;
+            var re = _qingLongApi.GetEnvs("Ray_BiliBiliCookies__", token).Result;
 
             if (re.Code != 200)
             {
