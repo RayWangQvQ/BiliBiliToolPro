@@ -16,9 +16,11 @@ namespace Ray.BiliBiliTool.Config
     {
         public string Prefix { get; set; }
 
+        public bool RemoveKeyPrefix { get; set; }
+
         public IConfigurationProvider Build(IConfigurationBuilder builder)
         {
-            return new EnvironmentVariablesExcludeEmptyConfigurationProvider(Prefix);
+            return new EnvironmentVariablesExcludeEmptyConfigurationProvider(Prefix, RemoveKeyPrefix);
         }
     }
 }

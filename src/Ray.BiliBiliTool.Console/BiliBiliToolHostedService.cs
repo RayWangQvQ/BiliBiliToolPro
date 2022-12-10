@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -20,6 +19,7 @@ namespace Ray.BiliBiliTool.Console
     {
         private readonly IHostApplicationLifetime _applicationLifetime;
         private readonly IServiceProvider _serviceProvider;
+        private readonly IHostEnvironment _environment;
         private readonly IConfiguration _configuration;
         private readonly ILogger<BiliBiliToolHostedService> _logger;
         private readonly CookieStrFactory _cookieStrFactory;
@@ -28,6 +28,7 @@ namespace Ray.BiliBiliTool.Console
         public BiliBiliToolHostedService(
             IHostApplicationLifetime applicationLifetime
             , IServiceProvider serviceProvider
+            , IHostEnvironment environment
             , IConfiguration configuration
             , ILogger<BiliBiliToolHostedService> logger
             , CookieStrFactory cookieStrFactory
@@ -35,6 +36,7 @@ namespace Ray.BiliBiliTool.Console
         {
             _applicationLifetime = applicationLifetime;
             _serviceProvider = serviceProvider;
+            _environment = environment;
             _configuration = configuration;
             _logger = logger;
             _cookieStrFactory = cookieStrFactory;
@@ -57,26 +59,34 @@ namespace Ray.BiliBiliTool.Console
                 var tasks = _configuration["RunTasks"]
                     .Split("&", options: StringSplitOptions.RemoveEmptyEntries);
 
-                for (int i = 0; i < _cookieStrFactory.Count; i++)
+                if (tasks.Contains("Login"))
                 {
-                    _cookieStrFactory.CurrentNum = i + 1;
-                    _logger.LogInformation("######### 账号 {num} #########{newLine}", _cookieStrFactory.CurrentNum, Environment.NewLine);
+                    DoTasks(tasks);
+                }
 
-                    try
+                else
+                {
+                    for (int i = 0; i < _cookieStrFactory.Count; i++)
                     {
-                        DoTasks(tasks);
-                        if (isNotifySingle)
+                        _cookieStrFactory.CurrentNum = i + 1;
+                        _logger.LogInformation("######### 账号 {num} #########{newLine}", _cookieStrFactory.CurrentNum, Environment.NewLine);
+
+                        try
                         {
-                            LogAppInfo();
+                            DoTasks(tasks);
+                            if (isNotifySingle)
+                            {
+                                LogAppInfo();
 
-                            var accountName = _cookieStrFactory.Count > 1 ? $"账号【{_cookieStrFactory.CurrentNum}】" : "";
-                            _logger.LogInformation("·开始推送·{task}·{user}", $"{_configuration["RunTasks"]}任务", accountName);
+                                var accountName = _cookieStrFactory.Count > 1 ? $"账号【{_cookieStrFactory.CurrentNum}】" : "";
+                                _logger.LogInformation("·开始推送·{task}·{user}", $"{_configuration["RunTasks"]}任务", accountName);
+                            }
                         }
-                    }
-                    catch (Exception e)
-                    {
-                        //ignore
-                        _logger.LogWarning("异常：{msg}", e);
+                        catch (Exception e)
+                        {
+                            //ignore
+                            _logger.LogWarning("异常：{msg}", e);
+                        }
                     }
                 }
             }
@@ -92,6 +102,9 @@ namespace Ray.BiliBiliTool.Console
                     LogAppInfo();
                     _logger.LogInformation("·开始推送·{task}·{user}", $"{_configuration["RunTasks"]}任务", "");
                 }
+                //环境
+                _logger.LogInformation("运行环境：{env}", _environment.EnvironmentName);
+                _logger.LogInformation("应用目录：{path}{newLine}", _environment.ContentRootPath, Environment.NewLine);
                 _logger.LogInformation("运行结束");
                 _applicationLifetime.StopApplication();
             }
@@ -113,7 +126,7 @@ namespace Ray.BiliBiliTool.Console
 
             //Cookie
             _logger.LogInformation("【账号个数】{count}个{newLine}", _cookieStrFactory.Count, Environment.NewLine);
-            if (_cookieStrFactory.Count == 0) return false;
+            if (_cookieStrFactory.Count == 0 && !tasks.Contains("Login")) return false;
 
             //是否跳过
             if (_securityOptions.IsSkipDailyTask)

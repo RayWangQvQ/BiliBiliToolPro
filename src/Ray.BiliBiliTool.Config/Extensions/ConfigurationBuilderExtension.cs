@@ -25,9 +25,10 @@ namespace Ray.BiliBiliTool.Config.Extensions
         /// <returns>The <see cref="IConfigurationBuilder"/>.</returns>
         public static IConfigurationBuilder AddExcludeEmptyEnvironmentVariables(
             this IConfigurationBuilder configurationBuilder,
-            string prefix)
+            string prefix,
+            bool removeKeyPrefix = true)
         {
-            configurationBuilder.Add(new EnvironmentVariablesExcludeEmptyConfigurationSource { Prefix = prefix });
+            configurationBuilder.Add(new EnvironmentVariablesExcludeEmptyConfigurationSource { Prefix = prefix, RemoveKeyPrefix = removeKeyPrefix });
             return configurationBuilder;
         }
 

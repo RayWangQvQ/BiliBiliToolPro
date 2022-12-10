@@ -26,6 +26,19 @@ namespace Ray.BiliBiliTool.Infrastructure
             }
         }
 
+        public CookieInfo(List<string> cookieItemList)
+        {
+            CookieItemList=cookieItemList ?? new List<string>();
+            foreach (var item in CookieItemList)
+            {
+                var list = item.Split('=');
+                if (list.Length >= 2)
+                    CookieItemDictionary.TryAdd(list[0].Trim(), list[1].Trim());
+            }
+
+            CookieStr = string.Join(';', CookieItemList);
+        }
+
         public string CookieStr { get; set; }
 
         public List<string> CookieItemList { get; set; }
