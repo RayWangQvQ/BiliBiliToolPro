@@ -234,7 +234,7 @@ namespace Ray.BiliBiliTool.Application
 
             _logger.LogInformation("用户不存在，新增cookie");
             var lastNum = list.LastOrDefault()?.value.Split("__").LastOrDefault();
-            var newNum = int.Parse(lastNum ?? "0") + 1;
+            var newNum = int.Parse(lastNum ?? "-1") + 1;
             var name = $"Ray_BiliBiliCookies__{newNum}";
 
             var add = new AddQingLongEnv()
