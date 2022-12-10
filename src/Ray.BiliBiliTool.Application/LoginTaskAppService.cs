@@ -47,6 +47,7 @@ namespace Ray.BiliBiliTool.Application
             AddOrUpdateCkToJson(cookieInfo);
 
             //更新cookie到青龙env
+            //todo
         }
 
         [TaskInterceptor("二维码登录", TaskLevel.Two)]
@@ -67,7 +68,7 @@ namespace Ray.BiliBiliTool.Application
 
             var online = GetOnlinePic(url);
             _logger.LogInformation(Environment.NewLine + Environment.NewLine);
-            _logger.LogInformation("如果上方二维码显示异常，或扫描失败，请使用浏览器访问如下链接，查看高清在线二维码：");
+            _logger.LogInformation("如果上方二维码显示异常，或扫描失败，请使用浏览器访问如下链接，查看高清二维码：");
             _logger.LogInformation(online + Environment.NewLine + Environment.NewLine);
 
             var waitTimes = 10;
@@ -171,7 +172,7 @@ namespace Ray.BiliBiliTool.Application
             QRCodeData qrCodeData = qrGenerator.CreateQrCode(str, QRCodeGenerator.ECCLevel.L);
 
             _logger.LogInformation("AsciiQRCode：");
-            var qrCode = new AsciiQRCode(qrCodeData);
+            //var qrCode = new AsciiQRCode(qrCodeData);
             //var qrCodeStr = qrCode.GetGraphic(1, drawQuietZones: false);
             //_logger.LogInformation(Environment.NewLine + qrCodeStr);
 
