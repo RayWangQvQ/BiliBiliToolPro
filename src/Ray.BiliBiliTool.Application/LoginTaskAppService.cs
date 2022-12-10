@@ -135,7 +135,7 @@ namespace Ray.BiliBiliTool.Application
 
             if (!fileInfo.Exists)
             {
-                using (var stream= File.Create(fileInfo.PhysicalPath))
+                using (var stream = File.Create(fileInfo.PhysicalPath))
                 {
                     using (var sw = new StreamWriter(stream))
                     {
@@ -217,7 +217,7 @@ namespace Ray.BiliBiliTool.Application
             if (oldEnv != null)
             {
                 _logger.LogInformation("用户已存在，更新cookie");
-                var update=new UpdateQingLongEnv()
+                var update = new UpdateQingLongEnv()
                 {
                     id = oldEnv.id,
                     name = oldEnv.name,
@@ -243,8 +243,8 @@ namespace Ray.BiliBiliTool.Application
                 value = ckInfo.CookieStr,
                 remarks = ""
             };
-            var addRe= _qingLongApi.AddEnvs(add, token).Result;
-            if(addRe.Code == 200) _logger.LogInformation("新增成功！");
+            var addRe = _qingLongApi.AddEnvs(new List<AddQingLongEnv>() { add }, token).Result;
+            if (addRe.Code == 200) _logger.LogInformation("新增成功！");
             else _logger.LogInformation(addRe.ToJson());
 
             return;

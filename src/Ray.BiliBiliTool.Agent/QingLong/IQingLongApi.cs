@@ -15,7 +15,7 @@ namespace Ray.BiliBiliTool.Agent.QingLong
         Task<QingLongGenericResponse<List<QingLongEnv>>> GetEnvs(string searchValue, [Header("Authorization")] string token);
 
         [HttpPost("/api/envs")]
-        Task<QingLongGenericResponse<List<QingLongEnv>>> AddEnvs([JsonContent] AddQingLongEnv env, [Header("Authorization")] string token);
+        Task<QingLongGenericResponse<List<QingLongEnv>>> AddEnvs([JsonContent] List<AddQingLongEnv> envs, [Header("Authorization")] string token);
 
         [HttpPut("/api/envs")]
         Task<QingLongGenericResponse<List<QingLongEnv>>> UpdateEnvs([JsonContent] UpdateQingLongEnv env, [Header("Authorization")] string token);
