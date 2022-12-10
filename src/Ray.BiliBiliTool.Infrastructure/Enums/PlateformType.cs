@@ -10,6 +10,7 @@ namespace Ray.BiliBiliTool.Infrastructure.Enums
     {
         Unknown,
         GitHubActions,
-        Docker
+        Docker,
+        QingLong
     }
 }

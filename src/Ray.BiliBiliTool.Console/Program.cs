@@ -76,6 +76,7 @@ namespace Ray.BiliBiliTool.Console
                 }
 
                 //环境变量：
+                configurationBuilder.AddExcludeEmptyEnvironmentVariables("QL_", false);
                 configurationBuilder.AddExcludeEmptyEnvironmentVariables("Ray_");
 
                 //命令行：

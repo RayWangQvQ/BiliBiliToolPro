@@ -1,18 +1,23 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using QRCoder;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
+using Ray.BiliBiliTool.Agent.QingLong;
 using Ray.BiliBiliTool.Application.Attributes;
 using Ray.BiliBiliTool.Application.Contracts;
 using Ray.BiliBiliTool.Infrastructure;
+using Ray.BiliBiliTool.Infrastructure.Enums;
 
 namespace Ray.BiliBiliTool.Application
 {
@@ -21,19 +26,22 @@ namespace Ray.BiliBiliTool.Application
         private readonly ILogger<LoginTaskAppService> _logger;
         private readonly IPassportApi _passportApi;
         private readonly IHostEnvironment _hostingEnvironment;
+        private readonly IQingLongApi _qingLongApi;
         private readonly IConfiguration _configuration;
 
         public LoginTaskAppService(
             IConfiguration configuration,
             ILogger<LoginTaskAppService> logger,
             IPassportApi passportApi,
-            IHostEnvironment hostingEnvironment
+            IHostEnvironment hostingEnvironment,
+            IQingLongApi qingLongApi
             )
         {
             _configuration = configuration;
             _logger = logger;
             _passportApi = passportApi;
             _hostingEnvironment = hostingEnvironment;
+            _qingLongApi = qingLongApi;
         }
 
         [TaskInterceptor("扫码登录", TaskLevel.One)]
@@ -43,18 +51,24 @@ namespace Ray.BiliBiliTool.Application
             var suc = QrCodeLogin(out BiliCookie cookieInfo);
             if (!suc) return;
 
-            //更新cookie到json
-            AddOrUpdateCkToJson(cookieInfo);
+            var plateformType = _configuration.GetSection("PlateformType").Get<PlateformType>();
 
             //更新cookie到青龙env
-            //todo
+            if (plateformType == PlateformType.QingLong)
+            {
+                AddOrUpdateCkToQingLong(cookieInfo);
+                return;
+            }
+
+            //更新cookie到json
+            AddOrUpdateCkToJson(cookieInfo);
         }
 
         [TaskInterceptor("二维码登录", TaskLevel.Two)]
         protected bool QrCodeLogin(out BiliCookie cookieInfo)
         {
             var result = false;
-            cookieInfo = new BiliCookie(new List<string>(){""});
+            cookieInfo = new BiliCookie(new List<string>() { "" });
 
             var re = _passportApi.GenerateQrCode().Result;
             if (re.Code != 0)
@@ -108,7 +122,7 @@ namespace Ray.BiliBiliTool.Application
 
 
         [TaskInterceptor("添加ck到json配置文件", TaskLevel.Two)]
-        protected void AddOrUpdateCkToJson(CookieInfo ckInfo)
+        protected void AddOrUpdateCkToJson(BiliCookie ckInfo)
         {
             //读取json
             var path = _hostingEnvironment.ContentRootPath;
@@ -166,6 +180,62 @@ namespace Ray.BiliBiliTool.Application
             lines[indexOfTargetCk] = $@"    ""{ckInfo.CookieStr}"",";
             SaveJson(lines, fileInfo);
             _logger.LogInformation("更新成功！");
+        }
+
+        [TaskInterceptor("添加ck到青龙环境变量", TaskLevel.Two)]
+        protected void AddOrUpdateCkToQingLong(BiliCookie ckInfo)
+        {
+            //拿token
+            var suc = GetToken(out string token);
+
+            if (!suc) return;
+
+            //查env
+            var re = _qingLongApi.GetEnvs("Ray_BiliBiliCookies__", $"Bearer {token}").Result;
+
+            if (re.Code != 200)
+            {
+                _logger.LogInformation($"查询环境变量失败：{re}", re.ToJson());
+                return;
+            }
+
+            var list = re.Data.OrderBy(x => x.id);
+            QingLongEnv oldEnv = list.FirstOrDefault(x => x.value.Contains(ckInfo.UserId));
+
+            if (oldEnv != null)
+            {
+                _logger.LogInformation("用户已存在，更新cookie");
+                var update=new UpdateQingLongEnv()
+                {
+                    id = oldEnv.id,
+                    name = oldEnv.name,
+                    value = ckInfo.CookieStr,
+                    remarks = oldEnv.remarks,
+                };
+
+                var updateRe = _qingLongApi.UpdateEnvs(update, token).Result;
+                if (updateRe.Code == 200) _logger.LogInformation("更新成功！");
+                else _logger.LogInformation(updateRe.ToJson());
+
+                return;
+            }
+
+            _logger.LogInformation("用户不存在，新增cookie");
+            var lastNum = list.LastOrDefault()?.value.Split("__").LastOrDefault();
+            var newNum = int.Parse(lastNum ?? "0") + 1;
+            var name = $"Ray_BiliBiliCookies__{newNum}";
+
+            var add = new AddQingLongEnv()
+            {
+                name = name,
+                value = ckInfo.CookieStr,
+                remarks = ""
+            };
+            var addRe= _qingLongApi.AddEnvs(add, token).Result;
+            if(addRe.Code == 200) _logger.LogInformation("新增成功！");
+            else _logger.LogInformation(addRe.ToJson());
+
+            return;
         }
 
         private void GenerateQrCode(string str)
@@ -264,7 +334,7 @@ namespace Ray.BiliBiliTool.Application
 
         private void SaveJson(List<string> lines, IFileInfo fileInfo)
         {
-            lines.Insert(0,"{");
+            lines.Insert(0, "{");
             lines.Add("}");
 
             var newJson = string.Join(Environment.NewLine, lines);
@@ -274,5 +344,26 @@ namespace Ray.BiliBiliTool.Application
                 sw.Write(newJson);
             }
         }
+
+        #region qinglong
+
+        private bool GetToken(out string token)
+        {
+            token = "";
+
+            var qlDir = _configuration["QL_DIR"] ?? "/ql";
+            var authFile = Path.Combine(qlDir, "data/config/auth.json");
+
+            if (!File.Exists(authFile)) return false;
+
+            var authJson = File.ReadAllText(authFile);
+
+            var jb = JsonConvert.DeserializeObject<JsonObject>(authJson);
+            token = jb["token"].ToString();
+
+            return true;
+        }
+
+        #endregion
     }
 }

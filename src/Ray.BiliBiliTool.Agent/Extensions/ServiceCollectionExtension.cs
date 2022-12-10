@@ -11,6 +11,7 @@ using Polly;
 using Polly.Extensions.Http;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Agent.HttpClientDelegatingHandlers;
+using Ray.BiliBiliTool.Agent.QingLong;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.Infrastructure;
 
@@ -70,6 +71,21 @@ namespace Ray.BiliBiliTool.Agent.Extensions
             services.AddBiliBiliClientApi<IVipBigPointApi>("https://api.bilibili.com");
 
             services.AddBiliBiliClientApi<IPassportApi>("http://passport.bilibili.com", false);
+
+            //qinglong
+            var qinglongHost = configuration["QL_URL"]?? "http://localhost:5600";
+            services
+                .AddHttpApi<IQingLongApi>(o =>
+                {
+                    o.HttpHost = new Uri(qinglongHost);
+                    o.UseDefaultUserAgent = false;
+                })
+                .ConfigureHttpClient((sp, c) =>
+                {
+                    c.DefaultRequestHeaders.Add("User-Agent",
+                        sp.GetRequiredService<IOptionsMonitor<SecurityOptions>>().CurrentValue.UserAgent);
+                })
+                .AddPolicyHandler(GetRetryPolicy());
 
             return services;
         }
