@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.FileSystemGlobbing.Internal;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Polly;
@@ -24,14 +25,14 @@ namespace Ray.BiliBiliTool.Application
     {
         private readonly ILogger<LoginTaskAppService> _logger;
         private readonly IPassportApi _passportApi;
-        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IHostEnvironment _hostingEnvironment;
         private readonly IConfiguration _configuration;
 
         public LoginTaskAppService(
             IConfiguration configuration,
             ILogger<LoginTaskAppService> logger,
             IPassportApi passportApi,
-            IHostingEnvironment hostingEnvironment
+            IHostEnvironment hostingEnvironment
             )
         {
             _configuration = configuration;
@@ -118,64 +119,51 @@ namespace Ray.BiliBiliTool.Application
             var fileProvider = new PhysicalFileProvider(_hostingEnvironment.ContentRootPath);
             IFileInfo fileInfo = fileProvider.GetFileInfo(path);
 
-            var json = "";
-            using (var stream = new FileStream(
-                fileInfo.PhysicalPath,
-                FileMode.Open))
+            string json;
+            using (var stream = new FileStream(fileInfo.PhysicalPath, FileMode.Open))
             {
                 using var reader = new StreamReader(stream);
                 json = reader.ReadToEnd();
             }
-            
+            var lines = json.Split(Environment.NewLine).ToList();
 
-            if (!json.Contains("BiliBiliCookies"))
+            var indexOfCkConfigKey = lines.FindIndex(x => x.TrimStart().StartsWith("\"BiliBiliCookies\""));
+            if (indexOfCkConfigKey == -1)
             {
-                _logger.LogInformation("不存在cookie，初始化并新增");
+                _logger.LogInformation("未配置过cookie，初始化并新增");
 
-                json = json.Remove(0);
-                var ck = @"{
-  ""BiliBiliCookies"": [
-    ""{0}""
-  ],
-";
-                json = string.Format(ck, ckInfo.CookieStr) + json;
-
-                using (var sw = new StreamWriter(fileInfo.PhysicalPath))
+                var indexOfInsert = lines.FindIndex(x => x.TrimStart().StartsWith("{"));
+                lines.InsertRange(indexOfInsert + 1, new List<string>()
                 {
-                    sw.Write(json);
-                }
+                    "  \"BiliBiliCookies\":[",
+                    $@"    ""{ckInfo.CookieStr}"",",
+                    "  ],"
+                });
+
+                SaveJson(lines, fileInfo);
+                _logger.LogInformation("新增成功！");
                 return;
             }
 
             ckInfo.CookieItemDictionary.TryGetValue("DedeUserID", out string userId);
+            var indexOfCkConfigEnd = lines.FindIndex(indexOfCkConfigKey, x => x.TrimStart().StartsWith("]"));
+            var indexOfTargetCk = lines.FindIndex(indexOfCkConfigKey,
+                indexOfCkConfigEnd - indexOfCkConfigKey,
+                x => x.Contains(userId) && !x.TrimStart().StartsWith("//"));
 
-            if (!json.Contains($"DedeUserID={userId}"))
+            if (indexOfTargetCk == -1)
             {
-                _logger.LogInformation("不存在cookie，新增");
-
-                var oldStr = "\"BiliBiliCookies\": [";
-                json = json.Replace(oldStr, $"{oldStr}{Environment.NewLine}\"{ckInfo.CookieStr}\",{Environment.NewLine}");
-                using (var sw = new StreamWriter(fileInfo.PhysicalPath))
-                {
-                    sw.Write(json);
-                }
+                _logger.LogInformation("不存在该用户，新增cookie");
+                lines.Insert(indexOfCkConfigEnd, $@"    ""{ckInfo.CookieStr}"",");
+                SaveJson(lines, fileInfo);
+                _logger.LogInformation("新增成功！");
                 return;
             }
 
-            //todo:update
             _logger.LogInformation("已存在该用户，更新cookie");
-            var listStr= SubstringSingle(json, "\"BiliBiliCookies\": \\[", "\\]");
-            var list = listStr.Split(Environment.NewLine).ToList();
-            var index= list.FindIndex(x => x.Contains(userId));
-            list[index] = $"\"{ckInfo.CookieStr}\",";
-            var newList = string.Join(Environment.NewLine,list);
-
-            json = json.Replace(listStr, newList);
-            using (var sw = new StreamWriter(fileInfo.PhysicalPath))
-            {
-                sw.Write(json);
-            }
-            return;
+            lines[indexOfTargetCk] = $@"    ""{ckInfo.CookieStr}"",";
+            SaveJson(lines, fileInfo);
+            _logger.LogInformation("更新成功！");
         }
 
         private void GenerateQrCode(string str)
@@ -261,19 +249,21 @@ namespace Ray.BiliBiliTool.Application
 
         private CookieInfo GetCookieStr(string url)
         {
-            var ckStrList= url.Split('?')[1]
+            var ckStrList = url.Split('?')[1]
                 .Split("&gourl=")[0]
                 .Split('&')
                 .ToList();
             return new CookieInfo(ckStrList);
         }
 
-        public static string SubstringSingle(string source, string startStr, string endStr,string middleRegex="")
+        private void SaveJson(List<string> lines, IFileInfo fileInfo)
         {
-            if (middleRegex.IsNullOrEmpty()) middleRegex = "[.\\s\\S]*?";
-            var regexStr = $"(?<=({startStr})){middleRegex}(?=({endStr}))";
-            Regex rg = new Regex(regexStr, RegexOptions.Multiline | RegexOptions.Singleline);
-            return rg.Match(source).Value;
+            var newJson = string.Join(Environment.NewLine, lines);
+
+            using (var sw = new StreamWriter(fileInfo.PhysicalPath))
+            {
+                sw.Write(newJson);
+            }
         }
     }
 }
