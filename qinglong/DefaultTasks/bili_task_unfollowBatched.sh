@@ -4,6 +4,6 @@
 . bili_task_base.sh
 
 cd ./src/Ray.BiliBiliTool.Console
-export ENVIRONMENT=Production && \
+
 export Ray_RunTasks=UnfollowBatched && \
-dotnet run
+dotnet run --ENVIRONMENT=Production
