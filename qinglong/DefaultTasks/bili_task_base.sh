@@ -19,3 +19,4 @@ bili_repo_dir="$(find $dir_repo -type d -iname $bili_repo | head -1)"
 echo -e "bili仓库目录: $bili_repo_dir\n"
 
 cd $bili_repo_dir
+export Ray_PlateformType=QingLong

@@ -10,6 +10,7 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using QRCoder;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
@@ -132,7 +133,16 @@ namespace Ray.BiliBiliTool.Application
             IFileInfo fileInfo = fileProvider.GetFileInfo("cookies.json");
             _logger.LogInformation("目标json地址：{path}", fileInfo.PhysicalPath);
 
-            if (!fileInfo.Exists) File.Create(fileInfo.PhysicalPath).Dispose();
+            if (!fileInfo.Exists)
+            {
+                using (var stream= File.Create(fileInfo.PhysicalPath))
+                {
+                    using (var sw = new StreamWriter(stream))
+                    {
+                        sw.Write($"\{{Environment.NewLine}\}");
+                    }
+                }
+            }
 
             string json;
             using (var stream = new FileStream(fileInfo.PhysicalPath, FileMode.Open))
@@ -334,9 +344,6 @@ namespace Ray.BiliBiliTool.Application
 
         private void SaveJson(List<string> lines, IFileInfo fileInfo)
         {
-            lines.Insert(0, "{");
-            lines.Add("}");
-
             var newJson = string.Join(Environment.NewLine, lines);
 
             using (var sw = new StreamWriter(fileInfo.PhysicalPath))
@@ -358,7 +365,7 @@ namespace Ray.BiliBiliTool.Application
 
             var authJson = File.ReadAllText(authFile);
 
-            var jb = JsonConvert.DeserializeObject<JsonObject>(authJson);
+            var jb = JsonConvert.DeserializeObject<JObject>(authJson);
             token = jb["token"].ToString();
 
             return true;
