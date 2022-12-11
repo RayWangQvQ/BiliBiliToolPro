@@ -19,21 +19,20 @@ namespace Ray.BiliBiliTool.Agent.Attributes
 
         protected override Task WriteLogAsync(ApiResponseContext context, LogMessage logMessage)
         {
-            ILoggerFactory service = context.HttpContext.ServiceProvider.GetService<ILoggerFactory>();
-            if (service == null)
-                return Task.CompletedTask;
+            ILoggerFactory loggerFactory = context.HttpContext.ServiceProvider.GetService<ILoggerFactory>();
+            if (loggerFactory == null) return Task.CompletedTask;
 
             MethodInfo member = context.ApiAction.Member;
-            string[] strArray = new string[5];
+            var strArray = new string[5];
             Type declaringType1 = member.DeclaringType;
-            strArray[0] = (object)declaringType1 != null ? declaringType1.Namespace : (string)null;
+            strArray[0] = (object)declaringType1 != null ? declaringType1.Namespace : null;
             strArray[1] = ".";
             Type declaringType2 = member.DeclaringType;
-            strArray[2] = (object)declaringType2 != null ? declaringType2.Name : (string)null;
+            strArray[2] = (object)declaringType2 != null ? declaringType2.Name : null;
             strArray[3] = ".";
             strArray[4] = member.Name;
             string categoryName = string.Concat(strArray);
-            ILogger logger = service.CreateLogger(categoryName);
+            ILogger logger = loggerFactory.CreateLogger(categoryName);
 
             if (logMessage.Exception == null)
                 logger.LogDebug(logMessage.ToString());//修改为Debug等级

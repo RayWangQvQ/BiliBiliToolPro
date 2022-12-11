@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
@@ -13,11 +11,12 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using QRCoder;
 using Ray.BiliBiliTool.Agent;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Passport;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Agent.QingLong;
 using Ray.BiliBiliTool.Application.Attributes;
 using Ray.BiliBiliTool.Application.Contracts;
-using Ray.BiliBiliTool.Infrastructure;
 using Ray.BiliBiliTool.Infrastructure.Enums;
 
 namespace Ray.BiliBiliTool.Application
@@ -69,7 +68,7 @@ namespace Ray.BiliBiliTool.Application
         protected bool QrCodeLogin(out BiliCookie cookieInfo)
         {
             var result = false;
-            cookieInfo = new BiliCookie(new List<string>() { "" });
+            cookieInfo = new BiliCookie("");
 
             var re = _passportApi.GenerateQrCode().Result;
             if (re.Code != 0)
@@ -95,27 +94,37 @@ namespace Ray.BiliBiliTool.Application
                 Task.Delay(5 * 1000).Wait();
 
                 var check = _passportApi.CheckQrCodeHasScaned(re.Data.Qrcode_key).Result;
-                if (check.Code != 0)
+                if (!check.IsSuccessStatusCode)
                 {
-                    _logger.LogWarning("调用检查接口异常：{msg}", check.ToJson());
+                    _logger.LogWarning("调用检测接口异常");
+                    continue;
+                }
+
+                var content = JsonConvert.DeserializeObject<BiliApiResponse<TokenDto>>(check.Content.ReadAsStringAsync().Result);
+                if (content.Code != 0)
+                {
+                    _logger.LogWarning("调用检测接口异常：{msg}", check.ToJson());
                     break;
                 }
 
-                if (check.Data.Code == 86038)//已失效
+                if (content.Data.Code == 86038)//已失效
                 {
-                    _logger.LogInformation(check.Data.Message);
+                    _logger.LogInformation(content.Data.Message);
                     break;
                 }
 
-                if (check.Data.Code == 0)
+                if (content.Data.Code == 0)
                 {
                     _logger.LogInformation("扫描成功！");
-                    cookieInfo = GetCookie(check.Data.Url);
+                    IEnumerable<string> cookies = check.Headers.SingleOrDefault(header => header.Key == "Set-Cookie").Value;
+
+                    cookieInfo = GetCookie(cookies);
                     result = true;
+                     
                     break;
                 }
 
-                _logger.LogInformation("{msg}", check.Data.Message + Environment.NewLine);
+                _logger.LogInformation("{msg}", content.Data.Message + Environment.NewLine);
             }
 
             return result;
@@ -222,7 +231,9 @@ namespace Ray.BiliBiliTool.Application
                     id = oldEnv.id,
                     name = oldEnv.name,
                     value = ckInfo.CookieStr,
-                    remarks = oldEnv.remarks,
+                    remarks = oldEnv.remarks.IsNullOrEmpty()
+                        ?$"bili-{ckInfo.UserId}"
+                        :oldEnv.remarks,
                 };
 
                 var updateRe = _qingLongApi.UpdateEnvs(update, token).Result;
@@ -244,13 +255,11 @@ namespace Ray.BiliBiliTool.Application
             {
                 name = name,
                 value = ckInfo.CookieStr,
-                remarks = ""
+                remarks = $"bili-{ckInfo.UserId}"
             };
             var addRe = _qingLongApi.AddEnvs(new List<AddQingLongEnv>() { add }, token).Result;
             if (addRe.Code == 200) _logger.LogInformation("新增成功！");
             else _logger.LogInformation(addRe.ToJson());
-
-            return;
         }
 
         private void GenerateQrCode(string str)
@@ -334,14 +343,15 @@ namespace Ray.BiliBiliTool.Application
             return $"https://tool.lu/qrcode/basic.html?text={encode}";
         }
 
-        private BiliCookie GetCookie(string url)
+        private BiliCookie GetCookie(IEnumerable<string> cookies)
         {
-            var ckItemList = url.Split('?')[1]
-                .Split("&gourl=")[0]
-                .Split('&')
-                .ToList();
-            var ckStr = string.Join(';', ckItemList);
-            var biliCk = new BiliCookie(new List<string>() { ckStr });
+            var ckItemList = new List<string>();
+            foreach (var item in cookies)
+            {
+                ckItemList.Add(item.Split(';').FirstOrDefault());
+            }
+
+            var biliCk = new BiliCookie(string.Join("; ", ckItemList));
 
             biliCk.Check();
             return biliCk;
@@ -366,7 +376,11 @@ namespace Ray.BiliBiliTool.Application
             var qlDir = _configuration["QL_DIR"] ?? "/ql";
             var authFile = Path.Combine(qlDir, "data/config/auth.json");
 
-            if (!File.Exists(authFile)) return false;
+            if (!File.Exists(authFile))
+            {
+                _logger.LogWarning("获取青龙授权失败");
+                return false;
+            }
 
             var authJson = File.ReadAllText(authFile);
 

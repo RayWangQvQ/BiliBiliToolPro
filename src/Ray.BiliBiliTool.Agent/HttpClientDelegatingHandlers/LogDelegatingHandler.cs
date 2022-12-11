@@ -26,7 +26,6 @@ namespace Ray.BiliBiliTool.Agent.HttpClientDelegatingHandlers
             }
 
             HttpResponseMessage response = await base.SendAsync(request, cancellationToken);
-            if (response.Content == null) return response;
 
             var content = await response.Content.ReadAsStringAsync(cancellationToken);
             _logger.LogDebug("返回Content：{content}", content);
