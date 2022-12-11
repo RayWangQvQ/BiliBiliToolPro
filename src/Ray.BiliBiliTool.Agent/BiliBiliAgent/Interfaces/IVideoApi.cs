@@ -103,7 +103,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         /// <param name="pageNumber"></param>
         /// <param name="keyword"></param>
         /// <returns></returns>
-        [Header("Referer", "https://space.bilibili.com/")]
+        [Header("Referer", "https://www.bilibili.com/")]
         [Header("Origin", "https://space.bilibili.com")]
         [HttpGet("/x/space/arc/search?mid={upId}&ps={pageSize}&tid=0&pn={pageNumber}&keyword={keyword}&order=pubdate&jsonp=jsonp")]
         Task<BiliApiResponse<SearchUpVideosResponse>> SearchVideosByUpId(long upId, int pageSize = 30, int pageNumber = 1, string keyword = "");

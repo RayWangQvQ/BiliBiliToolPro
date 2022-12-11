@@ -13,13 +13,15 @@ namespace Ray.BiliBiliTool.Config
     /// </summary>
     public class EnvironmentVariablesExcludeEmptyConfigurationProvider : EnvironmentVariablesConfigurationProvider
     {
+        private readonly bool _removeKeyPrefix;
         private readonly string _prefix;
         private readonly Func<KeyValuePair<string, string>, bool> _startsWith;
         private readonly Func<KeyValuePair<string, string>, bool> _removeNullValue;
         private readonly Func<KeyValuePair<string, string>, bool> _fifter;
 
-        public EnvironmentVariablesExcludeEmptyConfigurationProvider(string prefix = null) : base(prefix)
+        public EnvironmentVariablesExcludeEmptyConfigurationProvider(string prefix = null, bool removeKeyPrefix = true) : base(prefix)
         {
+            _removeKeyPrefix = removeKeyPrefix;
             _prefix = prefix ?? string.Empty;
 
             _startsWith = c => c.Key.StartsWith(prefix, StringComparison.OrdinalIgnoreCase);
@@ -44,7 +46,7 @@ namespace Ray.BiliBiliTool.Config
         /// <returns></returns>
         private string NormalizeKey(string key)
         {
-            key = RemoveKeyPrefix(key);
+            if(_removeKeyPrefix) key = RemoveKeyPrefix(key);
             key = ReplaceKeyDelimiter(key);
             return key;
         }

@@ -1,14 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging.Abstractions;
 using Ray.BiliBiliTool.Config;
-using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.Infrastructure;
 
 namespace Ray.BiliBiliTool.Agent
@@ -35,8 +30,10 @@ namespace Ray.BiliBiliTool.Agent
             {
                 SessData = sess;
             }
+        }
 
-            this.Check();
+        public BiliCookie(List<string> ckList) : this(NullLogger<BiliCookie>.Instance,new CookieStrFactory(ckList))
+        {
         }
 
         [Description("DedeUserID")]

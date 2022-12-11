@@ -5,6 +5,5 @@
 
 cd ./src/Ray.BiliBiliTool.Console
 
-export ENVIRONMENT=Production && \
 export Ray_RunTasks=LiveLottery && \
-dotnet run
+dotnet run --ENVIRONMENT=Production

@@ -7,6 +7,7 @@
 - [2. 运行容器](#2-运行容器)
     - [2.1. 极简版](#21-极简版)
     - [2.2. 综合版](#22-综合版)
+- [登录](#登录)
 - [3. 自己构建镜像（非必须）](#3-自己构建镜像非必须)
 - [4. 其他](#4-其他)
 
@@ -52,9 +53,7 @@ Podman可以和Docker共存，命令也基本可以通用。
 
 ```
 # 生成并运行容器
-podman run -itd --name="bili" \
-    -e Ray_BiliBiliCookies__1="cookie" \
-    docker.io/zai7lou/bilibili_tool_pro
+podman run -itd --name="bili" docker.io/zai7lou/bilibili_tool_pro
 
 # 查看实时日志
 podman logs -f bili
@@ -71,13 +70,13 @@ mkdir -p Logs
 
 # 下载appsettings.json
 wget https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/src/Ray.BiliBiliTool.Console/appsettings.json
+wget https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/docker/sample/cookies.json
 
 # 运行
 podman run -itd --name="bili" \
     -v /bili/Logs:/app/Logs \
     -v /bili/appsettings.json:/app/appsettings.json \
-    -e Ray_BiliBiliCookies__1="cookie" \
-    -e Ray_BiliBiliCookies__2="cookie" \
+    -v /bili/cookies.json:/app/cookies.json \
     -e Ray_DailyTaskConfig__Cron="0 15 * * *" \
     -e Ray_LiveLotteryTaskConfig__Cron="0 22 * * *" \
     -e Ray_UnfollowBatchedTaskConfig__Cron="0 6 1 * *" \
@@ -98,6 +97,14 @@ podman ps -a
 # 进入容器
 podman exec -it bili bash
 ```
+
+## 登录
+
+在宿主机运行`podman exec -it bili bash -c "dotnet Ray.BiliBiliTool.Console.dll --runTasks=Login"`
+
+扫码进行登录。
+
+![login](../docs/imgs/docker-login.png)
 
 ## 3. 自己构建镜像（非必须）
 
