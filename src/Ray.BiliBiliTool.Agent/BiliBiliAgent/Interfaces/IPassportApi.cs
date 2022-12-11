@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Net.Http;
+using System.Threading.Tasks;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Passport;
 using WebApiClientCore.Attributes;
@@ -12,6 +13,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         Task<BiliApiResponse<QrCodeDto>> GenerateQrCode();
 
         [HttpGet("/x/passport-login/web/qrcode/poll?qrcode_key={qrcode_key}&source=main_mini")]
-        Task<BiliApiResponse<TokenDto>> CheckQrCodeHasScaned(string qrcode_key);
+        //Task<BiliApiResponse<TokenDto>> CheckQrCodeHasScaned(string qrcode_key);
+        Task<HttpResponseMessage> CheckQrCodeHasScaned(string qrcode_key);
     }
 }

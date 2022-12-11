@@ -22,6 +22,7 @@ BiliBiliTool
 
 详细功能如下：
 
+- **扫码登录，自动更新cookie**
 - **每日获取满额升级经验（登录、投币、点赞、分享视频）（支持指定支持up主）**
 - **每天漫画签到**
 - **每天直播签到**
@@ -143,12 +144,11 @@ dotnet Ray.BiliBiliTool.Console.dll --runTasks=Daily&LiveLottery
 
 会依次运行`每日任务`和`天选抽奖任务`。
 
-一般来说，每个任务都有一个 GitHub Actions 的工作流脚本（workflow）对应，划分的依据主要是根据功能需求，其次是触发频率（比如，有些每天只需运行一次，有些需要允许多次）。
-
 任务列表如下：
 
 | 任务名 | Code | 功能 | 默认WorkFlow文件 | GithHub Environments | 推荐运行频率 | 备注 |
 | :----: | :----: | :----: | :----: | :----: | :----: | :----: |
+| 扫码登录 | Login | 试用bili app扫码登录，用于第一次运行时初始化cookie，或cookie过期时的更新。不同平台会将cookie存储到不同地方，青龙存储到环境变量中，其他会存储到cookies。json中 |  | Production | 手动 | |
 | 每日任务 | Daily | 完成每日任务获取满额65点经验（登录、观看视频、分享视频、投币），以及签到、领福利和充电等附属功能 | bilibili-daily-task.yml | Production | 每天一次 | |
 | 天选时刻抽奖 | LiveLottery | 直播中心天选时刻抽奖 | live-lottery-task.yml | LiveLottery | 建议每天运行0-4次内 | 对应Actions工作流默认是关闭的，需要添加key为`ISOPENLIVELOTTERYTASK`、值为`true`的secret来手动开启；大部分抽奖都需要关注主播，介意的不要开启 |
 | 批量取关 | UnfollowBatched | 批量取关指定分组下的所有关注（主要用于清理天选抽奖而产生的关注） | unfollow-batched-task.yml | 无 | 需要时手动运行 | 需要通过配置指定2个参数：`GroupName`（分组名称，如`天选时刻`）和`Count`（目标取关个数，-1表示全部），应用会倒序从后往前取关指定个数 |
@@ -162,19 +162,21 @@ dotnet Ray.BiliBiliTool.Console.dll --runTasks=Daily&LiveLottery
 
 ## 4. 多账号支持
 
-~~对于 GitHub Actions 托管的，可以通过添加 Key 为 `COOKIESTR2` 和 `COOKIESTR3` 的 Secret ，来支持最多 3 个账号。~~
+部署成功后，直接去运行扫码登录任务，扫码成功后，应用会自动更新或添加cookie。
 
-Docker或其他方式托管的，因配置项 `BiliBiliCookies` 被设计为一个字符串数组，所以理论可以添加任意个数的账号，例：
+青龙平台会添加环境变量里，Key 为 `Ray_BiliBiliCookies__0`、`Ray_BiliBiliCookies__1`、`Ray_BiliBiliCookies__2`...
+
+其他平台默认会添加到名为cookies.json的账号配置文件中：
 ```
- "BiliBiliCookies": [
-    "cookies1",
-    "cookies2",
-    "..."
+{
+  "BiliBiliCookies": [
+    "cookie1",
+    "cookie2",
+    "...",
   ],
+}
 
 ```
-
-使用环境变量配置的话，可以添加 Key 为 `Ray_BiliBiliCookies__2`、`Ray_BiliBiliCookies__3`、`Ray_BiliBiliCookies__4`...的环境变量，以此类推。
 
 ## 5. 常见问题
 
@@ -197,13 +199,9 @@ Docker或其他方式托管的，因配置项 `BiliBiliCookies` 被设计为一�
 
 ## 6. 版本发布及更新
 
-当前正处于稳定的迭代开发中，~~正常情况下每 2 周会发布一个小版本~~，详细待更新和计划内容可参见 [Projects](https://github.com/RayWangQvQ/BiliBiliToolPro/projects) 和 [Issues](https://github.com/RayWangQvQ/BiliBiliTool/issues) 。
+当前正处于稳定的迭代开发中，详细待更新和计划内容可参见 [Projects](https://github.com/RayWangQvQ/BiliBiliToolPro/projects) 和 [Issues](https://github.com/RayWangQvQ/BiliBiliTool/issues) 。
 
-关于新版本发布后，如何同步最新的内容到自己 Fork 的仓库，可参考**常见问题文档**中的 《**我 Fork 之后如何同步原作者的更新内容？**》章节。
-
-建议每个人都开启自动同步更新，因为越新的版本功能越完善、对账号来说也越安全。
-
-也建议把右上角的 Star 点一下，这样有重要更新时就会有邮件推送了。
+想要有重要更新时收到通知的话，可以把仓库右上角的`Star`或`Watch`按钮点亮。
 
 ## 7. 成为开源贡献成员
 
@@ -240,7 +238,6 @@ Docker或其他方式托管的，因配置项 `BiliBiliCookies` 被设计为一�
 ![赞赏码](docs/imgs/donate.jpg)
 
 > 项目中的优先支持的UP主的配置项，默认是作者的 UpId （只是作为了 JSON 配置文件的默认值，代码是干净的），需要更改的话，直接修改相应配置即可（secrets或环境变量等各种方式都行）。
-
 当然，不改的话，也算是另一种捐赠支持作者的方式啦。
 
 感谢支持~

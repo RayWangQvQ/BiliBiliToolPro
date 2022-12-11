@@ -140,6 +140,8 @@ namespace Ray.BiliBiliTool.Console
 
         private Task RandomSleep()
         {
+            if (_configuration["RunTasks"].Contains("Login") || _configuration["RunTasks"].Contains("Test")) return Task.CompletedTask;
+
             if (_securityOptions.RandomSleepMaxMin > 0)
             {
                 int randomMin = new Random().Next(1, ++_securityOptions.RandomSleepMaxMin);
@@ -170,12 +172,10 @@ namespace Ray.BiliBiliTool.Console
         private void LogAppInfo()
         {
             _logger.LogInformation(
-                "{newLine}========================{newLine} v{version} in {env} env.{newLine}开源 by {url}",
+                "{newLine}========================{newLine} v{version} 开源 by {url}",
                 Environment.NewLine + Environment.NewLine,
                 Environment.NewLine + Environment.NewLine,
                 typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion,
-                Global.HostingEnvironment.EnvironmentName,
-                Environment.NewLine,
                 Constants.SourceCodeUrl + Environment.NewLine
                 );
             //_logger.LogInformation("【当前IP】{ip} ", IpHelper.GetIp());

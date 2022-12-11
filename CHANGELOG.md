@@ -67,6 +67,9 @@
 - hotfix docker build error
 - 合并PR（#341），新增krew部署，感谢@chenliu1993
 - 合并PR（##348），更新文档，感谢@jexjws
-- 合并PR（#350），修改请求header错误的bug
+- 合并PR（#350），修改请求header错误的bug，感谢@catlair
 - 合并PR（#353），新增python扫码登录的feature（仅针对青龙），感谢@AFUL1991
 - Feature（#351）：重构并新增了扫码登录功能，使之适用于各种部署平台
+## 0.3.1
+- Fix(#260)，在需要的时候encode cookie
+- 更新文档
