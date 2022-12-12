@@ -374,12 +374,13 @@ namespace Ray.BiliBiliTool.Application
             token = "";
 
             var qlDir = _configuration["QL_DIR"] ?? "/ql";
-            string authFile;
 
+            string authFile= qlDir;
             if (_hostingEnvironment.ContentRootPath.Contains($"{qlDir}/data/"))
-                authFile = Path.Combine(qlDir, "data");
-
-            authFile = Path.Combine(qlDir, "config/auth.json");
+            {
+                authFile = Path.Combine(authFile, "data");
+            }
+            authFile = Path.Combine(authFile, "config/auth.json");
 
             if (!File.Exists(authFile))
             {
