@@ -120,7 +120,7 @@ namespace Ray.BiliBiliTool.Application
 
                     cookieInfo = GetCookie(cookies);
                     result = true;
-                     
+
                     break;
                 }
 
@@ -232,8 +232,8 @@ namespace Ray.BiliBiliTool.Application
                     name = oldEnv.name,
                     value = ckInfo.CookieStr,
                     remarks = oldEnv.remarks.IsNullOrEmpty()
-                        ?$"bili-{ckInfo.UserId}"
-                        :oldEnv.remarks,
+                        ? $"bili-{ckInfo.UserId}"
+                        : oldEnv.remarks,
                 };
 
                 var updateRe = _qingLongApi.UpdateEnvs(update, token).Result;
@@ -374,11 +374,16 @@ namespace Ray.BiliBiliTool.Application
             token = "";
 
             var qlDir = _configuration["QL_DIR"] ?? "/ql";
-            var authFile = Path.Combine(qlDir, "data/config/auth.json");
+            string authFile;
+
+            if (_hostingEnvironment.ContentRootPath.Contains($"{qlDir}/data/"))
+                authFile = Path.Combine(qlDir, "data");
+
+            authFile = Path.Combine(qlDir, "config/auth.json");
 
             if (!File.Exists(authFile))
             {
-                _logger.LogWarning("获取青龙授权失败");
+                _logger.LogWarning("获取青龙授权失败，文件不在：{authFile}", authFile);
                 return false;
             }
 
