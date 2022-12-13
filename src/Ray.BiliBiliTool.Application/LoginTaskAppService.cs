@@ -220,12 +220,13 @@ namespace Ray.BiliBiliTool.Application
                 return;
             }
 
-            var list = re.Data.OrderBy(x => x.id);
+            var list = re.Data.Where(x=>x.name.StartsWith("Ray_BiliBiliCookies__"));
             QingLongEnv oldEnv = list.FirstOrDefault(x => x.value.Contains(ckInfo.UserId));
 
             if (oldEnv != null)
             {
                 _logger.LogInformation("用户已存在，更新cookie");
+                _logger.LogInformation("Key：{key}", oldEnv.name);
                 var update = new UpdateQingLongEnv()
                 {
                     id = oldEnv.id,
@@ -244,12 +245,14 @@ namespace Ray.BiliBiliTool.Application
             }
 
             _logger.LogInformation("用户不存在，新增cookie");
-            var lastNum = list.LastOrDefault()
-                ?.name
-                .Split("__")
-                .LastOrDefault();
-            var newNum = int.Parse(lastNum ?? "-1") + 1;
-            var name = $"Ray_BiliBiliCookies__{newNum}";
+            var lastNum = list.Select(x =>
+            {
+                var num = x.name.Replace("Ray_BiliBiliCookies__","");
+                var parseSuc= int.TryParse(num, out int envNum);
+                return parseSuc ? envNum : 0;
+            }).MaxBy(x=>x);
+            var name = $"Ray_BiliBiliCookies__{lastNum + 1}";
+            _logger.LogInformation("Key：{key}", name);
 
             var add = new AddQingLongEnv()
             {
