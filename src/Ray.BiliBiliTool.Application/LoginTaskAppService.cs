@@ -226,6 +226,7 @@ namespace Ray.BiliBiliTool.Application
             if (oldEnv != null)
             {
                 _logger.LogInformation("用户已存在，更新cookie");
+                _logger.LogInformation("Key：{key}", oldEnv.name);
                 var update = new UpdateQingLongEnv()
                 {
                     id = oldEnv.id,
@@ -251,6 +252,7 @@ namespace Ray.BiliBiliTool.Application
                 return parseSuc ? envNum : 0;
             }).MaxBy(x=>x);
             var name = $"Ray_BiliBiliCookies__{lastNum + 1}";
+            _logger.LogInformation("Key：{key}", name);
 
             var add = new AddQingLongEnv()
             {
