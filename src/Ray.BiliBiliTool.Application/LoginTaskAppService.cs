@@ -220,7 +220,7 @@ namespace Ray.BiliBiliTool.Application
                 return;
             }
 
-            var list = re.Data.Where(x=>x.value.StartsWith("Ray_BiliBiliCookies__"));
+            var list = re.Data.Where(x=>x.name.StartsWith("Ray_BiliBiliCookies__"));
             QingLongEnv oldEnv = list.FirstOrDefault(x => x.value.Contains(ckInfo.UserId));
 
             if (oldEnv != null)
@@ -246,9 +246,9 @@ namespace Ray.BiliBiliTool.Application
             _logger.LogInformation("用户不存在，新增cookie");
             var lastNum = list.Select(x =>
             {
-                var num = x.value.Replace("Ray_BiliBiliCookies__","");
-                var suc= int.TryParse(num, out int re);
-                return suc ? re : 0;
+                var num = x.name.Replace("Ray_BiliBiliCookies__","");
+                var parseSuc= int.TryParse(num, out int envNum);
+                return parseSuc ? envNum : 0;
             }).MaxBy(x=>x);
             var name = $"Ray_BiliBiliCookies__{lastNum + 1}";
 
