@@ -33,7 +33,7 @@ namespace Ray.BiliBiliTool.Agent.QingLong
     {
         public string timestamp { get; set; }
         public int status { get; set; }
-        public long position { get; set; }
+        //public long position { get; set; }
         public DateTime createdAt { get; set; }
         public DateTime updatedAt { get; set; }
     }
