@@ -2,7 +2,7 @@
 # new Env("bili_base")
 # cron 0 0 1 1 * bili_base.sh
 
-dir_shell=$QL_DIR/shell
+dir_shell=${$QL_DIR-'/ql'}/shell
 . $dir_shell/share.sh
 
 ## 安装dotnet
