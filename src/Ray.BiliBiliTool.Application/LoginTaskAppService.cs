@@ -220,7 +220,7 @@ namespace Ray.BiliBiliTool.Application
                 return;
             }
 
-            var list = re.Data.Where(x=>x.name.StartsWith("Ray_BiliBiliCookies__"));
+            var list = re.Data.Where(x => x.name.StartsWith("Ray_BiliBiliCookies__")).ToList();
             QingLongEnv oldEnv = list.FirstOrDefault(x => x.value.Contains(ckInfo.UserId));
 
             if (oldEnv != null)
@@ -245,13 +245,17 @@ namespace Ray.BiliBiliTool.Application
             }
 
             _logger.LogInformation("用户不存在，新增cookie");
-            var lastNum = list.Select(x =>
+            var maxNum = -1;
+            if (list.Any())
             {
-                var num = x.name.Replace("Ray_BiliBiliCookies__","");
-                var parseSuc= int.TryParse(num, out int envNum);
-                return parseSuc ? envNum : 0;
-            }).MaxBy(x=>x);
-            var name = $"Ray_BiliBiliCookies__{lastNum + 1}";
+                maxNum = list.Select(x =>
+                {
+                    var num = x.name.Replace("Ray_BiliBiliCookies__", "");
+                    var parseSuc = int.TryParse(num, out int envNum);
+                    return parseSuc ? envNum : 0;
+                }).Max();
+            }
+            var name = $"Ray_BiliBiliCookies__{maxNum + 1}";
             _logger.LogInformation("Key：{key}", name);
 
             var add = new AddQingLongEnv()
@@ -378,7 +382,7 @@ namespace Ray.BiliBiliTool.Application
 
             var qlDir = _configuration["QL_DIR"] ?? "/ql";
 
-            string authFile= qlDir;
+            string authFile = qlDir;
             if (_hostingEnvironment.ContentRootPath.Contains($"{qlDir}/data/"))
             {
                 authFile = Path.Combine(authFile, "data");
