@@ -367,4 +367,4 @@ bilipro
 kustomization.yaml
 
 # cookie config
-cookies.json
+**/Ray.BiliBiliTool.Console/cookies.json
