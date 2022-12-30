@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
+using System.Threading;
+using System.Timers;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live;
@@ -11,6 +15,7 @@ using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Relation;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Interfaces;
+using Ray.BiliBiliTool.Infrastructure;
 
 namespace Ray.BiliBiliTool.DomainService
 {
@@ -22,6 +27,8 @@ namespace Ray.BiliBiliTool.DomainService
         private readonly ILogger<LiveDomainService> _logger;
         private readonly ILiveApi _liveApi;
         private readonly IRelationApi _relationApi;
+        private readonly ILiveTraceApi _liveTraceApi;
+        private readonly IUserInfoApi _userInfoApi;
         private readonly LiveLotteryTaskOptions _liveLotteryTaskOptions;
         private readonly BiliCookie _biliCookie;
         private readonly DailyTaskOptions _dailyTaskOptions;
@@ -29,6 +36,8 @@ namespace Ray.BiliBiliTool.DomainService
         public LiveDomainService(ILogger<LiveDomainService> logger,
             ILiveApi liveApi,
             IRelationApi relationApi,
+            ILiveTraceApi liveTraceApi,
+            IUserInfoApi userInfoApi,
             IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
             IOptionsMonitor<LiveLotteryTaskOptions> liveLotteryTaskOptions,
             BiliCookie biliCookie)
@@ -36,6 +45,8 @@ namespace Ray.BiliBiliTool.DomainService
             _logger = logger;
             _liveApi = liveApi;
             _relationApi = relationApi;
+            _liveTraceApi = liveTraceApi;
+            _userInfoApi = userInfoApi;
             _liveLotteryTaskOptions = liveLotteryTaskOptions.CurrentValue;
             _biliCookie = biliCookie;
             _dailyTaskOptions = dailyTaskOptions.CurrentValue;
@@ -385,5 +396,232 @@ namespace Ray.BiliBiliTool.DomainService
             return groupId;
         }
         #endregion
+
+        public void SendDanmakuToFansMedalLive()
+        {
+            CheckLiveCookie();
+
+            _logger.LogInformation("【获取直播列表】获取拥有粉丝牌的直播列表");
+
+            BiliApiResponse<MedalWallResponse> result = this._liveApi.GetMedalWall(int.Parse(this._biliCookie.UserId)).Result;
+
+            if (result.Code != 0)
+            {
+                _logger.LogError("【获取直播列表】失败");
+                _logger.LogError("【原因】{message}", result.Message);
+                return;
+            }
+
+            // 遍历粉丝牌
+            foreach (var medal in result.Data.List)
+            {
+                _logger.LogInformation("【直播间】{liveRoomName}", medal.Target_name);
+                _logger.LogInformation("【粉丝牌】{medalName}", medal.Medal_info.Medal_name);
+
+                _logger.LogInformation("正在发送弹幕...");
+
+                // 通过空间主页信息获取直播间 id
+                int liveHostUserId = medal.Medal_info.Target_id;
+                var spaceInfo = _userInfoApi.GetSpaceInfo(liveHostUserId).Result;
+                if (spaceInfo.Code != 0)
+                {
+                    _logger.LogError("【获取直播间信息】失败");
+                    _logger.LogError("【原因】{message}", spaceInfo.Message);
+                    continue;
+                }
+
+                // 发送弹幕
+                var sendResult = _liveApi.SendLiveDanmuku(new SendLiveDanmukuRequest(
+                    _biliCookie.BiliJct,
+                    spaceInfo.Data.Live_room.Roomid,
+                    "OwO")).Result;
+                if (sendResult.Code != 0)
+                {
+                    _logger.LogError("【弹幕发送】失败");
+                    _logger.LogError("【原因】{message}", sendResult.Message);
+                    continue;
+                }
+
+                _logger.LogInformation("【弹幕发送】成功~，你和主播 {name} 的亲密值增加了100！", spaceInfo.Data.Name);
+            }
+        }
+        class Temp
+        {
+            public long LastBeatTime { set; get; }
+
+            public int count { set; get; }
+        }
+        public void SendHeartBeatToFansMdealLive()
+        {
+            CheckLiveCookie();
+
+            _logger.LogInformation(_biliCookie.LiveBuvid);
+
+            _logger.LogInformation("【获取直播列表】获取拥有粉丝牌的直播列表");
+
+            BiliApiResponse<MedalWallResponse> result = this._liveApi.GetMedalWall(int.Parse(this._biliCookie.UserId)).Result;
+
+            if (result.Code != 0)
+            {
+                _logger.LogError("【获取直播列表】失败");
+                _logger.LogError("【原因】{message}", result.Message);
+                return;
+            }
+
+
+
+            var livingRoomIdList = new List<Tuple<int, GetLiveRoomInfoResponse, HeartBeatResponse, Temp>>();
+            foreach (var medal in result.Data.List)
+            {
+                if (medal.Live_status == 1 || true)
+                {
+                    _logger.LogInformation("【主播】{name} 正在直播", medal.Target_name);
+
+                    // 通过空间主页信息获取直播间 id
+                    int liveHostUserId = medal.Medal_info.Target_id;
+                    var spaceInfo = _userInfoApi.GetSpaceInfo(liveHostUserId).Result;
+                    if (spaceInfo.Code != 0)
+                    {
+                        _logger.LogError("【获取直播间信息】失败");
+                        _logger.LogError("【原因】{message}", spaceInfo.Message);
+                        continue;
+                    }
+
+                    var roomId = spaceInfo.Data.Live_room.Roomid;
+
+                    // 获取直播间详细信息
+                    var liveRoomInfo = _liveApi.GetLiveRoomInfo(roomId).Result;
+                    if (liveRoomInfo.Code != 0)
+                    {
+                        _logger.LogError("【获取直播间信息】失败");
+                        _logger.LogError("【原因】{message}", liveRoomInfo.Message);
+                        continue;
+                    }
+
+                    livingRoomIdList.Add(new (roomId, liveRoomInfo.Data, new(), new()));
+                }
+
+            }
+
+            if (livingRoomIdList.Count == 0)
+            {
+                _logger.LogInformation("【直播观看时长】跳过，未检测到开播的主播");
+                return;
+            }
+
+            string uuid = Guid.NewGuid().ToString();
+
+            for (var heartBeatCount = 0; heartBeatCount < 60; heartBeatCount += 1)
+            {
+                _logger.LogInformation("【心跳包】发送第 {index} 个心跳包", heartBeatCount);
+
+                foreach (var (roomId, roomInfo, heartBeatResponse, timer) in livingRoomIdList)
+                {
+                    var current = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+                    if (current - timer.LastBeatTime <= 65 * 1000)
+                    {
+                        int sleepTime = (int)(65 * 1000 - (current - timer.LastBeatTime));
+                        _logger.LogInformation("【休眠】{time} 毫秒", sleepTime);
+                        Thread.Sleep(sleepTime);
+                    }
+                    // Web Heart Beat 接口
+                    /*_logger.LogDebug("hb:{hb}", new WebHeartBeatRequest(roomId, 60).ToString());
+                    var webHeartBeatResult = _liveTraceApi.WebHeartBeat(new (roomId, 60)).Result;
+                    if (webHeartBeatResult.Code != 0)
+                    {
+                        _logger.LogError("【心跳包】发送失败");
+                        _logger.LogError("【原因】{message}", webHeartBeatResult.Message);
+                        continue;
+                    }*/
+
+                    // Heart Beat 接口
+                    var timestamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+                    BiliApiResponse<HeartBeatResponse> heartBeatResult = null;
+                    if (timer.count == 0)
+                    {
+                        heartBeatResult = _liveTraceApi.EnterRoom(new EnterRoomRequest(
+                            roomId,
+                            roomInfo.Parent_area_id,
+                            roomInfo.Area_id,
+                            timer.count,
+                            _biliCookie.LiveBuvid,
+                            timestamp,
+                            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36",
+                            _biliCookie.BiliJct,
+                            roomInfo.Uid
+                            ), $"[\"{_biliCookie.LiveBuvid}\",\"{uuid}\"]").Result;
+                    }
+                    else
+                    {
+                        heartBeatResult = _liveTraceApi.HeartBeat(new HeartBeatRequest(
+                            roomId,
+                            roomInfo.Parent_area_id,
+                            roomInfo.Area_id,
+                            timer.count,
+                            _biliCookie.LiveBuvid,
+                            timestamp,
+                            heartBeatResponse.Timestamp,
+                            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36",
+                            heartBeatResponse.Secret_rule,
+                            heartBeatResponse.Secret_key,
+                            _biliCookie.BiliJct,
+                            uuid
+                            ), $"[\"{_biliCookie.LiveBuvid}\",\"{uuid}\"]").Result;
+                    }
+
+                    timer.LastBeatTime = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+
+                    if (heartBeatResult == null || heartBeatResult.Code != 0)
+                    {
+                        _logger.LogError("【心跳包】直播间 {room} 发送失败", roomId);
+                        _logger.LogError("【原因】{message}", heartBeatResult != null ? heartBeatResult.Message : "");
+                        continue;
+                    }
+
+                    timer.count += 1;
+
+                    heartBeatResponse.Secret_rule = heartBeatResult.Data.Secret_rule;
+                    heartBeatResponse.Secret_key = heartBeatResult.Data.Secret_key;
+                    heartBeatResponse.Timestamp = heartBeatResult.Data.Timestamp;
+
+                    _logger.LogInformation("【直播间】{roomId} 的心跳包发送成功", roomId);
+                }
+            }
+            _logger.LogInformation("【直播观看时长】完成");
+        }
+
+        private void CheckLiveCookie()
+        {
+            // 检测 _biliCookie 是否正确配置
+            if (string.IsNullOrWhiteSpace(_biliCookie.LiveBuvid))
+            {
+                _logger.LogInformation("检测到直播 Cookie 未正确配置，尝试自动配置中...");
+
+                // 请求主播主页来正确配置 cookie
+                var liveHome = _liveApi.GetLiveHome().Result;
+                var liveHomeContent = JsonConvert.DeserializeObject<BiliApiResponse>(liveHome.Content.ReadAsStringAsync().Result);
+                if (liveHomeContent.Code != 0)
+                {
+                    _logger.LogError("【配置直播Cookie】失败");
+                    _logger.LogError("【原因】{message}", liveHomeContent.Message);
+                    return;
+                }
+
+                IEnumerable<string> liveCookies = liveHome.Headers.SingleOrDefault(header => header.Key == "Set-Cookie").Value;
+                var ckItemList = new List<string>();
+                foreach (var item in liveCookies)
+                {
+                    ckItemList.Add(item.Split(';').FirstOrDefault());
+                }
+                _biliCookie.LiveBuvid = CookieInfo.BuildCookieItemDictionaryByCookieItemList(
+                    ckItemList,
+                    null,
+                    v => v.Contains(',') ? Uri.EscapeDataString(v) : v)
+                    [_biliCookie.GetType().GetPropertyDescription(nameof(BiliCookie.LiveBuvid))];
+
+                _logger.LogDebug("LiveBuvid {value}", _biliCookie.LiveBuvid);
+                _logger.LogInformation("直播 Cookie 配置成功！");
+            }
+        }
     }
 }

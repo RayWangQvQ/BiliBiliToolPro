@@ -29,5 +29,9 @@ namespace Ray.BiliBiliTool.DomainService.Interfaces
         void TryJoinTianXuan(ListItemDto target);
 
         void GroupFollowing();
+
+        void SendDanmakuToFansMedalLive();
+
+        void SendHeartBeatToFansMdealLive();
     }
 }
