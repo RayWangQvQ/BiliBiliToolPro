@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
-using WebApiClientCore;
 
 namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Utils
 {
@@ -15,7 +12,6 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Utils
             string result = text;
             foreach(var rule in rules)
             {
-                Console.WriteLine(result);
                 switch (rule)
                 {
                     case 0:
@@ -40,7 +36,6 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Utils
                         break;
                 }
             }
-            Console.WriteLine(result);
             return result;
         }
 
@@ -49,7 +44,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Utils
             var hamc = HMAC.Create(algorithmName);
             hamc.Key = Encoding.UTF8.GetBytes(key);
             byte[] inArray = hamc.ComputeHash(Encoding.UTF8.GetBytes(text));
-            return System.BitConverter.ToString(inArray).Replace("-", "").ToLower();
+            return BitConverter.ToString(inArray).Replace("-", "").ToLower();
         }
     }
 }

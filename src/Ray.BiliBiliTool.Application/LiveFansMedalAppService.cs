@@ -42,7 +42,7 @@ namespace Ray.BiliBiliTool.Application
         [TaskInterceptor("直播间互动", TaskLevel.One)]
         public override void DoTask()
         {
-            // _liveDomainService.SendDanmakuToFansMedalLive();
+            _liveDomainService.SendDanmakuToFansMedalLive();
             _liveDomainService.SendHeartBeatToFansMdealLive();
         }
 

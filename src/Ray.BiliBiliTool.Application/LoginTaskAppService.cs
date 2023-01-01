@@ -123,7 +123,7 @@ namespace Ray.BiliBiliTool.Application
                     // 请求主播主页来正确配置 cookie
                     var liveHome = _liveApi.GetLiveHome().Result;
                     var liveHomeContent = JsonConvert.DeserializeObject<BiliApiResponse>(liveHome.Content.ReadAsStringAsync().Result);
-                    if (liveHomeContent.Code == 0 && 1==2)
+                    if (liveHomeContent.Code == 0)
                     {
                         // 合并 cookie
                         IEnumerable<string> liveCookies = liveHome.Headers.SingleOrDefault(header => header.Key == "Set-Cookie").Value;
@@ -131,8 +131,8 @@ namespace Ray.BiliBiliTool.Application
                     }
                     else
                     {
-                        _logger.LogError("获取直播 cookie 时出现错误");
-                        _logger.LogError("{msg}", liveHomeContent.Message);
+                        _logger.LogWarning("获取直播 cookie 时出现错误");
+                        _logger.LogWarning("{msg}", liveHomeContent.Message);
                     }
 
                     cookieInfo = GetCookie(cookies);

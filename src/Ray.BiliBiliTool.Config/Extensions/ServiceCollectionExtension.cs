@@ -25,6 +25,7 @@ namespace Ray.BiliBiliTool.Config.Extensions
                 .Configure<UnfollowBatchedTaskOptions>(configuration.GetSection("UnfollowBatchedTaskConfig"))
                 .Configure<SecurityOptions>(configuration.GetSection("Security"))
                 .Configure<ReceiveVipPrivilegeOptions>(configuration.GetSection("ReceiveVipPrivilegeConfig"))
+                .Configure<LiveFansMedalTaskOptions>(configuration.GetSection("LiveFansMedalTaskOptions"))
                 .Configure<Dictionary<string, int>>(Constants.OptionsNames.ExpDictionaryName, configuration.GetSection("Exp"))
                 .Configure<Dictionary<string, string>>(Constants.OptionsNames.DonateCoinCanContinueStatusDictionaryName, configuration.GetSection("DonateCoinCanContinueStatus"));
 

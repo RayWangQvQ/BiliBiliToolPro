@@ -1,9 +1,6 @@
 ﻿using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using Ray.BiliBiliTool.Config.Options;
 using System.Threading.Tasks;
 using WebApiClientCore.Attributes;
 
@@ -16,11 +13,17 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         [HttpGet("/xlive/rdata-interface/v1/heartbeat/webHeartBeat?hb={request}&pf=web")]
         Task<BiliApiResponse<WebHeartBeatResponse>> WebHeartBeat(WebHeartBeatRequest request);
 
-        [Header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36")]
+        /*
+            单独引入 device 参数的原因：
+            WebApiClientCore 库的 FormContent 有个已知 issue https://github.com/dotnetcore/WebApiClient/issues/211
+            会将表单中的双引号自动加入反斜杠转义...
+            如 ["key":"value"] => [\"key\":\"value\"]
+        */
+        [Header("User-Agent", LiveFansMedalTaskOptions.UserAgent)]
         [HttpPost("/xlive/data-interface/v1/x25Kn/E")]
         Task<BiliApiResponse<HeartBeatResponse>> EnterRoom([FormContent] EnterRoomRequest request, [FormField] string device);
 
-        [Header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36")]
+        [Header("User-Agent", LiveFansMedalTaskOptions.UserAgent)]
         [HttpPost("/xlive/data-interface/v1/x25Kn/X")]
         Task<BiliApiResponse<HeartBeatResponse>> HeartBeat([FormContent] HeartBeatRequest request, [FormField] string device);
     }

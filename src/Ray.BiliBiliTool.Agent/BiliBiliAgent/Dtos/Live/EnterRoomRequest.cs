@@ -16,18 +16,12 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live
             int parentId,
             int areaID,
             int seqNumber, // 心跳包编号
-            string buvid, // cookie['LIVE_BUVID']
             long timestamp,
             string userAgent,
             string csrf,
             int ruid)
         {
-            string uuid = Guid.NewGuid().ToString();
-
             this.Id = JsonConvert.SerializeObject(new[] { parentId, areaID, seqNumber, roomId });
-            Console.WriteLine(this.Id);
-            // this.Device = $"[\"{buvid}\",\"{uuid}\"]";
-            // Console.WriteLine(this.Device);
             this.Ts = timestamp;
             this.Ua = userAgent;
             this.Csrf = csrf;
@@ -38,8 +32,6 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live
             this.Visit_id = "";
         }
         public string Id { get; set; }
-
-        // public string Device { get; set; }
 
         public int Ruid { get; set; }
 

@@ -22,7 +22,6 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live
             string uuid)
         {
             this.Id = JsonSerializer.Serialize(new[] { parentId, areaID, seqNumber, roomId });
-            // this.Device = JsonSerializer.Serialize(new[] { buvid, uuid });
             this.Ets = ets;
             this.Benchmark = secretKey;
             this.Time = 60;
@@ -45,9 +44,6 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live
                 ts = timestamp,
             };
             string jsonString = JsonSerializer.Serialize(json);
-
-            Console.WriteLine(secretKey);
-            Console.WriteLine(JsonSerializer.Serialize(secretRule));
             this.S = LiveHeartBeatCrypto.Sypder(jsonString, secretRule, secretKey);
 
             this.Visit_id = "";
@@ -56,8 +52,6 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live
         public string S { get; set; }
 
         public string Id { get; set; }
-
-        // public string Device { get;set; }
 
         public long Ets { get; set; }
 

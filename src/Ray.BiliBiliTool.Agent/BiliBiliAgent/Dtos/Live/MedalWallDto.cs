@@ -29,5 +29,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live
         public int Medal_id { get; set; }
 
         public int Target_id { get; set; }
+
+        public int Level { get; set; }
     }
 }

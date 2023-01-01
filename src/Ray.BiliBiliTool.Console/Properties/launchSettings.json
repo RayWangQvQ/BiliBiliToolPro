@@ -2,7 +2,6 @@
   "profiles": {
     "Ray.BiliBiliTool.Console": {
       "commandName": "Project",
-      "commandLineArgs": "--runTasks=LiveFansMedal",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
