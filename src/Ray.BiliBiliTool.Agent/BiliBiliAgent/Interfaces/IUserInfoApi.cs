@@ -19,5 +19,13 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         /// <returns></returns>
         [HttpGet("/x/web-interface/nav")]
         Task<BiliApiResponse<UserInfo>> LoginByCookie();
+
+        /// <summary>
+        /// 获取用户空间信息
+        /// </summary>
+        /// <param name="userId">uid</param>
+        /// <returns></returns>
+        [HttpGet("/x/space/wbi/acc/info?mid={userId}")]
+        Task<BiliApiResponse<GetSpaceInfoResponse>> GetSpaceInfo(int userId);
     }
 }

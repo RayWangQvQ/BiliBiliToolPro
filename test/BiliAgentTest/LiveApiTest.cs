@@ -1,4 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
+ï»¿using Microsoft.Extensions.DependencyInjection;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live;
@@ -16,7 +16,7 @@ namespace BiliAgentTest
     {
         public LiveApiTest()
         {
-            Program.CreateHost(new[] { "--ENVIRONMENT=Development" });//Ä¬ÈÏPrd»·¾³£¬ÕâÀïÖ¸¶¨ÎªDevºó£¬¿ÉÒÔ¶ÁÈ¡µ½ÓÃ»§»úÃÜÅäÖÃ
+            Program.CreateHost(new[] { "--ENVIRONMENT=Development" });//Ã„Â¬ÃˆÃPrdÂ»Â·Â¾Â³Â£Â¬Ã•Ã¢Ã€Ã¯Ã–Â¸Â¶Â¨ÃÂªDevÂºÃ³Â£Â¬Â¿Ã‰Ã’Ã”Â¶ÃÃˆÂ¡ÂµÂ½Ã“ÃƒÂ»Â§Â»ÃºÃƒÃœÃ…Ã¤Ã–Ãƒ
         }
 
         [Fact]
@@ -81,6 +81,80 @@ namespace BiliAgentTest
             {
                 Assert.False(re.Code != 0);
             }
+        }
+
+        [Fact]
+        public void GetMedalWall_Normal_Success()
+        {
+            using var scope = Global.ServiceProviderRoot.CreateScope();
+
+            var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory>();
+            var api = scope.ServiceProvider.GetRequiredService<ILiveApi>();
+
+            BiliApiResponse<MedalWallResponse> re = api.GetMedalWall(919174).Result;
+
+            Assert.NotEmpty(re.Data.List);
+
+            var md = re.Data.List[0];
+            Assert.NotNull(md);
+            Assert.False(String.IsNullOrEmpty(md.Link));
+            Assert.False(String.IsNullOrEmpty(md.Target_name));
+            Assert.NotNull(md.Medal_info);
+            Assert.False(String.IsNullOrEmpty(md.Medal_info.Medal_name));
+            Assert.True(md.Medal_info.Medal_id > 0);
+        }
+
+        [Fact]
+        public void WearMedalWall_Normal_Success()
+        {
+            using var scope = Global.ServiceProviderRoot.CreateScope();
+
+            var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory>();
+            var api = scope.ServiceProvider.GetRequiredService<ILiveApi>();
+            var biliCookie = scope.ServiceProvider.GetRequiredService<BiliCookie>();
+
+            // çŒ«é›·ç²‰ä¸ç‰Œ
+            var request = new WearMedalWallRequest(biliCookie.BiliJct, 365421);
+
+            BiliApiResponse re = api.WearMedalWall(request).Result;
+
+            Assert.True(re.Code == 0);
+        }
+
+        [Fact]
+        public void GetSpaceInfo_Normal_Success()
+        {
+            using var scope = Global.ServiceProviderRoot.CreateScope();
+
+            var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory>();
+            var api = scope.ServiceProvider.GetRequiredService<IUserInfoApi>();
+            var biliCookie = scope.ServiceProvider.GetRequiredService<BiliCookie>();
+
+            BiliApiResponse<GetSpaceInfoResponse> re = api.GetSpaceInfo(919174).Result;
+
+            Assert.True(re.Code == 0);
+            Assert.NotNull(re.Data);
+            Assert.Equal(919174, re.Data.Mid);
+            Assert.NotNull(re.Data.Live_room);
+            Assert.Equal(3115258, re.Data.Live_room.Roomid);
+            Assert.False(String.IsNullOrEmpty(re.Data.Name));
+            Assert.False(String.IsNullOrEmpty(re.Data.Live_room.Title));
+        }
+
+        [Fact]
+        public void SendLiveDanmuku_Normal_Success()
+        {
+            using var scope = Global.ServiceProviderRoot.CreateScope();
+
+            var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory>();
+            var api = scope.ServiceProvider.GetRequiredService<ILiveApi>();
+            var biliCookie = scope.ServiceProvider.GetRequiredService<BiliCookie>();
+
+            var request = new SendLiveDanmukuRequest(biliCookie.BiliJct, 63666, "63666");
+
+            BiliApiResponse re = api.SendLiveDanmuku(request).Result;
+
+            Assert.True(re.Code == 0);
         }
     }
 }

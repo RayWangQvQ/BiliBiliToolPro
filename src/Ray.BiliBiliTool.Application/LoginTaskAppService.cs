@@ -27,6 +27,7 @@ namespace Ray.BiliBiliTool.Application
         private readonly IPassportApi _passportApi;
         private readonly IHostEnvironment _hostingEnvironment;
         private readonly IQingLongApi _qingLongApi;
+        private readonly ILiveApi _liveApi;
         private readonly IConfiguration _configuration;
 
         public LoginTaskAppService(
@@ -34,14 +35,15 @@ namespace Ray.BiliBiliTool.Application
             ILogger<LoginTaskAppService> logger,
             IPassportApi passportApi,
             IHostEnvironment hostingEnvironment,
-            IQingLongApi qingLongApi
-            )
+            IQingLongApi qingLongApi,
+            ILiveApi liveApi)
         {
             _configuration = configuration;
             _logger = logger;
             _passportApi = passportApi;
             _hostingEnvironment = hostingEnvironment;
             _qingLongApi = qingLongApi;
+            _liveApi = liveApi;
         }
 
         [TaskInterceptor("扫码登录", TaskLevel.One)]
@@ -117,6 +119,21 @@ namespace Ray.BiliBiliTool.Application
                 {
                     _logger.LogInformation("扫描成功！");
                     IEnumerable<string> cookies = check.Headers.SingleOrDefault(header => header.Key == "Set-Cookie").Value;
+
+                    // 请求主播主页来正确配置 cookie
+                    var liveHome = _liveApi.GetLiveHome().Result;
+                    var liveHomeContent = JsonConvert.DeserializeObject<BiliApiResponse>(liveHome.Content.ReadAsStringAsync().Result);
+                    if (liveHomeContent.Code == 0)
+                    {
+                        // 合并 cookie
+                        IEnumerable<string> liveCookies = liveHome.Headers.SingleOrDefault(header => header.Key == "Set-Cookie").Value;
+                        cookies = cookies.Union(liveCookies);
+                    }
+                    else
+                    {
+                        _logger.LogWarning("获取直播 cookie 时出现错误");
+                        _logger.LogWarning("{msg}", liveHomeContent.Message);
+                    }
 
                     cookieInfo = GetCookie(cookies);
                     result = true;

@@ -40,6 +40,10 @@ namespace Ray.BiliBiliTool.Agent
             {
                 SessData = sess;
             }
+            if (CookieItemDictionary.TryGetValue(GetPropertyDescription(nameof(LiveBuvid)), out string liveBuvid))
+            {
+                LiveBuvid = liveBuvid;
+            }
         }
 
         [Description("DedeUserID")]
@@ -53,6 +57,9 @@ namespace Ray.BiliBiliTool.Agent
 
         [Description("bili_jct")]
         public string BiliJct { get; set; }
+
+        [Description("LIVE_BUVID")]
+        public string LiveBuvid { get; set; }
 
         /// <summary>
         /// 检查是否已配置
@@ -91,6 +98,12 @@ namespace Ray.BiliBiliTool.Agent
             {
                 _logger.LogWarning(msg, GetPropertyDescription(nameof(BiliJct)));
                 result = false;
+            }
+
+            // LiveBuvid 为空时发出警告
+            if (string.IsNullOrWhiteSpace(LiveBuvid))
+            {
+                _logger.LogWarning("直播Cookie {cookie}未正确配置，将在执行相关任务时尝试自动获取", GetPropertyDescription(nameof(LiveBuvid)));
             }
 
             if (!result)

@@ -16,7 +16,9 @@ namespace Ray.BiliBiliTool.Agent.HttpClientDelegatingHandlers
         private readonly SecurityOptions _securityOptions;
 
         private readonly Dictionary<string, int> _special = new Dictionary<string, int>() {
-            {"/xlive/lottery-interface/v1/Anchor/Join",3 }//天选抽奖，有时效，不能间隔过久，使用默认3秒
+            {"/xlive/lottery-interface/v1/Anchor/Join",3 },//天选抽奖，有时效，不能间隔过久，使用默认3秒
+            {"/xlive/data-interface/v1/x25Kn/E", 1},
+            {"/xlive/data-interface/v1/x25Kn/X", 1},
         };
 
         public IntervalDelegatingHandler(IOptionsMonitor<SecurityOptions> securityOptions)

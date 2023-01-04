@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live;
@@ -52,7 +53,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         [Header("Content-Type", "application/x-www-form-urlencoded")]
         [Header("Origin", "https://link.bilibili.com")]
         [HttpPost("/xlive/revenue/v1/wallet/silver2coin")]
-        Task<BiliApiResponse<Silver2CoinResponse>> Silver2Coin([FormContent]Silver2CoinRequest request);
+        Task<BiliApiResponse<Silver2CoinResponse>> Silver2Coin([FormContent] Silver2CoinRequest request);
 
         /// <summary>
         /// 获取直播中心钱包状态
@@ -97,5 +98,44 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         /// <returns></returns>
         [HttpPost("/xlive/lottery-interface/v1/Anchor/Join")]
         Task<BiliApiResponse<JoinTianXuanResponse>> Join([FormContent] JoinTianXuanRequest request);
+
+        /// <summary>
+        /// 获取用户的粉丝勋章
+        /// </summary>
+        /// <param name="userId">uid</param>
+        /// <returns></returns>
+        [Header("Referer", "https://live.bilibili.com/")]
+        [Header("Origin", "https://live.bilibili.com")]
+        [HttpGet("/xlive/web-ucenter/user/MedalWall?target_id={userId}")]
+        Task<BiliApiResponse<MedalWallResponse>> GetMedalWall(int userId);
+
+        /// <summary>
+        /// 佩戴粉丝勋章
+        /// </summary>
+        /// <param name="userId">uid</param>
+        /// <returns></returns>
+        [Header("Referer", "https://live.bilibili.com/")]
+        [Header("Origin", "https://live.bilibili.com")]
+        [HttpPost("/xlive/app-ucenter/v1/fansMedal/wear")]
+        Task<BiliApiResponse> WearMedalWall([FormContent] WearMedalWallRequest request);
+
+        /// <summary>
+        /// 发送弹幕
+        /// </summary>
+        /// <param name="request">request</param>
+        /// <returns></returns>
+        [HttpPost("/msg/send")]
+        Task<BiliApiResponse> SendLiveDanmuku([FormContent] SendLiveDanmukuRequest request);
+
+        /// <summary>
+        /// 获取直播间信息
+        /// </summary>
+        /// <param name="roomId">roomId</param>
+        /// <returns></returns>
+        [HttpGet("/room/v1/Room/get_info?room_id={roomId}&from=room")]
+        Task<BiliApiResponse<GetLiveRoomInfoResponse>> GetLiveRoomInfo(int roomId);
+
+        [HttpGet("/news/v1/notice/recom?product=live")]
+        Task<HttpResponseMessage> GetLiveHome();
     }
 }
