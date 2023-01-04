@@ -100,12 +100,6 @@ namespace Ray.BiliBiliTool.Agent
                 result = false;
             }
 
-            // LiveBuvid 为空时发出警告
-            if (string.IsNullOrWhiteSpace(LiveBuvid))
-            {
-                _logger.LogWarning("直播Cookie {cookie}未正确配置，将在执行相关任务时尝试自动获取", GetPropertyDescription(nameof(LiveBuvid)));
-            }
-
             if (!result)
                 throw new Exception($"请正确配置Cookie后再运行，配置方式见 {Constants.SourceCodeUrl}");
         }
