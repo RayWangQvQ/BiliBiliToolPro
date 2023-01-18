@@ -18,6 +18,8 @@ using Ray.BiliBiliTool.Agent.QingLong;
 using Ray.BiliBiliTool.Application.Attributes;
 using Ray.BiliBiliTool.Application.Contracts;
 using Ray.BiliBiliTool.Infrastructure.Enums;
+using Ray.BiliBiliTool.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Ray.BiliBiliTool.Application
 {
@@ -34,8 +36,7 @@ namespace Ray.BiliBiliTool.Application
             ILogger<LoginTaskAppService> logger,
             IPassportApi passportApi,
             IHostEnvironment hostingEnvironment,
-            IQingLongApi qingLongApi
-            )
+            IQingLongApi qingLongApi)
         {
             _configuration = configuration;
             _logger = logger;

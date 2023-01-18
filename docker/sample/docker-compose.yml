@@ -19,6 +19,7 @@ services:
       - Ray_LiveLotteryTaskConfig__Cron=0 22 * * *
       - Ray_UnfollowBatchedTaskConfig__Cron=0 6 1 * *
       - Ray_VipBigPointConfig__Cron=7 1 * * *
+      - Ray_LiveFansMedalTaskConfig__Cron=5 0 * * *
 
       # UA：
       - Ray_Security__UserAgent=

@@ -40,6 +40,10 @@ namespace Ray.BiliBiliTool.Agent
             {
                 SessData = sess;
             }
+            if (CookieItemDictionary.TryGetValue(GetPropertyDescription(nameof(LiveBuvid)), out string liveBuvid))
+            {
+                LiveBuvid = liveBuvid;
+            }
         }
 
         [Description("DedeUserID")]
@@ -53,6 +57,9 @@ namespace Ray.BiliBiliTool.Agent
 
         [Description("bili_jct")]
         public string BiliJct { get; set; }
+
+        [Description("LIVE_BUVID")]
+        public string LiveBuvid { get; set; }
 
         /// <summary>
         /// 检查是否已配置

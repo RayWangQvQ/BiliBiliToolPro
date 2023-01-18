@@ -29,7 +29,7 @@ namespace Ray.BiliBiliTool.Infrastructure
             if (string.IsNullOrWhiteSpace(CookieStr)) throw new Exception("Cookie字符串为空");
         }
 
-        private static Dictionary<string, string> BuildCookieItemDictionaryByCookieItemList(IEnumerable<string> cookieItemList, Func<string, string> nameBuilder = null, Func<string, string> valueBuilder = null)
+        public static Dictionary<string, string> BuildCookieItemDictionaryByCookieItemList(IEnumerable<string> cookieItemList, Func<string, string> nameBuilder = null, Func<string, string> valueBuilder = null)
         {
             var re = new Dictionary<string, string>();
             foreach (var item in cookieItemList ?? new List<string>())
