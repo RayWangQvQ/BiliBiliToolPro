@@ -32,9 +32,10 @@ namespace Ray.BiliBiliTool.DomainService
         private readonly IUserInfoApi _userInfoApi;
         private readonly LiveLotteryTaskOptions _liveLotteryTaskOptions;
         private readonly LiveFansMedalTaskOptions _liveFansMedalTaskOptions;
-        private readonly BiliCookie _biliCookie;
         private readonly DailyTaskOptions _dailyTaskOptions;
         private readonly SecurityOptions _securityOptions;
+        private readonly BiliCookie _biliCookie;
+
 
         public LiveDomainService(ILogger<LiveDomainService> logger,
             ILiveApi liveApi,
@@ -43,6 +44,7 @@ namespace Ray.BiliBiliTool.DomainService
             IUserInfoApi userInfoApi,
             IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
             IOptionsMonitor<LiveLotteryTaskOptions> liveLotteryTaskOptions,
+            IOptionsMonitor<LiveFansMedalTaskOptions> liveFansMedalTaskOptions,
             IOptionsMonitor<SecurityOptions> securityOptions,
             BiliCookie biliCookie)
         {
@@ -52,9 +54,11 @@ namespace Ray.BiliBiliTool.DomainService
             _liveTraceApi = liveTraceApi;
             _userInfoApi = userInfoApi;
             _liveLotteryTaskOptions = liveLotteryTaskOptions.CurrentValue;
-            _biliCookie = biliCookie;
             _dailyTaskOptions = dailyTaskOptions.CurrentValue;
+            _liveFansMedalTaskOptions = liveFansMedalTaskOptions.CurrentValue;
             _securityOptions = securityOptions.CurrentValue;
+            _biliCookie = biliCookie;
+
         }
 
         /// <summary>
