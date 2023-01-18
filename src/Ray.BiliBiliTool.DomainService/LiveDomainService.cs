@@ -34,6 +34,7 @@ namespace Ray.BiliBiliTool.DomainService
         private readonly LiveFansMedalTaskOptions _liveFansMedalTaskOptions;
         private readonly BiliCookie _biliCookie;
         private readonly DailyTaskOptions _dailyTaskOptions;
+        private readonly SecurityOptions _securityOptions;
 
         public LiveDomainService(ILogger<LiveDomainService> logger,
             ILiveApi liveApi,
@@ -42,7 +43,7 @@ namespace Ray.BiliBiliTool.DomainService
             IUserInfoApi userInfoApi,
             IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
             IOptionsMonitor<LiveLotteryTaskOptions> liveLotteryTaskOptions,
-            IOptionsMonitor<LiveFansMedalTaskOptions> liveFansMedalTaskOptions,
+            IOptionsMonitor<SecurityOptions> securityOptions,
             BiliCookie biliCookie)
         {
             _logger = logger;
@@ -53,7 +54,7 @@ namespace Ray.BiliBiliTool.DomainService
             _liveLotteryTaskOptions = liveLotteryTaskOptions.CurrentValue;
             _biliCookie = biliCookie;
             _dailyTaskOptions = dailyTaskOptions.CurrentValue;
-            _liveFansMedalTaskOptions = liveFansMedalTaskOptions.CurrentValue;
+            _securityOptions = securityOptions.CurrentValue;
         }
 
         /// <summary>
@@ -439,7 +440,7 @@ namespace Ray.BiliBiliTool.DomainService
 
                 _logger.LogInformation("【弹幕发送】成功~，你和主播 {name} 的亲密值增加了100！", spaceInfo.Data.Name);
             });
-    }
+        }
 
         public void SendHeartBeatToFansMedalLive()
         {
@@ -457,10 +458,10 @@ namespace Ray.BiliBiliTool.DomainService
             var Now = () => new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
 
             while (infoList.Min(
-                info =>
-                info.FailedTimes >= _liveFansMedalTaskOptions.HeartBeatSendGiveUpThreshold ? int.MaxValue :
-                info.HeartBeatCount)
-                < _liveFansMedalTaskOptions.HeartBeatNumber)
+                       info => info.FailedTimes >= _liveFansMedalTaskOptions.HeartBeatSendGiveUpThreshold
+                           ? int.MaxValue :
+                           info.HeartBeatCount)
+                   < _liveFansMedalTaskOptions.HeartBeatNumber)
             {
                 foreach (var info in infoList)
                 {
@@ -488,7 +489,7 @@ namespace Ray.BiliBiliTool.DomainService
                                 info.RoomInfo.Area_id,
                                 info.HeartBeatCount,
                                 timestamp,
-                                LiveFansMedalTaskOptions.UserAgent,
+                                _securityOptions.UserAgent,
                                 _biliCookie.BiliJct,
                                 info.RoomInfo.Uid),
                             $"[\"{_biliCookie.LiveBuvid}\",\"{uuid}\"]")
@@ -505,7 +506,7 @@ namespace Ray.BiliBiliTool.DomainService
                                 _biliCookie.LiveBuvid,
                                 timestamp,
                                 info.HeartBeatInfo.Timestamp,
-                                LiveFansMedalTaskOptions.UserAgent,
+                                _securityOptions.UserAgent,
                                 info.HeartBeatInfo.Secret_rule,
                                 info.HeartBeatInfo.Secret_key,
                                 _biliCookie.BiliJct,

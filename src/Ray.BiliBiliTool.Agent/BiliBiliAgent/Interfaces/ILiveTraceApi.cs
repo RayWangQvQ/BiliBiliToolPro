@@ -19,11 +19,9 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
             会将表单中的双引号自动加入反斜杠转义...
             如 ["key":"value"] => [\"key\":\"value\"]
         */
-        [Header("User-Agent", LiveFansMedalTaskOptions.UserAgent)]
         [HttpPost("/xlive/data-interface/v1/x25Kn/E")]
         Task<BiliApiResponse<HeartBeatResponse>> EnterRoom([FormContent] EnterRoomRequest request, [FormField] string device);
 
-        [Header("User-Agent", LiveFansMedalTaskOptions.UserAgent)]
         [HttpPost("/xlive/data-interface/v1/x25Kn/X")]
         Task<BiliApiResponse<HeartBeatResponse>> HeartBeat([FormContent] HeartBeatRequest request, [FormField] string device);
     }

@@ -32,7 +32,7 @@ namespace Ray.BiliBiliTool.Config.Options
         /// </summary>
         public bool IsSkipLevel20Medal { get; set; } = true;
 
-        public const string UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36";
+        //public const string UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36";
 
         public const int HeartBeatInterval = 60;
     }
