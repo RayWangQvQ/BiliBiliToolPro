@@ -19,17 +19,19 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live
             long timestamp,
             string userAgent,
             string csrf,
-            int ruid)
+            int ruid,
+            string device)
         {
-            this.Id = JsonConvert.SerializeObject(new[] { parentId, areaID, seqNumber, roomId });
-            this.Ts = timestamp;
-            this.Ua = userAgent;
-            this.Csrf = csrf;
-            this.Ruid = ruid;
+            Id = JsonConvert.SerializeObject(new[] { parentId, areaID, seqNumber, roomId });
+            Ts = timestamp;
+            Ua = userAgent;
+            Csrf = csrf;
+            Ruid = ruid;
 
-            this.Is_patch = 0;
-            this.Heart_beat = "[]";
-            this.Visit_id = "";
+            Is_patch = 0;
+            Heart_beat = "[]";
+            Visit_id = "";
+            Device = device;
         }
         public string Id { get; set; }
 
@@ -48,5 +50,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live
         public string Csrf { get; set; }
 
         public string Visit_id { get; set; }
+
+        public string Device { get; set; }
     }
 }

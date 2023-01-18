@@ -19,15 +19,17 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live
             ICollection<int> secretRule,
             string secretKey,
             string csrf,
-            string uuid)
+            string uuid,
+            string device)
         {
-            this.Id = JsonSerializer.Serialize(new[] { parentId, areaID, seqNumber, roomId });
-            this.Ets = ets;
-            this.Benchmark = secretKey;
-            this.Time = 60;
-            this.Ts = timestamp;
-            this.Ua = userAgent;
-            this.Csrf = csrf;
+            Id = JsonSerializer.Serialize(new[] { parentId, areaID, seqNumber, roomId });
+            Ets = ets;
+            Benchmark = secretKey;
+            Time = 60;
+            Ts = timestamp;
+            Ua = userAgent;
+            Csrf = csrf;
+            Device = device;
 
             // 构造哈希值
             var json = new
@@ -69,5 +71,6 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live
 
         public string Visit_id { get; set; }
 
+        public string Device { get; }
     }
 }

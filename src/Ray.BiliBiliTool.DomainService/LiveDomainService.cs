@@ -495,8 +495,9 @@ namespace Ray.BiliBiliTool.DomainService
                                 timestamp,
                                 _securityOptions.UserAgent,
                                 _biliCookie.BiliJct,
-                                info.RoomInfo.Uid),
-                            $"[\"{_biliCookie.LiveBuvid}\",\"{uuid}\"]")
+                                info.RoomInfo.Uid,
+                                $"[\"{_biliCookie.LiveBuvid}\",\"{uuid}\"]")
+                            )
                             .Result;
                     }
                     else
@@ -514,8 +515,9 @@ namespace Ray.BiliBiliTool.DomainService
                                 info.HeartBeatInfo.Secret_rule,
                                 info.HeartBeatInfo.Secret_key,
                                 _biliCookie.BiliJct,
-                                uuid),
-                            $"[\"{_biliCookie.LiveBuvid}\",\"{uuid}\"]")
+                                uuid,
+                                $"[\"{_biliCookie.LiveBuvid}\",\"{uuid}\"]")
+                            )
                             .Result;
                     }
 
