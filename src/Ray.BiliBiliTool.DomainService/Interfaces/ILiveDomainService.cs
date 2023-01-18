@@ -38,6 +38,11 @@ namespace Ray.BiliBiliTool.DomainService.Interfaces
         /// <summary>
         /// 直播时长挂机
         /// </summary>
-        void SendHeartBeatToFansMdealLive();
+        void SendHeartBeatToFansMedalLive();
+
+        /// <summary>
+        /// 点赞直播间
+        /// </summary>
+        void LikeFansMedalLive();
     }
 }

@@ -405,19 +405,10 @@ namespace Ray.BiliBiliTool.DomainService
         {
             if (!CheckLiveCookie()) return;
 
-            _logger.LogInformation("【获取直播列表】获取拥有粉丝牌的直播列表");
-            var result = this._liveApi.GetMedalWall(int.Parse(this._biliCookie.UserId)).Result;
-
-            if (result.Code != 0)
+            GetFansMedalInfoList().ForEach(info =>
             {
-                _logger.LogError("【获取直播列表】失败");
-                _logger.LogError("【原因】{message}", result.Message);
-                return;
-            }
+                var medal = info.MedalInfo;
 
-            // 遍历粉丝牌
-            foreach (var medal in result.Data.List)
-            {
                 _logger.LogInformation("【直播间】{liveRoomName}", medal.Target_name);
                 _logger.LogInformation("【粉丝牌】{medalName}", medal.Medal_info.Medal_name);
 
@@ -430,7 +421,7 @@ namespace Ray.BiliBiliTool.DomainService
                 {
                     _logger.LogError("【获取直播间信息】失败");
                     _logger.LogError("【原因】{message}", spaceInfo.Message);
-                    continue;
+                    return;
                 }
 
                 // 发送弹幕
@@ -443,60 +434,19 @@ namespace Ray.BiliBiliTool.DomainService
                 {
                     _logger.LogError("【弹幕发送】失败");
                     _logger.LogError("【原因】{message}", sendResult.Message);
-                    continue;
+                    return;
                 }
 
                 _logger.LogInformation("【弹幕发送】成功~，你和主播 {name} 的亲密值增加了100！", spaceInfo.Data.Name);
-            }
-        }
+            });
+    }
 
-        public void SendHeartBeatToFansMdealLive()
+        public void SendHeartBeatToFansMedalLive()
         {
             if (!CheckLiveCookie()) return;
 
-            _logger.LogInformation("【获取直播列表】获取拥有粉丝牌的直播列表");
-            var medalWallInfo = this._liveApi.GetMedalWall(int.Parse(this._biliCookie.UserId)).Result;
-
-            if (medalWallInfo.Code != 0)
-            {
-                _logger.LogError("【获取直播列表】失败");
-                _logger.LogError("【原因】{message}", medalWallInfo.Message);
-                return;
-            }
-
             var infoList = new List<HeartBeatIterationInfoDto>();
-            foreach (var medal in medalWallInfo.Data.List)
-            {
-                _logger.LogInformation("【主播】{name} ", medal.Target_name);
-                if (_liveFansMedalTaskOptions.IsSkipLevel20Medal && medal.Medal_info.Level >= 20)
-                {
-                    _logger.LogInformation("粉丝牌等级为 {level}，观看将不再增长亲密度，跳过", medal.Medal_info.Level);
-                    continue;
-                }
-
-                // 通过空间主页信息获取直播间 id
-                int liveHostUserId = medal.Medal_info.Target_id;
-                var spaceInfo = _userInfoApi.GetSpaceInfo(liveHostUserId).Result;
-                if (spaceInfo.Code != 0)
-                {
-                    _logger.LogError("【获取空间信息】失败");
-                    _logger.LogError("【原因】{message}", spaceInfo.Message);
-                    continue;
-                }
-
-                var roomId = spaceInfo.Data.Live_room.Roomid;
-
-                // 获取直播间详细信息
-                var liveRoomInfo = _liveApi.GetLiveRoomInfo(roomId).Result;
-                if (liveRoomInfo.Code != 0)
-                {
-                    _logger.LogError("【获取直播间信息】失败");
-                    _logger.LogError("【原因】{message}", liveRoomInfo.Message);
-                    continue;
-                }
-
-                infoList.Add(new(roomId, liveRoomInfo.Data, new(), 0, 0));
-            }
+            GetFansMedalInfoList().ForEach((medal) => infoList.Add(new(medal.RoomId, medal.LiveRoomInfo, new(), 0, 0)));
 
             if (infoList.Count == 0)
             {
@@ -519,9 +469,9 @@ namespace Ray.BiliBiliTool.DomainService
 
                     string uuid = Guid.NewGuid().ToString();
                     var current = Now();
-                    if (current - info.LastBeatTime <= LiveFansMedalTaskOptions.HeartBeatInterval * 1000)
+                    if (current - info.LastBeatTime <= (LiveFansMedalTaskOptions.HeartBeatInterval + 5) * 1000)
                     {
-                        int sleepTime = (int)(LiveFansMedalTaskOptions.HeartBeatInterval * 1000 - (current - info.LastBeatTime));
+                        int sleepTime = (int)((LiveFansMedalTaskOptions.HeartBeatInterval + 5) * 1000 - (current - info.LastBeatTime));
                         _logger.LogDebug("【休眠】{time} 毫秒", sleepTime);
                         Thread.Sleep(sleepTime);
                     }
@@ -590,6 +540,74 @@ namespace Ray.BiliBiliTool.DomainService
 
             var successCount = infoList.Count(info => info.HeartBeatCount >= _liveFansMedalTaskOptions.HeartBeatNumber);
             _logger.LogInformation("【直播观看时长】完成情况：{success}/{total} ", successCount, infoList.Count);
+        }
+
+        public void LikeFansMedalLive()
+        {
+            if (!CheckLiveCookie()) return;
+
+            GetFansMedalInfoList().ForEach(info =>
+            {
+                var result = _liveApi.LikeLiveRoom(new LikeLiveRoomRequest(info.RoomId, _biliCookie.BiliJct)).Result;
+                if (result.Code == 0)
+                {
+                    _logger.LogInformation("【点赞直播间】{roomId} 完成", info.RoomId);
+                }
+                else
+                {
+                    _logger.LogError("【点赞直播间】{roomId} 时候出现错误", info.RoomId);
+                    _logger.LogError("【原因】{message}", result.Message);
+                }
+            });
+        }
+
+        private List<FansMedalInfoDto> GetFansMedalInfoList()
+        {
+            _logger.LogInformation("【获取直播列表】获取拥有粉丝牌的直播列表");
+            var medalWallInfo = this._liveApi.GetMedalWall(int.Parse(this._biliCookie.UserId)).Result;
+
+            if (medalWallInfo.Code != 0)
+            {
+                _logger.LogError("【获取直播列表】失败");
+                _logger.LogError("【原因】{message}", medalWallInfo.Message);
+                return null;
+            }
+
+            var infoList = new List<FansMedalInfoDto>();
+            foreach (var medal in medalWallInfo.Data.List)
+            {
+                _logger.LogInformation("【主播】{name} ", medal.Target_name);
+                if (_liveFansMedalTaskOptions.IsSkipLevel20Medal && medal.Medal_info.Level >= 20)
+                {
+                    _logger.LogInformation("粉丝牌等级为 {level}，观看将不再增长亲密度，跳过", medal.Medal_info.Level);
+                    continue;
+                }
+
+                // 通过空间主页信息获取直播间 id
+                int liveHostUserId = medal.Medal_info.Target_id;
+                var spaceInfo = _userInfoApi.GetSpaceInfo(liveHostUserId).Result;
+                if (spaceInfo.Code != 0)
+                {
+                    _logger.LogError("【获取空间信息】失败");
+                    _logger.LogError("【原因】{message}", spaceInfo.Message);
+                    continue;
+                }
+
+                var roomId = spaceInfo.Data.Live_room.Roomid;
+
+                // 获取直播间详细信息
+                var liveRoomInfo = _liveApi.GetLiveRoomInfo(roomId).Result;
+                if (liveRoomInfo.Code != 0)
+                {
+                    _logger.LogError("【获取直播间信息】失败");
+                    _logger.LogError("【原因】{message}", liveRoomInfo.Message);
+                    continue;
+                }
+
+                infoList.Add(new FansMedalInfoDto(roomId, medal, liveRoomInfo.Data));
+            }
+
+            return infoList;
         }
 
         /// <summary>

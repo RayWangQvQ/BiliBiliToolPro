@@ -43,7 +43,8 @@ namespace Ray.BiliBiliTool.Application
         public override void DoTask()
         {
             _liveDomainService.SendDanmakuToFansMedalLive();
-            _liveDomainService.SendHeartBeatToFansMdealLive();
+            _liveDomainService.LikeFansMedalLive();
+            _liveDomainService.SendHeartBeatToFansMedalLive();
         }
 
     }

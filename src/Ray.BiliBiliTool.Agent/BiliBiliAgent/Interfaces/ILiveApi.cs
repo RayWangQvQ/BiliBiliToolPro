@@ -135,7 +135,18 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         [HttpGet("/room/v1/Room/get_info?room_id={roomId}&from=room")]
         Task<BiliApiResponse<GetLiveRoomInfoResponse>> GetLiveRoomInfo(int roomId);
 
+        /// <summary>
+        /// 请求直播主页用于配置直播相关 Cookie
+        /// </summary>
         [HttpGet("/news/v1/notice/recom?product=live")]
         Task<HttpResponseMessage> GetLiveHome();
+
+        /// <summary>
+        /// 点赞直播间
+        /// </summary>
+        [HttpPost("/xlive/web-ucenter/v1/interact/likeInteract")]
+        [Header("Referer", "https://live.bilibili.com/")]
+        [Header("Origin", "https://live.bilibili.com")]
+        Task<BiliApiResponse> LikeLiveRoom([FormContent] LikeLiveRoomRequest request);
     }
 }
