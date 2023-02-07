@@ -59,6 +59,20 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         [HttpGet("/x/web-interface/archive/coins")]
         Task<BiliApiResponse<DonatedCoinsForVideo>> GetDonatedCoinsForVideo(GetAlreadyDonatedCoinsRequest request);
         #endregion
+        
+        /// <summary>
+        /// 搜索指定Up的视频列表
+        /// </summary>
+        /// <param name="upId"></param>
+        /// <param name="pageSize">[1,100]验证不通过接口会报异常</param>
+        /// <param name="pageNumber"></param>
+        /// <param name="keyword"></param>
+        /// <returns></returns>
+        [Header("Referer", "https://www.bilibili.com/")]
+        [Header("Origin", "https://space.bilibili.com")]
+        [HttpGet("/x/space/wbi/arc/search?mid={upId}&ps={pageSize}&tid=0&pn={pageNumber}&keyword={keyword}&order=pubdate&jsonp=jsonp")]
+        Task<BiliApiResponse<SearchUpVideosResponse>> SearchVideosByUpId(long upId, int pageSize = 30, int pageNumber = 1, string keyword = "");
+        
     }
 
     /// <summary>
@@ -95,18 +109,6 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         [HttpGet("/x/web-interface/ranking/v2?rid=0&type=all")]
         Task<BiliApiResponse<Ranking>> GetRegionRankingVideosV2();
 
-        /// <summary>
-        /// 搜索指定Up的视频列表
-        /// </summary>
-        /// <param name="upId"></param>
-        /// <param name="pageSize">[1,100]验证不通过接口会报异常</param>
-        /// <param name="pageNumber"></param>
-        /// <param name="keyword"></param>
-        /// <returns></returns>
-        [Header("Referer", "https://www.bilibili.com/")]
-        [Header("Origin", "https://space.bilibili.com")]
-        [HttpGet("/x/space/arc/search?mid={upId}&ps={pageSize}&tid=0&pn={pageNumber}&keyword={keyword}&order=pubdate&jsonp=jsonp")]
-        Task<BiliApiResponse<SearchUpVideosResponse>> SearchVideosByUpId(long upId, int pageSize = 30, int pageNumber = 1, string keyword = "");
 
     }
 }
