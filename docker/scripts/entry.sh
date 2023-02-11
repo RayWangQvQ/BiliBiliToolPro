@@ -32,8 +32,8 @@ else
 	if ! [ -z "$Ray_VipBigPointConfig__Cron" ]; then
 		echo "$Ray_VipBigPointConfig__Cron cd /app && dotnet $CONSOLE_DLL --runTasks=VipBigPoint" >>$CRON_FILE
 	fi
-	if ! [ -z "$Ray_LiveFansMedalConfig__Cron" ]; then
-		echo "$Ray_LiveFansMedalConfig__Cron cd /app && dotnet $CONSOLE_DLL --runTasks=LiveFansMedal" >>$CRON_FILE
+	if ! [ -z "$Ray_LiveFansMedalTaskConfig__Cron " ]; then
+		echo "$Ray_LiveFansMedalTaskConfig__Cron  cd /app && dotnet $CONSOLE_DLL --runTasks=LiveFansMedal" >>$CRON_FILE
 	fi
 fi
 

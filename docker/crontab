@@ -1,4 +1,5 @@
-0 15 * * * dotnet /app/Ray.BiliBiliTool.Console.dll --runTasks=Daily >> /var/log/cron.log
-0 22 * * * dotnet /app/Ray.BiliBiliTool.Console.dll --runTasks=LiveLottery >> /var/log/cron.log
-7 1 * * * dotnet /app/Ray.BiliBiliTool.Console.dll --runTasks=VipBigPoint >> /var/log/cron.log
-5 0 * * * dotnet /app/Ray.BiliBiliTool.Console.dll --runTasks=LiveFansMedal >> /var/log/cron.log
+0 15 * * * dotnet /app/Ray.BiliBiliTool.Console.dll --runTasks=Daily           >> /var/log/cron.log
+0 22 * * * dotnet /app/Ray.BiliBiliTool.Console.dll --runTasks=LiveLottery     >> /var/log/cron.log
+0 6 1 * *  dotnet /app/Ray.BiliBiliTool.Console.dll --runTasks=UnfollowBatched >> /var/log/cron.log
+7 1 * * *  dotnet /app/Ray.BiliBiliTool.Console.dll --runTasks=VipBigPoint     >> /var/log/cron.log
+5 0 * * *  dotnet /app/Ray.BiliBiliTool.Console.dll --runTasks=LiveFansMedal   >> /var/log/cron.log
