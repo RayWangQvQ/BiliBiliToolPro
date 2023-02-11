@@ -3,7 +3,7 @@
 # @Author: Ray zai7lou@outlook.com
 # @Date: 2023-02-11 23:13:19
  # @LastEditors: Ray zai7lou@outlook.com
- # @LastEditTime: 2023-02-12 02:36:52
+ # @LastEditTime: 2023-02-12 02:48:22
 # @FilePath: \BiliBiliToolPro\docker\install.sh
 # @Description:
 ###
@@ -113,7 +113,8 @@ checkResult() {
         echo "==============================================="
         echo "Congratulations! 恭喜！"
         echo "创建并运行$containerName容器成功。"
-        echo "第一次运行，请执行扫码登录：docker exec -it $containerName dotnet /app/Ray.BiliBiliTool.Console.dll --runTasks=Login --Security__RandomSleepMaxMin=0"
+        echo "第一次运行，请执行扫码登录："
+        echo "docker exec -it $containerName dotnet /app/Ray.BiliBiliTool.Console.dll --runTasks=Login --Security__RandomSleepMaxMin=0"
         echo "Enjoy it~"
         echo "==============================================="
     else

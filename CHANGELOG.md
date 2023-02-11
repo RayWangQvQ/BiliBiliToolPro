@@ -83,4 +83,6 @@
 ## 0.4.1
 - Merge PR #418 : Fix search video api's error, thx @catlair
 ## 0.4.2
-- Merfe PRs #425 #426 #427 : enhancement docker things, thx @zclkkk
+- Merfe PRs #425 #426 #427 : Enhancement docker things, thx @zclkkk
+## 0.4.3
+- Feature #419 : Add a auto shell script for install with docker
