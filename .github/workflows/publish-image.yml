@@ -6,8 +6,8 @@ on:
       manualTag:
         description: 'Manual Tag'
         required: true
-      manualWithLatestTag:
-        description: 'Manual With Latest Tag'
+      autoWithLatestTag:
+        description: 'Auto Add Latest Tag'
         required: true
         default: true
         type: boolean
@@ -17,82 +17,77 @@ on:
 env:
   DOCKERHUB_USERNAME : ${{ secrets.DOCKERHUB_USERNAME }}
   DOCKERHUB_PASSWORD : ${{ secrets.DOCKERHUB_PASSWORD }}
+  GHCR_USERNAME: ${{ github.repository_owner }}
+  GHCR_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+  DOCKER_IMG_NAME: "zai7lou/bilibili_tool_pro"
+  GHC_IMG_NAME: "ghcr.io/raywangqvq/bilibili_tool_pro"
 
 jobs:
-  CheckDockerToken:
+  PublishImage:
     runs-on: ubuntu-latest
-    outputs:
-      hasToken: ${{ steps.step_one.outputs.hasToken }}
     steps:
-      - name: Set the value
-        id: step_one
+      - name: GetTargetVersion
+        id: getTargetVersion
         run: |
-          if [ "$DOCKERHUB_PASSWORD" ] ; then
-            echo "::set-output name=hasToken::true"
-          else
-            echo "::set-output name=hasToken::false"
-          fi
-      - name: Check the value
-        run: |
-          echo ${{ steps.step_one.outputs.hasToken }}
-          ##echo "GITHUB_REF: $GITHUB_REF"
-          ##echo "GITHUB_REF#refs/tags/: ${GITHUB_REF#refs/tags/}"
-          echo "github.event.release.tag_name: ${{ github.event.release.tag_name }}"
-          echo "github.event.inputs.manualTag: ${{ github.event.inputs.manualTag }}"
-
-        
-  Publish2DockerHub:
-    runs-on: ubuntu-latest
-    needs: CheckDockerToken
-    if: "contains(needs.CheckDockerToken.outputs.hasToken, 'true')"
-    steps:
-      - 
-        name: GetRepoTag
-        id: getRepoTag
-        run: |
-          RepoTag=""
+          TargetVersion=""
           if [ "${{ github.event.release.tag_name }}" ] ; then
-            RepoTag=${{ github.event.release.tag_name }}
+            TargetVersion=${{ github.event.release.tag_name }}
           fi
           if [ "${{ github.event.inputs.manualTag }}" ] ; then
-            RepoTag=${{ github.event.inputs.manualTag }}
+            TargetVersion=${{ github.event.inputs.manualTag }}
           fi
-          echo "repo tag: $RepoTag"
-          echo "::set-output name=repoTag::$RepoTag"
-      -
-        name: Checkout
-        uses: actions/checkout@v2
+          echo "TargetVersion: $TargetVersion"
+          echo "TargetVersion=$TargetVersion" >> $GITHUB_OUTPUT
+
+      - name: Checkout
+        uses: actions/checkout@v3
         with:
-          ref: ${{ steps.getRepoTag.outputs.repoTag }}
-      -
-        name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
-      -
-        name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-      -
-        name: Login to DockerHub
-        uses: docker/login-action@v1 
+          ref: ${{ steps.getTargetVersion.outputs.TargetVersion }}
+      
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PASSWORD }}
-      - 
-        name: GetDockerTagNames
-        id: getDockerTags
+          username: ${{ env.DOCKERHUB_USERNAME }}
+          password: ${{ env.DOCKERHUB_PASSWORD }}
+
+      - name: Log in to ghcr
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ env.GHCR_USERNAME }}
+          password: ${{ env.GHCR_PASSWORD }}
+
+      - name: Generate tags
+        id: tags
         run: |
-          DOCKER_IMAGE_TAG="zai7lou/bilibili_tool_pro:${{ steps.getRepoTag.outputs.repoTag }}"
-          DOCKER_IMAGE_LATEST_TAG=",zai7lou/bilibili_tool_pro:latest"
-          if [ "${{ github.event.inputs.manualTag }}" ] && [ "${{ github.event.inputs.manualWithLatestTag }}" == "false" ] ; then
-            DOCKER_IMAGE_LATEST_TAG=""
+          targetVersion="${{ steps.getTargetVersion.outputs.TargetVersion }}"
+          dockerTagWithVersion="${{ env.DOCKER_IMG_NAME }}:$targetVersion"
+          ghcrTagWithVersion="${{ env.GHC_IMG_NAME }}:$targetVersion"
+          dockerTagWithLatest=""
+          ghcrTagWithLatest=""
+          if [ "${{ github.event.inputs.autoWithLatestTag }}" == "true" ] ; then
+            dockerTagWithLatest="$dockerImage:latest"
+            ghcrTagWithLatest="$ghcrImage:latest"
           fi
-          DOCKER_IMAGE_TAGS=$DOCKER_IMAGE_TAG$DOCKER_IMAGE_LATEST_TAG
-          echo "docker image tag: $DOCKER_IMAGE_TAGS"
-          echo "::set-output name=dockerTags::$DOCKER_IMAGE_TAGS"
-      -
-        name: Build and push
-        uses: docker/build-push-action@v2
+          echo "dockerTagWithVersion=$dockerTagWithVersion" >> $GITHUB_OUTPUT
+          echo "ghcrTagWithVersion=$ghcrTagWithVersion" >> $GITHUB_OUTPUT
+          echo "dockerTagWithLatest=$dockerTagWithLatest" >> $GITHUB_OUTPUT
+          echo "ghcrTagWithLatest=$ghcrTagWithLatest" >> $GITHUB_OUTPUT
+      
+      - name: Build and push
+        uses: docker/build-push-action@v4
         with:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ steps.getDockerTags.outputs.dockerTags }}
+          tags: |
+            ${{ steps.tags.outputs.dockerTagWithVersion }}
+            ${{ steps.tags.outputs.ghcrTagWithVersion }}
+            ${{ steps.tags.outputs.dockerTagWithLatest }}
+            ${{ steps.tags.outputs.ghcrTagWithLatest }}

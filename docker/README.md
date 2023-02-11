@@ -2,23 +2,20 @@
 <!-- TOC depthFrom:2 -->
 
 - [1. 前期工作](#1-前期工作)
-    - [1.1. Docker环境](#11-docker环境)
-    - [1.2. 须知](#12-须知)
-- [2. 方式一：Docker Compose(推荐)](#2-方式一docker-compose推荐)
-    - [2.1. 启动](#21-启动)
-    - [2.2. 其他命令参考](#22-其他命令参考)
-- [3. 方式二：Docker指令](#3-方式二docker指令)
-    - [3.1. Docker启动](#31-docker启动)
-    - [3.2. 其他指令参考](#32-其他指令参考)
-    - [3.3. 使用Watchtower更新容器](#33-使用watchtower更新容器)
-- [4. 登录](#4-登录)
-- [5. 自己构建镜像（非必须）](#5-自己构建镜像非必须)
-- [6. 其他](#6-其他)
+- [2. 方式一：一键脚本(推荐)](#2-方式一一键脚本推荐)
+- [3. 方式二：手动Docker Compose](#3-方式二手动docker-compose)
+    - [3.1. 启动](#31-启动)
+    - [3.2. 其他命令参考](#32-其他命令参考)
+- [4. 方式三：手动Docker指令](#4-方式三手动docker指令)
+    - [4.1. Docker启动](#41-docker启动)
+    - [4.2. 其他指令参考](#42-其他指令参考)
+    - [4.3. 使用Watchtower更新容器](#43-使用watchtower更新容器)
+- [5. 登录](#5-登录)
+- [6. 自己构建镜像（非必须）](#6-自己构建镜像非必须)
+- [7. 其他](#7-其他)
 
 <!-- /TOC -->
 ## 1. 前期工作
-
-### 1.1. Docker环境
 
 请确认已安装了Docker所需环境（[Docker](https://docs.docker.com/get-docker/)和[Docker Compose](https://docs.docker.com/compose/cli-command/)）
 
@@ -29,26 +26,21 @@ Window系统推荐使用Docker Desktop，官方下载安装包安装。
 
 安装完成后，请执行`docker --version`检查`Docker`是否安装成功，请执行`docker compose version`检查`Docker Compose`是否安装成功。
 
-### 1.2. 须知
+## 2. 方式一：一键脚本(推荐) 
 
-- Docker有两种部署方式：使用`Docker Compose`或使用docker指令，选择其中一种即可
+仅支持linux系统
 
-- 以下章节，凡设计到下载GitHub文件的，如`wget https://raw.githubusercontent.com...`，需要有良好的互联网环境，如果是“局域网”，可以在地址前添加`https://ghproxy.com/`，比如更改为`wget https://ghproxy.com/https://raw.githubusercontent.com...`
+```
+wget "https://ghproxy.com/https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/feature/docker-workflow/docker/install.sh" && chmod +x insatll.sh && install.sh
+```
 
-- 每次容器启动会去跑一遍 Test 任务，用于测试 Cookie ，其他任务由设定的Cron来指定定时触发。
+## 3. 方式二：手动Docker Compose
 
-- 想手动运行某任务的话，[查看功能任务参数](https://github.com/RayWangQvQ/BiliBiliToolPro/tree/develop#2-功能任务说明) 请进入容器后输入命令来启动执行。
-
-## 2. 方式一：Docker Compose(推荐) 
-
-### 2.1. 启动
+### 3.1. 启动
 
 ```
 # 创建目录
-mkdir bili
-cd bili
-
-docker pull zai7lou/bilibili_tool_pro
+mkdir bili && cd bili
 
 # 下载
 wget https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/src/Ray.BiliBiliTool.Console/appsettings.json
@@ -71,7 +63,7 @@ bili
 └── docker-compose.yml
 ```
 
-### 2.2. 其他命令参考
+### 3.2. 其他命令参考
 
 ```
 # 启动 docker-compose
@@ -90,9 +82,9 @@ docker exec -it bili /bin/bash
 docker compose pull && docker compose up -d
 ```
 
-## 3. 方式二：Docker指令
+## 4. 方式三：手动Docker指令
 
-### 3.1. Docker启动
+### 4.1. Docker启动
 
 ```
 # 生成并运行容器
@@ -111,7 +103,7 @@ docker logs -f bili
 
 其中，`cookie`需要替换为自己真实的cookie字符串
 
-### 3.2. 其他指令参考
+### 4.2. 其他指令参考
 
 ```
 # 启动容器
@@ -130,7 +122,7 @@ docker rm bili
 docker exec -it bili /bin/bash
 ```
 
-### 3.3. 使用Watchtower更新容器
+### 4.3. 使用Watchtower更新容器
 ```
 docker run --rm \
     -v /var/run/docker.sock:/var/run/docker.sock \
@@ -139,7 +131,7 @@ docker run --rm \
     bili
 ```
 
-## 4. 登录
+## 5. 登录
 
 在宿主机运行`docker exec -it bili bash -c "dotnet Ray.BiliBiliTool.Console.dll --runTasks=Login"`
 
@@ -147,7 +139,7 @@ docker run --rm \
 
 ![login](../docs/imgs/docker-login.png)
 
-## 5. 自己构建镜像（非必须）
+## 6. 自己构建镜像（非必须）
 
 目前我提供和维护的镜像：`[zai7lou/bilibili_tool_pro](https://hub.docker.com/repository/docker/zai7lou/bilibili_tool_pro)`;
 
@@ -159,10 +151,12 @@ docker run --rm \
 
  `TARGET_NAME`为镜像名称和版本，可以自己起个名字
 
-## 6. 其他
+## 7. 其他
 
 代码编译和发布环境: mcr.microsoft.com/dotnet/sdk:6.0
 
 代码运行环境: mcr.microsoft.com/dotnet/runtime:6.0
 
-apt-get 包源用的国内网易的。
+apt-get 包源用的国内网易的
+
+如果下载github资源有问题，可以尝试添加或删除代理url`https://ghproxy.com/`
