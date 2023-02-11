@@ -86,3 +86,4 @@
 - Merfe PRs #425 #426 #427 : Enhancement docker things, thx @zclkkk
 ## 0.4.3
 - Feature #419 : Add a auto shell script for install with docker
+- Feature #396 : Publish docker image to GitHub pkg
