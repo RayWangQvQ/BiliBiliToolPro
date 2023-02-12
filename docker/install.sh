@@ -2,8 +2,8 @@
 ###
 # @Author: Ray zai7lou@outlook.com
 # @Date: 2023-02-11 23:13:19
-# @LastEditors: Ray zai7lou@outlook.com
-# @LastEditTime: 2023-02-12 18:30:10
+ # @LastEditors: Ray zai7lou@outlook.com
+ # @LastEditTime: 2023-02-12 20:18:04
 # @FilePath: \BiliBiliToolPro\docker\install.sh
 # @Description:
 ###
@@ -34,10 +34,11 @@ base_dir="/bili"
 remote_compose_url="${githubProxy}https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/docker/sample/docker-compose.yml"
 remote_config_url="${githubProxy}https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/src/Ray.BiliBiliTool.Console/appsettings.json"
 remote_ckJson_url="${githubProxy}https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/docker/sample/cookies.json"
+docker_img_name="ghcr.io/raywangqvq/bilibili_tool_pro"
 
 createBaseDir() {
     eval $invocation
-    [ -f $base_dir ] || mkdir $base_dir
+    mkdir -p $base_dir
     cd $base_dir
 }
 
@@ -82,18 +83,21 @@ downloadResources() {
 
 runContainer() {
     eval $invocation
+
+    say_info "开始拉取镜像"
+    docker pull $docker_img_name
+
     say_info "开始运行容器"
     {
         docker compose version && docker compose up -d
     } || {
         docker-compose version && docker-compose up -d
     } || {
-        docker pull zai7lou/bilibili_tool_pro
         docker run -d --name="bili" \
         -v $base_dir/Logs:/app/Logs \
         -v $base_dir/appsettings.json:/app/appsettings.json \
         -v $base_dir/cookies.json:/app/cookies.json \
-        ghcr.io/raywangqvq/bilibili_tool_pro
+        $docker_img_name
     } || {
         say_err "创建容器失败，请检查"
         exit 1
