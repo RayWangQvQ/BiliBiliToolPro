@@ -31,7 +31,7 @@ Window系统推荐使用Docker Desktop，官方下载安装包安装。
 仅支持linux系统
 
 ```
-wget "https://ghproxy.com/https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/feature/docker-workflow/docker/install.sh" && chmod +x insatll.sh && install.sh
+wget "https://ghproxy.com/https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/docker/install.sh" && chmod +x install.sh && ./install.sh
 ```
 
 ## 3. 方式二：手动Docker Compose

@@ -92,3 +92,5 @@
 - Feature: Change default docker image from dockerhub to github
 ## 0.4.5
 - Fix #423 : Change int to string to avoid overflow exception
+## 0.4.6
+- Fix : ck list init empty error
