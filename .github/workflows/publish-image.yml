@@ -71,7 +71,7 @@ jobs:
           ghcrTagWithVersion="${{ env.GHC_IMG_NAME }}:$targetVersion"
           dockerTagWithLatest=""
           ghcrTagWithLatest=""
-          if [ "${{ github.event.inputs.autoWithLatestTag }}" == "true" ] ; then
+          if [ "${{ github.event.inputs.autoWithLatestTag }}" == "true" ] || [ ${{ github.event.release.created_at }} ]; then
             dockerTagWithLatest="$dockerImage:latest"
             ghcrTagWithLatest="$ghcrImage:latest"
           fi
