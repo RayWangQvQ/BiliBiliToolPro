@@ -30,7 +30,7 @@
 
 ```
 # 安装 dotnet 环境
-curl -sSL https://ghproxy.com/https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/qinglong/ray-dotnet-install.sh | bash /dev/stdin
+dotnet --version || (curl -sSL https://ghproxy.com/https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/qinglong/ray-dotnet-install.sh | bash /dev/stdin) && (echo "已安装dotnet")
 ```
 
 ![qinglong-extra.png](../docs/imgs/qinglong-extra.png)
@@ -38,7 +38,7 @@ curl -sSL https://ghproxy.com/https://raw.githubusercontent.com/RayWangQvQ/BiliB
 有人反馈国内服务器可能会出现下载缓慢的情况，如果下面一步运行时发现超时或异常，可以将上面指令改为：
 
 ```
-curl -sSL https://ghproxy.com/https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/qinglong/ray-dotnet-install.sh | bash /dev/stdin --no-official
+dotnet --version || (curl -sSL https://ghproxy.com/https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/qinglong/ray-dotnet-install.sh | bash /dev/stdin --no-official) && (echo "已安装dotnet")
 ```
 
 `--no-official`表示不会使用官方脚本去安装，而是通过手动下载二进制文件的形式来安装。
