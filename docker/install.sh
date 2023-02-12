@@ -3,7 +3,7 @@
 # @Author: Ray zai7lou@outlook.com
 # @Date: 2023-02-11 23:13:19
  # @LastEditors: Ray zai7lou@outlook.com
- # @LastEditTime: 2023-02-12 20:18:04
+ # @LastEditTime: 2023-02-12 20:51:19
 # @FilePath: \BiliBiliToolPro\docker\install.sh
 # @Description:
 ###
@@ -94,10 +94,10 @@ runContainer() {
         docker-compose version && docker-compose up -d
     } || {
         docker run -d --name="bili" \
-        -v $base_dir/Logs:/app/Logs \
-        -v $base_dir/appsettings.json:/app/appsettings.json \
-        -v $base_dir/cookies.json:/app/cookies.json \
-        $docker_img_name
+            -v $base_dir/Logs:/app/Logs \
+            -v $base_dir/appsettings.json:/app/appsettings.json \
+            -v $base_dir/cookies.json:/app/cookies.json \
+            $docker_img_name
     } || {
         say_err "创建容器失败，请检查"
         exit 1
@@ -113,6 +113,7 @@ checkResult() {
 
     containerId=$(docker ps -q --filter "name=^$containerName$")
     if [ -n "$containerId" ]; then
+        docker logs bili
         echo ""
         echo "==============================================="
         echo "Congratulations! 恭喜！"
