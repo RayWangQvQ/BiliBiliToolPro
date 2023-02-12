@@ -1,7 +1,7 @@
 version: '3.9'
 services:
   bilibili_tool:
-    image: zai7lou/bilibili_tool_pro
+    image: ghcr.io/raywangqvq/bilibili_tool_pro
     container_name: bili
     restart: unless-stopped
     tty: true

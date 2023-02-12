@@ -89,3 +89,4 @@
 - Feature #396 : Publish docker image to GitHub pkg
 ## 0.4.4
 - Fix #228 : Try to fix sharing video error
+- Feature: Change default docker image from dockerhub to github
