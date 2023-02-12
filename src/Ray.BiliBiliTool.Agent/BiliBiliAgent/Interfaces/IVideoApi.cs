@@ -16,9 +16,8 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         /// 分享视频
         /// </summary>
         /// <param name="request"></param>
+        /// <remarks>ck中必须要有buvid3，否则几率性-403</remarks>
         /// <returns></returns>
-        [Header("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")]
-        [Header("Referer", "https://www.bilibili.com/")]
         [Header("Origin", "https://www.bilibili.com")]
         [HttpPost("/x/web-interface/share/add")]
         Task<BiliApiResponse> ShareVideo([FormContent] ShareVideoRequest request);

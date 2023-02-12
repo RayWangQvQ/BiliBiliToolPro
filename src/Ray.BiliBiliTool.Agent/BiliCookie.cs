@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Net.Http.Headers;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Ray.BiliBiliTool.Config;
 using Ray.BiliBiliTool.Infrastructure;
+using Ray.BiliBiliTool.Infrastructure.Cookie;
 
 namespace Ray.BiliBiliTool.Agent
 {
@@ -106,9 +106,18 @@ namespace Ray.BiliBiliTool.Agent
 
         public override string ToString()
         {
-            if (CookieStr.IsNotNullOrEmpty()) return CookieStr;
+            var re = CookieStr;
+            if (re.IsNullOrEmpty()) return "";
 
-            return "";
+            // https://github.com/RayWangQvQ/BiliBiliToolPro/issues/228
+            if (!re.Contains("buvid3"))
+            {
+                //buvid3=G5F0F1C0-C1B5-D6E7-4CC0-13C1AAB7C1BC33815infoc;
+                var random = $"buvid3={Guid.NewGuid().ToString().ToUpper()}infoc; ";
+                re = random + re;
+            }
+
+            return re;
         }
 
         private string GetPropertyDescription(string propertyName)

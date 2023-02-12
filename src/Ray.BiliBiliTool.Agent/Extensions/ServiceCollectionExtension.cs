@@ -121,7 +121,7 @@ namespace Ray.BiliBiliTool.Agent.Extensions
                 httpClientBuilder.ConfigureHttpClient((sp, c) =>
                 {
                     var ck = sp.GetRequiredService<BiliCookie>();
-                    c.DefaultRequestHeaders.Add("Cookie", ck.CookieStr);
+                    c.DefaultRequestHeaders.Add("Cookie", ck.ToString());
                 });
 
             return services;

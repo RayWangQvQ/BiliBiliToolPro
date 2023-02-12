@@ -189,7 +189,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// <summary>
         /// 分享视频
         /// </summary>
-        /// <param name="aid">视频aid</param>
+        /// <param name="videoInfo">视频</param>
         public void ShareVideo(VideoInfoDto videoInfo)
         {
             var request = new ShareVideoRequest(long.Parse(videoInfo.Aid), _biliBiliCookie.BiliJct);

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Serilog.Core;
 using Serilog.Debugging;
 using Serilog.Events;
@@ -100,7 +99,7 @@ namespace Ray.Serilog.Sinks.Batched
 
         protected abstract PushService PushService { get; }
 
-        protected virtual void PushMessage(string message, string title = "BiliBiliTool任务推送")
+        protected virtual void PushMessage(string message, string title = "Bili推送")
         {
             //SelfLog.WriteLine($"Trying to send message: '{message}'.");
             var result = PushService.PushMessage(message, title);
@@ -178,7 +177,7 @@ namespace Ray.Serilog.Sinks.Batched
 
         protected virtual string GetPushTitle(LogEvent triggerLogEvent)
         {
-            var title = "BiliBiliTool推送";
+            var title = "Bili";
 
             var msg = RenderMessage(triggerLogEvent).Replace(Environment.NewLine, "");
             var list = msg.Split('·').ToList();
