@@ -568,7 +568,7 @@ namespace Ray.BiliBiliTool.DomainService
         private List<FansMedalInfoDto> GetFansMedalInfoList()
         {
             _logger.LogInformation("【获取直播列表】获取拥有粉丝牌的直播列表");
-            var medalWallInfo = this._liveApi.GetMedalWall(int.Parse(this._biliCookie.UserId)).Result;
+            var medalWallInfo = _liveApi.GetMedalWall(_biliCookie.UserId).Result;
 
             if (medalWallInfo.Code != 0)
             {

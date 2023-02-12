@@ -91,7 +91,7 @@ namespace BiliAgentTest
             var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory>();
             var api = scope.ServiceProvider.GetRequiredService<ILiveApi>();
 
-            BiliApiResponse<MedalWallResponse> re = api.GetMedalWall(919174).Result;
+            BiliApiResponse<MedalWallResponse> re = api.GetMedalWall("919174").Result;
 
             Assert.NotEmpty(re.Data.List);
 

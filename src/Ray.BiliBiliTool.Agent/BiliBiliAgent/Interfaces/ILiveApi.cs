@@ -107,7 +107,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         [Header("Referer", "https://live.bilibili.com/")]
         [Header("Origin", "https://live.bilibili.com")]
         [HttpGet("/xlive/web-ucenter/user/MedalWall?target_id={userId}")]
-        Task<BiliApiResponse<MedalWallResponse>> GetMedalWall(int userId);
+        Task<BiliApiResponse<MedalWallResponse>> GetMedalWall(string userId);
 
         /// <summary>
         /// 佩戴粉丝勋章

@@ -90,3 +90,5 @@
 ## 0.4.4
 - Fix #228 : Try to fix sharing video error
 - Feature: Change default docker image from dockerhub to github
+## 0.4.5
+- Fix #423 : Change int to string to avoid overflow exception
