@@ -88,14 +88,14 @@ docker compose pull && docker compose up -d
 
 ```
 # 生成并运行容器
-docker pull zai7lou/bilibili_tool_pro
+docker pull ghcr.io/raywangqvq/bilibili_tool_pro
 docker run -d --name="bili" \
     -v /bili/Logs:/app/Logs \
     -e Ray_DailyTaskConfig__Cron="0 15 * * *" \
     -e Ray_LiveLotteryTaskConfig__Cron="0 22 * * *" \
     -e Ray_UnfollowBatchedTaskConfig__Cron="0 6 1 * *" \
     -e Ray_VipBigPointConfig__Cron="7 1 * * *" \
-    zai7lou/bilibili_tool_pro
+    ghcr.io/raywangqvq/bilibili_tool_pro
 
 # 查看实时日志
 docker logs -f bili
@@ -141,7 +141,10 @@ docker run --rm \
 
 ## 6. 自己构建镜像（非必须）
 
-目前我提供和维护的镜像：`[zai7lou/bilibili_tool_pro](https://hub.docker.com/repository/docker/zai7lou/bilibili_tool_pro)`;
+目前我提供和维护的镜像：
+
+- DockerHub: `[zai7lou/bilibili_tool_pro](https://hub.docker.com/repository/docker/zai7lou/bilibili_tool_pro)`
+- GitHub: `[bilibili_tool_pro](https://github.com/RayWangQvQ/BiliBiliToolPro/pkgs/container/bilibili_tool_pro)`
 
 如果有需要（大部分都不需要），可以使用源码自己构建镜像，如下：
 
@@ -159,4 +162,4 @@ docker run --rm \
 
 apt-get 包源用的国内网易的
 
-如果下载github资源有问题，可以尝试添加或删除代理url`https://ghproxy.com/`
+如果下载`github`资源有问题，可以尝试添加或删除代理url`https://ghproxy.com/`

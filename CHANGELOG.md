@@ -85,5 +85,8 @@
 ## 0.4.2
 - Merfe PRs #425 #426 #427 : Enhancement docker things, thx @zclkkk
 ## 0.4.3
-- Feature #419 : Add a auto shell script for install with docker
+- Feature #419 : Add a auto shell script for installing with docker
 - Feature #396 : Publish docker image to GitHub pkg
+## 0.4.4
+- Fix #228 : Try to fix sharing video error
+- Feature: Change default docker image from dockerhub to github

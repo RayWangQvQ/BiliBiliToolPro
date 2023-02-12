@@ -2,8 +2,8 @@
 ###
 # @Author: Ray zai7lou@outlook.com
 # @Date: 2023-02-11 23:13:19
- # @LastEditors: Ray zai7lou@outlook.com
- # @LastEditTime: 2023-02-12 02:48:22
+# @LastEditors: Ray zai7lou@outlook.com
+# @LastEditTime: 2023-02-12 18:30:10
 # @FilePath: \BiliBiliToolPro\docker\install.sh
 # @Description:
 ###
@@ -90,10 +90,10 @@ runContainer() {
     } || {
         docker pull zai7lou/bilibili_tool_pro
         docker run -d --name="bili" \
-            -v $base_dir/Logs:/app/Logs \
-            -v $base_dir/appsettings.json:/app/appsettings.json \
-            -v $base_dir/cookies.json:/app/cookies.json \
-            zai7lou/bilibili_tool_pro
+        -v $base_dir/Logs:/app/Logs \
+        -v $base_dir/appsettings.json:/app/appsettings.json \
+        -v $base_dir/cookies.json:/app/cookies.json \
+        ghcr.io/raywangqvq/bilibili_tool_pro
     } || {
         say_err "创建容器失败，请检查"
         exit 1
