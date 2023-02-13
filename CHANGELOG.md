@@ -93,4 +93,5 @@
 ## 0.4.5
 - Fix #423 : Change int to string to avoid overflow exception
 ## 0.4.6
-- Fix : ck list init empty error
+- Fix: ck list init empty error
+- Feature #440 : use 'apk add' to install dotnet in qinglong

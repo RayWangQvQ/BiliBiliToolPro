@@ -5,12 +5,9 @@
 dir_shell=${QL_DIR-'/ql'}/shell
 . $dir_shell/share.sh
 
-## 安装dotnet
-# apk add bash icu-libs krb5-libs libgcc libintl libssl1.1 libstdc++ zlib
-# curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 6.0 --no-cdn
-# rm -f /usr/local/bin/dotnet
-# ln -s ~/.dotnet/dotnet /usr/local/bin
-# dotnet --version
+## 安装dotnet（如果未安装过）
+apk add dotnet6-sdk
+dotnet --version
 
 bili_repo="raywangqvq_bilibilitoolpro"
 
