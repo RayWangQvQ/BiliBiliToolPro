@@ -7,13 +7,11 @@
 <!-- TOC depthFrom:2 -->
 
 - [1. 步骤](#1-步骤)
-    - [1.1. 安装 `dotnet` 环境](#11-安装-dotnet-环境)
-    - [1.2. 重启青龙容器](#12-重启青龙容器)
-    - [1.3. 登录青龙面板并修改配置](#13-登录青龙面板并修改配置)
-    - [1.4. 在青龙面板中添加拉库定时任务](#14-在青龙面板中添加拉库定时任务)
-        - [1.4.1. 订阅管理](#141-订阅管理)
-        - [1.4.2. 定时任务拉库](#142-定时任务拉库)
-    - [1.5. 登录](#15-登录)
+    - [1.1. 登录青龙面板并修改配置](#11-登录青龙面板并修改配置)
+    - [1.2. 在青龙面板中添加拉库定时任务](#12-在青龙面板中添加拉库定时任务)
+        - [1.2.1. 订阅管理](#121-订阅管理)
+        - [1.2.2. 定时任务拉库](#122-定时任务拉库)
+    - [1.3. 登录](#13-登录)
 - [2. 先行版](#2-先行版)
     - [2.1. 订阅管理](#21-订阅管理)
     - [2.2. 定时任务拉库](#22-定时任务拉库)
@@ -25,38 +23,17 @@
 
 ## 1. 步骤
 
-### 1.1. 安装 `dotnet` 环境
-编辑青龙的 `extra.sh` 文件，添加如下指令：
-
-```
-# 安装 dotnet 环境
-dotnet --version || (curl -sSL https://ghproxy.com/https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/qinglong/ray-dotnet-install.sh | bash /dev/stdin) && (echo "已安装dotnet")
-```
-
-![qinglong-extra.png](../docs/imgs/qinglong-extra.png)
-
-有人反馈国内服务器可能会出现下载缓慢的情况，如果下面一步运行时发现超时或异常，可以将上面指令改为：
-
-```
-dotnet --version || (curl -sSL https://ghproxy.com/https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/qinglong/ray-dotnet-install.sh | bash /dev/stdin --no-official) && (echo "已安装dotnet")
-```
-
-`--no-official`表示不会使用官方脚本去安装，而是通过手动下载二进制文件的形式来安装。
-
-### 1.2. 重启青龙容器
-重启青龙容器，或在宿主机中执行 `docker exec -it qinglong bash /ql/data/config/extra.sh`，其中 `qinglong` 是你的容器名。
-
-### 1.3. 登录青龙面板并修改配置
+### 1.1. 登录青龙面板并修改配置
 青龙面板，`配置文件`页。
 
 修改 `RepoFileExtensions="js py"` 为 `RepoFileExtensions="js py sh"`
 
 保存配置。
 
-### 1.4. 在青龙面板中添加拉库定时任务
+### 1.2. 在青龙面板中添加拉库定时任务
 
 两种方式：
-#### 1.4.1. 订阅管理
+#### 1.2.1. 订阅管理
 
 ```
 名称：Bilibili
@@ -72,7 +49,7 @@ dotnet --version || (curl -sSL https://ghproxy.com/https://raw.githubusercontent
 
 保存后，点击运行按钮，运行拉库。
 
-#### 1.4.2. 定时任务拉库
+#### 1.2.2. 定时任务拉库
 青龙面板，`定时任务`页，右上角`添加任务`，填入以下信息：
 
 ```
@@ -89,7 +66,7 @@ dotnet --version || (curl -sSL https://ghproxy.com/https://raw.githubusercontent
 
 ![qinglong-tasks.png](../docs/imgs/qinglong-tasks.png)
 
-### 1.5. 登录
+### 1.3. 登录
 
 在青龙定时任务中，点击运行`bili扫码登录`任务，查看运行日志，扫描日志中的二维码进行登录。
 ![qinglong-login.png](../docs/imgs/qinglong-login.png)
@@ -97,6 +74,8 @@ dotnet --version || (curl -sSL https://ghproxy.com/https://raw.githubusercontent
 登录成功后，会将cookie保存到青龙的环境变量中：
 
 ![qinglong-env.png](../docs/imgs/qinglong-env.png)
+
+首次运行会自动安装dotnet环境，时间久点，之后就不需要重复安装了。
 
 ## 2. 先行版
 
