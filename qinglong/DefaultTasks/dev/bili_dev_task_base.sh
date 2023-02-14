@@ -6,8 +6,29 @@ dir_shell=${QL_DIR-'/ql'}/shell
 . $dir_shell/share.sh
 
 ## 安装dotnet（如果未安装过）
-apk add dotnet6-sdk
-dotnet --version
+dotnetVersion=$(dotnet --version)
+if [[ $dotnetVersion == 6.* ]]; then
+    echo "已安装dotnet，当前版本：$dotnetVersion"
+else
+    echo "开始安装dotnet"
+    {
+        echo "尝试使用apk安装"
+        apk add dotnet6-sdk
+        dotnet --version
+    } || {
+        echo "尝试使用官方脚本安装"
+        curl -sSL https://ghproxy.com/https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/qinglong/ray-dotnet-install.sh | bash /dev/stdin
+        dotnet --version
+    } || {
+        echo "尝试使用二进制包安装"
+        curl -sSL https://ghproxy.com/https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/qinglong/ray-dotnet-install.sh | bash /dev/stdin --no-official
+        dotnet --version
+    } || {
+        echo "安装失败，没办法了，毁灭吧，自己解决吧：https://learn.microsoft.com/zh-cn/dotnet/core/install/linux-alpine"
+        exit 1
+    }
+fi
+
 
 bili_repo="raywangqvq_bilibilitoolpro_develop"
 
