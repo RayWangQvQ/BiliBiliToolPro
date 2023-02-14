@@ -54,13 +54,17 @@ install_by_binaries() {
 
 # 创建软链接
 create_soft_link() {
-    echo "创建软链接..."
-    rm -f /usr/bin/dotnet
-    ln -s ~/.dotnet/dotnet /usr/bin/dotnet
-    # echo '' >> ~/.bashrc
-    # echo 'export DOTNET_ROOT=$HOME/.dotnet' >> ~/.bashrc
-    # echo 'export PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools' >> ~/.bashrc
-    # . ~/.bashrc
+    # echo "创建软链接..."
+    # rm -f /usr/bin/dotnet
+    # ln -s ~/.dotnet/dotnet /usr/bin/dotnet
+
+    echo "添加PATH"
+    local exportFile="$HOME/.bashrc"
+    touch $exportFile
+    echo '' >> $exportFile
+    echo 'export DOTNET_ROOT=$HOME/.dotnet' >> $exportFile
+    echo 'export PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools' >> $exportFile
+    . ~/.bashrc
 }
 
 args=("$@")
