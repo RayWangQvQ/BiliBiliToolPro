@@ -4,7 +4,6 @@
 
 dir_shell=${QL_DIR-'/ql'}/shell
 . $dir_shell/share.sh
-. ~/.bashrc
 . /root/.bashrc
 
 ## 安装dotnet（如果未安装过）
@@ -13,20 +12,19 @@ if [[ $dotnetVersion == 6.* ]]; then
     echo "已安装dotnet，当前版本：$dotnetVersion"
 else
     echo "开始安装dotnet"
+    rayInstallShell="https://ghproxy.com/https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/qinglong/ray-dotnet-install.sh"
     {
-        echo "尝试使用apk安装"
+        echo "------尝试使用apk安装------"
         apk add dotnet6-sdk
         dotnet --version
     } || {
-        echo "再尝试使用官方脚本安装"
-        curl -sSL https://ghproxy.com/https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/qinglong/ray-dotnet-install.sh | bash /dev/stdin
-        . ~/.bashrc
+        echo "------再尝试使用官方脚本安装------"
+        curl -sSL $rayInstallShell | bash /dev/stdin
         . /root/.bashrc
         dotnet --version
     } || {
-        echo "再尝试使用二进制包安装"
-        curl -sSL https://ghproxy.com/https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/qinglong/ray-dotnet-install.sh | bash /dev/stdin --no-official
-        . ~/.bashrc
+        echo "------再尝试使用二进制包安装------"
+        curl -sSL $rayInstallShell | bash /dev/stdin --no-official
         . /root/.bashrc
         dotnet --version
     } || {

@@ -3,9 +3,9 @@ echo -e "\n-------set up dot net env-------"
 
 ## 安装dotnet
 
-DOWNLOAD_X64=https://download.visualstudio.microsoft.com/download/pr/b5e6c72e-457c-406c-a4a8-6a4fcdd5f50c/feaa81a666c8942064453fb3c456856b/dotnet-sdk-6.0.403-linux-musl-x64.tar.gz
-DOWNLOAD_ARM32=https://download.visualstudio.microsoft.com/download/pr/035f9d69-66ab-4085-b821-9610b464f222/1c2ae5abba2d11dc77b2beece41c5100/dotnet-sdk-6.0.403-linux-musl-arm.tar.gz
-DOWNLOAD_ARM64=https://download.visualstudio.microsoft.com/download/pr/8019613a-7cff-4169-a996-1d11786cd97f/62604cf6ee5171e5d97755567e9645d9/dotnet-sdk-6.0.403-linux-musl-arm64.tar.gz
+DOWNLOAD_X64=https://download.visualstudio.microsoft.com/download/pr/d74b9eb9-d60c-4b0d-8d53-f30a6e22b917/ef06d32d3b5206786eac8011798568aa/dotnet-sdk-6.0.405-linux-musl-x64.tar.gz
+DOWNLOAD_ARM32=https://download.visualstudio.microsoft.com/download/pr/29682aff-7321-4034-9833-29f3ea435759/cf2fd8a078d3a6c106a1254cc2887ad3/dotnet-sdk-6.0.405-linux-musl-arm.tar.gz
+DOWNLOAD_ARM64=https://download.visualstudio.microsoft.com/download/pr/207a3484-7524-4963-9c4e-dacf20ba3a66/4a3bc869dc7a93753022752aa5782989/dotnet-sdk-6.0.405-linux-musl-arm64.tar.gz
 
 get_download_url_by_machine_architecture() {
     if command -v uname >/dev/null; then
@@ -59,12 +59,12 @@ create_soft_link() {
     # ln -s ~/.dotnet/dotnet /usr/bin/dotnet
 
     echo "添加PATH"
-    local exportFile="$HOME/.bashrc"
+    local exportFile="/root/.bashrc"
     touch $exportFile
     echo '' >> $exportFile
     echo 'export DOTNET_ROOT=$HOME/.dotnet' >> $exportFile
     echo 'export PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools' >> $exportFile
-    . ~/.bashrc
+    . $exportFile
 }
 
 args=("$@")
