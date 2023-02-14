@@ -26,7 +26,7 @@ else
         curl -sSL https://ghproxy.com/https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/qinglong/ray-dotnet-install.sh | bash /dev/stdin --no-official
         dotnet --version
     } || {
-        echo "安装失败，没办法了，自己解决吧"
+        echo "安装失败，没办法了，毁灭吧，自己解决吧：https://learn.microsoft.com/zh-cn/dotnet/core/install/linux-alpine"
         exit 1
     }
 fi
