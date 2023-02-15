@@ -16,9 +16,9 @@ echo -e "清理缓存...\n"
 cd $bili_repo_dir
 find . -type d -name "bin" -exec rm -rf {} +
 find . -type d -name "obj" -exec rm -rf {} +
-echo "清理完成"
+echo -e "清理完成\n"
 
-echo "检测dotnet"
+echo "检测dotnet..."
 dotnetVersion=$(dotnet --version)
 if [[ $dotnetVersion == 6.* ]]; then
     echo "已安装dotnet，当前版本：$dotnetVersion"
@@ -27,3 +27,4 @@ else
     echo "Paht: $PATH"
     rm -f /usr/local/bin/dotnet
 fi
+echo "检测dotnet结束"
