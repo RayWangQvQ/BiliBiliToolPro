@@ -4,6 +4,7 @@
 
 dir_shell=$QL_DIR/shell
 . $dir_shell/share.sh
+. /root/.bashrc
 
 bili_repo="raywangqvq_bilibilitoolpro_develop"
 
@@ -15,3 +16,14 @@ echo -e "清理缓存...\n"
 cd $bili_repo_dir
 find . -type d -name "bin" -exec rm -rf {} +
 find . -type d -name "obj" -exec rm -rf {} +
+echo "清理完成"
+
+echo "检测dotnet"
+dotnetVersion=$(dotnet --version)
+if [[ $dotnetVersion == 6.* ]]; then
+    echo "已安装dotnet，当前版本：$dotnetVersion"
+else
+    echo "which dotnet: $(which dotnet)"
+    echo "Paht: $PATH"
+    rm -f /usr/local/bin/dotnet
+fi
