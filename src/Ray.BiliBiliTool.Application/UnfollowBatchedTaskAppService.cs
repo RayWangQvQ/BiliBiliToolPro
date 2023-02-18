@@ -40,9 +40,10 @@ namespace Ray.BiliBiliTool.Application
         }
 
         [TaskInterceptor("批量取关", TaskLevel.One)]
-        public override void DoTask()
+        public override Task DoTaskAsync(CancellationToken cancellationToken)
         {
             _accountDomainService.UnfollowBatched();
+            return Task.CompletedTask;
         }
     }
 }

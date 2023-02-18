@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Threading;
+using System.Threading.Tasks;
 
 namespace Ray.BiliBiliTool.Application.Contracts
 {
@@ -9,6 +8,6 @@ namespace Ray.BiliBiliTool.Application.Contracts
     /// </summary>
     public interface IAppService
     {
-        void DoTask();
+        Task DoTaskAsync(CancellationToken cancellationToken);
     }
 }

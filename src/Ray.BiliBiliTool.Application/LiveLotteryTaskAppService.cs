@@ -43,11 +43,12 @@ namespace Ray.BiliBiliTool.Application
         }
 
         [TaskInterceptor("天选时刻抽奖", TaskLevel.One)]
-        public override void DoTask()
+        public override Task DoTaskAsync(CancellationToken cancellationToken)
         {
             LogUserInfo();
             LotteryTianXuan();
             AutoGroupFollowings();
+            return Task.CompletedTask;
         }
 
         [TaskInterceptor("打印用户信息")]

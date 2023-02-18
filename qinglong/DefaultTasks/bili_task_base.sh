@@ -45,3 +45,4 @@ echo -e "bili仓库目录: $bili_repo_dir\n"
 
 cd $bili_repo_dir
 export Ray_PlateformType=QingLong
+export DOTNET_ENVIRONMENT=Production

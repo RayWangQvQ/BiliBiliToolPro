@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -33,14 +34,14 @@ namespace Ray.BiliBiliTool.Application
         }
 
         [TaskInterceptor("大会员大积分", TaskLevel.One)]
-        public override void DoTask()
+        public override Task DoTaskAsync(CancellationToken cancellationToken)
         {
             var ui = GetUserInfo();
 
             if (ui.GetVipType() == VipType.None)
             {
                 _logger.LogInformation("当前不是大会员或已过期，跳过任务");
-                return;
+                return Task.CompletedTask;
             }
 
             var re = _vipApi.GetTaskList().Result;
@@ -79,6 +80,8 @@ namespace Ray.BiliBiliTool.Application
             taskInfo = BuyVipMall(taskInfo);
 
             taskInfo.LogInfo(_logger);
+
+            return Task.CompletedTask;
         }
 
         [TaskInterceptor("测试Cookie")]

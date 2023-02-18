@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Ray.BiliBiliTool.Application.Attributes;
 using Ray.BiliBiliTool.Application.Contracts;
@@ -24,9 +26,10 @@ namespace Ray.BiliBiliTool.Application
         }
 
         [TaskInterceptor("测试Cookie")]
-        public override void DoTask()
+        public override Task DoTaskAsync(CancellationToken cancellationToken)
         {
             _accountDomainService.LoginByCookie();
+            return Task.CompletedTask;
         }
     }
 }

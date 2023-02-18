@@ -95,3 +95,7 @@
 ## 0.4.6
 - Fix: ck list init empty error
 - Feature #440 : use 'apk add' to install dotnet in qinglong
+## 1.0.0
+- Feature: Enable asynchronous
+- Fix #344 : Support `Ctrl + C` to trigger exit event
+- Merge PR #448 : Fix typo

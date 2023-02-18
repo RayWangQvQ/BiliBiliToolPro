@@ -18,8 +18,7 @@ using Ray.BiliBiliTool.Agent.QingLong;
 using Ray.BiliBiliTool.Application.Attributes;
 using Ray.BiliBiliTool.Application.Contracts;
 using Ray.BiliBiliTool.Infrastructure.Enums;
-using Ray.BiliBiliTool.Infrastructure;
-using Microsoft.Extensions.DependencyInjection;
+using System.Threading;
 
 namespace Ray.BiliBiliTool.Application
 {
@@ -46,11 +45,11 @@ namespace Ray.BiliBiliTool.Application
         }
 
         [TaskInterceptor("扫码登录", TaskLevel.One)]
-        public override void DoTask()
+        public override async Task DoTaskAsync(CancellationToken cancellationToken)
         {
             //扫码登录
-            var suc = QrCodeLogin(out BiliCookie cookieInfo);
-            if (!suc) return;
+            var cookieInfo = await QrCodeLoginAsync(cancellationToken);
+            if (cookieInfo==null) return;
 
             var plateformType = _configuration.GetSection("PlateformType").Get<PlateformType>();
 
@@ -66,16 +65,15 @@ namespace Ray.BiliBiliTool.Application
         }
 
         [TaskInterceptor("二维码登录", TaskLevel.Two)]
-        protected bool QrCodeLogin(out BiliCookie cookieInfo)
+        protected async Task<BiliCookie> QrCodeLoginAsync(CancellationToken cancellationToken)
         {
-            var result = false;
-            cookieInfo = new BiliCookie("");
+            BiliCookie cookieInfo = null;
 
             var re = _passportApi.GenerateQrCode().Result;
             if (re.Code != 0)
             {
                 _logger.LogWarning("获取二维码失败：{msg}", re.ToJson());
-                return result;
+                return null;
             }
 
             var url = re.Data.Url;
@@ -92,7 +90,7 @@ namespace Ray.BiliBiliTool.Application
             {
                 _logger.LogInformation("[{num}]等待扫描...", i + 1);
 
-                Task.Delay(5 * 1000).Wait();
+                await Task.Delay(5 * 1000, cancellationToken);
 
                 var check = _passportApi.CheckQrCodeHasScaned(re.Data.Qrcode_key).Result;
                 if (!check.IsSuccessStatusCode)
@@ -120,7 +118,6 @@ namespace Ray.BiliBiliTool.Application
                     IEnumerable<string> cookies = check.Headers.SingleOrDefault(header => header.Key == "Set-Cookie").Value;
 
                     cookieInfo = GetCookie(cookies);
-                    result = true;
 
                     break;
                 }
@@ -128,7 +125,7 @@ namespace Ray.BiliBiliTool.Application
                 _logger.LogInformation("{msg}", content.Data.Message + Environment.NewLine);
             }
 
-            return result;
+            return cookieInfo;
         }
 
 

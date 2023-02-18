@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
@@ -56,7 +58,7 @@ namespace Ray.BiliBiliTool.Application
         }
 
         [TaskInterceptor("每日任务", TaskLevel.One)]
-        public override void DoTask()
+        public override Task DoTaskAsync(CancellationToken cancellationToken)
         {
             //每日任务赚经验：
             UserInfo userInfo = Login();
@@ -75,6 +77,8 @@ namespace Ray.BiliBiliTool.Application
             ReceiveMangaVipReward(userInfo);
 
             Charge(userInfo);
+
+            return Task.CompletedTask;
         }
 
         /// <summary>
