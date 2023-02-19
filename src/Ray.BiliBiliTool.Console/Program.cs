@@ -69,8 +69,8 @@ namespace Ray.BiliBiliTool.Console
                 //json文件：
                 configurationBuilder.AddJsonFile("appsettings.json", false, true)
                     .AddJsonFile($"appsettings.{hostBuilderContext.HostingEnvironment.EnvironmentName}.json", true, true)
-                    .AddJsonFile("exp.json", false, true)
-                    .AddJsonFile("donateCoinCanContinueStatus.json", false, true);
+                    .AddJsonFile("exp.json", false, true) //todo：不要使用配置
+                    .AddJsonFile("donateCoinCanContinueStatus.json", false, true);//todo：不要使用配置
 
                 //用户机密：
                 if (env.IsDevelopment() && env.ApplicationName?.Length > 0)
@@ -88,7 +88,7 @@ namespace Ray.BiliBiliTool.Console
                 {
                     configurationBuilder.AddCommandLine(args, hostBuilderContext.Configuration
                         .GetSection("CommandLineMappings")
-                        .Get<Dictionary<string, string>>());
+                        .Get<Dictionary<string, string>>());//todo：不要使用配置
                 }
 
                 //本地cookie存储文件

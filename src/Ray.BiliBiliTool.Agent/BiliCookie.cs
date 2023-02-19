@@ -24,7 +24,6 @@ namespace Ray.BiliBiliTool.Agent
 
         private BiliCookie(ILogger<BiliCookie> logger, string ckStr)
             : base(ckStr, null, v => v.Contains(',') ? Uri.EscapeDataString(v) : v)
-        //: base(ckStr, null, v => v)
         {
             _logger = logger;
 
@@ -44,6 +43,10 @@ namespace Ray.BiliBiliTool.Agent
             {
                 LiveBuvid = liveBuvid;
             }
+            if (CookieItemDictionary.TryGetValue(GetPropertyDescription(nameof(Buvid)), out string buvid))
+            {
+                Buvid = buvid;
+            }
         }
 
         [Description("DedeUserID")]
@@ -60,6 +63,9 @@ namespace Ray.BiliBiliTool.Agent
 
         [Description("LIVE_BUVID")]
         public string LiveBuvid { get; set; }
+
+        [Description("buvid3")]
+        public string Buvid { get; set; }
 
         /// <summary>
         /// 检查是否已配置
@@ -106,18 +112,7 @@ namespace Ray.BiliBiliTool.Agent
 
         public override string ToString()
         {
-            var re = CookieStr;
-            if (re.IsNullOrEmpty()) return "";
-
-            // https://github.com/RayWangQvQ/BiliBiliToolPro/issues/228
-            if (!re.Contains("buvid3"))
-            {
-                //buvid3=G5F0F1C0-C1B5-D6E7-4CC0-13C1AAB7C1BC33815infoc;
-                var random = $"buvid3={Guid.NewGuid().ToString().ToUpper()}infoc; ";
-                re = random + re;
-            }
-
-            return re;
+            return CookieStr ?? "";
         }
 
         private string GetPropertyDescription(string propertyName)

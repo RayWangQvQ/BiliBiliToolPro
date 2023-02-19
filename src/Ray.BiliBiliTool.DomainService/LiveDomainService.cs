@@ -612,41 +612,40 @@ namespace Ray.BiliBiliTool.DomainService
         private async Task<bool> CheckLiveCookie()
         {
             // 检测 _biliCookie 是否正确配置
-            if (string.IsNullOrWhiteSpace(_biliCookie.LiveBuvid))
+            if (!string.IsNullOrWhiteSpace(_biliCookie.LiveBuvid)) return true;
+
+            try
             {
-                try
+                _logger.LogInformation("检测到直播 Cookie 未正确配置，尝试自动配置中...");
+
+                // 请求主播主页来正确配置 cookie
+                var liveHome = await _liveApi.GetLiveHome();
+                var liveHomeContent = JsonConvert.DeserializeObject<BiliApiResponse>(await liveHome.Content.ReadAsStringAsync());
+                if (liveHomeContent.Code != 0)
                 {
-                    _logger.LogInformation("检测到直播 Cookie 未正确配置，尝试自动配置中...");
+                    throw new Exception(liveHomeContent.Message);
+                }
 
-                    // 请求主播主页来正确配置 cookie
-                    var liveHome = await _liveApi.GetLiveHome();
-                    var liveHomeContent = JsonConvert.DeserializeObject<BiliApiResponse>(await liveHome.Content.ReadAsStringAsync());
-                    if (liveHomeContent.Code != 0)
-                    {
-                        throw new Exception(liveHomeContent.Message);
-                    }
-
-                    IEnumerable<string> liveCookies = liveHome.Headers.SingleOrDefault(header => header.Key == "Set-Cookie").Value;
-                    var ckItemList = new List<string>();
-                    foreach (var item in liveCookies)
-                    {
-                        ckItemList.Add(item.Split(';').FirstOrDefault());
-                    }
-                    _biliCookie.LiveBuvid = CookieInfo.BuildCookieItemDictionaryByCookieItemList(
+                IEnumerable<string> liveCookies = liveHome.Headers.SingleOrDefault(header => header.Key == "Set-Cookie").Value;
+                var ckItemList = new List<string>();
+                foreach (var item in liveCookies)
+                {
+                    ckItemList.Add(item.Split(';').FirstOrDefault());
+                }
+                _biliCookie.LiveBuvid = CookieInfo.BuildCookieItemDictionaryByCookieItemList(
                         ckItemList,
                         null,
                         v => v.Contains(',') ? Uri.EscapeDataString(v) : v)
-                        [_biliCookie.GetType().GetPropertyDescription(nameof(BiliCookie.LiveBuvid))];
+                    [_biliCookie.GetType().GetPropertyDescription(nameof(BiliCookie.LiveBuvid))];
 
-                    _logger.LogDebug("LiveBuvid {value}", _biliCookie.LiveBuvid);
-                    _logger.LogInformation("直播 Cookie 配置成功！");
-                }
-                catch (Exception exception)
-                {
-                    _logger.LogError("【配置直播Cookie】失败，放弃执行后续任务...");
-                    _logger.LogError("【原因】{message}", exception.Message);
-                    return false;
-                }
+                _logger.LogDebug("LiveBuvid {value}", _biliCookie.LiveBuvid);
+                _logger.LogInformation("直播 Cookie 配置成功！");
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError("【配置直播Cookie】失败，放弃执行后续任务...");
+                _logger.LogError("【原因】{message}", exception.Message);
+                return false;
             }
             return true;
         }

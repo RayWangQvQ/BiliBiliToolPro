@@ -2,21 +2,25 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Application.Attributes;
 using Ray.BiliBiliTool.Application.Contracts;
 using Ray.BiliBiliTool.Config;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Interfaces;
+using Ray.BiliBiliTool.Infrastructure;
+using Ray.BiliBiliTool.Infrastructure.Enums;
 
 namespace Ray.BiliBiliTool.Application
 {
     public class DailyTaskAppService : AppService, IDailyTaskAppService
     {
         private readonly ILogger<DailyTaskAppService> _logger;
-        private readonly IAccountDomainService _loginDomainService;
+        private readonly IAccountDomainService _accountDomainService;
         private readonly IVideoDomainService _videoDomainService;
         private readonly IDonateCoinDomainService _donateCoinDomainService;
         private readonly IMangaDomainService _mangaDomainService;
@@ -26,11 +30,15 @@ namespace Ray.BiliBiliTool.Application
         private readonly DailyTaskOptions _dailyTaskOptions;
         private readonly ICoinDomainService _coinDomainService;
         private readonly Dictionary<string, int> _expDic;
+        private readonly ILoginDomainService _loginDomainService;
+        private readonly IConfiguration _configuration;
+        private readonly CookieStrFactory _cookieStrFactory;
+        private BiliCookie _biliCookie;
 
         public DailyTaskAppService(
             ILogger<DailyTaskAppService> logger,
             IOptionsMonitor<Dictionary<string, int>> dicOptions,
-            IAccountDomainService loginDomainService,
+            IAccountDomainService accountDomainService,
             IVideoDomainService videoDomainService,
             IDonateCoinDomainService donateCoinDomainService,
             IMangaDomainService mangaDomainService,
@@ -38,12 +46,14 @@ namespace Ray.BiliBiliTool.Application
             IVipPrivilegeDomainService vipPrivilegeDomainService,
             IChargeDomainService chargeDomainService,
             IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
-            ICoinDomainService coinDomainService
-        )
+            ICoinDomainService coinDomainService,
+            ILoginDomainService loginDomainService, IConfiguration configuration,
+            CookieStrFactory cookieStrFactory,
+            BiliCookie biliCookie)
         {
             _logger = logger;
             _expDic = dicOptions.Get(Constants.OptionsNames.ExpDictionaryName);
-            _loginDomainService = loginDomainService;
+            _accountDomainService = accountDomainService;
             _videoDomainService = videoDomainService;
             _donateCoinDomainService = donateCoinDomainService;
             _mangaDomainService = mangaDomainService;
@@ -52,13 +62,22 @@ namespace Ray.BiliBiliTool.Application
             _chargeDomainService = chargeDomainService;
             _dailyTaskOptions = dailyTaskOptions.CurrentValue;
             _coinDomainService = coinDomainService;
+            _loginDomainService = loginDomainService;
+            _configuration = configuration;
+            _cookieStrFactory = cookieStrFactory;
+            _biliCookie = biliCookie;
         }
 
         [TaskInterceptor("每日任务", TaskLevel.One)]
         public override async Task DoTaskAsync(CancellationToken cancellationToken)
         {
+            var ck = await SetCookiesAsync(_biliCookie, cancellationToken);
+            _biliCookie.CookieStr = ck.ToString();
+            _cookieStrFactory.ReplaceCurrentCookieStr(ck.ToString());
+
             //每日任务赚经验：
             UserInfo userInfo = await Login();
+
             DailyTaskInfo dailyTaskInfo = await GetDailyTaskStatus();
             await WatchAndShareVideo(dailyTaskInfo);
             await AddCoinsForVideo(userInfo);
@@ -76,6 +95,28 @@ namespace Ray.BiliBiliTool.Application
             await Charge(userInfo);
         }
 
+
+        [TaskInterceptor("Set Cookie", TaskLevel.Two)]
+        protected async Task<BiliCookie> SetCookiesAsync(BiliCookie biliCookie, CancellationToken cancellationToken)
+        {
+            //判断cookie是否完整
+            if (biliCookie.Buvid.IsNotNullOrEmpty())
+            {
+                _logger.LogInformation("Cookie完整，不需要Set Cookie");
+                return biliCookie;
+            }
+
+            //Set
+            _logger.LogInformation("开始Set Cookie");
+            var ck = await _loginDomainService.SetCookieAsync(biliCookie, cancellationToken);
+
+            //持久化
+            _logger.LogInformation("持久化Cookie");
+            await SaveCookieAsync(ck, cancellationToken);
+
+            return ck;
+        }
+
         /// <summary>
         /// 登录
         /// </summary>
@@ -83,7 +124,7 @@ namespace Ray.BiliBiliTool.Application
         [TaskInterceptor("登录")]
         private async Task<UserInfo> Login()
         {
-            UserInfo userInfo = await _loginDomainService.LoginByCookie();
+            UserInfo userInfo = await _accountDomainService.LoginByCookie();
             if (userInfo == null) throw new Exception("登录失败，请检查Cookie");//终止流程
 
             _expDic.TryGetValue("每日登录", out int exp);
@@ -99,7 +140,7 @@ namespace Ray.BiliBiliTool.Application
         [TaskInterceptor(null, rethrowWhenException: false)]
         private async Task<DailyTaskInfo> GetDailyTaskStatus()
         {
-            return await _loginDomainService.GetDailyTaskStatus();
+            return await _accountDomainService.GetDailyTaskStatus();
         }
 
         /// <summary>
@@ -166,7 +207,7 @@ namespace Ray.BiliBiliTool.Application
             {
                 try
                 {
-                    userInfo = await _loginDomainService.LoginByCookie();
+                    userInfo = await _accountDomainService.LoginByCookie();
                 }
                 catch (Exception ex)
                 {
@@ -209,6 +250,22 @@ namespace Ray.BiliBiliTool.Application
         private async Task ReceiveMangaVipReward(UserInfo userInfo)
         {
             await _mangaDomainService.ReceiveMangaVipReward(1, userInfo);
+        }
+
+        private async Task SaveCookieAsync(BiliCookie ckInfo, CancellationToken cancellationToken)
+        {
+            var platformType = _configuration.GetSection("PlateformType").Get<PlatformType>();
+            _logger.LogInformation("当前运行平台：{platform}", platformType);
+
+            //更新cookie到青龙env
+            if (platformType == PlatformType.QingLong)
+            {
+                await _loginDomainService.SaveCookieToQinLongAsync(ckInfo, cancellationToken);
+                return;
+            }
+
+            //更新cookie到json
+            await _loginDomainService.SaveCookieToJsonFileAsync(ckInfo, cancellationToken);
         }
     }
 }

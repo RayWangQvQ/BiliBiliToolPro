@@ -17,7 +17,7 @@ namespace Ray.BiliBiliTool.Infrastructure.Cookie
             CookieStr = string.Join("; ", CookieItemDictionary.Select(kv => $"{kv.Key}={kv.Value}"));
         }
 
-        public string CookieStr { get; private set; }
+        public string CookieStr { get; set; }
 
         public Dictionary<string, string> CookieItemDictionary { get; private set; }
 
