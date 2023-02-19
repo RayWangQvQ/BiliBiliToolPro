@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Threading.Tasks;
 
 namespace Ray.BiliBiliTool.DomainService.Interfaces
 {
@@ -13,12 +11,12 @@ namespace Ray.BiliBiliTool.DomainService.Interfaces
         /// 获取账户硬币余额
         /// </summary>
         /// <returns></returns>
-        decimal GetCoinBalance();
+        Task<decimal> GetCoinBalance();
 
         /// <summary>
         /// 获取今日已投币数量
         /// </summary>
         /// <returns></returns>
-        int GetDonatedCoins();
+        Task<int> GetDonatedCoins();
     }
 }

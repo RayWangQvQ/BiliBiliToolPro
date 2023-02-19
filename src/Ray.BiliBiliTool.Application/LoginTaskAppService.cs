@@ -49,19 +49,19 @@ namespace Ray.BiliBiliTool.Application
         {
             //扫码登录
             var cookieInfo = await QrCodeLoginAsync(cancellationToken);
-            if (cookieInfo==null) return;
+            if (cookieInfo == null) return;
 
             var plateformType = _configuration.GetSection("PlateformType").Get<PlateformType>();
 
             //更新cookie到青龙env
             if (plateformType == PlateformType.QingLong)
             {
-                AddOrUpdateCkToQingLong(cookieInfo);
+                await AddOrUpdateCkToQingLong(cookieInfo);
                 return;
             }
 
             //更新cookie到json
-            AddOrUpdateCkToJson(cookieInfo);
+            await AddOrUpdateCkToJson(cookieInfo);
         }
 
         [TaskInterceptor("二维码登录", TaskLevel.Two)]
@@ -69,7 +69,7 @@ namespace Ray.BiliBiliTool.Application
         {
             BiliCookie cookieInfo = null;
 
-            var re = _passportApi.GenerateQrCode().Result;
+            var re = await _passportApi.GenerateQrCode();
             if (re.Code != 0)
             {
                 _logger.LogWarning("获取二维码失败：{msg}", re.ToJson());
@@ -92,14 +92,14 @@ namespace Ray.BiliBiliTool.Application
 
                 await Task.Delay(5 * 1000, cancellationToken);
 
-                var check = _passportApi.CheckQrCodeHasScaned(re.Data.Qrcode_key).Result;
+                var check = await _passportApi.CheckQrCodeHasScaned(re.Data.Qrcode_key);
                 if (!check.IsSuccessStatusCode)
                 {
                     _logger.LogWarning("调用检测接口异常");
                     continue;
                 }
 
-                var content = JsonConvert.DeserializeObject<BiliApiResponse<TokenDto>>(check.Content.ReadAsStringAsync().Result);
+                var content = JsonConvert.DeserializeObject<BiliApiResponse<TokenDto>>(await check.Content.ReadAsStringAsync(cancellationToken));
                 if (content.Code != 0)
                 {
                     _logger.LogWarning("调用检测接口异常：{msg}", check.ToJson());
@@ -130,32 +130,28 @@ namespace Ray.BiliBiliTool.Application
 
 
         [TaskInterceptor("添加ck到json配置文件", TaskLevel.Two)]
-        protected void AddOrUpdateCkToJson(BiliCookie ckInfo)
+        protected async Task AddOrUpdateCkToJson(BiliCookie ckInfo)
         {
             //读取json
             var path = _hostingEnvironment.ContentRootPath;
             var indexOfBin = path.LastIndexOf("bin");
-            if (indexOfBin != -1) path = path.Substring(0, indexOfBin);
+            if (indexOfBin != -1) path = path[..indexOfBin];
             var fileProvider = new PhysicalFileProvider(path);
             IFileInfo fileInfo = fileProvider.GetFileInfo("cookies.json");
             _logger.LogInformation("目标json地址：{path}", fileInfo.PhysicalPath);
 
             if (!fileInfo.Exists)
             {
-                using (var stream = File.Create(fileInfo.PhysicalPath))
-                {
-                    using (var sw = new StreamWriter(stream))
-                    {
-                        sw.Write($"{{{Environment.NewLine}}}");
-                    }
-                }
+                await using var stream = File.Create(fileInfo.PhysicalPath);
+                await using var sw = new StreamWriter(stream);
+                await sw.WriteAsync($"{{{Environment.NewLine}}}");
             }
 
             string json;
-            using (var stream = new FileStream(fileInfo.PhysicalPath, FileMode.Open))
+            await using (var stream = new FileStream(fileInfo.PhysicalPath, FileMode.Open))
             {
                 using var reader = new StreamReader(stream);
-                json = reader.ReadToEnd();
+                json = await reader.ReadToEndAsync();
             }
             var lines = json.Split(Environment.NewLine).ToList();
 
@@ -172,7 +168,7 @@ namespace Ray.BiliBiliTool.Application
                     "  ],"
                 });
 
-                SaveJson(lines, fileInfo);
+                await SaveJson(lines, fileInfo);
                 _logger.LogInformation("新增成功！");
                 return;
             }
@@ -188,29 +184,29 @@ namespace Ray.BiliBiliTool.Application
             {
                 _logger.LogInformation("不存在该用户，新增cookie");
                 lines.Insert(indexOfCkConfigEnd, $@"    ""{ckInfo.CookieStr}"",");
-                SaveJson(lines, fileInfo);
+                await SaveJson(lines, fileInfo);
                 _logger.LogInformation("新增成功！");
                 return;
             }
 
             _logger.LogInformation("已存在该用户，更新cookie");
             lines[indexOfTargetCk] = $@"    ""{ckInfo.CookieStr}"",";
-            SaveJson(lines, fileInfo);
+            await SaveJson(lines, fileInfo);
             _logger.LogInformation("更新成功！");
         }
 
         [TaskInterceptor("添加ck到青龙环境变量", TaskLevel.Two)]
-        protected void AddOrUpdateCkToQingLong(BiliCookie ckInfo)
+        protected async Task AddOrUpdateCkToQingLong(BiliCookie ckInfo)
         {
             //拿token
-            var suc = GetToken(out string token);
+            var token = await GetQingLongAuthTokenAsync();
 
-            if (!suc) return;
+            if (token.IsNullOrEmpty()) return;
 
             token = $"Bearer {token}";
 
             //查env
-            var re = _qingLongApi.GetEnvs("Ray_BiliBiliCookies__", token).Result;
+            var re = await _qingLongApi.GetEnvs("Ray_BiliBiliCookies__", token);
 
             if (re.Code != 200)
             {
@@ -235,9 +231,8 @@ namespace Ray.BiliBiliTool.Application
                         : oldEnv.remarks,
                 };
 
-                var updateRe = _qingLongApi.UpdateEnvs(update, token).Result;
-                if (updateRe.Code == 200) _logger.LogInformation("更新成功！");
-                else _logger.LogInformation(updateRe.ToJson());
+                var updateRe = await _qingLongApi.UpdateEnvs(update, token);
+                _logger.LogInformation(updateRe.Code == 200 ? "更新成功！" : updateRe.ToJson());
 
                 return;
             }
@@ -262,9 +257,8 @@ namespace Ray.BiliBiliTool.Application
                 value = ckInfo.CookieStr,
                 remarks = $"bili-{ckInfo.UserId}"
             };
-            var addRe = _qingLongApi.AddEnvs(new List<AddQingLongEnv>() { add }, token).Result;
-            if (addRe.Code == 200) _logger.LogInformation("新增成功！");
-            else _logger.LogInformation(addRe.ToJson());
+            var addRe = await _qingLongApi.AddEnvs(new List<AddQingLongEnv> { add }, token);
+            _logger.LogInformation(addRe.Code == 200 ? "新增成功！" : addRe.ToJson());
         }
 
         private void GenerateQrCode(string str)
@@ -362,21 +356,19 @@ namespace Ray.BiliBiliTool.Application
             return biliCk;
         }
 
-        private void SaveJson(List<string> lines, IFileInfo fileInfo)
+        private async Task SaveJson(List<string> lines, IFileInfo fileInfo)
         {
             var newJson = string.Join(Environment.NewLine, lines);
 
-            using (var sw = new StreamWriter(fileInfo.PhysicalPath))
-            {
-                sw.Write(newJson);
-            }
+            await using var sw = new StreamWriter(fileInfo.PhysicalPath);
+            await sw.WriteAsync(newJson);
         }
 
         #region qinglong
 
-        private bool GetToken(out string token)
+        private async Task<string> GetQingLongAuthTokenAsync()
         {
-            token = "";
+            var token = "";
 
             var qlDir = _configuration["QL_DIR"] ?? "/ql";
 
@@ -390,15 +382,15 @@ namespace Ray.BiliBiliTool.Application
             if (!File.Exists(authFile))
             {
                 _logger.LogWarning("获取青龙授权失败，文件不在：{authFile}", authFile);
-                return false;
+                return token;
             }
 
-            var authJson = File.ReadAllText(authFile);
+            var authJson = await File.ReadAllTextAsync(authFile);
 
             var jb = JsonConvert.DeserializeObject<JObject>(authJson);
-            token = jb["token"].ToString();
+            token = jb["token"]?.ToString();
 
-            return true;
+            return token;
         }
 
         #endregion

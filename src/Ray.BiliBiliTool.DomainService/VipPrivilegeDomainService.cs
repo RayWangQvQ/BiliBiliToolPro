@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
@@ -37,7 +38,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// 每月领取大会员福利（B币券、大会员权益）
         /// </summary>
         /// <param name="useInfo"></param>
-        public bool ReceiveVipPrivilege(UserInfo userInfo)
+        public async Task<bool> ReceiveVipPrivilege(UserInfo userInfo)
         {
             if (!_receiveVipPrivilegeOptionsce.IsEnable)
             {
@@ -69,8 +70,8 @@ namespace Ray.BiliBiliTool.DomainService
             }
             */
 
-            var suc1 = ReceiveVipPrivilege(1);
-            var suc2 = ReceiveVipPrivilege(2);
+            var suc1 = await ReceiveVipPrivilege(1);
+            var suc2 = await ReceiveVipPrivilege(2);
 
             if (suc1 | suc2) return true;
             return false;
@@ -82,10 +83,9 @@ namespace Ray.BiliBiliTool.DomainService
         /// 领取大会员每月赠送福利
         /// </summary>
         /// <param name="type">1.大会员B币券；2.大会员福利</param>
-        private bool ReceiveVipPrivilege(int type)
+        private async Task<bool> ReceiveVipPrivilege(int type)
         {
-            var response = _dailyTaskApi.ReceiveVipPrivilege(type, _biliBiliCookie.BiliJct)
-                .GetAwaiter().GetResult();
+            var response = await _dailyTaskApi.ReceiveVipPrivilege(type, _biliBiliCookie.BiliJct);
 
             var name = GetPrivilegeName(type);
             _logger.LogInformation("【领取】{name}", name);

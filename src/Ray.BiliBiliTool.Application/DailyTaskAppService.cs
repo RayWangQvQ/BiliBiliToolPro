@@ -25,7 +25,6 @@ namespace Ray.BiliBiliTool.Application
         private readonly IChargeDomainService _chargeDomainService;
         private readonly DailyTaskOptions _dailyTaskOptions;
         private readonly ICoinDomainService _coinDomainService;
-        private readonly SecurityOptions _securityOptions;
         private readonly Dictionary<string, int> _expDic;
 
         public DailyTaskAppService(
@@ -38,7 +37,6 @@ namespace Ray.BiliBiliTool.Application
             ILiveDomainService liveDomainService,
             IVipPrivilegeDomainService vipPrivilegeDomainService,
             IChargeDomainService chargeDomainService,
-            IOptionsMonitor<SecurityOptions> securityOptions,
             IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
             ICoinDomainService coinDomainService
         )
@@ -54,31 +52,28 @@ namespace Ray.BiliBiliTool.Application
             _chargeDomainService = chargeDomainService;
             _dailyTaskOptions = dailyTaskOptions.CurrentValue;
             _coinDomainService = coinDomainService;
-            _securityOptions = securityOptions.CurrentValue;
         }
 
         [TaskInterceptor("每日任务", TaskLevel.One)]
-        public override Task DoTaskAsync(CancellationToken cancellationToken)
+        public override async Task DoTaskAsync(CancellationToken cancellationToken)
         {
             //每日任务赚经验：
-            UserInfo userInfo = Login();
-            DailyTaskInfo dailyTaskInfo = GetDailyTaskStatus();
-            WatchAndShareVideo(dailyTaskInfo);
-            AddCoinsForVideo(userInfo);
+            UserInfo userInfo = await Login();
+            DailyTaskInfo dailyTaskInfo = await GetDailyTaskStatus();
+            await WatchAndShareVideo(dailyTaskInfo);
+            await AddCoinsForVideo(userInfo);
 
             //签到：
-            LiveSign();
-            MangaSign();
-            MangaRead();
-            ExchangeSilver2Coin();
+            await LiveSign();
+            await MangaSign();
+            await MangaRead();
+            await ExchangeSilver2Coin();
 
             //领福利：
-            ReceiveVipPrivilege(ref userInfo);
-            ReceiveMangaVipReward(userInfo);
+            await ReceiveVipPrivilege(userInfo);
+            await ReceiveMangaVipReward(userInfo);
 
-            Charge(userInfo);
-
-            return Task.CompletedTask;
+            await Charge(userInfo);
         }
 
         /// <summary>
@@ -86,9 +81,9 @@ namespace Ray.BiliBiliTool.Application
         /// </summary>
         /// <returns></returns>
         [TaskInterceptor("登录")]
-        private UserInfo Login()
+        private async Task<UserInfo> Login()
         {
-            UserInfo userInfo = _loginDomainService.LoginByCookie();
+            UserInfo userInfo = await _loginDomainService.LoginByCookie();
             if (userInfo == null) throw new Exception("登录失败，请检查Cookie");//终止流程
 
             _expDic.TryGetValue("每日登录", out int exp);
@@ -102,55 +97,55 @@ namespace Ray.BiliBiliTool.Application
         /// </summary>
         /// <returns></returns>
         [TaskInterceptor(null, rethrowWhenException: false)]
-        private DailyTaskInfo GetDailyTaskStatus()
+        private async Task<DailyTaskInfo> GetDailyTaskStatus()
         {
-            return _loginDomainService.GetDailyTaskStatus();
+            return await _loginDomainService.GetDailyTaskStatus();
         }
 
         /// <summary>
         /// 观看、分享视频
         /// </summary>
         [TaskInterceptor("观看、分享视频", rethrowWhenException: false)]
-        private void WatchAndShareVideo(DailyTaskInfo dailyTaskInfo)
+        private async Task WatchAndShareVideo(DailyTaskInfo dailyTaskInfo)
         {
             if (!_dailyTaskOptions.IsWatchVideo && !_dailyTaskOptions.IsShareVideo)
             {
                 _logger.LogInformation("已配置为关闭，跳过任务");
                 return;
             }
-            _videoDomainService.WatchAndShareVideo(dailyTaskInfo);
+            await _videoDomainService.WatchAndShareVideo(dailyTaskInfo);
         }
 
         /// <summary>
         /// 投币任务
         /// </summary>
         [TaskInterceptor("投币", rethrowWhenException: false)]
-        private void AddCoinsForVideo(UserInfo userInfo)
+        private async Task AddCoinsForVideo(UserInfo userInfo)
         {
             if (_dailyTaskOptions.SaveCoinsWhenLv6 && userInfo.Level_info.Current_level >= 6)
             {
                 _logger.LogInformation("已经为LV6大佬，开始白嫖");
                 return;
             }
-            _donateCoinDomainService.AddCoinsForVideos();
+            await _donateCoinDomainService.AddCoinsForVideos();
         }
 
         /// <summary>
         /// 直播中心签到
         /// </summary>
         [TaskInterceptor("直播签到", rethrowWhenException: false)]
-        private void LiveSign()
+        private async Task LiveSign()
         {
-            _liveDomainService.LiveSign();
+            await _liveDomainService.LiveSign();
         }
 
         /// <summary>
         /// 直播中心的银瓜子兑换硬币
         /// </summary>
         [TaskInterceptor("银瓜子兑换硬币", rethrowWhenException: false)]
-        private void ExchangeSilver2Coin()
+        private async Task ExchangeSilver2Coin()
         {
-            var success = _liveDomainService.ExchangeSilver2Coin();
+            var success = await _liveDomainService.ExchangeSilver2Coin();
             if (!success) return;
 
             //如果兑换成功，则打印硬币余额
@@ -162,16 +157,16 @@ namespace Ray.BiliBiliTool.Application
         /// 每月领取大会员福利
         /// </summary>
         [TaskInterceptor("领取大会员福利", rethrowWhenException: false)]
-        private void ReceiveVipPrivilege(ref UserInfo userInfo)
+        private async Task ReceiveVipPrivilege(UserInfo userInfo)
         {
-            var suc = _vipPrivilegeDomainService.ReceiveVipPrivilege(userInfo);
+            var suc = await _vipPrivilegeDomainService.ReceiveVipPrivilege(userInfo);
 
             //如果领取成功，需要刷新账户信息（比如B币余额）
             if (suc)
             {
                 try
                 {
-                    userInfo = _loginDomainService.LoginByCookie();
+                    userInfo = await _loginDomainService.LoginByCookie();
                 }
                 catch (Exception ex)
                 {
@@ -184,36 +179,36 @@ namespace Ray.BiliBiliTool.Application
         /// 每月为自己充电
         /// </summary>
         [TaskInterceptor("B币券充电", rethrowWhenException: false)]
-        private void Charge(UserInfo userInfo)
+        private async Task Charge(UserInfo userInfo)
         {
-            _chargeDomainService.Charge(userInfo);
+            await _chargeDomainService.Charge(userInfo);
         }
 
         /// <summary>
         /// 漫画签到
         /// </summary>
         [TaskInterceptor("漫画签到", rethrowWhenException: false)]
-        private void MangaSign()
+        private async Task MangaSign()
         {
-            _mangaDomainService.MangaSign();
+            await _mangaDomainService.MangaSign();
         }
 
         /// <summary>
         /// 漫画阅读
         /// </summary>
         [TaskInterceptor("漫画阅读", rethrowWhenException: false)]
-        private void MangaRead()
+        private async Task MangaRead()
         {
-            _mangaDomainService.MangaRead();
+            await _mangaDomainService.MangaRead();
         }
 
         /// <summary>
         /// 每月获取大会员漫画权益
         /// </summary>
         [TaskInterceptor("领取大会员漫画权益", rethrowWhenException: false)]
-        private void ReceiveMangaVipReward(UserInfo userInfo)
+        private async Task ReceiveMangaVipReward(UserInfo userInfo)
         {
-            _mangaDomainService.ReceiveMangaVipReward(1, userInfo);
+            await _mangaDomainService.ReceiveMangaVipReward(1, userInfo);
         }
     }
 }

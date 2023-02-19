@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Threading.Tasks;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 
 namespace Ray.BiliBiliTool.DomainService.Interfaces
@@ -14,6 +12,6 @@ namespace Ray.BiliBiliTool.DomainService.Interfaces
         /// 获取大会员权益
         /// </summary>
         /// <param name="useInfo"></param>
-        bool ReceiveVipPrivilege(UserInfo userInfo);
+        Task<bool> ReceiveVipPrivilege(UserInfo userInfo);
     }
 }
