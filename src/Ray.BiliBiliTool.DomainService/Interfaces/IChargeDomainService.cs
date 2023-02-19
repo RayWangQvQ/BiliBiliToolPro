@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Threading.Tasks;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 
 namespace Ray.BiliBiliTool.DomainService.Interfaces
@@ -14,12 +12,12 @@ namespace Ray.BiliBiliTool.DomainService.Interfaces
         /// 充电
         /// </summary>
         /// <param name="userInfo"></param>
-        void Charge(UserInfo userInfo);
+        Task Charge(UserInfo userInfo);
 
         /// <summary>
         /// 充电后留言
         /// </summary>
         /// <param name="token"></param>
-        void ChargeComments(string token);
+        Task ChargeComments(string token);
     }
 }

@@ -26,10 +26,9 @@ namespace Ray.BiliBiliTool.Application
         }
 
         [TaskInterceptor("测试Cookie")]
-        public override Task DoTaskAsync(CancellationToken cancellationToken)
+        public override async Task DoTaskAsync(CancellationToken cancellationToken)
         {
-            _accountDomainService.LoginByCookie();
-            return Task.CompletedTask;
+            await _accountDomainService.LoginByCookie();
         }
     }
 }

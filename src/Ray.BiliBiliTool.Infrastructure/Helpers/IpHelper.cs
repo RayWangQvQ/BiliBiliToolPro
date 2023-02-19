@@ -17,7 +17,7 @@ namespace Ray.BiliBiliTool.Infrastructure.Helpers
                     .GetAsync("http://api.ipify.org/")
                     .Result;
                 return re.IsSuccessStatusCode
-                    ? re.Content?.ReadAsStringAsync()?.Result
+                    ? re.Content.ReadAsStringAsync().Result
                     : null;
             }
             catch (Exception)

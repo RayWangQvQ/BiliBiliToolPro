@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Ray.BiliBiliTool.Infrastructure.Enums
 {
-    public enum PlateformType
+    public enum PlatformType
     {
         Unknown,
         GitHubActions,

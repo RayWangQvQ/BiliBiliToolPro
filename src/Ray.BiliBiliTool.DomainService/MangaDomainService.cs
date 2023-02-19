@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
-using Ray.BiliBiliTool.Config;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 
@@ -32,12 +30,12 @@ namespace Ray.BiliBiliTool.DomainService
         /// <summary>
         /// 漫画签到
         /// </summary>
-        public void MangaSign()
+        public async Task MangaSign()
         {
             BiliApiResponse response;
             try
             {
-                response = _mangaApi.ClockIn(_dailyTaskOptions.DevicePlatform).GetAwaiter().GetResult();
+                response = await _mangaApi.ClockIn(_dailyTaskOptions.DevicePlatform);
             }
             catch (Exception)
             {
@@ -62,9 +60,9 @@ namespace Ray.BiliBiliTool.DomainService
         /// <summary>
         /// 漫画阅读
         /// </summary>
-        public void MangaRead()
+        public async Task MangaRead()
         {
-            BiliApiResponse response = _mangaApi.ReadManga(_dailyTaskOptions.DevicePlatform).GetAwaiter().GetResult();
+            BiliApiResponse response = await _mangaApi.ReadManga(_dailyTaskOptions.DevicePlatform);
 
             if (response.Code == 0)
             {
@@ -82,7 +80,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// </summary>
         /// <param name="reason_id">权益号，由https://api.bilibili.com/x/vip/privilege/my得到权益号数组，取值范围为数组中的整数
         /// 这里为方便直接取1，为领取漫读劵，暂时不取其他的值</param>
-        public void ReceiveMangaVipReward(int reason_id, UserInfo userInfo)
+        public async Task ReceiveMangaVipReward(int reason_id, UserInfo userInfo)
         {
             if (userInfo.GetVipType() == 0)
             {
@@ -101,8 +99,7 @@ namespace Ray.BiliBiliTool.DomainService
                 return;
             }
 
-            var response = _mangaApi.ReceiveMangaVipReward(reason_id)
-                .GetAwaiter().GetResult();
+            var response = await _mangaApi.ReceiveMangaVipReward(reason_id);
             if (response.Code == 0)
             {
                 _logger.LogInformation("【领取结果】成功");

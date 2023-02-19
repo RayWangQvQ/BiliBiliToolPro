@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Threading.Tasks;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 
 namespace Ray.BiliBiliTool.DomainService.Interfaces
@@ -13,18 +11,18 @@ namespace Ray.BiliBiliTool.DomainService.Interfaces
         /// <summary>
         /// 签到
         /// </summary>
-        void MangaSign();
+        Task MangaSign();
 
         /// <summary>
         /// 阅读
         /// </summary>
-        void MangaRead();
+        Task MangaRead();
 
         /// <summary>
         /// 获取大会员权益
         /// </summary>
         /// <param name="reason_id"></param>
         /// <param name="userIfo"></param>
-        void ReceiveMangaVipReward(int reason_id, UserInfo userIfo);
+        Task ReceiveMangaVipReward(int reason_id, UserInfo userIfo);
     }
 }

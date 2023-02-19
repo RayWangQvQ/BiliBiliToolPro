@@ -153,6 +153,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ray.Serilog.Sinks.Microsoft
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ray.Serilog.Sinks.GotifyBatched", "src\Ray.Serilog.Sinks\Ray.Serilog.Sinks.GotifyBatched\Ray.Serilog.Sinks.GotifyBatched.csproj", "{B00FF75D-4C48-45ED-9A24-5C0D383317EE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppServiceTest", "test\AppServiceTest\AppServiceTest.csproj", "{1D9DFF34-71EA-44AE-85B0-1F10C9BA0D81}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DomainServiceTest", "test\DomainServiceTest\DomainServiceTest.csproj", "{26B21C30-7358-4E7B-A73E-2272F10A6CA8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -243,6 +247,14 @@ Global
 		{B00FF75D-4C48-45ED-9A24-5C0D383317EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B00FF75D-4C48-45ED-9A24-5C0D383317EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B00FF75D-4C48-45ED-9A24-5C0D383317EE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1D9DFF34-71EA-44AE-85B0-1F10C9BA0D81}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D9DFF34-71EA-44AE-85B0-1F10C9BA0D81}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1D9DFF34-71EA-44AE-85B0-1F10C9BA0D81}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1D9DFF34-71EA-44AE-85B0-1F10C9BA0D81}.Release|Any CPU.Build.0 = Release|Any CPU
+		{26B21C30-7358-4E7B-A73E-2272F10A6CA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26B21C30-7358-4E7B-A73E-2272F10A6CA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26B21C30-7358-4E7B-A73E-2272F10A6CA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26B21C30-7358-4E7B-A73E-2272F10A6CA8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -283,6 +295,8 @@ Global
 		{099C4E10-1114-495C-A664-63A15E77B31A} = {4BAFC980-7A73-45C3-9460-8B8CCB87939B}
 		{FB9A43DE-00F0-42C4-BF92-AF61D752CCA2} = {4BAFC980-7A73-45C3-9460-8B8CCB87939B}
 		{B00FF75D-4C48-45ED-9A24-5C0D383317EE} = {4BAFC980-7A73-45C3-9460-8B8CCB87939B}
+		{1D9DFF34-71EA-44AE-85B0-1F10C9BA0D81} = {E9BDDCBE-A57D-4E3B-8252-708088386ADF}
+		{26B21C30-7358-4E7B-A73E-2272F10A6CA8} = {E9BDDCBE-A57D-4E3B-8252-708088386ADF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {197319DA-1148-4A99-847C-8B270B6A29AB}

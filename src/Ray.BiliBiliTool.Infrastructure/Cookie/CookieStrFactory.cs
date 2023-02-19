@@ -33,5 +33,10 @@ namespace Ray.BiliBiliTool.Infrastructure
 
             return _strList[_index];
         }
+
+        public void ReplaceCurrentCookieStr(string newCkStr)
+        {
+            _strList[_index] = newCkStr;
+        }
     }
 }

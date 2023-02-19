@@ -35,7 +35,9 @@ namespace Ray.BiliBiliTool.Agent.Attributes
             ILogger logger = loggerFactory.CreateLogger(categoryName);
 
             if (logMessage.Exception == null)
+            {
                 logger.LogDebug(logMessage.ToString());//修改为Debug等级
+            }
             else
             {
                 if (_logError)

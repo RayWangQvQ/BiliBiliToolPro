@@ -1,4 +1,5 @@
-﻿using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
+﻿using System.Threading.Tasks;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 
 namespace Ray.BiliBiliTool.DomainService
@@ -24,9 +25,9 @@ namespace Ray.BiliBiliTool.DomainService
         /// 获取账户硬币余额
         /// </summary>
         /// <returns></returns>
-        public decimal GetCoinBalance()
+        public async Task<decimal> GetCoinBalance()
         {
-            var response = _accountApi.GetCoinBalance().GetAwaiter().GetResult();
+            var response = await _accountApi.GetCoinBalance();
             return response.Data.Money ?? 0;
         }
 
@@ -34,9 +35,9 @@ namespace Ray.BiliBiliTool.DomainService
         /// 获取今日已投币数
         /// </summary>
         /// <returns></returns>
-        public int GetDonatedCoins()
+        public async Task<int> GetDonatedCoins()
         {
-            return GetDonateCoinExp() / 10;
+            return (await GetDonateCoinExp()) / 10;
         }
 
         #region private
@@ -44,9 +45,9 @@ namespace Ray.BiliBiliTool.DomainService
         /// 获取今日通过投币已获取的经验值
         /// </summary>
         /// <returns></returns>
-        private int GetDonateCoinExp()
+        private async Task<int> GetDonateCoinExp()
         {
-            return _dailyTaskApi.GetDonateCoinExp().GetAwaiter().GetResult().Data;
+            return (await _dailyTaskApi.GetDonateCoinExp()).Data;
         }
         #endregion
     }
