@@ -99,3 +99,4 @@
 - Feature: Enable asynchronous
 - Fix #344 : Support `Ctrl + C` to trigger exit event
 - Merge PR #448 : Fix typo
+- Replace AOP from MethodBoundaryAspect.Fody to Rougamo.Fody, to fix async exception
