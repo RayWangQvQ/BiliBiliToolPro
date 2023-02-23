@@ -59,9 +59,6 @@ namespace Ray.BiliBiliTool.DomainService
 
             UserInfo useInfo = apiResponse.Data;
 
-            //获取到UserId
-            _cookie.UserId = useInfo.Mid.ToString();
-
             _logger.LogInformation("【用户名】{0}", useInfo.GetFuzzyUname());
             _logger.LogInformation("【会员类型】{0}", useInfo.VipType.Description());
             _logger.LogInformation("【会员状态】{0}", useInfo.VipStatus.Description());

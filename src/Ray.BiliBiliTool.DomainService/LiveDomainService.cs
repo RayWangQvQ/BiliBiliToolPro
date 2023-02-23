@@ -626,17 +626,8 @@ namespace Ray.BiliBiliTool.DomainService
                     throw new Exception(liveHomeContent.Message);
                 }
 
-                IEnumerable<string> liveCookies = liveHome.Headers.SingleOrDefault(header => header.Key == "Set-Cookie").Value;
-                var ckItemList = new List<string>();
-                foreach (var item in liveCookies)
-                {
-                    ckItemList.Add(item.Split(';').FirstOrDefault());
-                }
-                _biliCookie.LiveBuvid = CookieInfo.BuildCookieItemDictionaryByCookieItemList(
-                        ckItemList,
-                        null,
-                        v => v.Contains(',') ? Uri.EscapeDataString(v) : v)
-                    [_biliCookie.GetType().GetPropertyDescription(nameof(BiliCookie.LiveBuvid))];
+                List<string> liveCookies = liveHome.Headers.SingleOrDefault(header => header.Key == "Set-Cookie").Value.ToList();
+                _biliCookie.MergeCurrentCookie(liveCookies);
 
                 _logger.LogDebug("LiveBuvid {value}", _biliCookie.LiveBuvid);
                 _logger.LogInformation("直播 Cookie 配置成功！");

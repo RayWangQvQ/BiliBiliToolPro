@@ -8,6 +8,7 @@ using Ray.BiliBiliTool.Infrastructure;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using Ray.BiliBiliTool.Infrastructure.Cookie;
 using Xunit;
 
 namespace BiliAgentTest

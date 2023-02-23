@@ -6,26 +6,52 @@ namespace Ray.BiliBiliTool.Infrastructure.Cookie
 {
     public class CookieInfo
     {
-        public CookieInfo(string cookieStr, Func<string, string> nameBuilder = null, Func<string, string> valueBuilder = null) : this(cookieStr?.Split(';'), nameBuilder, valueBuilder)
+        private readonly CookieStrFactory _ckFactory;
+
+        public CookieInfo(CookieStrFactory ckFactory)
         {
+            _ckFactory = ckFactory;
         }
 
-        public CookieInfo(IEnumerable<string> cookieItemList, Func<string, string> nameBuilder = null, Func<string, string> valueBuilder = null)
-        {
-            CookieItemDictionary = BuildCookieItemDictionaryByCookieItemList(cookieItemList, nameBuilder, valueBuilder);
+        public string CookieStr => _ckFactory.GetCurrentCookieStr();
 
-            CookieStr = string.Join("; ", CookieItemDictionary.Select(kv => $"{kv.Key}={kv.Value}"));
-        }
-
-        public string CookieStr { get; set; }
-
-        public Dictionary<string, string> CookieItemDictionary { get; private set; }
+        public Dictionary<string, string> CookieItemDictionary => _ckFactory.GetCurrentCookieDic();
 
         public virtual void Check()
         {
             if (string.IsNullOrWhiteSpace(CookieStr)) throw new Exception("Cookie字符串为空");
         }
 
+        public virtual string CkNameBuild(string name) { return name; }
+
+        public virtual string CkValueBuild(string value) { return value; }
+
+        public override string ToString()
+        {
+            var list= CookieItemDictionary.Select(d => $"{CkNameBuild(d.Key)}={CkValueBuild(d.Value)}");
+            return string.Join("; ", list);
+        }
+
+        #region merge
+
+        public void MergeCurrentCookie(string ckStr)
+        {
+            _ckFactory.MergeCurrentCookie(ckStr);
+        }
+
+        public void MergeCurrentCookie(List<string> ckItemList)
+        {
+            _ckFactory.MergeCurrentCookie(ckItemList);
+        }
+
+        public void MergeCurrentCookie(Dictionary<string, string> ckDic)
+        {
+            _ckFactory.MergeCurrentCookie(ckDic);
+        }
+
+        #endregion
+
+        [Obsolete]
         public static Dictionary<string, string> BuildCookieItemDictionaryByCookieItemList(IEnumerable<string> cookieItemList, Func<string, string> nameBuilder = null, Func<string, string> valueBuilder = null)
         {
             var re = new Dictionary<string, string>();

@@ -13,6 +13,7 @@ using Ray.BiliBiliTool.Config;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 using Ray.BiliBiliTool.Infrastructure;
+using Ray.BiliBiliTool.Infrastructure.Cookie;
 using Ray.BiliBiliTool.Infrastructure.Enums;
 
 namespace Ray.BiliBiliTool.Application
@@ -72,8 +73,7 @@ namespace Ray.BiliBiliTool.Application
         public override async Task DoTaskAsync(CancellationToken cancellationToken)
         {
             var ck = await SetCookiesAsync(_biliCookie, cancellationToken);
-            _biliCookie.CookieStr = ck.ToString();
-            _cookieStrFactory.ReplaceCurrentCookieStr(ck.ToString());
+            _biliCookie.MergeCurrentCookie(ck.ToString());
 
             //每日任务赚经验：
             UserInfo userInfo = await Login();
