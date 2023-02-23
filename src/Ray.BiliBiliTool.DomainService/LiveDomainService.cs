@@ -406,7 +406,7 @@ namespace Ray.BiliBiliTool.DomainService
                 _logger.LogInformation("正在发送弹幕...");
 
                 // 通过空间主页信息获取直播间 id
-                int liveHostUserId = medal.Medal_info.Target_id;
+                var liveHostUserId = medal.Medal_info.Target_id;
                 var spaceInfo = await _userInfoApi.GetSpaceInfo(liveHostUserId);
                 if (spaceInfo.Code != 0)
                 {
@@ -577,7 +577,7 @@ namespace Ray.BiliBiliTool.DomainService
                 }
 
                 // 通过空间主页信息获取直播间 id
-                int liveHostUserId = medal.Medal_info.Target_id;
+                var liveHostUserId = medal.Medal_info.Target_id;
                 var spaceInfo = await _userInfoApi.GetSpaceInfo(liveHostUserId);
                 if (spaceInfo.Code != 0)
                 {

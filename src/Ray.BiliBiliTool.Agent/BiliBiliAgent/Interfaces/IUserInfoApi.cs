@@ -27,6 +27,6 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         /// <param name="userId">uid</param>
         /// <returns></returns>
         [HttpGet("/x/space/wbi/acc/info?mid={userId}")]
-        Task<BiliApiResponse<GetSpaceInfoResponse>> GetSpaceInfo(int userId);
+        Task<BiliApiResponse<GetSpaceInfoResponse>> GetSpaceInfo(long userId);
     }
 }
