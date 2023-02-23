@@ -17,20 +17,17 @@ else
     {
         echo "------尝试使用apk安装------"
         apk add dotnet6-sdk
-        dotnet --version
-        echo "安装成功"
+        dotnet --version && echo "安装成功"
     } || {
         echo "------再尝试使用官方脚本安装------"
         curl -sSL $rayInstallShell | bash /dev/stdin
         . /root/.bashrc
-        dotnet --version
-        echo "安装成功"
+        dotnet --version && echo "安装成功"
     } || {
         echo "------再尝试使用二进制包安装------"
         curl -sSL $rayInstallShell | bash /dev/stdin --no-official
         . /root/.bashrc
-        dotnet --version
-        echo "安装成功"
+        dotnet --version && echo "安装成功"
     } || {
         echo "安装失败，没办法了，毁灭吧，自己解决吧：https://learn.microsoft.com/zh-cn/dotnet/core/install/linux-alpine"
         exit 1
