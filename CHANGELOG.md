@@ -95,3 +95,10 @@
 ## 0.4.6
 - Fix: ck list init empty error
 - Feature #440 : use 'apk add' to install dotnet in qinglong
+## 1.0.0
+- Feature: Enable asynchronous
+- Fix #344 : Support `Ctrl + C` to trigger exit event
+- Fix #451 : Rebuild cookie factory pattern and fix bug of donating coin
+- Featur: Replace AOP from MethodBoundaryAspect.Fody to Rougamo.Fody, to fix async exception
+- Merge PR #448 : Fix typo
+- Fix #446 : Change id type from int to long

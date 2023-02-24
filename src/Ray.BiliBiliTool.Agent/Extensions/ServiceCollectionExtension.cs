@@ -14,6 +14,7 @@ using Ray.BiliBiliTool.Agent.HttpClientDelegatingHandlers;
 using Ray.BiliBiliTool.Agent.QingLong;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.Infrastructure;
+using Ray.BiliBiliTool.Infrastructure.Cookie;
 
 namespace Ray.BiliBiliTool.Agent.Extensions
 {
@@ -44,7 +45,7 @@ namespace Ray.BiliBiliTool.Agent.Extensions
 
                 return new CookieStrFactory(list);
             });
-            services.AddTransient<BiliCookie>();
+            services.AddScoped<BiliCookie>();
 
             //全局代理
             services.SetGlobalProxy(configuration);
@@ -67,12 +68,10 @@ namespace Ray.BiliBiliTool.Agent.Extensions
             services.AddBiliBiliClientApi<IChargeApi>("https://api.bilibili.com");
             services.AddBiliBiliClientApi<IVideoApi>("https://api.bilibili.com");
             services.AddBiliBiliClientApi<IVideoWithoutCookieApi>("https://api.bilibili.com", false);
-
             services.AddBiliBiliClientApi<IVipBigPointApi>("https://api.bilibili.com");
-
             services.AddBiliBiliClientApi<IPassportApi>("http://passport.bilibili.com", false);
-
             services.AddBiliBiliClientApi<ILiveTraceApi>("https://live-trace.bilibili.com");
+            services.AddBiliBiliClientApi<IHomeApi>("https://www.bilibili.com", false);
 
             //qinglong
             var qinglongHost = configuration["QL_URL"] ?? "http://localhost:5600";

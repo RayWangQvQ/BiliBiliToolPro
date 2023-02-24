@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
+using System;
+using System.Threading.Tasks;
 
 namespace Ray.BiliBiliTool.DomainService.Interfaces
 {
@@ -9,10 +9,10 @@ namespace Ray.BiliBiliTool.DomainService.Interfaces
     /// </summary>
     public interface IDonateCoinDomainService : IDomainService
     {
-        void AddCoinsForVideos();
+        Task AddCoinsForVideos();
 
-        Tuple<string, string> TryGetCanDonatedVideo();
+        Task<UpVideoInfo> TryGetCanDonatedVideo();
 
-        bool DoAddCoinForVideo(string aid, int multiply, bool select_like, string title = "");
+        Task<bool> DoAddCoinForVideo(UpVideoInfo video, bool select_like);
     }
 }

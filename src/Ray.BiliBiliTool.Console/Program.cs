@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
@@ -48,32 +49,34 @@ namespace Ray.BiliBiliTool.Console
 
         internal static IHostBuilder CreateHostBuilder(string[] args)
         {
+            //IHostBuilder hostBuilder = Host.CreateDefaultBuilder();
             IHostBuilder hostBuilder = new HostBuilder();
+
+            hostBuilder.UseContentRoot(Directory.GetCurrentDirectory());
 
             //承载系统自身的配置：
             hostBuilder.ConfigureHostConfiguration(hostConfigurationBuilder =>
             {
-                Environment.SetEnvironmentVariable(HostDefaults.EnvironmentKey, Environment.GetEnvironmentVariable(Global.EnvironmentKey));
-                hostConfigurationBuilder.AddEnvironmentVariables();
+                hostConfigurationBuilder.AddEnvironmentVariables(prefix: "DOTNET_");
             });
 
             //应用配置:
             hostBuilder.ConfigureAppConfiguration((hostBuilderContext, configurationBuilder) =>
             {
                 Global.HostingEnvironment = hostBuilderContext.HostingEnvironment;
+                IHostEnvironment env = hostBuilderContext.HostingEnvironment;
 
                 //json文件：
                 configurationBuilder.AddJsonFile("appsettings.json", false, true)
                     .AddJsonFile($"appsettings.{hostBuilderContext.HostingEnvironment.EnvironmentName}.json", true, true)
-                    .AddJsonFile("exp.json", false, true)
-                    .AddJsonFile("donateCoinCanContinueStatus.json", false, true);
+                    .AddJsonFile("exp.json", false, true) //todo：不要使用配置
+                    .AddJsonFile("donateCoinCanContinueStatus.json", false, true);//todo：不要使用配置
 
                 //用户机密：
-                if (hostBuilderContext.HostingEnvironment.IsDevelopment())
+                if (env.IsDevelopment() && env.ApplicationName?.Length > 0)
                 {
-                    //Assembly assembly = Assembly.Load(new AssemblyName(hostBuilderContext.HostingEnvironment.ApplicationName));
-                    Assembly assembly = typeof(Program).Assembly;
-                    configurationBuilder.AddUserSecrets(assembly, true);
+                    var appAssembly = Assembly.Load(new AssemblyName(env.ApplicationName));
+                    configurationBuilder.AddUserSecrets(appAssembly, optional: true, reloadOnChange: true);
                 }
 
                 //环境变量：
@@ -85,7 +88,7 @@ namespace Ray.BiliBiliTool.Console
                 {
                     configurationBuilder.AddCommandLine(args, hostBuilderContext.Configuration
                         .GetSection("CommandLineMappings")
-                        .Get<Dictionary<string, string>>());
+                        .Get<Dictionary<string, string>>());//todo：不要使用配置
                 }
 
                 //本地cookie存储文件

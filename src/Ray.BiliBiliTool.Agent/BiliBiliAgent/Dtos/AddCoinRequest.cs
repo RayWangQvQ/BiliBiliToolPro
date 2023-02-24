@@ -23,5 +23,13 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos
         public string Cross_domain { get; set; } = "true";
 
         public string Csrf { get; set; }
+
+        public string Eab_x { get; set; } = "2";
+
+        public string Ramval { get; set; } = "3";
+
+        public string Source { get; set; } = "web_normal";
+
+        public string Ga { get; set; } = "1";
     }
 }

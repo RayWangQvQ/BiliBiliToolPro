@@ -150,5 +150,15 @@ namespace ConfigTest
         {
             Debug.WriteLine(Environment.GetEnvironmentVariable(HostDefaults.EnvironmentKey));
         }
+
+        [Fact]
+        public void Test()
+        {
+            var s = "0123456";
+
+            var s1 = s[..2];
+
+            var s2 = s[4..];
+        }
     }
 }

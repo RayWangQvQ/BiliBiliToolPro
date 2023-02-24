@@ -27,7 +27,7 @@ namespace ConfigTest
         {
             using var scope = Global.ServiceProviderRoot.CreateScope();
 
-            var en = Global.ConfigurationRoot.GetSection("PlateformType").Get<PlateformType>();
+            var en = Global.ConfigurationRoot.GetSection("PlatformType").Get<PlatformType>();
         }
     }
 }

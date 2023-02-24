@@ -6,4 +6,4 @@
 cd ./src/Ray.BiliBiliTool.Console
 
 export Ray_RunTasks=VipBigPoint && \
-dotnet run --ENVIRONMENT=Production
+dotnet run

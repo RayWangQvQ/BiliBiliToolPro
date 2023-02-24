@@ -1,18 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Text;
-using MethodBoundaryAspect.Fody.Attributes;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Ray.BiliBiliTool.Infrastructure;
+using Rougamo;
+using Rougamo.Context;
 
 namespace Ray.BiliBiliTool.Application.Attributes
 {
     /// <summary>
     /// 任务拦截器
     /// </summary>
-    public class TaskInterceptorAttribute : OnMethodBoundaryAspect
+    public class TaskInterceptorAttribute : MoAttribute //: OnMethodBoundaryAspect
     {
         private readonly ILogger _logger;
         private readonly string _taskName;
@@ -28,7 +27,7 @@ namespace Ray.BiliBiliTool.Application.Attributes
             _logger = Global.ServiceProviderRoot.GetRequiredService<ILogger<TaskInterceptorAttribute>>();
         }
 
-        public override void OnEntry(MethodExecutionArgs arg)
+        public override void OnEntry(MethodContext context)
         {
             if (_taskName == null) return;
             string end = _taskLevel == TaskLevel.One ? Environment.NewLine : "";
@@ -36,7 +35,7 @@ namespace Ray.BiliBiliTool.Application.Attributes
             _logger.LogInformation(delimiter + "开始 {taskName} " + delimiter + end, _taskName);
         }
 
-        public override void OnExit(MethodExecutionArgs arg)
+        public override void OnExit(MethodContext context)
         {
             if (_taskName == null) return;
 
@@ -46,17 +45,17 @@ namespace Ray.BiliBiliTool.Application.Attributes
             _logger.LogInformation(delimiter + append + "结束" + append + delimiter + Environment.NewLine);
         }
 
-        public override void OnException(MethodExecutionArgs arg)
+        public override void OnException(MethodContext context)
         {
             if (_rethrowWhenException)
             {
-                _logger.LogError("程序发生异常：{msg}", arg.Exception.Message);
-                base.OnException(arg);
+                _logger.LogError("程序发生异常：{msg}", context.Exception?.Message??"");
+                base.OnException(context);
                 return;
             }
 
-            _logger.LogError("{task}失败，继续其他任务。失败信息:{msg}" + Environment.NewLine, _taskName, arg.Exception.Message);
-            arg.FlowBehavior = FlowBehavior.Continue;
+            _logger.LogError("{task}失败，继续其他任务。失败信息:{msg}" + Environment.NewLine, _taskName, context.Exception?.Message??"");
+            context.HandledException(this,null);
         }
 
         private string GetDelimiters()

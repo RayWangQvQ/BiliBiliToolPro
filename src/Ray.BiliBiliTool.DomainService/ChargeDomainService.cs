@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent;
@@ -39,7 +40,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// 月底自动己充电
         /// 仅充会到期的B币券，低于2的时候不会充
         /// </summary>
-        public void Charge(UserInfo userInfo)
+        public async Task Charge(UserInfo userInfo)
         {
             if (_dailyTaskOptions.DayOfAutoCharge == 0)
             {
@@ -86,9 +87,8 @@ namespace Ray.BiliBiliTool.DomainService
 
             var request = new ChargeRequest(couponBalance, long.Parse(targetUpId), _cookie.BiliJct);
 
-            //BiliApiResponse<ChargeResponse> response = _chargeApi.Charge(decimal.ToInt32(couponBalance * 10), _dailyTaskOptions.AutoChargeUpId, _cookieOptions.UserId, _cookieOptions.BiliJct).Result;
-            BiliApiResponse<ChargeV2Response> response = _chargeApi.ChargeV2(request)
-                .GetAwaiter().GetResult();
+            //BiliApiResponse<ChargeResponse> response = await _chargeApi.Charge(decimal.ToInt32(couponBalance * 10), _dailyTaskOptions.AutoChargeUpId, _cookieOptions.UserId, _cookieOptions.BiliJct);
+            BiliApiResponse<ChargeV2Response> response = await _chargeApi.ChargeV2(request);
 
             if (response.Code == 0)
             {
@@ -100,7 +100,7 @@ namespace Ray.BiliBiliTool.DomainService
                     _logger.LogInformation("在过期前使用成功，赠送的B币券没有浪费哦~");
 
                     //充电留言
-                    ChargeComments(response.Data.Order_no);
+                    await ChargeComments(response.Data.Order_no);
                 }
                 else
                 {
@@ -119,11 +119,11 @@ namespace Ray.BiliBiliTool.DomainService
         /// 充电后留言
         /// </summary>
         /// <param name="token"></param>
-        public void ChargeComments(string orderNum)
+        public async Task ChargeComments(string orderNum)
         {
             var comment = _dailyTaskOptions.ChargeComment ?? "";
             var request = new ChargeCommentRequest(orderNum, comment, _cookie.BiliJct);
-            _chargeApi.ChargeComment(request).GetAwaiter().GetResult();
+            await _chargeApi.ChargeComment(request);
 
             _logger.LogInformation("【留言】{comment}", comment);
         }
