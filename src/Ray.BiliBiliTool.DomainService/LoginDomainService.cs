@@ -17,6 +17,7 @@ using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json.Linq;
 using QRCoder;
 using Ray.BiliBiliTool.Agent.QingLong;
+using Ray.BiliBiliTool.Infrastructure.Cookie;
 
 namespace Ray.BiliBiliTool.DomainService
 {
@@ -100,7 +101,7 @@ namespace Ray.BiliBiliTool.DomainService
                     _logger.LogInformation("扫描成功！");
                     IEnumerable<string> cookies = check.Headers.SingleOrDefault(header => header.Key == "Set-Cookie").Value;
 
-                    var cookieStr = GetCookieStr(cookies);
+                    var cookieStr = CookieInfo.ConvertSetCkHeadersToCkStr(cookies);
                     cookieInfo = new BiliCookie(cookieStr);
                     cookieInfo.Check();
 
@@ -121,9 +122,8 @@ namespace Ray.BiliBiliTool.DomainService
                 if (homePage.IsSuccessStatusCode)
                 {
                     _logger.LogInformation("访问主站成功");
-                    IEnumerable<string> cookies = homePage.Headers.SingleOrDefault(header => header.Key == "Set-Cookie").Value;
-                    var cookieStr = GetCookieStr(cookies);
-                    biliCookie = new BiliCookie($"{cookieStr}; {biliCookie}");
+                    IEnumerable<string> setCookieHeaders = homePage.Headers.SingleOrDefault(header => header.Key == "Set-Cookie").Value;
+                    biliCookie.MergeCurrentCookieBySetCookieHeaders(setCookieHeaders);
                     _logger.LogInformation("SetCookie成功");
                     return biliCookie;
                 }
