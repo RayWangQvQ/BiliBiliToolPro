@@ -28,7 +28,7 @@ namespace Ray.BiliBiliTool.Infrastructure.Cookie
 
         public override string ToString()
         {
-            var list= CookieItemDictionary.Select(d => $"{CkNameBuild(d.Key)}={CkValueBuild(d.Value)}");
+            var list = CookieItemDictionary.Select(d => $"{CkNameBuild(d.Key)}={CkValueBuild(d.Value)}");
             return string.Join("; ", list);
         }
 
@@ -65,7 +65,7 @@ namespace Ray.BiliBiliTool.Infrastructure.Cookie
         /// <returns></returns>
         public static List<string> ConvertSetCkHeadersToCkItemList(IEnumerable<string> setCookieList)
         {
-            return setCookieList.Select(item => item.Split(';').FirstOrDefault()).ToList();
+            return setCookieList.Select(item => item.Split(';').FirstOrDefault()?.Trim()).ToList();
         }
 
         /// <summary>
@@ -106,8 +106,8 @@ namespace Ray.BiliBiliTool.Infrastructure.Cookie
         /// <returns></returns>
         public static Dictionary<string, string> ConvertCkItemListToCkDic(IEnumerable<string> ckItemList)
         {
-            return ckItemList.ToDictionary(k => k[..(k.IndexOf("=", StringComparison.Ordinal) + 1)].Trim(),
-                v => v[v.IndexOf("=", StringComparison.Ordinal)..].Trim().TrimEnd(';'));
+            return ckItemList.ToDictionary(k => k[..k.IndexOf("=", StringComparison.Ordinal)].Trim(),
+                v => v[(v.IndexOf("=", StringComparison.Ordinal) + 1)..].Trim().TrimEnd(';'));
         }
 
         #endregion

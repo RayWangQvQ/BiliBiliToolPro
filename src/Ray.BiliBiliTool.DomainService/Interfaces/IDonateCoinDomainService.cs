@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
+using System;
 using System.Threading.Tasks;
 
 namespace Ray.BiliBiliTool.DomainService.Interfaces
@@ -10,8 +11,8 @@ namespace Ray.BiliBiliTool.DomainService.Interfaces
     {
         Task AddCoinsForVideos();
 
-        Task<Tuple<string, string>> TryGetCanDonatedVideo();
+        Task<UpVideoInfo> TryGetCanDonatedVideo();
 
-        Task<bool> DoAddCoinForVideo(string aid, int multiply, bool select_like, string title = "");
+        Task<bool> DoAddCoinForVideo(UpVideoInfo video, bool select_like);
     }
 }

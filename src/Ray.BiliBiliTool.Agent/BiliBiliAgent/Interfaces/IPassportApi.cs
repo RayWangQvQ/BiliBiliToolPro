@@ -15,5 +15,8 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         [HttpGet("/x/passport-login/web/qrcode/poll?qrcode_key={qrcode_key}&source=main_mini")]
         //Task<BiliApiResponse<TokenDto>> CheckQrCodeHasScaned(string qrcode_key);
         Task<HttpResponseMessage> CheckQrCodeHasScaned(string qrcode_key);
+
+        [HttpGet("/x/passport-login/web/sso/list?biliCSRF={csrf}")]
+        Task<BiliApiResponse<GetSsoListResponse>> GetSsoListAsync(string csrf);
     }
 }
