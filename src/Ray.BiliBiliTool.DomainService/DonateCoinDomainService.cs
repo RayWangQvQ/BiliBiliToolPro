@@ -95,12 +95,12 @@ namespace Ray.BiliBiliTool.DomainService
             {
                 _logger.LogDebug("开始尝试第{num}次", i);
 
-                Tuple<string, string> video = await TryGetCanDonatedVideo();
+                UpVideoInfo video = await TryGetCanDonatedVideo();
                 if (video == null) continue;
 
-                _logger.LogInformation("【视频】{title}", video.Item2);
+                _logger.LogInformation("【视频】{title}", video.Title);
 
-                bool re = await DoAddCoinForVideo(video.Item1, 1, _dailyTaskOptions.SelectLike, video.Item2);
+                bool re = await DoAddCoinForVideo(video, _dailyTaskOptions.SelectLike);
                 if (re) success++;
             }
 
@@ -116,9 +116,9 @@ namespace Ray.BiliBiliTool.DomainService
         /// 尝试获取一个可以投币的视频
         /// </summary>
         /// <returns></returns>
-        public async Task<Tuple<string, string>> TryGetCanDonatedVideo()
+        public async Task<UpVideoInfo> TryGetCanDonatedVideo()
         {
-            Tuple<string, string> result;
+            UpVideoInfo result;
 
             //从配置的up中随机尝试获取1次
             result = await TryGetCanDonateVideoByConfigUps(1);
@@ -145,17 +145,17 @@ namespace Ray.BiliBiliTool.DomainService
         /// <param name="multiply">投币数量</param>
         /// <param name="select_like">是否同时点赞 1是0否</param>
         /// <returns>是否投币成功</returns>
-        public async Task<bool> DoAddCoinForVideo(string aid, int multiply, bool select_like, string title = "")
+        public async Task<bool> DoAddCoinForVideo(UpVideoInfo video, bool select_like)
         {
             BiliApiResponse result;
             try
             {
-                var request = new AddCoinRequest(long.Parse(aid), _biliBiliCookie.BiliJct)
+                var request = new AddCoinRequest(video.Aid, _biliBiliCookie.BiliJct)
                 {
-                    Multiply = multiply,
                     Select_like = select_like ? 1 : 0
                 };
-                result = await _videoApi.AddCoinForVideo(request);
+                var referer = $"https://www.bilibili.com/video/{video.Bvid}/?spm_id_from=333.1007.tianma.1-1-1.click&vd_source=80c1601a7003934e7a90709c18dfcffd";
+                result = await _videoApi.AddCoinForVideo(request, referer);
             }
             catch (Exception)
             {
@@ -200,13 +200,13 @@ namespace Ray.BiliBiliTool.DomainService
                 return configCoins;
             }
 
-
             //已投的硬币
             int alreadyCoins = await _coinDomainService.GetDonatedCoins();
             //目标
-            int targetCoins = configCoins > Constants.MaxNumberOfDonateCoins
-                ? Constants.MaxNumberOfDonateCoins
-                : configCoins;
+            //int targetCoins = configCoins > Constants.MaxNumberOfDonateCoins
+            //    ? Constants.MaxNumberOfDonateCoins
+            //    : configCoins;
+            int targetCoins = configCoins;
 
             _logger.LogInformation("【今日已投】{already}枚", alreadyCoins);
             _logger.LogInformation("【目标欲投】{already}枚", targetCoins);
@@ -227,7 +227,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// </summary>
         /// <param name="tryCount"></param>
         /// <returns></returns>
-        private async Task<Tuple<string, string>> TryGetCanDonateVideoByConfigUps(int tryCount)
+        private async Task<UpVideoInfo> TryGetCanDonateVideoByConfigUps(int tryCount)
         {
             //是否配置了up主
             if (_dailyTaskOptions.SupportUpIdList.Count == 0) return null;
@@ -240,7 +240,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// </summary>
         /// <param name="tryCount"></param>
         /// <returns></returns>
-        private async Task<Tuple<string, string>> TryGetCanDonateVideoBySpecialUps(int tryCount)
+        private async Task<UpVideoInfo> TryGetCanDonateVideoBySpecialUps(int tryCount)
         {
             //获取特别关注列表
             var request = new GetSpecialFollowingsRequest(long.Parse(_biliBiliCookie.UserId));
@@ -255,7 +255,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// </summary>
         /// <param name="tryCount"></param>
         /// <returns></returns>
-        private async Task<Tuple<string, string>> TryGetCanDonateVideoByFollowingUps(int tryCount)
+        private async Task<UpVideoInfo> TryGetCanDonateVideoByFollowingUps(int tryCount)
         {
             //获取特别关注列表
             var request = new GetFollowingsRequest(long.Parse(_biliBiliCookie.UserId));
@@ -270,15 +270,20 @@ namespace Ray.BiliBiliTool.DomainService
         /// </summary>
         /// <param name="tryCount"></param>
         /// <returns></returns>
-        private async Task<Tuple<string, string>> TryGetCanDonateVideoByRegion(int tryCount)
+        private async Task<UpVideoInfo> TryGetCanDonateVideoByRegion(int tryCount)
         {
             try
             {
                 for (int i = 0; i < tryCount; i++)
                 {
-                    var video = await _videoDomainService.GetRandomVideoOfRanking();
+                    RankingInfo video = await _videoDomainService.GetRandomVideoOfRanking();
                     if (!await IsCanDonate(video.Aid.ToString())) continue;
-                    return Tuple.Create<string, string>(video.Aid.ToString(), video.Title);
+                    return new UpVideoInfo()
+                    {
+                        Aid = video.Aid,
+                        Bvid = video.Bvid,
+                        Title = video.Title
+                    };
                 }
             }
             catch (Exception e)
@@ -295,7 +300,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// <param name="upIds"></param>
         /// <param name="tryCount"></param>
         /// <returns></returns>
-        private async Task<Tuple<string, string>> TryCanDonateVideoByUps(List<long> upIds, int tryCount)
+        private async Task<UpVideoInfo> TryCanDonateVideoByUps(List<long> upIds, int tryCount)
         {
             if (upIds == null || upIds.Count == 0) return null;
 
@@ -329,7 +334,7 @@ namespace Ray.BiliBiliTool.DomainService
                     //检查是否可以投
                     if (!await IsCanDonate(videoInfo.Aid.ToString())) continue;
 
-                    return Tuple.Create(videoInfo.Aid.ToString(), videoInfo.Title);
+                    return videoInfo;
                 }
             }
             catch (Exception e)

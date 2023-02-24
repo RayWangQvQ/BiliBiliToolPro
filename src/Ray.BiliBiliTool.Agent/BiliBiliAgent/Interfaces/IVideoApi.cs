@@ -44,10 +44,10 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         /// <param name="csrf"></param>
         /// <returns></returns>
         [Header("Content-Type", "application/x-www-form-urlencoded")]
-        [Header("Referer", "https://www.bilibili.com/")]
+        //[Header("Referer", "https://www.bilibili.com/")]
         [Header("Origin", "https://www.bilibili.com")]
-        [HttpPost("/x/web-interface/coin/add?aid={aid}&multiply={multiply}&select_like={select_like}&cross_domain=true&csrf={csrf}")]
-        Task<BiliApiResponse> AddCoinForVideo([FormContent] AddCoinRequest request);
+        [HttpPost("/x/web-interface/coin/add")]
+        Task<BiliApiResponse> AddCoinForVideo([FormContent] AddCoinRequest request,[Header("referer")]string refer= "https://www.bilibili.com/video/BV123456/?spm_id_from=333.1007.tianma.1-1-1.click&vd_source=80c1601a7003934e7a90709c18dfcffd");
 
         /// <summary>
         /// 获取当前用户对<paramref name="aid"/>视频的投币信息

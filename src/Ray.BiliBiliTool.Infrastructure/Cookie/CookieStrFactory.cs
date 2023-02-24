@@ -16,9 +16,11 @@ namespace Ray.BiliBiliTool.Infrastructure.Cookie
             {
                 _cookieDictionary.Add(i + 1, CkStrToDictionary(strList[i]));
             }
+
+            CurrentNum = 1;
         }
 
-        public int CurrentNum { get; set; } = 1;
+        public int CurrentNum { get; set; }
 
         public int Count => _cookieDictionary.Count;
 
@@ -45,17 +47,37 @@ namespace Ray.BiliBiliTool.Infrastructure.Cookie
 
         #region merge
 
+        /// <summary>
+        /// 根据请求返回header中的set-cookie来merge cookie
+        /// </summary>
+        /// <param name="setCookieList">["ak=av; expire=abc;"]</param>
+        public void MergeCurrentCookieBySetCookieHeaders(IEnumerable<string> setCookieList)
+        {
+            MergeCurrentCookie(CookieInfo.ConvertSetCkHeadersToCkItemList(setCookieList));
+        }
+
+        /// <summary>
+        /// 根据cookie字符串merge
+        /// </summary>
+        /// <param name="ckStr"></param>
         public void MergeCurrentCookie(string ckStr)
         {
-            MergeCurrentCookie(ckStr.Split(";", StringSplitOptions.TrimEntries).ToList());
+            MergeCurrentCookie(CookieInfo.ConvertCkStrToCkItemList(ckStr));
         }
 
+        /// <summary>
+        /// 根据cookie item集合merge（一个“ak=av”为一个cookie item）
+        /// </summary>
+        /// <param name="ckItemList">["ak=av","bk=bv"]</param>
         public void MergeCurrentCookie(List<string> ckItemList)
         {
-            MergeCurrentCookie(ckItemList.ToDictionary(k => k[..(k.IndexOf("=", StringComparison.Ordinal) + 1)],
-                v => v[v.IndexOf("=", StringComparison.Ordinal)..]));
+            MergeCurrentCookie(CookieInfo.ConvertCkItemListToCkDic(ckItemList));
         }
 
+        /// <summary>
+        /// 根据cookie dic来merge
+        /// </summary>
+        /// <param name="ckDic">{{"ak":"av"}}</param>
         public void MergeCurrentCookie(Dictionary<string, string> ckDic)
         {
             var currentCkDic = GetCurrentCookieDic();
@@ -73,7 +95,6 @@ namespace Ray.BiliBiliTool.Infrastructure.Cookie
         }
 
         #endregion
-
 
         #region private
 

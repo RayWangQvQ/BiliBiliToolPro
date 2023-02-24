@@ -72,8 +72,7 @@ namespace Ray.BiliBiliTool.Application
         [TaskInterceptor("每日任务", TaskLevel.One)]
         public override async Task DoTaskAsync(CancellationToken cancellationToken)
         {
-            var ck = await SetCookiesAsync(_biliCookie, cancellationToken);
-            _biliCookie.MergeCurrentCookie(ck.ToString());
+            await SetCookiesAsync(_biliCookie, cancellationToken);
 
             //每日任务赚经验：
             UserInfo userInfo = await Login();

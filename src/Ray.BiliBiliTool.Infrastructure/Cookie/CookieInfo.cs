@@ -28,11 +28,16 @@ namespace Ray.BiliBiliTool.Infrastructure.Cookie
 
         public override string ToString()
         {
-            var list= CookieItemDictionary.Select(d => $"{CkNameBuild(d.Key)}={CkValueBuild(d.Value)}");
+            var list = CookieItemDictionary.Select(d => $"{CkNameBuild(d.Key)}={CkValueBuild(d.Value)}");
             return string.Join("; ", list);
         }
 
         #region merge
+
+        public void MergeCurrentCookieBySetCookieHeaders(IEnumerable<string> setCookieList)
+        {
+            _ckFactory.MergeCurrentCookieBySetCookieHeaders(setCookieList);
+        }
 
         public void MergeCurrentCookie(string ckStr)
         {
@@ -51,24 +56,61 @@ namespace Ray.BiliBiliTool.Infrastructure.Cookie
 
         #endregion
 
-        [Obsolete]
-        public static Dictionary<string, string> BuildCookieItemDictionaryByCookieItemList(IEnumerable<string> cookieItemList, Func<string, string> nameBuilder = null, Func<string, string> valueBuilder = null)
+        #region convert
+
+        /// <summary>
+        /// List<setCkHeader>—>List<ckItem>
+        /// </summary>
+        /// <param name="setCookieList"></param>
+        /// <returns></returns>
+        public static List<string> ConvertSetCkHeadersToCkItemList(IEnumerable<string> setCookieList)
         {
-            var re = new Dictionary<string, string>();
-            foreach (var item in cookieItemList ?? new List<string>())
-            {
-                var index = item.IndexOf('=');
-                if (index == -1) continue;
-
-                var name = item[..index].Trim();
-                if (nameBuilder != null) name = nameBuilder(name);
-
-                var value = item[(index+1)..].Trim();
-                if (valueBuilder != null) value = valueBuilder(value);
-
-                re.TryAdd(name, value);
-            }
-            return re;
+            return setCookieList.Select(item => item.Split(';').FirstOrDefault()?.Trim()).ToList();
         }
+
+        /// <summary>
+        /// List<setCkHeader>—>ckStr
+        /// </summary>
+        /// <param name="setCookieList"></param>
+        /// <returns></returns>
+        public static string ConvertSetCkHeadersToCkStr(IEnumerable<string> setCookieList)
+        {
+            var ckItemList = ConvertSetCkHeadersToCkItemList(setCookieList);
+            return ConvertCkItemListToCkStr(ckItemList);
+        }
+
+        /// <summary>
+        /// ckStr—>List<ckItem>
+        /// </summary>
+        /// <param name="ckStr"></param>
+        /// <returns></returns>
+        public static List<string> ConvertCkStrToCkItemList(string ckStr)
+        {
+            return ckStr.Split(";", StringSplitOptions.TrimEntries).ToList();
+        }
+
+        /// <summary>
+        /// List<ckItem>—>ckStr
+        /// </summary>
+        /// <param name="ckItemList"></param>
+        /// <returns></returns>
+        public static string ConvertCkItemListToCkStr(IEnumerable<string> ckItemList)
+        {
+            return string.Join("; ", ckItemList);
+        }
+
+        /// <summary>
+        /// List<ckItem>—>Dictionary<>
+        /// </summary>
+        /// <param name="ckItemList"></param>
+        /// <returns></returns>
+        public static Dictionary<string, string> ConvertCkItemListToCkDic(IEnumerable<string> ckItemList)
+        {
+            return ckItemList.ToDictionary(k => k[..k.IndexOf("=", StringComparison.Ordinal)].Trim(),
+                v => v[(v.IndexOf("=", StringComparison.Ordinal) + 1)..].Trim().TrimEnd(';'));
+        }
+
+        #endregion
+
     }
 }
