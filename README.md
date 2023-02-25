@@ -147,7 +147,7 @@ dotnet Ray.BiliBiliTool.Console.dll --runTasks=Daily&LiveLottery
 
 | 任务名 | Code | 功能 | 推荐运行频率 | 备注 |
 | :----: | :----: | :----: | :----: | :----: |
-| 扫码登录 | Login | 试用bili app扫码登录，用于第一次运行时初始化cookie，或cookie过期时的更新。不同平台会将cookie存储到不同地方，青龙存储到环境变量中，其他会存储到cookies。json中 | 手动 | |
+| 扫码登录 | Login | 试用bili app扫码登录，用于第一次运行时初始化cookie，或cookie过期时的更新。不同平台会将cookie存储到不同地方，青龙存储到环境变量中，其他会存储到cookies.json中 | 手动 | |
 | 每日任务 | Daily | 完成每日任务获取满额65点经验（登录、观看视频、分享视频、投币），以及签到、领福利和充电等附属功能 | 每天一次 | |
 | 天选时刻抽奖 | LiveLottery | 直播中心天选时刻抽奖 | 建议每天运行0-4次 | 对应Actions工作流默认是关闭的，需要添加key为`ISOPENLIVELOTTERYTASK`、值为`true`的secret来手动开启；大部分抽奖都需要关注主播，介意的不要开启 |
 | 批量取关 | UnfollowBatched | 批量取关指定分组下的所有关注（主要用于清理天选抽奖而产生的关注） | 需要时手动运行 | 需要通过配置指定2个参数：`GroupName`（分组名称，如`天选时刻`）和`Count`（目标取关个数，-1表示全部），应用会倒序从后往前取关指定个数 |
