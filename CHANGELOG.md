@@ -102,3 +102,5 @@
 - Featur: Replace AOP from MethodBoundaryAspect.Fody to Rougamo.Fody, to fix async exception
 - Merge PR #448 : Fix typo
 - Fix #446 : Change id type from int to long
+## 1.0.1
+- Fix #463 : do not trust user's ck config
