@@ -10,107 +10,103 @@ echo ' |  _ < (_| | |_| | | |_) | | | | | | (_) | (_) | | '
 echo ' |_| \_\__,_|\__, | |____/|_|_|_| |_|\___/ \___/|_| '
 echo '             |___/                                  '
 
-# ------------vars-----------、
-
+# ------------vars-----------
+repoDir=$(dirname $PWD)
+consoleDir=$repoDir/src/Ray.BiliBiliTool.Console
+publishDir=$consoleDir/bin/Publish
+version=""
 # --------------------------
 
-# read params from init cmd
+get_version() {
+    version=$(grep -oP '(?<=<Version>).*?(?=<\/Version>)' $repoDir/common.props)
+    echo -e "current version: $version \n"
+}
 
+publish_dotnet_dependent() {
+    echo "---------start publishing dotnet dependent release---------"
+    cd $consoleDir
 
-read_var_from_user() {
-    eval $invocation
+    echo "dotnet publish..."
+    dotnet publish --configuration Release --self-contained false -o $publishDir/dotnet-dependent
+    echo "dotnet Ray.BiliBiliTool.Console.dll" >$publishDir/dotnet-dependent/start.bat
 
-    # host
-    if [ -z "$host" ]; then
-        read -p "请输入域名(如demo.test.tk):" host
-    else
-        say "域名: $host"
-    fi
+    echo "zip files..."
+    cd $publishDir
+    zip -q -r bilibili-tool-pro-v$version-dotnet-dependent.zip ./dotnet-dependent/*
+    ls -l
+    echo -e "---------publish successfully---------\n"
+}
 
-    # cert
-    if [ -z "$certMode" ]; then
-        read -p "请输入证书模式(1.Caddy自动颁发；2.使用现有证书。默认1):" certMode
-        if [ -z "$certMode" ]; then
-            certMode="1"
-        fi
-    fi
+publish_win() {
+    echo "---------start publishing win release---------"
+    cd $consoleDir
 
-    if [ "$certMode" == "1" ]; then
-        # say "certMode: $certMode（由Caddy自动颁发）"
-        say_warning "自动颁发证书需要开放80端口给Caddy使用，请确保80端口开放且未被占用"
-        httpPort="80"
-        # email
-        if [ -z "$mail" ]; then
-            read -p "请输入邮箱(如test@qq.com):" mail
-        else
-            say "邮箱: $mail"
-        fi
-    else
-        # say "certMode: 2（使用现有证书）"
-        autoHttps="auto_https disable_certs"
-        if [ -z "$certKeyFile" ]; then
-            read -p "请输入证书key文件路径:" certKeyFile
-        else
-            say "证书key: $certKeyFile"
-        fi
+    echo "dotnet publish..."
+    dotnet publish --configuration Release --runtime win-x86 --self-contained true -p:PublishTrimmed=true -o $publishDir/win-x86-x64
 
-        if [ -z "$certFile" ]; then
-            read -p "请输入证书文件路径:" certFile
-        else
-            say "证书文件: $certFile"
-        fi
-    fi
+    echo "zip files..."
+    cd $publishDir
+    zip -q -r bilibili-tool-pro-v$version-win-x86-x64.zip ./win-x86-x64/*
+    echo -e "---------publish successfully---------\n"
+}
 
-    # port
-    if [ -z "$httpPort" ]; then
-        if [ $certMode == "2" ]; then
-            say "使用现有证书模式允许使用非80的http端口"
-            read -p "请输入Caddy的http端口(如8080, 默认80):" httpPort
-            if [ -z "$httpPort" ]; then
-                httpPort="80"
-            fi
-        else
-            httpPort="80"
-            say "Http端口: $httpPort"
-        fi
-    else
-        say "httpPort: $httpPort"
-    fi
+publish_linux_arm() {
+    echo "---------start publishing linux arm release---------"
+    cd $consoleDir
+    
+    echo "dotnet publish..."
+    dotnet publish --configuration Release --runtime linux-arm --self-contained true -p:PublishTrimmed=true -o $publishDir/linux-arm
 
-    if [ -z "$httpsPort" ]; then
-        read -p "请输入https端口(如8043, 默认443):" httpsPort
-        if [ -z "$httpsPort" ]; then
-            httpsPort="443"
-        fi
-    else
-        say "Https端口: $httpsPort"
-    fi
+    echo "zip files..."
+    cd $publishDir
+    zip -q -r bilibili-tool-pro-v$version-linux-arm.zip ./linux-arm/*
+    echo -e "---------publish successfully---------\n"
+}
 
-    if [ -z "$user" ]; then
-        read -p "请输入节点用户名(如zhangsan):" user
-    else
-        say "节点用户名: $user"
-    fi
+publish_linux_x64() {
+    echo "---------start publishing linux x64 release---------"
+    cd $consoleDir
 
-    if [ -z "$pwd" ]; then
-        read -p "请输入节点密码(如1qaz@wsx):" pwd
-    else
-        say "节点密码: $pwd"
-    fi
+    echo "dotnet publish..."
+    dotnet publish --configuration Release --runtime linux-x64 --self-contained true -p:PublishTrimmed=true -o $publishDir/linux-x64
 
-    if [ -z "$fakeHost" ]; then
-        read -p "请输入伪装站点地址(默认$fakeHostDefault):" fakeHost
-        if [ -z "$fakeHost" ]; then
-            fakeHost=$fakeHostDefault
-        fi
-    else
-        say "伪装站点地址: $fakeHost"
-    fi
+    echo "zip files..."
+    cd $publishDir
+    zip -q -r bilibili-tool-pro-v$version-linux-x64.zip ./linux-x64/*
+    echo -e "---------publish successfully---------\n"
+}
+
+publish_osx_x64() {
+    echo "---------start publishing osx x64 release---------"
+    cd $consoleDir
+
+    echo "dotnet publish..."
+    dotnet publish --configuration Release --runtime osx-x64 --self-contained true -p:PublishTrimmed=true -o $publishDir/osx-x64
+
+    echo "zip files..."
+    cd $publishDir
+    zip -q -r bilibili-tool-pro-v$version-osx-x64.zip ./osx-x64/*
+    echo -e "---------publish successfully---------\n"
+}
+
+publish_tencentScf() {
+    echo "---------start publishing linux x64 release---------"
+    cd $publishDir
+    cp -r $repoDir/tencentScf/bootstrap $repoDir/tencentScf/index.sh ./linux-x64/
+    cd ./linux-x64
+    chmod 755 index.sh bootstrap
+    zip -q -r ../bilibili-tool-pro-v$version-tencent-scf.zip ./*
+    echo -e "---------publish successfully---------\n"
 }
 
 main() {
-    dotnet publish --configuration Release --self-contained false -o ./bin/Publish/net5-dependent
-    echo "dotnet Ray.BiliBiliTool.Console.dll" > ./bin/Publish/net5-dependent/start.bat
+    get_version
+    publish_dotnet_dependent
+    publish_win
+    publish_linux_arm
+    publish_linux_x64
+    publish_osx_x64
+    publish_tencentScf
 }
 
 main
