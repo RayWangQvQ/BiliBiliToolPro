@@ -12,7 +12,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live
     public class EnterRoomRequest
     {
         public EnterRoomRequest(
-            int roomId,
+            long roomId,
             int parentId,
             int areaID,
             int seqNumber, // 心跳包编号

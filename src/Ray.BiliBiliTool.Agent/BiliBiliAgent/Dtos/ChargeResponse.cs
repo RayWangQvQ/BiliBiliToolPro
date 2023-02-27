@@ -21,6 +21,6 @@
 
         public int Status { get; set; }
 
-        public int Up_mid { get; set; }
+        public long Up_mid { get; set; }
     }
 }

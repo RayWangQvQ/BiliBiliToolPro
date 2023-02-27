@@ -1,6 +1,6 @@
 ::https://docs.microsoft.com/zh-cn/dotnet/core/tools/dotnet-publish
-
-cd ./src/Ray.BiliBiliTool.Console
+::关闭回显
+@echo off
 
 dotnet publish --configuration Release --self-contained false -o ./bin/Publish/net5-dependent
 echo "dotnet Ray.BiliBiliTool.Console.dll" > ./bin/Publish/net5-dependent/start.bat

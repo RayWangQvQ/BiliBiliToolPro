@@ -2,7 +2,7 @@
 {
     public class GetSpaceInfoResponse
     {
-        public int Mid { get; set; }
+        public long Mid { get; set; }
 
         public string Name { get; set; }
 
@@ -13,6 +13,6 @@
     {
         public string Title { get; set; }
 
-        public int Roomid { get; set; }
+        public long Roomid { get; set; }
     }
 }

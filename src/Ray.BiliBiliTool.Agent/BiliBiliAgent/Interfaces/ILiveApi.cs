@@ -89,7 +89,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         [Header("Referer", "https://live.bilibili.com/")]
         [Header("Origin", "https://live.bilibili.com")]
         [HttpGet("/xlive/lottery-interface/v1/Anchor/Check?roomid={roomId}")]
-        Task<BiliApiResponse<CheckTianXuanDto>> CheckTianXuan(int roomId);
+        Task<BiliApiResponse<CheckTianXuanDto>> CheckTianXuan(long roomId);
 
         /// <summary>
         /// 参加天选时刻抽奖
@@ -133,7 +133,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         /// <param name="roomId">roomId</param>
         /// <returns></returns>
         [HttpGet("/room/v1/Room/get_info?room_id={roomId}&from=room")]
-        Task<BiliApiResponse<GetLiveRoomInfoResponse>> GetLiveRoomInfo(int roomId);
+        Task<BiliApiResponse<GetLiveRoomInfoResponse>> GetLiveRoomInfo(long roomId);
 
         /// <summary>
         /// 请求直播主页用于配置直播相关 Cookie

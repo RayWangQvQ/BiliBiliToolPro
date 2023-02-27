@@ -1,5 +1,5 @@
 @echo off
-
+cd ..
 REM start to clean
 echo Start to clean all bin and obj folder under Noodle repo
 @echo on

@@ -8,13 +8,13 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live
 {
     public class LikeLiveRoomRequest
     {
-        public LikeLiveRoomRequest(int roomid, string csrf)
+        public LikeLiveRoomRequest(long roomid, string csrf)
         {
             Roomid = roomid;
             Csrf= csrf;
         }
 
-        public int Roomid { get; set; }
+        public long Roomid { get; set; }
 
         public string Csrf { get; set; }
 

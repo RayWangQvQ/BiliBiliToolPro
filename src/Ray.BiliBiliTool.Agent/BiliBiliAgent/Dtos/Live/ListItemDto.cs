@@ -26,7 +26,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live
 
     public class ListItemDto
     {
-        public int Roomid { get; set; }
+        public long Roomid { get; set; }
 
         public long Uid { get; set; }
 
