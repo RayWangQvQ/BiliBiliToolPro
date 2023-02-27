@@ -113,7 +113,7 @@ namespace Ray.BiliBiliTool.DomainService
 
             //根据分组名称获取tag
             TagDto tag = await GetTag(_unfollowBatchedTaskOptions.GroupName);
-            int? tagId = tag?.Tagid;
+            var tagId = tag?.Tagid;
             int total = tag?.Count ?? 0;
 
             if (!tagId.HasValue)

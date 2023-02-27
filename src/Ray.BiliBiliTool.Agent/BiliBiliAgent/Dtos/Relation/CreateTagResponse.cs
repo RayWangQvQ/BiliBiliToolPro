@@ -8,6 +8,6 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Relation
 {
     public class CreateTagResponse
     {
-        public int Tagid { get; set; }
+        public long Tagid { get; set; }
     }
 }

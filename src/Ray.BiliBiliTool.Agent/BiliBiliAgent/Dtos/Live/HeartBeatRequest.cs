@@ -9,8 +9,8 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live
     {
         public HeartBeatRequest(
             long roomId,
-            int parentId,
-            int areaID,
+            long parentId,
+            long areaID,
             int seqNumber, // 心跳包编号
             string buvid, // cookie['LIVE_BUVID']
             long timestamp,

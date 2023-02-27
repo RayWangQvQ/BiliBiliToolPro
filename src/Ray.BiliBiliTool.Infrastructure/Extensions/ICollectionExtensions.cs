@@ -19,8 +19,7 @@ namespace System.Collections.Generic
         {
             if (source == null) return;
 
-            if (source.FirstOrDefault(exist) == null)
-                source.Add(add);
+            if (!source.Any(exist)) source.Add(add);
         }
     }
 }

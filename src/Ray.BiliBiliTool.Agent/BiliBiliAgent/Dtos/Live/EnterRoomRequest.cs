@@ -13,13 +13,13 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live
     {
         public EnterRoomRequest(
             long roomId,
-            int parentId,
-            int areaID,
+            long parentId,
+            long areaID,
             int seqNumber, // 心跳包编号
             long timestamp,
             string userAgent,
             string csrf,
-            int ruid,
+            long ruid,
             string device)
         {
             Id = JsonConvert.SerializeObject(new[] { parentId, areaID, seqNumber, roomId });
@@ -35,7 +35,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live
         }
         public string Id { get; set; }
 
-        public int Ruid { get; set; }
+        public long Ruid { get; set; }
 
         public long Ts { get; set; }
 
