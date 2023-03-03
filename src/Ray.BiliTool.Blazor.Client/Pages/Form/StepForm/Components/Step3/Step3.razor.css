@@ -1,0 +1,65 @@
+/* stylelint-disable at-rule-empty-line-before,at-rule-name-space-after,at-rule-no-unknown */
+/* stylelint-disable no-duplicate-selectors */
+/* stylelint-disable */
+/* stylelint-disable declaration-bang-space-before,no-duplicate-selectors,string-no-newline */
+.stepForm {
+  max-width: 500px;
+  margin: 40px auto 0;
+}
+.stepFormText {
+  margin-bottom: 24px;
+}
+.stepFormText :global .ant-form-item-label,
+.stepFormText :global .ant-form-item-control {
+  line-height: 22px;
+}
+.result {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 24px 0 8px;
+}
+.desc {
+  padding: 0 56px;
+  color: rgba(0, 0, 0, 0.45);
+}
+.desc h3 {
+  margin: 0 0 12px 0;
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 16px;
+  line-height: 32px;
+}
+.desc h4 {
+  margin: 0 0 4px 0;
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 14px;
+  line-height: 22px;
+}
+.desc p {
+  margin-top: 0;
+  margin-bottom: 12px;
+  line-height: 22px;
+}
+@media screen and (max-width: 768px) {
+  .desc {
+    padding: 0;
+  }
+}
+.information {
+  line-height: 22px;
+}
+.information :global .ant-row:not(:last-child) {
+  margin-bottom: 24px;
+}
+.information .label {
+  padding-right: 8px;
+  color: rgba(0, 0, 0, 0.85);
+  text-align: right;
+}
+@media screen and (max-width: 576px) {
+  .information .label {
+    text-align: left;
+  }
+}
+.uppercase {
+  font-size: 12px;
+}

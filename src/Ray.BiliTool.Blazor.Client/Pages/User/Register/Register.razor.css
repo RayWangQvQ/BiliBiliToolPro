@@ -1,0 +1,46 @@
+/* stylelint-disable at-rule-empty-line-before,at-rule-name-space-after,at-rule-no-unknown */
+/* stylelint-disable no-duplicate-selectors */
+/* stylelint-disable */
+/* stylelint-disable declaration-bang-space-before,no-duplicate-selectors,string-no-newline */
+.main__b__1 {
+  width: 368px;
+  margin: 0 auto;
+}
+.main__b__1 h3 {
+  margin-bottom: 20px;
+  font-size: 16px;
+}
+.main__b__1 .password {
+  margin-bottom: 24px;
+}
+.main__b__1 .password :global .ant-form-item-explain {
+  display: none;
+}
+.main__b__1 .getCaptcha {
+  display: block;
+  width: 100%;
+}
+.main__b__1 .submit {
+  width: 50%;
+}
+.main__b__1 .login {
+  float: right;
+  line-height: 40px;
+}
+.success,
+.warning,
+.error {
+  transition: color 0.3s;
+}
+.success {
+  color: #52c41a;
+}
+.warning {
+  color: #faad14;
+}
+.error {
+  color: #ff4d4f;
+}
+.progress-pass > .progress :global .ant-progress-bg {
+  background-color: #faad14;
+}

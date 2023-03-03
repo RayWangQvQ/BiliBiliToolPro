@@ -1,0 +1,54 @@
+/* stylelint-disable at-rule-empty-line-before,at-rule-name-space-after,at-rule-no-unknown */
+/* stylelint-disable no-duplicate-selectors */
+/* stylelint-disable */
+/* stylelint-disable declaration-bang-space-before,no-duplicate-selectors,string-no-newline */
+.baseView {
+  display: flex;
+  padding-top: 12px;
+}
+.baseView :global .ant-legacy-form-item .ant-legacy-form-item-control-wrapper {
+  width: 100%;
+}
+.baseView .left {
+  min-width: 224px;
+  max-width: 448px;
+}
+.baseView .right__b__1 {
+  flex: 1;
+  padding-left: 104px;
+}
+.baseView .right__b__1 .avatar_title {
+  height: 22px;
+  margin-bottom: 8px;
+  color: rgba(0, 0, 0, 0.85);
+  font-size: 14px;
+  line-height: 22px;
+}
+.baseView .right__b__1 .avatar {
+  width: 144px;
+  height: 144px;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+.baseView .right__b__1 .avatar img {
+  width: 100%;
+}
+.baseView .right__b__1 .button_view {
+  width: 144px;
+  text-align: center;
+}
+@media screen and (max-width: 1200px) {
+  .baseView {
+    flex-direction: column-reverse;
+  }
+  .baseView .right__b__1 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 448px;
+    padding: 20px;
+  }
+  .baseView .right__b__1 .avatar_title {
+    display: none;
+  }
+}

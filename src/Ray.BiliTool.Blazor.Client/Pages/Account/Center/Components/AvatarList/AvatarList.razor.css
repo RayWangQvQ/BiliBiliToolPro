@@ -1,0 +1,43 @@
+/* stylelint-disable at-rule-empty-line-before,at-rule-name-space-after,at-rule-no-unknown */
+/* stylelint-disable no-duplicate-selectors */
+/* stylelint-disable */
+/* stylelint-disable declaration-bang-space-before,no-duplicate-selectors,string-no-newline */
+.avatarList {
+  display: inline-block;
+}
+.avatarList ul {
+  display: inline-block;
+  margin-left: 8px;
+  font-size: 0;
+}
+.avatarItem {
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  margin-left: -8px;
+  font-size: 14px;
+}
+.avatarItem :global .ant-avatar {
+  border: 1px solid #d9d9d9;
+}
+.avatarItemLarge {
+  width: 40px;
+  height: 40px;
+}
+.avatarItemSmall {
+  width: 24px;
+  height: 24px;
+}
+.avatarItemMini {
+  width: 20px;
+  height: 20px;
+}
+.avatarItemMini :global .ant-avatar {
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+}
+.avatarItemMini :global .ant-avatar .ant-avatar-string {
+  font-size: 12px;
+  line-height: 18px;
+}

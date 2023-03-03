@@ -1,0 +1,49 @@
+/* stylelint-disable at-rule-empty-line-before,at-rule-name-space-after,at-rule-no-unknown */
+/* stylelint-disable no-duplicate-selectors */
+/* stylelint-disable */
+/* stylelint-disable declaration-bang-space-before,no-duplicate-selectors,string-no-newline */
+.filterCardList {
+  margin-bottom: -24px;
+}
+.filterCardList :global .ant-card-meta-content {
+  margin-top: 0;
+}
+.filterCardList :global .ant-card-meta-avatar {
+  font-size: 0;
+}
+.filterCardList :global .ant-list .ant-list-item-content-single {
+  max-width: 100%;
+}
+.filterCardList .cardInfo {
+  margin-top: 16px;
+  margin-left: 40px;
+  zoom: 1;
+}
+.filterCardList .cardInfo::before,
+.filterCardList .cardInfo::after {
+  display: table;
+  content: ' ';
+}
+.filterCardList .cardInfo::after {
+  clear: both;
+  height: 0;
+  font-size: 0;
+  visibility: hidden;
+}
+.filterCardList .cardInfo > div {
+  position: relative;
+  float: left;
+  width: 50%;
+  text-align: left;
+}
+.filterCardList .cardInfo > div p {
+  margin: 0;
+  font-size: 24px;
+  line-height: 32px;
+}
+.filterCardList .cardInfo > div p:first-child {
+  margin-bottom: 4px;
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 12px;
+  line-height: 20px;
+}

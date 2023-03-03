@@ -1,0 +1,93 @@
+/* stylelint-disable at-rule-empty-line-before,at-rule-name-space-after,at-rule-no-unknown */
+/* stylelint-disable no-duplicate-selectors */
+/* stylelint-disable */
+/* stylelint-disable declaration-bang-space-before,no-duplicate-selectors,string-no-newline */
+.pie {
+  position: relative;
+}
+.pie .chart {
+  position: relative;
+}
+.pie.hasLegend .chart {
+  width: calc(100% - 240px);
+}
+.pie .legend {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  min-width: 200px;
+  margin: 0 20px;
+  padding: 0;
+  list-style: none;
+  transform: translateY(-50%);
+}
+.pie .legend li {
+  height: 22px;
+  margin-bottom: 16px;
+  line-height: 22px;
+  cursor: pointer;
+}
+.pie .legend li:last-child {
+  margin-bottom: 0;
+}
+.pie .dot {
+  position: relative;
+  top: -1px;
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 8px;
+  border-radius: 8px;
+}
+.pie .line {
+  display: inline-block;
+  width: 1px;
+  height: 16px;
+  margin-right: 8px;
+  background-color: #f0f0f0;
+}
+.pie .legendTitle {
+  color: rgba(0, 0, 0, 0.85);
+}
+.pie .percent {
+  color: rgba(0, 0, 0, 0.45);
+}
+.pie .value {
+  position: absolute;
+  right: 0;
+}
+.pie .title {
+  margin-bottom: 8px;
+}
+.pie .total {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  max-height: 62px;
+  text-align: center;
+  transform: translate(-50%, -50%);
+}
+.pie .total > h4 {
+  height: 22px;
+  margin-bottom: 8px;
+  color: rgba(0, 0, 0, 0.45);
+  font-weight: normal;
+  font-size: 14px;
+  line-height: 22px;
+}
+.pie .total > p {
+  display: block;
+  height: 32px;
+  color: rgba(0, 0, 0, 0.85);
+  font-size: 1.2em;
+  line-height: 32px;
+  white-space: nowrap;
+}
+.legendBlock.hasLegend .chart {
+  width: 100%;
+  margin: 0 0 32px 0;
+}
+.legendBlock .legend {
+  position: relative;
+  transform: none;
+}

@@ -1,0 +1,224 @@
+/* stylelint-disable at-rule-empty-line-before,at-rule-name-space-after,at-rule-no-unknown */
+/* stylelint-disable no-duplicate-selectors */
+/* stylelint-disable */
+/* stylelint-disable declaration-bang-space-before,no-duplicate-selectors,string-no-newline */
+.activitiesList {
+  padding: 0 24px 8px 24px;
+}
+.activitiesList .username {
+  color: rgba(0, 0, 0, 0.85);
+}
+.activitiesList .event {
+  font-weight: normal;
+}
+.pageHeaderContent__b__0 {
+  display: flex;
+}
+.pageHeaderContent__b__0 .avatar {
+  flex: 0 1 72px;
+}
+.pageHeaderContent__b__0 .avatar > span {
+  display: block;
+  width: 72px;
+  height: 72px;
+  border-radius: 72px;
+}
+.pageHeaderContent__b__0 .content {
+  position: relative;
+  top: 4px;
+  flex: 1 1 auto;
+  margin-left: 24px;
+  color: rgba(0, 0, 0, 0.45);
+  line-height: 22px;
+}
+.pageHeaderContent__b__0 .content .contentTitle {
+  margin-bottom: 12px;
+  color: rgba(0, 0, 0, 0.85);
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 28px;
+}
+.extraContent {
+  zoom: 1;
+  float: right;
+  white-space: nowrap;
+}
+.extraContent::before,
+.extraContent::after {
+  display: table;
+  content: ' ';
+}
+.extraContent::after {
+  clear: both;
+  height: 0;
+  font-size: 0;
+  visibility: hidden;
+}
+.extraContent .statItem {
+  position: relative;
+  display: inline-block;
+  padding: 0 32px;
+}
+.extraContent .statItem > p:first-child {
+  margin-bottom: 4px;
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 14px;
+  line-height: 22px;
+}
+.extraContent .statItem > p {
+  margin: 0;
+  color: rgba(0, 0, 0, 0.85);
+  font-size: 30px;
+  line-height: 38px;
+}
+.extraContent .statItem > p > span {
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 20px;
+}
+.extraContent .statItem::after {
+  position: absolute;
+  top: 8px;
+  right: 0;
+  width: 1px;
+  height: 40px;
+  background-color: #f0f0f0;
+  content: '';
+}
+.extraContent .statItem:last-child {
+  padding-right: 0;
+}
+.extraContent .statItem:last-child::after {
+  display: none;
+}
+.members a {
+  display: block;
+  height: 24px;
+  margin: 12px 0;
+  color: rgba(0, 0, 0, 0.85);
+  transition: all 0.3s;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  word-break: break-all;
+}
+.members a .member {
+  margin-left: 12px;
+  font-size: 14px;
+  line-height: 24px;
+  vertical-align: top;
+}
+.members a:hover {
+  color: #1890ff;
+}
+.projectList .ant-card-meta-description {
+  height: 44px;
+  overflow: hidden;
+  color: rgba(0, 0, 0, 0.45);
+  line-height: 22px;
+}
+.projectList .cardTitle {
+  font-size: 0;
+}
+.projectList .cardTitle a {
+  display: inline-block;
+  height: 24px;
+  margin-left: 12px;
+  color: rgba(0, 0, 0, 0.85);
+  font-size: 14px;
+  line-height: 24px;
+  vertical-align: top;
+}
+.projectList .cardTitle a:hover {
+  color: #1890ff;
+}
+.projectList .projectGrid {
+  width: 33.33%;
+}
+.projectList .projectItemContent {
+  display: flex;
+  height: 20px;
+  margin-top: 8px;
+  font-size: 12px;
+  line-height: 20px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  word-break: break-all;
+}
+.projectList .projectItemContent a {
+  display: inline-block;
+  flex: 1 1 0;
+  color: rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  word-break: break-all;
+}
+.projectList .projectItemContent a:hover {
+  color: #1890ff;
+}
+.projectList .projectItemContent .datetime {
+  flex: 0 0 auto;
+  float: right;
+  color: rgba(0, 0, 0, 0.25);
+}
+.datetime {
+  color: rgba(0, 0, 0, 0.25);
+}
+@media screen and (max-width: 1200px) and (min-width: 992px) {
+  .activeCard {
+    margin-bottom: 24px;
+  }
+  .members {
+    margin-bottom: 0;
+  }
+  .extraContent {
+    margin-left: -44px;
+  }
+  .extraContent .statItem {
+    padding: 0 16px;
+  }
+}
+@media screen and (max-width: 992px) {
+  .activeCard {
+    margin-bottom: 24px;
+  }
+  .members {
+    margin-bottom: 0;
+  }
+  .extraContent {
+    float: none;
+    margin-right: 0;
+  }
+  .extraContent .statItem {
+    padding: 0 16px;
+    text-align: left;
+  }
+  .extraContent .statItem::after {
+    display: none;
+  }
+}
+@media screen and (max-width: 768px) {
+  .extraContent {
+    margin-left: -16px;
+  }
+  .projectList .projectGrid {
+    width: 50%;
+  }
+}
+@media screen and (max-width: 576px) {
+  .pageHeaderContent {
+    display: block;
+  }
+  .pageHeaderContent .content {
+    margin-left: 0;
+  }
+  .extraContent .statItem {
+    float: none;
+  }
+}
+@media screen and (max-width: 480px) {
+  .projectList .projectGrid {
+    width: 100%;
+  }
+}

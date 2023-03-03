@@ -1,0 +1,152 @@
+/* stylelint-disable at-rule-empty-line-before,at-rule-name-space-after,at-rule-no-unknown */
+/* stylelint-disable no-duplicate-selectors */
+/* stylelint-disable */
+/* stylelint-disable declaration-bang-space-before,no-duplicate-selectors,string-no-newline */
+.standardList .ant-card-head {
+  border-bottom: none;
+}
+.standardList .ant-card-head-title {
+  padding: 24px 0;
+  line-height: 32px;
+}
+.standardList .ant-card-extra {
+  padding: 24px 0;
+}
+.standardList .ant-list-pagination {
+  margin-top: 24px;
+  text-align: right;
+}
+.standardList .ant-avatar-lg {
+  width: 48px;
+  height: 48px;
+  line-height: 48px;
+}
+.standardList .headerInfo {
+  position: relative;
+  text-align: center;
+}
+.standardList .headerInfo > span {
+  display: inline-block;
+  margin-bottom: 4px;
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 14px;
+  line-height: 22px;
+}
+.standardList .headerInfo > p {
+  margin: 0;
+  color: rgba(0, 0, 0, 0.85);
+  font-size: 24px;
+  line-height: 32px;
+}
+.standardList .headerInfo > em {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 1px;
+  height: 56px;
+  background-color: #f0f0f0;
+}
+.standardList .listContent {
+  font-size: 0;
+}
+.standardList .listContent .listContentItem {
+  display: inline-block;
+  margin-left: 40px;
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 14px;
+  vertical-align: middle;
+}
+.standardList .listContent .listContentItem > span {
+  line-height: 20px;
+}
+.standardList .listContent .listContentItem > p {
+  margin-top: 4px;
+  margin-bottom: 0;
+  line-height: 22px;
+}
+.standardList .extraContentSearch {
+  width: 272px;
+  margin-left: 16px;
+}
+@media screen and (max-width: 480px) {
+  .standardList .ant-list-item-content {
+    display: block;
+    flex: none;
+    width: 100%;
+  }
+  .standardList .ant-list-item-action {
+    margin-left: 0;
+  }
+  .standardList .listContent {
+    margin-left: 0;
+  }
+  .standardList .listContent > div {
+    margin-left: 0;
+  }
+  .standardList .listCard .ant-card-head-title {
+    overflow: visible;
+  }
+}
+@media screen and (max-width: 576px) {
+  .standardList .extraContentSearch {
+    width: 100%;
+    margin-left: 0;
+  }
+  .standardList .headerInfo {
+    margin-bottom: 16px;
+  }
+  .standardList .headerInfo > em {
+    display: none;
+  }
+}
+@media screen and (max-width: 768px) {
+  .standardList .listContent > div {
+    display: block;
+  }
+  .standardList .listContent > div:last-child {
+    top: 0;
+    width: 100%;
+  }
+  .listCard .ant-radio-group {
+    display: block;
+    margin-bottom: 8px;
+  }
+}
+@media screen and (max-width: 992px) and (min-width: 768px) {
+  .standardList .listContent > div {
+    display: block;
+  }
+  .standardList .listContent > div:last-child {
+    top: 0;
+    width: 100%;
+  }
+}
+@media screen and (max-width: 1200px) {
+  .standardList .listContent > div {
+    margin-left: 24px;
+  }
+  .standardList .listContent > div:last-child {
+    top: 0;
+  }
+}
+@media screen and (max-width: 1400px) {
+  .standardList .listContent {
+    text-align: right;
+  }
+  .standardList .listContent > div:last-child {
+    top: 0;
+  }
+}
+.standardListForm .ant-form-item {
+  margin-bottom: 12px;
+}
+.standardListForm .ant-form-item:last-child {
+  margin-bottom: 32px;
+  padding-top: 4px;
+}
+.formResult {
+  width: 100%;
+}
+.formResult [class^='title'] {
+  margin-bottom: 8px;
+}
