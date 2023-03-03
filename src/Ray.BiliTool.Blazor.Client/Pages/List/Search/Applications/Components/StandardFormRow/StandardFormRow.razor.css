@@ -1,0 +1,71 @@
+/* stylelint-disable at-rule-empty-line-before,at-rule-name-space-after,at-rule-no-unknown */
+/* stylelint-disable no-duplicate-selectors */
+/* stylelint-disable */
+/* stylelint-disable declaration-bang-space-before,no-duplicate-selectors,string-no-newline */
+.standardFormRow {
+  display: flex;
+  width: 100%;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px dashed #f0f0f0;
+}
+.standardFormRow .ant-form-item,
+.standardFormRow .ant-legacy-form-item {
+  margin-right: 24px;
+}
+.standardFormRow .ant-form-item-label label,
+.standardFormRow .ant-legacy-form-item-label label {
+  margin-right: 0;
+  color: rgba(0, 0, 0, 0.85);
+}
+.standardFormRow .ant-form-item-label,
+.standardFormRow .ant-legacy-form-item-label,
+.standardFormRow .ant-form-item-control,
+.standardFormRow .ant-legacy-form-item-control {
+  padding: 0;
+  line-height: 32px;
+}
+.standardFormRow .label {
+  flex: 0 0 auto;
+  margin-right: 24px;
+  color: rgba(0, 0, 0, 0.85);
+  font-size: 14px;
+  text-align: right;
+}
+.standardFormRow .label > span {
+  display: inline-block;
+  height: 32px;
+  line-height: 32px;
+}
+.standardFormRow .label > span::after {
+  content: '：';
+}
+.standardFormRow .content {
+  flex: 1 1 0;
+}
+.standardFormRow .content :global .ant-form-item:last-child,
+.standardFormRow .content :global .ant-legacy-form-item:last-child {
+  display: block;
+  margin-right: 0;
+}
+.standardFormRowLast {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border: none;
+}
+.standardFormRowBlock :global .ant-form-item,
+.standardFormRowBlock :global .ant-legacy-form-item,
+.standardFormRowBlock :global div.ant-form-item-control-wrapper,
+.standardFormRowBlock :global div.ant-legacy-form-item-control-wrapper {
+  display: block;
+}
+.standardFormRowGrid .ant-form-item,
+.standardFormRowGrid .ant-legacy-form-item,
+.standardFormRowGrid div.ant-form-item-control-wrapper,
+.standardFormRowGrid div.ant-legacy-form-item-control-wrapper {
+  display: block;
+}
+.standardFormRowGrid .ant-form-item-label,
+.standardFormRowGrid .ant-legacy-form-item-label {
+  float: left;
+}

@@ -1,0 +1,50 @@
+﻿@namespace Ray.BiliTool.Blazor
+@using OneOf
+@inherits LayoutComponentBase
+
+<div class="container__b__0">
+    <div class="lang">
+        <!--todo: selectLang-->
+    </div>
+    <div class="content">
+        <div class="top">
+            <div class="header">
+                <a>
+                    <img alt="logo" class="logo" src="assets/logo.svg" />
+                    <span class="title">Ant Design</span>
+                </a>
+            </div>
+            <div class="desc">Ant Design Blazor</div>
+        </div>
+        @Body
+    </div>
+    <FooterView Copyright="2021 Ant Design Blazor" Links="Links"></FooterView>
+</div>
+
+@code
+{
+    public LinkItem[] Links { get; set; } =
+    {
+        new LinkItem
+        {
+            Key = "Ant Design Blazor",
+            Title = "Ant Design Blazor",
+            Href = "https://antblazor.com",
+            BlankTarget = true,
+        },
+        new LinkItem
+        {
+            Key = "github",
+            Title = (RenderFragment)(@<Icon Type="github" />),
+            Href = "https://github.com/ant-design-blazor/ant-design-pro-blazor",
+            BlankTarget = true,
+        },
+        new LinkItem
+        {
+            Key = "Blazor",
+            Title = "Blazor",
+            Href = "https://dotnet.microsoft.com/apps/aspnet/web-apps/blazor?WT.mc_id=DT-MVP-5003987",
+            BlankTarget = true,
+        }
+    };
+}

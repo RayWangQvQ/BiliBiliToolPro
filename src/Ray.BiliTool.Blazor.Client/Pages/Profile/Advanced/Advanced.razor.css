@@ -1,0 +1,43 @@
+/* stylelint-disable at-rule-empty-line-before,at-rule-name-space-after,at-rule-no-unknown */
+/* stylelint-disable no-duplicate-selectors */
+/* stylelint-disable */
+/* stylelint-disable declaration-bang-space-before,no-duplicate-selectors,string-no-newline */
+.main__b__3 .ant-descriptions-row > td {
+  padding-bottom: 8px;
+}
+.main__b__3 .ant-page-header-heading-extra {
+  flex-direction: column;
+}
+.headerList {
+  margin-bottom: 4px;
+}
+.headerList .ant-descriptions-row > td {
+  padding-bottom: 8px;
+}
+.headerList .stepDescription {
+  position: relative;
+  left: 38px;
+  padding-top: 8px;
+  font-size: 14px;
+  text-align: left;
+}
+.headerList .stepDescription > div {
+  margin-top: 8px;
+  margin-bottom: 4px;
+}
+.pageHeader .ant-page-header-heading-extra > * + * {
+  margin-left: 8px;
+}
+.pageHeader .moreInfo {
+  display: flex;
+  justify-content: space-between;
+  width: 200px;
+}
+@media screen and (max-width: 576px) {
+  .stepDescription {
+    left: 8px;
+  }
+  .pageHeader .ant-pro-page-header-wrap-row {
+    flex-direction: column;
+  }
+}

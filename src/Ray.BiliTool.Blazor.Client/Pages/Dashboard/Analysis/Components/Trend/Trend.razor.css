@@ -1,0 +1,37 @@
+/* stylelint-disable at-rule-empty-line-before,at-rule-name-space-after,at-rule-no-unknown */
+/* stylelint-disable no-duplicate-selectors */
+/* stylelint-disable */
+/* stylelint-disable declaration-bang-space-before,no-duplicate-selectors,string-no-newline */
+.trendItem {
+  display: inline-block;
+  font-size: 14px;
+  line-height: 22px;
+}
+.trendItem .up,
+.trendItem .down {
+  position: relative;
+  top: 1px;
+  margin-left: 4px;
+}
+.trendItem .up span,
+.trendItem .down span {
+  font-size: 12px;
+  transform: scale(0.83);
+}
+.trendItem .up {
+  color: #f5222d;
+}
+.trendItem .down {
+  top: -1px;
+  color: #52c41a;
+}
+.trendItem.trendItemGrey .up,
+.trendItem.trendItemGrey .down {
+  color: rgba(0, 0, 0, 0.85);
+}
+.trendItem.reverseColor .up {
+  color: #52c41a;
+}
+.trendItem.reverseColor .down {
+  color: #f5222d;
+}

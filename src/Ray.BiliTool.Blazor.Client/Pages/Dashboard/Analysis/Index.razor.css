@@ -1,0 +1,161 @@
+/* stylelint-disable at-rule-empty-line-before,at-rule-name-space-after,at-rule-no-unknown */
+/* stylelint-disable no-duplicate-selectors */
+/* stylelint-disable */
+/* stylelint-disable declaration-bang-space-before,no-duplicate-selectors,string-no-newline */
+.iconGroup span.anticon {
+  margin-left: 16px;
+  color: rgba(0, 0, 0, 0.45);
+  cursor: pointer;
+  transition: color 0.32s;
+}
+.iconGroup span.anticon:hover {
+  color: rgba(0, 0, 0, 0.85);
+}
+.rankingList {
+  margin: 25px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.rankingList li {
+  display: flex;
+  align-items: center;
+  margin-top: 16px;
+  zoom: 1;
+}
+.rankingList li::before,
+.rankingList li::after {
+  display: table;
+  content: ' ';
+}
+.rankingList li::after {
+  clear: both;
+  height: 0;
+  font-size: 0;
+  visibility: hidden;
+}
+.rankingList li span {
+  color: rgba(0, 0, 0, 0.85);
+  font-size: 14px;
+  line-height: 22px;
+}
+.rankingList li .rankingItemNumber {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  margin-top: 1.5px;
+  margin-right: 16px;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 20px;
+  text-align: center;
+  background-color: #fafafa;
+  border-radius: 20px;
+}
+.rankingList li .rankingItemNumber.active {
+  color: #fff;
+  background-color: #314659;
+}
+.rankingList li .rankingItemTitle {
+  flex: 1;
+  margin-right: 8px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.salesExtra {
+  display: inline-block;
+  margin-right: 24px;
+}
+.salesExtra a {
+  margin-left: 24px;
+  color: rgba(0, 0, 0, 0.85);
+}
+.salesExtra a:hover {
+  color: #1890ff;
+}
+.salesExtra a.currentDate {
+  color: #1890ff;
+}
+.salesCard .salesBar {
+  padding: 0 0 32px 32px;
+}
+.salesCard .salesRank {
+  padding: 0 32px 32px 72px;
+}
+.salesCard :global .ant-tabs-bar,
+.salesCard :global .ant-tabs-nav-wrap {
+  padding-left: 16px;
+}
+.salesCard :global .ant-tabs-bar .ant-tabs-nav .ant-tabs-tab,
+.salesCard :global .ant-tabs-nav-wrap .ant-tabs-nav .ant-tabs-tab {
+  padding-top: 16px;
+  padding-bottom: 14px;
+  line-height: 24px;
+}
+.salesCard :global .ant-tabs-extra-content {
+  padding-right: 24px;
+  line-height: 55px;
+}
+.salesCard :global .ant-card-head {
+  position: relative;
+}
+.salesCard :global .ant-card-head-title {
+  align-items: normal;
+}
+.salesCardExtra {
+  height: inherit;
+}
+.salesTypeRadio {
+  position: absolute;
+  right: 54px;
+  bottom: 12px;
+}
+.offlineCard :global .ant-tabs-ink-bar {
+  bottom: auto;
+}
+.offlineCard :global .ant-tabs-bar {
+  border-bottom: none;
+}
+.offlineCard :global .ant-tabs-nav-container-scrolling {
+  padding-right: 40px;
+  padding-left: 40px;
+}
+.offlineCard :global .ant-tabs-tab-prev-icon::before {
+  position: relative;
+  left: 6px;
+}
+.offlineCard :global .ant-tabs-tab-next-icon::before {
+  position: relative;
+  right: 6px;
+}
+.offlineCard :global .ant-tabs-tab-active h4 {
+  color: #1890ff;
+}
+.trendText {
+  margin-left: 8px;
+  color: rgba(0, 0, 0, 0.85);
+}
+@media screen and (max-width: 992px) {
+  .salesExtra {
+    display: none;
+  }
+  .rankingList li span:first-child {
+    margin-right: 8px;
+  }
+}
+@media screen and (max-width: 768px) {
+  .rankingTitle {
+    margin-top: 16px;
+  }
+  .salesCard .salesBar {
+    padding: 16px;
+  }
+}
+@media screen and (max-width: 576px) {
+  .salesExtraWrap {
+    display: none;
+  }
+  .salesCard :global .ant-tabs-content {
+    padding-top: 30px;
+  }
+}

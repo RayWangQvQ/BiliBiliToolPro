@@ -1,0 +1,30 @@
+/* stylelint-disable at-rule-empty-line-before,at-rule-name-space-after,at-rule-no-unknown */
+/* stylelint-disable no-duplicate-selectors */
+/* stylelint-disable */
+/* stylelint-disable declaration-bang-space-before,no-duplicate-selectors,string-no-newline */
+.waterWave {
+  position: relative;
+  display: inline-block;
+  transform-origin: left;
+}
+.waterWave .text {
+  position: absolute;
+  top: 32px;
+  left: 0;
+  width: 100%;
+  text-align: center;
+}
+.waterWave .text span {
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 14px;
+  line-height: 22px;
+}
+.waterWave .text h4 {
+  color: rgba(0, 0, 0, 0.85);
+  font-size: 24px;
+  line-height: 32px;
+}
+.waterWave .waterWaveCanvasWrapper {
+  transform: scale(0.5);
+  transform-origin: 0 0;
+}

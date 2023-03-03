@@ -1,0 +1,16 @@
+/* stylelint-disable at-rule-empty-line-before,at-rule-name-space-after,at-rule-no-unknown */
+/* stylelint-disable no-duplicate-selectors */
+/* stylelint-disable */
+/* stylelint-disable declaration-bang-space-before,no-duplicate-selectors,string-no-newline */
+.title__b__1 {
+  position: relative;
+  color: rgba(0, 0, 0, 0.85);
+  font-size: 12px;
+  text-align: center;
+}
+.head-title {
+  margin-bottom: 20px;
+  color: rgba(0, 0, 0, 0.85);
+  font-weight: 500px;
+  font-size: 16px;
+}

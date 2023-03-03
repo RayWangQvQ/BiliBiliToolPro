@@ -1,0 +1,77 @@
+/* stylelint-disable at-rule-empty-line-before,at-rule-name-space-after,at-rule-no-unknown */
+/* stylelint-disable no-duplicate-selectors */
+/* stylelint-disable */
+/* stylelint-disable declaration-bang-space-before,no-duplicate-selectors,string-no-newline */
+.chartCard {
+  position: relative;
+}
+.chartCard .chartTop {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+.chartCard .chartTopMargin {
+  margin-bottom: 12px;
+}
+.chartCard .chartTopHasMargin {
+  margin-bottom: 20px;
+}
+.chartCard .metaWrap {
+  float: left;
+}
+.chartCard .avatar {
+  position: relative;
+  top: 4px;
+  float: left;
+  margin-right: 20px;
+}
+.chartCard .avatar img {
+  border-radius: 100%;
+}
+.chartCard .meta {
+  height: 22px;
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 14px;
+  line-height: 22px;
+}
+.chartCard .action {
+  position: absolute;
+  top: 4px;
+  right: 0;
+  line-height: 1;
+  cursor: pointer;
+}
+.chartCard .total {
+  height: 38px;
+  margin-top: 4px;
+  margin-bottom: 0;
+  overflow: hidden;
+  color: rgba(0, 0, 0, 0.85);
+  font-size: 30px;
+  line-height: 38px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  word-break: break-all;
+}
+.chartCard .content {
+  position: relative;
+  width: 100%;
+  margin-bottom: 12px;
+}
+.chartCard .contentFixed {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+}
+.chartCard .footer {
+  margin-top: 8px;
+  padding-top: 9px;
+  border-top: 1px solid #f0f0f0;
+}
+.chartCard .footer > * {
+  position: relative;
+}
+.chartCard .footerMargin {
+  margin-top: 20px;
+}

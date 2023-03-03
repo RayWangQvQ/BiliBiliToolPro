@@ -1,0 +1,18 @@
+/* stylelint-disable at-rule-empty-line-before,at-rule-name-space-after,at-rule-no-unknown */
+/* stylelint-disable no-duplicate-selectors */
+/* stylelint-disable */
+/* stylelint-disable declaration-bang-space-before,no-duplicate-selectors,string-no-newline */
+.linkGroup {
+  padding: 20px 0 8px 24px;
+  font-size: 0;
+}
+.linkGroup > a {
+  display: inline-block;
+  width: 25%;
+  margin-bottom: 13px;
+  color: rgba(0, 0, 0, 0.85);
+  font-size: 14px;
+}
+.linkGroup > a:hover {
+  color: #1890ff;
+}

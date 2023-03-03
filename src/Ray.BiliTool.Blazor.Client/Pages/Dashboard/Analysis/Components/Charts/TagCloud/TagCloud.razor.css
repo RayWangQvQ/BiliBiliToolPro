@@ -1,0 +1,6 @@
+.tagCloud {
+  overflow: hidden;
+}
+.tagCloud canvas {
+  transform-origin: 0 0;
+}

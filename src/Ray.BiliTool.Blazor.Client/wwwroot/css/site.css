@@ -1,0 +1,52 @@
+/* stylelint-disable at-rule-empty-line-before,at-rule-name-space-after,at-rule-no-unknown */
+/* stylelint-disable no-duplicate-selectors */
+/* stylelint-disable */
+/* stylelint-disable declaration-bang-space-before,no-duplicate-selectors,string-no-newline */
+html,
+body,
+#root,
+#app,
+app {
+  height: 100%;
+}
+.colorWeak {
+  filter: invert(80%);
+}
+.ant-layout {
+  min-height: 100vh;
+}
+canvas {
+  display: block;
+}
+body {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+ul,
+ol {
+  list-style: none;
+}
+@media (max-width: 480px) {
+  .ant-table {
+    width: 100%;
+    overflow-x: auto;
+  }
+  .ant-table-thead > tr > th,
+  .ant-table-tbody > tr > th,
+  .ant-table-thead > tr > td,
+  .ant-table-tbody > tr > td {
+    white-space: pre;
+  }
+  .ant-table-thead > tr > th > span,
+  .ant-table-tbody > tr > th > span,
+  .ant-table-thead > tr > td > span,
+  .ant-table-tbody > tr > td > span {
+    display: block;
+  }
+}
+@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+  body .ant-design-pro > .ant-layout {
+    min-height: 100vh;
+  }
+}
