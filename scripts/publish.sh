@@ -36,7 +36,6 @@ publish_dotnet_dependent() {
         --self-contained false \
         -p:PublishSingleFile=true \
         -o $outputDir
-    echo "dotnet Ray.BiliBiliTool.Console.dll" >$outputDir/start.bat
 
     echo "clear pdb files"
     rm -rf $outputDir/*.pdb

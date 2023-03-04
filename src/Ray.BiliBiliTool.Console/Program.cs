@@ -20,6 +20,8 @@ namespace Ray.BiliBiliTool.Console
     {
         public static async Task<int> Main(string[] args)
         {
+            PrintLogo();
+
             IHost host = CreateHost(args);
 
             try
@@ -118,6 +120,17 @@ namespace Ray.BiliBiliTool.Console
             });
 
             return hostBuilder;
+        }
+
+        private static void PrintLogo()
+        {
+            System.Console.WriteLine(@"  ____               ____    _   _____           _  ");
+            System.Console.WriteLine(@" |  _ \ __ _ _   _  | __ ) _| |_|_   _|__   ___ | | ");
+            System.Console.WriteLine(@" | |_) / _` | | | | |  _ \(_) (_) | |/ _ \ / _ \| | ");
+            System.Console.WriteLine(@" |  _ < (_| | |_| | | |_) | | | | | | (_) | (_) | | ");
+            System.Console.WriteLine(@" |_| \_\__,_|\__, | |____/|_|_|_| |_|\___/ \___/|_| ");
+            System.Console.WriteLine(@"             |___/                                  ");
+            System.Console.WriteLine();
         }
     }
 }
