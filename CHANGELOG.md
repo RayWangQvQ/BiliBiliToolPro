@@ -106,3 +106,4 @@
 - Fix #463 : do not trust user's ck config
 - Feature #460 : publish single file when release
 - Feature: use new scripts for gh actions's release
+- Feature: let user input when there is no target task in configs
