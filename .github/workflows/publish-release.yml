@@ -35,7 +35,7 @@ jobs:
           pwd && ls
           cd ./scripts
           chmod +x ./publish.sh
-          . publish.sh
+          . publish.sh --runtime all
           
       - name: Get release content
         id: release_content
