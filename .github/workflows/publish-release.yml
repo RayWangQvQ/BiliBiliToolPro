@@ -44,7 +44,9 @@ jobs:
           pwd && ls
           content=$(tac ./CHANGELOG.md | grep -m1 "##" -B 1000 | tac)
           echo "Release content: $content"
-          echo "release_content=$content" >> $GITHUB_OUTPUT
+          echo "release_content<<EOF" >> $GITHUB_OUTPUT
+          echo "$content" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Upload release asset
         id: upload-release-asset 
