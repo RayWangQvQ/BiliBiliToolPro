@@ -55,6 +55,7 @@ jobs:
           files: ${{ github.workspace }}/src/Ray.BiliBiliTool.Console/bin/Publish/*.zip
           token: ${{ secrets.GITHUB_TOKEN }}
           name: BiliBiliToolPro-V${{ github.event.inputs.version }}
+          tag_name: ${{ github.event.inputs.version }}
           body: ${{ steps.release_content.outputs.release_content }}
           discussion_category_name: Announcements
           generate_release_notes: true
