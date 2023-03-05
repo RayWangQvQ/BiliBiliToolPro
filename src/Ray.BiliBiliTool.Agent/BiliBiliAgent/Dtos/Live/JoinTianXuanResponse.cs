@@ -8,15 +8,15 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live
 {
     public class JoinTianXuanResponse
     {
-        public int Discount_id { get; set; }
+        public long Discount_id { get; set; }
 
-        public int Gold { get; set; }
+        public long Gold { get; set; }
 
-        public int Silver { get; set; }
+        public long Silver { get; set; }
 
-        public int Cur_gift_num { get; set; }
+        public long Cur_gift_num { get; set; }
 
-        public int Goods_id { get; set; }
+        public long Goods_id { get; set; }
 
         public string New_order_id { get; set; }
     }

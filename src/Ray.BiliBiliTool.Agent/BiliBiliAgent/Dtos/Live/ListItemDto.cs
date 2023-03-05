@@ -17,7 +17,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live
 
     public class LiveSortTag
     {
-        public int Id { get; set; }
+        public long Id { get; set; }
 
         public string Name { get; set; }
 
@@ -26,7 +26,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live
 
     public class ListItemDto
     {
-        public int Roomid { get; set; }
+        public long Roomid { get; set; }
 
         public long Uid { get; set; }
 
@@ -44,11 +44,11 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live
 
         public string Uname { get; set; }
 
-        public int Parent_id { get; set; }
+        public long Parent_id { get; set; }
 
         public string Parent_name { get; set; }
 
-        public int Area_id { get; set; }
+        public long Area_id { get; set; }
 
         public string Area_name { get; set; }
 
@@ -68,7 +68,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live
         /// <sample>504：天选</sample>
         /// <sample>426：百人成就</sample>
         /// <sample>397：新星主播</sample>
-        public int Pendent_id { get; set; }
+        public long Pendent_id { get; set; }
 
         /// <summary>
         /// 内容

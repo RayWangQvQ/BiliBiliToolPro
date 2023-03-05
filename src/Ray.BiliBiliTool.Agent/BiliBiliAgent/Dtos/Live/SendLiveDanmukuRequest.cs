@@ -8,7 +8,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live
 {
     public class SendLiveDanmukuRequest
     {
-        public SendLiveDanmukuRequest(string csrf, int room_id, string message)
+        public SendLiveDanmukuRequest(string csrf, long room_id, string message)
         {
             this.Csrf = csrf;
             this.Msg= message;
@@ -31,7 +31,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live
 
         public string Rnd { get; set; }
 
-        public int Roomid { get; set; }
+        public long Roomid { get; set; }
 
         public string Csrf { get; set; }
 

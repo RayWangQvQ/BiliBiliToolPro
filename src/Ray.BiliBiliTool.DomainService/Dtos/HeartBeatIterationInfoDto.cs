@@ -10,7 +10,7 @@ namespace Ray.BiliBiliTool.DomainService.Dtos
     public class HeartBeatIterationInfoDto
     {
         public HeartBeatIterationInfoDto(
-            int roomId,
+            long roomId,
             GetLiveRoomInfoResponse roomInfo,
             HeartBeatResponse heartBeatInfo,
             int heartBeatCount,
@@ -23,7 +23,7 @@ namespace Ray.BiliBiliTool.DomainService.Dtos
             LastBeatTime = lastBeatTime;
         }
 
-        public int RoomId { get; set; } = 0;
+        public long RoomId { get; set; } = 0;
 
         public GetLiveRoomInfoResponse RoomInfo { get; set; } = new();
 

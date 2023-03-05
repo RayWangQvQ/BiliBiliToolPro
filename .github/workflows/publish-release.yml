@@ -9,6 +9,10 @@ on:
         description: '版本号'
         required: true
 
+permissions:
+  contents: write
+  discussions: write
+
 jobs:
   build:
     name: publish relesae
@@ -17,108 +21,39 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: ${{ github.event.inputs.version }}
     
       - name: Setup .NET
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v3
         with:
           dotnet-version: 6.0.x
         
       - name: Publish and zip
         run: |
-          cd ./src/Ray.BiliBiliTool.Console
-          dotnet publish --configuration Release --self-contained false -o ./bin/Publish/dotnet-dependent
-          echo "dotnet Ray.BiliBiliTool.Console.dll" > ./bin/Publish/dotnet-dependent/start.bat
-          dotnet publish --configuration Release --runtime win-x86 --self-contained true -p:PublishTrimmed=true -o ./bin/Publish/win-x86-x64
-          dotnet publish --configuration Release --runtime linux-arm --self-contained true -p:PublishTrimmed=true -o ./bin/Publish/linux-arm
-          dotnet publish --configuration Release --runtime linux-x64 --self-contained true -p:PublishTrimmed=true -o ./bin/Publish/linux-x64
-          dotnet publish --configuration Release --runtime osx-x64 --self-contained true -p:PublishTrimmed=true -o ./bin/Publish/osx-x64
-          cd ./bin/Publish
-          zip -q -r bilibili-tool-pro-v${{ github.event.inputs.version }}-dotnet-dependent.zip ./dotnet-dependent/*
-          zip -q -r bilibili-tool-pro-v${{ github.event.inputs.version }}-win-x86-x64.zip ./win-x86-x64/*
-          zip -q -r bilibili-tool-pro-v${{ github.event.inputs.version }}-linux-arm.zip ./linux-arm/*
-          zip -q -r bilibili-tool-pro-v${{ github.event.inputs.version }}-linux-x64.zip ./linux-x64/*
-          zip -q -r bilibili-tool-pro-v${{ github.event.inputs.version }}-osx-x64.zip ./osx-x64/*
-          cp -r ../../../../tencentScf/bootstrap ../../../../tencentScf/index.sh ./linux-x64/
-          cd ./linux-x64
-          chmod 755 index.sh bootstrap
-          zip -q -r ../bilibili-tool-pro-v${{ github.event.inputs.version }}-tencent-scf.zip ./*
+          pwd && ls
+          cd ./scripts
+          chmod +x ./publish.sh
+          . publish.sh --runtime all
           
-      - name: Create release info
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.event.inputs.version }}
-          release_name: BiliBiliToolPro-V${{ github.event.inputs.version }}
-          draft: true
-          prerelease: false
+      - name: Get release content
+        id: release_content
+        run: |
+          cd ${{ github.workspace }}
+          pwd && ls
+          content=$(tac ./CHANGELOG.md | grep -m1 "##" -B 1000 | tac)
+          echo "Release content: $content"
+          echo "release_content=$content" >> $GITHUB_OUTPUT
 
       - name: Upload release asset
         id: upload-release-asset 
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v1
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./src/Ray.BiliBiliTool.Console/bin/Publish/bilibili-tool-pro-v${{ github.event.inputs.version }}-dotnet-dependent.zip
-          asset_name: bilibili-tool-pro-v${{ github.event.inputs.version }}-dotnet-dependent.zip
-          asset_content_type: application/zip
-          
-      - name: Upload win-x86-x64
-        id: upload-win-x86-x64
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./src/Ray.BiliBiliTool.Console/bin/Publish/bilibili-tool-pro-v${{ github.event.inputs.version }}-win-x86-x64.zip
-          asset_name: bilibili-tool-pro-v${{ github.event.inputs.version }}-win-x86-x64.zip
-          asset_content_type: application/zip
-
-      - name: Upload linux-arm
-        id: upload-linux-arm
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./src/Ray.BiliBiliTool.Console/bin/Publish/bilibili-tool-pro-v${{ github.event.inputs.version }}-linux-arm.zip
-          asset_name: bilibili-tool-pro-v${{ github.event.inputs.version }}-linux-arm.zip
-          asset_content_type: application/zip
-
-      - name: Upload linux-x64
-        id: upload-linux-x64
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./src/Ray.BiliBiliTool.Console/bin/Publish/bilibili-tool-pro-v${{ github.event.inputs.version }}-linux-x64.zip
-          asset_name: bilibili-tool-pro-v${{ github.event.inputs.version }}-linux-x64.zip
-          asset_content_type: application/zip
-
-      - name: Upload osx-x64
-        id: upload-osx-x64
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./src/Ray.BiliBiliTool.Console/bin/Publish/bilibili-tool-pro-v${{ github.event.inputs.version }}-osx-x64.zip
-          asset_name: bilibili-tool-pro-v${{ github.event.inputs.version }}-osx-x64.zip
-          asset_content_type: application/zip
-
-      - name: Upload tencent-scf
-        id: upload-tencent-scf
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./src/Ray.BiliBiliTool.Console/bin/Publish/bilibili-tool-pro-v${{ github.event.inputs.version }}-tencent-scf.zip
-          asset_name: bilibili-tool-pro-v${{ github.event.inputs.version }}-tencent-scf.zip
-          asset_content_type: application/zip
+          files: ${{ github.workspace }}/src/Ray.BiliBiliTool.Console/bin/Publish/*.zip
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: BiliBiliToolPro-V${{ github.event.inputs.version }}
+          body: ${{ steps.release_content.outputs.release_content }}
+          discussion_category_name: Announcements
+          generate_release_notes: true
+          fail_on_unmatched_files: true

@@ -8,9 +8,9 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live
 {
     public class CheckTianXuanDto
     {
-        public int Id { get; set; }
+        public long Id { get; set; }
 
-        public int Room_id { get; set; }
+        public long Room_id { get; set; }
 
         /// <summary>
         /// 状态
@@ -50,7 +50,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live
         public string Require_text { get; set; }
 
         #region 礼物
-        public int Gift_id { get; set; }
+        public long Gift_id { get; set; }
 
         public string Gift_name { get; set; }
 

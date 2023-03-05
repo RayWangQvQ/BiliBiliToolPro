@@ -20,6 +20,8 @@ namespace Ray.BiliBiliTool.Console
     {
         public static async Task<int> Main(string[] args)
         {
+            PrintLogo();
+
             IHost host = CreateHost(args);
 
             try
@@ -52,12 +54,17 @@ namespace Ray.BiliBiliTool.Console
             //IHostBuilder hostBuilder = Host.CreateDefaultBuilder();
             IHostBuilder hostBuilder = new HostBuilder();
 
-            hostBuilder.UseContentRoot(Directory.GetCurrentDirectory());
+            //hostBuilder.UseContentRoot(Directory.GetCurrentDirectory());
 
             //承载系统自身的配置：
             hostBuilder.ConfigureHostConfiguration(hostConfigurationBuilder =>
             {
                 hostConfigurationBuilder.AddEnvironmentVariables(prefix: "DOTNET_");
+
+                if (args is { Length: > 0 })
+                {
+                    hostConfigurationBuilder.AddCommandLine(args);
+                }
             });
 
             //应用配置:
@@ -67,10 +74,9 @@ namespace Ray.BiliBiliTool.Console
                 IHostEnvironment env = hostBuilderContext.HostingEnvironment;
 
                 //json文件：
-                configurationBuilder.AddJsonFile("appsettings.json", false, true)
+                configurationBuilder.AddJsonFile("appsettings.json", true, true)
                     .AddJsonFile($"appsettings.{hostBuilderContext.HostingEnvironment.EnvironmentName}.json", true, true)
-                    .AddJsonFile("exp.json", false, true) //todo：不要使用配置
-                    .AddJsonFile("donateCoinCanContinueStatus.json", false, true);//todo：不要使用配置
+                    ;
 
                 //用户机密：
                 if (env.IsDevelopment() && env.ApplicationName?.Length > 0)
@@ -86,13 +92,15 @@ namespace Ray.BiliBiliTool.Console
                 //命令行：
                 if (args != null && args.Length > 0)
                 {
-                    configurationBuilder.AddCommandLine(args, hostBuilderContext.Configuration
-                        .GetSection("CommandLineMappings")
-                        .Get<Dictionary<string, string>>());//todo：不要使用配置
+                    configurationBuilder.AddCommandLine(args, Config.Constants.GetCommandLineMappingsDic());
                 }
 
                 //本地cookie存储文件
                 configurationBuilder.AddJsonFile("cookies.json", true, true);
+
+                //内置配置
+                configurationBuilder.AddInMemoryCollection(Config.Constants.GetExpDic());
+                configurationBuilder.AddInMemoryCollection(Config.Constants.GetDonateCoinCanContinueStatusDic());
             });
 
             //日志:
@@ -118,6 +126,17 @@ namespace Ray.BiliBiliTool.Console
             });
 
             return hostBuilder;
+        }
+
+        private static void PrintLogo()
+        {
+            System.Console.WriteLine(@"  ____               ____    _   _____           _  ");
+            System.Console.WriteLine(@" |  _ \ __ _ _   _  | __ ) _| |_|_   _|__   ___ | | ");
+            System.Console.WriteLine(@" | |_) / _` | | | | |  _ \(_) (_) | |/ _ \ / _ \| | ");
+            System.Console.WriteLine(@" |  _ < (_| | |_| | | |_) | | | | | | (_) | (_) | | ");
+            System.Console.WriteLine(@" |_| \_\__,_|\__, | |____/|_|_|_| |_|\___/ \___/|_| ");
+            System.Console.WriteLine(@"             |___/                                  ");
+            System.Console.WriteLine();
         }
     }
 }

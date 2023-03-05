@@ -14,7 +14,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live
             this.NextInterval = next_interval;
         }
 
-        public int RoomId { set; get; }
+        public long RoomId { set; get; }
 
         public int NextInterval { set; get; }
 

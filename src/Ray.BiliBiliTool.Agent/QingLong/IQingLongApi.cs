@@ -47,6 +47,6 @@ namespace Ray.BiliBiliTool.Agent.QingLong
 
     public class UpdateQingLongEnv : AddQingLongEnv
     {
-        public int id { get; set; }
+        public long id { get; set; }
     }
 }

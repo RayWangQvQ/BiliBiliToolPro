@@ -13,12 +13,12 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live
         /// <summary>
         /// Id（从Check接口获取）
         /// </summary>
-        public int Id { get; set; }
+        public long Id { get; set; }
 
         /// <summary>
         /// 礼物Id（从Check接口获取）
         /// </summary>
-        public int Gift_id { get; set; }
+        public long Gift_id { get; set; }
 
         /// <summary>
         /// 礼物数量（从Check接口获取）
