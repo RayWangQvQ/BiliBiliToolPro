@@ -45,7 +45,7 @@ namespace Ray.Serilog.Sinks.TelegramBatched
             var botApiUrl = TelegramBotApiUrl;
             if (!string.IsNullOrWhiteSpace(apiHost))
             {
-                botApiUrl = apiHost
+                botApiUrl = apiHost;
             }
             this._apiUrl = new Uri($"{botApiUrl}{botToken}/sendMessage");
 
