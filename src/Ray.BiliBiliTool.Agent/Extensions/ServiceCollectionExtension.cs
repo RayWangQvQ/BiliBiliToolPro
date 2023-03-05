@@ -45,7 +45,7 @@ namespace Ray.BiliBiliTool.Agent.Extensions
 
                 return new CookieStrFactory(list);
             });
-            services.AddScoped<BiliCookie>();
+            services.AddTransient<BiliCookie>();
 
             //全局代理
             services.SetGlobalProxy(configuration);

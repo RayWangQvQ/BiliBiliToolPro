@@ -221,6 +221,9 @@ namespace Ray.BiliBiliTool.DomainService
                 return;
             }
 
+            _logger.LogDebug(re.Data.ToJson());
+            _logger.LogDebug(ckInfo.ToString());
+
             var list = re.Data.Where(x => x.name.StartsWith("Ray_BiliBiliCookies__")).ToList();
             QingLongEnv oldEnv = list.FirstOrDefault(x => x.value.Contains(ckInfo.UserId));
 
