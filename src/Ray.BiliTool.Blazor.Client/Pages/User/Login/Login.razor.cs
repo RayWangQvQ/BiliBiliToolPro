@@ -14,14 +14,19 @@ namespace Ray.BiliTool.Blazor.Pages.User {
 
     [Inject] public MessageService Message { get; set; }
 
-    public void HandleSubmit() {
-      if (_model.UserName == "admin" && _model.Password == "ant.design") {
-        NavigationManager.NavigateTo("/");
-        return;
-      }
+    public async Task HandleSubmit()
+    {
+        await AccountService.LoginAsync(new LoginParamsType());
 
-      if (_model.UserName == "user" && _model.Password == "ant.design") NavigationManager.NavigateTo("/");
-    }
+        NavigationManager.NavigateTo("/");
+
+            //if (_model.UserName == "admin" && _model.Password == "ant.design") {
+            //  NavigationManager.NavigateTo("/");
+            //  return;
+            //}
+
+            //if (_model.UserName == "user" && _model.Password == "ant.design") NavigationManager.NavigateTo("/");
+        }
 
     public async Task GetCaptcha() {
       var captcha = await AccountService.GetCaptchaAsync(_model.Mobile);

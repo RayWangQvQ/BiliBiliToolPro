@@ -2,9 +2,11 @@
 
   <PropertyGroup>
     <TargetFramework>net6</TargetFramework>
+    <UserSecretsId>ed6abce5-aca1-4d43-b283-845704397ef2</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="6.0.14" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="6.0.0" />
   </ItemGroup>
 

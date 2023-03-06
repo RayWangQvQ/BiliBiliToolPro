@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Linq;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace Ray.BiliTool.Blazor.Server
 {
@@ -24,6 +25,17 @@ namespace Ray.BiliTool.Blazor.Server
         {
             services.AddControllersWithViews();
             services.AddRazorPages();
+
+            services.AddAuthentication(options => options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                {
+                    options.LoginPath = "/user/login";
+                })
+                .AddGitHub(options =>
+                {
+                    options.ClientId = Configuration["GitHub:ClientId"];
+                    options.ClientSecret = Configuration["GitHub:ClientSecret"];
+                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -44,6 +56,8 @@ namespace Ray.BiliTool.Blazor.Server
             app.UseHttpsRedirection();
             app.UseBlazorFrameworkFiles();
             app.UseStaticFiles();
+
+            app.UseAuthentication();
 
             app.UseRouting();
 
