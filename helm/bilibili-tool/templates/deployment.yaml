@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "bilibili_tool.fullname" . }}
+  namespace: {{ .Values.namespace }}
   labels:
     {{- include "bilibili_tool.labels" . | nindent 4 }}
 spec:
@@ -17,11 +18,28 @@ spec:
       labels:
         {{- include "bilibili_tool.selectorLabels" . | nindent 8 }}
     spec:
-      {{- if .Values.volumes.enabled }}
+      {{- if or (eq .Values.volumes.log.enabled true) (eq .Values.volumes.login.enabled true) }}
       volumes:
-      - name: {{ .Values.volumes.name }}
+      {{- if .Values.volumes.log.enabled }}
+      - name: {{ .Values.volumes.log.name }}
         hostPath: 
-          path: {{ .Values.volumes.path }}
+          path: {{ .Values.volumes.log.path }}
+      {{- end }}
+      {{- if .Values.volumes.login.enabled }}
+      - name: {{ .Values.volumes.login.name }}
+        configMap:
+          name: {{ .Values.configmap.name }}
+          items:
+          - key: "entry.sh"
+            path: "entry.sh"
+            mode: 0755
+          - key: "entry_before.sh"
+            path: "entry_before.sh"
+            mode: 0755
+          - key: "entry_after.sh"
+            path: "entry_after.sh"
+            mode: 0755
+      {{- end }}
       {{- end }}
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -33,10 +51,16 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             {{- toYaml .Values.env | nindent 12 }}
-          {{- if .Values.volumes.enabled }}
+          {{- if or (eq .Values.volumes.log.enabled true) (eq .Values.volumes.login.enabled true) }}
           volumeMounts:
+          {{- if .Values.volumes.log.enabled }}
           - mountPath: "/bilibili_tool/Logs"
-            name: {{ .Values.volumes.name }}
+            name: {{ .Values.volumes.log.name }}
+          {{- end }}
+          {{- if .Values.volumes.login.enabled }}
+          - mountPath: "/app/scripts"
+            name: {{ .Values.volumes.login.name }}
+          {{- end }}
           {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
