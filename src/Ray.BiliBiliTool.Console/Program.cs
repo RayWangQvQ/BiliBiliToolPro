@@ -81,7 +81,8 @@ namespace Ray.BiliBiliTool.Console
                 //用户机密：
                 if (env.IsDevelopment() && env.ApplicationName?.Length > 0)
                 {
-                    var appAssembly = Assembly.Load(new AssemblyName(env.ApplicationName));
+                    //var appAssembly = Assembly.Load(new AssemblyName(env.ApplicationName));
+                    var appAssembly = Assembly.GetAssembly(typeof(Program));
                     configurationBuilder.AddUserSecrets(appAssembly, optional: true, reloadOnChange: true);
                 }
 
