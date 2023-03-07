@@ -107,3 +107,5 @@
 - Feature #460 : publish single file when release
 - Feature: use new scripts for gh actions's release
 - Feature #473 : let user input when there is no target task in configs
+## 1.0.2
+- Fix #484 : fix read dic config error

@@ -1,5 +1,7 @@
 ﻿
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Ray.BiliBiliTool.Config
 {
@@ -33,13 +35,16 @@ namespace Ray.BiliBiliTool.Config
         /// <returns></returns>
         public static Dictionary<string, string> GetExpDic()
         {
-            return new Dictionary<string, string>()
+            var dic = new Dictionary<string, string>()
             {
                 {"每日登录", "5"},
                 {"每日观看视频", "5"},
                 {"每日分享视频", "5"},
                 {"每日投币", "10"}
             };
+            return dic.Select(x =>
+                new KeyValuePair<string, string>($"{OptionsNames.ExpDictionaryName}:{x.Key}", x.Value))
+                .ToDictionary(k => k.Key, v => v.Value);
         }
 
         /// <summary>
@@ -49,7 +54,7 @@ namespace Ray.BiliBiliTool.Config
         /// <returns></returns>
         public static Dictionary<string, string> GetDonateCoinCanContinueStatusDic()
         {
-            return new Dictionary<string, string>()
+            var dic = new Dictionary<string, string>()
             {
                 {"0", "成功"},
                 {"-400", "请求错误"},
@@ -59,6 +64,10 @@ namespace Ray.BiliBiliTool.Config
                 {"34004", "投币间隔太短"},
                 {"34005", "超过投币上限"}
             };
+            return dic.Select(x =>
+                new KeyValuePair<string, string>($"{OptionsNames.DonateCoinCanContinueStatusDictionaryName}:{x.Key}", x.Value))
+                    .ToDictionary(k => k.Key, v => v.Value)
+                ;
         }
 
         public static Dictionary<string, string> GetCommandLineMappingsDic()
