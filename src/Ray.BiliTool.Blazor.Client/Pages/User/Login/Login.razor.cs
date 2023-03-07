@@ -16,17 +16,14 @@ namespace Ray.BiliTool.Blazor.Pages.User {
 
     public async Task HandleSubmit()
     {
-        await AccountService.LoginAsync(new LoginParamsType());
+        await AccountService.LoginAsync(new LoginParamsType()
+        {
+            UserName = _model.UserName,
+            Password = _model.Password,
+        });
 
         NavigationManager.NavigateTo("/");
-
-            //if (_model.UserName == "admin" && _model.Password == "ant.design") {
-            //  NavigationManager.NavigateTo("/");
-            //  return;
-            //}
-
-            //if (_model.UserName == "user" && _model.Password == "ant.design") NavigationManager.NavigateTo("/");
-        }
+    }
 
     public async Task GetCaptcha() {
       var captcha = await AccountService.GetCaptchaAsync(_model.Mobile);
