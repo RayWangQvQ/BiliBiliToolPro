@@ -18,8 +18,8 @@ namespace LogTest
 
         public TestTelegram()
         {
-            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
-            Program.CreateHost(new string[] { });
+            Environment.SetEnvironmentVariable("DOTNET_ENVIRONMENT", "Development");
+            Program.CreateHost(new string[] { "ENVIRONMENT=Development" });
 
             _botToken = Global.ConfigurationRoot["Serilog:WriteTo:3:Args:botToken"];
             _chatId = Global.ConfigurationRoot["Serilog:WriteTo:3:Args:chatId"];

@@ -109,3 +109,5 @@
 - Feature #473 : let user input when there is no target task in configs
 ## 1.0.2
 - Fix #484 : fix read dic config error
+- Merge PR #472 : add reverse proxy host for telegram notification
+- Merge PR #483 : update login field for entrypoint
