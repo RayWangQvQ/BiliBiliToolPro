@@ -2,13 +2,18 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+
+namespace: default
 replicaCount: 1
+
+configmap:
+  name: entry
 
 image:
   repository: zai7lou/bilibili_tool_pro
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "0.2.1"
+  tag: "1.0.1"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -34,10 +39,16 @@ env:
   #   value: ""
 
 volumes:
-  enabled: false
   # if `enabled=true`, then path and name is required
-  path: "/tmp/Logs"
-  name: "bili-tool-vol"
+  log:
+    enabled: true
+    path: "/tmp/logs"
+    name: "bili-tool-vol"
+  login:
+    enabled: true
+    name: "entry"
+
+
 
 podAnnotations: {}
 
@@ -45,10 +56,10 @@ resources:
   # Recommended to set this resources field
   limits:
     cpu: 100m
-    memory: 180Mi
+    memory: 120Mi
   requests:
     cpu: 100m
-    memory: 180Mi
+    memory: 120Mi
 
 nodeSelector: {}
 
