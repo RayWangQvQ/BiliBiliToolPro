@@ -18,7 +18,7 @@
                         </AntDesign.Input>
                     </FormItem>
                 </TabPane>
-                <TabPane Key="2" Tab="Mobile Login">
+@*                <TabPane Key="2" Tab="Mobile Login">
                     <FormItem>
                         <AntDesign.Input Placeholder="Phone Number" Size="large" @bind-Value="@context.Mobile">
                             <Prefix><Icon Type="mobile" /></Prefix>
@@ -36,7 +36,7 @@
                             </AntDesign.Col>
                         </Row>
                     </FormItem>
-                </TabPane>
+                </TabPane>*@
             </Tabs>
             <div>
                 <Checkbox Checked="@context.AutoLogin">
@@ -47,13 +47,13 @@
                 </a>
             </div>
             <Button Type="primary" HtmlType="submit" Class="submit" Size="large" Block>Log in </Button>
-            <div class="other">
+@*            <div class="other">
                 Other Login Methods
                 <Icon Class="icon" Type="alipay-circle" />
                 <Icon Class="icon" Type="taobao-circle" />
                 <Icon Class="icon" Type="weibo-circle" />
                 <a class="register" href="/user/register">Register Account</a>
-            </div>
+            </div>*@
         </Form>
     </div>
 </div>

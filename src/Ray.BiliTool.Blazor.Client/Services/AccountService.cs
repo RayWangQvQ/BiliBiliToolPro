@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Ray.BiliTool.Blazor.Models;
 
 namespace Ray.BiliTool.Blazor.Services
@@ -14,18 +15,18 @@ namespace Ray.BiliTool.Blazor.Services
     public class AccountService : IAccountService
     {
         private readonly HttpClient _httpClient;
+        private readonly IConfiguration _config;
         private readonly Random _random = new Random();
 
-        public AccountService(HttpClient httpClient)
+        public AccountService(HttpClient httpClient, IConfiguration config)
         {
             _httpClient = httpClient;
+            _config = config;
         }
 
         public async Task LoginAsync(LoginParamsType model)
         {
-            await _httpClient.GetAsync("Account/Login");
-            // todo: login logic
-            //return Task.CompletedTask;
+            await _httpClient.GetAsync($"Account/Login?uname={model.UserName}&pwd={model.Password}");
         }
 
         public Task<string> GetCaptchaAsync(string modile)
