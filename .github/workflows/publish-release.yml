@@ -29,12 +29,6 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: 6.0.x
-
-      - name: Test 1
-        run: |
-          pwd && ls
-          cd ./scripts
-          ls
         
       - name: Publish and zip
         run: |
@@ -42,6 +36,10 @@ jobs:
           cd ./scripts
           chmod +x ./publish.sh
           . publish.sh --runtime all
+
+      - name: Copy zip files
+        run: |
+          cp -f ./src/Ray.BiliBiliTool.Console/bin/Publish/*.zip /
           
       - name: Get release content
         id: release_content
@@ -53,13 +51,12 @@ jobs:
           echo "release_content<<EOF" >> $GITHUB_OUTPUT
           echo "$content" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
-          cd ${{ github.workspace }}/src/Ray.BiliBiliTool.Console/bin/Publish
 
       - name: Upload release asset
         id: upload-release-asset 
         uses: softprops/action-gh-release@v1
         with:
-          files: ./*.zip
+          files: /*.zip
           token: ${{ secrets.GITHUB_TOKEN }}
           name: BiliBiliToolPro-V${{ github.event.inputs.version }}
           tag_name: ${{ github.event.inputs.version }}
