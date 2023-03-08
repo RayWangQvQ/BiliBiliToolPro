@@ -97,7 +97,7 @@ publish_self_contained() {
 
     echo "zip files..."
     cd $publishDir
-    zip -q -r bilibili-tool-pro-v$version-$runtime.zip $publishDir/$runtime/*
+    zip -q -r bilibili-tool-pro-v$version-$runtime.zip ./$runtime/*
     ls -l
     echo -e "---------publish successfully---------\n\n"
 }
@@ -108,7 +108,7 @@ publish_tencentScf() {
     cp -r $repoDir/tencentScf/bootstrap $repoDir/tencentScf/index.sh ./linux-x64/
     cd ./linux-x64
     chmod 755 index.sh bootstrap
-    zip -q -r ../bilibili-tool-pro-v$version-tencent-scf.zip ./*
+    zip -r ../bilibili-tool-pro-v$version-tencent-scf.zip ./*
     cd .. && ls
     echo -e "---------publish successfully---------\n\n"
 }
