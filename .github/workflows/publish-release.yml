@@ -39,7 +39,7 @@ jobs:
 
       - name: Copy zip files
         run: |
-          cp -f ./src/Ray.BiliBiliTool.Console/bin/Publish/*.zip /
+          cp -f ./src/Ray.BiliBiliTool.Console/bin/Publish/*.zip ./
           
       - name: Get release content
         id: release_content
@@ -56,7 +56,7 @@ jobs:
         id: upload-release-asset 
         uses: softprops/action-gh-release@v1
         with:
-          files: /*.zip
+          files: ./*.zip
           token: ${{ secrets.GITHUB_TOKEN }}
           name: BiliBiliToolPro-V${{ github.event.inputs.version }}
           tag_name: ${{ github.event.inputs.version }}
