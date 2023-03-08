@@ -111,3 +111,5 @@
 - Fix #484 : fix read dic config error
 - Merge PR #472 : add reverse proxy host for telegram notification
 - Merge PR #483 : update login field for entrypoint
+## 1.0.3
+- Fix #486 : fix release zip error
