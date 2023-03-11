@@ -1,15 +1,13 @@
 package cmd
 
 import (
-	"bufio"
-	"fmt"
 	"io"
-	"os"
 	"os/exec"
 
 	"k8s.io/klog/v2"
 
 	"github.com/RayWangQvQ/BiliBiliToolPro/krew/pkg/options"
+	helper "github.com/RayWangQvQ/BiliBiliToolPro/krew/pkg/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -39,7 +37,7 @@ func newGetCmd(out io.Writer, errOut io.Writer) *cobra.Command {
 
 			err := o.run(out)
 			if err != nil {
-				klog.Warning(err)
+				klog.Error(err)
 				return err
 			}
 			return nil
@@ -56,32 +54,8 @@ func (o *getCmd) run(writer io.Writer) error {
 	// do kubectl get
 	cmd := exec.Command("kubectl", "get", "deploy", o.deployOpts.Name, "-n", o.deployOpts.Namespace)
 
-	stdoutReader, _ := cmd.StdoutPipe()
-	stdoutScanner := bufio.NewScanner(stdoutReader)
-	go func() {
-		for stdoutScanner.Scan() {
-			fmt.Println(stdoutScanner.Text())
-		}
-	}()
-	stderrReader, _ := cmd.StderrPipe()
-	stderrScanner := bufio.NewScanner(stderrReader)
-	go func() {
-		for stderrScanner.Scan() {
-			fmt.Println(stderrScanner.Text())
-		}
-	}()
-
-	err := cmd.Start()
-	if err != nil {
-		fmt.Printf("Error : %v \n", err)
-		os.Exit(1)
-	}
-
-	// stuck here to wait for the completion
-	err = cmd.Wait()
-	if err != nil {
-		fmt.Printf("Error: %v \n", err)
-		os.Exit(1)
+	if err := helper.Run(cmd, nil); err != nil {
+		return err
 	}
 
 	return nil

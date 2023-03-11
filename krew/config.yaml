@@ -1,4 +1,4 @@
-- name: Ray_BiliBiliCookies__2
+- name: Ray_BiliBiliCookies__1
   value: "cookie"
   # DailyTrigger - required
 - name: Ray_DailyTaskConfig__Cron

@@ -24,6 +24,7 @@ deploy: build install #### build + install
 build: #### build the plugin
 	@go vet ./... && \
 	go fmt ./... && \
+	echo "build on ${GOOS}/${GOARCH}" && \
 	cd ${ROOT_DIR}/krew/cmd && \
 		GOOS=${GOOS} GOARCH=${GOARCH} CGO_ENABLED=0 go build -ldflags "-X github.com/RayWangQvQ/BiliBiliToolPro/krew/pkg/cmd.Version=${GITCOMMIT}" -o $(BIN_NAME) kubectl-bilipro.go
 
@@ -32,3 +33,11 @@ build: #### build the plugin
 install: #### install the plugin
 	@cd ${ROOT_DIR}/krew/cmd && \
       sudo install ./$(BIN_NAME) ${KUBECTL_DIR}/$(BIN_NAME)
+
+.PHONY: test
+test: #### run tests
+	@cd ${ROOT_DIR}/krew/pkg/utils && \
+	rm -rf fixtures && \
+	mkdir fixtures && \
+	go test ./... -cover && \
+	  rm -rf fixtures

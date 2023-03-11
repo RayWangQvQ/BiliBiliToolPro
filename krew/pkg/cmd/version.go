@@ -35,7 +35,7 @@ func newVersionCmd(out io.Writer, errOut io.Writer) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			err := o.run()
 			if err != nil {
-				klog.Warning(err)
+				klog.Error(err)
 				return err
 			}
 			return nil
