@@ -6,7 +6,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Linq;
+using System.Text;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Ray.BiliTool.Blazor.Server.Options;
 
 namespace Ray.BiliTool.Blazor.Server
 {
@@ -26,7 +30,22 @@ namespace Ray.BiliTool.Blazor.Server
             services.AddControllersWithViews();
             services.AddRazorPages();
 
-            services.AddAuthentication(options => options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme)
+            //services.AddAuthentication(options => options.DefaultScheme = "GitHub")
+            services.AddAuthentication(options => options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = Configuration.GetValue<string>("JWT:Issuer"),
+                        ValidAudience = Configuration.GetValue<string>("JWT:Audience"),
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration.GetValue<string>("JWT:Key"))),
+                        RequireExpirationTime = true
+                    };
+                })
                 .AddCookie(options =>
                 {
                     options.LoginPath = "/user/login";
@@ -35,7 +54,10 @@ namespace Ray.BiliTool.Blazor.Server
                 {
                     options.ClientId = Configuration["GitHub:ClientId"];
                     options.ClientSecret = Configuration["GitHub:ClientSecret"];
-                });
+                })
+                ;
+
+            services.Configure<JwtOption>(Configuration.GetSection("JWT"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
