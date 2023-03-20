@@ -1,10 +1,14 @@
 using System;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading.Tasks;
 using AntDesign.ProLayout;
+using Blazored.LocalStorage;
 using Ray.BiliTool.Blazor.Services;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Components.Authorization;
+using Ray.BiliTool.Blazor.Client.Services;
 
 namespace Ray.BiliTool.Blazor.Client
 {
@@ -23,6 +27,22 @@ namespace Ray.BiliTool.Blazor.Client
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IAccountService, AccountService>();
             builder.Services.AddScoped<IProfileService, ProfileService>();
+
+            builder.Services.AddBlazoredLocalStorage(config =>
+            {
+                config.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
+                config.JsonSerializerOptions.IgnoreNullValues = true;
+                config.JsonSerializerOptions.IgnoreReadOnlyProperties = true;
+                config.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+                config.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                config.JsonSerializerOptions.ReadCommentHandling = JsonCommentHandling.Skip;
+                config.JsonSerializerOptions.WriteIndented = false;
+            });
+
+            builder.Services
+                .AddAuthorizationCore()
+                .AddScoped<AuthenticationStateProvider, ApiAuthenticationStateProvider>()
+                .AddScoped<IAuthService, AuthService>();
 
             await builder.Build().RunAsync();
         }
