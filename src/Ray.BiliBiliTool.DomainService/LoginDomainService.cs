@@ -56,7 +56,7 @@ namespace Ray.BiliBiliTool.DomainService
             var re = await _passportApi.GenerateQrCode();
             if (re.Code != 0)
             {
-                _logger.LogWarning("获取二维码失败：{msg}", re.ToJson());
+                _logger.LogWarning("获取二维码失败：{msg}", re.ToJsonStr());
                 return null;
             }
 
@@ -86,7 +86,7 @@ namespace Ray.BiliBiliTool.DomainService
                 var content = JsonConvert.DeserializeObject<BiliApiResponse<TokenDto>>(await check.Content.ReadAsStringAsync(cancellationToken));
                 if (content.Code != 0)
                 {
-                    _logger.LogWarning("调用检测接口异常：{msg}", check.ToJson());
+                    _logger.LogWarning("调用检测接口异常：{msg}", check.ToJsonStr());
                     break;
                 }
 
@@ -127,12 +127,12 @@ namespace Ray.BiliBiliTool.DomainService
                     _logger.LogInformation("SetCookie成功");
                     return biliCookie;
                 }
-                _logger.LogError("访问主站失败：{msg}", homePage.ToJson());
+                _logger.LogError("访问主站失败：{msg}", homePage.ToJsonStr());
             }
             catch (Exception e)
             {
                 //buvid只影响分享和投币，可以吞掉异常
-                _logger.LogError(e.ToJson());
+                _logger.LogError(e.ToJsonStr());
             }
 
             return biliCookie;
@@ -217,11 +217,11 @@ namespace Ray.BiliBiliTool.DomainService
 
             if (re.Code != 200)
             {
-                _logger.LogInformation($"查询环境变量失败：{re}", re.ToJson());
+                _logger.LogInformation($"查询环境变量失败：{re}", re.ToJsonStr());
                 return;
             }
 
-            _logger.LogDebug(re.Data.ToJson());
+            _logger.LogDebug(re.Data.ToJsonStr());
             _logger.LogDebug(ckInfo.ToString());
 
             var list = re.Data.Where(x => x.name.StartsWith("Ray_BiliBiliCookies__")).ToList();
@@ -242,7 +242,7 @@ namespace Ray.BiliBiliTool.DomainService
                 };
 
                 var updateRe = await _qingLongApi.UpdateEnvs(update, token);
-                _logger.LogInformation(updateRe.Code == 200 ? "更新成功！" : updateRe.ToJson());
+                _logger.LogInformation(updateRe.Code == 200 ? "更新成功！" : updateRe.ToJsonStr());
 
                 return;
             }
@@ -268,7 +268,7 @@ namespace Ray.BiliBiliTool.DomainService
                 remarks = $"bili-{ckInfo.UserId}"
             };
             var addRe = await _qingLongApi.AddEnvs(new List<AddQingLongEnv> { add }, token);
-            _logger.LogInformation(addRe.Code == 200 ? "新增成功！" : addRe.ToJson());
+            _logger.LogInformation(addRe.Code == 200 ? "新增成功！" : addRe.ToJsonStr());
         }
 
         #region private

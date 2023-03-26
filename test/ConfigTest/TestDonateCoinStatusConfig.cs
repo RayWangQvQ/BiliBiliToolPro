@@ -25,7 +25,7 @@ namespace ConfigTest
             var options = scope.ServiceProvider.GetRequiredService<IOptionsMonitor<Dictionary<string, string>>>();
             var dic = options.Get(Constants.OptionsNames.DonateCoinCanContinueStatusDictionaryName);
 
-            Debug.WriteLine(dic.ToJson());
+            Debug.WriteLine(dic.ToJsonStr());
 
             Assert.True(dic.Count > 0);
         }
