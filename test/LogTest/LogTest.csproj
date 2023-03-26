@@ -21,7 +21,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Ray.BiliBiliTool.Console\Ray.BiliBiliTool.Console.csproj" />
-    <ProjectReference Include="..\..\src\Ray.Serilog.Sinks\Ray.Serilog.Sinks.MicrosoftTeamsBatched\Ray.Serilog.Sinks.MicrosoftTeamsBatched.csproj" />
   </ItemGroup>
 
 </Project>

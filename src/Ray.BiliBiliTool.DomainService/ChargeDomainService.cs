@@ -105,7 +105,7 @@ namespace Ray.BiliBiliTool.DomainService
                 else
                 {
                     _logger.LogInformation("【充电结果】失败");
-                    _logger.LogError("【原因】{reason}", response.ToJson());
+                    _logger.LogError("【原因】{reason}", response.ToJsonStr());
                 }
             }
             else
