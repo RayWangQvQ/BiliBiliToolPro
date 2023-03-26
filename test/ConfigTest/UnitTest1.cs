@@ -23,7 +23,7 @@ namespace ConfigTest
             Program.CreateHost(new string[] { });
             string proxyAddress = Global.ConfigurationRoot["Security:WebProxy"];
 
-            if (proxyAddress.IsNotNullOrEmpty())
+            if (!proxyAddress.IsNullOrEmpty())
             {
                 WebProxy webProxy = new WebProxy();
 
