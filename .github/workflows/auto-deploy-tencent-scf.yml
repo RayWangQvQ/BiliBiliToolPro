@@ -18,7 +18,7 @@ jobs:
     steps:
       - id: check
         run: |
-          [ ${{ github.event_name }} == 'workflow_dispatch' -o true == "${{ env.IsAutoDeployTencentScf }}" ] && echo "::set-output name=result::开启" || echo "::set-output name=result::关闭"
+          [ ${{ github.event_name }} == 'workflow_dispatch' -o true == "${{ env.IsAutoDeployTencentScf }}" ] && echo "result=开启" >> $GITHUB_OUTPUT || echo "result=关闭" >> $GITHUB_OUTPUT
 
   deploy:
     name: deploy serverless
@@ -28,13 +28,13 @@ jobs:
     if: needs.pre-check.outputs.result=='开启'
     steps:
       - name: clone local repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Use Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: 14.x
+          node-version: 16.x
       - name: install serverless
-        run: npm install -g serverless
+        run: npm i -g serverless-cloud-framework
       - name: deploy serverless
         run: |
           cd ./tencentScf
@@ -45,7 +45,7 @@ jobs:
           chmod +x publish.sh
           ./publish.sh
           echo "开始部署到云函数"
-          sls deploy --force
+          scf deploy
         env: # 环境变量
           STAGE: dev #您的部署环境
           SERVERLESS_PLATFORM_VENDOR: tencent # serverless海外默认为aws部署，配置为腾讯部署
