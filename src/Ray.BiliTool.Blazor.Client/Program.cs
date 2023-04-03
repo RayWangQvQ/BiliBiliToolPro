@@ -41,7 +41,7 @@ namespace Ray.BiliTool.Blazor.Client
 
             builder.Services
                 .AddAuthorizationCore()
-                .AddScoped<AuthenticationStateProvider, ApiAuthenticationStateProvider>()
+                .AddScoped<AuthenticationStateProvider, AuthProvider>()
                 .AddScoped<IAuthService, AuthService>();
 
             await builder.Build().RunAsync();

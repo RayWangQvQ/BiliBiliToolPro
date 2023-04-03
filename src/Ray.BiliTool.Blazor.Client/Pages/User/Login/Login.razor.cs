@@ -4,6 +4,10 @@ using Ray.BiliTool.Blazor.Services;
 using Microsoft.AspNetCore.Components;
 using AntDesign;
 using Ray.BiliTool.Blazor.Client.Services;
+using Ray.BiliTool.Blazor.Client;
+using static System.Net.WebRequestMethods;
+using System.Net.Http.Headers;
+using Microsoft.AspNetCore.Components.Authorization;
 
 namespace Ray.BiliTool.Blazor.Pages.User
 {
@@ -18,6 +22,9 @@ namespace Ray.BiliTool.Blazor.Pages.User
 
         [Inject] public MessageService Message { get; set; }
 
+        [Inject] public MessageService MsgSvr { get; set; }
+        [Inject] public AuthenticationStateProvider AuthProvider { get; set; }
+
         public async Task HandleSubmit()
         {
             var result = await AuthService.Login(new LoginParamsType()
@@ -26,10 +33,18 @@ namespace Ray.BiliTool.Blazor.Pages.User
                 Password = _model.Password,
             });
 
-            if (!result)
+            if (string.IsNullOrWhiteSpace(result?.Token) == false)
             {
-                return;
+                MsgSvr.Success($"登录成功");
+                
+                ((AuthProvider)AuthProvider).MarkUserAsAuthenticated(result);
             }
+            else
+            {
+                MsgSvr.Error($"用户名或密码错误");
+            }
+            //isLoading = false;
+            InvokeAsync(StateHasChanged);
 
             NavigationManager.NavigateTo("/");
         }

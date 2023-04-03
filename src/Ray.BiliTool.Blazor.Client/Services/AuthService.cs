@@ -1,16 +1,19 @@
 ﻿using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
+using Ray.BiliTool.Blazor.Client.Models;
 using Ray.BiliTool.Blazor.Models;
+using static System.Net.WebRequestMethods;
 
 namespace Ray.BiliTool.Blazor.Client.Services
 {
     public interface IAuthService
     {
-        Task<bool> Login(LoginParamsType rqtDto);
+        Task<UserDto> Login(LoginParamsType rqtDto);
 
         Task Logout();
     }
@@ -30,23 +33,17 @@ namespace Ray.BiliTool.Blazor.Client.Services
             _localStorage = localStorage;
         }
 
-        public async Task<bool> Login(LoginParamsType rqtDto)
+        public async Task<UserDto> Login(LoginParamsType rqtDto)
         {
-            var content = new FormUrlEncodedContent(new KeyValuePair<string, string>[]
+            var httpResponse = await _httpClient.PostAsJsonAsync<LoginParamsType>($"api/Auth/Login", rqtDto);
+            UserDto result = await httpResponse.Content.ReadFromJsonAsync<UserDto>();
+
+            if (result != null)
             {
-                new(nameof(LoginParamsType.UserName), rqtDto.UserName),
-                new(nameof(LoginParamsType.Password), rqtDto.Password),
-            });
-            using var rsp = await _httpClient.PostAsync("/account/login", content);
-            if (!rsp.IsSuccessStatusCode)
-            {
-                return false;
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", result.Token);
             }
-            var authToken = await rsp.Content.ReadAsStringAsync();
-            await _localStorage.SetItemAsync("authToken", authToken);
-            ((ApiAuthenticationStateProvider)_authenticationStateProvider).MarkUserAsAuthenticated(rqtDto.UserName);
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
-            return true;
+
+            return result;
         }
 
         public async Task Logout()

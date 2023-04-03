@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Net.Http;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Ray.BiliTool.Blazor.Models;
+using static System.Net.WebRequestMethods;
 
 namespace Ray.BiliTool.Blazor.Services
 {
@@ -26,7 +28,7 @@ namespace Ray.BiliTool.Blazor.Services
 
         public async Task LoginAsync(LoginParamsType model)
         {
-            await _httpClient.GetAsync($"Account/Login?uname={model.UserName}&pwd={model.Password}");
+            await _httpClient.PostAsJsonAsync<LoginParamsType>($"api/Auth/Login", model);
         }
 
         public Task<string> GetCaptchaAsync(string modile)
