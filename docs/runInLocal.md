@@ -35,6 +35,7 @@ P.S.这里的运行环境指的是 `.NET Runtime 6.0.0` ，安装方法可详见
 请下载 `win-x86-x64.zip`，此文件已自包含（self-contained）运行环境。
 
 解压后，在应用目录打开cmd或powershell，执行`.\Ray.BiliBiliTool.Console.exe --runTasks=Login`，扫码登录。
+也可以直接双击`Ray.BiliBiliTool.Console.exe`来运行，建议使用windows自带的定时任务来执行它
 
 ## 3. Linux:
 
