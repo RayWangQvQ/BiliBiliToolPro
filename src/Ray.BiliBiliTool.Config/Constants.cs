@@ -1,5 +1,4 @@
-﻿
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -35,7 +34,7 @@ namespace Ray.BiliBiliTool.Config
         /// <returns></returns>
         public static Dictionary<string, string> GetExpDic()
         {
-            var dic = new Dictionary<string, string>()
+            Dictionary<string, string> dic = new Dictionary<string, string>()
             {
                 {"每日登录", "5"},
                 {"每日观看视频", "5"},
@@ -48,13 +47,14 @@ namespace Ray.BiliBiliTool.Config
         }
 
         /// <summary>
-        /// 投币接口的data.code返回以下这些状态码，则可以继续尝试投币
-        /// 如返回除这些之外的状态码，则终止投币流程，不进行无意义的尝试（比如返回-101：账号未登录；-102：账号被封停；-111：csrf校验失败等）
+        /// 投币接口的data.code返回以下这些状态码，则可以继续尝试投币<para></para>
+        /// 如返回除这些之外的状态码，则终止投币流程，不进行无意义的尝试<para></para>
+        /// （比如返回-101：账号未登录；-102：账号被封停；-111：csrf校验失败等）
         /// </summary>
         /// <returns></returns>
         public static Dictionary<string, string> GetDonateCoinCanContinueStatusDic()
         {
-            var dic = new Dictionary<string, string>()
+            Dictionary<string, string> dic = new Dictionary<string, string>()
             {
                 {"0", "成功"},
                 {"-400", "请求错误"},
@@ -64,8 +64,11 @@ namespace Ray.BiliBiliTool.Config
                 {"34004", "投币间隔太短"},
                 {"34005", "超过投币上限"}
             };
+
+            string buildKey(string key) => $"{OptionsNames.DonateCoinCanContinueStatusDictionaryName}:{key}";
+
             return dic.Select(x =>
-                new KeyValuePair<string, string>($"{OptionsNames.DonateCoinCanContinueStatusDictionaryName}:{x.Key}", x.Value))
+                new KeyValuePair<string, string>(buildKey(x.Key), x.Value))
                     .ToDictionary(k => k.Key, v => v.Value)
                 ;
         }

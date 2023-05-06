@@ -45,28 +45,28 @@ namespace Ray.BiliBiliTool.Console
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            var isNotifySingle = _configuration.GetSection("Notification:IsSingleAccountSingleNotify").Get<bool>();
+            bool isNotifySingle = _configuration.GetSection("Notification:IsSingleAccountSingleNotify").Get<bool>();
 
             try
             {
                 _logger.LogInformation("BiliBiliToolPro 开始运行...{newLine}", Environment.NewLine);
 
-                var pass = await PreCheckAsync(cancellationToken);
-                if (!pass) return;
+                bool pass = await PreCheckAsync(cancellationToken);
+                if(!pass)
+                    return;
 
                 await RandomSleepAsync(cancellationToken);
 
-                var tasks = await ReadTargetTasksAsync(cancellationToken);
+                string[] tasks = await ReadTargetTasksAsync(cancellationToken);
                 _logger.LogInformation("【目标任务】{tasks}", string.Join(",", tasks));
 
-                if (tasks.Contains("Login"))
+                if(tasks.Contains("Login"))
                 {
                     await DoTasksAsync(tasks, cancellationToken);
                 }
-
                 else
                 {
-                    for (int i = 0; i < _cookieStrFactory.Count; i++)
+                    for(int i = 0 ; i < _cookieStrFactory.Count ; i++)
                     {
                         _cookieStrFactory.CurrentNum = i + 1;
                         _logger.LogInformation("######### 账号 {num} #########{newLine}", _cookieStrFactory.CurrentNum, Environment.NewLine);
@@ -74,15 +74,15 @@ namespace Ray.BiliBiliTool.Console
                         try
                         {
                             await DoTasksAsync(tasks, cancellationToken);
-                            if (isNotifySingle)
+                            if(isNotifySingle)
                             {
                                 LogAppInfo();
 
-                                var accountName = _cookieStrFactory.Count > 1 ? $"账号【{_cookieStrFactory.CurrentNum}】" : "";
+                                string accountName = _cookieStrFactory.Count > 1 ? $"账号【{_cookieStrFactory.CurrentNum}】" : "";
                                 _logger.LogInformation("·开始推送·{task}·{user}", $"{_configuration["RunTasks"]}任务", accountName);
                             }
                         }
-                        catch (Exception e)
+                        catch(Exception e)
                         {
                             //ignore
                             _logger.LogWarning("异常：{msg}", e);
@@ -90,14 +90,14 @@ namespace Ray.BiliBiliTool.Console
                     }
                 }
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 _logger.LogError("程序异常终止，原因：{msg}", ex.Message);
                 throw;
             }
             finally
             {
-                if (!isNotifySingle)
+                if(!isNotifySingle)
                 {
                     LogAppInfo();
                     _logger.LogInformation("·开始推送·{task}·{user}", $"{_configuration["RunTasks"]}任务", "");
@@ -123,7 +123,7 @@ namespace Ray.BiliBiliTool.Console
             _logger.LogInformation("【账号个数】{count}个{newLine}", _cookieStrFactory.Count, Environment.NewLine);
 
             //是否跳过
-            if (_securityOptions.IsSkipDailyTask)
+            if(_securityOptions.IsSkipDailyTask)
             {
                 _logger.LogWarning("已配置为跳过任务{newLine}", Environment.NewLine);
                 return Task.FromResult(false);
@@ -134,9 +134,10 @@ namespace Ray.BiliBiliTool.Console
 
         private async Task RandomSleepAsync(CancellationToken cancellationToken)
         {
-            if (_configuration["RunTasks"].Contains("Login") || _configuration["RunTasks"].Contains("Test")) return;
+            if(_configuration["RunTasks"].Contains("Login") || _configuration["RunTasks"].Contains("Test"))
+                return;
 
-            if (_securityOptions.RandomSleepMaxMin > 0)
+            if(_securityOptions.RandomSleepMaxMin > 0)
             {
                 int randomMin = new Random().Next(1, ++_securityOptions.RandomSleepMaxMin);
                 _logger.LogInformation("随机休眠{min}分钟{newLine}", randomMin, Environment.NewLine);
@@ -144,11 +145,16 @@ namespace Ray.BiliBiliTool.Console
             }
         }
 
+        /// <summary>
+        /// 读取目标任务
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         private Task<string[]> ReadTargetTasksAsync(CancellationToken cancellationToken)
         {
-            var tasks = _configuration["RunTasks"]
+            string[] tasks = _configuration["RunTasks"]
                 .Split("&", options: StringSplitOptions.RemoveEmptyEntries);
-            if (tasks.Any())
+            if(tasks.Any())
             {
                 return Task.FromResult(tasks);
             }
@@ -157,13 +163,13 @@ namespace Ray.BiliBiliTool.Console
             TaskTypeFactory.Show(_logger);
             _logger.LogInformation("请输入：");
 
-            while (true)
+            while(true)
             {
-                var index = System.Console.ReadLine();
-                var suc = int.TryParse(index, out int num);
-                if (suc)
+                string index = System.Console.ReadLine();
+                bool suc = int.TryParse(index, out int num);
+                if(suc)
                 {
-                    var code = TaskTypeFactory.GetCodeByIndex(num);
+                    string code = TaskTypeFactory.GetCodeByIndex(num);
                     _configuration["RunTasks"] = code;
                     return Task.FromResult(new string[] { code });
                 }
@@ -174,17 +180,17 @@ namespace Ray.BiliBiliTool.Console
 
         private async Task DoTasksAsync(string[] tasks, CancellationToken cancellationToken)
         {
-            using var scope = _serviceProvider.CreateScope();
-            foreach (var task in tasks)
+            using IServiceScope scope = _serviceProvider.CreateScope();
+            foreach(string task in tasks)
             {
-                var type = TaskTypeFactory.Create(task);
-                if (type == null)
+                Type type = TaskTypeFactory.Create(task);
+                if(type == null)
                 {
                     _logger.LogWarning("任务不存在：{task}", task);
                     continue;
                 }
 
-                var appService = (IAppService)scope.ServiceProvider.GetRequiredService(type);
+                IAppService appService = (IAppService)scope.ServiceProvider.GetRequiredService(type);
                 await appService?.DoTaskAsync(cancellationToken);
             }
         }
