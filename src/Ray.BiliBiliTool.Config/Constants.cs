@@ -41,8 +41,11 @@ namespace Ray.BiliBiliTool.Config
                 {"每日分享视频", "5"},
                 {"每日投币", "10"}
             };
+
+            string buildKey(string key) => $"{OptionsNames.ExpDictionaryName}:{key}";
+
             return dic.Select(x =>
-                new KeyValuePair<string, string>($"{OptionsNames.ExpDictionaryName}:{x.Key}", x.Value))
+                new KeyValuePair<string, string>(buildKey(x.Key), x.Value))
                 .ToDictionary(k => k.Key, v => v.Value);
         }
 
