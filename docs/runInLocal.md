@@ -20,7 +20,7 @@
 
 任何操作系统，不管是Win还是Linux还是mac，只要已安装了`.NET 6.0` 环境，均可通过下载`net-dependent.zip`运行。
 
-下载解压后，进入应用目录，执行`./Ray.BiliBiliTool.Console.exe --runTasks=Login`
+下载解压后，进入应用目录，执行`.\Ray.BiliBiliTool.Console.exe --runTasks=Login`
 
 会出现二维码，扫码登录后即可运行各个任务。
 
