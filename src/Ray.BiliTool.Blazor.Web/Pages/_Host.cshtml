@@ -1,0 +1,30 @@
+﻿@page "/"
+@namespace Ray.BiliTool.Blazor.Web.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ray.BiliTool.Blazor.Web</title>
+    <base href="~/" />
+    <link href="_content/AntDesign/css/ant-design-blazor.css" rel="stylesheet" />
+    <link href="_content/AntDesign.ProLayout/css/ant-design-pro-layout-blazor.css" rel="stylesheet" />
+    <link href="./css/site.css" rel="stylesheet" />
+    <link href="Ray.BiliTool.Blazor.Web.styles.css" rel="stylesheet" />
+</head>
+<body>
+    <app>
+        <component type="typeof(App)" render-mode="Server" />
+    </app>
+
+     <script type="text/javascript" src="@("https://unpkg.com/@antv/g2plot@2.4.17/dist/g2plot.min.js")"></script>
+    <script src="_content/AntDesign/js/ant-design-blazor.js"></script>
+    <script src="_content/AntDesign.Charts/ant-design-charts-blazor.js"></script>
+    <script src="_framework/blazor.server.js"></script>
+</body>
+</html>
