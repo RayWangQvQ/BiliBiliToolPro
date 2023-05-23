@@ -65,8 +65,8 @@ namespace Ray.BiliBiliTool.DomainService
 
             UserInfo useInfo = apiResponse.Data;
 
-            _logger.LogInformation("【img_url】{0}", useInfo.Wbi_img?.img_url);
-            _logger.LogInformation("【sub_url】{0}", useInfo.Wbi_img?.sub_url);
+            _logger.LogDebug("【img_url】{0}", useInfo.Wbi_img?.img_url);
+            _logger.LogDebug("【sub_url】{0}", useInfo.Wbi_img?.sub_url);
 
             return useInfo.Wbi_img;
         }
