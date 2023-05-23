@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Video;
 using WebApiClientCore.Attributes;
 
 namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
@@ -69,8 +70,9 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         /// <returns></returns>
         [Header("Referer", "https://www.bilibili.com/")]
         [Header("Origin", "https://space.bilibili.com")]
-        [HttpGet("/x/space/wbi/arc/search?mid={upId}&ps={pageSize}&tid=0&pn={pageNumber}&keyword={keyword}&order=pubdate&jsonp=jsonp")]
-        Task<BiliApiResponse<SearchUpVideosResponse>> SearchVideosByUpId(long upId, int pageSize = 30, int pageNumber = 1, string keyword = "");
+        //[HttpGet("/x/space/wbi/arc/search?mid={upId}&ps={pageSize}&tid=0&pn={pageNumber}&keyword={keyword}&order=pubdate&platform=web&web_location=1550101&order_avoided=true&w_rid=5df06b1c48e2be86a96e9d0f99bf06f4&wts=1684854929")]
+        [HttpGet("/x/space/wbi/arc/search")]
+        Task<BiliApiResponse<SearchUpVideosResponse>> SearchVideosByUpId([PathQuery] SearchVideosByUpIdDto request);
         
     }
 
@@ -107,7 +109,6 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         [Header("Origin", "https://www.bilibili.com")]
         [HttpGet("/x/web-interface/ranking/v2?rid=0&type=all")]
         Task<BiliApiResponse<Ranking>> GetRegionRankingVideosV2();
-
 
     }
 }
