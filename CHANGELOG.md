@@ -113,3 +113,6 @@
 - Merge PR #483 : update login field for entrypoint
 ## 1.0.3
 - Fix #486 : fix release zip error
+## 2.0.0
+- Feature[#513]：将基础组件和抽象迁移到nuget包中
+- Fix[#543]：修复部分Api调用报“访问权限不足”

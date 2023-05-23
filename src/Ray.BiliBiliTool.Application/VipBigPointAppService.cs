@@ -46,7 +46,7 @@ namespace Ray.BiliBiliTool.Application
 
             var re = await _vipApi.GetTaskList();
 
-            if (re.Code != 0) throw new Exception(re.ToJson());
+            if (re.Code != 0) throw new Exception(re.ToJsonStr());
 
             VipTaskInfo taskInfo = re.Data;
             taskInfo.LogInfo(_logger);
@@ -103,11 +103,11 @@ namespace Ray.BiliBiliTool.Application
             }
 
             var re = await _vipApi.Sign(new SignRequest());
-            if (re.Code != 0) throw new Exception(re.ToJson());
+            if (re.Code != 0) throw new Exception(re.ToJsonStr());
 
             //确认
             var infoResult = await _vipApi.GetTaskList();
-            if (infoResult.Code != 0) throw new Exception(infoResult.ToJson());
+            if (infoResult.Code != 0) throw new Exception(infoResult.ToJsonStr());
             info = infoResult.Data;
 
             _logger.LogInformation("今日可获得签到积分：{score}", info.Task_info.Sing_task_item.TodayHistory?.Score);
@@ -143,7 +143,7 @@ namespace Ray.BiliBiliTool.Application
             if (re)
             {
                 var infoResult = await _vipApi.GetTaskList();
-                if (infoResult.Code != 0) throw new Exception(infoResult.ToJson());
+                if (infoResult.Code != 0) throw new Exception(infoResult.ToJsonStr());
                 info = infoResult.Data;
                 bonusTask = GetTarget(info);
 
@@ -186,7 +186,7 @@ namespace Ray.BiliBiliTool.Application
             if (re)
             {
                 var infoResult = await _vipApi.GetTaskList();
-                if (infoResult.Code != 0) throw new Exception(infoResult.ToJson());
+                if (infoResult.Code != 0) throw new Exception(infoResult.ToJsonStr());
                 info = infoResult.Data;
                 privilegeTask = GetTarget(info);
 
@@ -231,7 +231,7 @@ namespace Ray.BiliBiliTool.Application
             if (re)
             {
                 var infoResult = await _vipApi.GetTaskList();
-                if (infoResult.Code != 0) throw new Exception(infoResult.ToJson());
+                if (infoResult.Code != 0) throw new Exception(infoResult.ToJsonStr());
                 info = infoResult.Data;
                 targetTask = GetTarget(info);
 
@@ -276,7 +276,7 @@ namespace Ray.BiliBiliTool.Application
             if (re)
             {
                 var infoResult = await _vipApi.GetTaskList();
-                if (infoResult.Code != 0) throw new Exception(infoResult.ToJson());
+                if (infoResult.Code != 0) throw new Exception(infoResult.ToJsonStr());
                 info = infoResult.Data;
                 targetTask = GetTarget(info);
 
@@ -433,12 +433,12 @@ namespace Ray.BiliBiliTool.Application
                 if (re.Code == 0)
                     _logger.LogInformation("领取任务成功");
                 else
-                    _logger.LogInformation("领取任务失败：{msg}", re.ToJson());
+                    _logger.LogInformation("领取任务失败：{msg}", re.ToJsonStr());
             }
             catch (Exception e)
             {
                 _logger.LogError("领取任务异常");
-                _logger.LogError(e.Message + re?.ToJson());
+                _logger.LogError(e.Message + re?.ToJsonStr());
             }
         }
 
@@ -454,7 +454,7 @@ namespace Ray.BiliBiliTool.Application
 
             else
             {
-                _logger.LogInformation("失败：{msg}", re.ToJson());
+                _logger.LogInformation("失败：{msg}", re.ToJsonStr());
                 return false;
             }
         }
@@ -474,7 +474,7 @@ namespace Ray.BiliBiliTool.Application
 
             else
             {
-                _logger.LogInformation("浏览失败：{msg}", re.ToJson());
+                _logger.LogInformation("浏览失败：{msg}", re.ToJsonStr());
                 return false;
             }
         }

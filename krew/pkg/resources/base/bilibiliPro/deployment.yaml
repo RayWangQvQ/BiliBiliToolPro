@@ -13,6 +13,14 @@ spec:
     spec:
       containers:
       - name: bilibilipro
-        image: zai7lou/bilibili_tool_pro:0.2.1
+        image: zai7lou/bilibili_tool_pro:1.0.1
         imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            cpu: 80m
+            memory: 100M
+          limits:
+            cpu: 100m
+            memory: 120M
+            
   

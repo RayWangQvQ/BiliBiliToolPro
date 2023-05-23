@@ -94,7 +94,7 @@ namespace Ray.BiliBiliTool.DomainService
             }
             else
             {
-                _logger.LogWarning("获取今日任务完成状态失败：{result}", apiResponse.ToJson());
+                _logger.LogWarning("获取今日任务完成状态失败：{result}", apiResponse.ToJsonStr());
                 result = (await _dailyTaskApi.GetDailyTaskRewardInfo()).Data;
                 //todo:偶发性请求失败，再请求一次，这么写很丑陋，待用polly再框架层面实现
             }

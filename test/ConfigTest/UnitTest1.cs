@@ -23,7 +23,7 @@ namespace ConfigTest
             Program.CreateHost(new string[] { });
             string proxyAddress = Global.ConfigurationRoot["Security:WebProxy"];
 
-            if (proxyAddress.IsNotNullOrEmpty())
+            if (!proxyAddress.IsNullOrEmpty())
             {
                 WebProxy webProxy = new WebProxy();
 
@@ -128,7 +128,7 @@ namespace ConfigTest
             Program.CreateHost(new string[] { });
 
             var options = Global.ServiceProviderRoot.GetRequiredService<IOptionsMonitor<BiliBiliCookieOptions>>();
-            Debug.WriteLine(options.CurrentValue.ToJson());
+            Debug.WriteLine(options.CurrentValue.ToJsonStr());
 
             //手动赋值
             //RayConfiguration.Root["BiliBiliCookie:UserId"] = "123456";
@@ -136,10 +136,10 @@ namespace ConfigTest
 
             Debug.WriteLine($"从Configuration读取：{Global.ConfigurationRoot["BiliBiliCookie:UserId"]}");
 
-            Debug.WriteLine($"从老options读取：{options.CurrentValue.ToJson()}");
+            Debug.WriteLine($"从老options读取：{options.CurrentValue.ToJsonStr()}");
 
             var optionsNew = Global.ServiceProviderRoot.GetRequiredService<IOptionsMonitor<BiliBiliCookieOptions>>();
-            Debug.WriteLine($"从新options读取：{optionsNew.CurrentValue.ToJson()}");
+            Debug.WriteLine($"从新options读取：{optionsNew.CurrentValue.ToJsonStr()}");
         }
 
         /// <summary>

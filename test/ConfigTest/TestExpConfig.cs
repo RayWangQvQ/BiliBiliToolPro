@@ -25,7 +25,7 @@ namespace ConfigTest
             var options = scope.ServiceProvider.GetRequiredService<IOptionsMonitor<Dictionary<string, int>>>();
             var dic = options.Get(Constants.OptionsNames.ExpDictionaryName);
 
-            Debug.WriteLine(dic.ToJson());
+            Debug.WriteLine(dic.ToJsonStr());
 
             Assert.True(dic.Count > 0);
         }

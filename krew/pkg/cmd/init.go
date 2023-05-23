@@ -1,14 +1,13 @@
 package cmd
 
 import (
-	"bufio"
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"strings"
+	"time"
 
 	corev1 "k8s.io/api/core/v1"
 
@@ -23,7 +22,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/RayWangQvQ/BiliBiliToolPro/krew/pkg/options"
-	"github.com/RayWangQvQ/BiliBiliToolPro/krew/pkg/utils"
+	helper "github.com/RayWangQvQ/BiliBiliToolPro/krew/pkg/utils"
 	"sigs.k8s.io/kustomize/api/krusty"
 )
 
@@ -37,6 +36,7 @@ type initCmd struct {
 	out        io.Writer
 	errOut     io.Writer
 	output     bool
+	login      bool
 	deployOpts options.DeployOptions
 }
 
@@ -52,7 +52,7 @@ func newInitCmd(out io.Writer, errOut io.Writer) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			err := o.run(out)
 			if err != nil {
-				klog.Warning(err)
+				klog.Error(err)
 				return err
 			}
 			return nil
@@ -60,11 +60,12 @@ func newInitCmd(out io.Writer, errOut io.Writer) *cobra.Command {
 	}
 
 	f := cmd.Flags()
-	f.StringVarP(&o.deployOpts.Image, "image", "i", "zai7lou/bilibili_tool_pro:0.2.1", "bilibilipro image")
+	f.StringVarP(&o.deployOpts.Image, "image", "i", "zai7lou/bilibili_tool_pro:1.0.1", "bilibilipro image")
 	f.StringVarP(&o.deployOpts.Namespace, "namespace", "n", "bilipro", "namespace scope for this request")
 	f.StringVar(&o.deployOpts.ImagePullSecret, "image-pull-secret", "", "image pull secret to be used for pulling bilibilipro image")
 	f.StringVarP(&o.deployOpts.ConfigFilePath, "config", "c", "", "the config file contanis the environment variables")
 	f.BoolVarP(&o.output, "output", "o", false, "dry run this command and generate requisite yaml")
+	f.BoolVarP(&o.login, "login", "l", false, "scan QR login code")
 	return cmd
 }
 
@@ -87,17 +88,18 @@ type normalEnvVars struct {
 
 // run initializes local config and installs BiliBiliPro tool to Kubernetes Cluster.
 func (o *initCmd) run(writer io.Writer) error {
-	inDiskSys, err := utils.GetResourceFileSys()
+	inDiskSys, err := helper.GetResourceFileSys()
 	if err != nil {
 		return err
 	}
 
+	// TODO: All about paths are a little bit tricky should give it more thoughts
 	// if the bilibili tool is deployed under system/pre-defined namespace, ignore the namespace file
-	resources := []string{}
+	var resources []string // nolint: go-staticcheck
 	if o.deployOpts.Namespace == "default" || o.deployOpts.Namespace == "kube-system" || o.deployOpts.Namespace == "kube-public" {
-		resources = []string{"bilipro/bilibiliPro"}
+		resources = []string{"base/bilibiliPro/deployment.yaml"}
 	} else {
-		resources = []string{"bilipro/ns", "bilipro/bilibiliPro"}
+		resources = []string{"base/ns/namespace.yaml", "base/bilibiliPro/deployment.yaml"}
 	}
 
 	// write the kustomization file
@@ -120,17 +122,15 @@ func (o *initCmd) run(writer io.Writer) error {
 		})
 	}
 	// create patches for the env
-	content, err := ioutil.ReadFile(o.deployOpts.ConfigFilePath)
+	content, err := os.ReadFile(o.deployOpts.ConfigFilePath)
 	if err != nil {
-		klog.Error(err)
-		return err
+		return helper.GenErrorMsg(helper.FILE_ERROR, err.Error())
 	}
 
 	envs := []normalEnvVars{}
 	err = yaml.Unmarshal(content, &envs)
 	if err != nil {
-		klog.Error(err)
-		return err
+		return helper.GenErrorMsg(helper.TEMPLATE_ERROR, err.Error())
 	}
 
 	deployDepPatches = append(deployDepPatches, opInterface{
@@ -158,7 +158,8 @@ func (o *initCmd) run(writer io.Writer) error {
 						Version: "v1",
 						Kind:    "Deployment",
 					},
-					Name: "bilibilipro",
+					Name:      "bilibilipro",
+					Namespace: o.deployOpts.Namespace,
 				},
 			},
 		})
@@ -175,20 +176,17 @@ func (o *initCmd) run(writer io.Writer) error {
 	// Compile the kustomization to a file and create on the in memory filesystem
 	kustYaml, err := yaml.Marshal(kustomizationYaml)
 	if err != nil {
-		klog.Error(err)
 		return err
 	}
 
-	kustFile, err := inDiskSys.Create("kustomization.yaml")
+	kustFile, err := inDiskSys.Create("./bilipro/kustomization.yaml")
 	if err != nil {
-		klog.Error(err)
-		return err
+		return helper.GenErrorMsg(helper.TEMPLATE_ERROR, err.Error())
 	}
 
 	_, err = kustFile.Write(kustYaml)
 	if err != nil {
-		klog.Error(err)
-		return err
+		return helper.GenErrorMsg(helper.TEMPLATE_ERROR, err.Error())
 	}
 
 	// kustomize build the target location
@@ -198,52 +196,60 @@ func (o *initCmd) run(writer io.Writer) error {
 
 	m, err := k.Run(inDiskSys, "./bilipro")
 	if err != nil {
-		klog.Error(err)
-		return err
+		return helper.GenErrorMsg(helper.TEMPLATE_ERROR, err.Error())
 	}
 
 	yml, err := m.AsYaml()
 	if err != nil {
-		klog.Error(err)
-		return err
+		return helper.GenErrorMsg(helper.TEMPLATE_ERROR, err.Error())
 	}
 
 	if o.output {
 		_, err = writer.Write(yml)
-		klog.Error(err)
-		return err
+		if err != nil {
+			return helper.GenErrorMsg(helper.TEMPLATE_ERROR, err.Error())
+		}
 	}
 
 	// do kubectl apply
+	// make sure kubectl is under your PATH
 	cmd := exec.Command("kubectl", "apply", "-f", "-")
 
-	cmd.Stdin = strings.NewReader(string(yml))
-
-	stdoutReader, _ := cmd.StdoutPipe()
-	stdoutScanner := bufio.NewScanner(stdoutReader)
-	go func() {
-		for stdoutScanner.Scan() {
-			fmt.Println(stdoutScanner.Text())
-		}
-	}()
-	stderrReader, _ := cmd.StderrPipe()
-	stderrScanner := bufio.NewScanner(stderrReader)
-	go func() {
-		for stderrScanner.Scan() {
-			fmt.Println(stderrScanner.Text())
-		}
-	}()
-	err = cmd.Start()
-	if err != nil {
-		fmt.Printf("Error : %v \n", err)
-		os.Exit(1)
+	if err := helper.Run(cmd, strings.NewReader(string(yml))); err != nil {
+		return err
 	}
 
-	// Stuck here until there are out and err
-	err = cmd.Wait()
-	if err != nil {
-		fmt.Printf("Error: %v \n", err)
-		os.Exit(1)
+	// if there is login required
+	if o.login {
+
+		client, _, err := helper.GetK8sClient()
+		if err != nil {
+			return err
+		}
+
+		// get the pod name
+		podName, err := helper.GetBiliName(client, o.deployOpts.Namespace, "bilibilipro")
+		if err != nil {
+			return err
+		}
+
+		// TODO: Stupid way, just sleep to wait container is ready, maybe a watch is a better option
+		time.Sleep(15 * time.Second)
+		args := []string{
+			"exec",
+			podName,
+			"-n",
+			o.deployOpts.Namespace,
+			"--",
+			"dotnet",
+			"Ray.BiliBiliTool.Console.dll",
+			"--runTasks=Login",
+		}
+		cmd := exec.Command("kubectl", args...)
+
+		if err := helper.Run(cmd, nil); err != nil {
+			return err
+		}
 	}
 
 	return nil
