@@ -80,13 +80,26 @@ namespace Ray.BiliBiliTool.DomainService
         {
             if (total <= 0) return null;
 
-            var req = new SearchVideosByUpIdFullDto()
+            var req = new SearchVideosByUpIdDto()
             {
                 mid = upId,
                 ps = 1,
                 pn= new Random().Next(1, total + 1)
             };
-            BiliApiResponse<SearchUpVideosResponse> re = await _videoApi.SearchVideosByUpId(req);
+
+            var w_ridDto = await _wbiDomainService.GetWridAsync(req);
+
+            var fullDto = new SearchVideosByUpIdFullDto
+            {
+                mid = upId,
+                ps = req.ps,
+                pn = req.pn,
+
+                w_rid = w_ridDto.w_rid,
+                wts = w_ridDto.wts,
+            };
+
+            BiliApiResponse<SearchUpVideosResponse> re = await _videoApi.SearchVideosByUpId(fullDto);
 
             if (re.Code != 0)
             {
