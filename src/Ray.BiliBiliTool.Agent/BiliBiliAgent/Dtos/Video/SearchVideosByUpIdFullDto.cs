@@ -34,11 +34,14 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Video
 
         public int web_location { get; set; } = 1550101;
 
-        public bool order_avoided { get; set; } = true;
+        public string order_avoided { get; set; } = "true";
+    }
 
-        public string w_rid { get; set; } = "b280d7bc02d653ffa06d874a74e5bfd9"; //todo：应该是md5
+    public class SearchVideosByUpIdFullDto: SearchVideosByUpIdDto
+    {
+        public string w_rid { get; set; } //= "b280d7bc02d653ffa06d874a74e5bfd9"; //todo：应该是md5
 
         //public long wts { get; set; } = TimeStampHelper.DateTimeToTimeStamp(DateTime.Now);
-        public long wts { get; set; } = 1684857205; //todo
+        public long wts { get; set; } //= 1684857205; //todo
     }
 }

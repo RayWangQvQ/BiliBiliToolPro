@@ -28,6 +28,7 @@ namespace Ray.BiliBiliTool.DomainService
         private readonly IRelationApi _relationApi;
         private readonly IVideoApi _videoApi;
         private readonly IVideoWithoutCookieApi _videoWithoutCookieApi;
+        private readonly IWbiDomainService _wbiDomainService;
 
         public VideoDomainService(
             ILogger<VideoDomainService> logger,
@@ -37,7 +38,8 @@ namespace Ray.BiliBiliTool.DomainService
             IOptionsMonitor<Dictionary<string, int>> dicOptions,
             IRelationApi relationApi,
             IVideoApi videoApi,
-            IVideoWithoutCookieApi videoWithoutCookieApi
+            IVideoWithoutCookieApi videoWithoutCookieApi,
+            IWbiDomainService wbiDomainService
             )
         {
             _logger = logger;
@@ -45,6 +47,7 @@ namespace Ray.BiliBiliTool.DomainService
             _relationApi = relationApi;
             _videoApi = videoApi;
             _videoWithoutCookieApi = videoWithoutCookieApi;
+            _wbiDomainService = wbiDomainService;
             _biliBiliCookie = biliBiliCookie;
             _expDic = dicOptions.Get(Constants.OptionsNames.ExpDictionaryName);
             _dailyTaskOptions = dailyTaskOptions.CurrentValue;
@@ -77,7 +80,7 @@ namespace Ray.BiliBiliTool.DomainService
         {
             if (total <= 0) return null;
 
-            var req = new SearchVideosByUpIdDto()
+            var req = new SearchVideosByUpIdFullDto()
             {
                 mid = upId,
                 ps = 1,
@@ -104,7 +107,17 @@ namespace Ray.BiliBiliTool.DomainService
             {
                 mid = upId
             };
-            BiliApiResponse<SearchUpVideosResponse> re = await _videoApi.SearchVideosByUpId(req);
+
+            var w_ridDto = await _wbiDomainService.GetWridAsync(req);
+
+            var fullDto = new SearchVideosByUpIdFullDto
+            {
+                mid = upId,
+                w_rid = w_ridDto.w_rid,
+                wts = w_ridDto.wts,
+            };
+
+            BiliApiResponse<SearchUpVideosResponse> re = await _videoApi.SearchVideosByUpId(fullDto);
             if (re.Code != 0)
             {
                 throw new Exception(re.Message);

@@ -72,7 +72,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         [Header("Origin", "https://space.bilibili.com")]
         //[HttpGet("/x/space/wbi/arc/search?mid={upId}&ps={pageSize}&tid=0&pn={pageNumber}&keyword={keyword}&order=pubdate&platform=web&web_location=1550101&order_avoided=true&w_rid=5df06b1c48e2be86a96e9d0f99bf06f4&wts=1684854929")]
         [HttpGet("/x/space/wbi/arc/search")]
-        Task<BiliApiResponse<SearchUpVideosResponse>> SearchVideosByUpId([PathQuery] SearchVideosByUpIdDto request);
+        Task<BiliApiResponse<SearchUpVideosResponse>> SearchVideosByUpId([PathQuery] SearchVideosByUpIdFullDto request);
         
     }
 
