@@ -34,7 +34,7 @@ namespace Ray.BiliBiliTool.Config
         /// <returns></returns>
         public static Dictionary<string, string> GetExpDic()
         {
-            Dictionary<string, string> dic = new Dictionary<string, string>()
+            Dictionary<string, string> dic = new()
             {
                 {"每日登录", "5"},
                 {"每日观看视频", "5"},
