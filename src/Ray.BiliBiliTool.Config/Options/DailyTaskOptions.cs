@@ -82,13 +82,13 @@ namespace Ray.BiliBiliTool.Config.Options
             get
             {
                 List<long> re = new();
-                if(string.IsNullOrWhiteSpace(SupportUpIds) | SupportUpIds == "-1")
+                if (string.IsNullOrWhiteSpace(SupportUpIds) | SupportUpIds == "-1")
                     return re;
 
                 string[] array = SupportUpIds.Split(',');
-                foreach(string item in array)
+                foreach (string item in array)
                 {
-                    if(long.TryParse(item.Trim(), out long upId))
+                    if (long.TryParse(item.Trim(), out long upId))
                         re.Add(upId);
                     else
                         re.Add(long.MinValue);

@@ -52,7 +52,7 @@ namespace Ray.BiliBiliTool.Console
                 _logger.LogInformation("BiliBiliToolPro 开始运行...{newLine}", Environment.NewLine);
 
                 bool pass = await PreCheckAsync(cancellationToken);
-                if(!pass)
+                if (!pass)
                     return;
 
                 await RandomSleepAsync(cancellationToken);
@@ -60,13 +60,13 @@ namespace Ray.BiliBiliTool.Console
                 string[] tasks = await ReadTargetTasksAsync(cancellationToken);
                 _logger.LogInformation("【目标任务】{tasks}", string.Join(",", tasks));
 
-                if(tasks.Contains("Login"))
+                if (tasks.Contains("Login"))
                 {
                     await DoTasksAsync(tasks, cancellationToken);
                 }
                 else
                 {
-                    for(int i = 0 ; i < _cookieStrFactory.Count ; i++)
+                    for (int i = 0 ; i < _cookieStrFactory.Count ; i++)
                     {
                         _cookieStrFactory.CurrentNum = i + 1;
                         _logger.LogInformation("######### 账号 {num} #########{newLine}", _cookieStrFactory.CurrentNum, Environment.NewLine);
@@ -74,7 +74,7 @@ namespace Ray.BiliBiliTool.Console
                         try
                         {
                             await DoTasksAsync(tasks, cancellationToken);
-                            if(isNotifySingle)
+                            if (isNotifySingle)
                             {
                                 LogAppInfo();
 
@@ -82,7 +82,7 @@ namespace Ray.BiliBiliTool.Console
                                 _logger.LogInformation("·开始推送·{task}·{user}", $"{_configuration["RunTasks"]}任务", accountName);
                             }
                         }
-                        catch(Exception e)
+                        catch (Exception e)
                         {
                             //ignore
                             _logger.LogWarning("异常：{msg}", e);
@@ -90,14 +90,14 @@ namespace Ray.BiliBiliTool.Console
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError("程序异常终止，原因：{msg}", ex.Message);
                 throw;
             }
             finally
             {
-                if(!isNotifySingle)
+                if (!isNotifySingle)
                 {
                     LogAppInfo();
                     _logger.LogInformation("·开始推送·{task}·{user}", $"{_configuration["RunTasks"]}任务", "");
@@ -123,7 +123,7 @@ namespace Ray.BiliBiliTool.Console
             _logger.LogInformation("【账号个数】{count}个{newLine}", _cookieStrFactory.Count, Environment.NewLine);
 
             //是否跳过
-            if(_securityOptions.IsSkipDailyTask)
+            if (_securityOptions.IsSkipDailyTask)
             {
                 _logger.LogWarning("已配置为跳过任务{newLine}", Environment.NewLine);
                 return Task.FromResult(false);
@@ -134,10 +134,10 @@ namespace Ray.BiliBiliTool.Console
 
         private async Task RandomSleepAsync(CancellationToken cancellationToken)
         {
-            if(_configuration["RunTasks"].Contains("Login") || _configuration["RunTasks"].Contains("Test"))
+            if (_configuration["RunTasks"].Contains("Login") || _configuration["RunTasks"].Contains("Test"))
                 return;
 
-            if(_securityOptions.RandomSleepMaxMin > 0)
+            if (_securityOptions.RandomSleepMaxMin > 0)
             {
                 int randomMin = new Random().Next(1, ++_securityOptions.RandomSleepMaxMin);
                 _logger.LogInformation("随机休眠{min}分钟{newLine}", randomMin, Environment.NewLine);
@@ -154,7 +154,7 @@ namespace Ray.BiliBiliTool.Console
         {
             string[] tasks = _configuration["RunTasks"]
                 .Split("&", options: StringSplitOptions.RemoveEmptyEntries);
-            if(tasks.Any())
+            if (tasks.Any())
             {
                 return Task.FromResult(tasks);
             }
@@ -163,11 +163,11 @@ namespace Ray.BiliBiliTool.Console
             TaskTypeFactory.Show(_logger);
             _logger.LogInformation("请输入：");
 
-            while(true)
+            while (true)
             {
                 string index = System.Console.ReadLine();
                 bool suc = int.TryParse(index, out int num);
-                if(suc)
+                if (suc)
                 {
                     string code = TaskTypeFactory.GetCodeByIndex(num);
                     _configuration["RunTasks"] = code;
@@ -181,10 +181,10 @@ namespace Ray.BiliBiliTool.Console
         private async Task DoTasksAsync(string[] tasks, CancellationToken cancellationToken)
         {
             using IServiceScope scope = _serviceProvider.CreateScope();
-            foreach(string task in tasks)
+            foreach (string task in tasks)
             {
                 Type type = TaskTypeFactory.Create(task);
-                if(type == null)
+                if (type == null)
                 {
                     _logger.LogWarning("任务不存在：{task}", task);
                     continue;

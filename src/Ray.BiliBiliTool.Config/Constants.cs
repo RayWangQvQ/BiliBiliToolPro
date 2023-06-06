@@ -57,7 +57,7 @@ namespace Ray.BiliBiliTool.Config
         /// <returns></returns>
         public static Dictionary<string, string> GetDonateCoinCanContinueStatusDic()
         {
-            Dictionary<string, string> dic = new Dictionary<string, string>()
+            Dictionary<string, string> dic = new()
             {
                 {"0", "成功"},
                 {"-400", "请求错误"},
