@@ -49,7 +49,7 @@ namespace Ray.BiliBiliTool.Config
         /// <returns></returns>
         private string NormalizeKey(string key)
         {
-            if(_removeKeyPrefix)
+            if (_removeKeyPrefix)
                 key = RemoveKeyPrefix(key);
             key = ReplaceKeyDelimiter(key);
             return key;

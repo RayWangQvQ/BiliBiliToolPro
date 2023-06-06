@@ -66,7 +66,7 @@ namespace Ray.BiliBiliTool.Console
                 }
                 else
                 {
-                    for (int i = 0 ; i < _cookieStrFactory.Count ; i++)
+                    for (int i = 0; i < _cookieStrFactory.Count; i++)
                     {
                         _cookieStrFactory.CurrentNum = i + 1;
                         _logger.LogInformation("######### 账号 {num} #########{newLine}", _cookieStrFactory.CurrentNum, Environment.NewLine);
