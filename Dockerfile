@@ -12,17 +12,6 @@ COPY ["src/Ray.BiliBiliTool.Infrastructure/Ray.BiliBiliTool.Infrastructure.cspro
 COPY ["src/Ray.BiliBiliTool.Agent/Ray.BiliBiliTool.Agent.csproj", "src/Ray.BiliBiliTool.Agent/"]
 COPY ["src/Ray.BiliBiliTool.Application/Ray.BiliBiliTool.Application.csproj", "src/Ray.BiliBiliTool.Application/"]
 COPY ["src/Ray.BiliBiliTool.Application.Contracts/Ray.BiliBiliTool.Application.Contracts.csproj", "src/Ray.BiliBiliTool.Application.Contracts/"]
-COPY ["src/Ray.Serilog.Sinks/Ray.Serilog.Sinks.CoolPushBatched/Ray.Serilog.Sinks.CoolPushBatched.csproj", "src/Ray.Serilog.Sinks/Ray.Serilog.Sinks.CoolPushBatched/"]
-COPY ["src/Ray.Serilog.Sinks/Ray.Serilog.Sinks.Batched/Ray.Serilog.Sinks.Batched.csproj", "src/Ray.Serilog.Sinks/Ray.Serilog.Sinks.Batched/"]
-COPY ["src/Ray.Serilog.Sinks/Ray.Serilog.Sinks.TelegramBatched/Ray.Serilog.Sinks.TelegramBatched.csproj", "src/Ray.Serilog.Sinks/Ray.Serilog.Sinks.TelegramBatched/"]
-COPY ["src/Ray.Serilog.Sinks/Ray.Serilog.Sinks.WorkWeiXinBatched/Ray.Serilog.Sinks.WorkWeiXinBatched.csproj", "src/Ray.Serilog.Sinks/Ray.Serilog.Sinks.WorkWeiXinBatched/"]
-COPY ["src/Ray.Serilog.Sinks/Ray.Serilog.Sinks.OtherApiBatched/Ray.Serilog.Sinks.OtherApiBatched.csproj", "src/Ray.Serilog.Sinks/Ray.Serilog.Sinks.OtherApiBatched/"]
-COPY ["src/Ray.Serilog.Sinks/Ray.Serilog.Sinks.DingTalkBatched/Ray.Serilog.Sinks.DingTalkBatched.csproj", "src/Ray.Serilog.Sinks/Ray.Serilog.Sinks.DingTalkBatched/"]
-COPY ["src/Ray.Serilog.Sinks/Ray.Serilog.Sinks.PushPlusBatched/Ray.Serilog.Sinks.PushPlusBatched.csproj", "src/Ray.Serilog.Sinks/Ray.Serilog.Sinks.PushPlusBatched/"]
-COPY ["src/Ray.Serilog.Sinks/Ray.Serilog.Sinks.ServerChanBatched/Ray.Serilog.Sinks.ServerChanBatched.csproj", "src/Ray.Serilog.Sinks/Ray.Serilog.Sinks.ServerChanBatched/"]
-COPY ["src/Ray.Serilog.Sinks/Ray.Serilog.Sinks.MicrosoftTeamsBatched/Ray.Serilog.Sinks.MicrosoftTeamsBatched.csproj", "src/Ray.Serilog.Sinks/Ray.Serilog.Sinks.MicrosoftTeamsBatched/"]
-COPY ["src/Ray.Serilog.Sinks/Ray.Serilog.Sinks.WorkWeiXinAppBatched/Ray.Serilog.Sinks.WorkWeiXinAppBatched.csproj", "src/Ray.Serilog.Sinks/Ray.Serilog.Sinks.WorkWeiXinAppBatched/"]
-COPY ["src/Ray.Serilog.Sinks/Ray.Serilog.Sinks.GotifyBatched/Ray.Serilog.Sinks.GotifyBatched.csproj", "src/Ray.Serilog.Sinks/Ray.Serilog.Sinks.GotifyBatched/"]
 RUN dotnet restore "src/Ray.BiliBiliTool.Console/Ray.BiliBiliTool.Console.csproj"
 COPY . .
 WORKDIR "/code/src/Ray.BiliBiliTool.Console"

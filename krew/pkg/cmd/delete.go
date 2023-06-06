@@ -1,10 +1,7 @@
 package cmd
 
 import (
-	"bufio"
-	"fmt"
 	"io"
-	"os"
 	"os/exec"
 	"strings"
 
@@ -15,7 +12,7 @@ import (
 	"k8s.io/klog/v2"
 
 	"github.com/RayWangQvQ/BiliBiliToolPro/krew/pkg/options"
-	"github.com/RayWangQvQ/BiliBiliToolPro/krew/pkg/utils"
+	helper "github.com/RayWangQvQ/BiliBiliToolPro/krew/pkg/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -45,7 +42,7 @@ func newDeleteCmd(out io.Writer, errOut io.Writer) *cobra.Command {
 
 			err := o.run(out)
 			if err != nil {
-				klog.Warning(err)
+				klog.Error(err)
 				return err
 			}
 			return nil
@@ -59,19 +56,13 @@ func newDeleteCmd(out io.Writer, errOut io.Writer) *cobra.Command {
 }
 
 func (o *deleteCmd) run(writer io.Writer) error {
-	inDiskSys, err := utils.GetResourceFileSys()
+	inDiskSys, err := helper.GetResourceFileSys()
 	if err != nil {
-		klog.Error(err)
 		return err
 	}
 
-	// if the bilibili tool is deployed under system/pre-defined namespace, ignore the namespace file
-	resources := []string{}
-	if o.deployOpts.Namespace == "default" || o.deployOpts.Namespace == "kube-system" || o.deployOpts.Namespace == "kube-public" {
-		resources = []string{"bilipro/bilibiliPro"}
-	} else {
-		resources = []string{"bilipro/bilibiliPro", "bilipro/ns"}
-	}
+	// remove namespace files lastly
+	resources := []string{"base/bilibiliPro/deployment.yaml"}
 
 	// write the kustomization file
 
@@ -90,20 +81,17 @@ func (o *deleteCmd) run(writer io.Writer) error {
 	// Compile the kustomization to a file and create on the in memory filesystem
 	kustYaml, err := yaml.Marshal(kustomizationYaml)
 	if err != nil {
-		klog.Error(err)
-		return err
+		return helper.GenErrorMsg(helper.TEMPLATE_ERROR, err.Error())
 	}
 
-	kustFile, err := inDiskSys.Create("kustomization.yaml")
+	kustFile, err := inDiskSys.Create("./bilipro/kustomization.yaml")
 	if err != nil {
-		klog.Error(err)
-		return err
+		return helper.GenErrorMsg(helper.TEMPLATE_ERROR, err.Error())
 	}
 
 	_, err = kustFile.Write(kustYaml)
 	if err != nil {
-		klog.Error(err)
-		return err
+		return helper.GenErrorMsg(helper.TEMPLATE_ERROR, err.Error())
 	}
 
 	// kustomize build the target location
@@ -113,53 +101,30 @@ func (o *deleteCmd) run(writer io.Writer) error {
 
 	m, err := k.Run(inDiskSys, "./bilipro")
 	if err != nil {
-		klog.Error(err)
-		return err
+		return helper.GenErrorMsg(helper.TEMPLATE_ERROR, err.Error())
 	}
 
 	yml, err := m.AsYaml()
 	if err != nil {
-		klog.Error(err)
-		return err
+		return helper.GenErrorMsg(helper.TEMPLATE_ERROR, err.Error())
 	}
 
 	if o.output {
 		_, err = writer.Write(yml)
-		klog.Error(err)
-		return err
+		return helper.GenErrorMsg(helper.TEMPLATE_ERROR, err.Error())
 	}
 
 	// do kubectl delete
 	cmd := exec.Command("kubectl", "delete", "-f", "-")
 
-	cmd.Stdin = strings.NewReader(string(yml))
-
-	stdoutReader, _ := cmd.StdoutPipe()
-	stdoutScanner := bufio.NewScanner(stdoutReader)
-	go func() {
-		for stdoutScanner.Scan() {
-			fmt.Println(stdoutScanner.Text())
-		}
-	}()
-	stderrReader, _ := cmd.StderrPipe()
-	stderrScanner := bufio.NewScanner(stderrReader)
-	go func() {
-		for stderrScanner.Scan() {
-			fmt.Println(stderrScanner.Text())
-		}
-	}()
-	err = cmd.Start()
-	if err != nil {
-		fmt.Printf("Error : %v \n", err)
-		os.Exit(1)
+	if err := helper.Run(cmd, strings.NewReader(string(yml))); err != nil {
+		return err
 	}
 
-	// stuck here to wait for the completion
-	err = cmd.Wait()
-	if err != nil {
-		fmt.Printf("Error: %v \n", err)
-		os.Exit(1)
+	// delete the namespace
+	cmd = exec.Command("kubectl", "delete", "ns", o.deployOpts.Namespace)
+	if err := helper.Run(cmd, nil); err != nil {
+		return err
 	}
-
 	return nil
 }

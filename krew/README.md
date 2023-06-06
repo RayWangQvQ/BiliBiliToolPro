@@ -10,7 +10,7 @@
 ## Install Plugin
 
 Command: `cd ./krew && make deploy`
-The binary will be generated in cmd/ install it alonside the kubectl binary. 
+The binary will be generated in cmd/ install it alonside the kubectl binary.
 
 For example: the kubectl is installed under `/usr/bin`, then put the bilibilipro plugin under `/usr/bin` too.
 
@@ -18,14 +18,13 @@ For example: the kubectl is installed under `/usr/bin`, then put the bilibilipro
 
 ### Deployment && Update
 
-Command: `kubectl bilipro init --config config.yaml`
+Command: `kubectl bilipro init --config config.yaml [optional]--login`
 
-Creates Deployment with the needed environments. 
-
+Creates Deployment with the needed environments.
 
 Optional Options:
 
-- `--image=zai7lou/bilibili_tool_pro:0.2.1`
+- `--image=zai7lou/bilibili_tool_pro:1.0.1`
 - `--namespace=bilipro`
 - `--image-pull-secret=`
 
@@ -36,6 +35,7 @@ Required Options:
 The content of <config.yaml> is a yaml array, please refer to the example config yaml under the krew directory.
 
 For example
+
 ````yaml
 - name: Ray_BiliBiliCookies__2
   value: "cookie"
@@ -44,9 +44,7 @@ For example
   value: "11 11 * * *"
 ````
 
-
 Suggestions: Deploy this workload in namespace other than default or kube-* namespace, because the delete logic should be improved
-
 
 ### Deletion
 
@@ -65,4 +63,6 @@ Command: `kubectl bilipro version`
 
 Output the plugin version.
 
+## Package
 
+Pls refer to [installation](https://krew.sigs.k8s.io/docs), you can package your own krew plugin
