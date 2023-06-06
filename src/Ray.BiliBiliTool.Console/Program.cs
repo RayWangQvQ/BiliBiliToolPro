@@ -27,7 +27,7 @@ namespace Ray.BiliBiliTool.Console
                 await host.RunAsync();
                 return 0;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Log.Fatal(ex, "Host terminated unexpectedly!");
                 return 1;
@@ -60,7 +60,7 @@ namespace Ray.BiliBiliTool.Console
             {
                 hostConfigurationBuilder.AddEnvironmentVariables(prefix: "DOTNET_");
 
-                if(args is { Length: > 0 })
+                if (args is { Length: > 0 })
                 {
                     hostConfigurationBuilder.AddCommandLine(args);
                 }
@@ -82,7 +82,7 @@ namespace Ray.BiliBiliTool.Console
                     ;
 
                 //用户机密：
-                if(env.IsDevelopment() && env.ApplicationName?.Length > 0)
+                if (env.IsDevelopment() && env.ApplicationName?.Length > 0)
                 {
                     //var appAssembly = Assembly.Load(new AssemblyName(env.ApplicationName));
                     Assembly appAssembly = Assembly.GetAssembly(typeof(Program));
@@ -94,7 +94,7 @@ namespace Ray.BiliBiliTool.Console
                 configurationBuilder.AddExcludeEmptyEnvironmentVariables("Ray_");
 
                 //命令行：
-                if(args != null && args.Length > 0)
+                if (args != null && args.Length > 0)
                 {
                     configurationBuilder.AddCommandLine(args, Config.Constants.GetCommandLineMappingsDic());
                 }
