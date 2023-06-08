@@ -24,6 +24,11 @@ namespace Ray.BiliBiliTool.Config.Options
         public int NumberOfCoins { get; set; } = 5;
 
         /// <summary>
+        /// 要保留的硬币数量 [0,int_max]
+        /// </summary>
+        public int NumberOfProtectedCoins { get; set; } = 0;
+
+        /// <summary>
         /// 达到六级后是否开始白嫖
         /// </summary>
         public bool SaveCoinsWhenLv6 { get; set; } = false;

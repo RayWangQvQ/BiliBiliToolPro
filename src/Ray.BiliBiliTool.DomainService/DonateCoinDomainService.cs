@@ -70,6 +70,7 @@ namespace Ray.BiliBiliTool.DomainService
         public async Task AddCoinsForVideos()
         {
             int needCoins = await GetNeedDonateCoinNum();
+            int protectedCoins = _dailyTaskOptions.NumberOfProtectedCoins;
             if (needCoins <= 0) return;
 
             //投币前硬币余额
@@ -82,11 +83,25 @@ namespace Ray.BiliBiliTool.DomainService
                 return;
             }
 
+            if (coinBalance <= protectedCoins)
+            {
+                _logger.LogInformation("因硬币余额达到或低于保留值，今日暂不执行投币任务");
+                return;
+            }
+
             //余额小于目标投币数，按余额投
             if (coinBalance < needCoins)
             {
                 _ = int.TryParse(decimal.Truncate(coinBalance).ToString(), out needCoins);
                 _logger.LogInformation("因硬币余额不足，目标投币数调整为: {needCoins}", needCoins);
+            }
+
+            //投币后余额小于等于保护值，按保护值允许投
+            if (coinBalance - needCoins <= protectedCoins)
+            {
+                //余额除去保护部分后还可以投多少
+                _ = int.TryParse(decimal.Truncate(coinBalance - protectedCoins).ToString(), out needCoins);
+                _logger.LogInformation("因硬币余额投币后将达到或低于保留值，目标投币数调整为: {needCoins}", needCoins);
             }
 
             int success = 0;
