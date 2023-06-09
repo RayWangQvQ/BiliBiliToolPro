@@ -77,6 +77,15 @@ namespace Ray.BiliBiliTool.Config.Options
         /// </summary>
         public string DevicePlatform { get; set; } = "android";
 
+        /// <summary>
+        /// 自定义漫画阅读 comic_id
+        /// </summary>
+        public int CustomComicId { get; set; } = 27355;
+
+        /// <summary>
+        /// 自定义漫画阅读 ep_id
+        /// </summary>
+        public int CustomEpId { get; set; } = 381662;
 
         public List<long> SupportUpIdList
         {
