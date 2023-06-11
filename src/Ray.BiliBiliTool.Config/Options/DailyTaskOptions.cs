@@ -28,7 +28,6 @@ namespace Ray.BiliBiliTool.Config.Options
         /// </summary>
         public bool SaveCoinsWhenLv6 { get; set; } = false;
 
-
         /// <summary>
         /// 投币时是否点赞[false,true]
         /// </summary>
@@ -50,6 +49,7 @@ namespace Ray.BiliBiliTool.Config.Options
         public string AutoChargeUpId { get; set; }
 
         private string _chargeComment;
+
         /// <summary>
         /// 充电后留言
         /// </summary>
@@ -77,16 +77,16 @@ namespace Ray.BiliBiliTool.Config.Options
         /// </summary>
         public string DevicePlatform { get; set; } = "android";
 
-
         public List<long> SupportUpIdList
         {
             get
             {
-                var re = new List<long>();
-                if (string.IsNullOrWhiteSpace(SupportUpIds) | SupportUpIds == "-1") return re;
+                List<long> re = new();
+                if (string.IsNullOrWhiteSpace(SupportUpIds) | SupportUpIds == "-1")
+                    return re;
 
-                var array = SupportUpIds.Split(',');
-                foreach (var item in array)
+                string[] array = SupportUpIds.Split(',');
+                foreach (string item in array)
                 {
                     if (long.TryParse(item.Trim(), out long upId))
                         re.Add(upId);
