@@ -87,6 +87,7 @@ namespace Ray.BiliBiliTool.Config
                 {"--randomSleep","Security:RandomSleepMaxMin"},
 
                 {"--numberOfCoins", "DailyTaskConfig:NumberOfCoins"},
+                {"--numberOfProtectedCoins", "DailyTaskConfig:NumberOfProtectedCoins"},
                 {"--saveCoinsWhenLv6", "DailyTaskConfig:SaveCoinsWhenLv6"},
                 {"--selectLike", "DailyTaskConfig:SelectLike"},
                 {"--supportUpIds", "DailyTaskConfig:SupportUpIds"},
