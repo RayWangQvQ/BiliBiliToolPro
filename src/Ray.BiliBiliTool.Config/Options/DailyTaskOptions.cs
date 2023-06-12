@@ -24,10 +24,14 @@ namespace Ray.BiliBiliTool.Config.Options
         public int NumberOfCoins { get; set; } = 5;
 
         /// <summary>
+        /// 要保留的硬币数量 [0,int_max]
+        /// </summary>
+        public int NumberOfProtectedCoins { get; set; } = 0;
+
+        /// <summary>
         /// 达到六级后是否开始白嫖
         /// </summary>
         public bool SaveCoinsWhenLv6 { get; set; } = false;
-
 
         /// <summary>
         /// 投币时是否点赞[false,true]
@@ -50,6 +54,7 @@ namespace Ray.BiliBiliTool.Config.Options
         public string AutoChargeUpId { get; set; }
 
         private string _chargeComment;
+
         /// <summary>
         /// 充电后留言
         /// </summary>
@@ -91,11 +96,12 @@ namespace Ray.BiliBiliTool.Config.Options
         {
             get
             {
-                var re = new List<long>();
-                if (string.IsNullOrWhiteSpace(SupportUpIds) | SupportUpIds == "-1") return re;
+                List<long> re = new();
+                if (string.IsNullOrWhiteSpace(SupportUpIds) | SupportUpIds == "-1")
+                    return re;
 
-                var array = SupportUpIds.Split(',');
-                foreach (var item in array)
+                string[] array = SupportUpIds.Split(',');
+                foreach (string item in array)
                 {
                     if (long.TryParse(item.Trim(), out long upId))
                         re.Add(upId);

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
@@ -56,7 +54,8 @@ namespace Ray.BiliBiliTool.Console
 
             //hostBuilder.UseContentRoot(Directory.GetCurrentDirectory());
 
-            //承载系统自身的配置：
+            #region 承载系统自身的配置
+
             hostBuilder.ConfigureHostConfiguration(hostConfigurationBuilder =>
             {
                 hostConfigurationBuilder.AddEnvironmentVariables(prefix: "DOTNET_");
@@ -67,22 +66,26 @@ namespace Ray.BiliBiliTool.Console
                 }
             });
 
-            //应用配置:
+            #endregion 承载系统自身的配置
+
+            #region 应用配置
+
             hostBuilder.ConfigureAppConfiguration((hostBuilderContext, configurationBuilder) =>
             {
                 Global.HostingEnvironment = hostBuilderContext.HostingEnvironment;
                 IHostEnvironment env = hostBuilderContext.HostingEnvironment;
 
                 //json文件：
+                string envName = hostBuilderContext.HostingEnvironment.EnvironmentName;
                 configurationBuilder.AddJsonFile("appsettings.json", true, true)
-                    .AddJsonFile($"appsettings.{hostBuilderContext.HostingEnvironment.EnvironmentName}.json", true, true)
+                    .AddJsonFile($"appsettings.{envName}.json", true, true)
                     ;
 
                 //用户机密：
                 if (env.IsDevelopment() && env.ApplicationName?.Length > 0)
                 {
                     //var appAssembly = Assembly.Load(new AssemblyName(env.ApplicationName));
-                    var appAssembly = Assembly.GetAssembly(typeof(Program));
+                    Assembly appAssembly = Assembly.GetAssembly(typeof(Program));
                     configurationBuilder.AddUserSecrets(appAssembly, optional: true, reloadOnChange: true);
                 }
 
@@ -104,16 +107,23 @@ namespace Ray.BiliBiliTool.Console
                 configurationBuilder.AddInMemoryCollection(Config.Constants.GetDonateCoinCanContinueStatusDic());
             });
 
-            //日志:
+            #endregion 应用配置
+
+            #region 日志
+
             hostBuilder.ConfigureLogging((hostBuilderContext, loggingBuilder) =>
             {
                 Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(hostBuilderContext.Configuration)
                 .CreateLogger();
                 SelfLog.Enable(x => System.Console.WriteLine(x ?? ""));
-            }).UseSerilog();
+            })
+                .UseSerilog();
 
-            //DI容器:
+            #endregion 日志
+
+            #region DI容器
+
             hostBuilder.ConfigureServices((hostContext, services) =>
             {
                 Global.ConfigurationRoot = (IConfigurationRoot)hostContext.Configuration;
@@ -126,9 +136,14 @@ namespace Ray.BiliBiliTool.Console
                 services.AddAppServices();
             });
 
+            #endregion DI容器
+
             return hostBuilder;
         }
 
+        /// <summary>
+        /// 输出本工具启动logo
+        /// </summary>
         private static void PrintLogo()
         {
             System.Console.WriteLine(@"  ____               ____    _   _____           _  ");
