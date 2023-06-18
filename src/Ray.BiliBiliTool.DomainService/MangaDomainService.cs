@@ -62,6 +62,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// </summary>
         public async Task MangaRead()
         {
+            if ( _dailyTaskOptions.CustomComicId <= 0 ) return;
             BiliApiResponse response = await _mangaApi.ReadManga(_dailyTaskOptions.DevicePlatform, _dailyTaskOptions.CustomComicId, _dailyTaskOptions.CustomEpId);
 
             if (response.Code == 0)
