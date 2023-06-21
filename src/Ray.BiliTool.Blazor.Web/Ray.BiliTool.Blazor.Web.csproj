@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net6</TargetFramework>
@@ -6,15 +6,38 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AntDesign.Charts" Version="0.2.3" />
-    <PackageReference Include="AntDesign.ProLayout" Version="0.12.4" />
+    <Content Remove="cookies.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AntDesign.Charts" Version="0.3.1" />
+    <PackageReference Include="AntDesign.ProLayout" Version="0.14.4.1" />
     <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="6.0.15" />
+    <PackageReference Include="Hangfire.AspNetCore" Version="1.8.2" />
+    <PackageReference Include="Hangfire.Core" Version="1.8.2" />
+    <PackageReference Include="Hangfire.SqlServer" Version="1.8.2" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.1" />
     <PackageReference Include="System.Net.Http.Json" Version="6.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.14" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.14" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.14" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.14" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.14" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Jobs\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="cookies.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Ray.BiliBiliTool.Application.Contracts\Ray.BiliBiliTool.Application.Contracts.csproj" />
+    <ProjectReference Include="..\Ray.BiliBiliTool.Application\Ray.BiliBiliTool.Application.csproj" />
   </ItemGroup>
   
 </Project>

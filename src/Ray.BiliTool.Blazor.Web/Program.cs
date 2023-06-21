@@ -20,6 +20,11 @@ namespace Ray.BiliTool.Blazor.Web
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+                .ConfigureAppConfiguration((hostBuilderContext, configurationBuilder) =>
+                {
+                    //本地cookie存储文件
+                    configurationBuilder.AddJsonFile("cookies.json", true, true);
+                })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();

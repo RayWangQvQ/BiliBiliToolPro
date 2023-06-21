@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
@@ -17,6 +18,14 @@ using Microsoft.EntityFrameworkCore;
 using Ray.BiliTool.Blazor.Web.Areas.Identity;
 using Ray.BiliTool.Blazor.Web.Data;
 using Ray.BiliTool.Blazor.Web.Services;
+using Hangfire;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Ray.BiliBiliTool.Agent.Extensions;
+using Ray.BiliBiliTool.Application.Extensions;
+using Ray.BiliBiliTool.Application.Contracts;
+using Ray.BiliBiliTool.Config.Extensions;
+using Ray.BiliBiliTool.DomainService.Extensions;
+using Ray.BiliBiliTool.Infrastructure;
 
 namespace Ray.BiliTool.Blazor.Web
 {
@@ -71,11 +80,21 @@ namespace Ray.BiliTool.Blazor.Web
                 {
                     Configuration.Bind("OAuth:GitHub", o);
                 });
+
+            //Hangfire
+            services.AddHangfire(Configuration);
+
+            services.AddBiliBiliConfigs(Configuration)
+                .AddBiliBiliClientApi(Configuration)
+                .AddDomainServices()
+                .AddAppServices();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            Global.ServiceProviderRoot = app.ApplicationServices;
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -100,7 +119,34 @@ namespace Ray.BiliTool.Blazor.Web
             {
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
+                endpoints.MapHangfireDashboard();
             });
+
+            BackgroundJob.Enqueue(() => Console.WriteLine("Hello world from Hangfire!"));
+            RecurringJob.AddOrUpdate("health-check", () => Console.WriteLine("healthy!"), Cron.Minutely);
+            RecurringJob.AddOrUpdate<ITestAppService>("test", x => x.DoTaskAsync(default), Cron.Daily);
+        }
+    }
+
+    public static class ServiceCollectionExt
+    {
+        public static IServiceCollection AddHangfire(this IServiceCollection services, IConfiguration config)
+        {
+            var connectionString = config.GetConnectionString("DefaultConnection")
+                                   ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
+            // Add Hangfire services.
+            services.AddHangfire(configuration => configuration
+                .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseRecommendedSerializerSettings()
+                .UseSqlServerStorage(connectionString)
+            );
+
+            // Add the processing server as IHostedService
+            services.AddHangfireServer();
+
+            return services;
         }
     }
 }

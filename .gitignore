@@ -368,4 +368,4 @@ krew/pkg/utils/fixtures
 kustomization.yaml
 
 # cookie config
-**/Ray.BiliBiliTool.Console/cookies.json
+**/cookies.json

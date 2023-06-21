@@ -130,10 +130,10 @@ namespace Ray.BiliBiliTool.Console
 
                 services.AddHostedService<BiliBiliToolHostedService>();
 
-                services.AddBiliBiliConfigs(hostContext.Configuration);
-                services.AddBiliBiliClientApi(hostContext.Configuration);
-                services.AddDomainServices();
-                services.AddAppServices();
+                services.AddBiliBiliConfigs(hostContext.Configuration)
+                    .AddBiliBiliClientApi(hostContext.Configuration)
+                    .AddDomainServices()
+                    .AddAppServices();
             });
 
             #endregion DI容器
