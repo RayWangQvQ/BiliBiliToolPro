@@ -19,6 +19,8 @@ using Ray.BiliTool.Blazor.Web.Areas.Identity;
 using Ray.BiliTool.Blazor.Web.Data;
 using Ray.BiliTool.Blazor.Web.Services;
 using Hangfire;
+using Hangfire.Console;
+using Hangfire.Console.Extensions;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Ray.BiliBiliTool.Agent.Extensions;
 using Ray.BiliBiliTool.Application.Extensions;
@@ -141,10 +143,13 @@ namespace Ray.BiliTool.Blazor.Web
                 .UseSimpleAssemblyNameTypeSerializer()
                 .UseRecommendedSerializerSettings()
                 .UseSqlServerStorage(connectionString)
+                .UseConsole()
             );
 
             // Add the processing server as IHostedService
             services.AddHangfireServer();
+
+            services.AddHangfireConsoleExtensions();
 
             return services;
         }
