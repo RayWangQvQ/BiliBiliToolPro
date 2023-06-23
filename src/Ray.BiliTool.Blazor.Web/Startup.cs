@@ -21,6 +21,7 @@ using Ray.BiliTool.Blazor.Web.Services;
 using Hangfire;
 using Hangfire.Console;
 using Hangfire.Console.Extensions;
+using Hangfire.RecurringJobAdmin;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Ray.BiliBiliTool.Agent.Extensions;
 using Ray.BiliBiliTool.Application.Extensions;
@@ -144,11 +145,11 @@ namespace Ray.BiliTool.Blazor.Web
                 .UseRecommendedSerializerSettings()
                 .UseSqlServerStorage(connectionString)
                 .UseConsole()
+                .UseRecurringJobAdmin(typeof(Startup).Assembly)
             );
 
             // Add the processing server as IHostedService
             services.AddHangfireServer();
-
             services.AddHangfireConsoleExtensions();
 
             return services;
