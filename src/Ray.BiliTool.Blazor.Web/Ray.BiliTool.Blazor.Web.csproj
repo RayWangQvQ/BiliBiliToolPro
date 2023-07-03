@@ -42,5 +42,9 @@
     <ProjectReference Include="..\Ray.BiliBiliTool.Application.Contracts\Ray.BiliBiliTool.Application.Contracts.csproj" />
     <ProjectReference Include="..\Ray.BiliBiliTool.Application\Ray.BiliBiliTool.Application.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Pages\User\RegisterResult\" />
+  </ItemGroup>
   
 </Project>

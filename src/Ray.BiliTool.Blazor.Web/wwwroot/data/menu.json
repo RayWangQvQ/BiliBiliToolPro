@@ -6,25 +6,30 @@
     "icon": "dashboard"
   },
   {
-    "path": "/dashboard",
+    "path": "/Configs",
     "name": "配置",
-    "key": "dashboard",
+    "key": "Configs",
     "icon": "dashboard",
     "children": [
       {
-        "path": "/daily",
+        "path": "/Configs/Daily",
         "name": "每日任务",
-        "key": "dashboard.analysis"
+        "key": "Configs.Daily"
       },
       {
-        "path": "/dashboard/monitor",
+        "path": "/Configs/LiveLottery",
         "name": "天选时刻",
-        "key": "dashboard.monitor"
+        "key": "Configs.LiveLottery"
       },
       {
-        "path": "/dashboard/workplace",
+        "path": "/Configs/UnfollowBatched",
+        "name": "批量取关",
+        "key": "Configs.UnfollowBatched"
+      },
+      {
+        "path": "/Configs/LiveFansMedal",
         "name": "直播间互动",
-        "key": "dashboard.workplace"
+        "key": "Configs.LiveFansMedal"
       }
     ]
   }
