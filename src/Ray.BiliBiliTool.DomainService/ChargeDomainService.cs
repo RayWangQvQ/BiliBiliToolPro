@@ -80,7 +80,7 @@ namespace Ray.BiliBiliTool.DomainService
 
             string targetUpId = _dailyTaskOptions.AutoChargeUpId;
             //如果没有配置或配了-1，则为自己充电
-            if (_dailyTaskOptions.AutoChargeUpId.IsNullOrEmpty() | _dailyTaskOptions.AutoChargeUpId == "-1")
+            if (string.IsNullOrWhiteSpace(_dailyTaskOptions.AutoChargeUpId) || _dailyTaskOptions.AutoChargeUpId == "-1")
                 targetUpId = _cookie.UserId;
 
             _logger.LogDebug("【目标Up】{up}", targetUpId);

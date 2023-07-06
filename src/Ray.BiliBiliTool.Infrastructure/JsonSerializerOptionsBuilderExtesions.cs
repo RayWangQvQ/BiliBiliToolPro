@@ -12,8 +12,8 @@ namespace Ray.BiliBiliTool.Infrastructure
             [NotNull] JsonSerializerOptionsBuilder builder,
             [NotNull] Action<JsonSerializerOptions> action)
         {
-            builder.CheckNullWithException(nameof(builder));
-            action.CheckNullWithException(nameof(action));
+            //builder.CheckNullWithException(nameof(builder));
+            //action.CheckNullWithException(nameof(action));
             builder.BuildActionList.Add(action);
             return builder;
         }
@@ -24,7 +24,7 @@ namespace Ray.BiliBiliTool.Infrastructure
             this JsonSerializerOptionsBuilder builder,
             [NotNull] JavaScriptEncoder encoder)
         {
-            encoder.CheckNullWithException(nameof(encoder));
+            //encoder.CheckNullWithException(nameof(encoder));
             return SetActionBase(
                 builder,
                 t => t.Encoder = encoder);
@@ -70,7 +70,7 @@ namespace Ray.BiliBiliTool.Infrastructure
 
         public static JsonSerializerOptions GetOrBuildDefaultOptions(this JsonSerializerOptionsBuilder builder)
         {
-            if (JsonSerializerOptionsBuilderExtesions.DefaultOptions.IsNull())
+            if (JsonSerializerOptionsBuilderExtesions.DefaultOptions==null)
             {
                 return builder
                       .SetCamelCase()

@@ -16,12 +16,12 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Ray.BiliTool.Blazor.Web.Areas.Identity;
-using Ray.BiliTool.Blazor.Web.Data;
 using Ray.BiliTool.Blazor.Web.Services;
 using Hangfire;
 using Hangfire.Console;
 using Hangfire.Console.Extensions;
 using Hangfire.RecurringJobAdmin;
+using Hangfire.Storage.SQLite;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Ray.BiliBiliTool.Agent.Extensions;
 using Ray.BiliBiliTool.Application.Extensions;
@@ -29,6 +29,8 @@ using Ray.BiliBiliTool.Application.Contracts;
 using Ray.BiliBiliTool.Config.Extensions;
 using Ray.BiliBiliTool.DomainService.Extensions;
 using Ray.BiliBiliTool.Infrastructure;
+using Ray.Repository.EntityFramework;
+using Ray.BiliTool.Repository;
 
 namespace Ray.BiliTool.Blazor.Web
 {
@@ -65,7 +67,11 @@ namespace Ray.BiliTool.Blazor.Web
             // EF
             var connectionString = Configuration.GetConnectionString("DefaultConnection") 
                                    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
+            //services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
+            services.AddIdentityDefaultRepositories<BiliDbContext>(optionsAction =>
+            {
+                optionsAction.UseSqlite(connectionString);
+            });
             services.AddDatabaseDeveloperPageExceptionFilter();
 
             // Identity
@@ -74,7 +80,7 @@ namespace Ray.BiliTool.Blazor.Web
                     options.SignIn.RequireConfirmedAccount = true;
                     options.Password = null;
                 })
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+                .AddEntityFrameworkStores<BiliDbContext>();
 
             // Authentication
             services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
@@ -143,7 +149,7 @@ namespace Ray.BiliTool.Blazor.Web
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
                 .UseSimpleAssemblyNameTypeSerializer()
                 .UseRecommendedSerializerSettings()
-                .UseSqlServerStorage(connectionString)
+                .UseSQLiteStorage("bili.db")
                 .UseConsole()
                 .UseRecurringJobAdmin(typeof(Startup).Assembly)
             );

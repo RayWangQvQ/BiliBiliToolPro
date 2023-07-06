@@ -208,7 +208,7 @@ namespace Ray.BiliBiliTool.DomainService
             //拿token
             var token = await GetQingLongAuthTokenAsync();
 
-            if (token.IsNullOrEmpty()) return;
+            if (string.IsNullOrEmpty(token)) return;
 
             token = $"Bearer {token}";
 
@@ -236,7 +236,7 @@ namespace Ray.BiliBiliTool.DomainService
                     id = oldEnv.id,
                     name = oldEnv.name,
                     value = ckInfo.CookieStr,
-                    remarks = oldEnv.remarks.IsNullOrEmpty()
+                    remarks = string.IsNullOrEmpty(oldEnv.remarks)
                         ? $"bili-{ckInfo.UserId}"
                         : oldEnv.remarks,
                 };

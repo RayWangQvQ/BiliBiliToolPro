@@ -62,7 +62,7 @@ namespace Ray.BiliBiliTool.Config
         /// <returns></returns>
         private string RemoveKeyPrefix(string key)
         {
-            return _prefix.IsNullOrEmpty()
+            return string.IsNullOrWhiteSpace(_prefix)
                 ? key
                 : key.Substring(_prefix.Length);
         }

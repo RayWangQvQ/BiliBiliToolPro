@@ -134,7 +134,7 @@ namespace Ray.BiliBiliTool.Agent.Extensions
         private static IServiceCollection SetGlobalProxy(this IServiceCollection services, IConfiguration configuration)
         {
             string proxyAddress = configuration["Security:WebProxy"];
-            if (proxyAddress.IsNotNullOrEmpty())
+            if (!string.IsNullOrWhiteSpace(proxyAddress))
             {
                 WebProxy webProxy = new WebProxy();
 

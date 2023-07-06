@@ -135,6 +135,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DomainServiceTest", "test\D
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ray.BiliTool.Blazor.Web", "src\Ray.BiliTool.Blazor.Web\Ray.BiliTool.Blazor.Web.csproj", "{7E39F2DC-3392-4BF0-9826-3D111C074433}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ray.BiliTool.Repository", "src\Ray.BiliTool.Repository\Ray.BiliTool.Repository.csproj", "{0DD4A3C8-F355-472E-BEF2-0A725F466C80}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ray.BiliTool.Domain", "src\Ray.BiliTool.Domain\Ray.BiliTool.Domain.csproj", "{420EB09E-15A0-4953-959B-18450BA56534}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -193,6 +197,14 @@ Global
 		{7E39F2DC-3392-4BF0-9826-3D111C074433}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7E39F2DC-3392-4BF0-9826-3D111C074433}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7E39F2DC-3392-4BF0-9826-3D111C074433}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0DD4A3C8-F355-472E-BEF2-0A725F466C80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0DD4A3C8-F355-472E-BEF2-0A725F466C80}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0DD4A3C8-F355-472E-BEF2-0A725F466C80}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0DD4A3C8-F355-472E-BEF2-0A725F466C80}.Release|Any CPU.Build.0 = Release|Any CPU
+		{420EB09E-15A0-4953-959B-18450BA56534}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{420EB09E-15A0-4953-959B-18450BA56534}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{420EB09E-15A0-4953-959B-18450BA56534}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{420EB09E-15A0-4953-959B-18450BA56534}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -224,6 +236,8 @@ Global
 		{1D9DFF34-71EA-44AE-85B0-1F10C9BA0D81} = {E9BDDCBE-A57D-4E3B-8252-708088386ADF}
 		{26B21C30-7358-4E7B-A73E-2272F10A6CA8} = {E9BDDCBE-A57D-4E3B-8252-708088386ADF}
 		{7E39F2DC-3392-4BF0-9826-3D111C074433} = {38736647-2196-417E-8519-C48A012A63D9}
+		{0DD4A3C8-F355-472E-BEF2-0A725F466C80} = {110D3D21-8E9B-45AB-9667-6DA1DB3862AC}
+		{420EB09E-15A0-4953-959B-18450BA56534} = {120917DC-474C-448B-9EBB-1B3BA3A20B9D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {197319DA-1148-4A99-847C-8B270B6A29AB}
