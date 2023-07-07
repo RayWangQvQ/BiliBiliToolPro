@@ -63,6 +63,7 @@ namespace Ray.BiliTool.Blazor.Web
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<IProfileService, ProfileService>();
+            services.AddScoped<IDbConfigService, DbConfigService>();
 
             // EF
             var connectionString = Configuration.GetConnectionString("DefaultConnection") 

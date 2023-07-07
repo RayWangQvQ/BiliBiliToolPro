@@ -1,8 +1,94 @@
 ﻿@namespace Ray.BiliTool.Blazor.Web.Pages.Configs.LiveLottery
 @page "/Configs/LiveLottery"
 
-<h3>This is LiveLottery</h3>
 
-@code {
+@using System.ComponentModel.DataAnnotations;
+@using System.Text.Json;
+@using System.ComponentModel
 
+<Form Model="@_liveLotteryTaskConfigModel"
+      OnFinish="OnFinish"
+      OnFinishFailed="OnFinishFailed"
+      LabelColSpan="8"
+      WrapperColSpan="8">
+    <FormItem>
+        <Input @bind-Value="@context.ExcludeAwardNames" />
+    </FormItem>
+    <FormItem Label="包含关键字">
+        <Input @bind-Value="@context.IncludeAwardNames" />
+    </FormItem>
+    <FormItem>
+        <Input @bind-Value="@context.DenyUids" />
+    </FormItem>
+    <FormItem>
+        <Checkbox @bind-Value="context.AutoGroupFollowings">开启</Checkbox>
+    </FormItem>
+    <FormItem WrapperColOffset="8" WrapperColSpan="16">
+        <Button Type="@ButtonType.Primary" HtmlType="submit">
+            Submit
+        </Button>
+    </FormItem>
+</Form>
+@code
+{
+    public class LiveLotteryTaskConfigModel
+    {
+        [DisplayName("排除关键字")]
+        public string ExcludeAwardNames { get; set; }
+
+        [DisplayName("包含关键字")]
+        public string IncludeAwardNames { get; set; }
+
+        [DisplayName("开启自动分组")]
+        public bool AutoGroupFollowings { get; set; } = true;
+
+        [DisplayName("屏蔽UPs")]
+        public string DenyUids { get; set; }
+    }
+
+    [Inject]
+    protected IDbConfigService DbConfigService { get; set; }
+
+    private LiveLotteryTaskConfigModel _liveLotteryTaskConfigModel;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var keyList = new List<string>()
+        {
+            nameof(LiveLotteryTaskConfigModel.ExcludeAwardNames),
+            nameof(LiveLotteryTaskConfigModel.IncludeAwardNames),
+            nameof(LiveLotteryTaskConfigModel.AutoGroupFollowings),
+            nameof(LiveLotteryTaskConfigModel.DenyUids),
+        };
+        keyList = keyList.Select(x => "LiveLotteryTaskConfig:" + x).ToList();
+        var configs = await DbConfigService.GetConfigsAsync(keyList);
+
+        _liveLotteryTaskConfigModel = new LiveLotteryTaskConfigModel
+        {
+                ExcludeAwardNames = configs["LiveLotteryTaskConfig:" + nameof(LiveLotteryTaskConfigModel.ExcludeAwardNames)] ?? "",
+                IncludeAwardNames = configs["LiveLotteryTaskConfig:" + nameof(LiveLotteryTaskConfigModel.IncludeAwardNames)] ?? "",
+                AutoGroupFollowings = bool.Parse(configs["LiveLotteryTaskConfig:" + nameof(LiveLotteryTaskConfigModel.AutoGroupFollowings)]),
+                DenyUids = configs["LiveLotteryTaskConfig:" + nameof(LiveLotteryTaskConfigModel.DenyUids)] ?? ""
+        };
+
+        await base.OnInitializedAsync();
+    }
+
+    private async Task OnFinish(EditContext editContext)
+    {
+        var dic = new Dictionary<string, string>()
+        {
+            {nameof(LiveLotteryTaskConfigModel.ExcludeAwardNames), _liveLotteryTaskConfigModel.ExcludeAwardNames},
+            {nameof(LiveLotteryTaskConfigModel.IncludeAwardNames), _liveLotteryTaskConfigModel.IncludeAwardNames},
+            {nameof(LiveLotteryTaskConfigModel.AutoGroupFollowings), _liveLotteryTaskConfigModel.AutoGroupFollowings.ToString()},
+            {nameof(LiveLotteryTaskConfigModel.DenyUids), _liveLotteryTaskConfigModel.DenyUids}
+        };
+        dic = dic.ToDictionary(kv => "LiveLotteryTaskConfig:" + kv.Key, kv => kv.Value);
+        await DbConfigService.AddOrUpdateConfigsAsync(dic);
+    }
+
+    private void OnFinishFailed(EditContext editContext)
+    {
+        Console.WriteLine($"Failed:{JsonSerializer.Serialize(_liveLotteryTaskConfigModel)}");
+    }
 }
