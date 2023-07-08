@@ -1,8 +1,94 @@
 ﻿@namespace Ray.BiliTool.Blazor.Web.Pages.Configs.LiveFansMedal
 @page "/Configs/LiveFansMedal"
 
-<h3>This is LiveFansMedal task</h3>
 
-@code {
+@using System.ComponentModel.DataAnnotations;
+@using System.Text.Json;
+@using System.ComponentModel
+@using Ray.BiliBiliTool.Config;
 
+<Form Model="@_liveFansMedalTaskConfigModel"
+      OnFinish="OnFinish"
+      OnFinishFailed="OnFinishFailed"
+      LabelColSpan="8"
+      WrapperColSpan="8">
+    <FormItem Label="弹幕内容">
+        <Input @bind-Value="@context.DanmakuContent" />
+    </FormItem>
+    <FormItem Label="每分钟心跳数">
+        <Input @bind-Value="@context.HeartBeatNumber" />
+    </FormItem>
+    <FormItem Label="允许心跳失败次数">
+        <Input @bind-Value="@context.HeartBeatSendGiveUpThreshold" />
+    </FormItem>
+    <FormItem Label="直播时常任务跳过粉丝等级已20级的">
+        <Checkbox @bind-Value="context.IsSkipLevel20Medal">开启</Checkbox>
+    </FormItem>
+    <FormItem WrapperColOffset="8" WrapperColSpan="16">
+        <Button Type="@ButtonType.Primary" HtmlType="submit">
+            Submit
+        </Button>
+    </FormItem>
+</Form>
+@code
+{
+    [Inject]
+    protected IDbConfigService DbConfigService { get; set; }
+    [Inject]
+    protected ModalService ModalService { get; set; }
+
+    private LiveFansMedalTaskConfigModel _liveFansMedalTaskConfigModel;
+    private const string ConfigPrefix = "LiveFansMedalTaskConfig:";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var keyList = new List<string>()
+        {
+            nameof(LiveFansMedalTaskConfigModel.DanmakuContent),
+            nameof(LiveFansMedalTaskConfigModel.HeartBeatNumber),
+            nameof(LiveFansMedalTaskConfigModel.HeartBeatSendGiveUpThreshold),
+            nameof(LiveFansMedalTaskConfigModel.IsSkipLevel20Medal),
+        };
+        keyList = keyList.Select(x => ConfigPrefix + x).ToList();
+        var configs = await DbConfigService.GetConfigsAsync(keyList);
+
+        _liveFansMedalTaskConfigModel = new LiveFansMedalTaskConfigModel
+            {
+                DanmakuContent = configs[ConfigPrefix + nameof(LiveFansMedalTaskConfigModel.DanmakuContent)] ?? "",
+                HeartBeatNumber = int.Parse(configs[ConfigPrefix + nameof(LiveFansMedalTaskConfigModel.HeartBeatNumber)]),
+                HeartBeatSendGiveUpThreshold = int.Parse(configs[ConfigPrefix + nameof(LiveFansMedalTaskConfigModel.HeartBeatSendGiveUpThreshold)]),
+                IsSkipLevel20Medal = bool.Parse(configs[ConfigPrefix + nameof(LiveFansMedalTaskConfigModel.IsSkipLevel20Medal)])
+            };
+
+        await base.OnInitializedAsync();
+    }
+
+    private async Task OnFinish(EditContext editContext)
+    {
+        var dic = new Dictionary<string, string>()
+        {
+            {nameof(LiveFansMedalTaskConfigModel.DanmakuContent), _liveFansMedalTaskConfigModel.DanmakuContent},
+            {nameof(LiveFansMedalTaskConfigModel.HeartBeatNumber), _liveFansMedalTaskConfigModel.HeartBeatNumber.ToString()},
+            {nameof(LiveFansMedalTaskConfigModel.HeartBeatSendGiveUpThreshold), _liveFansMedalTaskConfigModel.HeartBeatSendGiveUpThreshold.ToString()},
+            {nameof(LiveFansMedalTaskConfigModel.IsSkipLevel20Medal), _liveFansMedalTaskConfigModel.IsSkipLevel20Medal.ToString()}
+        };
+        dic = dic.ToDictionary(kv => ConfigPrefix + kv.Key, kv => kv.Value);
+        await DbConfigService.AddOrUpdateConfigsAsync(dic);
+
+        ModalService.Success(new ConfirmOptions()
+            {
+                Content = "保存成功！"
+            });
+    }
+
+    private void OnFinishFailed(EditContext editContext)
+    {
+        Console.WriteLine($"Failed:{JsonSerializer.Serialize(_liveFansMedalTaskConfigModel)}");
+
+        ModalService.Error(new ConfirmOptions()
+            {
+                Title = "保存失败",
+                Content = editContext.ToJsonStr()
+            });
+    }
 }

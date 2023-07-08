@@ -36,7 +36,7 @@ namespace Ray.BiliBiliTool.Config
 
         private void EntityChangeObserver_Changed(object sender, EntityChangeEventArgs e)
         {
-            if (e.Entity.GetType() != typeof(IDbConfigEntity))
+            if (!e.Entity.GetType().IsAssignableTo(typeof(IDbConfigEntity)))
                 return;
 
             Thread.Sleep(_source.ReloadDelay);

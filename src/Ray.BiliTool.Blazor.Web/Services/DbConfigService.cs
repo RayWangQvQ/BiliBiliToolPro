@@ -2,8 +2,10 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using Ray.BiliBiliTool.Config;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliTool.Domain;
+using Ray.DDD;
 using Ray.Repository;
 
 namespace Ray.BiliTool.Blazor.Web.Services
@@ -58,6 +60,7 @@ namespace Ray.BiliTool.Blazor.Web.Services
             }
 
             await _repo.UnitOfWork.SaveChangesAsync();
+            EntityChangeObserver.Instance.OnChanged(new EntityChangeEventArgs(new DbConfig("","")));
         }
     }
 }

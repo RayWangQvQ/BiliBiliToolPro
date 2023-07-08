@@ -1,8 +1,153 @@
 ﻿@namespace Ray.BiliTool.Blazor.Web.Pages.Configs.Daily
 @page "/Configs/Daily"
 
-<h3>This is daily task</h3>
 
-@code {
+@using System.ComponentModel.DataAnnotations;
+@using System.Text.Json;
+@using System.ComponentModel
 
+<Form Model="@_dailyTaskConfigModel"
+      OnFinish="OnFinish"
+      OnFinishFailed="OnFinishFailed"
+      LabelColSpan="8"
+      WrapperColSpan="8">
+    <FormItem>
+        <Checkbox @bind-Value="context.IsWatchVideo">开启</Checkbox>
+    </FormItem>
+    <FormItem>
+        <Checkbox @bind-Value="context.IsShareVideo">开启</Checkbox>
+    </FormItem>
+    <FormItem>
+        <Input @bind-Value="@context.NumberOfCoins" />
+    </FormItem>
+    <FormItem>
+        <Input @bind-Value="@context.NumberOfProtectedCoins" />
+    </FormItem>
+    <FormItem>
+        <Checkbox @bind-Value="context.SaveCoinsWhenLv6">开启</Checkbox>
+    </FormItem>
+    <FormItem>
+        <Checkbox @bind-Value="context.SelectLike">开启</Checkbox>
+    </FormItem>
+    <FormItem>
+        <Input @bind-Value="@context.SupportUpIds" />
+    </FormItem>
+    <FormItem>
+        <Input @bind-Value="@context.DayOfAutoCharge" />
+    </FormItem>
+    <FormItem>
+        <Input @bind-Value="@context.AutoChargeUpId" />
+    </FormItem>
+    <FormItem>
+        <Input @bind-Value="@context.ChargeComment" />
+    </FormItem>
+    <FormItem>
+        <Input @bind-Value="@context.DayOfReceiveVipPrivilege" />
+    </FormItem>
+    <FormItem>
+        <Input @bind-Value="@context.DayOfExchangeSilver2Coin" />
+    </FormItem>
+    <FormItem>
+        <Input @bind-Value="@context.CustomComicId" />
+    </FormItem>
+    <FormItem>
+        <Input @bind-Value="@context.CustomEpId" />
+    </FormItem>
+    <FormItem WrapperColOffset="8" WrapperColSpan="16">
+        <Button Type="@ButtonType.Primary" HtmlType="submit">
+            Submit
+        </Button>
+    </FormItem>
+</Form>
+@code
+{
+    [Inject]
+    protected IDbConfigService DbConfigService { get; set; }
+    [Inject]
+    protected ModalService ModalService { get; set; }
+
+    private DailyTaskConfigModel _dailyTaskConfigModel;
+    private const string ConfigPrefix = "DailyTaskConfig:";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var keyList = new List<string>()
+        {
+            nameof(DailyTaskConfigModel.IsWatchVideo),
+            nameof(DailyTaskConfigModel.IsShareVideo),
+            nameof(DailyTaskConfigModel.NumberOfCoins),
+            nameof(DailyTaskConfigModel.NumberOfProtectedCoins),
+            nameof(DailyTaskConfigModel.SaveCoinsWhenLv6),
+            nameof(DailyTaskConfigModel.SelectLike),
+            nameof(DailyTaskConfigModel.SupportUpIds),
+            nameof(DailyTaskConfigModel.DayOfAutoCharge),
+            nameof(DailyTaskConfigModel.AutoChargeUpId),
+            nameof(DailyTaskConfigModel.ChargeComment),
+            nameof(DailyTaskConfigModel.DayOfReceiveVipPrivilege),
+            nameof(DailyTaskConfigModel.DayOfExchangeSilver2Coin),
+            nameof(DailyTaskConfigModel.CustomComicId),
+            nameof(DailyTaskConfigModel.CustomEpId),
+        };
+        keyList = keyList.Select(x => ConfigPrefix + x).ToList();
+        var configs = await DbConfigService.GetConfigsAsync(keyList);
+
+        _dailyTaskConfigModel = new DailyTaskConfigModel
+            {
+                IsWatchVideo = bool.Parse(configs[ConfigPrefix + nameof(DailyTaskConfigModel.IsWatchVideo)]),
+                IsShareVideo = bool.Parse(configs[ConfigPrefix + nameof(DailyTaskConfigModel.IsShareVideo)]),
+                NumberOfCoins = int.Parse(configs[ConfigPrefix + nameof(DailyTaskConfigModel.NumberOfCoins)]),
+                NumberOfProtectedCoins = int.Parse(configs[ConfigPrefix + nameof(DailyTaskConfigModel.NumberOfProtectedCoins)]),
+                SaveCoinsWhenLv6 = bool.Parse(configs[ConfigPrefix + nameof(DailyTaskConfigModel.SaveCoinsWhenLv6)]),
+                SelectLike = bool.Parse(configs[ConfigPrefix + nameof(DailyTaskConfigModel.SelectLike)]),
+                SupportUpIds = configs[ConfigPrefix + nameof(DailyTaskConfigModel.SupportUpIds)] ?? "",
+                DayOfAutoCharge = int.Parse(configs[ConfigPrefix + nameof(DailyTaskConfigModel.DayOfAutoCharge)]),
+                AutoChargeUpId = configs[ConfigPrefix + nameof(DailyTaskConfigModel.AutoChargeUpId)] ?? "",
+                ChargeComment = configs[ConfigPrefix + nameof(DailyTaskConfigModel.ChargeComment)] ?? "",
+                DayOfReceiveVipPrivilege = int.Parse(configs[ConfigPrefix + nameof(DailyTaskConfigModel.DayOfReceiveVipPrivilege)]),
+                DayOfExchangeSilver2Coin = int.Parse(configs[ConfigPrefix + nameof(DailyTaskConfigModel.DayOfExchangeSilver2Coin)]),
+                CustomComicId = int.Parse(configs[ConfigPrefix + nameof(DailyTaskConfigModel.CustomComicId)]),
+                CustomEpId = int.Parse(configs[ConfigPrefix + nameof(DailyTaskConfigModel.CustomEpId)]),
+            };
+
+        await base.OnInitializedAsync();
+    }
+
+    private async Task OnFinish(EditContext editContext)
+    {
+        var dic = new Dictionary<string, string>()
+        {
+            {nameof(DailyTaskConfigModel.IsWatchVideo),_dailyTaskConfigModel.IsWatchVideo.ToString()},
+            {nameof(DailyTaskConfigModel.IsShareVideo),_dailyTaskConfigModel.IsShareVideo.ToString()},
+            {nameof(DailyTaskConfigModel.NumberOfCoins),_dailyTaskConfigModel.NumberOfCoins.ToString()},
+            {nameof(DailyTaskConfigModel.NumberOfProtectedCoins),_dailyTaskConfigModel.NumberOfProtectedCoins.ToString()},
+            {nameof(DailyTaskConfigModel.SaveCoinsWhenLv6),_dailyTaskConfigModel.SaveCoinsWhenLv6.ToString()},
+            {nameof(DailyTaskConfigModel.SelectLike),_dailyTaskConfigModel.SelectLike.ToString()},
+            {nameof(DailyTaskConfigModel.SupportUpIds),_dailyTaskConfigModel.SupportUpIds},
+            {nameof(DailyTaskConfigModel.DayOfAutoCharge),_dailyTaskConfigModel.DayOfAutoCharge.ToString()},
+            {nameof(DailyTaskConfigModel.AutoChargeUpId),_dailyTaskConfigModel.AutoChargeUpId},
+            {nameof(DailyTaskConfigModel.ChargeComment),_dailyTaskConfigModel.ChargeComment},
+            {nameof(DailyTaskConfigModel.DayOfReceiveVipPrivilege),_dailyTaskConfigModel.DayOfReceiveVipPrivilege.ToString()},
+            {nameof(DailyTaskConfigModel.DayOfExchangeSilver2Coin),_dailyTaskConfigModel.DayOfExchangeSilver2Coin.ToString()},
+            {nameof(DailyTaskConfigModel.CustomComicId),_dailyTaskConfigModel.CustomComicId.ToString()},
+            {nameof(DailyTaskConfigModel.CustomEpId),_dailyTaskConfigModel.CustomEpId.ToString()},
+        };
+        dic = dic.ToDictionary(kv => ConfigPrefix + kv.Key, kv => kv.Value);
+        await DbConfigService.AddOrUpdateConfigsAsync(dic);
+
+        ModalService.Success(new ConfirmOptions()
+        {
+            Content = "保存成功！"
+        });
+    }
+
+    private void OnFinishFailed(EditContext editContext)
+    {
+        Console.WriteLine($"Failed:{JsonSerializer.Serialize(_dailyTaskConfigModel)}");
+
+        ModalService.Error(new ConfirmOptions()
+        {
+            Title = "保存失败",
+            Content = editContext.ToJsonStr()
+        });
+    }
 }

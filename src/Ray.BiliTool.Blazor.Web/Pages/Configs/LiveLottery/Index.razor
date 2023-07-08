@@ -5,6 +5,7 @@
 @using System.ComponentModel.DataAnnotations;
 @using System.Text.Json;
 @using System.ComponentModel
+@using Ray.BiliBiliTool.Config;
 
 <Form Model="@_liveLotteryTaskConfigModel"
       OnFinish="OnFinish"
@@ -31,25 +32,13 @@
 </Form>
 @code
 {
-    public class LiveLotteryTaskConfigModel
-    {
-        [DisplayName("排除关键字")]
-        public string ExcludeAwardNames { get; set; }
-
-        [DisplayName("包含关键字")]
-        public string IncludeAwardNames { get; set; }
-
-        [DisplayName("开启自动分组")]
-        public bool AutoGroupFollowings { get; set; } = true;
-
-        [DisplayName("屏蔽UPs")]
-        public string DenyUids { get; set; }
-    }
-
     [Inject]
     protected IDbConfigService DbConfigService { get; set; }
+    [Inject]
+    protected ModalService ModalService { get; set; }
 
     private LiveLotteryTaskConfigModel _liveLotteryTaskConfigModel;
+    private const string ConfigPrefix = "LiveLotteryTaskConfig:";
 
     protected override async Task OnInitializedAsync()
     {
@@ -60,16 +49,16 @@
             nameof(LiveLotteryTaskConfigModel.AutoGroupFollowings),
             nameof(LiveLotteryTaskConfigModel.DenyUids),
         };
-        keyList = keyList.Select(x => "LiveLotteryTaskConfig:" + x).ToList();
+        keyList = keyList.Select(x => ConfigPrefix + x).ToList();
         var configs = await DbConfigService.GetConfigsAsync(keyList);
 
         _liveLotteryTaskConfigModel = new LiveLotteryTaskConfigModel
-        {
-                ExcludeAwardNames = configs["LiveLotteryTaskConfig:" + nameof(LiveLotteryTaskConfigModel.ExcludeAwardNames)] ?? "",
-                IncludeAwardNames = configs["LiveLotteryTaskConfig:" + nameof(LiveLotteryTaskConfigModel.IncludeAwardNames)] ?? "",
-                AutoGroupFollowings = bool.Parse(configs["LiveLotteryTaskConfig:" + nameof(LiveLotteryTaskConfigModel.AutoGroupFollowings)]),
-                DenyUids = configs["LiveLotteryTaskConfig:" + nameof(LiveLotteryTaskConfigModel.DenyUids)] ?? ""
-        };
+            {
+                ExcludeAwardNames = configs[ConfigPrefix + nameof(LiveLotteryTaskConfigModel.ExcludeAwardNames)] ?? "",
+                IncludeAwardNames = configs[ConfigPrefix + nameof(LiveLotteryTaskConfigModel.IncludeAwardNames)] ?? "",
+                AutoGroupFollowings = bool.Parse(configs[ConfigPrefix + nameof(LiveLotteryTaskConfigModel.AutoGroupFollowings)]),
+                DenyUids = configs[ConfigPrefix + nameof(LiveLotteryTaskConfigModel.DenyUids)] ?? ""
+            };
 
         await base.OnInitializedAsync();
     }
@@ -83,12 +72,23 @@
             {nameof(LiveLotteryTaskConfigModel.AutoGroupFollowings), _liveLotteryTaskConfigModel.AutoGroupFollowings.ToString()},
             {nameof(LiveLotteryTaskConfigModel.DenyUids), _liveLotteryTaskConfigModel.DenyUids}
         };
-        dic = dic.ToDictionary(kv => "LiveLotteryTaskConfig:" + kv.Key, kv => kv.Value);
+        dic = dic.ToDictionary(kv => ConfigPrefix + kv.Key, kv => kv.Value);
         await DbConfigService.AddOrUpdateConfigsAsync(dic);
+
+        ModalService.Success(new ConfirmOptions()
+            {
+                Content = "保存成功！"
+            });
     }
 
     private void OnFinishFailed(EditContext editContext)
     {
         Console.WriteLine($"Failed:{JsonSerializer.Serialize(_liveLotteryTaskConfigModel)}");
+
+        ModalService.Error(new ConfirmOptions()
+            {
+                Title = "保存失败",
+                Content = editContext.ToJsonStr()
+            });
     }
 }
