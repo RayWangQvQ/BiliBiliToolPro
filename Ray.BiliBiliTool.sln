@@ -135,9 +135,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DomainServiceTest", "test\D
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ray.BiliTool.Blazor.Web", "src\Ray.BiliTool.Blazor.Web\Ray.BiliTool.Blazor.Web.csproj", "{7E39F2DC-3392-4BF0-9826-3D111C074433}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ray.BiliTool.Repository", "src\Ray.BiliTool.Repository\Ray.BiliTool.Repository.csproj", "{0DD4A3C8-F355-472E-BEF2-0A725F466C80}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ray.BiliTool.Repository", "src\Ray.BiliTool.Repository\Ray.BiliTool.Repository.csproj", "{0DD4A3C8-F355-472E-BEF2-0A725F466C80}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ray.BiliTool.Domain", "src\Ray.BiliTool.Domain\Ray.BiliTool.Domain.csproj", "{420EB09E-15A0-4953-959B-18450BA56534}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ray.BiliTool.Domain", "src\Ray.BiliTool.Domain\Ray.BiliTool.Domain.csproj", "{420EB09E-15A0-4953-959B-18450BA56534}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

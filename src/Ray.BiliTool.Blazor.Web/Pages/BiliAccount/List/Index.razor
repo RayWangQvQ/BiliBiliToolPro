@@ -1,0 +1,49 @@
+﻿@namespace Ray.BiliTool.Blazor.Web.Pages.BiliAccount.List
+@page "/BiliAccount/List"
+
+@using System.ComponentModel
+@using AntDesign.TableModels
+@using Microsoft.Extensions.Configuration
+
+<Table TItem="BiliCookieModel" DataSource="@_data" OnRowClick="OnRowClick">
+    <PropertyColumn Property="c => c.UserId">
+        <a>@context.UserId</a>
+    </PropertyColumn>
+
+    <PropertyColumn Property="c => c.CookieStr"></PropertyColumn>
+
+    <ActionColumn Title="Action">
+        <Space Size=@("middle")>
+            <SpaceItem>
+                <a>Delete</a>
+            </SpaceItem>
+        </Space>
+    </ActionColumn>
+</Table>
+
+@code {
+    [Inject]
+    protected IDbConfigService DbConfigService { get; set; }
+    [Inject]
+    protected ModalService ModalService { get; set; }
+    [Inject]
+    protected IConfiguration Config { get; set; }
+
+
+    private List<BiliCookieModel> _data;
+
+    protected override Task OnInitializedAsync()
+    {
+        var ckStrList = Config.GetSection("BiliBiliCookies").Get<List<string >>();
+
+        _data = ckStrList.Select(x => new BiliCookieModel(x)).ToList();
+
+        return base.OnInitializedAsync();
+    }
+
+
+    void OnRowClick(RowData<BiliCookieModel> row)
+    {
+        Console.WriteLine($"row {row.Data.UserId} was clicked.");
+    }
+}

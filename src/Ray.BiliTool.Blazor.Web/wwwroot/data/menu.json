@@ -6,6 +6,24 @@
     "icon": "dashboard"
   },
   {
+    "path": "/BiliAccount",
+    "name": "Bili账号",
+    "key": "BiliAccount",
+    "icon": "dashboard",
+    "children": [
+      {
+        "path": "/BiliAccount/List",
+        "name": "账号列表",
+        "key": "BiliAccount.List"
+      },
+      {
+        "path": "/BiliAccount/Login",
+        "name": "账号登录",
+        "key": "BiliAccount.Login"
+      }
+    ]
+  },
+  {
     "path": "/Configs",
     "name": "配置",
     "key": "Configs",
