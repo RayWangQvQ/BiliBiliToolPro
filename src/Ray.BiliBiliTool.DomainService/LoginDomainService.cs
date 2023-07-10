@@ -53,7 +53,7 @@ namespace Ray.BiliBiliTool.DomainService
         {
             BiliCookie cookieInfo = null;
 
-            var re = await _passportApi.GenerateQrCode();
+            BiliApiResponse<QrCodeDto> re = await _passportApi.GenerateQrCode();
             if (re.Code != 0)
             {
                 _logger.LogWarning("获取二维码失败：{msg}", re.ToJsonStr());
