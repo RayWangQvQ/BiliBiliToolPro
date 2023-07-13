@@ -60,7 +60,6 @@ namespace Ray.BiliTool.Blazor.Web.Services
             }
 
             await _repo.UnitOfWork.SaveChangesAsync();
-            EntityChangeObserver.Instance.OnChanged(new EntityChangeEventArgs(new DbConfig("","")));
         }
     }
 }

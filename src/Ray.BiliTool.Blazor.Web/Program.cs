@@ -27,24 +27,22 @@ namespace Ray.BiliTool.Blazor.Web
             Host.CreateDefaultBuilder(args)
                 .ConfigureAppConfiguration((hostBuilderContext, configurationBuilder) =>
                 {
-                    //本地cookie存储文件
-                    configurationBuilder.AddJsonFile("cookies.json", true, true);
-
                     //数据库
                     var temp = configurationBuilder.Build();
                     var connectionString = temp["ConnectionStrings:DefaultConnection"]
                                            ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
                     var builder = new DbContextOptionsBuilder<BiliDbContext>();
                     builder.UseSqlite(connectionString);
+
                     var dbContext = new BiliDbContext(builder.Options);
-                    dbContext.Database.EnsureCreated();
-                    //dbContext.Database.Migrate();
+                    dbContext.Database.Migrate();
+
                     configurationBuilder.Add(new DbConfigurationSource
                     {
-                        //OptionsAction = o => o.UseSqlite("Data Source=demo.db"),
                         GetDbListFunc = ()=> dbContext.DbConfigs.AsNoTracking().Select(x=>(IDbConfigEntity)x).ToList(),
                         ReloadOnChange = true,
-                        ReloadDelay = 200
+                        ReloadDelay = 0
                     });
                 })
                 .ConfigureWebHostDefaults(webBuilder =>

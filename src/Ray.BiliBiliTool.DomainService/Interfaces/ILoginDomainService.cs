@@ -34,5 +34,7 @@ namespace Ray.BiliBiliTool.DomainService.Interfaces
         /// </summary>
         /// <returns></returns>
         Task SaveCookieToQinLongAsync(BiliCookie ckInfo, CancellationToken cancellationToken);
+
+        Task SaveCookieToDbAsync(BiliCookie ckInfo, CancellationToken cancellationToken);
     }
 }

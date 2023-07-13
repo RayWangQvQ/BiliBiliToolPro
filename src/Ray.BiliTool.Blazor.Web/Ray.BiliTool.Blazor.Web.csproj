@@ -6,10 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Remove="cookies.json" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="AntDesign.Charts" Version="0.3.1" />
     <PackageReference Include="AntDesign.ProLayout" Version="0.14.4.1" />
     <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="6.0.15" />
@@ -31,12 +27,6 @@
     <PackageReference Include="Serilog.Extensions.Logging" Version="3.1.0" />
     <PackageReference Include="Serilog.Settings.Configuration" Version="3.4.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="cookies.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
   <ItemGroup>

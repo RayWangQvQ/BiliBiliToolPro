@@ -18,6 +18,8 @@ using Newtonsoft.Json.Linq;
 using QRCoder;
 using Ray.BiliBiliTool.Agent.QingLong;
 using Ray.BiliBiliTool.Infrastructure.Cookie;
+using Ray.BiliTool.Domain;
+using Ray.Repository;
 
 namespace Ray.BiliBiliTool.DomainService
 {
@@ -32,6 +34,7 @@ namespace Ray.BiliBiliTool.DomainService
         private readonly IQingLongApi _qingLongApi;
         private readonly IHomeApi _homeApi;
         private readonly IConfiguration _configuration;
+        private readonly IBaseRepository<DbConfig, long> _dbConfigRepo;
 
         public LoginDomainService(
             ILogger<LoginDomainService> logger,
@@ -39,7 +42,8 @@ namespace Ray.BiliBiliTool.DomainService
             IHostEnvironment hostingEnvironment,
             IQingLongApi qingLongApi,
             IHomeApi homeApi,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            IBaseRepository<DbConfig, long> dbConfigRepo)
         {
             _logger = logger;
             _passportApi = passportApi;
@@ -47,6 +51,7 @@ namespace Ray.BiliBiliTool.DomainService
             _qingLongApi = qingLongApi;
             _homeApi = homeApi;
             _configuration = configuration;
+            _dbConfigRepo = dbConfigRepo;
         }
 
         public async Task<BiliCookie> LoginByQrCodeAsync(CancellationToken cancellationToken)
@@ -269,6 +274,29 @@ namespace Ray.BiliBiliTool.DomainService
             };
             var addRe = await _qingLongApi.AddEnvs(new List<AddQingLongEnv> { add }, token);
             _logger.LogInformation(addRe.Code == 200 ? "新增成功！" : addRe.ToJsonStr());
+        }
+
+        public async Task SaveCookieToDbAsync(BiliCookie ckInfo, CancellationToken cancellationToken)
+        {
+            List<DbConfig> ckList = await _dbConfigRepo.GetListAsync(x => x.ConfigKey.StartsWith("BiliBiliCookies"));
+
+            ckInfo.CookieItemDictionary.TryGetValue("DedeUserID", out string userId);
+            userId ??= ckInfo.CookieStr;
+            var indexOfTargetCk = ckList.FirstOrDefault(x => x.ConfigValue.Contains(userId));
+
+            if (indexOfTargetCk == null)
+            {
+                _logger.LogInformation("不存在该用户，新增cookie");
+                await _dbConfigRepo.InsertAsync(new DbConfig("BiliBiliCookies:0", ckInfo.CookieStr), cancellationToken: cancellationToken);
+                await _dbConfigRepo.UnitOfWork.SaveChangesAsync(cancellationToken);
+                _logger.LogInformation("新增成功！");
+                return;
+            }
+
+            _logger.LogInformation("已存在该用户，更新cookie");
+            indexOfTargetCk.UpdateConfig(ckInfo.CookieStr);
+            await _dbConfigRepo.UnitOfWork.SaveChangesAsync(cancellationToken);
+            _logger.LogInformation("更新成功！");
         }
 
         #region private

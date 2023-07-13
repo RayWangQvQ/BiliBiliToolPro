@@ -34,7 +34,7 @@
 
     protected override Task OnInitializedAsync()
     {
-        var ckStrList = Config.GetSection("BiliBiliCookies").Get<List<string >>();
+        var ckStrList = Config.GetSection("BiliBiliCookies").Get<List<string>>() ?? new List<string>();
 
         _data = ckStrList.Select(x => new BiliCookieModel(x)).ToList();
 

@@ -133,7 +133,7 @@
                 biliCk = new BiliCookie(cookieStr);
                 biliCk.Check();
 
-                await LoginDomainService.SaveCookieToJsonFileAsync(biliCk, default);
+                await LoginDomainService.SaveCookieToDbAsync(biliCk, default);
 
                 ModalService.Success(new ConfirmOptions()
                     {

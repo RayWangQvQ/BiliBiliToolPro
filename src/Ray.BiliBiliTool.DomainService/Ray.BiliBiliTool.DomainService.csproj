@@ -17,6 +17,8 @@
     <ProjectReference Include="..\Ray.BiliBiliTool.Agent\Ray.BiliBiliTool.Agent.csproj" />
     <ProjectReference Include="..\Ray.BiliBiliTool.Config\Ray.BiliBiliTool.Config.csproj" />
     <ProjectReference Include="..\Ray.BiliBiliTool.Infrastructure\Ray.BiliBiliTool.Infrastructure.csproj" />
+    <ProjectReference Include="..\Ray.BiliTool.Domain\Ray.BiliTool.Domain.csproj" />
+    <ProjectReference Include="..\Ray.BiliTool.Repository\Ray.BiliTool.Repository.csproj" />
   </ItemGroup>
 
 </Project>
