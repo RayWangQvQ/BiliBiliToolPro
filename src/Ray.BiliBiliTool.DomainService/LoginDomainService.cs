@@ -287,15 +287,16 @@ namespace Ray.BiliBiliTool.DomainService
             if (indexOfTargetCk == null)
             {
                 _logger.LogInformation("不存在该用户，新增cookie");
-                await _dbConfigRepo.InsertAsync(new DbConfig("BiliBiliCookies:0", ckInfo.CookieStr), cancellationToken: cancellationToken);
-                await _dbConfigRepo.UnitOfWork.SaveChangesAsync(cancellationToken);
+                await _dbConfigRepo.InsertAsync(new DbConfig("BiliBiliCookies:0", ckInfo.CookieStr),true, cancellationToken: cancellationToken);
+                //await _dbConfigRepo.UnitOfWork.SaveChangesAsync(cancellationToken);
                 _logger.LogInformation("新增成功！");
                 return;
             }
 
             _logger.LogInformation("已存在该用户，更新cookie");
             indexOfTargetCk.UpdateConfig(ckInfo.CookieStr);
-            await _dbConfigRepo.UnitOfWork.SaveChangesAsync(cancellationToken);
+            await _dbConfigRepo.UpdateAsync(indexOfTargetCk, true, cancellationToken);
+            //await _dbConfigRepo.UnitOfWork.SaveChangesAsync(cancellationToken);
             _logger.LogInformation("更新成功！");
         }
 
