@@ -5,6 +5,10 @@
 @using System.ComponentModel.DataAnnotations;
 @using System.Text.Json;
 @using System.ComponentModel
+@using System.Reflection
+@using System.Threading
+@using Hangfire
+@using Ray.BiliBiliTool.Application.Contracts
 @using Ray.BiliBiliTool.Config;
 
 <Form Model="@_unfollowBatchedTaskModel"
@@ -12,14 +16,17 @@
       OnFinishFailed="OnFinishFailed"
       LabelColSpan="8"
       WrapperColSpan="8">
-    <FormItem>
-        <Input @bind-Value="@context.GroupName" />
+    <FormItem Label="定时运行">
+        <Input @bind-Value="@context.Cron" />
     </FormItem>
-    <FormItem>
-        <Input @bind-Value="@context.Count" />
+    <FormItem Label="分组名称">
+        <Input @bind-Value="@context.GroupName"/>
     </FormItem>
-    <FormItem>
-        <Input @bind-Value="@context.RetainUids" />
+    <FormItem Label="取关数量">
+        <Input @bind-Value="@context.Count"/>
+    </FormItem>
+    <FormItem Label="UP白名单">
+        <Input @bind-Value="@context.RetainUids"/>
     </FormItem>
     <FormItem WrapperColOffset="8" WrapperColSpan="16">
         <Button Type="@ButtonType.Primary" HtmlType="submit">
@@ -41,6 +48,7 @@
     {
         var keyList = new List<string>()
         {
+            nameof(UnfollowBatchedTaskConfigModel.Cron),
             nameof(UnfollowBatchedTaskConfigModel.GroupName),
             nameof(UnfollowBatchedTaskConfigModel.Count),
             nameof(UnfollowBatchedTaskConfigModel.RetainUids),
@@ -50,6 +58,7 @@
 
         _unfollowBatchedTaskModel = new UnfollowBatchedTaskConfigModel
             {
+                Cron = configs[ConfigPrefix + nameof(UnfollowBatchedTaskConfigModel.Cron)] ?? "",
                 GroupName = configs[ConfigPrefix + nameof(UnfollowBatchedTaskConfigModel.GroupName)] ?? "",
                 Count = int.Parse(configs[ConfigPrefix + nameof(UnfollowBatchedTaskConfigModel.Count)]),
                 RetainUids = configs[ConfigPrefix + nameof(UnfollowBatchedTaskConfigModel.RetainUids)] ?? ""
@@ -62,12 +71,18 @@
     {
         var dic = new Dictionary<string, string>()
         {
+            {nameof(UnfollowBatchedTaskConfigModel.Cron), _unfollowBatchedTaskModel.Cron},
             {nameof(UnfollowBatchedTaskConfigModel.GroupName), _unfollowBatchedTaskModel.GroupName},
             {nameof(UnfollowBatchedTaskConfigModel.Count), _unfollowBatchedTaskModel.Count.ToString()},
             {nameof(UnfollowBatchedTaskConfigModel.RetainUids), _unfollowBatchedTaskModel.RetainUids},
         };
         dic = dic.ToDictionary(kv => ConfigPrefix + kv.Key, kv => kv.Value);
         await DbConfigService.AddOrUpdateConfigsAsync(dic);
+
+        string code = typeof(IUnfollowBatchedTaskAppService).GetCustomAttribute<DescriptionAttribute>()?.Description;
+        RecurringJob.AddOrUpdate<IUnfollowBatchedTaskAppService>(code,
+            x => x.DoTaskAsync(new CancellationToken()),
+            () => _unfollowBatchedTaskModel.Cron);
 
         ModalService.Success(new ConfirmOptions()
             {

@@ -5,6 +5,10 @@
 @using System.ComponentModel.DataAnnotations;
 @using System.Text.Json;
 @using System.ComponentModel
+@using System.Reflection
+@using System.Threading
+@using Hangfire
+@using Ray.BiliBiliTool.Application.Contracts
 @using Ray.BiliBiliTool.Config;
 
 <Form Model="@_liveFansMedalTaskConfigModel"
@@ -12,14 +16,17 @@
       OnFinishFailed="OnFinishFailed"
       LabelColSpan="8"
       WrapperColSpan="8">
+    <FormItem Label="定时运行">
+        <Input @bind-Value="@context.Cron" />
+    </FormItem>
     <FormItem Label="弹幕内容">
-        <Input @bind-Value="@context.DanmakuContent" />
+        <Input @bind-Value="@context.DanmakuContent"/>
     </FormItem>
     <FormItem Label="每分钟心跳数">
-        <Input @bind-Value="@context.HeartBeatNumber" />
+        <Input @bind-Value="@context.HeartBeatNumber"/>
     </FormItem>
     <FormItem Label="允许心跳失败次数">
-        <Input @bind-Value="@context.HeartBeatSendGiveUpThreshold" />
+        <Input @bind-Value="@context.HeartBeatSendGiveUpThreshold"/>
     </FormItem>
     <FormItem Label="直播时常任务跳过粉丝等级已20级的">
         <Checkbox @bind-Value="context.IsSkipLevel20Medal">开启</Checkbox>
@@ -44,6 +51,7 @@
     {
         var keyList = new List<string>()
         {
+            nameof(LiveFansMedalTaskConfigModel.Cron),
             nameof(LiveFansMedalTaskConfigModel.DanmakuContent),
             nameof(LiveFansMedalTaskConfigModel.HeartBeatNumber),
             nameof(LiveFansMedalTaskConfigModel.HeartBeatSendGiveUpThreshold),
@@ -54,6 +62,7 @@
 
         _liveFansMedalTaskConfigModel = new LiveFansMedalTaskConfigModel
             {
+                Cron = configs[ConfigPrefix + nameof(LiveFansMedalTaskConfigModel.Cron)] ?? "",
                 DanmakuContent = configs[ConfigPrefix + nameof(LiveFansMedalTaskConfigModel.DanmakuContent)] ?? "",
                 HeartBeatNumber = int.Parse(configs[ConfigPrefix + nameof(LiveFansMedalTaskConfigModel.HeartBeatNumber)]),
                 HeartBeatSendGiveUpThreshold = int.Parse(configs[ConfigPrefix + nameof(LiveFansMedalTaskConfigModel.HeartBeatSendGiveUpThreshold)]),
@@ -67,6 +76,7 @@
     {
         var dic = new Dictionary<string, string>()
         {
+            {nameof(LiveFansMedalTaskConfigModel.Cron), _liveFansMedalTaskConfigModel.Cron},
             {nameof(LiveFansMedalTaskConfigModel.DanmakuContent), _liveFansMedalTaskConfigModel.DanmakuContent},
             {nameof(LiveFansMedalTaskConfigModel.HeartBeatNumber), _liveFansMedalTaskConfigModel.HeartBeatNumber.ToString()},
             {nameof(LiveFansMedalTaskConfigModel.HeartBeatSendGiveUpThreshold), _liveFansMedalTaskConfigModel.HeartBeatSendGiveUpThreshold.ToString()},
@@ -74,6 +84,11 @@
         };
         dic = dic.ToDictionary(kv => ConfigPrefix + kv.Key, kv => kv.Value);
         await DbConfigService.AddOrUpdateConfigsAsync(dic);
+
+        string code = typeof(ILiveFansMedalAppService).GetCustomAttribute<DescriptionAttribute>()?.Description;
+        RecurringJob.AddOrUpdate<ILiveFansMedalAppService>(code,
+            x => x.DoTaskAsync(new CancellationToken()),
+            () => _liveFansMedalTaskConfigModel.Cron);
 
         ModalService.Success(new ConfirmOptions()
             {

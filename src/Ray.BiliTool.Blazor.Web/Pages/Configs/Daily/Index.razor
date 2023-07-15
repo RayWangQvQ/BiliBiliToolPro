@@ -5,53 +5,60 @@
 @using System.ComponentModel.DataAnnotations;
 @using System.Text.Json;
 @using System.ComponentModel
+@using System.Reflection
+@using System.Threading
+@using Hangfire
+@using Ray.BiliBiliTool.Application.Contracts
 
 <Form Model="@_dailyTaskConfigModel"
       OnFinish="OnFinish"
       OnFinishFailed="OnFinishFailed"
       LabelColSpan="8"
       WrapperColSpan="8">
-    <FormItem>
+    <FormItem Label="定时运行">
+        <Input @bind-Value="context.Cron"></Input>
+    </FormItem>
+    <FormItem Label="开启观看视频">
         <Checkbox @bind-Value="context.IsWatchVideo">开启</Checkbox>
     </FormItem>
-    <FormItem>
+    <FormItem Label="开启分享视频">
         <Checkbox @bind-Value="context.IsShareVideo">开启</Checkbox>
     </FormItem>
-    <FormItem>
-        <Input @bind-Value="@context.NumberOfCoins" />
+    <FormItem Label="每日投币数量">
+        <Input @bind-Value="@context.NumberOfCoins"/>
     </FormItem>
-    <FormItem>
-        <Input @bind-Value="@context.NumberOfProtectedCoins" />
+    <FormItem Label="保留硬币数量">
+        <Input @bind-Value="@context.NumberOfProtectedCoins"/>
     </FormItem>
-    <FormItem>
+    <FormItem Label="SaveCoinsWhenLv6">
         <Checkbox @bind-Value="context.SaveCoinsWhenLv6">开启</Checkbox>
     </FormItem>
-    <FormItem>
+    <FormItem Label="投币的同时点赞">
         <Checkbox @bind-Value="context.SelectLike">开启</Checkbox>
     </FormItem>
-    <FormItem>
-        <Input @bind-Value="@context.SupportUpIds" />
+    <FormItem Label="优先支持的UP">
+        <Input @bind-Value="@context.SupportUpIds"/>
     </FormItem>
-    <FormItem>
-        <Input @bind-Value="@context.DayOfAutoCharge" />
+    <FormItem Label="充电日期">
+        <Input @bind-Value="@context.DayOfAutoCharge"/>
     </FormItem>
-    <FormItem>
-        <Input @bind-Value="@context.AutoChargeUpId" />
+    <FormItem Label="充电UP">
+        <Input @bind-Value="@context.AutoChargeUpId"/>
     </FormItem>
-    <FormItem>
-        <Input @bind-Value="@context.ChargeComment" />
+    <FormItem Label="充电后留言">
+        <Input @bind-Value="@context.ChargeComment"/>
     </FormItem>
-    <FormItem>
-        <Input @bind-Value="@context.DayOfReceiveVipPrivilege" />
+    <FormItem Label="领取会员权益日期">
+        <Input @bind-Value="@context.DayOfReceiveVipPrivilege"/>
     </FormItem>
-    <FormItem>
-        <Input @bind-Value="@context.DayOfExchangeSilver2Coin" />
+    <FormItem Label="银瓜子兑换硬币日期">
+        <Input @bind-Value="@context.DayOfExchangeSilver2Coin"/>
     </FormItem>
-    <FormItem>
-        <Input @bind-Value="@context.CustomComicId" />
+    <FormItem Label="阅读漫画Id">
+        <Input @bind-Value="@context.CustomComicId"/>
     </FormItem>
-    <FormItem>
-        <Input @bind-Value="@context.CustomEpId" />
+    <FormItem Label="阅读漫画EpId">
+        <Input @bind-Value="@context.CustomEpId"/>
     </FormItem>
     <FormItem WrapperColOffset="8" WrapperColSpan="16">
         <Button Type="@ButtonType.Primary" HtmlType="submit">
@@ -73,6 +80,7 @@
     {
         var keyList = new List<string>()
         {
+            nameof(DailyTaskConfigModel.Cron),
             nameof(DailyTaskConfigModel.IsWatchVideo),
             nameof(DailyTaskConfigModel.IsShareVideo),
             nameof(DailyTaskConfigModel.NumberOfCoins),
@@ -93,6 +101,7 @@
 
         _dailyTaskConfigModel = new DailyTaskConfigModel
             {
+                Cron = configs[ConfigPrefix + nameof(DailyTaskConfigModel.Cron)],
                 IsWatchVideo = bool.Parse(configs[ConfigPrefix + nameof(DailyTaskConfigModel.IsWatchVideo)]),
                 IsShareVideo = bool.Parse(configs[ConfigPrefix + nameof(DailyTaskConfigModel.IsShareVideo)]),
                 NumberOfCoins = int.Parse(configs[ConfigPrefix + nameof(DailyTaskConfigModel.NumberOfCoins)]),
@@ -116,6 +125,7 @@
     {
         var dic = new Dictionary<string, string>()
         {
+            {nameof(DailyTaskConfigModel.Cron),_dailyTaskConfigModel.Cron},
             {nameof(DailyTaskConfigModel.IsWatchVideo),_dailyTaskConfigModel.IsWatchVideo.ToString()},
             {nameof(DailyTaskConfigModel.IsShareVideo),_dailyTaskConfigModel.IsShareVideo.ToString()},
             {nameof(DailyTaskConfigModel.NumberOfCoins),_dailyTaskConfigModel.NumberOfCoins.ToString()},
@@ -133,6 +143,11 @@
         };
         dic = dic.ToDictionary(kv => ConfigPrefix + kv.Key, kv => kv.Value);
         await DbConfigService.AddOrUpdateConfigsAsync(dic);
+
+        string code = typeof(IDailyTaskAppService).GetCustomAttribute<DescriptionAttribute>()?.Description;
+        RecurringJob.AddOrUpdate<IDailyTaskAppService>(code,
+            x => x.DoTaskAsync(new CancellationToken()),
+            () => _dailyTaskConfigModel.Cron);
 
         ModalService.Success(new ConfirmOptions()
         {

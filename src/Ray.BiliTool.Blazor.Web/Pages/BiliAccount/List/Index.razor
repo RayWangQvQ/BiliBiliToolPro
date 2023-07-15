@@ -6,7 +6,7 @@
 
 <Table TItem="BiliCookieModel" DataSource="@_data" OnRowClick="OnRowClick">
     <PropertyColumn Title="Key" Property="c => c.ConfigKey"><a>@context.ConfigKey</a></PropertyColumn>
-    <PropertyColumn Title="Cookie" Property="c => c.ConfigValue" Width="400" Ellipsis="true"></PropertyColumn>
+    <PropertyColumn Title="Cookie" Property="c => c.ConfigValue" Width="300px" Ellipsis="true" ></PropertyColumn>
 
     <PropertyColumn Title="开启" Property="c=>c.Enable">
         <Switch @bind-Value="@context.Enable" OnChange="() => OnEnableAsync(context)"></Switch>

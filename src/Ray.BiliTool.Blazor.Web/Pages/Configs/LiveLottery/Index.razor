@@ -5,6 +5,10 @@
 @using System.ComponentModel.DataAnnotations;
 @using System.Text.Json;
 @using System.ComponentModel
+@using System.Reflection
+@using System.Threading
+@using Hangfire
+@using Ray.BiliBiliTool.Application.Contracts
 @using Ray.BiliBiliTool.Config;
 
 <Form Model="@_liveLotteryTaskConfigModel"
@@ -12,16 +16,19 @@
       OnFinishFailed="OnFinishFailed"
       LabelColSpan="8"
       WrapperColSpan="8">
-    <FormItem>
-        <Input @bind-Value="@context.ExcludeAwardNames" />
+    <FormItem Label="定时运行">
+        <Input @bind-Value="@context.Cron" />
+    </FormItem>
+    <FormItem Label="排除关键字">
+        <Input @bind-Value="@context.ExcludeAwardNames"/>
     </FormItem>
     <FormItem Label="包含关键字">
-        <Input @bind-Value="@context.IncludeAwardNames" />
+        <Input @bind-Value="@context.IncludeAwardNames"/>
     </FormItem>
-    <FormItem>
-        <Input @bind-Value="@context.DenyUids" />
+    <FormItem Label="开启自动分组">
+        <Input @bind-Value="@context.DenyUids"/>
     </FormItem>
-    <FormItem>
+    <FormItem Label="屏蔽UPs">
         <Checkbox @bind-Value="context.AutoGroupFollowings">开启</Checkbox>
     </FormItem>
     <FormItem WrapperColOffset="8" WrapperColSpan="16">
@@ -44,6 +51,7 @@
     {
         var keyList = new List<string>()
         {
+            nameof(LiveLotteryTaskConfigModel.Cron),
             nameof(LiveLotteryTaskConfigModel.ExcludeAwardNames),
             nameof(LiveLotteryTaskConfigModel.IncludeAwardNames),
             nameof(LiveLotteryTaskConfigModel.AutoGroupFollowings),
@@ -54,6 +62,7 @@
 
         _liveLotteryTaskConfigModel = new LiveLotteryTaskConfigModel
             {
+                Cron = configs[ConfigPrefix + nameof(LiveLotteryTaskConfigModel.Cron)] ?? "",
                 ExcludeAwardNames = configs[ConfigPrefix + nameof(LiveLotteryTaskConfigModel.ExcludeAwardNames)] ?? "",
                 IncludeAwardNames = configs[ConfigPrefix + nameof(LiveLotteryTaskConfigModel.IncludeAwardNames)] ?? "",
                 AutoGroupFollowings = bool.Parse(configs[ConfigPrefix + nameof(LiveLotteryTaskConfigModel.AutoGroupFollowings)]),
@@ -67,6 +76,7 @@
     {
         var dic = new Dictionary<string, string>()
         {
+            {nameof(LiveLotteryTaskConfigModel.Cron), _liveLotteryTaskConfigModel.Cron},
             {nameof(LiveLotteryTaskConfigModel.ExcludeAwardNames), _liveLotteryTaskConfigModel.ExcludeAwardNames},
             {nameof(LiveLotteryTaskConfigModel.IncludeAwardNames), _liveLotteryTaskConfigModel.IncludeAwardNames},
             {nameof(LiveLotteryTaskConfigModel.AutoGroupFollowings), _liveLotteryTaskConfigModel.AutoGroupFollowings.ToString()},
@@ -74,6 +84,11 @@
         };
         dic = dic.ToDictionary(kv => ConfigPrefix + kv.Key, kv => kv.Value);
         await DbConfigService.AddOrUpdateConfigsAsync(dic);
+
+        string code = typeof(ILiveLotteryTaskAppService).GetCustomAttribute<DescriptionAttribute>()?.Description;
+        RecurringJob.AddOrUpdate<ILiveLotteryTaskAppService>(code,
+            x => x.DoTaskAsync(new CancellationToken()),
+            () => _liveLotteryTaskConfigModel.Cron);
 
         ModalService.Success(new ConfirmOptions()
             {

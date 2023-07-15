@@ -8,6 +8,8 @@ namespace Ray.BiliBiliTool.Config.Options
 {
     public class LiveLotteryTaskOptions
     {
+        public string Cron { get; set; }
+
         public string IncludeAwardNames { get; set; }
 
         public string ExcludeAwardNames { get; set; }

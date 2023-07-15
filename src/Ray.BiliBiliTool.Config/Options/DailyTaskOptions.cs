@@ -8,6 +8,8 @@ namespace Ray.BiliBiliTool.Config.Options
     /// </summary>
     public class DailyTaskOptions
     {
+        public string Cron { get; set; }
+
         /// <summary>
         /// 是否观看视频
         /// </summary>

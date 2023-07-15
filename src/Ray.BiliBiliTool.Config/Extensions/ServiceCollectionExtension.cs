@@ -22,10 +22,10 @@ namespace Ray.BiliBiliTool.Config.Extensions
                 .Configure<BiliBiliCookieOptions>(configuration.GetSection("BiliBiliCookie"))
                 .Configure<DailyTaskOptions>(configuration.GetSection("DailyTaskConfig"))
                 .Configure<LiveLotteryTaskOptions>(configuration.GetSection("LiveLotteryTaskConfig"))
+                .Configure<LiveFansMedalTaskOptions>(configuration.GetSection("LiveFansMedalTaskConfig"))
                 .Configure<UnfollowBatchedTaskOptions>(configuration.GetSection("UnfollowBatchedTaskConfig"))
                 .Configure<SecurityOptions>(configuration.GetSection("Security"))
                 .Configure<ReceiveVipPrivilegeOptions>(configuration.GetSection("ReceiveVipPrivilegeConfig"))
-                .Configure<LiveFansMedalTaskOptions>(configuration.GetSection("LiveFansMedalTaskOptions"))
                 .Configure<Dictionary<string, int>>(Constants.OptionsNames.ExpDictionaryName, configuration.GetSection(Constants.OptionsNames.ExpDictionaryName))
                 .Configure<Dictionary<string, string>>(Constants.OptionsNames.DonateCoinCanContinueStatusDictionaryName, configuration.GetSection(Constants.OptionsNames.DonateCoinCanContinueStatusDictionaryName));
 

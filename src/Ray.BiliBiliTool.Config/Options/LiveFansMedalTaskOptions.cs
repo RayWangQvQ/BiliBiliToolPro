@@ -12,6 +12,8 @@ namespace Ray.BiliBiliTool.Config.Options
     /// </summary>
     public class LiveFansMedalTaskOptions
     {
+        public string Cron { get; set; }
+
         /// <summary>
         /// 自定义发送弹幕内容，如 “打卡” 等来触发直播间内机器人关键词
         /// </summary>
