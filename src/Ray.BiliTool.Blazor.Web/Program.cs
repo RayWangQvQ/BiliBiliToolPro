@@ -40,7 +40,11 @@ namespace Ray.BiliTool.Blazor.Web
 
                     configurationBuilder.Add(new DbConfigurationSource
                     {
-                        GetDbListFunc = ()=> dbContext.DbConfigs.AsNoTracking().Select(x=>(IDbConfigEntity)x).ToList(),
+                        GetDbListFunc = () => dbContext.DbConfigs
+                            .AsNoTracking()
+                            .Select(x => (IDbConfigEntity)x)
+                            .Where(x=>x.Enable)
+                            .ToList(),
                         ReloadOnChange = true,
                         ReloadDelay = 0
                     });

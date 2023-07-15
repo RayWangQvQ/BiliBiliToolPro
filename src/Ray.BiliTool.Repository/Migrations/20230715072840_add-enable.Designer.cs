@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Ray.BiliTool.Repository;
 
@@ -10,9 +11,11 @@ using Ray.BiliTool.Repository;
 namespace Ray.BiliTool.Repository.Migrations
 {
     [DbContext(typeof(BiliDbContext))]
-    partial class BiliDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230715072840_add-enable")]
+    partial class addenable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.9");

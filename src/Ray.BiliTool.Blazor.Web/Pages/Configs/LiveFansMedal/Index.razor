@@ -50,7 +50,7 @@
             nameof(LiveFansMedalTaskConfigModel.IsSkipLevel20Medal),
         };
         keyList = keyList.Select(x => ConfigPrefix + x).ToList();
-        var configs = await DbConfigService.GetConfigsAsync(keyList);
+        var configs = await DbConfigService.GetConfigsByConfigurationAsync(keyList);
 
         _liveFansMedalTaskConfigModel = new LiveFansMedalTaskConfigModel
             {

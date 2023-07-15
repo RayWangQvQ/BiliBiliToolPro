@@ -11,5 +11,7 @@ namespace Ray.BiliBiliTool.Config
         public string ConfigKey { get; set; }
 
         public string ConfigValue { get; set; }
+
+        public bool Enable { get; set; }
     }
 }
