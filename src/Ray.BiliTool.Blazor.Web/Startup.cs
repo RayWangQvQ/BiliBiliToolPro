@@ -66,7 +66,7 @@ namespace Ray.BiliTool.Blazor.Web
             services.AddScoped<IDbConfigService, DbConfigService>();
 
             // EF
-            var connectionString = Configuration.GetConnectionString("DefaultConnection") 
+            var connectionString = Configuration.GetConnectionString("DefaultConnection")
                                    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
             //services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
             services.AddIdentityDefaultRepositories<BiliDbContext>(optionsAction =>
@@ -132,9 +132,20 @@ namespace Ray.BiliTool.Blazor.Web
                 endpoints.MapHangfireDashboard();
             });
 
+            InitHangfireJobs();
+        }
+
+        private static void InitHangfireJobs()
+        {
             BackgroundJob.Enqueue(() => Console.WriteLine("Hello world from Hangfire!"));
+
             RecurringJob.AddOrUpdate("health-check", () => Console.WriteLine("healthy!"), Cron.Minutely);
-            RecurringJob.AddOrUpdate<ITestAppService>("test", x => x.DoTaskAsync(default), Cron.Daily);
+
+            RecurringJob.AddOrUpdate<ITestAppService>("Test", x => x.DoTaskAsync(default), Cron.Daily);
+            RecurringJob.AddOrUpdate<IDailyTaskAppService>("Daily", x => x.DoTaskAsync(default), Cron.Daily);
+            RecurringJob.AddOrUpdate<ILiveLotteryTaskAppService>("LiveLottery", x => x.DoTaskAsync(default), Cron.Daily);
+            RecurringJob.AddOrUpdate<ILiveFansMedalAppService>("LiveFansMedal", x => x.DoTaskAsync(default), Cron.Daily);
+            RecurringJob.AddOrUpdate<IUnfollowBatchedTaskAppService>("UnfollowBatched", x => x.DoTaskAsync(default), Cron.Daily);
         }
     }
 
@@ -142,9 +153,6 @@ namespace Ray.BiliTool.Blazor.Web
     {
         public static IServiceCollection AddHangfire(this IServiceCollection services, IConfiguration config)
         {
-            var connectionString = config.GetConnectionString("DefaultConnection")
-                                   ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-
             // Add Hangfire services.
             services.AddHangfire(configuration => configuration
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
@@ -152,7 +160,7 @@ namespace Ray.BiliTool.Blazor.Web
                 .UseRecommendedSerializerSettings()
                 .UseSQLiteStorage("bili.db")
                 .UseConsole()
-                .UseRecurringJobAdmin(typeof(Startup).Assembly)
+            //.UseRecurringJobAdmin(typeof(Startup).Assembly)
             );
 
             // Add the processing server as IHostedService
