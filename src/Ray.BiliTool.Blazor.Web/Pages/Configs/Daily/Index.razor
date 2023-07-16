@@ -1,6 +1,6 @@
 ﻿@namespace Ray.BiliTool.Blazor.Web.Pages.Configs.Daily
 @page "/Configs/Daily"
-
+@attribute [Authorize]
 
 @using System.ComponentModel.DataAnnotations;
 @using System.Text.Json;
@@ -30,7 +30,7 @@
     <FormItem Label="保留硬币数量">
         <Input @bind-Value="@context.NumberOfProtectedCoins"/>
     </FormItem>
-    <FormItem Label="SaveCoinsWhenLv6">
+    <FormItem Label="Lv6时开启白嫖模式">
         <Checkbox @bind-Value="context.SaveCoinsWhenLv6">开启</Checkbox>
     </FormItem>
     <FormItem Label="投币的同时点赞">

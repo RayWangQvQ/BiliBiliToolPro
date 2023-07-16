@@ -1,5 +1,6 @@
 ﻿@namespace Ray.BiliTool.Blazor.Web.Pages.BiliAccount.List
 @page "/BiliAccount/List"
+@attribute [Authorize(Roles = "Admin")]
 
 @using AntDesign.TableModels
 @using Microsoft.Extensions.Configuration

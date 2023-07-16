@@ -36,6 +36,7 @@ using System.Reflection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Config.Options;
+using Ray.BiliTool.Repository.Extensions;
 
 namespace Ray.BiliTool.Blazor.Web
 {
@@ -71,21 +72,15 @@ namespace Ray.BiliTool.Blazor.Web
             services.AddScoped<IDbConfigService, DbConfigService>();
 
             // EF
-            var connectionString = Configuration.GetConnectionString("DefaultConnection")
-                                   ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-            //services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
-            services.AddIdentityDefaultRepositories<BiliDbContext>(optionsAction =>
-            {
-                optionsAction.UseSqlite(connectionString);
-            });
+            services.AddRepositoryModule(Configuration);
             services.AddDatabaseDeveloperPageExceptionFilter();
 
             // Identity
-            services.AddDefaultIdentity<IdentityUser>(options =>
+            services.AddDefaultIdentity<IdentityUser>(option =>
                 {
-                    options.SignIn.RequireConfirmedAccount = true;
-                    options.Password = null;
+                    option.SignIn.RequireConfirmedAccount = false;
                 })
+                .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<BiliDbContext>();
 
             // Authentication
@@ -94,7 +89,8 @@ namespace Ray.BiliTool.Blazor.Web
                 .AddGitHub(o =>
                 {
                     Configuration.Bind("OAuth:GitHub", o);
-                });
+                })
+                ;
 
             //Hangfire
             services.AddHangfire(Configuration);
@@ -139,11 +135,12 @@ namespace Ray.BiliTool.Blazor.Web
 
             using var scope= app.ApplicationServices.CreateScope();
             InitHangfireJobs(scope.ServiceProvider);
+            scope.ServiceProvider.Seed();
         }
 
         private static void InitHangfireJobs(IServiceProvider sp)
         {
-            BackgroundJob.Enqueue(() => sp.GetRequiredService<ILogger<BackgroundJob>>()
+            BackgroundJob.Enqueue(() => sp.GetRequiredService<ILogger<Startup>>()
                 .LogInformation("Hello world from Hangfire!"));
 
             RecurringJob.AddOrUpdate<ITestAppService>("Test",
