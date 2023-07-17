@@ -37,6 +37,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliTool.Repository.Extensions;
+using Serilog.Core;
 
 namespace Ray.BiliTool.Blazor.Web
 {
@@ -133,16 +134,17 @@ namespace Ray.BiliTool.Blazor.Web
                 endpoints.MapHangfireDashboard();
             });
 
-            using var scope= app.ApplicationServices.CreateScope();
+            using var scope = app.ApplicationServices.CreateScope();
             InitHangfireJobs(scope.ServiceProvider);
             scope.ServiceProvider.Seed();
         }
 
         private static void InitHangfireJobs(IServiceProvider sp)
         {
-            BackgroundJob.Enqueue(() => sp.GetRequiredService<ILogger<Startup>>()
-                .LogInformation("Hello world from Hangfire!"));
 
+            BackgroundJob.Enqueue(() => Console.WriteLine("Hello world from Hangfire!"));
+
+            //Test
             RecurringJob.AddOrUpdate<ITestAppService>("Test",
                 x => x.DoTaskAsync(new CancellationToken()),
                 Cron.Daily);

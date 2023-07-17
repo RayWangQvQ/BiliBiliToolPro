@@ -1,88 +1,99 @@
 ﻿@namespace Ray.BiliTool.Blazor.Web.Pages.Account.Center
 @page "/account/center"
+@attribute [Authorize(Roles = "Admin")]
 
-<GridContent>
-    <Row Gutter="24">
-        <AntDesign.Col Lg="7" Md="24">
-            <Card Style="margin-bottom: 24px;">
-                <div class="avatarHolder">
-                    <img alt="" src="@_currentUser.Avatar" />
-                    <div className="name">@_currentUser.Name</div>
-                    <div>@_currentUser.Signature</div>
-                </div>
+@using AntDesign.TableModels
+@using Microsoft.Extensions.Configuration
+@using Ray.BiliBiliTool.Infrastructure
 
-                <div class="detail">
-                    <p>
-                        <Icon Type="contacts" Theme="outline" Style="margin-right:8px;" />
-                        @_currentUser.Title
-                    </p>
-                    <p>
-                        <Icon Type="cluster" Theme="outline" Style="margin-right:8px;" />
-                        @_currentUser.Group
-                    </p>
-                    <p>
-                        <Icon Type="home" Theme="outline" Style="margin-right:8px;" />
-                        <!--todo: add userinfo-->
-                        @_currentUser.Geographic.Province.Label
-                        @_currentUser.Geographic.City.Label
-                    </p>
-                </div>
+<Table TItem="AccountManage" DataSource="@_data" OnRowClick="OnRowClick">
+    <PropertyColumn Title="Id" Property="c => c.Id"><a>@context.Id</a></PropertyColumn>
+    <PropertyColumn Title="邮箱" Property="c => c.Email"></PropertyColumn>
 
-                <Divider Dashed />
+    <PropertyColumn Title="角色" Property="c => c.RoleType">
+        <EnumRadioGroup TEnum="RoleType" @bind-Value="@context.RoleType" OnChange="() => OnRoleChangedAsync(context)"></EnumRadioGroup>
+    </PropertyColumn>
 
-                <div class="tags">
-                    <div class="tagsTitle">Tags</div>
-                    @foreach (var tag in _currentUser.Tags) {
-                        <Tag>@tag.Label</Tag>
-                    }
+    <ActionColumn Title="操作">
+        <Space Size=@("middle")>
+            <SpaceItem>
+                <Popconfirm Title="确定删除？"
+                            OnConfirm="()=> OnDeleteClickAsync(context)"
+                            OkText="Yes"
+                            CancelText="No">
+                    <a>Delete</a>
+                </Popconfirm>
+            </SpaceItem>
+        </Space>
+    </ActionColumn>
+</Table>
 
-                    @if (_inputVisible) {
-                        <AntDesign.Input Type="text"
-                                         Size="small"
-                                         Style="width: 78px"
-                                         @bind-Value="InputValue"
-                                         OnBlur="HandleInputConfirm" />
-                    }
-                    else {
-                        <Tag OnClick="ShowInput" Style="border-style: dashed">
-                            <Icon Type="plus" Theme="outline" />
-                        </Tag>
-                    }
-                </div>
+@code {
+    [Inject]
+    protected IDbConfigService DbConfigService { get; set; }
+    [Inject]
+    protected ModalService ModalService { get; set; }
+    [Inject]
+    protected IConfiguration Config { get; set; }
+    [Inject]
+    protected IAccountService AccountService { get; set; }
 
-                <Divider Dashed Style="margin-top: 16px;" />
+    private List<AccountManage> _data;
 
-                <div class="team">
-                    <div class="teamTitle">Team</div>
-                    <!--todo: add notice-->
-                </div>
-            </Card>
-        </AntDesign.Col>
-        <AntDesign.Col Lg="17" Md="24">
-            <Card Class="tabsCard">
-                <CardTabs>
-                    <Tabs DefaultActiveKey="1">
-                        <TabPane Key="1">
-                            <TabTemplate>Articles (@_fakeList.Count)</TabTemplate>
-                            <ChildContent>
-                                <Articles List="_fakeList" />
-                            </ChildContent>
-                        </TabPane>
-                        <TabPane Key="2">
-                            <TabTemplate>Applications (@_fakeList.Count)</TabTemplate>
-                            <ChildContent>
-                                <Applications List="_fakeList" />
-                            </ChildContent>
-                        </TabPane>
-                        <TabPane Key="3">
-                            <TabTemplate>Projects (@_fakeList.Count)</TabTemplate>
-                            <ChildContent>
-                                <Projects List="_fakeList" />
-                            </ChildContent>
-                        </TabPane>
-                    </Tabs>
-                </CardTabs>
-            </Card>
-        </AntDesign.Col>
-    </Row>
-</GridContent>
+    protected override async Task OnInitializedAsync()
+    {
+        await GetTableListAsync();
+        await base.OnInitializedAsync();
+    }
+
+    private async Task GetTableListAsync()
+    {
+        _data = await AccountService.GetListAsync();
+    }
+
+
+    private void OnRowClick(RowData<AccountManage> row)
+    {
+        Console.WriteLine($"row {row.Data.Id} was clicked.");
+    }
+
+    private async Task OnDeleteClickAsync(AccountManage ck)
+    {
+        var check =await CheckAsync(ck);
+        if(!check)return;
+        await AccountService.DeleteAsync(ck.Id);
+        await ModalService.SuccessAsync(new ConfirmOptions()
+            {
+                Title = "删除成功",
+                Content = $"Email：{ck.Email}"
+            });
+        await GetTableListAsync();
+    }
+
+    private async Task OnRoleChangedAsync(AccountManage ck)
+    {
+        var check =await CheckAsync(ck);
+        if(!check)return;
+
+        await AccountService.PutSync(ck.Id,ck);
+        await ModalService.SuccessAsync(new ConfirmOptions()
+            {
+                Title = "修改成功",
+            });
+        await GetTableListAsync();
+    }
+
+    private async Task<bool> CheckAsync(AccountManage ck)
+    {
+        if (ck.Id == "0")
+        {
+            await ModalService.WarningAsync(new ConfirmOptions()
+            {
+                Title = "这河狸吗。。。",
+            });
+            await GetTableListAsync();
+            return false;
+        }
+        return true;
+    }
+}

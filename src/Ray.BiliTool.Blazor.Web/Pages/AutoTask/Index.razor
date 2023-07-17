@@ -1,6 +1,6 @@
 ﻿@page "/autotask"
 @page "/"
-@attribute [Authorize]
+@attribute [Authorize(Roles = "Admin,Manager")]
 
 <GridContent>
     <iframe src="/hangfire" width="100%" height="1200"></iframe>

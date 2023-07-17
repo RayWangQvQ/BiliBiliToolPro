@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Ray.BiliBiliTool.Infrastructure;
 
 namespace Ray.BiliTool.Repository
 {
@@ -27,21 +28,25 @@ namespace Ray.BiliTool.Repository
 
         public async Task SeedAsync()
         {
-            var adminRole = "Admin";
-            var roleNames = new String[] { adminRole, "Manager", "Guest" };
+            var roleNames = new String[] { RoleType.Admin.ToString(), RoleType.Manager.ToString(), RoleType.Guest.ToString() };
 
             foreach (var roleName in roleNames)
             {
                 var role = await _rolesManager.RoleExistsAsync(roleName);
                 if (!role)
                 {
-                    var result = await _rolesManager.CreateAsync(new IdentityRole { Name = roleName });
+                    var result = await _rolesManager.CreateAsync(new IdentityRole
+                    {
+                        Id = roleName,
+                        Name = roleName
+                    });
                     _logger.LogInformation("Create {0}: {1}", roleName, result.Succeeded);
                 }
             }
             // administrator
             var user = new IdentityUser
             {
+                Id = "0",
                 UserName = "admin@bili.tool",
                 Email = "admin@bili.tool",
                 EmailConfirmed = true
@@ -52,7 +57,7 @@ namespace Ray.BiliTool.Repository
                 var adminUser = await _userManager.CreateAsync(user, "1234@qweR");
                 if (adminUser.Succeeded)
                 {
-                    await _userManager.AddToRoleAsync(user, adminRole);
+                    await _userManager.AddToRoleAsync(user, RoleType.Admin.ToString());
                     _logger.LogInformation("Create {0}", user.UserName);
                 }
             }

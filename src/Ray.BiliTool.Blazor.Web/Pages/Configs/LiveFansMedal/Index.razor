@@ -1,6 +1,6 @@
 ﻿@namespace Ray.BiliTool.Blazor.Web.Pages.Configs.LiveFansMedal
 @page "/Configs/LiveFansMedal"
-@attribute [Authorize]
+@attribute [Authorize(Roles = "Admin,Manager")]
 
 @using System.ComponentModel.DataAnnotations;
 @using System.Text.Json;

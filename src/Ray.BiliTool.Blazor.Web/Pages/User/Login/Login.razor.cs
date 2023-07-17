@@ -24,8 +24,8 @@ namespace Ray.BiliTool.Blazor.Web.Pages.User {
     }
 
     public async Task GetCaptcha() {
-      var captcha = await AccountService.GetCaptchaAsync(_model.Mobile);
-      await Message.Success($"Verification code validated successfully! The verification code is: {captcha}");
+      //var captcha = await AccountService.GetCaptchaAsync(_model.Mobile);
+      //await Message.Success($"Verification code validated successfully! The verification code is: {captcha}");
     }
   }
 }
