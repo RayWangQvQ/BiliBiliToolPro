@@ -1,18 +1,16 @@
 version: '3.9'
 services:
-  bilibili_tool:
-    image: ghcr.io/raywangqvq/bilibili_tool_pro
+  bilitool:
+    image: zai7lou/bilitool
     container_name: bili
     restart: unless-stopped
     tty: true
+    ports:
+      - 7654:80
     volumes:
       - ./Logs:/app/Logs
-      - ./appsettings.json:/app/appsettings.json
-      - ./cookies.json:/app/cookies.json
+      # - ./appsettings.json:/app/appsettings.json
     environment:
       # 定时任务
-      - Ray_DailyTaskConfig__Cron=0 15 * * *
-      - Ray_LiveLotteryTaskConfig__Cron=0 22 * * *
-      - Ray_UnfollowBatchedTaskConfig__Cron=0 6 1 * *
-      - Ray_VipBigPointConfig__Cron=7 1 * * *
-      - Ray_LiveFansMedalTaskConfig__Cron=5 0 * * *
+      - OAuth__GitHub__ClientId=
+      - OAuth__GitHub__ClientSecret=
