@@ -43,6 +43,8 @@ namespace Ray.BiliTool.Blazor.Web
 {
     public class Startup
     {
+        private const string HangfirePolicyName = "HangfirePolicy";
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -92,6 +94,17 @@ namespace Ray.BiliTool.Blazor.Web
                     Configuration.Bind("OAuth:GitHub", o);
                 })
                 ;
+            services.AddAuthorization(options =>
+            {
+                // Policy to be applied to hangfire endpoint
+                options.AddPolicy(HangfirePolicyName, builder =>
+                {
+                    builder
+                        //.AddAuthenticationSchemes(AzureADDefaults.AuthenticationScheme)
+                        .RequireAuthenticatedUser()
+                        .RequireRole(new[] { RoleType.Admin.ToString(), RoleType.Manager.ToString() });
+                });
+            });
 
             //Hangfire
             services.AddHangfire(Configuration);
@@ -131,7 +144,9 @@ namespace Ray.BiliTool.Blazor.Web
             {
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
-                endpoints.MapHangfireDashboard();
+                endpoints.MapHangfireDashboard("/hangfire")
+                    .RequireAuthorization(HangfirePolicyName) //https://sahansera.dev/securing-hangfire-dashboard-with-endpoint-routing-auth-policy-aspnetcore/
+                    ;
             });
 
             using var scope = app.ApplicationServices.CreateScope();

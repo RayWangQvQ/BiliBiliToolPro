@@ -32,7 +32,7 @@ namespace Ray.BiliBiliTool.Infrastructure.Cookie
 
         public Dictionary<string, string> GetCurrentCookieDic()
         {
-            if (!Any()) throw new Exception($"第 {CurrentNum} 个cookie不存在");
+            if (!Any()) return new Dictionary<string, string>();
 
             return _cookieDictionary[CurrentNum];
         }
