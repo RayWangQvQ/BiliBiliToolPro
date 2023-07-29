@@ -19,14 +19,17 @@ namespace Ray.BiliBiliTool.DomainService
     /// </summary>
     public class AccountDomainService : IAccountDomainService
     {
+
         private readonly ILogger<AccountDomainService> _logger;
         private readonly IDailyTaskApi _dailyTaskApi;
+        private readonly DailyTaskOptions _dailyTaskOptions;
         private readonly IUserInfoApi _userInfoApi;
         private readonly IRelationApi _relationApi;
         private readonly UnfollowBatchedTaskOptions _unfollowBatchedTaskOptions;
         private readonly BiliCookie _cookie;
 
         public AccountDomainService(
+            IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
             ILogger<AccountDomainService> logger,
             IDailyTaskApi dailyTaskApi,
             BiliCookie cookie,
@@ -37,6 +40,7 @@ namespace Ray.BiliBiliTool.DomainService
         {
             _logger = logger;
             _dailyTaskApi = dailyTaskApi;
+            _dailyTaskOptions = dailyTaskOptions.CurrentValue;
             _cookie = cookie;
             _userInfoApi = userInfoApi;
             _relationApi = relationApi;
@@ -66,9 +70,20 @@ namespace Ray.BiliBiliTool.DomainService
 
             if (useInfo.Level_info.Current_level < 6)
             {
-                _logger.LogInformation("【距升级Lv{0}】{1}天（如每日做满65点经验）",
-                    useInfo.Level_info.Current_level + 1,
-                    (useInfo.Level_info.GetNext_expLong() - useInfo.Level_info.Current_exp) / Constants.EveryDayExp);
+                if ((useInfo.Money ?? 0 - _dailyTaskOptions.NumberOfProtectedCoins) < 5)
+                {
+                    _logger.LogInformation("【距升级Lv{0}】{1}天（如每日获得25点经验）",
+                        useInfo.Level_info.Current_level + 1,
+                        (useInfo.Level_info.GetNext_expLong() - useInfo.Level_info.Current_exp) / Constants.EveryDayMinExp);
+                }
+                else
+                {
+                    _logger.LogInformation("【距升级Lv{0}】{1}天（如每日做满65点经验）",
+                        useInfo.Level_info.Current_level + 1,
+                        (useInfo.Level_info.GetNext_expLong() - useInfo.Level_info.Current_exp) / Constants.EveryDayExp);
+                }
+
+                
             }
             else
             {
