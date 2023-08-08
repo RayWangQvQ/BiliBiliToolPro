@@ -14,6 +14,8 @@ namespace Ray.BiliTool.Blazor.Web.Hangfire
     {
         public static void InitHangfireJobs(IServiceProvider sp)
         {
+            GlobalJobFilters.Filters.Add(new AutomaticRetryAttribute { Attempts = 0 });
+
             BackgroundJob.Enqueue(() => Console.WriteLine("Hello world from Hangfire!"));
 
             //Test

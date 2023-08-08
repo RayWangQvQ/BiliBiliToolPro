@@ -13,14 +13,16 @@ namespace Ray.BiliTool.Blazor.Web.Hangfire
         public static IServiceCollection AddHangfire(this IServiceCollection services, IConfiguration config)
         {
             // Add Hangfire services.
-            services.AddHangfire(configuration => configuration
+            services.AddSingleton(new AutomaticRetryAttribute { Attempts = 0 });
+            services.AddHangfire((sp, configuration) => configuration
                     .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
                     .UseSimpleAssemblyNameTypeSerializer()
                     .UseRecommendedSerializerSettings()
                     .UseSQLiteStorage("bili.db")
                     .UseConsole()
                     .UseDefaultCulture(new CultureInfo("zh-CN"))
-                //.UseRecurringJobAdmin(typeof(Startup).Assembly)
+                    .UseFilter(sp.GetRequiredService<AutomaticRetryAttribute>())
+            //.UseRecurringJobAdmin(typeof(Startup).Assembly)
             );
 
             // Add the processing server as IHostedService
