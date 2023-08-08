@@ -46,20 +46,18 @@ namespace Ray.BiliTool.Blazor.Web.Components
 
         [Inject] protected NavigationManager NavigationManager { get; set; }
 
-        [Inject] protected IUserService UserService { get; set; }
-        [Inject] protected IProjectService ProjectService { get; set; }
         [Inject] protected MessageService MessageService { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();
             SetClassMap();
-            _currentUser = await UserService.GetCurrentUserAsync();
-            var notices = await ProjectService.GetNoticesAsync();
-            _notifications = notices.Where(x => x.Type == "notification").Cast<NoticeIconData>().ToArray();
-            _messages = notices.Where(x => x.Type == "message").Cast<NoticeIconData>().ToArray();
-            _events = notices.Where(x => x.Type == "event").Cast<NoticeIconData>().ToArray();
-            _count = notices.Length;
+            //_currentUser = await UserService.GetCurrentUserAsync();
+            //var notices = await ProjectService.GetNoticesAsync();
+            //_notifications = notices.Where(x => x.Type == "notification").Cast<NoticeIconData>().ToArray();
+            //_messages = notices.Where(x => x.Type == "message").Cast<NoticeIconData>().ToArray();
+            //_events = notices.Where(x => x.Type == "event").Cast<NoticeIconData>().ToArray();
+            //_count = notices.Length;
         }
 
         protected void SetClassMap()

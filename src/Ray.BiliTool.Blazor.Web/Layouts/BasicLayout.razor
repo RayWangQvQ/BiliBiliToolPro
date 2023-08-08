@@ -1,4 +1,5 @@
 ﻿@namespace Ray.BiliTool.Blazor.Web
+@using Newtonsoft.Json
 @inherits LayoutComponentBase
 
 
@@ -22,14 +23,83 @@
 
 @code
 {
-    private MenuDataItem[] _menuData = { };
+    private string menu=@"
+[
+  {
+    ""path"": ""/AutoTask"",
+    ""name"": ""定时任务"",
+    ""key"": ""autotask"",
+    ""icon"": ""dashboard""
+  },
+  {
+    ""path"": ""/BiliAccount"",
+    ""name"": ""Bili账号"",
+    ""key"": ""BiliAccount"",
+    ""icon"": ""dashboard"",
+    ""children"": [
+      {
+        ""path"": ""/BiliAccount/Login"",
+        ""name"": ""账号登录"",
+        ""key"": ""BiliAccount.Login""
+      },
+      {
+        ""path"": ""/BiliAccount/List"",
+        ""name"": ""账号列表"",
+        ""key"": ""BiliAccount.List""
+      }
+    ]
+  },
+  {
+    ""path"": ""/Configs"",
+    ""name"": ""配置"",
+    ""key"": ""Configs"",
+    ""icon"": ""dashboard"",
+    ""children"": [
+      {
+        ""path"": ""/Configs/Daily"",
+        ""name"": ""每日任务"",
+        ""key"": ""Configs.Daily""
+      },
+      {
+        ""path"": ""/Configs/LiveLottery"",
+        ""name"": ""天选时刻"",
+        ""key"": ""Configs.LiveLottery""
+      },
+      {
+        ""path"": ""/Configs/UnfollowBatched"",
+        ""name"": ""批量取关"",
+        ""key"": ""Configs.UnfollowBatched""
+      },
+      {
+        ""path"": ""/Configs/LiveFansMedal"",
+        ""name"": ""直播间互动"",
+        ""key"": ""Configs.LiveFansMedal""
+      }
+    ]
+  },
+  {
+    ""path"": ""/Account"",
+    ""name"": ""用户管理"",
+    ""key"": ""Account"",
+    ""icon"": ""dashboard"",
+    ""children"": [
+      {
+        ""path"": ""/account/center"",
+        ""name"": ""用户中心"",
+        ""key"": ""Account.Center""
+      }
+    ]
+  }
+]
+";
+    private MenuDataItem[] _menuData;
 
     [Inject] public HttpClient HttpClient { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        _menuData = await HttpClient.GetFromJsonAsync<MenuDataItem[]>("data/menu.json");
+        _menuData = JsonConvert.DeserializeObject<MenuDataItem[]>(menu);
     }
 
 

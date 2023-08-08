@@ -2,8 +2,8 @@ version: '3.9'
 services:
   bilitool:
     image: zai7lou/bilitool
-    container_name: bili
-    restart: unless-stopped
+    container_name: bilitool
+    restart: no
     tty: true
     ports:
       - 7654:80
@@ -11,6 +11,7 @@ services:
       - ./Logs:/app/Logs
       # - ./appsettings.json:/app/appsettings.json
     environment:
+      # - ASPNETCORE_URLS=http://localhost:80
       # 定时任务
       - OAuth__GitHub__ClientId=
       - OAuth__GitHub__ClientSecret=

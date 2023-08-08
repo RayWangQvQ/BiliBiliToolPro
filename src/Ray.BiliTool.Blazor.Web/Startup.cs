@@ -1,43 +1,38 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using AntDesign.ProLayout;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Ray.BiliTool.Blazor.Web.Areas.Identity;
 using Ray.BiliTool.Blazor.Web.Services;
 using Hangfire;
 using Hangfire.Console;
 using Hangfire.Console.Extensions;
-using Hangfire.RecurringJobAdmin;
 using Hangfire.Storage.SQLite;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Ray.BiliBiliTool.Agent.Extensions;
 using Ray.BiliBiliTool.Application.Extensions;
 using Ray.BiliBiliTool.Application.Contracts;
 using Ray.BiliBiliTool.Config.Extensions;
 using Ray.BiliBiliTool.DomainService.Extensions;
 using Ray.BiliBiliTool.Infrastructure;
-using Ray.Repository.EntityFramework;
 using Ray.BiliTool.Repository;
 using System.ComponentModel;
 using System.Reflection;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliTool.Repository.Extensions;
-using Serilog.Core;
+using System.Globalization;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Hangfire.Dashboard;
 
 namespace Ray.BiliTool.Blazor.Web
 {
@@ -52,8 +47,6 @@ namespace Ray.BiliTool.Blazor.Web
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRazorPages();
@@ -62,23 +55,20 @@ namespace Ray.BiliTool.Blazor.Web
 
             services.AddScoped(sp => new HttpClient
             {
-                BaseAddress = new Uri(sp.GetService<NavigationManager>().BaseUri)
+                //BaseAddress = new Uri(sp.GetService<NavigationManager>().BaseUri)
+                //BaseAddress = new Uri(Configuration["ASPNETCORE_URLS"])
             });
 
             services.Configure<ProSettings>(Configuration.GetSection("ProSettings"));
 
-            services.AddScoped<IChartService, ChartService>();
-            services.AddScoped<IProjectService, ProjectService>();
-            services.AddScoped<IUserService, UserService>();
             services.AddScoped<IAccountService, AccountService>();
-            services.AddScoped<IProfileService, ProfileService>();
             services.AddScoped<IDbConfigService, DbConfigService>();
 
-            // EF
+            //EF
             services.AddRepositoryModule(Configuration);
             services.AddDatabaseDeveloperPageExceptionFilter();
 
-            // Identity
+            //Identity
             services.AddDefaultIdentity<IdentityUser>(option =>
                 {
                     option.SignIn.RequireConfirmedAccount = false;
@@ -86,17 +76,21 @@ namespace Ray.BiliTool.Blazor.Web
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<BiliDbContext>();
 
-            // Authentication
+            //Authentication
             services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
-            services.AddAuthentication()
-                .AddGitHub(o =>
+            var authenticationBuilder = services.AddAuthentication();
+            if (!string.IsNullOrWhiteSpace(Configuration["OAuth:GitHub:ClientId"]))
+            {
+                authenticationBuilder.AddGitHub(o =>
                 {
                     Configuration.Bind("OAuth:GitHub", o);
-                })
-                ;
+                });
+            }
+
+            //Authorization
             services.AddAuthorization(options =>
             {
-                // Policy to be applied to hangfire endpoint
+                //Policy to be applied to hangfire endpoint
                 options.AddPolicy(HangfirePolicyName, builder =>
                 {
                     builder
@@ -115,7 +109,6 @@ namespace Ray.BiliTool.Blazor.Web
                 .AddAppServices();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             Global.ServiceProviderRoot = app.ApplicationServices;
@@ -128,11 +121,25 @@ namespace Ray.BiliTool.Blazor.Web
             else
             {
                 app.UseExceptionHandler("/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
+                //app.UseHsts(); //// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
             }
 
-            app.UseHttpsRedirection();
+            app.UseForwardedHeaders(new ForwardedHeadersOptions());
+
+            var supportedCultures = new[]
+            {
+                new CultureInfo("zh-CN"),
+                new CultureInfo("en-US"),
+            };
+
+            app.UseRequestLocalization(new RequestLocalizationOptions
+            {
+                DefaultRequestCulture = new RequestCulture("zh-CN"),
+                SupportedCultures = supportedCultures,
+                SupportedUICultures = supportedCultures
+            });
+
+            //app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
@@ -144,7 +151,14 @@ namespace Ray.BiliTool.Blazor.Web
             {
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
-                endpoints.MapHangfireDashboard("/hangfire")
+                endpoints.MapHangfireDashboard("/hangfire", new DashboardOptions()
+                {
+                    DashboardTitle = "Dashboard",
+                    AppPath = "",
+                    StatsPollingInterval = 60 * 1000,
+
+                    Authorization = new[] { new MyAuthorizationFilter() }
+                })
                     .RequireAuthorization(HangfirePolicyName) //https://sahansera.dev/securing-hangfire-dashboard-with-endpoint-routing-auth-policy-aspnetcore/
                     ;
             });
@@ -156,7 +170,6 @@ namespace Ray.BiliTool.Blazor.Web
 
         private static void InitHangfireJobs(IServiceProvider sp)
         {
-
             BackgroundJob.Enqueue(() => Console.WriteLine("Hello world from Hangfire!"));
 
             //Test
@@ -205,6 +218,7 @@ namespace Ray.BiliTool.Blazor.Web
                 .UseRecommendedSerializerSettings()
                 .UseSQLiteStorage("bili.db")
                 .UseConsole()
+                .UseDefaultCulture(new CultureInfo("zh-CN"))
             //.UseRecurringJobAdmin(typeof(Startup).Assembly)
             );
 
@@ -213,6 +227,17 @@ namespace Ray.BiliTool.Blazor.Web
             services.AddHangfireConsoleExtensions();
 
             return services;
+        }
+    }
+
+    public class MyAuthorizationFilter : IDashboardAuthorizationFilter
+    {
+        public bool Authorize(DashboardContext context)
+        {
+            var httpContext = context.GetHttpContext();
+
+            // Allow all authenticated users to see the Dashboard (potentially dangerous).
+            return httpContext.User.Identity?.IsAuthenticated ?? false;
         }
     }
 }

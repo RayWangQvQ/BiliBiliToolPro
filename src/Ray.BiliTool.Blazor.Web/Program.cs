@@ -1,14 +1,8 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Ray.BiliBiliTool.Config;
 using Ray.BiliTool.Repository;
 using Serilog;
@@ -51,6 +45,7 @@ namespace Ray.BiliTool.Blazor.Web
                 })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
+                    webBuilder.UseStaticWebAssets();
                     webBuilder.UseStartup<Startup>();
                 })
                 .ConfigureLogging((hostBuilderContext, loggingBuilder) =>
@@ -58,7 +53,7 @@ namespace Ray.BiliTool.Blazor.Web
                     Log.Logger = new LoggerConfiguration()
                         .ReadFrom.Configuration(hostBuilderContext.Configuration)
                         .CreateLogger();
-                    SelfLog.Enable(x => System.Console.WriteLine(x ?? ""));
+                    SelfLog.Enable(x => Console.WriteLine(x ?? ""));
                 })
                 .UseSerilog()
             ;
