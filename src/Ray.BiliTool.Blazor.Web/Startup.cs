@@ -33,6 +33,7 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Hangfire.Dashboard;
+using Ray.BiliTool.Blazor.Web.Hangfire;
 
 namespace Ray.BiliTool.Blazor.Web
 {
@@ -157,87 +158,15 @@ namespace Ray.BiliTool.Blazor.Web
                     AppPath = "",
                     StatsPollingInterval = 60 * 1000,
 
-                    Authorization = new[] { new MyAuthorizationFilter() }
+                    Authorization = new[] { new BiliAuthorizationFilter() }
                 })
                     .RequireAuthorization(HangfirePolicyName) //https://sahansera.dev/securing-hangfire-dashboard-with-endpoint-routing-auth-policy-aspnetcore/
                     ;
             });
 
             using var scope = app.ApplicationServices.CreateScope();
-            InitHangfireJobs(scope.ServiceProvider);
+            HangfireHelper.InitHangfireJobs(scope.ServiceProvider);
             scope.ServiceProvider.Seed();
-        }
-
-        private static void InitHangfireJobs(IServiceProvider sp)
-        {
-            BackgroundJob.Enqueue(() => Console.WriteLine("Hello world from Hangfire!"));
-
-            //Test
-            RecurringJob.AddOrUpdate<ITestAppService>("Test",
-                x => x.DoTaskAsync(new CancellationToken()),
-                Cron.Daily);
-
-            //Daily
-            var dailyOptions = sp.GetRequiredService<IOptions<DailyTaskOptions>>().Value;
-            string dailyCode = typeof(IDailyTaskAppService).GetCustomAttribute<DescriptionAttribute>()?.Description;
-            RecurringJob.AddOrUpdate<IDailyTaskAppService>(dailyCode,
-                x => x.DoTaskAsync(new CancellationToken()),
-                dailyOptions.Cron);
-
-            //LiveLottery
-            var liveLotteryOptions = sp.GetRequiredService<IOptions<LiveLotteryTaskOptions>>().Value;
-            string liveLotteryCode = typeof(ILiveLotteryTaskAppService).GetCustomAttribute<DescriptionAttribute>()?.Description;
-            RecurringJob.AddOrUpdate<ILiveLotteryTaskAppService>(liveLotteryCode,
-                x => x.DoTaskAsync(new CancellationToken()),
-                liveLotteryOptions.Cron);
-
-            //LiveFansMedal
-            var liveFansMedalOptions = sp.GetRequiredService<IOptions<LiveFansMedalTaskOptions>>().Value;
-            string liveFansMedalCode = typeof(ILiveFansMedalAppService).GetCustomAttribute<DescriptionAttribute>()?.Description;
-            RecurringJob.AddOrUpdate<ILiveFansMedalAppService>(liveFansMedalCode,
-                x => x.DoTaskAsync(new CancellationToken()),
-                liveFansMedalOptions.Cron);
-
-            //UnfollowBatched
-            var unfollowBatchedOptions = sp.GetRequiredService<IOptions<UnfollowBatchedTaskOptions>>().Value;
-            string unfollowBatchedCode = typeof(IUnfollowBatchedTaskAppService).GetCustomAttribute<DescriptionAttribute>()?.Description;
-            RecurringJob.AddOrUpdate<IUnfollowBatchedTaskAppService>(unfollowBatchedCode,
-                x => x.DoTaskAsync(new CancellationToken()),
-                unfollowBatchedOptions.Cron);
-        }
-    }
-
-    public static class ServiceCollectionExt
-    {
-        public static IServiceCollection AddHangfire(this IServiceCollection services, IConfiguration config)
-        {
-            // Add Hangfire services.
-            services.AddHangfire(configuration => configuration
-                .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
-                .UseSimpleAssemblyNameTypeSerializer()
-                .UseRecommendedSerializerSettings()
-                .UseSQLiteStorage("bili.db")
-                .UseConsole()
-                .UseDefaultCulture(new CultureInfo("zh-CN"))
-            //.UseRecurringJobAdmin(typeof(Startup).Assembly)
-            );
-
-            // Add the processing server as IHostedService
-            services.AddHangfireServer();
-            services.AddHangfireConsoleExtensions();
-
-            return services;
-        }
-    }
-
-    public class MyAuthorizationFilter : IDashboardAuthorizationFilter
-    {
-        public bool Authorize(DashboardContext context)
-        {
-            var httpContext = context.GetHttpContext();
-
-            // Allow all authenticated users to see the Dashboard (potentially dangerous).
-            return httpContext.User.Identity?.IsAuthenticated ?? false;
         }
     }
 }
