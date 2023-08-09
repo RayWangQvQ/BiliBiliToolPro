@@ -41,6 +41,7 @@ namespace Ray.BiliTool.Blazor.Web
             services.AddAntDesign();
 
             services.AddControllers();
+            services.AddSwaggerGen();
 
             services.AddScoped(sp => new HttpClient
             {
@@ -104,6 +105,9 @@ namespace Ray.BiliTool.Blazor.Web
 
             if (env.IsDevelopment())
             {
+                app.UseSwagger();
+                app.UseSwaggerUI();
+
                 app.UseDeveloperExceptionPage();
                 app.UseMigrationsEndPoint(); // Migrations
             }
