@@ -1,8 +1,5 @@
-using System;
 using System.Net.Http;
-using System.Threading;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,26 +10,15 @@ using Microsoft.AspNetCore.Identity;
 using Ray.BiliTool.Blazor.Web.Areas.Identity;
 using Ray.BiliTool.Blazor.Web.Services;
 using Hangfire;
-using Hangfire.Console;
-using Hangfire.Console.Extensions;
-using Hangfire.Storage.SQLite;
 using Ray.BiliBiliTool.Agent.Extensions;
 using Ray.BiliBiliTool.Application.Extensions;
-using Ray.BiliBiliTool.Application.Contracts;
 using Ray.BiliBiliTool.Config.Extensions;
 using Ray.BiliBiliTool.DomainService.Extensions;
 using Ray.BiliBiliTool.Infrastructure;
 using Ray.BiliTool.Repository;
-using System.ComponentModel;
-using System.Reflection;
-using Microsoft.Extensions.Options;
-using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliTool.Repository.Extensions;
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Filters;
-using Hangfire.Dashboard;
 using Ray.BiliTool.Blazor.Web.Hangfire;
 
 namespace Ray.BiliTool.Blazor.Web
@@ -53,6 +39,8 @@ namespace Ray.BiliTool.Blazor.Web
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddAntDesign();
+
+            services.AddControllers();
 
             services.AddScoped(sp => new HttpClient
             {
@@ -162,6 +150,8 @@ namespace Ray.BiliTool.Blazor.Web
                 })
                     .RequireAuthorization(HangfirePolicyName) //https://sahansera.dev/securing-hangfire-dashboard-with-endpoint-routing-auth-policy-aspnetcore/
                     ;
+
+                endpoints.MapControllers();
             });
 
             using var scope = app.ApplicationServices.CreateScope();

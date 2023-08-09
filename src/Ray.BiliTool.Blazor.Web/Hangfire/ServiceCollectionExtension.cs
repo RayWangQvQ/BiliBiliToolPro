@@ -18,7 +18,7 @@ namespace Ray.BiliTool.Blazor.Web.Hangfire
                     .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
                     .UseSimpleAssemblyNameTypeSerializer()
                     .UseRecommendedSerializerSettings()
-                    .UseSQLiteStorage("bili.db")
+                    .UseSQLiteStorage("db/bili.db")
                     .UseConsole()
                     .UseDefaultCulture(new CultureInfo("zh-CN"))
                     .UseFilter(sp.GetRequiredService<AutomaticRetryAttribute>())

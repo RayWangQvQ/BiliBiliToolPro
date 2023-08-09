@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -22,6 +23,7 @@ namespace Ray.BiliTool.Blazor.Web
                 .ConfigureAppConfiguration((hostBuilderContext, configurationBuilder) =>
                 {
                     //Êý¾Ý¿â
+                    Directory.CreateDirectory("./db");
                     var temp = configurationBuilder.Build();
                     var connectionString = temp["ConnectionStrings:DefaultConnection"]
                                            ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
