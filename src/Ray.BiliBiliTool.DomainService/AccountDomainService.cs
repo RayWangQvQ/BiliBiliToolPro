@@ -68,7 +68,7 @@ namespace Ray.BiliBiliTool.DomainService
 
             if (useInfo.Level_info.Current_level < 6)
             {
-                _logger.LogInformation("【距升级Lv{0}】{1}天",
+                _logger.LogInformation("【距升级Lv{0}】预计{1}天",
                     useInfo.Level_info.Current_level + 1,
                     CalculateUpgradeTime(useInfo));
             }
