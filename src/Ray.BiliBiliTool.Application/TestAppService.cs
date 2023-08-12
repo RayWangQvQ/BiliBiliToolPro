@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Ray.BiliBiliTool.Application.Attributes;
 using Ray.BiliBiliTool.Application.Contracts;
 using Ray.BiliBiliTool.DomainService.Interfaces;
+using Ray.BiliBiliTool.Infrastructure.Cookie;
 
 namespace Ray.BiliBiliTool.Application
 {
@@ -29,6 +30,8 @@ namespace Ray.BiliBiliTool.Application
         public override async Task DoTaskAsync(CancellationToken cancellationToken)
         {
             await _accountDomainService.LoginByCookie();
+
+            _logger.LogInformation("·开始推送·{task}·{user}", "Test任务", "");
         }
     }
 }
