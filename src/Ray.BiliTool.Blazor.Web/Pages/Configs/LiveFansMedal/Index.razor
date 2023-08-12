@@ -1,6 +1,6 @@
 ﻿@namespace Ray.BiliTool.Blazor.Web.Pages.Configs.LiveFansMedal
 @page "/Configs/LiveFansMedal"
-@attribute [Authorize(Roles = "Admin,Manager")]
+@attribute [Authorize(policy: AuthorizationHelper.RequireManagerPolicy)]
 
 @using System.ComponentModel.DataAnnotations;
 @using System.Text.Json;
@@ -11,6 +11,7 @@
 @using Hangfire
 @using Ray.BiliBiliTool.Application.Contracts
 @using Ray.BiliBiliTool.Config;
+@using Ray.BiliTool.Blazor.Web.Auth
 
 <Form Model="@_liveFansMedalTaskConfigModel"
       OnFinish="OnFinish"

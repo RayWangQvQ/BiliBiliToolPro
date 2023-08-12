@@ -6,7 +6,7 @@ services:
     restart: no
     tty: true
     ports:
-      - 7654:80
+      - 7777:80
     volumes:
       - ./Logs:/app/Logs
       - ./db:/app/db

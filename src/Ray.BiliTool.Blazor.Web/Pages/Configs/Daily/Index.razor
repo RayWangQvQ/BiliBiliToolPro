@@ -1,6 +1,6 @@
 ﻿@namespace Ray.BiliTool.Blazor.Web.Pages.Configs.Daily
 @page "/Configs/Daily"
-@attribute [Authorize(Roles = "Admin,Manager")]
+@attribute [Authorize(policy: AuthorizationHelper.RequireManagerPolicy)]
 
 @using System.ComponentModel.DataAnnotations;
 @using System.Text.Json;
@@ -10,6 +10,7 @@
 @using global::Hangfire
 @using Hangfire
 @using Ray.BiliBiliTool.Application.Contracts
+@using Ray.BiliTool.Blazor.Web.Auth
 
 <Form Model="@_dailyTaskConfigModel"
       OnFinish="OnFinish"

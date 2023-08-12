@@ -1,6 +1,7 @@
 ﻿@page "/autotask"
 @page "/"
-@attribute [Authorize(Roles = "Admin,Manager")]
+@using Ray.BiliTool.Blazor.Web.Auth
+@attribute [Authorize(policy: AuthorizationHelper.RequireManagerPolicy)]
 
 <GridContent>
     <iframe src="/hangfire" width="100%" height="1200"></iframe>

@@ -1,6 +1,6 @@
 ﻿@namespace Ray.BiliTool.Blazor.Web.Pages.Configs.UnfollowBatched
 @page "/Configs/UnfollowBatched"
-@attribute [Authorize(Roles = "Admin,Manager")]
+@attribute [Authorize(policy: AuthorizationHelper.RequireManagerPolicy)]
 
 @using System.ComponentModel.DataAnnotations;
 @using System.Text.Json;

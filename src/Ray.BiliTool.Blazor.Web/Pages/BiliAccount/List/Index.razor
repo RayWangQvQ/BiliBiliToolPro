@@ -1,9 +1,10 @@
 ﻿@namespace Ray.BiliTool.Blazor.Web.Pages.BiliAccount.List
 @page "/BiliAccount/List"
-@attribute [Authorize(Roles = "Admin,Manager")]
+@attribute [Authorize(policy: AuthorizationHelper.RequireManagerPolicy)]
 
 @using AntDesign.TableModels
 @using Microsoft.Extensions.Configuration
+@using Ray.BiliTool.Blazor.Web.Auth
 
 <Table TItem="BiliCookieModel" DataSource="@_data" OnRowClick="OnRowClick">
     <PropertyColumn Title="Key" Property="c => c.ConfigKey"><a>@context.ConfigKey</a></PropertyColumn>

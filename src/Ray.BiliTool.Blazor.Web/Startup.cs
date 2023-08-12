@@ -20,12 +20,14 @@ using Ray.BiliTool.Repository.Extensions;
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
 using Ray.BiliTool.Blazor.Web.Hangfire;
+using Hangfire.Dashboard;
+using System.Collections.Generic;
+using Ray.BiliTool.Blazor.Web.Auth;
 
 namespace Ray.BiliTool.Blazor.Web
 {
     public class Startup
     {
-        private const string HangfirePolicyName = "HangfirePolicy";
 
         public Startup(IConfiguration configuration)
         {
@@ -65,30 +67,13 @@ namespace Ray.BiliTool.Blazor.Web
                 })
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<BiliDbContext>();
+            services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
 
             //Authentication
-            services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
-            var authenticationBuilder = services.AddAuthentication();
-            if (!string.IsNullOrWhiteSpace(Configuration["OAuth:GitHub:ClientId"]))
-            {
-                authenticationBuilder.AddGitHub(o =>
-                {
-                    Configuration.Bind("OAuth:GitHub", o);
-                });
-            }
+            services.AddBiliAuthentication(Configuration);
 
             //Authorization
-            services.AddAuthorization(options =>
-            {
-                //Policy to be applied to hangfire endpoint
-                options.AddPolicy(HangfirePolicyName, builder =>
-                {
-                    builder
-                        //.AddAuthenticationSchemes(AzureADDefaults.AuthenticationScheme)
-                        .RequireAuthenticatedUser()
-                        .RequireRole(new[] { RoleType.Admin.ToString(), RoleType.Manager.ToString() });
-                });
-            });
+            services.AddBiliAuthorization();
 
             //Hangfire
             services.AddHangfire(Configuration);
@@ -150,9 +135,9 @@ namespace Ray.BiliTool.Blazor.Web
                     AppPath = "",
                     StatsPollingInterval = 60 * 1000,
 
-                    Authorization = new[] { new BiliAuthorizationFilter() }
+                    Authorization = new List<IDashboardAuthorizationFilter>()
                 })
-                    .RequireAuthorization(HangfirePolicyName) //https://sahansera.dev/securing-hangfire-dashboard-with-endpoint-routing-auth-policy-aspnetcore/
+                    .RequireAuthorization(AuthorizationHelper.RequireManagerPolicy) //https://sahansera.dev/securing-hangfire-dashboard-with-endpoint-routing-auth-policy-aspnetcore/
                     ;
 
                 endpoints.MapControllers();

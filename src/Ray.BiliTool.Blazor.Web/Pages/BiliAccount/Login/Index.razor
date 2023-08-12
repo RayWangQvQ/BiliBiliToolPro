@@ -1,6 +1,6 @@
 ﻿@namespace Ray.BiliTool.Blazor.Web.Pages.BiliAccount.Login
 @page "/BiliAccount/Login"
-@attribute [Authorize]
+@attribute [Authorize(policy: AuthorizationHelper.RequireGuestPolicy)]
 
 @using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
 @using Ray.BiliBiliTool.Infrastructure.Cookie
@@ -9,6 +9,7 @@
 @using Newtonsoft.Json
 @using Ray.BiliBiliTool.Agent
 @using Ray.BiliBiliTool.DomainService.Interfaces
+@using Ray.BiliTool.Blazor.Web.Auth
 @using Ray.Infrastructure.BarCode;
 @using SixLabors.ImageSharp
 @using SixLabors.ImageSharp.Formats.Png

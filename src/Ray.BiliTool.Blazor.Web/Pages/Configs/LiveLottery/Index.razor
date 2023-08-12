@@ -1,6 +1,6 @@
 ﻿@namespace Ray.BiliTool.Blazor.Web.Pages.Configs.LiveLottery
 @page "/Configs/LiveLottery"
-@attribute [Authorize(Roles = "Admin,Manager")]
+@attribute [Authorize(policy: AuthorizationHelper.RequireManagerPolicy)]
 
 @using System.ComponentModel.DataAnnotations;
 @using System.Text.Json;

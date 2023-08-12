@@ -1,10 +1,11 @@
 ﻿@namespace Ray.BiliTool.Blazor.Web.Pages.Account.Center
 @page "/account/center"
-@attribute [Authorize(Roles = "Admin")]
+@attribute [Authorize(policy:AuthorizationHelper.RequireAdminPolicy)]
 
 @using AntDesign.TableModels
 @using Microsoft.Extensions.Configuration
 @using Ray.BiliBiliTool.Infrastructure
+@using Ray.BiliTool.Blazor.Web.Auth
 
 <Table TItem="AccountManage" DataSource="@_data" OnRowClick="OnRowClick">
     <PropertyColumn Title="Id" Property="c => c.Id"><a>@context.Id</a></PropertyColumn>
