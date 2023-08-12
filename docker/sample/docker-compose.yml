@@ -9,7 +9,7 @@ services:
       - 7654:80
     volumes:
       - ./Logs:/app/Logs
-      # - ./appsettings.json:/app/appsettings.json
+      - ./db:/app/db
     environment:
       # - ASPNETCORE_URLS=http://localhost:80
       # 定时任务
