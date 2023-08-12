@@ -289,10 +289,12 @@ namespace Ray.BiliBiliTool.DomainService
                 _logger.LogInformation("不存在该用户，新增cookie");
 
                 //计算num
-                var max=ckList.Select(x=>int.Parse(x.ConfigKey.Split(':').Last())).Max();
+                var max = ckList.Count == 0
+                    ? -1
+                    : ckList.Select(x => int.Parse(x.ConfigKey.Split(':').Last())).Max();
                 var num = ++max;
 
-                await _dbConfigRepo.InsertAsync(new DbConfig($"BiliBiliCookies:{num}", ckInfo.CookieStr),true, cancellationToken: cancellationToken);
+                await _dbConfigRepo.InsertAsync(new DbConfig($"BiliBiliCookies:{num}", ckInfo.CookieStr), true, cancellationToken: cancellationToken);
                 _logger.LogInformation("新增成功！");
                 return;
             }
