@@ -45,8 +45,6 @@ namespace Ray.BiliBiliTool.Console
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            bool isNotifySingle = _configuration.GetSection("Notification:IsSingleAccountSingleNotify").Get<bool>();
-
             try
             {
                 _logger.LogInformation("BiliBiliToolPro 开始运行...{newLine}", Environment.NewLine);
@@ -60,48 +58,17 @@ namespace Ray.BiliBiliTool.Console
                 string[] tasks = await ReadTargetTasksAsync(cancellationToken);
                 _logger.LogInformation("【目标任务】{tasks}", string.Join(",", tasks));
 
-                if (tasks.Contains("Login"))
-                {
-                    await DoTasksAsync(tasks, cancellationToken);
-                }
-                else
-                {
-                    for (int i = 0; i < _cookieStrFactory.Count; i++)
-                    {
-                        _cookieStrFactory.CurrentNum = i + 1;
-                        _logger.LogInformation("######### 账号 {num} #########{newLine}", _cookieStrFactory.CurrentNum, Environment.NewLine);
-
-                        try
-                        {
-                            await DoTasksAsync(tasks, cancellationToken);
-                            if (isNotifySingle)
-                            {
-                                LogAppInfo();
-
-                                string accountName = _cookieStrFactory.Count > 1 ? $"账号【{_cookieStrFactory.CurrentNum}】" : "";
-                                _logger.LogInformation("·开始推送·{task}·{user}", $"{_configuration["RunTasks"]}任务", accountName);
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            //ignore
-                            _logger.LogWarning("异常：{msg}", e);
-                        }
-                    }
-                }
+                await DoTasksAsync(tasks, cancellationToken);
             }
             catch (Exception ex)
             {
                 _logger.LogError("程序异常终止，原因：{msg}", ex.Message);
+                _logger.LogInformation("·开始推送·{task}·{user}", $"{_configuration["RunTasks"]}任务", "");
                 throw;
             }
             finally
             {
-                if (!isNotifySingle)
-                {
-                    LogAppInfo();
-                    _logger.LogInformation("·开始推送·{task}·{user}", $"{_configuration["RunTasks"]}任务", "");
-                }
+                LogAppInfo();
                 //环境
                 _logger.LogInformation("运行环境：{env}", _environment.EnvironmentName);
                 _logger.LogInformation("应用目录：{path}{newLine}", _environment.ContentRootPath, Environment.NewLine);
