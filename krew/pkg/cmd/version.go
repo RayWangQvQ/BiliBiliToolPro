@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"io"
 
-	"k8s.io/klog/v2"
-
 	"github.com/spf13/cobra"
 )
 
@@ -35,7 +33,7 @@ func newVersionCmd(out io.Writer, errOut io.Writer) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			err := o.run()
 			if err != nil {
-				klog.Error(err)
+				fmt.Println(err)
 				return err
 			}
 			return nil
