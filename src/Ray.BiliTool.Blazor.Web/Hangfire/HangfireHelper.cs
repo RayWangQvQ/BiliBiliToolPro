@@ -50,6 +50,13 @@ namespace Ray.BiliTool.Blazor.Web.Hangfire
             RecurringJob.AddOrUpdate<IUnfollowBatchedTaskAppService>(unfollowBatchedCode,
                 x => x.DoTaskAsync(new CancellationToken()),
                 unfollowBatchedOptions.Cron);
+
+            //VipBigPoint
+            var vipBigPointOptions = sp.GetRequiredService<IOptions<VipBigPointTaskOptions>>().Value;
+            string vipBigPointCode = typeof(IVipBigPointAppService).GetCustomAttribute<DescriptionAttribute>()?.Description;
+            RecurringJob.AddOrUpdate<IVipBigPointAppService>(vipBigPointCode,
+                x => x.DoTaskAsync(new CancellationToken()),
+                vipBigPointOptions.Cron);
         }
     }
 }
