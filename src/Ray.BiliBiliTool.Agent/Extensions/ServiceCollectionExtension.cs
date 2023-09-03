@@ -28,24 +28,8 @@ namespace Ray.BiliBiliTool.Agent.Extensions
         public static IServiceCollection AddBiliBiliClientApi(this IServiceCollection services, IConfiguration configuration)
         {
             //Cookie
-            services.AddSingleton<CookieStrFactory>(sp =>
-            {
-                var list = new List<string>();
-                var config = sp.GetRequiredService<IConfiguration>();
-
-                //兼容老版
-                var old = config["BiliBiliCookie:CookieStr"];
-                if (!string.IsNullOrWhiteSpace(old)) list.Add(old);
-
-                var configList = config.GetSection("BiliBiliCookies")
-                    .Get<List<string>>() ?? new List<string>()
-                    .Where(x => !string.IsNullOrWhiteSpace(x))
-                    .ToList();
-                list.AddRange(configList);
-
-                return new CookieStrFactory(list);
-            });
-            services.AddTransient<BiliCookie>();
+            services.AddScoped<BiliCookie>();
+            services.AddSingleton<CookieStrFactory>();
 
             //全局代理
             services.SetGlobalProxy(configuration);
@@ -119,7 +103,8 @@ namespace Ray.BiliBiliTool.Agent.Extensions
             if (withCookie)
                 httpClientBuilder.ConfigureHttpClient((sp, c) =>
                 {
-                    var ck = sp.GetRequiredService<BiliCookie>();
+                    using var scope = sp.CreateScope();
+                    var ck = scope.ServiceProvider.GetRequiredService<BiliCookie>();
                     c.DefaultRequestHeaders.Add("Cookie", ck.ToString());
                 });
 

@@ -88,6 +88,9 @@ namespace Ray.BiliTool.Blazor.Web
         {
             Global.ServiceProviderRoot = app.ApplicationServices;
 
+            GlobalConfiguration.Configuration.UseActivator(new BiliHangfireActivator(app.ApplicationServices));
+
+
             if (env.IsDevelopment())
             {
                 app.UseSwagger();

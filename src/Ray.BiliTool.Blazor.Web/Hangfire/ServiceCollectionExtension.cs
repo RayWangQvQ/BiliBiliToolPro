@@ -12,6 +12,8 @@ namespace Ray.BiliTool.Blazor.Web.Hangfire
     {
         public static IServiceCollection AddHangfire(this IServiceCollection services, IConfiguration config)
         {
+            services.AddScoped<TestService>();
+
             // Add Hangfire services.
             services.AddSingleton(new AutomaticRetryAttribute { Attempts = 0 });
             services.AddHangfire((sp, configuration) => configuration

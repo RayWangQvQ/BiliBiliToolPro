@@ -6,16 +6,14 @@ namespace Ray.BiliBiliTool.Infrastructure.Cookie
 {
     public class CookieInfo
     {
-        private readonly CookieStrFactory _ckFactory;
-
-        public CookieInfo(CookieStrFactory ckFactory)
+        public CookieInfo(string ckStr)
         {
-            _ckFactory = ckFactory;
+            this.CookieStr = ckStr;
         }
 
-        public string CookieStr => _ckFactory.GetCurrentCookieStr();
+        public string CookieStr { get; set; }
 
-        public Dictionary<string, string> CookieItemDictionary => _ckFactory.GetCurrentCookieDic();
+        public Dictionary<string, string> CookieItemDictionary => CkStrToDictionary(CookieStr);
 
         public virtual void Check()
         {
@@ -36,22 +34,34 @@ namespace Ray.BiliBiliTool.Infrastructure.Cookie
 
         public void MergeCurrentCookieBySetCookieHeaders(IEnumerable<string> setCookieList)
         {
-            _ckFactory.MergeCurrentCookieBySetCookieHeaders(setCookieList);
+            MergeCurrentCookie(CookieInfo.ConvertSetCkHeadersToCkItemList(setCookieList));
         }
 
         public void MergeCurrentCookie(string ckStr)
         {
-            _ckFactory.MergeCurrentCookie(ckStr);
+            MergeCurrentCookie(CookieInfo.ConvertCkStrToCkItemList(ckStr));
         }
 
         public void MergeCurrentCookie(List<string> ckItemList)
         {
-            _ckFactory.MergeCurrentCookie(ckItemList);
+            MergeCurrentCookie(CookieInfo.ConvertCkItemListToCkDic(ckItemList));
         }
 
         public void MergeCurrentCookie(Dictionary<string, string> ckDic)
         {
-            _ckFactory.MergeCurrentCookie(ckDic);
+            foreach (var item in ckDic)
+            {
+                if (CookieItemDictionary.ContainsKey(item.Key))
+                {
+                    CookieItemDictionary[item.Key] = item.Value;
+                }
+                else
+                {
+                    CookieItemDictionary.Add(item.Key, item.Value);
+                }
+            }
+
+            CookieStr = DictionaryToCkStr(CookieItemDictionary);
         }
 
         #endregion
@@ -108,6 +118,29 @@ namespace Ray.BiliBiliTool.Infrastructure.Cookie
         {
             return ckItemList.ToDictionary(k => k[..k.IndexOf("=", StringComparison.Ordinal)].Trim(),
                 v => v[(v.IndexOf("=", StringComparison.Ordinal) + 1)..].Trim().TrimEnd(';'));
+        }
+
+        #endregion
+
+        #region private
+
+        private Dictionary<string, string> CkStrToDictionary(string ckStr)
+        {
+            var dic = new Dictionary<string, string>();
+            var ckItemList = ckStr.Split(";", StringSplitOptions.TrimEntries).Distinct();
+            foreach (var item in ckItemList)
+            {
+                var key = item[..item.IndexOf("=", StringComparison.Ordinal)].Trim();
+                var value = item[(item.IndexOf("=", StringComparison.Ordinal) + 1)..].Trim();
+                dic.AddIfNotExist(new KeyValuePair<string, string>(key, value), p => p.Key == key);
+            }
+            return dic;
+        }
+
+        private string DictionaryToCkStr(Dictionary<string, string> dic)
+        {
+            var list = dic.Select(item => $"{item.Key}={item.Value}").ToList();
+            return string.Join("; ", list);
         }
 
         #endregion

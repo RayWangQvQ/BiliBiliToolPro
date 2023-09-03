@@ -13,16 +13,15 @@ namespace Ray.BiliBiliTool.Agent
     {
         private readonly ILogger<BiliCookie> _logger;
 
-        public BiliCookie(string ckStr)
-            : this(new List<string> { ckStr }) { }
-
-        public BiliCookie(List<string> ckStrList)
-            : this(NullLogger<BiliCookie>.Instance, new CookieStrFactory(ckStrList)) { }
-
-        public BiliCookie(ILogger<BiliCookie> logger, CookieStrFactory cookieStrFactory)
-            : base(cookieStrFactory)
+        public BiliCookie():this("")
         {
-            _logger = logger;
+        }
+        public BiliCookie(string ckStr)
+            : base(ckStr) { }
+
+        public void Init(string ckStr)
+        {
+            this.CookieStr=ckStr;
         }
 
         public override string CkValueBuild(string value)

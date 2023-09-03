@@ -8,6 +8,10 @@ namespace Ray.BiliBiliTool.Infrastructure.Cookie
     {
         private readonly Dictionary<int, Dictionary<string, string>> _cookieDictionary;
 
+        public CookieStrFactory()
+        {
+            
+        }
         public CookieStrFactory(List<string> strList)
         {
             _cookieDictionary = new Dictionary<int, Dictionary<string, string>>();
