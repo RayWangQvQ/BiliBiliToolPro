@@ -1,0 +1,91 @@
+﻿@namespace Ray.BiliTool.Blazor.Web.Pages.Configs.VipBigPoint
+@page "/Configs/VipBigPoint"
+@attribute [Authorize(policy: AuthorizationHelper.RequireManagerPolicy)]
+
+@using System.Text.Json;
+@using System.ComponentModel
+@using System.Reflection
+@using System.Threading
+@using global::Hangfire
+@using Microsoft.AspNetCore.Components
+@using Ray.BiliBiliTool.Application.Contracts
+@using Ray.BiliTool.Blazor.Web.Pages.Configs.LiveFansMedal
+
+<Form Model="@_vipBigPointTaskConfigModel"
+      OnFinish="OnFinish"
+      OnFinishFailed="OnFinishFailed"
+      LabelColSpan="8"
+      WrapperColSpan="8">
+    <FormItem Label="开启">
+        <Checkbox @bind-Value="context.IsEnable">开启</Checkbox>
+    </FormItem>
+    <FormItem Label="定时运行">
+        <Input @bind-Value="@context.Cron"/>
+    </FormItem>
+    <FormItem WrapperColOffset="8" WrapperColSpan="16">
+        <Button Type="@ButtonType.Primary" HtmlType="submit">
+            Submit
+        </Button>
+    </FormItem>
+</Form>
+@code
+{
+    [Inject]
+    protected IDbConfigService DbConfigService { get; set; }
+    [Inject]
+    protected ModalService ModalService { get; set; }
+
+    private VipBigPointConfigModel _vipBigPointTaskConfigModel;
+    private const string ConfigPrefix = "VipBigPointTaskConfig:";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var keyList = new List<string>()
+        {
+            nameof(VipBigPointConfigModel.Cron),
+            nameof(VipBigPointConfigModel.IsEnable),
+        };
+        keyList = keyList.Select(x => ConfigPrefix + x).ToList();
+        var configs = await DbConfigService.GetConfigsByConfigurationAsync(keyList);
+
+        _vipBigPointTaskConfigModel = new VipBigPointConfigModel
+            {
+                Cron = configs[ConfigPrefix + nameof(VipBigPointConfigModel.Cron)] ?? "",
+                IsEnable = bool.Parse(configs[ConfigPrefix + nameof(VipBigPointConfigModel.IsEnable)]),
+            };
+
+        await base.OnInitializedAsync();
+    }
+
+    private async Task OnFinish(EditContext editContext)
+    {
+        var dic = new Dictionary<string, string>()
+        {
+            {nameof(VipBigPointConfigModel.Cron), _vipBigPointTaskConfigModel.Cron},
+            {nameof(VipBigPointConfigModel.IsEnable), _vipBigPointTaskConfigModel.IsEnable.ToString()},
+        };
+        dic = dic.ToDictionary(kv => ConfigPrefix + kv.Key, kv => kv.Value);
+        await DbConfigService.AddOrUpdateConfigsAsync(dic);
+
+        string code = typeof(IVipBigPointAppService).GetCustomAttribute<DescriptionAttribute>()?.Description;
+        RecurringJob.AddOrUpdate<IVipBigPointAppService>(code,
+            x => x.DoTaskAsync(new CancellationToken()),
+            () => _vipBigPointTaskConfigModel.Cron);
+
+        ModalService.Success(new ConfirmOptions()
+            {
+                Content = "保存成功！"
+            });
+    }
+
+    private void OnFinishFailed(EditContext editContext)
+    {
+        Console.WriteLine($"Failed:{JsonSerializer.Serialize(_vipBigPointTaskConfigModel)}");
+
+        ModalService.Error(new ConfirmOptions()
+            {
+                Title = "保存失败",
+                Content = editContext.ToJsonStr()
+            });
+    }
+}

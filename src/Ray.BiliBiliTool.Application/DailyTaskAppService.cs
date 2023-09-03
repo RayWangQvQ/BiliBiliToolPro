@@ -69,8 +69,28 @@ namespace Ray.BiliBiliTool.Application
             _biliCookie = biliCookie;
         }
 
-        [TaskInterceptor("每日任务", TaskLevel.One)]
+        [TaskInterceptor("每日任务")]
         public override async Task DoTaskAsync(CancellationToken cancellationToken)
+        {
+            for (int i = 0; i < _cookieStrFactory.Count; i++)
+            {
+                _cookieStrFactory.CurrentNum = i + 1;
+                _logger.LogInformation("######### 账号 {num} #########{newLine}", _cookieStrFactory.CurrentNum, Environment.NewLine);
+
+                try
+                {
+                    await DoEachAccountAsync(cancellationToken);
+                }
+                catch (Exception e)
+                {
+                    //ignore
+                    _logger.LogWarning("异常：{msg}", e);
+                }
+            }
+            _logger.LogInformation("·开始推送·{task}·{user}", "每日任务", "");
+        }
+
+        protected async Task DoEachAccountAsync(CancellationToken cancellationToken)
         {
             await SetCookiesAsync(_biliCookie, cancellationToken);
 
