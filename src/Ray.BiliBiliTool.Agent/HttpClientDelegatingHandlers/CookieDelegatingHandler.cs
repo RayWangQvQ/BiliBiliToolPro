@@ -1,11 +1,14 @@
-﻿using System.Net.Http;
+﻿using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
 namespace Ray.BiliBiliTool.Agent.HttpClientDelegatingHandlers
 {
-    public class CookieDelegatingHandler : DelegatingHandler
+    public class CookieDelegatingHandler : HttpClientHandler
     {
         private readonly ILogger<CookieDelegatingHandler> _logger;
         private readonly BiliCookie _biliCookie;
@@ -18,21 +21,36 @@ namespace Ray.BiliBiliTool.Agent.HttpClientDelegatingHandlers
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            //记录请求内容
-            _logger.LogDebug("发起请求：[{method}] {uri}", request.Method, request.RequestUri);
+            ReplaceCookieContainerWithCurrentAccount(this.CookieContainer);
 
-            if (request.Content != null)
+            HttpResponseMessage re = await base.SendAsync(request, cancellationToken);
+
+            UpdateCurrentCookieContainer(this.CookieContainer);
+
+            return re;
+        }
+
+        public void ReplaceCookieContainerWithCurrentAccount(CookieContainer source)
+        {
+            //clear existed by Expiring it
+            source.GetAllCookies().ToList().ForEach(x => x.Expired = true);
+            if (source.Count > 0)
             {
-                var requestContent = await request.Content.ReadAsStringAsync(cancellationToken);
-                _logger.LogDebug("请求Content： {content}", requestContent);
+                var m = source.GetType().GetMethod("AgeCookies", BindingFlags.NonPublic | BindingFlags.Instance);
+                m.Invoke(source, new object[] { null });
             }
 
-            HttpResponseMessage response = await base.SendAsync(request, cancellationToken);
+            //add new
+            //source.Add(this.CurrentTargetAccount.MyCookieContainer.GetAllCookies());
+            //todo
+        }
 
-            var content = await response.Content.ReadAsStringAsync(cancellationToken);
-            _logger.LogDebug("返回Content：{content}", content);
-
-            return response;
+        public void UpdateCurrentCookieContainer(CookieContainer update)
+        {
+            var newCookieContainer = new CookieContainer();
+            newCookieContainer.Add(update.GetAllCookies());
+            //this.CurrentTargetAccount.MyCookieContainer = newCookieContainer;
+            //todo
         }
     }
 }

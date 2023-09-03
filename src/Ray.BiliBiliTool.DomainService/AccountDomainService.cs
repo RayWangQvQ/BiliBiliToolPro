@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent;
@@ -20,6 +21,7 @@ namespace Ray.BiliBiliTool.DomainService
     public class AccountDomainService : IAccountDomainService
     {
         private readonly ILogger<AccountDomainService> _logger;
+        private readonly IConfiguration _configuration;
         private readonly IDailyTaskApi _dailyTaskApi;
         private readonly IUserInfoApi _userInfoApi;
         private readonly IRelationApi _relationApi;
@@ -28,6 +30,7 @@ namespace Ray.BiliBiliTool.DomainService
 
         public AccountDomainService(
             ILogger<AccountDomainService> logger,
+            IConfiguration configuration,
             IDailyTaskApi dailyTaskApi,
             BiliCookie cookie,
             IUserInfoApi userInfoApi,
@@ -36,6 +39,7 @@ namespace Ray.BiliBiliTool.DomainService
         )
         {
             _logger = logger;
+            _configuration = configuration;
             _dailyTaskApi = dailyTaskApi;
             _cookie = cookie;
             _userInfoApi = userInfoApi;
@@ -77,6 +81,15 @@ namespace Ray.BiliBiliTool.DomainService
             }
 
             return useInfo;
+        }
+
+        public Task<List<string>> GetAllCookieStrListAsync()
+        {
+            var re = _configuration.GetSection("BiliBiliCookies")
+                .Get<List<string>>() ?? new List<string>()
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .ToList();
+            return Task.FromResult(re);
         }
 
         /// <summary>

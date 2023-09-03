@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent;
@@ -12,14 +13,13 @@ using Ray.BiliBiliTool.Application.Contracts;
 using Ray.BiliBiliTool.Config;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Interfaces;
-using Ray.BiliBiliTool.Infrastructure;
-using Ray.BiliBiliTool.Infrastructure.Cookie;
 using Ray.BiliBiliTool.Infrastructure.Enums;
 
 namespace Ray.BiliBiliTool.Application
 {
     public class DailyTaskAppService : AppService, IDailyTaskAppService
     {
+        private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<DailyTaskAppService> _logger;
         private readonly IAccountDomainService _accountDomainService;
         private readonly IVideoDomainService _videoDomainService;
@@ -33,10 +33,9 @@ namespace Ray.BiliBiliTool.Application
         private readonly Dictionary<string, int> _expDic;
         private readonly ILoginDomainService _loginDomainService;
         private readonly IConfiguration _configuration;
-        private readonly CookieStrFactory _cookieStrFactory;
-        private BiliCookie _biliCookie;
 
         public DailyTaskAppService(
+            IServiceProvider serviceProvider,
             ILogger<DailyTaskAppService> logger,
             IOptionsMonitor<Dictionary<string, int>> dicOptions,
             IAccountDomainService accountDomainService,
@@ -48,10 +47,11 @@ namespace Ray.BiliBiliTool.Application
             IChargeDomainService chargeDomainService,
             IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
             ICoinDomainService coinDomainService,
-            ILoginDomainService loginDomainService, IConfiguration configuration,
-            CookieStrFactory cookieStrFactory,
-            BiliCookie biliCookie)
+            ILoginDomainService loginDomainService,
+            IConfiguration configuration
+            )
         {
+            _serviceProvider = serviceProvider;
             _logger = logger;
             _expDic = dicOptions.Get(Constants.OptionsNames.ExpDictionaryName);
             _accountDomainService = accountDomainService;
@@ -65,21 +65,22 @@ namespace Ray.BiliBiliTool.Application
             _coinDomainService = coinDomainService;
             _loginDomainService = loginDomainService;
             _configuration = configuration;
-            _cookieStrFactory = cookieStrFactory;
-            _biliCookie = biliCookie;
         }
 
         [TaskInterceptor("每日任务")]
         public override async Task DoTaskAsync(CancellationToken cancellationToken)
         {
-            for (int i = 0; i < _cookieStrFactory.Count; i++)
+            var ckStrList = await _accountDomainService.GetAllCookieStrListAsync();
+            for (int i = 0; i < ckStrList.Count; i++)
             {
-                _cookieStrFactory.CurrentNum = i + 1;
-                _logger.LogInformation("######### 账号 {num} #########{newLine}", _cookieStrFactory.CurrentNum, Environment.NewLine);
+                _logger.LogInformation("######### 账号 {num} #########{newLine}", i + 1, Environment.NewLine);
 
                 try
                 {
-                    await DoEachAccountAsync(cancellationToken);
+                    using var scope = _serviceProvider.CreateScope();
+                    var biliCookie = scope.ServiceProvider.GetRequiredService<BiliCookie>();
+                    biliCookie.Init(ckStrList[i]);
+                    await DoEachAccountAsync(biliCookie, cancellationToken);
                 }
                 catch (Exception e)
                 {
@@ -87,12 +88,12 @@ namespace Ray.BiliBiliTool.Application
                     _logger.LogWarning("异常：{msg}", e);
                 }
             }
-            _logger.LogInformation("·开始推送·{task}·{user}", "每日任务", "");
+            _logger.LogInformation("·开始推送·{task}·{user}", "Test任务", "");
         }
 
-        protected async Task DoEachAccountAsync(CancellationToken cancellationToken)
+        protected async Task DoEachAccountAsync(BiliCookie biliCookie, CancellationToken cancellationToken)
         {
-            await SetCookiesAsync(_biliCookie, cancellationToken);
+            await SetCookiesAsync(biliCookie, cancellationToken);
 
             //每日任务赚经验：
             UserInfo userInfo = await Login();

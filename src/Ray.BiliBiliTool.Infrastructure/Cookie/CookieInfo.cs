@@ -127,7 +127,11 @@ namespace Ray.BiliBiliTool.Infrastructure.Cookie
         private Dictionary<string, string> CkStrToDictionary(string ckStr)
         {
             var dic = new Dictionary<string, string>();
-            var ckItemList = ckStr.Split(";", StringSplitOptions.TrimEntries).Distinct();
+            var ckItemList = ckStr
+                .Split(";", StringSplitOptions.TrimEntries)
+                .Distinct()
+                .Where(x=>!string.IsNullOrWhiteSpace(x))
+                .ToList();
             foreach (var item in ckItemList)
             {
                 var key = item[..item.IndexOf("=", StringComparison.Ordinal)].Trim();

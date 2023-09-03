@@ -101,12 +101,8 @@ namespace Ray.BiliBiliTool.Agent.Extensions
                 .AddPolicyHandler(GetRetryPolicy());
 
             if (withCookie)
-                httpClientBuilder.ConfigureHttpClient((sp, c) =>
-                {
-                    using var scope = sp.CreateScope();
-                    var ck = scope.ServiceProvider.GetRequiredService<BiliCookie>();
-                    c.DefaultRequestHeaders.Add("Cookie", ck.ToString());
-                });
+                httpClientBuilder
+                    .AddHttpMessageHandler<CookieDelegatingHandler>();
 
             return services;
         }

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 
 namespace Ray.BiliBiliTool.DomainService.Interfaces
@@ -13,6 +14,8 @@ namespace Ray.BiliBiliTool.DomainService.Interfaces
         /// </summary>
         /// <returns></returns>
         Task<UserInfo> LoginByCookie();
+
+        Task<List<string>> GetAllCookieStrListAsync();
 
         /// <summary>
         /// 获取每日任务完成情况
