@@ -79,6 +79,7 @@ namespace Ray.BiliBiliTool.Application
 
             DailyTaskInfo dailyTaskInfo = await GetDailyTaskStatus();
             await WatchAndShareVideo(dailyTaskInfo);
+            // TODO 允许切换模式至投币给专栏
             await AddCoinsForVideo(userInfo);
 
             //签到：
