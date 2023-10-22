@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -18,13 +21,34 @@ public class ArticleDomainService : IArticleDomainService
     private readonly ILogger<ArticleDomainService> _logger;
     private readonly DailyTaskOptions _dailyTaskOptions;
     private readonly ICoinDomainService _coinDomainService;
+    private readonly IAccountApi _accountApi;
+    private readonly IWbiDomainService _wbiDomainService;
 
-    public ArticleDomainService(IArticleApi articleApi, BiliCookie biliCookie, ILogger<ArticleDomainService> logger, IOptionsMonitor<DailyTaskOptions> dailyTaskOptions, ICoinDomainService coinDomainService)
+
+    /// <summary>
+    /// up的专栏总数缓存
+    /// </summary>
+    private readonly Dictionary<long, int> _upArticleCountDicCatch = new();
+
+    /// <summary>
+    /// 已对投币数量缓存
+    /// </summary>
+    private readonly Dictionary<string, int> _alreadyDonatedCoinCountCatch = new();
+
+    public ArticleDomainService(
+        IArticleApi articleApi,
+        BiliCookie biliCookie,
+        ILogger<ArticleDomainService> logger,
+        IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
+        ICoinDomainService coinDomainService,
+        IAccountApi accountApi, IWbiDomainService wbiDomainService)
     {
         _articleApi = articleApi;
         _biliCookie = biliCookie;
         _logger = logger;
         _coinDomainService = coinDomainService;
+        _accountApi = accountApi;
+        _wbiDomainService = wbiDomainService;
         _dailyTaskOptions = dailyTaskOptions.CurrentValue;
     }
 
@@ -42,9 +66,118 @@ public class ArticleDomainService : IArticleDomainService
         }
 
 
-            
+        int success = 0;
+        int tryCount = 10;
+
+        for (int i = 0; i <= tryCount && success < donateCoinsCounts; i++)
+        {
+            _logger.LogDebug("开始尝试第{num}次", i);
+
+            var upId = GetUpFromConfigUps();
+            var cvid = await GetRandomArticleFromUp(upId);
+
+            if (await AddCoinForArticle(cvid, upId))
+                success++;
+        }
+
+        if (success == donateCoinsCounts)
+            _logger.LogInformation("投币任务完成");
+        else
+            _logger.LogInformation("投币尝试超过10次，已终止");
+
+        _logger.LogInformation("【硬币余额】{coin}", (await _accountApi.GetCoinBalance()).Data.Money ?? 0);
     }
 
+    /// <summary>
+    /// 从支持UP主列表中随机挑选一位
+    /// </summary>
+    /// <returns>被挑选up主的mid</returns>
+    public long GetUpFromConfigUps()
+    {
+        if (_dailyTaskOptions.SupportUpIdList == null || _dailyTaskOptions.SupportUpIdList.Count == 0)
+        {
+            return 0;
+        }
+
+        try
+        {
+            long randomUpId =
+                _dailyTaskOptions.SupportUpIdList[new Random().Next(0, _dailyTaskOptions.SupportUpIdList.Count)];
+
+            if (randomUpId is 0 or long.MinValue) return 0;
+
+            if (randomUpId.ToString() == _biliCookie.UserId)
+            {
+                _logger.LogDebug("不能为自己投币");
+                return 0;
+            }
+
+            return randomUpId;
+        }
+        catch (Exception e)
+        {
+            _logger.LogWarning("异常：{msg}", e);
+        }
+
+        return 0;
+    }
+
+
+    /// <summary>
+    /// 从某个up主中随机挑选一个专栏
+    /// </summary>
+    /// <param name="mid"></param>
+    /// <returns>专栏的cvid</returns>
+    public async Task<long> GetRandomArticleFromUp(long mid)
+    {
+        if (Equals(!_upArticleCountDicCatch.TryGetValue(mid, out int articleCount)))
+        {
+            articleCount = await GetArticleCountOfUp(mid);
+            _upArticleCountDicCatch.Add(mid, articleCount);
+        }
+
+        // 专栏数为0时
+        if (articleCount == 0)
+        {
+            return 0;
+        }
+
+        var req = new SearchArticlesByUpIdDto()
+        {
+            Mid = mid,
+            Ps = 1,
+            Pn = new Random().Next(1, articleCount + 1)
+        };
+        var w_ridDto = await _wbiDomainService.GetWridAsync(req);
+
+        var fullDto = new SearchArticlesByUpIdFullFto()
+        {
+            Mid = mid,
+            Ps = req.Ps,
+            Pn = req.Pn,
+            w_rid = w_ridDto.w_rid,
+            wts = w_ridDto.wts
+        };
+
+        BiliApiResponse<SearchUpArticlesResponse> re = await _articleApi.SearchUpArticlesByUpId(fullDto);
+
+        if (re.Code != 0)
+        {
+            throw new Exception(re.Message);
+        }
+
+        ArticleInfo articleInfo = re.Data.ArticleInfoList.FirstOrDefault();
+
+        _logger.LogDebug("获取到的专栏{cvid}({title})", articleInfo.Id, articleInfo.Title);
+
+        // 检查是否可投
+        if (!await IsCanDonate(articleInfo.Id))
+        {
+            return 0;
+        }
+
+        return articleInfo.Id;
+    }
 
 
     /// <summary>
@@ -52,7 +185,7 @@ public class ArticleDomainService : IArticleDomainService
     /// </summary>
     /// <param name="cvid">文章cvid</param>
     /// <param name="mid">文章作者mid</param>
-    /// <returns>投币是否成功</returns>
+    /// <returns>投币是否成功（false 投币失败，true 投币成功）</returns>
     public async Task<bool> AddCoinForArticle(long cvid, long mid)
     {
         BiliApiResponse result;
@@ -62,14 +195,14 @@ public class ArticleDomainService : IArticleDomainService
             result = await _articleApi.AddCoinForArticle(new AddCoinForArticleRequest(cvid, mid, _biliCookie.BiliJct),
                 refer);
         }
-        catch (Exception )
+        catch (Exception)
         {
             return false;
         }
-        
+
         if (result.Code == 0)
         {
-            _logger.LogInformation("投币成功，经验+10 √" );
+            _logger.LogInformation("投币成功，经验+10 √");
             return true;
         }
         else
@@ -77,6 +210,33 @@ public class ArticleDomainService : IArticleDomainService
             _logger.LogError("投币错误 {message}", result.Message);
             return false;
         }
+    }
+
+
+    public async Task<int> GetArticleCountOfUp(long mid)
+    {
+        var req = new SearchArticlesByUpIdDto()
+        {
+            Mid = mid
+        };
+
+        var w_ridDto = await _wbiDomainService.GetWridAsync(req);
+
+        var fullDto = new SearchArticlesByUpIdFullFto()
+        {
+            Mid = mid,
+            w_rid = w_ridDto.w_rid,
+            wts = w_ridDto.wts
+        };
+
+        BiliApiResponse<SearchUpArticlesResponse> re = await _articleApi.SearchUpArticlesByUpId(fullDto);
+
+        if (re.Code != 0)
+        {
+            throw new Exception(re.Message);
+        }
+
+        return re.Data.Count;
     }
 
 
@@ -131,7 +291,9 @@ public class ArticleDomainService : IArticleDomainService
         return 0;
     }
 
-    public async Task<int> GetNeedDonateCoinCounts()
+    #region private
+
+    private async Task<int> GetNeedDonateCoinCounts()
     {
         int configCoins = _dailyTaskOptions.NumberOfCoins;
 
@@ -143,7 +305,7 @@ public class ArticleDomainService : IArticleDomainService
 
         //已投的硬币
         int alreadyCoins = await _coinDomainService.GetDonatedCoins();
-        
+
         int targetCoins = configCoins;
 
         _logger.LogInformation("【今日已投】{already}枚", alreadyCoins);
@@ -159,4 +321,40 @@ public class ArticleDomainService : IArticleDomainService
         _logger.LogInformation("已完成投币任务，不需要再投啦~");
         return 0;
     }
+
+
+    private async Task<bool> IsCanDonate(long cvid)
+    {
+        try
+        {
+            if (_alreadyDonatedCoinCountCatch.Any(x => x.Key == cvid.ToString()))
+            {
+                _logger.LogDebug("重复专栏，丢弃处理");
+                return false;
+            }
+
+            if (!_alreadyDonatedCoinCountCatch.TryGetValue(cvid.ToString(), out int multiply))
+            {
+                multiply = (await _articleApi.SearchArticleInfo(cvid)).Data.Coin;
+                _alreadyDonatedCoinCountCatch.TryAdd(cvid.ToString(), multiply);
+            }
+            // 在网页端我测试时只能投一枚硬币，暂时设置最多投一枚
+            if (multiply >= 1)
+            {
+                return false;
+            }
+
+            return true;
+        }
+        catch (Exception e)
+        {
+            _logger.LogWarning("异常：{mag}", e);
+            return false;
+        }
+
+    }
+
+    #endregion
 }
+
+

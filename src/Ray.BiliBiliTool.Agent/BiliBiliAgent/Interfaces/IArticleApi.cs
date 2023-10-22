@@ -17,6 +17,21 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         [HttpPost("/x/web-interface/coin/add")]
         Task<BiliApiResponse> AddCoinForArticle([FormContent] AddCoinForArticleRequest request, [Header("referer")] string refer = "https://www.bilibili.com/read/cv5806746/?from=search&spm_id_from=333.337.0.0");
 
+
+        [Header("Referer", "https://www.bilibili.com/")]
+        [Header("Origin", "https://space.bilibili.com")]
+        [HttpGet("/x/space/wbi/article")]
+        Task<BiliApiResponse<SearchUpArticlesResponse>> SearchUpArticlesByUpId(
+            [PathQuery] SearchArticlesByUpIdFullFto request);
+
+        /// <summary>
+        /// 获取专栏详情
+        /// </summary>
+        /// <param name="cvid"></param>
+        /// <returns></returns>
+        [HttpGet("/x/article/viewinfo?id={cvid}")]
+        Task<BiliApiResponse<SearchArticleInfoResponse>> SearchArticleInfo(long cvid);
+
     }
 
     

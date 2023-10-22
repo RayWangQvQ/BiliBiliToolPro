@@ -23,6 +23,7 @@ namespace Ray.BiliBiliTool.Application
         private readonly ILogger<DailyTaskAppService> _logger;
         private readonly IAccountDomainService _accountDomainService;
         private readonly IVideoDomainService _videoDomainService;
+        private readonly IArticleDomainService _articleDomainService;
         private readonly IDonateCoinDomainService _donateCoinDomainService;
         private readonly IMangaDomainService _mangaDomainService;
         private readonly ILiveDomainService _liveDomainService;
@@ -41,6 +42,7 @@ namespace Ray.BiliBiliTool.Application
             IOptionsMonitor<Dictionary<string, int>> dicOptions,
             IAccountDomainService accountDomainService,
             IVideoDomainService videoDomainService,
+            IArticleDomainService articleDomainService,
             IDonateCoinDomainService donateCoinDomainService,
             IMangaDomainService mangaDomainService,
             ILiveDomainService liveDomainService,
@@ -56,6 +58,7 @@ namespace Ray.BiliBiliTool.Application
             _expDic = dicOptions.Get(Constants.OptionsNames.ExpDictionaryName);
             _accountDomainService = accountDomainService;
             _videoDomainService = videoDomainService;
+            _articleDomainService = articleDomainService;
             _donateCoinDomainService = donateCoinDomainService;
             _mangaDomainService = mangaDomainService;
             _liveDomainService = liveDomainService;
@@ -168,7 +171,9 @@ namespace Ray.BiliBiliTool.Application
                 _logger.LogInformation("已经为LV6大佬，开始白嫖");
                 return;
             }
-            await _donateCoinDomainService.AddCoinsForVideos();
+            // await _donateCoinDomainService.AddCoinsForVideos();
+            await _articleDomainService.AddCoinForArticles();
+
         }
 
         /// <summary>
