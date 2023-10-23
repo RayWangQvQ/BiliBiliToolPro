@@ -119,7 +119,7 @@ checkResult() {
         echo "Congratulations! 恭喜！"
         echo "创建并运行$containerName容器成功。"
         echo "第一次运行，请执行扫码登录："
-        echo "docker exec -it $containerName dotnet /app/Ray.BiliBiliTool.Console.dll --runTasks=Login --Security__RandomSleepMaxMin=0"
+        docker exec -it $containerName dotnet /app/Ray.BiliBiliTool.Console.dll --runTasks=Login --Security__RandomSleepMaxMin=0
         echo "Enjoy it~"
         echo "==============================================="
     else
