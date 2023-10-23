@@ -19,6 +19,11 @@ namespace Ray.BiliBiliTool.Config.Options
         public bool IsShareVideo { get; set; }
 
         /// <summary>
+        /// 是否开启专栏投币模式
+        /// </summary>
+        public bool IsDonateCoinForArticle { get; set; }
+
+        /// <summary>
         /// 每日设定的投币数 [0,5]
         /// </summary>
         public int NumberOfCoins { get; set; } = 5;

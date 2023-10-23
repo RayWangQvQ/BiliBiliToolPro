@@ -82,8 +82,8 @@ namespace Ray.BiliBiliTool.Application
 
             DailyTaskInfo dailyTaskInfo = await GetDailyTaskStatus();
             await WatchAndShareVideo(dailyTaskInfo);
-            // TODO 允许切换模式至投币给专栏
-            await AddCoinsForVideo(userInfo);
+
+            await AddCoins(userInfo);
 
             //签到：
             await LiveSign();
@@ -128,7 +128,7 @@ namespace Ray.BiliBiliTool.Application
         private async Task<UserInfo> Login()
         {
             UserInfo userInfo = await _accountDomainService.LoginByCookie();
-            if (userInfo == null) throw new Exception("登录失败，请检查Cookie");//终止流程
+            if (userInfo == null) throw new Exception("登录失败，请检查Cookie"); //终止流程
 
             _expDic.TryGetValue("每日登录", out int exp);
             _logger.LogInformation("登录成功，经验+{exp} √", exp);
@@ -157,6 +157,7 @@ namespace Ray.BiliBiliTool.Application
                 _logger.LogInformation("已配置为关闭，跳过任务");
                 return;
             }
+
             await _videoDomainService.WatchAndShareVideo(dailyTaskInfo);
         }
 
@@ -164,16 +165,27 @@ namespace Ray.BiliBiliTool.Application
         /// 投币任务
         /// </summary>
         [TaskInterceptor("投币", rethrowWhenException: false)]
-        private async Task AddCoinsForVideo(UserInfo userInfo)
+        private async Task AddCoins(UserInfo userInfo)
         {
             if (_dailyTaskOptions.SaveCoinsWhenLv6 && userInfo.Level_info.Current_level >= 6)
             {
                 _logger.LogInformation("已经为LV6大佬，开始白嫖");
                 return;
             }
-            // await _donateCoinDomainService.AddCoinsForVideos();
-            await _articleDomainService.AddCoinForArticles();
 
+            if (_dailyTaskOptions.IsDonateCoinForArticle)
+            {
+                _logger.LogInformation("专栏投币已开启");
+
+                if (!await _articleDomainService.AddCoinForArticles())
+                {
+                    await _donateCoinDomainService.AddCoinsForVideos();
+                }
+            }
+            else
+            {
+                await _donateCoinDomainService.AddCoinsForVideos();
+            }
         }
 
         /// <summary>

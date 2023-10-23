@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Polly;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Article;
@@ -56,13 +57,14 @@ public class ArticleDomainService : IArticleDomainService
     /// 投币专栏任务
     /// </summary>
     /// <returns></returns>
-    public async Task AddCoinForArticles()
+    public async Task<bool> AddCoinForArticles()
     {
         var donateCoinsCounts = await CalculateDonateCoinsCounts();
 
         if (donateCoinsCounts == 0)
         {
-            return;
+            // 没有可投的币相当于投币任务全部完成
+            return true;
         }
 
 
@@ -75,108 +77,28 @@ public class ArticleDomainService : IArticleDomainService
 
             var upId = GetUpFromConfigUps();
             var cvid = await GetRandomArticleFromUp(upId);
+            if (upId == 0 || cvid == 0)
+            {
+                _logger.LogInformation("未添加支持的Up主，任务跳过");
+                return false;
+            }
 
             if (await AddCoinForArticle(cvid, upId))
                 success++;
         }
 
         if (success == donateCoinsCounts)
-            _logger.LogInformation("投币任务完成");
+            _logger.LogInformation("专栏投币任务完成");
         else
+        {
             _logger.LogInformation("投币尝试超过10次，已终止");
+            return false;
+        }
+            
 
         _logger.LogInformation("【硬币余额】{coin}", (await _accountApi.GetCoinBalance()).Data.Money ?? 0);
-    }
 
-    /// <summary>
-    /// 从支持UP主列表中随机挑选一位
-    /// </summary>
-    /// <returns>被挑选up主的mid</returns>
-    public long GetUpFromConfigUps()
-    {
-        if (_dailyTaskOptions.SupportUpIdList == null || _dailyTaskOptions.SupportUpIdList.Count == 0)
-        {
-            return 0;
-        }
-
-        try
-        {
-            long randomUpId =
-                _dailyTaskOptions.SupportUpIdList[new Random().Next(0, _dailyTaskOptions.SupportUpIdList.Count)];
-
-            if (randomUpId is 0 or long.MinValue) return 0;
-
-            if (randomUpId.ToString() == _biliCookie.UserId)
-            {
-                _logger.LogDebug("不能为自己投币");
-                return 0;
-            }
-
-            return randomUpId;
-        }
-        catch (Exception e)
-        {
-            _logger.LogWarning("异常：{msg}", e);
-        }
-
-        return 0;
-    }
-
-
-    /// <summary>
-    /// 从某个up主中随机挑选一个专栏
-    /// </summary>
-    /// <param name="mid"></param>
-    /// <returns>专栏的cvid</returns>
-    public async Task<long> GetRandomArticleFromUp(long mid)
-    {
-        if (Equals(!_upArticleCountDicCatch.TryGetValue(mid, out int articleCount)))
-        {
-            articleCount = await GetArticleCountOfUp(mid);
-            _upArticleCountDicCatch.Add(mid, articleCount);
-        }
-
-        // 专栏数为0时
-        if (articleCount == 0)
-        {
-            return 0;
-        }
-
-        var req = new SearchArticlesByUpIdDto()
-        {
-            Mid = mid,
-            Ps = 1,
-            Pn = new Random().Next(1, articleCount + 1)
-        };
-        var w_ridDto = await _wbiDomainService.GetWridAsync(req);
-
-        var fullDto = new SearchArticlesByUpIdFullFto()
-        {
-            Mid = mid,
-            Ps = req.Ps,
-            Pn = req.Pn,
-            w_rid = w_ridDto.w_rid,
-            wts = w_ridDto.wts
-        };
-
-        BiliApiResponse<SearchUpArticlesResponse> re = await _articleApi.SearchUpArticlesByUpId(fullDto);
-
-        if (re.Code != 0)
-        {
-            throw new Exception(re.Message);
-        }
-
-        ArticleInfo articleInfo = re.Data.ArticleInfoList.FirstOrDefault();
-
-        _logger.LogDebug("获取到的专栏{cvid}({title})", articleInfo.Id, articleInfo.Title);
-
-        // 检查是否可投
-        if (!await IsCanDonate(articleInfo.Id))
-        {
-            return 0;
-        }
-
-        return articleInfo.Id;
+        return true;
     }
 
 
@@ -213,7 +135,107 @@ public class ArticleDomainService : IArticleDomainService
     }
 
 
-    public async Task<int> GetArticleCountOfUp(long mid)
+    #region private
+
+    /// <summary>
+    /// 从某个up主中随机挑选一个专栏
+    /// </summary>
+    /// <param name="mid"></param>
+    /// <returns>专栏的cvid</returns>
+    private async Task<long> GetRandomArticleFromUp(long mid)
+    {
+        if (!_upArticleCountDicCatch.TryGetValue(mid, out int articleCount))
+        {
+            articleCount = await GetArticleCountOfUp(mid);
+            _upArticleCountDicCatch.Add(mid, articleCount);
+        }
+
+        // 专栏数为0时
+        if (articleCount == 0)
+        {
+            return 0;
+        }
+
+        var req = new SearchArticlesByUpIdDto()
+        {
+            Mid = mid,
+            Ps = 1,
+            Pn = new Random().Next(1, articleCount + 1)
+        };
+        var w_ridDto = await _wbiDomainService.GetWridAsync(req);
+
+        var fullDto = new SearchArticlesByUpIdFullFto()
+        {
+            Mid = mid,
+            Ps = req.Ps,
+            Pn = req.Pn,
+            w_rid = w_ridDto.w_rid,
+            wts = w_ridDto.wts
+        };
+
+        BiliApiResponse<SearchUpArticlesResponse> re = await _articleApi.SearchUpArticlesByUpId(fullDto);
+
+        if (re.Code != 0)
+        {
+            throw new Exception(re.Message);
+        }
+
+        ArticleInfo articleInfo = re.Data.Articles.FirstOrDefault();
+
+        _logger.LogDebug("获取到的专栏{cvid}({title})", articleInfo.Id, articleInfo.Title);
+
+        // 检查是否可投
+        if (!await IsCanDonate(articleInfo.Id))
+        {
+            return 0;
+        }
+
+        return articleInfo.Id;
+    }
+
+
+    // TODO 转变为异步代码
+    /// <summary>
+    /// 从支持UP主列表中随机挑选一位
+    /// </summary>
+    /// <returns>被挑选up主的mid</returns>
+    private long GetUpFromConfigUps()
+    {
+        if (_dailyTaskOptions.SupportUpIdList == null || _dailyTaskOptions.SupportUpIdList.Count == 0)
+        {
+            return 0;
+        }
+
+        try
+        {
+            long randomUpId =
+                _dailyTaskOptions.SupportUpIdList[new Random().Next(0, _dailyTaskOptions.SupportUpIdList.Count)];
+
+            if (randomUpId is 0 or long.MinValue) return 0;
+
+            if (randomUpId.ToString() == _biliCookie.UserId)
+            {
+                _logger.LogDebug("不能为自己投币");
+                return 0;
+            }
+
+            return randomUpId;
+        }
+        catch (Exception e)
+        {
+            _logger.LogWarning("异常：{msg}", e);
+        }
+
+        return 0;
+    }
+
+    /// <summary>
+    /// 获取Up主专栏总数
+    /// </summary>
+    /// <param name="mid">up主mid</param>
+    /// <returns>专栏总数</returns>
+    /// <exception cref="Exception"></exception>
+    private async Task<int> GetArticleCountOfUp(long mid)
     {
         var req = new SearchArticlesByUpIdDto()
         {
@@ -239,12 +261,11 @@ public class ArticleDomainService : IArticleDomainService
         return re.Data.Count;
     }
 
-
     /// <summary>
     /// 计算所需要投的硬币数量
     /// </summary>
     /// <returns>硬币数量</returns>
-    public async Task<int> CalculateDonateCoinsCounts()
+    private async Task<int> CalculateDonateCoinsCounts()
     {
         int needCoins = await GetNeedDonateCoinCounts();
 
@@ -291,8 +312,6 @@ public class ArticleDomainService : IArticleDomainService
         return 0;
     }
 
-    #region private
-
     private async Task<int> GetNeedDonateCoinCounts()
     {
         int configCoins = _dailyTaskOptions.NumberOfCoins;
@@ -338,6 +357,7 @@ public class ArticleDomainService : IArticleDomainService
                 multiply = (await _articleApi.SearchArticleInfo(cvid)).Data.Coin;
                 _alreadyDonatedCoinCountCatch.TryAdd(cvid.ToString(), multiply);
             }
+
             // 在网页端我测试时只能投一枚硬币，暂时设置最多投一枚
             if (multiply >= 1)
             {
@@ -351,10 +371,7 @@ public class ArticleDomainService : IArticleDomainService
             _logger.LogWarning("异常：{mag}", e);
             return false;
         }
-
     }
 
     #endregion
 }
-
-

@@ -124,7 +124,7 @@ namespace Ray.BiliBiliTool.DomainService
             }
 
             if (success == needCoins)
-                _logger.LogInformation("投币任务完成");
+                _logger.LogInformation("视频投币任务完成");
             else
                 _logger.LogInformation("投币尝试超过10次，已终止");
 

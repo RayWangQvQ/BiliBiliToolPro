@@ -4,7 +4,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Article;
 
 public class SearchUpArticlesResponse
 {
-    public List<ArticleInfo> ArticleInfoList { get; set; }
+    public List<ArticleInfo> Articles { get; set; }
     public int Count { get; set; }
 
 }

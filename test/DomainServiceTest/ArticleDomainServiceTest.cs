@@ -12,19 +12,6 @@ public class ArticleDomainServiceTest
     }
 
     [Fact]
-    public async Task CalculateDonateCoinsCountsTest()
-    {
-        using var scope = Global.ServiceProviderRoot.CreateScope();
-        var config = Global.ConfigurationRoot;
-        var domainService = scope.ServiceProvider.GetRequiredService<IArticleDomainService>();
-
-        int coins = await domainService.CalculateDonateCoinsCounts();
-        _output.WriteLine($"当前测试账户应当投币{coins}枚，请根据账户硬币余额自行计算结果是否正确");
-    }
-
-
-
-    [Fact]
     public async Task AddCoinForArticleTest()
     {
         using var scope = Global.ServiceProviderRoot.CreateScope();
