@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
+using System.Net;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Ray.BiliBiliTool.Config;
@@ -9,25 +11,29 @@ using Ray.BiliBiliTool.Infrastructure.Cookie;
 
 namespace Ray.BiliBiliTool.Agent
 {
-    public class BiliCookie : CookieInfo
+    public class BiliCookie : CookieContainer
     {
         private readonly ILogger<BiliCookie> _logger;
 
-        public BiliCookie():this("")
+        public BiliCookie()
         {
         }
-        public BiliCookie(string ckStr)
-            : base(ckStr) { }
+        public BiliCookie(string cookieHeader)
+        {
+            this.Init(cookieHeader);
+        }
 
         public void Init(string ckStr)
         {
-            this.CookieStr=ckStr;
+            var dic= CkStrToDictionary(ckStr);
+            foreach (var item in dic)
+            {
+                this.Add(new Cookie(item.Key, CkValueBuild(item.Value), "/", ".bilibili.com"));
+            }
         }
 
-        public override string CkValueBuild(string value)
+        public string CkValueBuild(string value)
         {
-            value = base.CkValueBuild(value);
-
             if (value.Contains(','))
             {
                 value = Uri.EscapeDataString(value);
@@ -37,32 +43,30 @@ namespace Ray.BiliBiliTool.Agent
         }
 
         [Description("DedeUserID")]
-        public string UserId => CookieItemDictionary.TryGetValue(GetPropertyDescription(nameof(UserId)), out string userId) ? userId : "";
+        public string UserId => this.GetAllCookies().FirstOrDefault(x => x.Name == GetPropertyDescription(nameof(UserId)))?.Value;
 
         /// <summary>
         /// SESSDATA
         /// </summary>
         [Description("SESSDATA")]
-        public string SessData => CookieItemDictionary.TryGetValue(GetPropertyDescription(nameof(SessData)), out string sess) ? sess : "";
+        public string SessData => this.GetAllCookies().FirstOrDefault(x => x.Name == GetPropertyDescription(nameof(SessData)))?.Value;
 
         [Description("bili_jct")]
-        public string BiliJct => CookieItemDictionary.TryGetValue(GetPropertyDescription(nameof(BiliJct)), out string jct) ? jct : "";
+        public string BiliJct => this.GetAllCookies().FirstOrDefault(x => x.Name == GetPropertyDescription(nameof(BiliJct)))?.Value;
 
         [Description("LIVE_BUVID")]
-        public string LiveBuvid => CookieItemDictionary.TryGetValue(GetPropertyDescription(nameof(LiveBuvid)), out string liveBuvid) ? liveBuvid : "";
+        public string LiveBuvid => this.GetAllCookies().FirstOrDefault(x => x.Name == GetPropertyDescription(nameof(LiveBuvid)))?.Value;
 
         [Description("buvid3")]
-        public string Buvid => CookieItemDictionary.TryGetValue(GetPropertyDescription(nameof(Buvid)), out string buvid) ? buvid : "";
+        public string Buvid => this.GetAllCookies().FirstOrDefault(x => x.Name == GetPropertyDescription(nameof(Buvid)))?.Value;
 
         /// <summary>
         /// 检查是否已配置
         /// </summary>
         /// <returns></returns>
-        public override void Check()
+        public void Check()
         {
-            base.Check();
-
-            if (CookieItemDictionary.Count == 0) throw new Exception("Cookie字符串格式异常，内部无等号");
+            if (this.GetAllCookies().Count == 0) throw new Exception("Cookie字符串格式异常，内部无等号");
 
             bool result = true;
             string msg = "Cookie字符串异常，无[{1}]项";
@@ -97,9 +101,37 @@ namespace Ray.BiliBiliTool.Agent
                 throw new Exception($"请正确配置Cookie后再运行，配置方式见 {Constants.SourceCodeUrl}");
         }
 
+        public string GetCookieStr()
+        {
+            var cookieStr = this.GetCookieHeader(new Uri("https://bilibili.com"));
+            return cookieStr;
+        }
+
+        #region  private
+
         private string GetPropertyDescription(string propertyName)
         {
             return GetType().GetPropertyDescription(propertyName);
         }
+
+        private Dictionary<string, string> CkStrToDictionary(string ckStr)
+        {
+            var dic = new Dictionary<string, string>();
+            var ckItemList = ckStr
+                .Split(";", StringSplitOptions.TrimEntries)
+                .Distinct()
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .ToList();
+            foreach (var item in ckItemList)
+            {
+                var key = item[..item.IndexOf("=", StringComparison.Ordinal)].Trim();
+                var value = item[(item.IndexOf("=", StringComparison.Ordinal) + 1)..].Trim();
+                dic.AddIfNotExist(new KeyValuePair<string, string>(key, value), p => p.Key == key);
+            }
+            return dic;
+        }
+
+        #endregion
+
     }
 }

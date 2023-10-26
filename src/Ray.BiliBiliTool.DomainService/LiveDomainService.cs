@@ -654,8 +654,8 @@ namespace Ray.BiliBiliTool.DomainService
                     throw new Exception(liveHomeContent.Message);
                 }
 
-                List<string> liveCookies = liveHome.Headers.SingleOrDefault(header => header.Key == "Set-Cookie").Value.ToList();
-                _biliCookie.MergeCurrentCookie(liveCookies);
+                //List<string> liveCookies = liveHome.Headers.SingleOrDefault(header => header.Key == "Set-Cookie").Value.ToList();
+                //_biliCookie.MergeCurrentCookie(liveCookies);
 
                 _logger.LogDebug("LiveBuvid {value}", _biliCookie.LiveBuvid);
                 _logger.LogInformation("直播 Cookie 配置成功！");

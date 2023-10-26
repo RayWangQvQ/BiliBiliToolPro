@@ -28,7 +28,7 @@ namespace Ray.BiliBiliTool.Agent.Extensions
         public static IServiceCollection AddBiliBiliClientApi(this IServiceCollection services, IConfiguration configuration)
         {
             //Cookie
-            services.AddScoped<BiliCookie>();
+            services.AddSingleton<BiliCookie>();
             services.AddSingleton<CookieStrFactory>();
 
             //全局代理
@@ -38,6 +38,12 @@ namespace Ray.BiliBiliTool.Agent.Extensions
             services.Scan(scan => scan
                 .FromAssemblyOf<IBiliBiliApi>()
                 .AddClasses(classes => classes.AssignableTo<DelegatingHandler>())
+                .AsSelf()
+                .WithTransientLifetime()
+            );
+            services.Scan(scan => scan
+                .FromAssemblyOf<IBiliBiliApi>()
+                .AddClasses(classes => classes.AssignableTo<HttpClientHandler>())
                 .AsSelf()
                 .WithTransientLifetime()
             );
@@ -102,7 +108,7 @@ namespace Ray.BiliBiliTool.Agent.Extensions
 
             if (withCookie)
                 httpClientBuilder
-                    .AddHttpMessageHandler<CookieDelegatingHandler>();
+                    .ConfigurePrimaryHttpMessageHandler<CookieDelegatingHandler>();
 
             return services;
         }

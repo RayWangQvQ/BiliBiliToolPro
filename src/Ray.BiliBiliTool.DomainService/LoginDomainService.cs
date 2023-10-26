@@ -127,8 +127,8 @@ namespace Ray.BiliBiliTool.DomainService
                 if (homePage.IsSuccessStatusCode)
                 {
                     _logger.LogInformation("访问主站成功");
-                    IEnumerable<string> setCookieHeaders = homePage.Headers.SingleOrDefault(header => header.Key == "Set-Cookie").Value;
-                    biliCookie.MergeCurrentCookieBySetCookieHeaders(setCookieHeaders);
+                    //IEnumerable<string> setCookieHeaders = homePage.Headers.SingleOrDefault(header => header.Key == "Set-Cookie").Value;
+                    //biliCookie.MergeCurrentCookieBySetCookieHeaders(setCookieHeaders);
                     _logger.LogInformation("SetCookie成功");
                     return biliCookie;
                 }
@@ -177,7 +177,7 @@ namespace Ray.BiliBiliTool.DomainService
                 lines.InsertRange(indexOfInsert + 1, new List<string>()
                 {
                     "  \"BiliBiliCookies\":[",
-                    $@"    ""{ckInfo.CookieStr}"",",
+                    $@"    ""{ckInfo.GetCookieHeader(new Uri(""))}"",",
                     "  ],"
                 });
 
@@ -186,8 +186,8 @@ namespace Ray.BiliBiliTool.DomainService
                 return;
             }
 
-            ckInfo.CookieItemDictionary.TryGetValue("DedeUserID", out string userId);
-            userId ??= ckInfo.CookieStr;
+            //ckInfo.CookieItemDictionary.TryGetValue("DedeUserID", out string userId);
+            var userId = ckInfo.UserId;
             var indexOfCkConfigEnd = lines.FindIndex(indexOfCkConfigKey, x => x.TrimStart().StartsWith("]"));
             var indexOfTargetCk = lines.FindIndex(indexOfCkConfigKey,
                 indexOfCkConfigEnd - indexOfCkConfigKey,
@@ -196,14 +196,14 @@ namespace Ray.BiliBiliTool.DomainService
             if (indexOfTargetCk == -1)
             {
                 _logger.LogInformation("不存在该用户，新增cookie");
-                lines.Insert(indexOfCkConfigEnd, $@"    ""{ckInfo.CookieStr}"",");
+                lines.Insert(indexOfCkConfigEnd, $@"    ""{ckInfo.GetCookieStr()}"",");
                 await SaveJson(lines, fileInfo);
                 _logger.LogInformation("新增成功！");
                 return;
             }
 
             _logger.LogInformation("已存在该用户，更新cookie");
-            lines[indexOfTargetCk] = $@"    ""{ckInfo.CookieStr}"",";
+            lines[indexOfTargetCk] = $@"    ""{ckInfo.GetCookieStr()}"",";
             await SaveJson(lines, fileInfo);
             _logger.LogInformation("更新成功！");
         }
@@ -240,7 +240,7 @@ namespace Ray.BiliBiliTool.DomainService
                 {
                     id = oldEnv.id,
                     name = oldEnv.name,
-                    value = ckInfo.CookieStr,
+                    value = ckInfo.GetCookieStr(),
                     remarks = string.IsNullOrEmpty(oldEnv.remarks)
                         ? $"bili-{ckInfo.UserId}"
                         : oldEnv.remarks,
@@ -269,7 +269,7 @@ namespace Ray.BiliBiliTool.DomainService
             var add = new AddQingLongEnv()
             {
                 name = name,
-                value = ckInfo.CookieStr,
+                value = ckInfo.GetCookieStr(),
                 remarks = $"bili-{ckInfo.UserId}"
             };
             var addRe = await _qingLongApi.AddEnvs(new List<AddQingLongEnv> { add }, token);
@@ -280,8 +280,8 @@ namespace Ray.BiliBiliTool.DomainService
         {
             List<DbConfig> ckList = await _dbConfigRepo.GetListAsync(x => x.ConfigKey.StartsWith("BiliBiliCookies"));
 
-            ckInfo.CookieItemDictionary.TryGetValue("DedeUserID", out string userId);
-            userId ??= ckInfo.CookieStr;
+            //ckInfo.CookieItemDictionary.TryGetValue("DedeUserID", out string userId);
+            var userId = ckInfo.UserId;
             var indexOfTargetCk = ckList.FirstOrDefault(x => x.ConfigValue.Contains(userId));
 
             if (indexOfTargetCk == null)
@@ -294,13 +294,13 @@ namespace Ray.BiliBiliTool.DomainService
                     : ckList.Select(x => int.Parse(x.ConfigKey.Split(':').Last())).Max();
                 var num = ++max;
 
-                await _dbConfigRepo.InsertAsync(new DbConfig($"BiliBiliCookies:{num}", ckInfo.CookieStr), true, cancellationToken: cancellationToken);
+                await _dbConfigRepo.InsertAsync(new DbConfig($"BiliBiliCookies:{num}", ckInfo.GetCookieStr()), true, cancellationToken: cancellationToken);
                 _logger.LogInformation("新增成功！");
                 return;
             }
 
             _logger.LogInformation("已存在该用户，更新cookie");
-            indexOfTargetCk.UpdateConfig(ckInfo.CookieStr);
+            indexOfTargetCk.UpdateConfig(ckInfo.GetCookieStr());
             await _dbConfigRepo.UpdateAsync(indexOfTargetCk, true, cancellationToken);
             //await _dbConfigRepo.UnitOfWork.SaveChangesAsync(cancellationToken);
             _logger.LogInformation("更新成功！");

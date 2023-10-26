@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
@@ -21,36 +22,23 @@ namespace Ray.BiliBiliTool.Agent.HttpClientDelegatingHandlers
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            ReplaceCookieContainerWithCurrentAccount(this.CookieContainer);
+            // 发送请求之前处理 Cookie
+            var cookies = _biliCookie.GetCookieStr();
+            // 将 Cookie 设置为请求头
+            request.Headers.Add("Cookie", cookies.ToString());
 
-            HttpResponseMessage re = await base.SendAsync(request, cancellationToken);
+            HttpResponseMessage response = await base.SendAsync(request, cancellationToken);
 
-            UpdateCurrentCookieContainer(this.CookieContainer);
-
-            return re;
-        }
-
-        public void ReplaceCookieContainerWithCurrentAccount(CookieContainer source)
-        {
-            //clear existed by Expiring it
-            source.GetAllCookies().ToList().ForEach(x => x.Expired = true);
-            if (source.Count > 0)
+            // 收到响应后处理 Set-Cookie 头
+            if (response.Headers.TryGetValues("Set-Cookie", out var setCookieHeaders))
             {
-                var m = source.GetType().GetMethod("AgeCookies", BindingFlags.NonPublic | BindingFlags.Instance);
-                m.Invoke(source, new object[] { null });
+                foreach (var setCookieHeader in setCookieHeaders)
+                {
+                    this.CookieContainer.SetCookies(response.RequestMessage.RequestUri, setCookieHeader);
+                }
             }
 
-            //add new
-            //source.Add(this.CurrentTargetAccount.MyCookieContainer.GetAllCookies());
-            //todo
-        }
-
-        public void UpdateCurrentCookieContainer(CookieContainer update)
-        {
-            var newCookieContainer = new CookieContainer();
-            newCookieContainer.Add(update.GetAllCookies());
-            //this.CurrentTargetAccount.MyCookieContainer = newCookieContainer;
-            //todo
+            return response;
         }
     }
 }

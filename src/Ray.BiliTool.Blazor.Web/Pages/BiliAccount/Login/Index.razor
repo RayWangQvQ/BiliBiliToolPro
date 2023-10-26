@@ -139,7 +139,7 @@
                 ModalService.Success(new ConfirmOptions()
                     {
                         Title = "扫描成功！",
-                        Content = $"已自动更新如下Cookie：\n\n{biliCk.CookieStr}"
+                        Content = $"已自动更新如下Cookie：\n\n{biliCk.GetCookieStr()}"
                     });
 
                 await QrCodeTimeOutAsync();
