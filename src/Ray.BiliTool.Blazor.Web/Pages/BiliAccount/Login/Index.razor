@@ -33,12 +33,14 @@
     protected IMessageService Message { get; set; }
     [Inject]
     protected ILoginDomainService LoginDomainService { get; set; }
+    [Inject]
+    protected BiliCookieContainer BiliCk { get; set; }
 
     private string _qrCodeOutOfDate = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAMAAAC7IEhfAAAARVBMVEUAAAAAruwArusAruwAruwArewAq+sArusAresAr+sAruwAr+8Aru8AruwAruwAr+cArewAr+0AruwArewAr98ArusAruy8BWrbAAAAFnRSTlMA76DfcL9AMJBAgCAQz68gYI9fUBDPY12YwgAAAUZJREFUOMuNlFuShCAMRcNTQEBbp9n/UkcTuhnKKHN/rIqHXBII0MvrrEQpIuXg4VYxHEyTkjOPvcpFHKpFYaQ2OLQb813x+vxx626t1VLVwOvwOj6p2hoMCmebxSSJTNGeHwq+MWQW6LQQahBsvkIzGyfyA67ITcBoohIJnHHfyHFkA3EnmsV8COkLzthZPl1pqgkXFnSNUwDqNiGsDdzAPlQC2pCkBQiUd6xMzmMl7M1AMQKcDfUDLpzFlBFInRb/AKkxaL2PQYH9Xp8wumwJ2+OeMDrkDHrYcDQNYIfVTJUQI2+JnnTYYr7F2n2NOD/3YLuvrjwdt24DEAUO4UMlaqmLRuO69bOhWd++J4Z95GYKv6EppkLoH38vKWZ+2MlUUnvvd+1UDbjLaKrCiHu5FnnlHNoyqOqyBcR42ZCTOBiVtYVOvw1hKHrM5JK6AAAAAElFTkSuQmCC";
 
     private string _qrCode;
     private string _qrCodeKey;
-    private BiliCookieContainer biliCk;
+
 
     private async Task OnButtonClick()
     {
@@ -131,15 +133,17 @@
                 IEnumerable<string> cookies = check.Headers.SingleOrDefault(header => header.Key == "Set-Cookie").Value;
 
                 string cookieStr = CookieInfo.ConvertSetCkHeadersToCkStr(cookies);
-                biliCk = new BiliCookieContainer(cookieStr);
-                biliCk.Check();
+                BiliCk.Init(cookieStr);
+                BiliCk.Check();
 
-                await LoginDomainService.SaveCookieToDbAsync(biliCk, default);
+                await LoginDomainService.SetCookieAsync(BiliCk, default);
+
+                await LoginDomainService.SaveCookieToDbAsync(BiliCk, default);
 
                 ModalService.Success(new ConfirmOptions()
                     {
                         Title = "扫描成功！",
-                        Content = $"已自动更新如下Cookie：\n\n{biliCk.GetCookieStr()}"
+                        Content = $"已自动更新如下Cookie：\n\n{BiliCk.GetCookieStr()}"
                     });
 
                 await QrCodeTimeOutAsync();

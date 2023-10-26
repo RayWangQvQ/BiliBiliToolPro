@@ -1,7 +1,9 @@
-﻿using System.Threading;
+﻿using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Application.Attributes;
 using Ray.BiliBiliTool.Application.Contracts;
 using Ray.BiliBiliTool.Config.Options;
@@ -9,18 +11,20 @@ using Ray.BiliBiliTool.DomainService.Interfaces;
 
 namespace Ray.BiliBiliTool.Application
 {
-    public class LiveLotteryTaskAppService : AppService, ILiveLotteryTaskAppService
+    public class LiveLotteryTaskAppService : MultiAccountsAppService, ILiveLotteryTaskAppService
     {
         private readonly ILogger<LiveLotteryTaskAppService> _logger;
         private readonly ILiveDomainService _liveDomainService;
         private readonly LiveLotteryTaskOptions _liveLotteryTaskOptions;
         private readonly IAccountDomainService _accountDomainService;
 
-        public LiveLotteryTaskAppService(ILiveDomainService liveDomainService,
-            IOptionsMonitor<LiveLotteryTaskOptions> liveLotteryTaskOptions,
+        public LiveLotteryTaskAppService(
             ILogger<LiveLotteryTaskAppService> logger,
-            IAccountDomainService accountDomainService
-            )
+            BiliCookieContainer biliCookieContainer,
+            IAccountDomainService accountDomainService,
+            ILiveDomainService liveDomainService,
+                IOptionsMonitor<LiveLotteryTaskOptions> liveLotteryTaskOptions
+            ):base(logger, biliCookieContainer, accountDomainService)
         {
             _liveDomainService = liveDomainService;
             _liveLotteryTaskOptions = liveLotteryTaskOptions.CurrentValue;
@@ -28,8 +32,7 @@ namespace Ray.BiliBiliTool.Application
             _accountDomainService = accountDomainService;
         }
 
-        [TaskInterceptor("天选时刻抽奖", TaskLevel.One)]
-        public override async Task DoTaskAsync(CancellationToken cancellationToken)
+        protected override async Task DoEachAccountAsync(CancellationToken cancellationToken)
         {
             await LogUserInfo();
             await LotteryTianXuan();

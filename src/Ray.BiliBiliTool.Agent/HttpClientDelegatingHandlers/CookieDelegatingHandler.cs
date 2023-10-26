@@ -25,7 +25,7 @@ namespace Ray.BiliBiliTool.Agent.HttpClientDelegatingHandlers
             // 发送请求之前处理 Cookie
             var cookies = _biliCookieContainer.GetCookieStr();
             // 将 Cookie 设置为请求头
-            request.Headers.Add("Cookie", cookies.ToString());
+            request.Headers.Add("Cookie", cookies);
 
             HttpResponseMessage response = await base.SendAsync(request, cancellationToken);
 
@@ -34,7 +34,7 @@ namespace Ray.BiliBiliTool.Agent.HttpClientDelegatingHandlers
             {
                 foreach (var setCookieHeader in setCookieHeaders)
                 {
-                    this.CookieContainer.SetCookies(response.RequestMessage.RequestUri, setCookieHeader);
+                    _biliCookieContainer.SetCookies(response.RequestMessage.RequestUri, setCookieHeader);
                 }
             }
 

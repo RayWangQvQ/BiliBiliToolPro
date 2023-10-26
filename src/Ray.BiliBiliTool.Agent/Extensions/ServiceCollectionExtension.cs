@@ -57,11 +57,11 @@ namespace Ray.BiliBiliTool.Agent.Extensions
             services.AddBiliBiliClientApi<IRelationApi>("https://api.bilibili.com");
             services.AddBiliBiliClientApi<IChargeApi>("https://api.bilibili.com");
             services.AddBiliBiliClientApi<IVideoApi>("https://api.bilibili.com");
-            services.AddBiliBiliClientApi<IVideoWithoutCookieApi>("https://api.bilibili.com", false);
+            services.AddBiliBiliClientApi<IVideoWithoutCookieApi>("https://api.bilibili.com");
             services.AddBiliBiliClientApi<IVipBigPointApi>("https://api.bilibili.com");
-            services.AddBiliBiliClientApi<IPassportApi>("http://passport.bilibili.com", false);
+            services.AddBiliBiliClientApi<IPassportApi>("http://passport.bilibili.com");
             services.AddBiliBiliClientApi<ILiveTraceApi>("https://live-trace.bilibili.com");
-            services.AddBiliBiliClientApi<IHomeApi>("https://www.bilibili.com", false);
+            services.AddBiliBiliClientApi<IHomeApi>("https://www.bilibili.com");
 
             //qinglong
             var qinglongHost = configuration["QL_URL"] ?? "http://localhost:5600";
@@ -88,7 +88,7 @@ namespace Ray.BiliBiliTool.Agent.Extensions
         /// <param name="services"></param>
         /// <param name="host"></param>
         /// <returns></returns>
-        private static IServiceCollection AddBiliBiliClientApi<TInterface>(this IServiceCollection services, string host, bool withCookie = true)
+        private static IServiceCollection AddBiliBiliClientApi<TInterface>(this IServiceCollection services, string host)
             where TInterface : class
         {
             var uri = new Uri(host);
@@ -104,11 +104,9 @@ namespace Ray.BiliBiliTool.Agent.Extensions
                         sp.GetRequiredService<IOptionsMonitor<SecurityOptions>>().CurrentValue.UserAgent);
                 })
                 .AddHttpMessageHandler<IntervalDelegatingHandler>()
-                .AddPolicyHandler(GetRetryPolicy());
-
-            if (withCookie)
-                httpClientBuilder
-                    .ConfigurePrimaryHttpMessageHandler<CookieDelegatingHandler>();
+                .AddPolicyHandler(GetRetryPolicy())
+                .ConfigurePrimaryHttpMessageHandler<CookieDelegatingHandler>()
+                ;
 
             return services;
         }

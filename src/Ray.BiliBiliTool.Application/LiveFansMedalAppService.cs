@@ -1,25 +1,28 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Application.Attributes;
 using Ray.BiliBiliTool.Application.Contracts;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 
 namespace Ray.BiliBiliTool.Application
 {
-    public class LiveFansMedalAppService : AppService, ILiveFansMedalAppService
+    public class LiveFansMedalAppService : MultiAccountsAppService, ILiveFansMedalAppService
     {
         private readonly ILiveDomainService _liveDomainService;
 
         public LiveFansMedalAppService(
+            ILogger<LiveFansMedalAppService> logger,
+            BiliCookieContainer biliCookieContainer,
+            IAccountDomainService accountDomainService,
             ILiveDomainService liveDomainService
-            )
+            ):base(logger,biliCookieContainer, accountDomainService)
         {
             _liveDomainService = liveDomainService;
         }
 
-        [TaskInterceptor("直播间互动", TaskLevel.One)]
-        public override async Task DoTaskAsync(CancellationToken cancellationToken)
+        protected override async Task DoEachAccountAsync(CancellationToken cancellationToken)
         {
             await SendDanmaku();
             await Like();

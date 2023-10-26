@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.VipTask;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
@@ -13,7 +14,7 @@ using Ray.BiliBiliTool.DomainService.Interfaces;
 
 namespace Ray.BiliBiliTool.Application
 {
-    public class VipBigPointAppService : AppService, IVipBigPointAppService
+    public class VipBigPointAppService : MultiAccountsAppService, IVipBigPointAppService
     {
         private readonly ILogger<VipBigPointAppService> _logger;
         private readonly IConfiguration _configuration;
@@ -23,18 +24,18 @@ namespace Ray.BiliBiliTool.Application
         public VipBigPointAppService(
             IConfiguration configuration,
             ILogger<VipBigPointAppService> logger,
-            IVipBigPointApi vipApi,
-            IAccountDomainService loginDomainService
-            )
-        {
+            BiliCookieContainer biliCookieContainer,
+            IAccountDomainService loginDomainService,
+            IVipBigPointApi vipApi
+            ):base(logger, biliCookieContainer, loginDomainService)
+            {
             _configuration = configuration;
             _logger = logger;
             _vipApi = vipApi;
             _loginDomainService = loginDomainService;
         }
 
-        [TaskInterceptor("大会员大积分", TaskLevel.One)]
-        public override async Task DoTaskAsync(CancellationToken cancellationToken)
+        protected override async Task DoEachAccountAsync(CancellationToken cancellationToken)
         {
             var ui = await GetUserInfo();
 

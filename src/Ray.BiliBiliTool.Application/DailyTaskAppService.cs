@@ -264,7 +264,7 @@ namespace Ray.BiliBiliTool.Application
             }
 
             //更新cookie到json
-            await _loginDomainService.SaveCookieToJsonFileAsync(ckInfo, cancellationToken);
+            //await _loginDomainService.SaveCookieToJsonFileAsync(ckInfo, cancellationToken);
         }
     }
 }
