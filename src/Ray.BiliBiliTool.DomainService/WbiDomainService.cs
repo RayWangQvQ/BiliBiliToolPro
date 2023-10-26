@@ -29,12 +29,12 @@ namespace Ray.BiliBiliTool.DomainService
         private readonly IUserInfoApi _userInfoApi;
         private readonly IRelationApi _relationApi;
         private readonly UnfollowBatchedTaskOptions _unfollowBatchedTaskOptions;
-        private readonly BiliCookie _cookie;
+        private readonly BiliCookieContainer _cookieContainer;
 
         public WbiDomainService(
             ILogger<AccountDomainService> logger,
             IDailyTaskApi dailyTaskApi,
-            BiliCookie cookie,
+            BiliCookieContainer cookieContainer,
             IUserInfoApi userInfoApi,
             IRelationApi relationApi,
             IOptionsMonitor<UnfollowBatchedTaskOptions> unfollowBatchedTaskOptions
@@ -42,7 +42,7 @@ namespace Ray.BiliBiliTool.DomainService
         {
             _logger = logger;
             _dailyTaskApi = dailyTaskApi;
-            _cookie = cookie;
+            _cookieContainer = cookieContainer;
             _userInfoApi = userInfoApi;
             _relationApi = relationApi;
             _unfollowBatchedTaskOptions = unfollowBatchedTaskOptions.CurrentValue;

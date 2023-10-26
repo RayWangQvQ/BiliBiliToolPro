@@ -17,10 +17,11 @@ using Ray.BiliBiliTool.Infrastructure.Enums;
 
 namespace Ray.BiliBiliTool.Application
 {
-    public class DailyTaskAppService : AppService, IDailyTaskAppService
+    public class DailyTaskAppService : MultiAccountsAppService, IDailyTaskAppService
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<DailyTaskAppService> _logger;
+        private readonly BiliCookieContainer _biliCookieContainer;
         private readonly IAccountDomainService _accountDomainService;
         private readonly IVideoDomainService _videoDomainService;
         private readonly IDonateCoinDomainService _donateCoinDomainService;
@@ -37,6 +38,7 @@ namespace Ray.BiliBiliTool.Application
         public DailyTaskAppService(
             IServiceProvider serviceProvider,
             ILogger<DailyTaskAppService> logger,
+            BiliCookieContainer biliCookieContainer,
             IOptionsMonitor<Dictionary<string, int>> dicOptions,
             IAccountDomainService accountDomainService,
             IVideoDomainService videoDomainService,
@@ -49,10 +51,11 @@ namespace Ray.BiliBiliTool.Application
             ICoinDomainService coinDomainService,
             ILoginDomainService loginDomainService,
             IConfiguration configuration
-            )
+            ) : base(logger, biliCookieContainer, accountDomainService)
         {
             _serviceProvider = serviceProvider;
             _logger = logger;
+            _biliCookieContainer = biliCookieContainer;
             _expDic = dicOptions.Get(Constants.OptionsNames.ExpDictionaryName);
             _accountDomainService = accountDomainService;
             _videoDomainService = videoDomainService;
@@ -67,33 +70,9 @@ namespace Ray.BiliBiliTool.Application
             _configuration = configuration;
         }
 
-        [TaskInterceptor("每日任务")]
-        public override async Task DoTaskAsync(CancellationToken cancellationToken)
+        protected override async Task DoEachAccountAsync(CancellationToken cancellationToken)
         {
-            var ckStrList = await _accountDomainService.GetAllCookieStrListAsync();
-            for (int i = 0; i < ckStrList.Count; i++)
-            {
-                _logger.LogInformation("######### 账号 {num} #########{newLine}", i + 1, Environment.NewLine);
-
-                try
-                {
-                    using var scope = _serviceProvider.CreateScope();
-                    var biliCookie = scope.ServiceProvider.GetRequiredService<BiliCookie>();
-                    biliCookie.Init(ckStrList[i]);
-                    await DoEachAccountAsync(biliCookie, cancellationToken);
-                }
-                catch (Exception e)
-                {
-                    //ignore
-                    _logger.LogWarning("异常：{msg}", e);
-                }
-            }
-            _logger.LogInformation("·开始推送·{task}·{user}", "Test任务", "");
-        }
-
-        protected async Task DoEachAccountAsync(BiliCookie biliCookie, CancellationToken cancellationToken)
-        {
-            await SetCookiesAsync(biliCookie, cancellationToken);
+            await SetCookiesAsync(_biliCookieContainer, cancellationToken);
 
             //每日任务赚经验：
             UserInfo userInfo = await Login();
@@ -117,18 +96,18 @@ namespace Ray.BiliBiliTool.Application
 
 
         [TaskInterceptor("Set Cookie", TaskLevel.Two)]
-        protected async Task<BiliCookie> SetCookiesAsync(BiliCookie biliCookie, CancellationToken cancellationToken)
+        protected async Task<BiliCookieContainer> SetCookiesAsync(BiliCookieContainer biliCookieContainer, CancellationToken cancellationToken)
         {
             //判断cookie是否完整
-            if (string.IsNullOrWhiteSpace(biliCookie.Buvid))
+            if (string.IsNullOrWhiteSpace(biliCookieContainer.Buvid))
             {
                 _logger.LogInformation("Cookie完整，不需要Set Cookie");
-                return biliCookie;
+                return biliCookieContainer;
             }
 
             //Set
             _logger.LogInformation("开始Set Cookie");
-            var ck = await _loginDomainService.SetCookieAsync(biliCookie, cancellationToken);
+            var ck = await _loginDomainService.SetCookieAsync(biliCookieContainer, cancellationToken);
 
             //持久化
             _logger.LogInformation("持久化Cookie");
@@ -272,7 +251,7 @@ namespace Ray.BiliBiliTool.Application
             await _mangaDomainService.ReceiveMangaVipReward(1, userInfo);
         }
 
-        private async Task SaveCookieAsync(BiliCookie ckInfo, CancellationToken cancellationToken)
+        private async Task SaveCookieAsync(BiliCookieContainer ckInfo, CancellationToken cancellationToken)
         {
             var platformType = _configuration.GetSection("PlateformType").Get<PlatformType>();
             _logger.LogInformation("当前运行平台：{platform}", platformType);

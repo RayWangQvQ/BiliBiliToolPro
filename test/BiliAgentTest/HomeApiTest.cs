@@ -24,7 +24,7 @@ namespace BiliAgentTest
         {
             using var scope = Global.ServiceProviderRoot.CreateScope();
 
-            var ck = scope.ServiceProvider.GetRequiredService<BiliCookie>();
+            var ck = scope.ServiceProvider.GetRequiredService<BiliCookieContainer>();
             var api = scope.ServiceProvider.GetRequiredService<IHomeApi>();
 
             var re = await api.GetHomePageAsync(ck.ToString());

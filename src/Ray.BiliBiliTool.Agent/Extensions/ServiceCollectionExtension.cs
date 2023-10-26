@@ -28,7 +28,7 @@ namespace Ray.BiliBiliTool.Agent.Extensions
         public static IServiceCollection AddBiliBiliClientApi(this IServiceCollection services, IConfiguration configuration)
         {
             //Cookie
-            services.AddSingleton<BiliCookie>();
+            services.AddSingleton<BiliCookieContainer>();
             services.AddSingleton<CookieStrFactory>();
 
             //全局代理

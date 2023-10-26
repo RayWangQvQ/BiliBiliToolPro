@@ -32,7 +32,7 @@ namespace Ray.BiliBiliTool.DomainService
         private readonly LiveFansMedalTaskOptions _liveFansMedalTaskOptions;
         private readonly DailyTaskOptions _dailyTaskOptions;
         private readonly SecurityOptions _securityOptions;
-        private readonly BiliCookie _biliCookie;
+        private readonly BiliCookieContainer _biliCookieContainer;
         private readonly IWbiDomainService _wbiDomainService;
 
         public LiveDomainService(ILogger<LiveDomainService> logger,
@@ -45,7 +45,7 @@ namespace Ray.BiliBiliTool.DomainService
             IOptionsMonitor<LiveFansMedalTaskOptions> liveFansMedalTaskOptions,
             IOptionsMonitor<SecurityOptions> securityOptions,
             IWbiDomainService wbiDomainService,
-            BiliCookie biliCookie)
+            BiliCookieContainer biliCookieContainer)
         {
             _logger = logger;
             _liveApi = liveApi;
@@ -57,7 +57,7 @@ namespace Ray.BiliBiliTool.DomainService
             _liveFansMedalTaskOptions = liveFansMedalTaskOptions.CurrentValue;
             _securityOptions = securityOptions.CurrentValue;
             _wbiDomainService = wbiDomainService;
-            _biliCookie = biliCookie;
+            _biliCookieContainer = biliCookieContainer;
 
         }
 
@@ -127,7 +127,7 @@ namespace Ray.BiliBiliTool.DomainService
             if (queryStatus.Data.Silver_2_coin_left <= 0) return false;
 
             _logger.LogInformation("开始尝试兑换...");
-            Silver2CoinRequest request = new(_biliCookie.BiliJct);
+            Silver2CoinRequest request = new(_biliCookieContainer.BiliJct);
             var response = await _liveApi.Silver2Coin(request);
             if (response.Code == 0)
             {
@@ -253,7 +253,7 @@ namespace Ray.BiliBiliTool.DomainService
                     Id = check.Id,
                     Gift_id = check.Gift_id,
                     Gift_num = check.Gift_num,
-                    Csrf = _biliCookie.BiliJct
+                    Csrf = _biliCookieContainer.BiliJct
                 };
                 var re = await _liveApi.Join(request);
                 if (re.Code == 0)
@@ -301,11 +301,11 @@ namespace Ray.BiliBiliTool.DomainService
             long targetGroupId = await GetOrCreateTianXuanGroupId();
 
             //执行批量分组
-            var referer = string.Format(RelationApiConstant.CopyReferer, _biliCookie.UserId);
+            var referer = string.Format(RelationApiConstant.CopyReferer, _biliCookieContainer.UserId);
             var req = new CopyUserToGroupRequest(
                 targetUps.Select(x => x.Uid).ToList(),
                 targetGroupId.ToString(),
-                _biliCookie.BiliJct);
+                _biliCookieContainer.BiliJct);
             var re = await _relationApi.CopyUpsToGroup(req, referer);
 
             if (re.Code == 0)
@@ -328,7 +328,7 @@ namespace Ray.BiliBiliTool.DomainService
         private async Task<long> GetLastFollowUpId()
         {
             var followings = await _relationApi
-                .GetFollowings(new GetFollowingsRequest(long.Parse(_biliCookie.UserId), FollowingsOrderType.TimeDesc));
+                .GetFollowings(new GetFollowingsRequest(long.Parse(_biliCookieContainer.UserId), FollowingsOrderType.TimeDesc));
             return followings.Data.List.FirstOrDefault()?.Mid ?? 0;
         }
 
@@ -342,7 +342,7 @@ namespace Ray.BiliBiliTool.DomainService
 
             //获取最后一个upId之后关注的所有upId
             var followings = await _relationApi
-                .GetFollowings(new GetFollowingsRequest(long.Parse(_biliCookie.UserId), FollowingsOrderType.TimeDesc));
+                .GetFollowings(new GetFollowingsRequest(long.Parse(_biliCookieContainer.UserId), FollowingsOrderType.TimeDesc));
 
             foreach (UpInfo item in followings.Data.List)
             {
@@ -373,14 +373,14 @@ namespace Ray.BiliBiliTool.DomainService
         {
             //获取天选分组Id，没有就创建
             long groupId = 0;
-            string referer = string.Format(RelationApiConstant.GetTagsReferer, _biliCookie.UserId);
+            string referer = string.Format(RelationApiConstant.GetTagsReferer, _biliCookieContainer.UserId);
             var groups = await _relationApi.GetTags(referer);
             var tianXuanGroup = groups.Data.FirstOrDefault(x => x.Name == "天选时刻");
             if (tianXuanGroup == null)
             {
                 _logger.LogInformation("“天选时刻”分组不存在，尝试创建...");
                 //创建一个
-                var createRe = await _relationApi.CreateTag(new CreateTagRequest { Tag = "天选时刻", Csrf = _biliCookie.BiliJct });
+                var createRe = await _relationApi.CreateTag(new CreateTagRequest { Tag = "天选时刻", Csrf = _biliCookieContainer.BiliJct });
                 groupId = createRe.Data.Tagid;
                 _logger.LogInformation("创建成功");
             }
@@ -432,7 +432,7 @@ namespace Ray.BiliBiliTool.DomainService
 
                 // 发送弹幕
                 var sendResult = await _liveApi.SendLiveDanmuku(new SendLiveDanmukuRequest(
-                    _biliCookie.BiliJct,
+                    _biliCookieContainer.BiliJct,
                     spaceInfo.Data.Live_room.Roomid,
                     _liveFansMedalTaskOptions.DanmakuContent));
 
@@ -497,9 +497,9 @@ namespace Ray.BiliBiliTool.DomainService
                                 info.HeartBeatCount,
                                 timestamp,
                                 _securityOptions.UserAgent,
-                                _biliCookie.BiliJct,
+                                _biliCookieContainer.BiliJct,
                                 info.RoomInfo.Uid,
-                                $"[\"{_biliCookie.LiveBuvid}\",\"{uuid}\"]")
+                                $"[\"{_biliCookieContainer.LiveBuvid}\",\"{uuid}\"]")
                             );
                     }
                     else
@@ -510,15 +510,15 @@ namespace Ray.BiliBiliTool.DomainService
                                 info.RoomInfo.Parent_area_id,
                                 info.RoomInfo.Area_id,
                                 info.HeartBeatCount,
-                                _biliCookie.LiveBuvid,
+                                _biliCookieContainer.LiveBuvid,
                                 timestamp,
                                 info.HeartBeatInfo.Timestamp,
                                 _securityOptions.UserAgent,
                                 info.HeartBeatInfo.Secret_rule,
                                 info.HeartBeatInfo.Secret_key,
-                                _biliCookie.BiliJct,
+                                _biliCookieContainer.BiliJct,
                                 uuid,
-                                $"[\"{_biliCookie.LiveBuvid}\",\"{uuid}\"]")
+                                $"[\"{_biliCookieContainer.LiveBuvid}\",\"{uuid}\"]")
                             );
                     }
 
@@ -556,7 +556,7 @@ namespace Ray.BiliBiliTool.DomainService
 
             (await GetFansMedalInfoList()).ForEach(async info =>
             {
-                var result = await _liveApi.LikeLiveRoom(new LikeLiveRoomRequest(info.RoomId, _biliCookie.BiliJct));
+                var result = await _liveApi.LikeLiveRoom(new LikeLiveRoomRequest(info.RoomId, _biliCookieContainer.BiliJct));
                 if (result.Code == 0)
                 {
                     _logger.LogInformation("【点赞直播间】{roomId} 完成", info.RoomId);
@@ -572,7 +572,7 @@ namespace Ray.BiliBiliTool.DomainService
         private async Task<List<FansMedalInfoDto>> GetFansMedalInfoList()
         {
             _logger.LogInformation("【获取直播列表】获取拥有粉丝牌的直播列表");
-            var medalWallInfo = await _liveApi.GetMedalWall(_biliCookie.UserId);
+            var medalWallInfo = await _liveApi.GetMedalWall(_biliCookieContainer.UserId);
 
             if (medalWallInfo.Code != 0)
             {
@@ -640,7 +640,7 @@ namespace Ray.BiliBiliTool.DomainService
         private async Task<bool> CheckLiveCookie()
         {
             // 检测 _biliCookie 是否正确配置
-            if (!string.IsNullOrWhiteSpace(_biliCookie.LiveBuvid)) return true;
+            if (!string.IsNullOrWhiteSpace(_biliCookieContainer.LiveBuvid)) return true;
 
             try
             {
@@ -657,7 +657,7 @@ namespace Ray.BiliBiliTool.DomainService
                 //List<string> liveCookies = liveHome.Headers.SingleOrDefault(header => header.Key == "Set-Cookie").Value.ToList();
                 //_biliCookie.MergeCurrentCookie(liveCookies);
 
-                _logger.LogDebug("LiveBuvid {value}", _biliCookie.LiveBuvid);
+                _logger.LogDebug("LiveBuvid {value}", _biliCookieContainer.LiveBuvid);
                 _logger.LogInformation("直播 Cookie 配置成功！");
             }
             catch (Exception exception)

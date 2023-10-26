@@ -22,7 +22,7 @@ namespace Ray.BiliBiliTool.DomainService
     {
         private readonly ILogger<VideoDomainService> _logger;
         private readonly IDailyTaskApi _dailyTaskApi;
-        private readonly BiliCookie _biliBiliCookie;
+        private readonly BiliCookieContainer _biliBiliCookieContainer;
         private readonly DailyTaskOptions _dailyTaskOptions;
         private readonly Dictionary<string, int> _expDic;
         private readonly IRelationApi _relationApi;
@@ -33,7 +33,7 @@ namespace Ray.BiliBiliTool.DomainService
         public VideoDomainService(
             ILogger<VideoDomainService> logger,
             IDailyTaskApi dailyTaskApi,
-            BiliCookie biliBiliCookie,
+            BiliCookieContainer biliBiliCookieContainer,
             IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
             IOptionsMonitor<Dictionary<string, int>> dicOptions,
             IRelationApi relationApi,
@@ -48,7 +48,7 @@ namespace Ray.BiliBiliTool.DomainService
             _videoApi = videoApi;
             _videoWithoutCookieApi = videoWithoutCookieApi;
             _wbiDomainService = wbiDomainService;
-            _biliBiliCookie = biliBiliCookie;
+            _biliBiliCookieContainer = biliBiliCookieContainer;
             _expDic = dicOptions.Get(Constants.OptionsNames.ExpDictionaryName);
             _dailyTaskOptions = dailyTaskOptions.CurrentValue;
         }
@@ -200,8 +200,8 @@ namespace Ray.BiliBiliTool.DomainService
                 Aid = long.Parse(videoInfo.Aid),
                 Bvid = videoInfo.Bvid,
                 Cid = videoInfo.Cid,
-                Mid = long.Parse(_biliBiliCookie.UserId),
-                Csrf = _biliBiliCookie.BiliJct,
+                Mid = long.Parse(_biliBiliCookieContainer.UserId),
+                Csrf = _biliBiliCookieContainer.BiliJct,
 
                 Played_time = playedTime,
                 Realtime = playedTime,
@@ -226,7 +226,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// <param name="videoInfo">视频</param>
         public async Task ShareVideo(VideoInfoDto videoInfo)
         {
-            var request = new ShareVideoRequest(long.Parse(videoInfo.Aid), _biliBiliCookie.BiliJct);
+            var request = new ShareVideoRequest(long.Parse(videoInfo.Aid), _biliBiliCookieContainer.BiliJct);
             BiliApiResponse apiResponse = await _videoApi.ShareVideo(request);
 
             if (apiResponse.Code == 0)
@@ -253,8 +253,8 @@ namespace Ray.BiliBiliTool.DomainService
                 Bvid = videoInfo.Bvid,
                 Cid = videoInfo.Cid,
 
-                Mid = long.Parse(_biliBiliCookie.UserId),
-                Csrf = _biliBiliCookie.BiliJct,
+                Mid = long.Parse(_biliBiliCookieContainer.UserId),
+                Csrf = _biliBiliCookieContainer.BiliJct,
             };
 
             //开始上报一次
@@ -307,7 +307,7 @@ namespace Ray.BiliBiliTool.DomainService
             }
 
             //关注列表
-            var request = new GetFollowingsRequest(long.Parse(_biliBiliCookie.UserId));
+            var request = new GetFollowingsRequest(long.Parse(_biliBiliCookieContainer.UserId));
             BiliApiResponse<GetFollowingsResponse> result = await _relationApi.GetFollowings(request);
             if (result.Data.Total > 0)
             {

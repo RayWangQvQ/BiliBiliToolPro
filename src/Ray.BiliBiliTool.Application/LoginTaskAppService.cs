@@ -55,21 +55,21 @@ namespace Ray.BiliBiliTool.Application
         }
 
         [TaskInterceptor("获取二维码", TaskLevel.Two)]
-        protected async Task<BiliCookie> QrCodeLoginAsync(CancellationToken cancellationToken)
+        protected async Task<BiliCookieContainer> QrCodeLoginAsync(CancellationToken cancellationToken)
         {
             var biliCookie = await _loginDomainService.LoginByQrCodeAsync(cancellationToken);
             return biliCookie;
         }
 
         [TaskInterceptor("Set Cookie", TaskLevel.Two)]
-        protected async Task<BiliCookie> SetCookiesAsync(BiliCookie biliCookie, CancellationToken cancellationToken)
+        protected async Task<BiliCookieContainer> SetCookiesAsync(BiliCookieContainer biliCookieContainer, CancellationToken cancellationToken)
         {
-            var ck= await _loginDomainService.SetCookieAsync(biliCookie, cancellationToken);
+            var ck= await _loginDomainService.SetCookieAsync(biliCookieContainer, cancellationToken);
             return ck;
         }
 
         [TaskInterceptor("持久化Cookie", TaskLevel.Two)]
-        protected async Task SaveCookieAsync(BiliCookie ckInfo, CancellationToken cancellationToken)
+        protected async Task SaveCookieAsync(BiliCookieContainer ckInfo, CancellationToken cancellationToken)
         {
             var platformType = _configuration.GetSection("PlateformType").Get<PlatformType>();
             _logger.LogInformation("当前运行平台：{platform}",platformType);

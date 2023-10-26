@@ -14,27 +14,27 @@ namespace Ray.BiliBiliTool.DomainService.Interfaces
         /// 扫描二维码登录
         /// </summary>
         /// <returns></returns>
-        Task<BiliCookie> LoginByQrCodeAsync(CancellationToken cancellationToken);
+        Task<BiliCookieContainer> LoginByQrCodeAsync(CancellationToken cancellationToken);
 
         /// <summary>
         /// Set Cookie
         /// </summary>
-        /// <param name="cookie"></param>
+        /// <param name="cookieContainer"></param>
         /// <returns></returns>
-        Task<BiliCookie> SetCookieAsync(BiliCookie cookie, CancellationToken cancellationToken);
+        Task<BiliCookieContainer> SetCookieAsync(BiliCookieContainer cookieContainer, CancellationToken cancellationToken);
 
         /// <summary>
         /// 持久化Cookie到配置文件
         /// </summary>
         /// <returns></returns>
-        Task SaveCookieToJsonFileAsync(BiliCookie ckInfo, CancellationToken cancellationToken);
+        Task SaveCookieToJsonFileAsync(BiliCookieContainer ckInfo, CancellationToken cancellationToken);
 
         /// <summary>
         /// 持久化Cookie到青龙环境变量
         /// </summary>
         /// <returns></returns>
-        Task SaveCookieToQinLongAsync(BiliCookie ckInfo, CancellationToken cancellationToken);
+        Task SaveCookieToQinLongAsync(BiliCookieContainer ckInfo, CancellationToken cancellationToken);
 
-        Task SaveCookieToDbAsync(BiliCookie ckInfo, CancellationToken cancellationToken);
+        Task SaveCookieToDbAsync(BiliCookieContainer ckInfo, CancellationToken cancellationToken);
     }
 }

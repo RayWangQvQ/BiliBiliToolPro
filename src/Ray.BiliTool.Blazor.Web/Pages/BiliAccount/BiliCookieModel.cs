@@ -13,6 +13,6 @@ namespace Ray.BiliTool.Blazor.Web.Pages.BiliAccount
             UpdateTime=config.UpdateTime;
         }
 
-        public BiliCookie BiliCookie => new BiliCookie(this.ConfigValue);
+        public BiliCookieContainer BiliCookieContainer => new BiliCookieContainer(this.ConfigValue);
     }
 }

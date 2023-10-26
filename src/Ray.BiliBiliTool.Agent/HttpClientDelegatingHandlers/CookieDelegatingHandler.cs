@@ -12,18 +12,18 @@ namespace Ray.BiliBiliTool.Agent.HttpClientDelegatingHandlers
     public class CookieDelegatingHandler : HttpClientHandler
     {
         private readonly ILogger<CookieDelegatingHandler> _logger;
-        private readonly BiliCookie _biliCookie;
+        private readonly BiliCookieContainer _biliCookieContainer;
 
-        public CookieDelegatingHandler(ILogger<CookieDelegatingHandler> logger, BiliCookie biliCookie)
+        public CookieDelegatingHandler(ILogger<CookieDelegatingHandler> logger, BiliCookieContainer biliCookieContainer)
         {
             _logger = logger;
-            _biliCookie = biliCookie;
+            _biliCookieContainer = biliCookieContainer;
         }
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             // 发送请求之前处理 Cookie
-            var cookies = _biliCookie.GetCookieStr();
+            var cookies = _biliCookieContainer.GetCookieStr();
             // 将 Cookie 设置为请求头
             request.Headers.Add("Cookie", cookies.ToString());
 

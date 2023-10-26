@@ -54,9 +54,9 @@ namespace Ray.BiliBiliTool.DomainService
             _dbConfigRepo = dbConfigRepo;
         }
 
-        public async Task<BiliCookie> LoginByQrCodeAsync(CancellationToken cancellationToken)
+        public async Task<BiliCookieContainer> LoginByQrCodeAsync(CancellationToken cancellationToken)
         {
-            BiliCookie cookieInfo = null;
+            BiliCookieContainer cookieContainerInfo = null;
 
             BiliApiResponse<QrCodeDto> re = await _passportApi.GenerateQrCode();
             if (re.Code != 0)
@@ -107,8 +107,8 @@ namespace Ray.BiliBiliTool.DomainService
                     IEnumerable<string> cookies = check.Headers.SingleOrDefault(header => header.Key == "Set-Cookie").Value;
 
                     var cookieStr = CookieInfo.ConvertSetCkHeadersToCkStr(cookies);
-                    cookieInfo = new BiliCookie(cookieStr);
-                    cookieInfo.Check();
+                    cookieContainerInfo = new BiliCookieContainer(cookieStr);
+                    cookieContainerInfo.Check();
 
                     break;
                 }
@@ -116,21 +116,21 @@ namespace Ray.BiliBiliTool.DomainService
                 _logger.LogInformation("{msg}", content.Data.Message + Environment.NewLine);
             }
 
-            return cookieInfo;
+            return cookieContainerInfo;
         }
 
-        public async Task<BiliCookie> SetCookieAsync(BiliCookie biliCookie, CancellationToken cancellationToken)
+        public async Task<BiliCookieContainer> SetCookieAsync(BiliCookieContainer biliCookieContainer, CancellationToken cancellationToken)
         {
             try
             {
-                var homePage = await _homeApi.GetHomePageAsync(biliCookie.ToString());
+                var homePage = await _homeApi.GetHomePageAsync(biliCookieContainer.ToString());
                 if (homePage.IsSuccessStatusCode)
                 {
                     _logger.LogInformation("访问主站成功");
                     //IEnumerable<string> setCookieHeaders = homePage.Headers.SingleOrDefault(header => header.Key == "Set-Cookie").Value;
                     //biliCookie.MergeCurrentCookieBySetCookieHeaders(setCookieHeaders);
                     _logger.LogInformation("SetCookie成功");
-                    return biliCookie;
+                    return biliCookieContainer;
                 }
                 _logger.LogError("访问主站失败：{msg}", homePage.ToJsonStr());
             }
@@ -140,10 +140,10 @@ namespace Ray.BiliBiliTool.DomainService
                 _logger.LogError(e.ToJsonStr());
             }
 
-            return biliCookie;
+            return biliCookieContainer;
         }
 
-        public async Task SaveCookieToJsonFileAsync(BiliCookie ckInfo, CancellationToken cancellationToken)
+        public async Task SaveCookieToJsonFileAsync(BiliCookieContainer ckInfo, CancellationToken cancellationToken)
         {
             //读取json
             var path = _hostingEnvironment.ContentRootPath;
@@ -208,7 +208,7 @@ namespace Ray.BiliBiliTool.DomainService
             _logger.LogInformation("更新成功！");
         }
 
-        public async Task SaveCookieToQinLongAsync(BiliCookie ckInfo, CancellationToken cancellationToken)
+        public async Task SaveCookieToQinLongAsync(BiliCookieContainer ckInfo, CancellationToken cancellationToken)
         {
             //拿token
             var token = await GetQingLongAuthTokenAsync();
@@ -276,7 +276,7 @@ namespace Ray.BiliBiliTool.DomainService
             _logger.LogInformation(addRe.Code == 200 ? "新增成功！" : addRe.ToJsonStr());
         }
 
-        public async Task SaveCookieToDbAsync(BiliCookie ckInfo, CancellationToken cancellationToken)
+        public async Task SaveCookieToDbAsync(BiliCookieContainer ckInfo, CancellationToken cancellationToken)
         {
             List<DbConfig> ckList = await _dbConfigRepo.GetListAsync(x => x.ConfigKey.StartsWith("BiliBiliCookies"));
 

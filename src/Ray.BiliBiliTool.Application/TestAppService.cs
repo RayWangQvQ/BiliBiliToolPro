@@ -13,22 +13,24 @@ using Ray.BiliBiliTool.DomainService.Interfaces;
 
 namespace Ray.BiliBiliTool.Application
 {
-    public class TestAppService : EveryAccountAppService, ITestAppService
+    public class TestAppService : MultiAccountsAppService, ITestAppService
     {
         private readonly ILogger<LiveLotteryTaskAppService> _logger;
+        private readonly BiliCookieContainer _biliCookieContainer;
         private readonly IAccountDomainService _accountDomainService;
 
         public TestAppService(
-            IServiceProvider serviceProvider,
             ILogger<LiveLotteryTaskAppService> logger,
+            BiliCookieContainer biliCookieContainer,
             IAccountDomainService accountDomainService
-            ):base(serviceProvider, logger, accountDomainService)
+            ):base(logger, biliCookieContainer, accountDomainService)
         {
             _logger = logger;
+            _biliCookieContainer = biliCookieContainer;
             _accountDomainService = accountDomainService;
         }
 
-        protected override async Task DoEachAccountAsync(BiliCookie biliCookie, CancellationToken cancellationToken)
+        protected override async Task DoEachAccountAsync(CancellationToken cancellationToken)
         {
             await _accountDomainService.LoginByCookie();
         }

@@ -19,7 +19,7 @@ namespace Ray.BiliBiliTool.DomainService
     public class DonateCoinDomainService : IDonateCoinDomainService
     {
         private readonly ILogger<DonateCoinDomainService> _logger;
-        private readonly BiliCookie _biliBiliCookie;
+        private readonly BiliCookieContainer _biliBiliCookieContainer;
         private readonly DailyTaskOptions _dailyTaskOptions;
         private readonly IAccountApi _accountApi;
         private readonly ICoinDomainService _coinDomainService;
@@ -41,7 +41,7 @@ namespace Ray.BiliBiliTool.DomainService
 
         public DonateCoinDomainService(
             ILogger<DonateCoinDomainService> logger,
-            BiliCookie cookie,
+            BiliCookieContainer cookieContainer,
             IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
             IAccountApi accountApi,
             ICoinDomainService coinDomainService,
@@ -53,7 +53,7 @@ namespace Ray.BiliBiliTool.DomainService
             )
         {
             _logger = logger;
-            _biliBiliCookie = cookie;
+            _biliBiliCookieContainer = cookieContainer;
             _dailyTaskOptions = dailyTaskOptions.CurrentValue;
             _accountApi = accountApi;
             _coinDomainService = coinDomainService;
@@ -169,7 +169,7 @@ namespace Ray.BiliBiliTool.DomainService
             BiliApiResponse result;
             try
             {
-                var request = new AddCoinRequest(video.Aid, _biliBiliCookie.BiliJct)
+                var request = new AddCoinRequest(video.Aid, _biliBiliCookieContainer.BiliJct)
                 {
                     Select_like = select_like ? 1 : 0
                 };
@@ -262,7 +262,7 @@ namespace Ray.BiliBiliTool.DomainService
         private async Task<UpVideoInfo> TryGetCanDonateVideoBySpecialUps(int tryCount)
         {
             //获取特别关注列表
-            var request = new GetSpecialFollowingsRequest(long.Parse(_biliBiliCookie.UserId));
+            var request = new GetSpecialFollowingsRequest(long.Parse(_biliBiliCookieContainer.UserId));
             BiliApiResponse<List<UpInfo>> specials = await _relationApi.GetFollowingsByTag(request);
             if (specials.Data == null || specials.Data.Count == 0) return null;
 
@@ -277,7 +277,7 @@ namespace Ray.BiliBiliTool.DomainService
         private async Task<UpVideoInfo> TryGetCanDonateVideoByFollowingUps(int tryCount)
         {
             //获取特别关注列表
-            var request = new GetFollowingsRequest(long.Parse(_biliBiliCookie.UserId));
+            var request = new GetFollowingsRequest(long.Parse(_biliBiliCookieContainer.UserId));
             BiliApiResponse<GetFollowingsResponse> result = await _relationApi.GetFollowings(request);
             if (result.Data.Total == 0) return null;
 
@@ -333,7 +333,7 @@ namespace Ray.BiliBiliTool.DomainService
 
                     if (randomUpId == 0 || randomUpId == long.MinValue) continue;
 
-                    if (randomUpId.ToString() == _biliBiliCookie.UserId)
+                    if (randomUpId.ToString() == _biliBiliCookieContainer.UserId)
                     {
                         _logger.LogDebug("不能为自己投币");
                         continue;

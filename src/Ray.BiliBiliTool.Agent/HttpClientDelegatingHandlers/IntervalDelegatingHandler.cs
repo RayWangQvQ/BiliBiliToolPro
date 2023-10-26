@@ -21,7 +21,7 @@ namespace Ray.BiliBiliTool.Agent.HttpClientDelegatingHandlers
             {"/xlive/data-interface/v1/x25Kn/X", 1},
         };
 
-        public IntervalDelegatingHandler(IOptionsMonitor<SecurityOptions> securityOptions, BiliCookie biliCookie)
+        public IntervalDelegatingHandler(IOptionsMonitor<SecurityOptions> securityOptions, BiliCookieContainer biliCookieContainer)
         {
             _securityOptions = securityOptions.CurrentValue;
         }

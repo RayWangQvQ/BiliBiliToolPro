@@ -49,7 +49,7 @@ namespace BiliAgentTest
 
             var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory>();
             var api = scope.ServiceProvider.GetRequiredService<ILiveApi>();
-            var biliCookie = scope.ServiceProvider.GetRequiredService<BiliCookie>();
+            var biliCookie = scope.ServiceProvider.GetRequiredService<BiliCookieContainer>();
 
             Silver2CoinRequest request = new(biliCookie.BiliJct);
 
@@ -113,7 +113,7 @@ namespace BiliAgentTest
 
             var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory>();
             var api = scope.ServiceProvider.GetRequiredService<ILiveApi>();
-            var biliCookie = scope.ServiceProvider.GetRequiredService<BiliCookie>();
+            var biliCookie = scope.ServiceProvider.GetRequiredService<BiliCookieContainer>();
 
             // 猫雷粉丝牌
             var request = new WearMedalWallRequest(biliCookie.BiliJct, 365421);
@@ -130,7 +130,7 @@ namespace BiliAgentTest
 
             var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory>();
             var api = scope.ServiceProvider.GetRequiredService<IUserInfoApi>();
-            var biliCookie = scope.ServiceProvider.GetRequiredService<BiliCookie>();
+            var biliCookie = scope.ServiceProvider.GetRequiredService<BiliCookieContainer>();
 
             var domainService = scope.ServiceProvider.GetRequiredService<IWbiDomainService>();
 
@@ -168,7 +168,7 @@ namespace BiliAgentTest
 
             var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory>();
             var api = scope.ServiceProvider.GetRequiredService<ILiveApi>();
-            var biliCookie = scope.ServiceProvider.GetRequiredService<BiliCookie>();
+            var biliCookie = scope.ServiceProvider.GetRequiredService<BiliCookieContainer>();
 
             var request = new SendLiveDanmukuRequest(biliCookie.BiliJct, 63666, "63666");
 

@@ -11,20 +11,22 @@ using Ray.BiliBiliTool.Infrastructure.Cookie;
 
 namespace Ray.BiliBiliTool.Agent
 {
-    public class BiliCookie : CookieContainer
+    public class BiliCookieContainer : CookieContainer
     {
-        private readonly ILogger<BiliCookie> _logger;
+        private readonly ILogger<BiliCookieContainer> _logger;
 
-        public BiliCookie()
+        public BiliCookieContainer()
         {
         }
-        public BiliCookie(string cookieHeader)
+        public BiliCookieContainer(string cookieHeader)
         {
             this.Init(cookieHeader);
         }
 
         public void Init(string ckStr)
         {
+            ExpireAll();
+
             var dic= CkStrToDictionary(ckStr);
             foreach (var item in dic)
             {
@@ -105,6 +107,16 @@ namespace Ray.BiliBiliTool.Agent
         {
             var cookieStr = this.GetCookieHeader(new Uri("https://bilibili.com"));
             return cookieStr;
+        }
+
+        public void ExpireAll()
+        {
+            foreach (Cookie cookie in this.GetCookies(new Uri("https://bilibili.com")))
+            {
+                cookie.Expired = true; // 设置Cookie过期
+                cookie.Discard = true; // 标记Cookie为丢弃
+                //cookieContainer.Remove(cookie); // 如果希望从CookieContainer中移除Cookie，可以使用此行代码
+            }
         }
 
         #region  private

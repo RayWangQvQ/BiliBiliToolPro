@@ -63,7 +63,7 @@ namespace ConfigTest
             string logLevel = Global.ConfigurationRoot["Serilog:WriteTo:0:Args:restrictedToMinimumLevel"];
             Debug.WriteLine(logLevel);
 
-            var cookie = Global.ServiceProviderRoot.GetRequiredService<BiliCookie>();
+            var cookie = Global.ServiceProviderRoot.GetRequiredService<BiliCookieContainer>();
 
             Debug.WriteLine(JsonSerializer.Serialize(cookie, new JsonSerializerOptions { WriteIndented = true }));
             Assert.True(!string.IsNullOrWhiteSpace(cookie.UserId));

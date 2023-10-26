@@ -38,7 +38,7 @@
 
     private string _qrCode;
     private string _qrCodeKey;
-    private BiliCookie biliCk;
+    private BiliCookieContainer biliCk;
 
     private async Task OnButtonClick()
     {
@@ -131,7 +131,7 @@
                 IEnumerable<string> cookies = check.Headers.SingleOrDefault(header => header.Key == "Set-Cookie").Value;
 
                 string cookieStr = CookieInfo.ConvertSetCkHeadersToCkStr(cookies);
-                biliCk = new BiliCookie(cookieStr);
+                biliCk = new BiliCookieContainer(cookieStr);
                 biliCk.Check();
 
                 await LoginDomainService.SaveCookieToDbAsync(biliCk, default);

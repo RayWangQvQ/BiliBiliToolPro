@@ -7,13 +7,13 @@ namespace Ray.BiliTool.Blazor.Web.Hangfire
     public class TestService
     {
         private readonly ILogger<TestService> _logger;
-        private readonly BiliCookie _biliCookie;
+        private readonly BiliCookieContainer _biliCookieContainer;
         private readonly IUserInfoApi _userInfoApi;
 
-        public TestService(ILogger<TestService> logger, BiliCookie biliCookie, IUserInfoApi userInfoApi)
+        public TestService(ILogger<TestService> logger, BiliCookieContainer biliCookieContainer, IUserInfoApi userInfoApi)
         {
             _logger = logger;
-            _biliCookie = biliCookie;
+            _biliCookieContainer = biliCookieContainer;
             _userInfoApi = userInfoApi;
         }
 

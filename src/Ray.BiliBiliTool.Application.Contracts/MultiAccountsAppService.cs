@@ -11,20 +11,20 @@ using Ray.BiliBiliTool.Agent;
 
 namespace Ray.BiliBiliTool.Application.Contracts
 {
-    public abstract class EveryAccountAppService: AppService,IAppService
+    public abstract class MultiAccountsAppService: AppService,IAppService
     {
-        private readonly IServiceProvider _serviceProvider;
         private readonly ILogger _logger;
+        private readonly BiliCookieContainer _biliCookieContainer;
         private readonly IAccountDomainService _accountDomainService;
 
-        protected EveryAccountAppService(
-            IServiceProvider serviceProvider,
+        protected MultiAccountsAppService(
             ILogger logger,
+            BiliCookieContainer biliCookieContainer,
             IAccountDomainService accountDomainService
             )
         {
-            _serviceProvider = serviceProvider;
             _logger = logger;
+            _biliCookieContainer = biliCookieContainer;
             _accountDomainService = accountDomainService;
         }
 
@@ -37,10 +37,8 @@ namespace Ray.BiliBiliTool.Application.Contracts
 
                 try
                 {
-                    using var scope = _serviceProvider.CreateScope();
-                    BiliCookie biliCookie = scope.ServiceProvider.GetRequiredService<BiliCookie>();
-                    biliCookie.Init(ckStrList[i]);
-                    await DoEachAccountAsync(biliCookie, cancellationToken);
+                    _biliCookieContainer.Init(ckStrList[i]);
+                    await DoEachAccountAsync(cancellationToken);
                 }
                 catch (Exception e)
                 {
@@ -51,6 +49,6 @@ namespace Ray.BiliBiliTool.Application.Contracts
             _logger.LogInformation("·开始推送·{task}·{user}", $"{this.Description()}任务", "");
         }
 
-        protected abstract Task DoEachAccountAsync(BiliCookie biliCookie, CancellationToken cancellationToken);
+        protected abstract Task DoEachAccountAsync(CancellationToken cancellationToken);
     }
 }

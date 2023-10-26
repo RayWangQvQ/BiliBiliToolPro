@@ -18,21 +18,21 @@ namespace Ray.BiliBiliTool.DomainService
         private readonly ILogger<ChargeDomainService> _logger;
         private readonly DailyTaskOptions _dailyTaskOptions;
         private readonly IDailyTaskApi _dailyTaskApi;
-        private readonly BiliCookie _cookie;
+        private readonly BiliCookieContainer _cookieContainer;
         private readonly IChargeApi _chargeApi;
 
         public ChargeDomainService(
             ILogger<ChargeDomainService> logger,
             IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
             IDailyTaskApi dailyTaskApi,
-            BiliCookie cookie,
+            BiliCookieContainer cookieContainer,
             IChargeApi chargeApi
             )
         {
             _logger = logger;
             _dailyTaskOptions = dailyTaskOptions.CurrentValue;
             _dailyTaskApi = dailyTaskApi;
-            _cookie = cookie;
+            _cookieContainer = cookieContainer;
             _chargeApi = chargeApi;
         }
 
@@ -81,11 +81,11 @@ namespace Ray.BiliBiliTool.DomainService
             string targetUpId = _dailyTaskOptions.AutoChargeUpId;
             //如果没有配置或配了-1，则为自己充电
             if (string.IsNullOrWhiteSpace(_dailyTaskOptions.AutoChargeUpId) || _dailyTaskOptions.AutoChargeUpId == "-1")
-                targetUpId = _cookie.UserId;
+                targetUpId = _cookieContainer.UserId;
 
             _logger.LogDebug("【目标Up】{up}", targetUpId);
 
-            var request = new ChargeRequest(couponBalance, long.Parse(targetUpId), _cookie.BiliJct);
+            var request = new ChargeRequest(couponBalance, long.Parse(targetUpId), _cookieContainer.BiliJct);
 
             //BiliApiResponse<ChargeResponse> response = await _chargeApi.Charge(decimal.ToInt32(couponBalance * 10), _dailyTaskOptions.AutoChargeUpId, _cookieOptions.UserId, _cookieOptions.BiliJct);
             BiliApiResponse<ChargeV2Response> response = await _chargeApi.ChargeV2(request);
@@ -122,7 +122,7 @@ namespace Ray.BiliBiliTool.DomainService
         public async Task ChargeComments(string orderNum)
         {
             var comment = _dailyTaskOptions.ChargeComment ?? "";
-            var request = new ChargeCommentRequest(orderNum, comment, _cookie.BiliJct);
+            var request = new ChargeCommentRequest(orderNum, comment, _cookieContainer.BiliJct);
             await _chargeApi.ChargeComment(request);
 
             _logger.LogInformation("【留言】{comment}", comment);

@@ -26,13 +26,13 @@ namespace Ray.BiliBiliTool.DomainService
         private readonly IUserInfoApi _userInfoApi;
         private readonly IRelationApi _relationApi;
         private readonly UnfollowBatchedTaskOptions _unfollowBatchedTaskOptions;
-        private readonly BiliCookie _cookie;
+        private readonly BiliCookieContainer _cookieContainer;
 
         public AccountDomainService(
             ILogger<AccountDomainService> logger,
             IConfiguration configuration,
             IDailyTaskApi dailyTaskApi,
-            BiliCookie cookie,
+            BiliCookieContainer cookieContainer,
             IUserInfoApi userInfoApi,
             IRelationApi relationApi,
             IOptionsMonitor<UnfollowBatchedTaskOptions> unfollowBatchedTaskOptions
@@ -41,7 +41,7 @@ namespace Ray.BiliBiliTool.DomainService
             _logger = logger;
             _configuration = configuration;
             _dailyTaskApi = dailyTaskApi;
-            _cookie = cookie;
+            _cookieContainer = cookieContainer;
             _userInfoApi = userInfoApi;
             _relationApi = relationApi;
             _unfollowBatchedTaskOptions = unfollowBatchedTaskOptions.CurrentValue;
@@ -150,7 +150,7 @@ namespace Ray.BiliBiliTool.DomainService
             int totalPage = (int)Math.Ceiling(total / (double)20);
 
             //从最后一页开始获取
-            var req = new GetSpecialFollowingsRequest(long.Parse(_cookie.UserId), tagId.Value)
+            var req = new GetSpecialFollowingsRequest(long.Parse(_cookieContainer.UserId), tagId.Value)
             {
                 Pn = totalPage
             };
@@ -194,8 +194,8 @@ namespace Ray.BiliBiliTool.DomainService
                     continue;
                 }
 
-                string modifyReferer = string.Format(RelationApiConstant.ModifyReferer, _cookie.UserId, tagId);
-                var modifyReq = new ModifyRelationRequest(info.Mid, _cookie.BiliJct);
+                string modifyReferer = string.Format(RelationApiConstant.ModifyReferer, _cookieContainer.UserId, tagId);
+                var modifyReq = new ModifyRelationRequest(info.Mid, _cookieContainer.BiliJct);
                 var re = await _relationApi.ModifyRelation(modifyReq, modifyReferer);
 
                 if (re.Code == 0)
@@ -224,7 +224,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// <returns></returns>
         private async Task<TagDto> GetTag(string groupName)
         {
-            string getTagsReferer = string.Format(RelationApiConstant.GetTagsReferer, _cookie.UserId);
+            string getTagsReferer = string.Format(RelationApiConstant.GetTagsReferer, _cookieContainer.UserId);
             List<TagDto> tagList = (await _relationApi.GetTags(getTagsReferer)).Data;
             TagDto tag = tagList.FirstOrDefault(x => x.Name == groupName);
             return tag;
