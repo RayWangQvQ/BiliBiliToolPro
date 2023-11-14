@@ -14,4 +14,10 @@
     <ProjectReference Include="..\Ray.BiliBiliTool.Config\Ray.BiliBiliTool.Config.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="BiliAccount\Repository\" />
+    <Folder Include="BiliAccount\Repository\PO\" />
+    <Folder Include="BiliAccount\Event\" />
+  </ItemGroup>
+
 </Project>

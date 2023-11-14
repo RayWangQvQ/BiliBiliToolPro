@@ -19,7 +19,6 @@ namespace Ray.BiliBiliTool.Application
 {
     public class DailyTaskAppService : MultiAccountsAppService, IDailyTaskAppService
     {
-        private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<DailyTaskAppService> _logger;
         private readonly BiliCookieContainer _biliCookieContainer;
         private readonly IAccountDomainService _accountDomainService;
@@ -36,7 +35,6 @@ namespace Ray.BiliBiliTool.Application
         private readonly IConfiguration _configuration;
 
         public DailyTaskAppService(
-            IServiceProvider serviceProvider,
             ILogger<DailyTaskAppService> logger,
             BiliCookieContainer biliCookieContainer,
             IOptionsMonitor<Dictionary<string, int>> dicOptions,
@@ -53,7 +51,6 @@ namespace Ray.BiliBiliTool.Application
             IConfiguration configuration
             ) : base(logger, biliCookieContainer, accountDomainService)
         {
-            _serviceProvider = serviceProvider;
             _logger = logger;
             _biliCookieContainer = biliCookieContainer;
             _expDic = dicOptions.Get(Constants.OptionsNames.ExpDictionaryName);
