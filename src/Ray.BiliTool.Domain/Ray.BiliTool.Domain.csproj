@@ -11,13 +11,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Ray.Repository\Ray.Repository\src\Ray.Repository\Ray.Repository.csproj" />
     <ProjectReference Include="..\Ray.BiliBiliTool.Config\Ray.BiliBiliTool.Config.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="BiliAccount\Repository\" />
-    <Folder Include="BiliAccount\Repository\PO\" />
-    <Folder Include="BiliAccount\Event\" />
+    <Folder Include="BiliAccountAggregate\Event\" />
   </ItemGroup>
 
 </Project>

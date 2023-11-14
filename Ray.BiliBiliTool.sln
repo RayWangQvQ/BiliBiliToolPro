@@ -143,6 +143,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ray.BiliBiliTool.DomainServ
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ray.Infrastructure", "..\Ray.Infrastructure\src\Ray.Infrastructure\Ray.Infrastructure.csproj", "{0FB28060-5A5E-4F11-8EA1-1BF0173C202C}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ray.Repository.EntityFramework", "..\Ray.Repository\Ray.Repository\src\Ray.Repository.EntityFramework\Ray.Repository.EntityFramework.csproj", "{5F0BA67F-21F5-445A-8F5B-5D40D3D78605}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ray.Repository", "..\Ray.Repository\Ray.Repository\src\Ray.Repository\Ray.Repository.csproj", "{3B2D4476-921B-46F1-AA8A-7E0871949E8E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -213,6 +217,14 @@ Global
 		{0FB28060-5A5E-4F11-8EA1-1BF0173C202C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0FB28060-5A5E-4F11-8EA1-1BF0173C202C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0FB28060-5A5E-4F11-8EA1-1BF0173C202C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F0BA67F-21F5-445A-8F5B-5D40D3D78605}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F0BA67F-21F5-445A-8F5B-5D40D3D78605}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F0BA67F-21F5-445A-8F5B-5D40D3D78605}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F0BA67F-21F5-445A-8F5B-5D40D3D78605}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B2D4476-921B-46F1-AA8A-7E0871949E8E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B2D4476-921B-46F1-AA8A-7E0871949E8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B2D4476-921B-46F1-AA8A-7E0871949E8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B2D4476-921B-46F1-AA8A-7E0871949E8E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
