@@ -11,7 +11,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Ray.Infrastructure\src\Ray.Infrastructure\Ray.Infrastructure.csproj" />
     <ProjectReference Include="..\..\..\Ray.Repository\Ray.Repository\src\Ray.Repository\Ray.Repository.csproj" />
+    <ProjectReference Include="..\Ray.BiliBiliTool.Agent\Ray.BiliBiliTool.Agent.csproj" />
     <ProjectReference Include="..\Ray.BiliBiliTool.Config\Ray.BiliBiliTool.Config.csproj" />
   </ItemGroup>
 
