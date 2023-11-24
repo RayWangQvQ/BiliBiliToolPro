@@ -53,12 +53,20 @@ public class ArticleDomainService : IArticleDomainService
         _dailyTaskOptions = dailyTaskOptions.CurrentValue;
     }
 
+
+
+    public async Task LikeArticle(long cvid)
+    {
+        await _articleApi.Like(cvid, _biliCookie.BiliJct);
+    }
+
     /// <summary>
     /// 投币专栏任务
     /// </summary>
     /// <returns></returns>
     public async Task<bool> AddCoinForArticles()
     {
+        
         var donateCoinsCounts = await CalculateDonateCoinsCounts();
 
         if (donateCoinsCounts == 0)
@@ -84,7 +92,17 @@ public class ArticleDomainService : IArticleDomainService
             }
 
             if (await AddCoinForArticle(cvid, upId))
+            {
+                // 点赞
+                if (_dailyTaskOptions.SelectLike)
+                {
+                    await LikeArticle(cvid);
+                    _logger.LogInformation("文章点赞成功");
+                }
                 success++;
+            }
+
+                
         }
 
         if (success == donateCoinsCounts)
@@ -101,7 +119,7 @@ public class ArticleDomainService : IArticleDomainService
         return true;
     }
 
-
+    
     /// <summary>
     /// 给某一篇专栏投币
     /// </summary>

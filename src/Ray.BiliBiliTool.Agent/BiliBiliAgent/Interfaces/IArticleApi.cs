@@ -32,6 +32,13 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         [HttpGet("/x/article/viewinfo?id={cvid}")]
         Task<BiliApiResponse<SearchArticleInfoResponse>> SearchArticleInfo(long cvid);
 
+
+        [Header("Content-Type", "application/x-www-form-urlencoded")]
+        [Header("Referer", "https://www.bilibili.com/read/cv{cvid}/?from=search&spm_id_from=333.337.0.0")]
+        [Header("Origin", "https://www.bilibili.com")]
+        [HttpPost("/x/article/like?id={cvid}&type=1&csrf={csrf}")]
+        Task<BiliApiResponse> Like(long cvid, string csrf);
+
     }
 
     

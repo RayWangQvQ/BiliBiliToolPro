@@ -7,4 +7,6 @@ public interface IArticleDomainService : IDomainService
     Task<bool> AddCoinForArticle(long cvid, long mid);
 
     Task<bool> AddCoinForArticles();
+
+    Task LikeArticle(long cvid);
 }

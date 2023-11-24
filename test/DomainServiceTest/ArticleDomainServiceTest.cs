@@ -12,6 +12,16 @@ public class ArticleDomainServiceTest
     }
 
     [Fact]
+    public async Task LikeArticleTest()
+    {
+        using var scope = Global.ServiceProviderRoot.CreateScope();
+        var config = Global.ConfigurationRoot;
+        var domainService = scope.ServiceProvider.GetRequiredService<IArticleDomainService>();
+        await domainService.LikeArticle(5806746);
+    }
+
+
+    [Fact]
     public async Task AddCoinForArticleTest()
     {
         using var scope = Global.ServiceProviderRoot.CreateScope();
@@ -32,4 +42,6 @@ public class ArticleDomainServiceTest
         var domainService = scope.ServiceProvider.GetRequiredService<IArticleDomainService>();
         await domainService.AddCoinForArticles();
     }
+
+
 }
