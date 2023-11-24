@@ -327,7 +327,7 @@ public class ArticleDomainService : IArticleDomainService
             }
         }
 
-        return 0;
+        return needCoins;
     }
 
     private async Task<int> GetNeedDonateCoinCounts()
