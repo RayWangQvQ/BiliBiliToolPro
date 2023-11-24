@@ -179,6 +179,7 @@ namespace Ray.BiliBiliTool.Application
 
                 if (!await _articleDomainService.AddCoinForArticles())
                 {
+                    _logger.LogInformation("专栏投币结束，转入视频投币");
                     await _donateCoinDomainService.AddCoinsForVideos();
                 }
             }

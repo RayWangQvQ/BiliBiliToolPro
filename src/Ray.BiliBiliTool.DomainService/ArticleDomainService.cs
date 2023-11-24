@@ -236,7 +236,7 @@ public class ArticleDomainService : IArticleDomainService
                 _logger.LogDebug("不能为自己投币");
                 return 0;
             }
-
+            _logger.LogDebug("挑选出的up主为{UpId}",randomUpId);
             return randomUpId;
         }
         catch (Exception e)
