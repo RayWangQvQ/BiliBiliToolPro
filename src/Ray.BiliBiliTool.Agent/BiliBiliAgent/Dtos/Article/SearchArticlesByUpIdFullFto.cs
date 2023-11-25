@@ -11,7 +11,7 @@ public class SearchArticlesByUpIdDto
     public string Sort { get; set; } = "publish_time";
 }
 
-public class SearchArticlesByUpIdFullFto : SearchArticlesByUpIdDto
+public class SearchArticlesByUpIdFullDto : SearchArticlesByUpIdDto
 {
     public string w_rid { get; set; }
 

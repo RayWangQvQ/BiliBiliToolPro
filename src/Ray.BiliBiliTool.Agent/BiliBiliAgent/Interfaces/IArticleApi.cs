@@ -22,7 +22,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         [Header("Origin", "https://space.bilibili.com")]
         [HttpGet("/x/space/wbi/article")]
         Task<BiliApiResponse<SearchUpArticlesResponse>> SearchUpArticlesByUpId(
-            [PathQuery] SearchArticlesByUpIdFullFto request);
+            [PathQuery] SearchArticlesByUpIdFullDto request);
 
         /// <summary>
         /// 获取专栏详情

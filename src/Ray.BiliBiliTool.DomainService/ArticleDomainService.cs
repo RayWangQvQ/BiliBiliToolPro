@@ -182,7 +182,7 @@ public class ArticleDomainService : IArticleDomainService
         };
         var w_ridDto = await _wbiDomainService.GetWridAsync(req);
 
-        var fullDto = new SearchArticlesByUpIdFullFto()
+        var fullDto = new SearchArticlesByUpIdFullDto()
         {
             Mid = mid,
             Ps = req.Ps,
@@ -262,7 +262,7 @@ public class ArticleDomainService : IArticleDomainService
 
         var w_ridDto = await _wbiDomainService.GetWridAsync(req);
 
-        var fullDto = new SearchArticlesByUpIdFullFto()
+        var fullDto = new SearchArticlesByUpIdFullDto()
         {
             Mid = mid,
             w_rid = w_ridDto.w_rid,
