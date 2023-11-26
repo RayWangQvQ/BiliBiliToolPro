@@ -19,19 +19,49 @@ namespace Ray.BiliBiliTool.Application
         private readonly IConfiguration _configuration;
         private readonly IVipBigPointApi _vipApi;
         private readonly IAccountDomainService _loginDomainService;
+        private readonly IVideoDomainService _videoDomainService;
 
         public VipBigPointAppService(
             IConfiguration configuration,
             ILogger<VipBigPointAppService> logger,
             IVipBigPointApi vipApi,
-            IAccountDomainService loginDomainService
-            )
+            IAccountDomainService loginDomainService,
+            IVideoDomainService videoDomainService)
         {
             _configuration = configuration;
             _logger = logger;
             _vipApi = vipApi;
             _loginDomainService = loginDomainService;
+            _videoDomainService = videoDomainService;
         }
+
+        // 临时测试函数
+        public async Task Info()
+        {
+            var re = await _vipApi.GetVouchersInfo();
+            if (re.Code == 0)
+            {
+                var state = re.Data.list.Find(x => x.Type == 9).State;
+
+                switch (state)
+                {
+                    case 2:
+                        _logger.LogInformation("未完成");
+                        // 未观看视频，观看和分享视频为第一个执行的每日任务，如果认为观看，就直接抛弃此任务
+                        break;
+                    case 1:
+                        _logger.LogInformation("已兑换");
+                        break;
+                    case 0:
+                        _logger.LogInformation("未兑换");
+                        // TODO 兑换api
+                        break;
+                }
+
+            }
+            
+        }
+
 
         [TaskInterceptor("大会员大积分", TaskLevel.One)]
         public override async Task DoTaskAsync(CancellationToken cancellationToken)

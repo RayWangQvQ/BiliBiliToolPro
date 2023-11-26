@@ -95,6 +95,9 @@ namespace Ray.BiliBiliTool.Application
             await ReceiveVipPrivilege(userInfo);
             await ReceiveMangaVipReward(userInfo);
 
+            //TODO 大会员领经验
+
+
             await Charge(userInfo);
         }
 
