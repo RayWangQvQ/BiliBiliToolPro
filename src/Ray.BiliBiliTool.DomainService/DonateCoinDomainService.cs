@@ -419,7 +419,7 @@ namespace Ray.BiliBiliTool.DomainService
             //已经投满2个币的，不能再投
             if (!await IsDonatedLessThenLimitCoinsForVideo(aid))
             {
-                _logger.LogDebug("超出单个视频投币数量限制，丢弃处理", aid);
+                _logger.LogDebug("超出单个视频投币数量限制，丢弃处理");
                 return false;
             }
 
