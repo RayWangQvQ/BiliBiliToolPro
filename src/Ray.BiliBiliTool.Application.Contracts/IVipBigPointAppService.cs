@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ray.BiliBiliTool.Application.Contracts
 {
@@ -12,5 +13,6 @@ namespace Ray.BiliBiliTool.Application.Contracts
 
     public interface IVipBigPointAppService : IAppService
     {
+        Task VipExpress();
     }
 }

@@ -4,7 +4,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.VipTask;
 
 public class VouchersInfoResponse
 {
-    public List<VouchersInfo> VouchersInfos { get; set; }
+    public List<List> List { get; set; }
     public bool IsShortVip { get; set; }
     public bool IsFreightOpen { get; set; }
     public int Level { get; set; }
@@ -16,7 +16,7 @@ public class VouchersInfoResponse
 }
 
 
-public class VouchersInfo
+public class List
 {
     public int Type { get; set; }
     public int State { get; set; }
