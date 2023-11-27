@@ -29,7 +29,7 @@ public class VipApiTest
         var re = await api.GetVouchersInfo();
         if (re.Code == 0)
         {
-            var info = re.Data.VouchersInfos.Find(x => x.Type == 9);
+            var info = re.Data.List.Find(x => x.Type == 9);
             if (info != null)
             {
                 _output.WriteLine(info.State.ToString());
