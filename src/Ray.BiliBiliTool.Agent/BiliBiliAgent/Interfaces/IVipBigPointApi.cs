@@ -31,5 +31,12 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
 
         [HttpPost("/pgc/activity/deliver/task/complete")]
         Task<BiliApiResponse> ViewComplete([FormContent] ViewRequest request);
+
+        [HttpGet("/x/vip/privilege/my")]
+        Task<BiliApiResponse<VouchersInfoResponse>> GetVouchersInfo();
+
+        [Header("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")]
+        [HttpPost("/x/vip/experience/add")]
+        Task<BiliApiResponse> GetVipExperience([FormContent] VipExperienceRequest request);
     }
 }

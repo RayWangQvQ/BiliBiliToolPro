@@ -614,6 +614,14 @@ namespace Ray.BiliBiliTool.DomainService
                     continue;
                 }
 
+                // 用以排除有牌子无直播间的up主
+                if (spaceInfo.Data.Live_room is null)
+                {
+                    _logger.LogInformation("【主播】{name} 直播间id获取失败，已跳过",medal.Target_name);
+                    continue;
+                }
+                    
+                
                 var roomId = spaceInfo.Data.Live_room.Roomid;
 
                 // 获取直播间详细信息

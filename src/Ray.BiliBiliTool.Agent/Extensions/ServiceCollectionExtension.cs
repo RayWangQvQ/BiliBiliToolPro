@@ -73,6 +73,9 @@ namespace Ray.BiliBiliTool.Agent.Extensions
             services.AddBiliBiliClientApi<ILiveTraceApi>("https://live-trace.bilibili.com");
             services.AddBiliBiliClientApi<IHomeApi>("https://www.bilibili.com", false);
 
+            // 添加注入
+            services.AddBiliBiliClientApi<IArticleApi>("https://api.bilibili.com");
+
             //qinglong
             var qinglongHost = configuration["QL_URL"] ?? "http://localhost:5600";
             services
