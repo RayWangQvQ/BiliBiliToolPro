@@ -62,10 +62,9 @@ publish_dotnet_dependent() {
     dotnet publish --configuration Release \
         --self-contained false \
         -p:PublishSingleFile=true \
+        -p:DebugType=None \
+        -p:DebugSymbols=false \
         -o $outputDir
-
-    echo "clear pdb files"
-    rm -rf $outputDir/*.pdb
 
     echo "zip files..."
     cd $publishDir
@@ -90,10 +89,9 @@ publish_self_contained() {
         --runtime $runtime \
         -p:PublishTrimmed=true \
         -p:PublishSingleFile=true \
+        -p:DebugType=None \
+        -p:DebugSymbols=false \
         -o $outputDir
-
-    echo "clear pdb files"
-    rm -rf $outputDir/*.pdb
 
     echo "zip files..."
     cd $publishDir
