@@ -33,6 +33,8 @@ func GetK8sClient() (*kubernetes.Clientset, *rest.Config, error) {
 	if err != nil {
 		return nil, nil, GenErrorMsg(SERVER_ERROR, err.Error())
 	}
+	config.QPS = float32(10.0)
+	config.Burst = 20
 
 	// create the clientset
 	clientset, err := kubernetes.NewForConfig(config)

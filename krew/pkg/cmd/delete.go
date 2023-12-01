@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"io"
 	"os/exec"
 	"strings"
@@ -8,8 +9,6 @@ import (
 	"sigs.k8s.io/kustomize/api/krusty"
 	"sigs.k8s.io/kustomize/api/types"
 	"sigs.k8s.io/yaml"
-
-	"k8s.io/klog/v2"
 
 	"github.com/RayWangQvQ/BiliBiliToolPro/krew/pkg/options"
 	helper "github.com/RayWangQvQ/BiliBiliToolPro/krew/pkg/utils"
@@ -42,9 +41,10 @@ func newDeleteCmd(out io.Writer, errOut io.Writer) *cobra.Command {
 
 			err := o.run(out)
 			if err != nil {
-				klog.Error(err)
+				fmt.Println(err)
 				return err
 			}
+			fmt.Println("bilibili tool is removed from your cluster")
 			return nil
 		},
 	}

@@ -18,15 +18,18 @@ For example: the kubectl is installed under `/usr/bin`, then put the bilibilipro
 
 ### Deployment && Update
 
-Command: `kubectl bilipro init --config config.yaml [optional]--login`
+Prerequsites: please make sure you have the right permission to at least manage namespaces/deployments
+
+Command: `kubectl bilipro init --config config.yaml`
 
 Creates Deployment with the needed environments.
 
 Optional Options:
 
-- `--image=zai7lou/bilibili_tool_pro:1.0.1`
+- `--image=zai7lou/bilibili_tool_pro:2.0.1`
 - `--namespace=bilipro`
-- `--image-pull-secret=`
+- `--image-pull-secret=<docker secrets>`
+- `--login` to scan QR code to login
 
 Required Options:
 
