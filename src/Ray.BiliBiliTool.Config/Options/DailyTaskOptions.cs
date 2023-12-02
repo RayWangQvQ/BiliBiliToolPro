@@ -19,15 +19,24 @@ namespace Ray.BiliBiliTool.Config.Options
         public bool IsShareVideo { get; set; }
 
         /// <summary>
+        /// 是否开启专栏投币模式
+        /// </summary>
+        public bool IsDonateCoinForArticle { get; set; }
+
+        /// <summary>
         /// 每日设定的投币数 [0,5]
         /// </summary>
         public int NumberOfCoins { get; set; } = 5;
 
         /// <summary>
+        /// 要保留的硬币数量 [0,int_max]
+        /// </summary>
+        public int NumberOfProtectedCoins { get; set; } = 0;
+
+        /// <summary>
         /// 达到六级后是否开始白嫖
         /// </summary>
         public bool SaveCoinsWhenLv6 { get; set; } = false;
-
 
         /// <summary>
         /// 投币时是否点赞[false,true]
@@ -50,6 +59,7 @@ namespace Ray.BiliBiliTool.Config.Options
         public string AutoChargeUpId { get; set; }
 
         private string _chargeComment;
+
         /// <summary>
         /// 充电后留言
         /// </summary>
@@ -77,16 +87,26 @@ namespace Ray.BiliBiliTool.Config.Options
         /// </summary>
         public string DevicePlatform { get; set; } = "android";
 
+        /// <summary>
+        /// 自定义漫画阅读 comic_id
+        /// </summary>
+        public long CustomComicId { get; set; } = 27355;
+
+        /// <summary>
+        /// 自定义漫画阅读 ep_id
+        /// </summary>
+        public long CustomEpId { get; set; } = 381662;
 
         public List<long> SupportUpIdList
         {
             get
             {
-                var re = new List<long>();
-                if (string.IsNullOrWhiteSpace(SupportUpIds) | SupportUpIds == "-1") return re;
+                List<long> re = new();
+                if (string.IsNullOrWhiteSpace(SupportUpIds) | SupportUpIds == "-1")
+                    return re;
 
-                var array = SupportUpIds.Split(',');
-                foreach (var item in array)
+                string[] array = SupportUpIds.Split(',');
+                foreach (string item in array)
                 {
                     if (long.TryParse(item.Trim(), out long upId))
                         re.Add(upId);

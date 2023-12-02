@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.VipTask;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
@@ -19,23 +20,81 @@ namespace Ray.BiliBiliTool.Application
         private readonly IConfiguration _configuration;
         private readonly IVipBigPointApi _vipApi;
         private readonly IAccountDomainService _loginDomainService;
+        private readonly IVideoDomainService _videoDomainService;
+        private readonly IAccountDomainService _accountDomainService;
+        private readonly BiliCookie _biliCookie;
 
         public VipBigPointAppService(
             IConfiguration configuration,
             ILogger<VipBigPointAppService> logger,
             IVipBigPointApi vipApi,
-            IAccountDomainService loginDomainService
-            )
+            IAccountDomainService loginDomainService,
+            IVideoDomainService videoDomainService,
+            BiliCookie biliCookie, IAccountDomainService accountDomainService)
         {
             _configuration = configuration;
             _logger = logger;
             _vipApi = vipApi;
             _loginDomainService = loginDomainService;
+            _videoDomainService = videoDomainService;
+            _biliCookie = biliCookie;
+            _accountDomainService = accountDomainService;
         }
+
+        public async Task VipExpress()
+        {
+            _logger.LogInformation("大会员经验领取任务开始");
+            var re = await _vipApi.GetVouchersInfo();
+            if (re.Code == 0)
+            {
+                var state = re.Data.List.Find(x => x.Type == 9).State;
+
+                switch (state)
+                {
+                    case 2:
+                        _logger.LogInformation("大会员经验观看任务未完成");
+                        _logger.LogInformation("开始观看视频");
+                        // 观看视频，暂时没有好办法解决，先这样使着
+                        DailyTaskInfo dailyTaskInfo = await _accountDomainService.GetDailyTaskStatus();
+                        await _videoDomainService.WatchAndShareVideo(dailyTaskInfo);
+                        // 跳转到未兑换，执行兑换任务
+                        goto case 0;
+
+                    case 1:
+                        _logger.LogInformation("大会员经验已兑换");
+                        break;
+
+                    case 0:
+                        _logger.LogInformation("大会员经验未兑换");
+                        //兑换api
+                        var response = await _vipApi.GetVipExperience(new VipExperienceRequest()
+                        {
+                            csrf = _biliCookie.BiliJct
+                        });
+                        if (response.Code != 0)
+                        {
+                            _logger.LogInformation("大会员经验领取失败，错误信息：{message}", response.Message);
+                            break;
+                        }
+                        _logger.LogInformation("领取成功，经验+10 √");
+                        break;
+
+                    default:
+                        _logger.LogDebug("大会员经验领取失败，未知错误");
+                        break;
+                }
+
+            }
+            
+        }
+
 
         [TaskInterceptor("大会员大积分", TaskLevel.One)]
         public override async Task DoTaskAsync(CancellationToken cancellationToken)
         {
+            await VipExpress();
+
+            // TODO 解决taskInfo在一个任务出错后，后续的任务均会报空引用错误
             var ui = await GetUserInfo();
 
             if (ui.GetVipType() == VipType.None)
@@ -66,7 +125,7 @@ namespace Ray.BiliBiliTool.Application
             taskInfo = await ViewAnimate(taskInfo);
 
             //浏览影视频道页10秒
-            taskInfo = await ViewFilmChannel(taskInfo);
+            // taskInfo = await ViewFilmChannel(taskInfo);
 
             //浏览会员购页面10秒
             taskInfo = ViewVipMall(taskInfo);
@@ -76,10 +135,12 @@ namespace Ray.BiliBiliTool.Application
 
             //领取购买任务
             taskInfo = await BuyVipVideo(taskInfo);
-            taskInfo = await BuyVipProduct(taskInfo);
+            // taskInfo = await BuyVipProduct(taskInfo);
             taskInfo = await BuyVipMall(taskInfo);
-
+                        
             taskInfo.LogInfo(_logger);
+
+            
         }
 
         [TaskInterceptor("测试Cookie")]

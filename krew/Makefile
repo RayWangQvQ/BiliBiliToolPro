@@ -20,18 +20,30 @@ help: #### display help
 deploy: build install #### build + install
 
 
+.PHONY: fmt
+fmt: #### run go fmt against code
+	@go fmt ./...
+
+
+.PHONY: vet
+vet: #### run go vet against code
+	@go vet ./...
+
+.PHONY: update-modules
+update-modules: tidy #### update go modules
+
+.PHONY: tidy
+tidy: #### run go mod tidy
+	@go mod tidy
+
 .PHONY: build
 build: #### build the plugin
-	@go vet ./... && \
-	go fmt ./... && \
-	echo "build on ${GOOS}/${GOARCH}" && \
-	cd ${ROOT_DIR}/krew/cmd && \
-		GOOS=${GOOS} GOARCH=${GOARCH} CGO_ENABLED=0 go build -ldflags "-X github.com/RayWangQvQ/BiliBiliToolPro/krew/pkg/cmd.Version=${GITCOMMIT}" -o $(BIN_NAME) kubectl-bilipro.go
-
+	@echo "build on ${GOOS}/${GOARCH}" && \
+		GOOS=${GOOS} GOARCH=${GOARCH} CGO_ENABLED=0 go build -mod readonly -ldflags "-X github.com/RayWangQvQ/BiliBiliToolPro/krew/pkg/cmd.version=${GITCOMMIT}" -o bin/$(BIN_NAME) cmd/kubectl-bilipro.go
 
 .PHONY: install
 install: #### install the plugin
-	@cd ${ROOT_DIR}/krew/cmd && \
+	@cd ${ROOT_DIR}/krew/bin && \
       sudo install ./$(BIN_NAME) ${KUBECTL_DIR}/$(BIN_NAME)
 
 .PHONY: test

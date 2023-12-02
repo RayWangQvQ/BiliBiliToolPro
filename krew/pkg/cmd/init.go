@@ -7,7 +7,6 @@ import (
 	"os"
 	"os/exec"
 	"strings"
-	"time"
 
 	corev1 "k8s.io/api/core/v1"
 
@@ -16,8 +15,6 @@ import (
 	"sigs.k8s.io/yaml"
 
 	"sigs.k8s.io/kustomize/api/types"
-
-	"k8s.io/klog/v2"
 
 	"github.com/spf13/cobra"
 
@@ -52,7 +49,7 @@ func newInitCmd(out io.Writer, errOut io.Writer) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			err := o.run(out)
 			if err != nil {
-				klog.Error(err)
+				fmt.Println(err)
 				return err
 			}
 			return nil
@@ -60,7 +57,7 @@ func newInitCmd(out io.Writer, errOut io.Writer) *cobra.Command {
 	}
 
 	f := cmd.Flags()
-	f.StringVarP(&o.deployOpts.Image, "image", "i", "zai7lou/bilibili_tool_pro:1.0.1", "bilibilipro image")
+	f.StringVarP(&o.deployOpts.Image, "image", "i", "zai7lou/bilibili_tool_pro:2.0.1", "bilibilipro image")
 	f.StringVarP(&o.deployOpts.Namespace, "namespace", "n", "bilipro", "namespace scope for this request")
 	f.StringVar(&o.deployOpts.ImagePullSecret, "image-pull-secret", "", "image pull secret to be used for pulling bilibilipro image")
 	f.StringVarP(&o.deployOpts.ConfigFilePath, "config", "c", "", "the config file contanis the environment variables")
@@ -94,6 +91,8 @@ func (o *initCmd) run(writer io.Writer) error {
 	}
 
 	// TODO: All about paths are a little bit tricky should give it more thoughts
+
+	fmt.Println("Creating the kustomization file")
 	// if the bilibili tool is deployed under system/pre-defined namespace, ignore the namespace file
 	var resources []string // nolint: go-staticcheck
 	if o.deployOpts.Namespace == "default" || o.deployOpts.Namespace == "kube-system" || o.deployOpts.Namespace == "kube-public" {
@@ -211,6 +210,7 @@ func (o *initCmd) run(writer io.Writer) error {
 		}
 	}
 
+	fmt.Println("Applying the kustomization file")
 	// do kubectl apply
 	// make sure kubectl is under your PATH
 	cmd := exec.Command("kubectl", "apply", "-f", "-")
@@ -219,9 +219,9 @@ func (o *initCmd) run(writer io.Writer) error {
 		return err
 	}
 
-	// if there is login required
+	// if there is login required, exectue the login command as the last step
 	if o.login {
-
+		fmt.Println("please login...")
 		client, _, err := helper.GetK8sClient()
 		if err != nil {
 			return err
@@ -233,8 +233,33 @@ func (o *initCmd) run(writer io.Writer) error {
 			return err
 		}
 
-		// TODO: Stupid way, just sleep to wait container is ready, maybe a watch is a better option
-		time.Sleep(15 * time.Second)
+		fmt.Println("wait for the deployment to be ready")
+		// Wait for the deployment ready
+		checkCmdArgs := []string{
+			"rollout",
+			"status",
+			"deployment/bilibilipro",
+			"-n",
+			o.deployOpts.Namespace,
+		}
+		checkCmd := exec.Command("kubectl", checkCmdArgs...)
+
+		for {
+			if err := checkCmd.Start(); err != nil {
+				fmt.Printf("deployment is not ready yet, current status: %v\n", err)
+				continue
+			}
+
+			err := checkCmd.Wait()
+			if err == nil {
+				fmt.Printf("deployment is ready\n")
+				break
+			}
+			fmt.Printf("deployment is not ready yet, current status: %v\n", err)
+		}
+
+		fmt.Println("please scan the QR code")
+		// Exec the login command
 		args := []string{
 			"exec",
 			podName,

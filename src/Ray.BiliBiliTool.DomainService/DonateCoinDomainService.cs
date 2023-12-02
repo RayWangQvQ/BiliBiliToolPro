@@ -70,15 +70,23 @@ namespace Ray.BiliBiliTool.DomainService
         public async Task AddCoinsForVideos()
         {
             int needCoins = await GetNeedDonateCoinNum();
+            int protectedCoins = _dailyTaskOptions.NumberOfProtectedCoins;
             if (needCoins <= 0) return;
 
             //投币前硬币余额
             decimal coinBalance = await _coinDomainService.GetCoinBalance();
             _logger.LogInformation("【投币前余额】 : {coinBalance}", coinBalance);
+            _ = int.TryParse(decimal.Truncate(coinBalance - protectedCoins).ToString(), out int unprotectedCoins);
 
             if (coinBalance <= 0)
             {
                 _logger.LogInformation("因硬币余额不足，今日暂不执行投币任务");
+                return;
+            }
+
+            if (coinBalance <= protectedCoins)
+            {
+                _logger.LogInformation("因硬币余额达到或低于保留值，今日暂不执行投币任务");
                 return;
             }
 
@@ -87,6 +95,17 @@ namespace Ray.BiliBiliTool.DomainService
             {
                 _ = int.TryParse(decimal.Truncate(coinBalance).ToString(), out needCoins);
                 _logger.LogInformation("因硬币余额不足，目标投币数调整为: {needCoins}", needCoins);
+            }
+
+            //投币后余额小于等于保护值，按保护值允许投
+            if (coinBalance - needCoins <= protectedCoins)
+            {
+                //排除需投等于保护后可投数量相等时的情况
+                if (unprotectedCoins != needCoins)
+                {
+                    needCoins = unprotectedCoins;
+                    _logger.LogInformation("因硬币余额投币后将达到或低于保留值，目标投币数调整为: {needCoins}", needCoins);
+                }
             }
 
             int success = 0;
@@ -105,7 +124,7 @@ namespace Ray.BiliBiliTool.DomainService
             }
 
             if (success == needCoins)
-                _logger.LogInformation("投币任务完成");
+                _logger.LogInformation("视频投币任务完成");
             else
                 _logger.LogInformation("投币尝试超过10次，已终止");
 
@@ -400,7 +419,7 @@ namespace Ray.BiliBiliTool.DomainService
             //已经投满2个币的，不能再投
             if (!await IsDonatedLessThenLimitCoinsForVideo(aid))
             {
-                _logger.LogDebug("超出单个视频投币数量限制，丢弃处理", aid);
+                _logger.LogDebug("超出单个视频投币数量限制，丢弃处理");
                 return false;
             }
 

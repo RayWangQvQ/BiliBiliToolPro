@@ -25,6 +25,7 @@ namespace Ray.BiliBiliTool.DomainService
         private readonly IRelationApi _relationApi;
         private readonly UnfollowBatchedTaskOptions _unfollowBatchedTaskOptions;
         private readonly BiliCookie _cookie;
+        private readonly DailyTaskOptions _dailyTaskOptions;
 
         public AccountDomainService(
             ILogger<AccountDomainService> logger,
@@ -32,14 +33,15 @@ namespace Ray.BiliBiliTool.DomainService
             BiliCookie cookie,
             IUserInfoApi userInfoApi,
             IRelationApi relationApi,
-            IOptionsMonitor<UnfollowBatchedTaskOptions> unfollowBatchedTaskOptions
-        )
+            IOptionsMonitor<UnfollowBatchedTaskOptions> unfollowBatchedTaskOptions,
+            IOptionsMonitor<DailyTaskOptions> dailyTaskOptions)
         {
             _logger = logger;
             _dailyTaskApi = dailyTaskApi;
             _cookie = cookie;
             _userInfoApi = userInfoApi;
             _relationApi = relationApi;
+            _dailyTaskOptions = dailyTaskOptions.CurrentValue;
             _unfollowBatchedTaskOptions = unfollowBatchedTaskOptions.CurrentValue;
         }
 
@@ -66,9 +68,9 @@ namespace Ray.BiliBiliTool.DomainService
 
             if (useInfo.Level_info.Current_level < 6)
             {
-                _logger.LogInformation("【距升级Lv{0}】{1}天（如每日做满65点经验）",
+                _logger.LogInformation("【距升级Lv{0}】预计{1}天",
                     useInfo.Level_info.Current_level + 1,
-                    (useInfo.Level_info.GetNext_expLong() - useInfo.Level_info.Current_exp) / Constants.EveryDayExp);
+                    CalculateUpgradeTime(useInfo));
             }
             else
             {
@@ -216,5 +218,42 @@ namespace Ray.BiliBiliTool.DomainService
             TagDto tag = tagList.FirstOrDefault(x => x.Name == groupName);
             return tag;
         }
+
+        /// <summary>
+        /// 计算升级时间
+        /// </summary>
+        /// <param name="useInfo"></param>
+        /// <returns>升级时间</returns>
+        public int CalculateUpgradeTime(UserInfo useInfo)
+        {
+            double availableCoins = decimal.ToDouble(useInfo.Money ?? 0) - _dailyTaskOptions.NumberOfProtectedCoins;
+            long needExp = useInfo.Level_info.GetNext_expLong() - useInfo.Level_info.Current_exp;
+            int needDay;
+
+            if (availableCoins < 0)
+                needDay = (int)((double)needExp / 25 + _dailyTaskOptions.NumberOfProtectedCoins - Math.Abs(availableCoins));
+
+            switch (_dailyTaskOptions.NumberOfCoins)
+            {
+                case 0:
+                    needDay = (int)(needExp / 15);
+                    break;
+                case 1:
+                    needDay = (int)(needExp / 25);
+                    break;
+                default:
+                    int dailyExpAvailable = 15 + _dailyTaskOptions.NumberOfCoins * 10;
+                    double needFrontDay = availableCoins / (_dailyTaskOptions.NumberOfCoins - 1);
+
+                    if ((double)needExp / dailyExpAvailable > needFrontDay)
+                        needDay = (int)(needFrontDay + (needExp - dailyExpAvailable * needFrontDay) / 25);
+                    else
+                        needDay= (int)(needExp / dailyExpAvailable );
+                    break;
+            }
+
+            return needDay;
+        }
+
     }
 }

@@ -23,6 +23,7 @@ namespace Ray.BiliBiliTool.Application
         private readonly ILogger<DailyTaskAppService> _logger;
         private readonly IAccountDomainService _accountDomainService;
         private readonly IVideoDomainService _videoDomainService;
+        private readonly IArticleDomainService _articleDomainService;
         private readonly IDonateCoinDomainService _donateCoinDomainService;
         private readonly IMangaDomainService _mangaDomainService;
         private readonly ILiveDomainService _liveDomainService;
@@ -41,6 +42,7 @@ namespace Ray.BiliBiliTool.Application
             IOptionsMonitor<Dictionary<string, int>> dicOptions,
             IAccountDomainService accountDomainService,
             IVideoDomainService videoDomainService,
+            IArticleDomainService articleDomainService,
             IDonateCoinDomainService donateCoinDomainService,
             IMangaDomainService mangaDomainService,
             ILiveDomainService liveDomainService,
@@ -56,6 +58,7 @@ namespace Ray.BiliBiliTool.Application
             _expDic = dicOptions.Get(Constants.OptionsNames.ExpDictionaryName);
             _accountDomainService = accountDomainService;
             _videoDomainService = videoDomainService;
+            _articleDomainService = articleDomainService;
             _donateCoinDomainService = donateCoinDomainService;
             _mangaDomainService = mangaDomainService;
             _liveDomainService = liveDomainService;
@@ -79,7 +82,8 @@ namespace Ray.BiliBiliTool.Application
 
             DailyTaskInfo dailyTaskInfo = await GetDailyTaskStatus();
             await WatchAndShareVideo(dailyTaskInfo);
-            await AddCoinsForVideo(userInfo);
+
+            await AddCoins(userInfo);
 
             //签到：
             await LiveSign();
@@ -90,6 +94,9 @@ namespace Ray.BiliBiliTool.Application
             //领福利：
             await ReceiveVipPrivilege(userInfo);
             await ReceiveMangaVipReward(userInfo);
+
+            //TODO 大会员领经验
+
 
             await Charge(userInfo);
         }
@@ -124,7 +131,7 @@ namespace Ray.BiliBiliTool.Application
         private async Task<UserInfo> Login()
         {
             UserInfo userInfo = await _accountDomainService.LoginByCookie();
-            if (userInfo == null) throw new Exception("登录失败，请检查Cookie");//终止流程
+            if (userInfo == null) throw new Exception("登录失败，请检查Cookie"); //终止流程
 
             _expDic.TryGetValue("每日登录", out int exp);
             _logger.LogInformation("登录成功，经验+{exp} √", exp);
@@ -153,6 +160,7 @@ namespace Ray.BiliBiliTool.Application
                 _logger.LogInformation("已配置为关闭，跳过任务");
                 return;
             }
+
             await _videoDomainService.WatchAndShareVideo(dailyTaskInfo);
         }
 
@@ -160,14 +168,28 @@ namespace Ray.BiliBiliTool.Application
         /// 投币任务
         /// </summary>
         [TaskInterceptor("投币", rethrowWhenException: false)]
-        private async Task AddCoinsForVideo(UserInfo userInfo)
+        private async Task AddCoins(UserInfo userInfo)
         {
             if (_dailyTaskOptions.SaveCoinsWhenLv6 && userInfo.Level_info.Current_level >= 6)
             {
                 _logger.LogInformation("已经为LV6大佬，开始白嫖");
                 return;
             }
-            await _donateCoinDomainService.AddCoinsForVideos();
+
+            if (_dailyTaskOptions.IsDonateCoinForArticle)
+            {
+                _logger.LogInformation("专栏投币已开启");
+
+                if (!await _articleDomainService.AddCoinForArticles())
+                {
+                    _logger.LogInformation("专栏投币结束，转入视频投币");
+                    await _donateCoinDomainService.AddCoinsForVideos();
+                }
+            }
+            else
+            {
+                await _donateCoinDomainService.AddCoinsForVideos();
+            }
         }
 
         /// <summary>

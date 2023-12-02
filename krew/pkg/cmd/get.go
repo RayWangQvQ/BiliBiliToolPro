@@ -1,10 +1,9 @@
 package cmd
 
 import (
+	"fmt"
 	"io"
 	"os/exec"
-
-	"k8s.io/klog/v2"
 
 	"github.com/RayWangQvQ/BiliBiliToolPro/krew/pkg/options"
 	helper "github.com/RayWangQvQ/BiliBiliToolPro/krew/pkg/utils"
@@ -37,7 +36,7 @@ func newGetCmd(out io.Writer, errOut io.Writer) *cobra.Command {
 
 			err := o.run(out)
 			if err != nil {
-				klog.Error(err)
+				fmt.Println(err)
 				return err
 			}
 			return nil

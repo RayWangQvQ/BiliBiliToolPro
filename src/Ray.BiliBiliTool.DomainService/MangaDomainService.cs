@@ -62,11 +62,12 @@ namespace Ray.BiliBiliTool.DomainService
         /// </summary>
         public async Task MangaRead()
         {
-            BiliApiResponse response = await _mangaApi.ReadManga(_dailyTaskOptions.DevicePlatform);
+            if ( _dailyTaskOptions.CustomComicId <= 0 ) return;
+            BiliApiResponse response = await _mangaApi.ReadManga(_dailyTaskOptions.DevicePlatform, _dailyTaskOptions.CustomComicId, _dailyTaskOptions.CustomEpId);
 
             if (response.Code == 0)
             {
-                _logger.LogInformation("【漫画阅读】成功, 阅读漫画为：堀与宫村");
+                _logger.LogInformation("【漫画阅读】成功");
             }
             else
             {

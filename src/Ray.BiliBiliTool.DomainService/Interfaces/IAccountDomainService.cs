@@ -24,5 +24,12 @@ namespace Ray.BiliBiliTool.DomainService.Interfaces
         /// 批量取关
         /// </summary>
         Task UnfollowBatched();
+
+        /// <summary>
+        /// 计算升级时间
+        /// </summary>
+        /// <param name="useInfo"></param>
+        /// <returns>升级时间</returns>
+        int CalculateUpgradeTime(UserInfo useInfo);
     }
 }

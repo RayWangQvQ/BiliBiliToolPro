@@ -8,7 +8,7 @@ using Microsoft.Extensions.Configuration.EnvironmentVariables;
 namespace Ray.BiliBiliTool.Config
 {
     /// <summary>
-    /// 自定义的排除空值的环境变量提供者
+    /// 自定义的排除空值的环境变量提供者<para></para>
     /// （使用GitHub Actions的脚本传入环境变量，空值会保留，所以这里自己写了一个用来替换掉默认的<see cref="EnvironmentVariablesConfigurationProvider"/>）
     /// </summary>
     public class EnvironmentVariablesExcludeEmptyConfigurationProvider : EnvironmentVariablesConfigurationProvider
@@ -19,7 +19,10 @@ namespace Ray.BiliBiliTool.Config
         private readonly Func<KeyValuePair<string, string>, bool> _removeNullValue;
         private readonly Func<KeyValuePair<string, string>, bool> _fifter;
 
-        public EnvironmentVariablesExcludeEmptyConfigurationProvider(string prefix = null, bool removeKeyPrefix = true) : base(prefix)
+        public EnvironmentVariablesExcludeEmptyConfigurationProvider(
+            string prefix = null,
+            bool removeKeyPrefix = true)
+            : base(prefix)
         {
             _removeKeyPrefix = removeKeyPrefix;
             _prefix = prefix ?? string.Empty;
@@ -46,7 +49,8 @@ namespace Ray.BiliBiliTool.Config
         /// <returns></returns>
         private string NormalizeKey(string key)
         {
-            if(_removeKeyPrefix) key = RemoveKeyPrefix(key);
+            if (_removeKeyPrefix)
+                key = RemoveKeyPrefix(key);
             key = ReplaceKeyDelimiter(key);
             return key;
         }
