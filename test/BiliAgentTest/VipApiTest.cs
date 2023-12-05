@@ -92,4 +92,16 @@ public class VipApiTest
         _output.WriteLine(re.Message);
         
     }
+
+    [Fact]
+    public async Task DressViewTest()
+    {
+        using var scope = Global.ServiceProviderRoot.CreateScope();
+
+        var ck = scope.ServiceProvider.GetRequiredService<BiliCookie>();
+        var api = scope.ServiceProvider.GetRequiredService<IVipBigPointApi>();
+        var re = await api.Complete(new ReceiveOrCompleteTaskRequest(
+            "dress-view"));
+        _output.WriteLine(re.Message);
+    }
 }
