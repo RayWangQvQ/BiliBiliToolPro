@@ -26,7 +26,7 @@ public class VipServiceTest
         using var scope = Global.ServiceProviderRoot.CreateScope();
         var appService = scope.ServiceProvider.GetRequiredService<IVipBigPointAppService>();
         var res = await appService.WatchBangumi();
-        Assert.Equal(true,res);
-
+        Assert.True(res);
+         
     }
 }

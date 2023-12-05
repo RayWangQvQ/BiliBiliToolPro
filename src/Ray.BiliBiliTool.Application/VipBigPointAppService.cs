@@ -151,6 +151,8 @@ namespace Ray.BiliBiliTool.Application
             //观看任意正片内容
             taskInfo = await ViewVideo(taskInfo);
 
+            
+
             //领取购买任务
             taskInfo = await BuyVipVideo(taskInfo);
             // taskInfo = await BuyVipProduct(taskInfo);
@@ -393,6 +395,14 @@ namespace Ray.BiliBiliTool.Application
             }
 
             _logger.LogInformation("开始完成任务");
+            _logger.LogInformation("观看第一个正片内容");
+
+            await WatchBangumi();
+
+            _logger.LogInformation("观看第二个正片内容");
+
+            //等待40s
+            await Task.Delay(TimeSpan.FromSeconds(40));
 
             await WatchBangumi();
 
