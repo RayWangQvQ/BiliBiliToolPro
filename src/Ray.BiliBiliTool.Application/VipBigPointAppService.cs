@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.ViewMall;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.VipTask;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Application.Attributes;
@@ -23,6 +24,7 @@ namespace Ray.BiliBiliTool.Application
         private readonly IVideoDomainService _videoDomainService;
         private readonly IAccountDomainService _accountDomainService;
         private readonly BiliCookie _biliCookie;
+        private readonly IVipMallApi _vipMallApi;
 
         public VipBigPointAppService(
             IConfiguration configuration,
@@ -30,7 +32,8 @@ namespace Ray.BiliBiliTool.Application
             IVipBigPointApi vipApi,
             IAccountDomainService loginDomainService,
             IVideoDomainService videoDomainService,
-            BiliCookie biliCookie, IAccountDomainService accountDomainService)
+            BiliCookie biliCookie, IAccountDomainService accountDomainService,
+            IVipMallApi vipMallApi)
         {
             _configuration = configuration;
             _logger = logger;
@@ -39,6 +42,7 @@ namespace Ray.BiliBiliTool.Application
             _videoDomainService = videoDomainService;
             _biliCookie = biliCookie;
             _accountDomainService = accountDomainService;
+            _vipMallApi = vipMallApi;
         }
 
         public async Task VipExpress()
@@ -92,8 +96,6 @@ namespace Ray.BiliBiliTool.Application
         [TaskInterceptor("大会员大积分", TaskLevel.One)]
         public override async Task DoTaskAsync(CancellationToken cancellationToken)
         {
-            await VipExpress();
-
             // TODO 解决taskInfo在一个任务出错后，后续的任务均会报空引用错误
             var ui = await GetUserInfo();
 
@@ -110,6 +112,9 @@ namespace Ray.BiliBiliTool.Application
             VipTaskInfo taskInfo = re.Data;
             taskInfo.LogInfo(_logger);
 
+            await VipExpress();
+
+            // TODO 浏览装扮商城主页
             //签到
             taskInfo = await Sign(taskInfo);
 
@@ -128,7 +133,7 @@ namespace Ray.BiliBiliTool.Application
             // taskInfo = await ViewFilmChannel(taskInfo);
 
             //浏览会员购页面10秒
-            taskInfo = ViewVipMall(taskInfo);
+            taskInfo = await ViewVipMall(taskInfo);
 
             //观看任意正片内容
             taskInfo = await ViewVideo(taskInfo);
@@ -355,10 +360,48 @@ namespace Ray.BiliBiliTool.Application
         }
 
         [TaskInterceptor("浏览会员购页面10秒", TaskLevel.Two, false)]
-        private VipTaskInfo ViewVipMall(VipTaskInfo info)
+        private async Task<VipTaskInfo> ViewVipMall(VipTaskInfo info)
         {
-            //todo
-            _logger.LogInformation("待实现...");
+            CommonTaskItem targetTask = GetTarget(info);
+
+            //如果状态不等于3，则做
+            if (targetTask.state == 3)
+            {
+                _logger.LogInformation("已完成，跳过");
+                return info;
+            }
+
+            //0需要领取
+            if (targetTask.state == 0)
+            {
+                _logger.LogInformation("开始领取任务");
+                await TryReceive(targetTask.task_code);
+            }
+
+            _logger.LogInformation("开始完成任务");
+            var re = await _vipMallApi.ViewVipMall(new ViewVipMallRequest()
+            {
+                Csrf = _biliCookie.BiliJct
+            });
+            if (re.Code != 0) throw new Exception(re.ToJsonStr());
+
+            //确认
+            if (re.Code == 0)
+            {
+                var infoResult = await _vipApi.GetTaskList();
+                if (infoResult.Code != 0) throw new Exception(infoResult.ToJsonStr());
+                info = infoResult.Data;
+                targetTask = GetTarget(info);
+
+                _logger.LogInformation("确认：{re}", targetTask.state == 3 && targetTask.complete_times >= 1);
+            }
+
+            CommonTaskItem GetTarget(VipTaskInfo info)
+            {
+                return info.Task_info.Modules.First(x => x.module_title == "日常任务")
+                    .common_task_item
+                    .First(x => x.task_code == "vipmallview");
+            }
             return info;
         }
 
@@ -395,7 +438,7 @@ namespace Ray.BiliBiliTool.Application
         }
 
         [TaskInterceptor("购买单点付费影片（仅领取）", TaskLevel.Two, false)]
-        private async Task<VipTaskInfo> BuyVipVideo(VipTaskInfo info)
+            private async Task<VipTaskInfo> BuyVipVideo(VipTaskInfo info)
         {
             CommonTaskItem targetTask = GetTarget(info);
 
