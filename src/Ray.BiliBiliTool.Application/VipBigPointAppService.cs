@@ -287,7 +287,7 @@ namespace Ray.BiliBiliTool.Application
         [TaskInterceptor("浏览追番频道页10秒", TaskLevel.Two, false)]
         private async Task<VipTaskInfo> ViewAnimate(VipTaskInfo info)
         {
-            var code = "dress-view";
+            var code = "jp_channel";
 
             CommonTaskItem targetTask = GetTarget(info);
 
@@ -304,7 +304,7 @@ namespace Ray.BiliBiliTool.Application
                 _logger.LogInformation("开始领取任务");
                 await TryReceive(targetTask.task_code);
             }
-
+            
             _logger.LogInformation("开始完成任务");
             var re = await CompleteView(code);
 
@@ -323,7 +323,7 @@ namespace Ray.BiliBiliTool.Application
             {
                 return info.Task_info.Modules.First(x => x.module_title == "日常任务")
                     .common_task_item
-                    .First(x => x.task_code == "dress-view");
+                    .First(x => x.task_code == "animatetab");
             }
 
             return info;
@@ -496,7 +496,7 @@ namespace Ray.BiliBiliTool.Application
             }
 
             _logger.LogInformation("开始完成任务");
-            var re = await CompleteView(code);
+            var re = await Complete(code);
 
             //确认
             if (re)
