@@ -513,7 +513,7 @@ namespace Ray.BiliBiliTool.Application
             {
                 return info.Task_info.Modules.First(x => x.module_title == "日常任务")
                     .common_task_item
-                    .First(x => x.task_code == "animatetab");
+                    .First(x => x.task_code == "dress-view");
             }
 
             return info;
