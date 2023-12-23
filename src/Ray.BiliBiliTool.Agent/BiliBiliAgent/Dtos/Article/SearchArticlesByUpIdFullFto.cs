@@ -2,13 +2,17 @@
 
 public class SearchArticlesByUpIdDto
 {
-    public long Mid { get; set; }
+    public long mid { get; set; }
 
-    public int Pn { get; set; } = 1;
+    public int pn { get; set; } = 1;
 
-    public int Ps { get; set; } = 30;
+    public int ps { get; set; } = 12;
 
-    public string Sort { get; set; } = "publish_time";
+    public string sort { get; set; } = "publish_time";
+    
+    public long web_location { get; set; } = 1550101;
+    
+    public string platform { get; set; } = "web";
 }
 
 public class SearchArticlesByUpIdFullDto : SearchArticlesByUpIdDto

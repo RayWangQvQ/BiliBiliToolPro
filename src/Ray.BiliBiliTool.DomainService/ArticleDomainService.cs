@@ -179,17 +179,17 @@ public class ArticleDomainService : IArticleDomainService
 
         var req = new SearchArticlesByUpIdDto()
         {
-            Mid = mid,
-            Ps = 1,
-            Pn = new Random().Next(1, articleCount + 1)
+            mid = mid,
+            ps = 1,
+            pn = new Random().Next(1, articleCount + 1)
         };
         var w_ridDto = await _wbiDomainService.GetWridAsync(req);
 
         var fullDto = new SearchArticlesByUpIdFullDto()
         {
-            Mid = mid,
-            Ps = req.Ps,
-            Pn = req.Pn,
+            mid = mid,
+            ps = req.ps,
+            pn = req.pn,
             w_rid = w_ridDto.w_rid,
             wts = w_ridDto.wts
         };
@@ -261,14 +261,14 @@ public class ArticleDomainService : IArticleDomainService
     {
         var req = new SearchArticlesByUpIdDto()
         {
-            Mid = mid
+            mid = mid
         };
 
         var w_ridDto = await _wbiDomainService.GetWridAsync(req);
 
         var fullDto = new SearchArticlesByUpIdFullDto()
         {
-            Mid = mid,
+            mid = mid,
             w_rid = w_ridDto.w_rid,
             wts = w_ridDto.wts
         };
