@@ -17,6 +17,10 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos
 
         public string Bvid { get; set; }
 
+        public long? Epid { get; set; }
+
+        public long? Sid { get; set; }
+
         /// <summary>
         /// 当前用户UID
         /// </summary>
@@ -48,6 +52,11 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos
         /// <sample>10：课程</sample>
         /// </summary>
         public int Type { get; set; } = 3;
+
+        /// <summary>
+        /// 剧集副类型
+        /// </summary>
+        public int? Sub_type { get; set; }
 
         /// <summary>
         /// 2

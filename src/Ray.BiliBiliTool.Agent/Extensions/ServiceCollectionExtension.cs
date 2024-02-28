@@ -75,6 +75,7 @@ namespace Ray.BiliBiliTool.Agent.Extensions
 
             // 添加注入
             services.AddBiliBiliClientApi<IArticleApi>("https://api.bilibili.com");
+            services.AddBiliBiliClientApi<IVipMallApi>("https://show.bilibili.com");
 
             //qinglong
             var qinglongHost = configuration["QL_URL"] ?? "http://localhost:5600";

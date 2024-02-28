@@ -31,6 +31,7 @@
         - [3.3.8. 每月几号自动领取会员权益](#338-每月几号自动领取会员权益)
         - [3.3.9. 每月几号进行直播中心银瓜子兑换硬币](#339-每月几号进行直播中心银瓜子兑换硬币)
         - [3.3.10. Lv6后开启硬币白嫖模式](#3310-lv6后开启硬币白嫖模式)
+        - [3.3.11. 是否开启专栏投币](#3311-是否开启专栏投币)
     - [3.4. 天选时刻抽奖相关](#34-天选时刻抽奖相关)
         - [3.4.1. 根据关键字排除奖品](#341-根据关键字排除奖品)
         - [3.4.2. 根据关键字指定奖品](#342-根据关键字指定奖品)
@@ -75,6 +76,8 @@
         - [3.7.3. 定时任务相关](#373-定时任务相关)
         - [3.7.4. 定时任务](#374-定时任务)
         - [3.7.5. Crontab](#375-crontab)
+    - [3.8. 大积分相关](#38-大积分相关)
+        - [3.8.1. 自定义观看番剧](#381-自定义观看番剧)
 
 <!-- /TOC -->
 
@@ -314,6 +317,8 @@ export Ray_Serilog__WriteTo__9__Args__token="abcde"
 <a id="markdown-331-是否开启观看视频任务" name="331-是否开启观看视频任务"></a>
 #### 3.3.1. 是否开启观看视频任务
 
+当该配置被设置为`false`时会导致大积分任务中的签到领额外10点经验的任务不能自动完成。
+
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
 | 配置Key | `DailyTaskConfig:IsWatchVideo` |
@@ -436,6 +441,18 @@ export Ray_Serilog__WriteTo__9__Args__token="abcde"
 | 默认值   | false |
 | 环境变量   | `Ray_DailyTaskConfig__SaveCoinsWhenLv6` |
 | GitHub Secrets  |  |
+
+<a id="markdown-3311-是否开启专栏投币" name="3311-是否开启专栏投币"></a>
+#### 3.3.11. 是否开启专栏投币
+
+|   TITLE   | CONTENT   |
+| ---------- | -------------- |
+| 配置Key | `DailyTaskConfig:IsDonateCoinForArticle` |
+| 值域   | [true,false]|
+| 默认值   | false |
+| 环境变量   | `Ray_DailyTaskConfig__IsDonateCoinForArticle` |
+| GitHub Secrets  |  |
+
 
 <a id="markdown-34-天选时刻抽奖相关" name="34-天选时刻抽奖相关"></a>
 ### 3.4. 天选时刻抽奖相关
@@ -896,3 +913,17 @@ environment:
     0 15 * * * dotnet /app/Ray.BiliBiliTool.Console.dll --runTasks=Daily >> /var/log/cron.log
     0 22 * * * dotnet /app/Ray.BiliBiliTool.Console.dll --runTasks=LiveLottery >> /var/log/cron.log
 ```
+
+<a id="markdown-38-大积分相关" name="38-大积分相关"></a>
+### 3.8. 大积分相关
+
+<a id="markdown-381-自定义观看番剧" name="381-自定义观看番剧"></a>
+#### 3.8.1. 自定义观看番剧
+
+|   TITLE   | CONTENT   |
+| ---------- | -------------- |
+| 配置Key | `VipBigPointConfig:ViewBangumis` |
+| 值域   | 番剧的ssid（season_id） |
+| 默认值   | `33378`（名侦探柯南） |
+| 环境变量   | `Ray_VipBigPointConfig__ViewBangumis` |
+| GitHub Secrets  | |

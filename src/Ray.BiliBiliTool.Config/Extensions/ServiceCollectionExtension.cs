@@ -23,6 +23,7 @@ namespace Ray.BiliBiliTool.Config.Extensions
                 .Configure<DailyTaskOptions>(configuration.GetSection("DailyTaskConfig"))
                 .Configure<LiveLotteryTaskOptions>(configuration.GetSection("LiveLotteryTaskConfig"))
                 .Configure<UnfollowBatchedTaskOptions>(configuration.GetSection("UnfollowBatchedTaskConfig"))
+                .Configure<VipBigPointOptions>(configuration.GetSection("VipBigPointConfig"))
                 .Configure<SecurityOptions>(configuration.GetSection("Security"))
                 .Configure<ReceiveVipPrivilegeOptions>(configuration.GetSection("ReceiveVipPrivilegeConfig"))
                 .Configure<LiveFansMedalTaskOptions>(configuration.GetSection("LiveFansMedalTaskOptions"))

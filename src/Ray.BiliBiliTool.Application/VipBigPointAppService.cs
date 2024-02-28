@@ -4,12 +4,17 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Video;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.ViewMall;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.VipTask;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Application.Attributes;
 using Ray.BiliBiliTool.Application.Contracts;
+using Ray.BiliBiliTool.Config.Options;
+using Ray.BiliBiliTool.DomainService.Dtos;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 
 namespace Ray.BiliBiliTool.Application
@@ -23,6 +28,9 @@ namespace Ray.BiliBiliTool.Application
         private readonly IVideoDomainService _videoDomainService;
         private readonly IAccountDomainService _accountDomainService;
         private readonly BiliCookie _biliCookie;
+        private readonly IVipMallApi _vipMallApi;
+        private readonly IVideoApi _videoApi;
+        private readonly VipBigPointOptions _vipBigPointOptions;
 
         public VipBigPointAppService(
             IConfiguration configuration,
@@ -30,7 +38,11 @@ namespace Ray.BiliBiliTool.Application
             IVipBigPointApi vipApi,
             IAccountDomainService loginDomainService,
             IVideoDomainService videoDomainService,
-            BiliCookie biliCookie, IAccountDomainService accountDomainService)
+            BiliCookie biliCookie,
+            IAccountDomainService accountDomainService,
+            IVipMallApi vipMallApi,
+            IVideoApi videoApi,
+            IOptionsMonitor<VipBigPointOptions> vipBigPointOptions)
         {
             _configuration = configuration;
             _logger = logger;
@@ -39,6 +51,9 @@ namespace Ray.BiliBiliTool.Application
             _videoDomainService = videoDomainService;
             _biliCookie = biliCookie;
             _accountDomainService = accountDomainService;
+            _vipMallApi = vipMallApi;
+            _videoApi = videoApi;
+            _vipBigPointOptions = vipBigPointOptions.CurrentValue;
         }
 
         public async Task VipExpress()
@@ -92,8 +107,6 @@ namespace Ray.BiliBiliTool.Application
         [TaskInterceptor("大会员大积分", TaskLevel.One)]
         public override async Task DoTaskAsync(CancellationToken cancellationToken)
         {
-            await VipExpress();
-
             // TODO 解决taskInfo在一个任务出错后，后续的任务均会报空引用错误
             var ui = await GetUserInfo();
 
@@ -109,6 +122,8 @@ namespace Ray.BiliBiliTool.Application
 
             VipTaskInfo taskInfo = re.Data;
             taskInfo.LogInfo(_logger);
+
+            await VipExpress();
 
             //签到
             taskInfo = await Sign(taskInfo);
@@ -128,10 +143,15 @@ namespace Ray.BiliBiliTool.Application
             // taskInfo = await ViewFilmChannel(taskInfo);
 
             //浏览会员购页面10秒
-            taskInfo = ViewVipMall(taskInfo);
+            taskInfo = await ViewVipMall(taskInfo);
+
+            //浏览装扮商城
+            taskInfo = await ViewDressMall(taskInfo);
 
             //观看任意正片内容
             taskInfo = await ViewVideo(taskInfo);
+
+            
 
             //领取购买任务
             taskInfo = await BuyVipVideo(taskInfo);
@@ -284,7 +304,7 @@ namespace Ray.BiliBiliTool.Application
                 _logger.LogInformation("开始领取任务");
                 await TryReceive(targetTask.task_code);
             }
-
+            
             _logger.LogInformation("开始完成任务");
             var re = await CompleteView(code);
 
@@ -309,11 +329,9 @@ namespace Ray.BiliBiliTool.Application
             return info;
         }
 
-        [TaskInterceptor("浏览影视频道页10秒", TaskLevel.Two, false)]
-        private async Task<VipTaskInfo> ViewFilmChannel(VipTaskInfo info)
+        [TaskInterceptor("浏览会员购页面10秒", TaskLevel.Two, false)]
+        private async Task<VipTaskInfo> ViewVipMall(VipTaskInfo info)
         {
-            var code = "tv_channel";
-
             CommonTaskItem targetTask = GetTarget(info);
 
             //如果状态不等于3，则做
@@ -331,10 +349,14 @@ namespace Ray.BiliBiliTool.Application
             }
 
             _logger.LogInformation("开始完成任务");
-            var re = await CompleteView(code);
+            var re = await _vipMallApi.ViewVipMall(new ViewVipMallRequest()
+            {
+                Csrf = _biliCookie.BiliJct
+            });
+            if (re.Code != 0) throw new Exception(re.ToJsonStr());
 
             //确认
-            if (re)
+            if (re.Code == 0)
             {
                 var infoResult = await _vipApi.GetTaskList();
                 if (infoResult.Code != 0) throw new Exception(infoResult.ToJsonStr());
@@ -348,17 +370,8 @@ namespace Ray.BiliBiliTool.Application
             {
                 return info.Task_info.Modules.First(x => x.module_title == "日常任务")
                     .common_task_item
-                    .First(x => x.task_code == "filmtab");
+                    .First(x => x.task_code == "vipmallview");
             }
-
-            return info;
-        }
-
-        [TaskInterceptor("浏览会员购页面10秒", TaskLevel.Two, false)]
-        private VipTaskInfo ViewVipMall(VipTaskInfo info)
-        {
-            //todo
-            _logger.LogInformation("待实现...");
             return info;
         }
 
@@ -367,12 +380,12 @@ namespace Ray.BiliBiliTool.Application
         {
             CommonTaskItem targetTask = GetTarget(info);
 
-            //如果状态不等于3，则做
-            if (targetTask.state == 3)
-            {
-                _logger.LogInformation("已完成，跳过");
-                return info;
-            }
+            // 如果状态不等于3，则做
+             if (targetTask.state == 3)
+             {
+                 _logger.LogInformation("已完成，跳过");
+                 return info;
+             }
 
             //0需要领取
             if (targetTask.state == 0)
@@ -382,7 +395,16 @@ namespace Ray.BiliBiliTool.Application
             }
 
             _logger.LogInformation("开始完成任务");
-            _logger.LogInformation("待开发...");//todo
+            _logger.LogInformation("观看第一个正片内容");
+
+            await WatchBangumi();
+
+            _logger.LogInformation("观看第二个正片内容");
+
+            //等待40s
+            await Task.Delay(TimeSpan.FromSeconds(40));
+
+            await WatchBangumi();
 
             CommonTaskItem GetTarget(VipTaskInfo info)
             {
@@ -423,35 +445,6 @@ namespace Ray.BiliBiliTool.Application
             }
         }
 
-        [TaskInterceptor("购买指定大会员产品（仅领取）", TaskLevel.Two, false)]
-        private async Task<VipTaskInfo> BuyVipProduct(VipTaskInfo info)
-        {
-            CommonTaskItem targetTask = GetTarget(info);
-
-            if (targetTask.state is 3 or 1)
-            {
-                var re = targetTask.state == 1 ? "已领取" : "已完成";
-                _logger.LogInformation("{re}，跳过", re);
-                return info;
-            }
-
-            //0需要领取
-            if (targetTask.state == 0)
-            {
-                _logger.LogInformation("开始领取任务");
-                await TryReceive(targetTask.task_code);
-            }
-
-            return info;
-
-            CommonTaskItem GetTarget(VipTaskInfo info)
-            {
-                return info.Task_info.Modules.First(x => x.module_title == "日常任务")
-                    .common_task_item
-                    .First(x => x.task_code == "subscribe");
-            }
-        }
-
         [TaskInterceptor("购买指定会员购商品（仅领取）", TaskLevel.Two, false)]
         private async Task<VipTaskInfo> BuyVipMall(VipTaskInfo info)
         {
@@ -480,6 +473,52 @@ namespace Ray.BiliBiliTool.Application
                     .First(x => x.task_code == "vipmallbuy");
             }
         }
+
+        [TaskInterceptor("浏览装扮商城主页", TaskLevel.Two, false)]
+        private async Task<VipTaskInfo> ViewDressMall(VipTaskInfo info)
+        {
+            var code = "dress-view";
+
+            CommonTaskItem targetTask = GetTarget(info);
+
+            //如果状态不等于3，则做
+            if (targetTask.state == 3)
+            {
+                _logger.LogInformation("已完成，跳过");
+                return info;
+            }
+
+            //0需要领取
+            if (targetTask.state == 0)
+            {
+                _logger.LogInformation("开始领取任务");
+                await TryReceive(targetTask.task_code);
+            }
+
+            _logger.LogInformation("开始完成任务");
+            var re = await Complete(code);
+
+            //确认
+            if (re)
+            {
+                var infoResult = await _vipApi.GetTaskList();
+                if (infoResult.Code != 0) throw new Exception(infoResult.ToJsonStr());
+                info = infoResult.Data;
+                targetTask = GetTarget(info);
+
+                _logger.LogInformation("确认：{re}", targetTask.state == 3 && targetTask.complete_times >= 1);
+            }
+
+            CommonTaskItem GetTarget(VipTaskInfo info)
+            {
+                return info.Task_info.Modules.First(x => x.module_title == "日常任务")
+                    .common_task_item
+                    .First(x => x.task_code == "dress-view");
+            }
+
+            return info;
+        }
+
 
         /// <summary>
         /// 领取任务
@@ -539,5 +578,161 @@ namespace Ray.BiliBiliTool.Application
                 return false;
             }
         }
+
+        public async Task<bool> WatchBangumi()
+        {
+            if (_vipBigPointOptions.ViewBangumiList == null ||_vipBigPointOptions.ViewBangumiList.Count == 0)
+                return false;
+
+            long randomSsid = _vipBigPointOptions.ViewBangumiList[new Random().Next(0,_vipBigPointOptions.ViewBangumiList.Count)];
+
+            var res = await GetBangumi(randomSsid);
+            if (res is null)
+            {
+                return false;
+            }
+
+            var videoInfo = res.Value.Item1;
+            
+            // 随机播放时间
+            int playedTime = new Random().Next(905, 1800);
+            // 观看该视频
+            var request = new UploadVideoHeartbeatRequest()
+            {
+                Aid = long.Parse(videoInfo.Aid),
+                Bvid = videoInfo.Bvid,
+                Cid = videoInfo.Cid,
+                Mid = long.Parse(_biliCookie.UserId),
+                Sid = randomSsid,
+                Epid = res.Value.Item2,
+                Csrf = _biliCookie.BiliJct,
+                Type = 4,
+                Sub_type = 1,
+                Start_ts = DateTime.Now.ToTimeStamp() - playedTime,
+                Played_time = playedTime,
+                Realtime = playedTime,
+                Real_played_time = playedTime
+            };
+            BiliApiResponse apiResponse = await _videoApi.UploadVideoHeartbeat(request);
+            if (apiResponse.Code == 0)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// 从自定义的番剧ssid中选择其中的一部中的一集
+        /// </summary>
+        /// <param name="randomSsid">番剧ssid</param>
+        /// <returns></returns>
+        private async Task<(VideoInfoDto,long)?> GetBangumi(long randomSsid)
+        {
+            try
+            {
+                if (randomSsid is 0 or long.MinValue)
+                    return null;
+                var bangumiInfo = await _videoApi.GetBangumiBySsid(randomSsid);
+
+                // 从获取的剧集中随机获得其中的一集
+
+                var bangumi = bangumiInfo.Result.episodes[new Random().Next(0, bangumiInfo.Result.episodes.Count)];
+                var videoInfo = new VideoInfoDto()
+                {
+                    Bvid = bangumi.bvid,
+                    Aid = bangumi.aid.ToString(),
+                    Cid = bangumi.cid,
+                    Copyright = 1,
+                    Duration = bangumi.duration,
+                    Title = bangumi.share_copy
+                };
+                _logger.LogInformation("本次播放的正片为：{title}",bangumi.share_copy);
+                return (videoInfo, bangumi.ep_id);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.Message);   
+            }
+            return null;
+        }
+        #region deprecated
+        [TaskInterceptor("浏览影视频道页10秒", TaskLevel.Two, false)]
+        private async Task<VipTaskInfo> ViewFilmChannel(VipTaskInfo info)
+        {
+            var code = "tv_channel";
+
+            CommonTaskItem targetTask = GetTarget(info);
+
+            //如果状态不等于3，则做
+            if (targetTask.state == 3)
+            {
+                _logger.LogInformation("已完成，跳过");
+                return info;
+            }
+
+            //0需要领取
+            if (targetTask.state == 0)
+            {
+                _logger.LogInformation("开始领取任务");
+                await TryReceive(targetTask.task_code);
+            }
+
+            _logger.LogInformation("开始完成任务");
+            var re = await CompleteView(code);
+
+            //确认
+            if (re)
+            {
+                var infoResult = await _vipApi.GetTaskList();
+                if (infoResult.Code != 0) throw new Exception(infoResult.ToJsonStr());
+                info = infoResult.Data;
+                targetTask = GetTarget(info);
+
+                _logger.LogInformation("确认：{re}", targetTask.state == 3 && targetTask.complete_times >= 1);
+            }
+
+            CommonTaskItem GetTarget(VipTaskInfo info)
+            {
+                return info.Task_info.Modules.First(x => x.module_title == "日常任务")
+                    .common_task_item
+                    .First(x => x.task_code == "filmtab");
+            }
+
+            return info;
+        }
+
+        [TaskInterceptor("购买指定大会员产品（仅领取）", TaskLevel.Two, false)]
+        private async Task<VipTaskInfo> BuyVipProduct(VipTaskInfo info)
+        {
+            CommonTaskItem targetTask = GetTarget(info);
+
+            if (targetTask.state is 3 or 1)
+            {
+                var re = targetTask.state == 1 ? "已领取" : "已完成";
+                _logger.LogInformation("{re}，跳过", re);
+                return info;
+            }
+
+            //0需要领取
+            if (targetTask.state == 0)
+            {
+                _logger.LogInformation("开始领取任务");
+                await TryReceive(targetTask.task_code);
+            }
+
+            return info;
+
+            CommonTaskItem GetTarget(VipTaskInfo info)
+            {
+                return info.Task_info.Modules.First(x => x.module_title == "日常任务")
+                    .common_task_item
+                    .First(x => x.task_code == "subscribe");
+            }
+        }
+
+
+        #endregion
+
     }
 }
