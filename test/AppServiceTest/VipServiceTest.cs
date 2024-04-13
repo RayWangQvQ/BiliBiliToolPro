@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.VipTask;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Application.Contracts;
 using Ray.BiliBiliTool.DomainService.Dtos;
 using Ray.BiliBiliTool.Infrastructure;
@@ -27,6 +29,24 @@ public class VipServiceTest
         var appService = scope.ServiceProvider.GetRequiredService<IVipBigPointAppService>();
         var res = await appService.WatchBangumi();
         Assert.True(res);
-         
+    }
+
+
+    [Fact]
+    public async Task CompleteV2Test()
+    {
+        using var scope = Global.ServiceProviderRoot.CreateScope();
+        var api = scope.ServiceProvider.GetRequiredService<IVipBigPointApi>();
+        var res = await api.CompleteV2(new ReceiveOrCompleteTaskRequest("dress-view"));
+        Assert.True(res.Code == 0);
+    }
+
+    [Fact]
+    public async Task ReceiveV2Test()
+    {
+        using var scope = Global.ServiceProviderRoot.CreateScope();
+        var api = scope.ServiceProvider.GetRequiredService<IVipBigPointApi>();
+        var res = await api.ReceiveV2(new ReceiveOrCompleteTaskRequest("ogvwatchnew"));
+        Assert.True(res.Code == 0);
     }
 }
