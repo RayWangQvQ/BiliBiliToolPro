@@ -141,16 +141,13 @@ public class VipBigPointAppService : AppService, IVipBigPointAppService
         //浏览追番频道页10秒
         taskInfo = await ViewAnimate(taskInfo);
 
-        //浏览影视频道页10秒
-        // taskInfo = await ViewFilmChannel(taskInfo);
-
         //浏览会员购页面10秒
         taskInfo = await ViewVipMall(taskInfo);
 
         //浏览装扮商城
         taskInfo = await ViewDressMall(taskInfo);
 
-        //观看任意正片内容
+        //观看剧集内容
         taskInfo = await ViewVideo(taskInfo);
 
         //领取购买任务
@@ -373,7 +370,7 @@ public class VipBigPointAppService : AppService, IVipBigPointAppService
         return info;
     }
 
-    [TaskInterceptor("观看任意正片内容", TaskLevel.Two, false)]
+    [TaskInterceptor("观看剧集内容", TaskLevel.Two, false)]
     private async Task<VipTaskInfo> ViewVideo(VipTaskInfo info)
     {
         CommonTaskItem targetTask = GetTarget(info);
@@ -393,16 +390,9 @@ public class VipBigPointAppService : AppService, IVipBigPointAppService
         }
 
         _logger.LogInformation("开始完成任务");
-        _logger.LogInformation("观看第一个正片内容");
 
-        await WatchBangumi();
-
-        _logger.LogInformation("观看第二个正片内容");
-
-        //等待40s
-        await Task.Delay(TimeSpan.FromSeconds(40));
-
-        await WatchBangumi();
+        // 观看剧集内容
+        _logger.LogInformation("api变更，暂未实现");
 
         CommonTaskItem GetTarget(VipTaskInfo info)
         {
