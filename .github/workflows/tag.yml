@@ -22,7 +22,7 @@ jobs:
       - name: Get current version
         id: current_version
         run: |
-          version=$(grep -oP '(?<=<Version>).*?(?=<\/Version>)' ./scripts/common.props)
+          version=$(grep -oP '(?<=<Version>).*?(?=<\/Version>)' ./common.props)
           echo "Curent version: $version"
           echo "current_version=$version" >> $GITHUB_OUTPUT
 
