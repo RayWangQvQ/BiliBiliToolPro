@@ -53,5 +53,17 @@ namespace BiliAgentTest
 
             Assert.Equal(0,req.Code);
         }
+
+        [Fact]
+        public async Task GetRandomVideoOfRanking()
+        {
+            using var scope = Global.ServiceProviderRoot.CreateScope();
+
+            var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory>();
+            var api = scope.ServiceProvider.GetRequiredService<IVideoWithoutCookieApi>();
+            var req = await api.GetRegionRankingVideosV2();
+
+            Assert.Equal(0, req.Code);
+        }
     }
 }
