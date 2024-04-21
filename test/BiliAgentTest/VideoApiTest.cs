@@ -17,7 +17,7 @@ namespace BiliAgentTest
     {
         public VideoApiTest()
         {
-            Program.CreateHost(new[] { "--ENVIRONMENT=Development" });//Ä¬ÈÏPrd»·¾³£¬ÕâÀïÖ¸¶¨ÎªDevºó£¬¿ÉÒÔ¶ÁÈ¡µ½ÓÃ»§»úÃÜÅäÖÃ
+            Program.CreateHost(new[] { "--ENVIRONMENT=Development" });//Ä¬ï¿½ï¿½Prdï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ÎªDevï¿½ó£¬¿ï¿½ï¿½Ô¶ï¿½È¡ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         }
 
         [Fact]
@@ -39,6 +39,31 @@ namespace BiliAgentTest
             {
                 Assert.False(re.Code != 0);
             }
+        }
+
+        [Fact]
+        public async Task GetBangumiTest()
+        {
+
+            using var scope = Global.ServiceProviderRoot.CreateScope();
+
+            var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory>();
+            var api = scope.ServiceProvider.GetRequiredService<IVideoApi>();
+            var req = await api.GetBangumiBySsid(46508);
+
+            Assert.Equal(0,req.Code);
+        }
+
+        [Fact]
+        public async Task GetRandomVideoOfRanking()
+        {
+            using var scope = Global.ServiceProviderRoot.CreateScope();
+
+            var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory>();
+            var api = scope.ServiceProvider.GetRequiredService<IVideoWithoutCookieApi>();
+            var req = await api.GetRegionRankingVideosV2();
+
+            Assert.Equal(0, req.Code);
         }
     }
 }

@@ -75,6 +75,7 @@ namespace Ray.BiliBiliTool.Agent.Extensions
 
             // 添加注入
             services.AddBiliBiliClientApi<IArticleApi>("https://api.bilibili.com");
+            services.AddBiliBiliClientApi<IVipMallApi>("https://show.bilibili.com");
 
             //qinglong
             var qinglongHost = configuration["QL_URL"] ?? "http://localhost:5600";
@@ -147,8 +148,13 @@ namespace Ray.BiliBiliTool.Agent.Extensions
                     string userPass = proxyAddress.Split("@")[0];
                     string address = proxyAddress.Split("@")[1];
 
-                    string proxyUser = userPass.Split(":")[0];
-                    string proxyPass = userPass.Split(":")[1];
+                    string proxyUser = "";
+                    string proxyPass = "";
+                    if (userPass.Contains(":"))
+                    {
+                        proxyUser = userPass?.Split(":")[0];
+                        proxyPass = userPass?.Split(":")[1];
+                    }
 
                     webProxy.Address = new Uri("http://" + address);
                     webProxy.Credentials = new NetworkCredential(proxyUser, proxyPass);
