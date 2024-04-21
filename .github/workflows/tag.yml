@@ -28,5 +28,5 @@ jobs:
 
       - name: Tag and push
         run: |
-          git tag "$new_tag"
-          git push origin "$new_tag"
+          git tag "$GITHUB_OUTPUT"
+          git push origin "$GITHUB_OUTPUT"
