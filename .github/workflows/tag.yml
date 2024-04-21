@@ -28,5 +28,6 @@ jobs:
 
       - name: Tag and push
         run: |
-          git tag "$GITHUB_OUTPUT"
-          git push origin "$GITHUB_OUTPUT"
+          new_tag="${{ steps.current_version.outputs.current_version }}"
+          git tag "$new_tag"
+          git push origin "$new_tag"
