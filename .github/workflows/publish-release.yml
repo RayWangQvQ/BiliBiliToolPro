@@ -1,13 +1,8 @@
 # 打包发布Release
-
 name: Publish release
 
 on:
   workflow_dispatch:
-    inputs:
-      version:
-        description: '版本号'
-        required: true
 
 permissions:
   contents: write
@@ -15,48 +10,39 @@ permissions:
 
 jobs:
   build:
-    name: publish relesae
+    name: Publish Release
     if: ${{ github.repository == 'RayWangQvQ/BiliBiliToolPro' }}
     runs-on: ubuntu-latest
     
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v3
-        with:
-          ref: ${{ github.event.inputs.version }}
     
-      - name: Setup .NET
+      - name: Setup .NET Core
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: 6.0.x
+          dotnet-version: '6.0.x'
         
-      - name: Publish and zip
+      - name: Publish and Zip Release
         run: |
-          pwd && ls
           cd ./scripts
           chmod +x ./publish.sh
-          . publish.sh --runtime all
+          ./publish.sh --runtime all
           
-      - name: Get release content
-        id: release_content
+      - name: Extract Release Notes
+        id: release_notes
         run: |
-          cd ${{ github.workspace }}
-          pwd && ls
-          content=$(tac ./CHANGELOG.md | grep -m1 "##" -B 1000 | tac)
-          echo "Release content: $content"
-          echo "release_content<<EOF" >> $GITHUB_OUTPUT
-          echo "$content" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          content=$(grep -m1 "##" -A 1000 ./CHANGELOG.md)
+          echo "::set-output name=content::$content"
 
-      - name: Upload release asset
-        id: upload-release-asset 
+      - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          files: ./src/Ray.BiliBiliTool.Console/bin/Publish/*.zip
+          files: './src/Ray.BiliBiliTool.Console/bin/Publish/*.zip'
           token: ${{ secrets.GITHUB_TOKEN }}
-          name: BiliBiliToolPro-V${{ github.event.inputs.version }}
+          name: "BiliBiliToolPro-V${{ github.event.inputs.version }}"
           tag_name: ${{ github.event.inputs.version }}
-          body: ${{ steps.release_content.outputs.release_content }}
+          body: ${{ steps.release_notes.outputs.content }}
           discussion_category_name: Announcements
           generate_release_notes: true
           fail_on_unmatched_files: true

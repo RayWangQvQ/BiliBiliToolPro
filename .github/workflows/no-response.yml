@@ -1,19 +1,25 @@
-name: No Response
-
+name: Close Stale Issues
 on:
-  # workflow_dispatch:
-  issue_comment:
-    types: [created]
   schedule:
-    - cron: '7 4,10 * * *'
+    - cron: "0 8 * * *" # 每天的 00:00 运行
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
 
 jobs:
-  noResponse:
+  close_stale_issues:
     runs-on: ubuntu-latest
     steps:
-      - uses: lee-dohm/no-response@v0.5.0
+      - name: Close Stale Issues
+        uses: actions/stale@v5
         with:
-          token: ${{ github.token }}
-          # closeComment: This issue has been automatically closed due to no response from the original author. Please feel free to reopen it if you have more information that can help us investigate the issue further.
-          daysUntilClose: 3
-          responseRequiredLabel: needs-more-info
+          days-before-stale: 3 # 3 天不活跃后标记Stale
+          days-before-close: 3 # 标记Stale后3天不活跃则关闭问题
+          stale-issue-label: "Stale" # 标记为 "Stale" 的问题
+          stale-issue-message: "🕸️ This has been inactive for 3 days, please confirm if it still needs attention~~" # Comment added
+          close-issue-message: "🚫 This has been inactive for too long and is now closed, feel free to reopen it if needed!" # Comment added
+          only-labels: "needs-more-info" # 只处理标签为 "help wanted" 的问题
+          repo-token: ${{ secrets.GITHUB_TOKEN }}

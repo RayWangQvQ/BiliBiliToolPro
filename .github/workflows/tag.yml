@@ -22,11 +22,12 @@ jobs:
       - name: Get current version
         id: current_version
         run: |
-          version=$(grep -oP '(?<=<Version>).*?(?=<\/Version>)' ./scripts/common.props)
+          version=$(grep -oP '(?<=<Version>).*?(?=<\/Version>)' ./common.props)
           echo "Curent version: $version"
           echo "current_version=$version" >> $GITHUB_OUTPUT
 
       - name: Tag and push
         run: |
+          new_tag="${{ steps.current_version.outputs.current_version }}"
           git tag "$new_tag"
           git push origin "$new_tag"
