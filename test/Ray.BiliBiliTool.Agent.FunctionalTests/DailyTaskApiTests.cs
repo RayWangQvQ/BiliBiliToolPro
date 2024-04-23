@@ -18,8 +18,8 @@ namespace Ray.BiliBiliTool.Agent.FunctionalTests
             var envs = new List<string>
             {
                 "--ENVIRONMENT=Development",
-                "HTTP_PROXY=localhost:8888",
-                "HTTPS_PROXY=localhost:8888"
+                //"HTTP_PROXY=localhost:8888",
+                //"HTTPS_PROXY=localhost:8888"
             };
             IHost host = Program.CreateHost(envs.ToArray());
             _ck = host.Services.GetRequiredService<BiliCookie>();
