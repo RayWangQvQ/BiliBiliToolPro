@@ -27,7 +27,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// <returns></returns>
         public async Task<decimal> GetCoinBalance()
         {
-            var response = await _accountApi.GetCoinBalance();
+            var response = await _accountApi.GetCoinBalanceAsync();
             return response.Data.Money ?? 0;
         }
 

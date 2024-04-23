@@ -117,7 +117,7 @@ public class ArticleDomainService : IArticleDomainService
         }
 
 
-        _logger.LogInformation("【硬币余额】{coin}", (await _accountApi.GetCoinBalance()).Data.Money ?? 0);
+        _logger.LogInformation("【硬币余额】{coin}", (await _accountApi.GetCoinBalanceAsync()).Data.Money ?? 0);
 
         return true;
     }
