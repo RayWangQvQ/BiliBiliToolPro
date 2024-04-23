@@ -70,8 +70,8 @@ namespace Ray.BiliBiliTool.DomainService
             }
             */
 
-            var suc1 = await ReceiveVipPrivilege(1);
-            var suc2 = await ReceiveVipPrivilege(2);
+            var suc1 = await ReceiveVipPrivilege(VipPrivilegeType.BCoinCoupon);
+            var suc2 = await ReceiveVipPrivilege(VipPrivilegeType.MembershipBenefits);
 
             if (suc1 | suc2) return true;
             return false;
@@ -83,9 +83,9 @@ namespace Ray.BiliBiliTool.DomainService
         /// 领取大会员每月赠送福利
         /// </summary>
         /// <param name="type">1.大会员B币券；2.大会员福利</param>
-        private async Task<bool> ReceiveVipPrivilege(int type)
+        private async Task<bool> ReceiveVipPrivilege(VipPrivilegeType type)
         {
-            var response = await _dailyTaskApi.ReceiveVipPrivilege(type, _biliBiliCookie.BiliJct);
+            var response = await _dailyTaskApi.ReceiveVipPrivilegeAsync((int)type, _biliBiliCookie.BiliJct);
 
             var name = GetPrivilegeName(type);
             _logger.LogInformation("【领取】{name}", name);
@@ -108,14 +108,14 @@ namespace Ray.BiliBiliTool.DomainService
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        private string GetPrivilegeName(int type)
+        private string GetPrivilegeName(VipPrivilegeType type)
         {
             switch (type)
             {
-                case 1:
+                case VipPrivilegeType.BCoinCoupon:
                     return "年度大会员每月赠送的B币券";
 
-                case 2:
+                case VipPrivilegeType.MembershipBenefits:
                     return "大会员福利/权益";
             }
 

@@ -47,7 +47,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// <returns></returns>
         private async Task<int> GetDonateCoinExp()
         {
-            return (await _dailyTaskApi.GetDonateCoinExp()).Data;
+            return (await _dailyTaskApi.GetDonateCoinExpAsync()).Data;
         }
         #endregion
     }
