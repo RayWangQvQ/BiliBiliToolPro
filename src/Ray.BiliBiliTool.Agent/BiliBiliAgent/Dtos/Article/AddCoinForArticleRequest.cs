@@ -2,7 +2,7 @@
 
 public class AddCoinForArticleRequest
 {
-    public AddCoinForArticleRequest(long cvid,long mid,string csrf)
+    public AddCoinForArticleRequest(long cvid, long mid, string csrf)
     {
         Aid = cvid;
         Upid = mid;

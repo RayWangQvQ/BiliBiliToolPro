@@ -1,6 +1,8 @@
-﻿namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Article;
+﻿using Ray.BiliBiliTool.Agent.BiliBiliAgent.Services;
 
-public class SearchArticlesByUpIdDto
+namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Article;
+
+public class SearchArticlesByUpIdDto:IWri
 {
     public long mid { get; set; }
 
@@ -13,11 +15,7 @@ public class SearchArticlesByUpIdDto
     public long web_location { get; set; } = 1550101;
     
     public string platform { get; set; } = "web";
-}
 
-public class SearchArticlesByUpIdFullDto : SearchArticlesByUpIdDto
-{
     public string w_rid { get; set; }
-
     public long wts { get; set; }
 }
