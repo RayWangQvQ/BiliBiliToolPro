@@ -34,7 +34,7 @@ namespace Ray.BiliBiliTool.DomainService
         private readonly DailyTaskOptions _dailyTaskOptions;
         private readonly SecurityOptions _securityOptions;
         private readonly BiliCookie _biliCookie;
-        private readonly IWbiService _wbiDomainService;
+        private readonly IWbiService _wbiService;
 
         public LiveDomainService(ILogger<LiveDomainService> logger,
             ILiveApi liveApi,
@@ -45,7 +45,7 @@ namespace Ray.BiliBiliTool.DomainService
             IOptionsMonitor<LiveLotteryTaskOptions> liveLotteryTaskOptions,
             IOptionsMonitor<LiveFansMedalTaskOptions> liveFansMedalTaskOptions,
             IOptionsMonitor<SecurityOptions> securityOptions,
-            IWbiService wbiDomainService,
+            IWbiService wbiService,
             BiliCookie biliCookie)
         {
             _logger = logger;
@@ -57,7 +57,7 @@ namespace Ray.BiliBiliTool.DomainService
             _dailyTaskOptions = dailyTaskOptions.CurrentValue;
             _liveFansMedalTaskOptions = liveFansMedalTaskOptions.CurrentValue;
             _securityOptions = securityOptions.CurrentValue;
-            _wbiDomainService = wbiDomainService;
+            _wbiService = wbiService;
             _biliCookie = biliCookie;
 
         }
@@ -414,7 +414,7 @@ namespace Ray.BiliBiliTool.DomainService
                 {
                     mid = liveHostUserId
                 };
-                await _wbiDomainService.SetWridAsync(req);
+                await _wbiService.SetWridAsync(req);
 
                 var spaceInfo = await _userInfoApi.GetSpaceInfo(req);
                 if (spaceInfo.Code != 0)
@@ -591,7 +591,7 @@ namespace Ray.BiliBiliTool.DomainService
                 {
                     mid = liveHostUserId
                 };
-                await _wbiDomainService.SetWridAsync(req);
+                await _wbiService.SetWridAsync(req);
 
                 var spaceInfo = await _userInfoApi.GetSpaceInfo(req);
                 if (spaceInfo.Code != 0)

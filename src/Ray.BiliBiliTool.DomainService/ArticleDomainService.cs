@@ -24,7 +24,7 @@ public class ArticleDomainService : IArticleDomainService
     private readonly DailyTaskOptions _dailyTaskOptions;
     private readonly ICoinDomainService _coinDomainService;
     private readonly IAccountApi _accountApi;
-    private readonly IWbiService _wbiDomainService;
+    private readonly IWbiService _wbiService;
 
 
     /// <summary>
@@ -43,14 +43,14 @@ public class ArticleDomainService : IArticleDomainService
         ILogger<ArticleDomainService> logger,
         IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
         ICoinDomainService coinDomainService,
-        IAccountApi accountApi, IWbiService wbiDomainService)
+        IAccountApi accountApi, IWbiService wbiService)
     {
         _articleApi = articleApi;
         _biliCookie = biliCookie;
         _logger = logger;
         _coinDomainService = coinDomainService;
         _accountApi = accountApi;
-        _wbiDomainService = wbiDomainService;
+        _wbiService = wbiService;
         _dailyTaskOptions = dailyTaskOptions.CurrentValue;
     }
 
@@ -184,7 +184,7 @@ public class ArticleDomainService : IArticleDomainService
             ps = 1,
             pn = new Random().Next(1, articleCount + 1)
         };
-        await _wbiDomainService.SetWridAsync(req);
+        await _wbiService.SetWridAsync(req);
 
         BiliApiResponse<SearchUpArticlesResponse> re = await _articleApi.SearchUpArticlesByUpIdAsync(req);
 
@@ -256,7 +256,7 @@ public class ArticleDomainService : IArticleDomainService
             mid = mid
         };
 
-        await _wbiDomainService.SetWridAsync(req);
+        await _wbiService.SetWridAsync(req);
 
         BiliApiResponse<SearchUpArticlesResponse> re = await _articleApi.SearchUpArticlesByUpIdAsync(req);
 

@@ -132,14 +132,14 @@ namespace BiliAgentTest
             var api = scope.ServiceProvider.GetRequiredService<IUserInfoApi>();
             var biliCookie = scope.ServiceProvider.GetRequiredService<BiliCookie>();
 
-            var domainService = scope.ServiceProvider.GetRequiredService<IWbiService>();
+            var wbiService = scope.ServiceProvider.GetRequiredService<IWbiService>();
 
             var req = new GetSpaceInfoDto()
             {
                 mid = 919174L
             };
 
-            await domainService.SetWridAsync(req);
+            await wbiService.SetWridAsync(req);
 
 
             BiliApiResponse<GetSpaceInfoResponse> re = api.GetSpaceInfo(req).Result;

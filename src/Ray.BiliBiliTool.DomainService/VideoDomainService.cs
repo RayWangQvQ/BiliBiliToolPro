@@ -29,7 +29,7 @@ namespace Ray.BiliBiliTool.DomainService
         private readonly IRelationApi _relationApi;
         private readonly IVideoApi _videoApi;
         private readonly IVideoWithoutCookieApi _videoWithoutCookieApi;
-        private readonly IWbiService _wbiDomainService;
+        private readonly IWbiService _wbiService;
 
         public VideoDomainService(
             ILogger<VideoDomainService> logger,
@@ -40,7 +40,7 @@ namespace Ray.BiliBiliTool.DomainService
             IRelationApi relationApi,
             IVideoApi videoApi,
             IVideoWithoutCookieApi videoWithoutCookieApi,
-            IWbiService wbiDomainService
+            IWbiService wbiService
             )
         {
             _logger = logger;
@@ -48,7 +48,7 @@ namespace Ray.BiliBiliTool.DomainService
             _relationApi = relationApi;
             _videoApi = videoApi;
             _videoWithoutCookieApi = videoWithoutCookieApi;
-            _wbiDomainService = wbiDomainService;
+            _wbiService = wbiService;
             _biliBiliCookie = biliBiliCookie;
             _expDic = dicOptions.Get(Constants.OptionsNames.ExpDictionaryName);
             _dailyTaskOptions = dailyTaskOptions.CurrentValue;
@@ -87,7 +87,7 @@ namespace Ray.BiliBiliTool.DomainService
                 ps = 1,
                 pn= new Random().Next(1, total + 1)
             };
-            await _wbiDomainService.SetWridAsync(req);
+            await _wbiService.SetWridAsync(req);
 
             BiliApiResponse<SearchUpVideosResponse> re = await _videoApi.SearchVideosByUpId(req);
 
@@ -110,7 +110,7 @@ namespace Ray.BiliBiliTool.DomainService
             {
                 mid = upId
             };
-            await _wbiDomainService.SetWridAsync(req);
+            await _wbiService.SetWridAsync(req);
 
             BiliApiResponse<SearchUpVideosResponse> re = await _videoApi.SearchVideosByUpId(req);
             if (re.Code != 0)
