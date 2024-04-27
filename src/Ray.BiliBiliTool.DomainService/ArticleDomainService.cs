@@ -184,7 +184,7 @@ public class ArticleDomainService : IArticleDomainService
             ps = 1,
             pn = new Random().Next(1, articleCount + 1)
         };
-        await _wbiDomainService.GetWridAsync(req);
+        await _wbiDomainService.SetWridAsync(req);
 
         BiliApiResponse<SearchUpArticlesResponse> re = await _articleApi.SearchUpArticlesByUpIdAsync(req);
 
@@ -256,7 +256,7 @@ public class ArticleDomainService : IArticleDomainService
             mid = mid
         };
 
-        await _wbiDomainService.GetWridAsync(req);
+        await _wbiDomainService.SetWridAsync(req);
 
         BiliApiResponse<SearchUpArticlesResponse> re = await _articleApi.SearchUpArticlesByUpIdAsync(req);
 

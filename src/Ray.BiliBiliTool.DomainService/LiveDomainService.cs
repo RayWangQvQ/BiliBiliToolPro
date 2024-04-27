@@ -414,7 +414,7 @@ namespace Ray.BiliBiliTool.DomainService
                 {
                     mid = liveHostUserId
                 };
-                await _wbiDomainService.GetWridAsync(req);
+                await _wbiDomainService.SetWridAsync(req);
 
                 var spaceInfo = await _userInfoApi.GetSpaceInfo(req);
                 if (spaceInfo.Code != 0)
@@ -591,7 +591,7 @@ namespace Ray.BiliBiliTool.DomainService
                 {
                     mid = liveHostUserId
                 };
-                await _wbiDomainService.GetWridAsync(req);
+                await _wbiDomainService.SetWridAsync(req);
 
                 var spaceInfo = await _userInfoApi.GetSpaceInfo(req);
                 if (spaceInfo.Code != 0)

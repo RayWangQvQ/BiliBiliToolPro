@@ -2,7 +2,7 @@
 
 namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Video;
 
-public class SearchVideosByUpIdDto : IWri
+public class SearchVideosByUpIdDto : IWrid
 {
     /// <summary>
     /// upId

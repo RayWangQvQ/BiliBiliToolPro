@@ -12,7 +12,7 @@ public interface IWbiService
     /// 获取WbiKey
     /// </summary>
     /// <returns></returns>
-    Task GetWridAsync<T>(T ob) where T : IWri;
+    Task SetWridAsync<T>(T ob) where T : IWrid;
 
     WridDto EncWbi(Dictionary<string, object> parameters, string imgKey, string subKey, long timespan = 0);
 }

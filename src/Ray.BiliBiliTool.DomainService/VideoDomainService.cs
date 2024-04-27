@@ -87,7 +87,7 @@ namespace Ray.BiliBiliTool.DomainService
                 ps = 1,
                 pn= new Random().Next(1, total + 1)
             };
-            await _wbiDomainService.GetWridAsync(req);
+            await _wbiDomainService.SetWridAsync(req);
 
             BiliApiResponse<SearchUpVideosResponse> re = await _videoApi.SearchVideosByUpId(req);
 
@@ -110,7 +110,7 @@ namespace Ray.BiliBiliTool.DomainService
             {
                 mid = upId
             };
-            await _wbiDomainService.GetWridAsync(req);
+            await _wbiDomainService.SetWridAsync(req);
 
             BiliApiResponse<SearchUpVideosResponse> re = await _videoApi.SearchVideosByUpId(req);
             if (re.Code != 0)

@@ -2,7 +2,7 @@
 
 namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Article;
 
-public class SearchArticlesByUpIdDto:IWri
+public class SearchArticlesByUpIdDto : IWrid
 {
     public long mid { get; set; }
 
@@ -11,9 +11,9 @@ public class SearchArticlesByUpIdDto:IWri
     public int ps { get; set; } = 12;
 
     public string sort { get; set; } = "publish_time";
-    
+
     public long web_location { get; set; } = 1550101;
-    
+
     public string platform { get; set; } = "web";
 
     public string w_rid { get; set; }

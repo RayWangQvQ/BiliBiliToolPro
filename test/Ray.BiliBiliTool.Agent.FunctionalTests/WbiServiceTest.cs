@@ -15,8 +15,6 @@ public class WbiServiceTest
 {
     private readonly IWbiService _target;
 
-    private readonly BiliCookie _ck;
-
     public WbiServiceTest()
     {
         var envs = new List<string>
@@ -26,10 +24,34 @@ public class WbiServiceTest
                 //"HTTPS_PROXY=localhost:8888"
             };
         IHost host = Program.CreateHost(envs.ToArray());
-        _ck = host.Services.GetRequiredService<BiliCookie>();
         _target = host.Services.GetRequiredService<IWbiService>();
     }
 
+    [Fact]
+    public async void SetWridAsync_SendRequest_SetWridSuccess()
+    {
+        // Arrange
+        var upId = 1585227649;
+        var req = new SearchVideosByUpIdDto()
+        {
+            mid = upId,
+            ps = 30,
+            tid = 0,
+            pn = 1,
+            keyword = "",
+            order = "pubdate",
+            platform = "web",
+            web_location = 1550101,
+            order_avoided = "true"
+        };
+
+        // Act
+        await _target.SetWridAsync(req);
+
+        // Assert
+        req.w_rid.Should().NotBeNullOrWhiteSpace();
+        req.wts.Should().NotBe(0);
+    }
 
     [Fact]
     public void EncWbi_InputParams_GetCorrectWbiResult()
@@ -56,36 +78,4 @@ public class WbiServiceTest
         re.w_rid.Should().BeEquivalentTo(expectResult);
         re.wts.Should().Be(timeSpan);
     }
-
-    [Fact]
-    public void EncWbi_Test()
-    {
-        var upId = 1585227649;
-
-        var req = new SearchVideosByUpIdDto()
-        {
-            mid = upId,
-            ps = 30,
-            tid = 0,
-            pn = 1,
-            keyword = "",
-            order = "pubdate",
-            platform = "web",
-            web_location = 1550101,
-            order_avoided = "true"
-        };
-
-        //var wbiDto= await domainService.GetWbiKeysAsync();
-        var wbiDto = new WbiImg()
-        {
-            img_url = "https://i0.hdslb.com/bfs/wbi/9cd4224d4fe74c7e9d6963e2ef891688.png",
-            sub_url = "https://i0.hdslb.com/bfs/wbi/263655ae2cad4cce95c9c401981b044a.png"
-        };
-        var dic = ObjectHelper.ObjectToDictionary(req);
-        //dic.Remove("keyword");
-        var re = _target.EncWbi(dic, wbiDto.ImgKey, wbiDto.SubKey, 1684866934);
-
-        Assert.Equal("8dca01c5633c1ed8cda9566b8502ca03", re.w_rid);
-    }
-
 }

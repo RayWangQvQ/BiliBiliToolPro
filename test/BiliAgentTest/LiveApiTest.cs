@@ -139,7 +139,7 @@ namespace BiliAgentTest
                 mid = 919174L
             };
 
-            await domainService.GetWridAsync(req);
+            await domainService.SetWridAsync(req);
 
 
             BiliApiResponse<GetSpaceInfoResponse> re = api.GetSpaceInfo(req).Result;

@@ -2,7 +2,7 @@
 
 namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 
-public class GetSpaceInfoDto : IWri
+public class GetSpaceInfoDto : IWrid
 {
     public long mid { get; set; }
 

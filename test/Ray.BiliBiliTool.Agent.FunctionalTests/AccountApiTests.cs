@@ -5,38 +5,34 @@ using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Console;
 
-namespace Ray.BiliBiliTool.Agent.FunctionalTests
+namespace Ray.BiliBiliTool.Agent.FunctionalTests;
+
+public class AccountApiTests
 {
-    public class AccountApiTests
+    private readonly IAccountApi _api;
+
+    public AccountApiTests()
     {
-        private readonly IAccountApi _api;
-
-        private readonly BiliCookie _ck;
-
-        public AccountApiTests()
+        var envs = new List<string>
         {
-            var envs = new List<string>
-            {
-                "--ENVIRONMENT=Development",
-                //"HTTP_PROXY=localhost:8888",
-                //"HTTPS_PROXY=localhost:8888"
-            };
-            IHost host = Program.CreateHost(envs.ToArray());
-            _ck = host.Services.GetRequiredService<BiliCookie>();
-            _api = host.Services.GetRequiredService<IAccountApi>();
-        }
+            "--ENVIRONMENT=Development",
+            //"HTTP_PROXY=localhost:8888",
+            //"HTTPS_PROXY=localhost:8888"
+        };
+        IHost host = Program.CreateHost(envs.ToArray());
+        _api = host.Services.GetRequiredService<IAccountApi>();
+    }
 
-        [Fact]
-        public async Task GetCoinBalance_Normal_GetCoinBalance()
-        {
-            // Act
-            BiliApiResponse<CoinBalance> re = await _api.GetCoinBalanceAsync();
+    [Fact]
+    public async Task GetCoinBalance_Normal_GetCoinBalance()
+    {
+        // Act
+        BiliApiResponse<CoinBalance> re = await _api.GetCoinBalanceAsync();
 
-            // Arrange
+        // Arrange
 
-            // Assert
-            re.Code.Should().Be(0);
-            re.Data.Money.Should().IsNotNull();
-        }
+        // Assert
+        re.Code.Should().Be(0);
+        re.Data.Money.Should().IsNotNull();
     }
 }

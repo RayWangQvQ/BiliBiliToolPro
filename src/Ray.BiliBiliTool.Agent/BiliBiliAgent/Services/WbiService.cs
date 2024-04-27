@@ -29,12 +29,12 @@ public class WbiService : IWbiService
         _userInfoApi = userInfoApi;
     }
 
-    public async Task GetWridAsync<T>(T request) where T: IWri
+    public async Task SetWridAsync<T>(T request) where T: IWrid
     {
         //生成字典
         Dictionary<string, object> parameters = ObjectHelper.ObjectToDictionary(request);
-        parameters.Remove(nameof(IWri.wts));
-        parameters.Remove(nameof(IWri.w_rid));
+        parameters.Remove(nameof(IWrid.wts));
+        parameters.Remove(nameof(IWrid.w_rid));
 
         //根据当前用户信息取加密key
         WbiImg wbi = await GetWbiKeysAsync();
@@ -143,14 +143,14 @@ public class WbiService : IWbiService
     }
 }
 
-public class WridDto: IWri
+public class WridDto: IWrid
 {
     public long wts { get; set; }
 
     public string w_rid { get; set; }
 }
 
-public interface IWri
+public interface IWrid
 {
     public long wts { get; set; }
 
