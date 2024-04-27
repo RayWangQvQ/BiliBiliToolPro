@@ -57,7 +57,7 @@ public class ArticleDomainService : IArticleDomainService
 
     public async Task LikeArticle(long cvid)
     {
-        await _articleApi.Like(cvid, _biliCookie.BiliJct);
+        await _articleApi.LikeAsync(cvid, _biliCookie.BiliJct);
     }
 
     /// <summary>

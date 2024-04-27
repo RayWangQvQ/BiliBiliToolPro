@@ -31,6 +31,6 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         [Header("Referer", "https://www.bilibili.com/read/cv{cvid}/?from=search&spm_id_from=333.337.0.0")]
         [Header("Origin", "https://www.bilibili.com")]
         [HttpPost("/x/article/like?id={cvid}&type=1&csrf={csrf}")]
-        Task<BiliApiResponse> Like(long cvid, string csrf);
+        Task<BiliApiResponse> LikeAsync(long cvid, string csrf);
     }
 }
