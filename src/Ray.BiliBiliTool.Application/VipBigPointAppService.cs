@@ -343,7 +343,7 @@ public class VipBigPointAppService : AppService, IVipBigPointAppService
         }
 
         _logger.LogInformation("开始完成任务");
-        var re = await _vipMallApi.ViewVipMall(new ViewVipMallRequest()
+        var re = await _vipMallApi.ViewVipMallAsync(new ViewVipMallRequest()
         {
             Csrf = _biliCookie.BiliJct
         });

@@ -84,7 +84,7 @@ public class VipApiTest
         var ck = scope.ServiceProvider.GetRequiredService<BiliCookie>();
         var api = scope.ServiceProvider.GetRequiredService<IVipMallApi>();
         // var test = await api.ViewvipMall("{\r\n\"csrf\":\"33e5d4564b6b69cb4ed829bc404158cb\",\r\n\"eventId\":\"hevent_oy4b7h3epeb\"\r\n}");
-        var re = await api.ViewVipMall(new ViewVipMallRequest()
+        var re = await api.ViewVipMallAsync(new ViewVipMallRequest()
         {
             Csrf = ck.BiliJct,
             EventId = "hevent_oy4b7h3epeb"
