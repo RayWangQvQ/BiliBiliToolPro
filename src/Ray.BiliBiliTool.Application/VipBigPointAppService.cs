@@ -118,7 +118,7 @@ public class VipBigPointAppService : AppService, IVipBigPointAppService
             return;
         }
 
-        var re = await _vipApi.GetTaskList();
+        var re = await _vipApi.GetTaskListAsync();
 
         if (re.Code != 0) throw new Exception(re.ToJsonStr());
 
@@ -177,11 +177,11 @@ public class VipBigPointAppService : AppService, IVipBigPointAppService
             return info;
         }
 
-        var re = await _vipApi.Sign(new SignRequest());
+        var re = await _vipApi.SignAsync(new SignRequest());
         if (re.Code != 0) throw new Exception(re.ToJsonStr());
 
         //确认
-        var infoResult = await _vipApi.GetTaskList();
+        var infoResult = await _vipApi.GetTaskListAsync();
         if (infoResult.Code != 0) throw new Exception(infoResult.ToJsonStr());
         info = infoResult.Data;
 
@@ -217,7 +217,7 @@ public class VipBigPointAppService : AppService, IVipBigPointAppService
         //确认
         if (re)
         {
-            var infoResult = await _vipApi.GetTaskList();
+            var infoResult = await _vipApi.GetTaskListAsync();
             if (infoResult.Code != 0) throw new Exception(infoResult.ToJsonStr());
             info = infoResult.Data;
             bonusTask = GetTarget(info);
@@ -260,7 +260,7 @@ public class VipBigPointAppService : AppService, IVipBigPointAppService
         //确认
         if (re)
         {
-            var infoResult = await _vipApi.GetTaskList();
+            var infoResult = await _vipApi.GetTaskListAsync();
             if (infoResult.Code != 0) throw new Exception(infoResult.ToJsonStr());
             info = infoResult.Data;
             privilegeTask = GetTarget(info);
@@ -305,7 +305,7 @@ public class VipBigPointAppService : AppService, IVipBigPointAppService
         //确认
         if (re)
         {
-            var infoResult = await _vipApi.GetTaskList();
+            var infoResult = await _vipApi.GetTaskListAsync();
             if (infoResult.Code != 0) throw new Exception(infoResult.ToJsonStr());
             info = infoResult.Data;
             targetTask = GetTarget(info);
@@ -352,7 +352,7 @@ public class VipBigPointAppService : AppService, IVipBigPointAppService
         //确认
         if (re.Code == 0)
         {
-            var infoResult = await _vipApi.GetTaskList();
+            var infoResult = await _vipApi.GetTaskListAsync();
             if (infoResult.Code != 0) throw new Exception(infoResult.ToJsonStr());
             info = infoResult.Data;
             targetTask = GetTarget(info);
@@ -490,7 +490,7 @@ public class VipBigPointAppService : AppService, IVipBigPointAppService
         //确认
         if (re)
         {
-            var infoResult = await _vipApi.GetTaskList();
+            var infoResult = await _vipApi.GetTaskListAsync();
             if (infoResult.Code != 0) throw new Exception(infoResult.ToJsonStr());
             info = infoResult.Data;
             targetTask = GetTarget(info);
