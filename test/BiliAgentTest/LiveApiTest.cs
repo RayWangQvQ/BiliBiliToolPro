@@ -10,7 +10,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Ray.BiliBiliTool.Infrastructure.Cookie;
 using Xunit;
-using Ray.BiliBiliTool.DomainService.Interfaces;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Services;
 
 namespace BiliAgentTest
 {
@@ -132,25 +132,17 @@ namespace BiliAgentTest
             var api = scope.ServiceProvider.GetRequiredService<IUserInfoApi>();
             var biliCookie = scope.ServiceProvider.GetRequiredService<BiliCookie>();
 
-            var domainService = scope.ServiceProvider.GetRequiredService<IWbiDomainService>();
+            var wbiService = scope.ServiceProvider.GetRequiredService<IWbiService>();
 
             var req = new GetSpaceInfoDto()
             {
                 mid = 919174L
             };
 
-            var w_ridDto = await domainService.GetWridAsync(req);
-
-            var fullDto = new GetSpaceInfoFullDto()
-            {
-                mid = 919174L,
-                w_rid = w_ridDto.w_rid,
-                wts = w_ridDto.wts
-            };
+            await wbiService.SetWridAsync(req);
 
 
-
-            BiliApiResponse<GetSpaceInfoResponse> re = api.GetSpaceInfo(fullDto).Result;
+            BiliApiResponse<GetSpaceInfoResponse> re = api.GetSpaceInfo(req).Result;
 
             Assert.True(re.Code == 0);
             Assert.NotNull(re.Data);

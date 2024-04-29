@@ -36,7 +36,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         [Header("Referer", "https://www.bilibili.com/")]
         [Header("Origin", "https://www.bilibili.com")]
         [HttpPost("/x/ugcpay/web/v2/trade/elec/pay/quick")]
-        Task<BiliApiResponse<ChargeV2Response>> ChargeV2([FormContent] ChargeRequest request);
+        Task<BiliApiResponse<ChargeV2Response>> ChargeV2Async([FormContent] ChargeRequest request);
 
         /// <summary>
         /// 充电后留言
@@ -50,7 +50,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         [Header("Referer", "https://www.bilibili.com/")]
         [Header("Origin", "https://www.bilibili.com")]
         [HttpPost("/x/ugcpay/trade/elec/message")]
-        Task<BiliApiResponse<ChargeResponse>> ChargeComment([FormContent] ChargeCommentRequest request);
+        Task<BiliApiResponse<ChargeResponse>> ChargeCommentAsync([FormContent] ChargeCommentRequest request);
 
     }
 }

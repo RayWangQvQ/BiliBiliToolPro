@@ -10,20 +10,32 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
     /// 大会员大积分
     /// </summary>
     [Header("Host", "api.bilibili.com")]
-    [Header("User-Agent",
-        "Mozilla/5.0 (Linux; Android 9; SM-N9700 Build/PQ3A.190605.04081832; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/91.0.4472.114 Safari/537.36 Mobile os/android model/SM-N9700 build/7300400 osVer/9 sdkInt/28 network/2 BiliApp/7300400 mobi_app/android channel/alifenfa Buvid/XY77D6C72ECDC63147110C5C8D1DA34D38CD1 sessionID/9795ed5c innerVer/7300400 c_locale/zh_CN s_locale/zh_CN disable_rcmd/0 7.30.0 os/android model/SM-N9700 mobi_app/android build/7300400 channel/alifenfa innerVer/7300400 osVer/9 network/2")]
+    [Header("User-Agent", "Mozilla/5.0 (Linux; Android 12; SM-S9080 Build/V417IR; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/91.0.4472.114 Mobile Safari/537.36 os/android model/SM-S9080 build/7760700 osVer/12 sdkInt/32 network/2 BiliApp/7760700 mobi_app/android channel/bili Buvid/XZ286B42466A3AB0A8CC096DCF56101466E9A sessionID/811cdab4 innerVer/7760710 c_locale/zh_CN s_locale/zh_CN disable_rcmd/0 7.76.0 os/android model/SM-S9080 mobi_app/android build/7760700 channel/bili innerVer/7760710 osVer/12 network/2\nx-bili-trace-id: ba85aa511a87af24e23a771873662e7d:e23a771873662e7d:0:0")]
     [LogFilter]
     public interface IVipBigPointApi
     {
+        /// <summary>
+        /// 获取任务列表
+        /// </summary>
+        /// <returns></returns>
         [Header("Referer", "https://big.bilibili.com/mobile/bigPoint/task")]
         [HttpGet("/x/vip_point/task/combine")]
-        Task<BiliApiResponse<VipTaskInfo>> GetTaskList();
+        Task<BiliApiResponse<VipTaskInfo>> GetTaskListAsync();
 
-
-        [Header("Referer", "https://www.bilibili.com")]
+        /// <summary>
+        /// 签到任务
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [Header("Referer", "https://big.bilibili.com/mobile/bigPoint/task")]
         [HttpPost("/pgc/activity/score/task/sign")]
-        Task<BiliApiResponse> Sign([FormContent] SignRequest request);
+        Task<BiliApiResponse> SignAsync([FormContent] SignRequest request);
 
+        /// <summary>
+        /// 领取任务
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [Header("Referer", "https://big.bilibili.com/mobile/bigPoint/task")]
         [HttpPost("/pgc/activity/score/task/receive")]
         Task<BiliApiResponse> Receive([JsonContent] ReceiveOrCompleteTaskRequest request);
@@ -35,7 +47,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
 
         [Header("Referer", "https://big.bilibili.com/mobile/bigPoint/task")]
         [HttpPost("/pgc/activity/score/task/complete")]
-        Task<BiliApiResponse> Complete([JsonContent] ReceiveOrCompleteTaskRequest request);
+        Task<BiliApiResponse> CompleteAsync([JsonContent] ReceiveOrCompleteTaskRequest request);
 
         [Header("Referer", "https://big.bilibili.com/mobile/bigPoint/task")]
         [HttpPost("/pgc/activity/score/task/complete/v2")]
@@ -48,11 +60,15 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
 
         [Header("Referer", "https://big.bilibili.com/mobile/bigPoint/task")]
         [HttpGet("/x/vip/privilege/my")]
-        Task<BiliApiResponse<VouchersInfoResponse>> GetVouchersInfo();
+        Task<BiliApiResponse<VouchersInfoResponse>> GetVouchersInfoAsync();
 
+        /// <summary>
+        /// 兑换大会员经验
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [Header("Referer", "https://big.bilibili.com/mobile/bigPoint/task")]
-        // [Header("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")]
         [HttpPost("/x/vip/experience/add")]
-        Task<BiliApiResponse> GetVipExperience([FormContent] VipExperienceRequest request);
+        Task<BiliApiResponse> ObtainVipExperienceAsync([FormContent] VipExperienceRequest request);
     }
 }

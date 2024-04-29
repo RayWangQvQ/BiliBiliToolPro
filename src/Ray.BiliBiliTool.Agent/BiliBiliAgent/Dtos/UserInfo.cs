@@ -143,23 +143,19 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos
     public class WbiImg
     {
         /// <summary>
-        /// https://i0.hdslb.com/bfs/wbi/9cd4224d4fe74c7e9d6963e2ef891688.png
+        /// img url
         /// </summary>
+        /// <sample>https://i0.hdslb.com/bfs/wbi/9cd4224d4fe74c7e9d6963e2ef891688.png</sample>
         public string img_url { get; set; }
 
         /// <summary>
-        /// https://i0.hdslb.com/bfs/wbi/263655ae2cad4cce95c9c401981b044a.png
+        /// sub url
         /// </summary>
+        /// <sample>https://i0.hdslb.com/bfs/wbi/263655ae2cad4cce95c9c401981b044a.png</sample>
         public string sub_url { get; set; }
 
-        public string GetImgKey()
-        {
-            return img_url.Split("wbi/").ToList().Last().Replace(".png", "");
-        }
+        public string ImgKey => img_url.Split("wbi/").ToList().Last().Replace(".png", "");
 
-        public string GetSubKey()
-        {
-            return sub_url.Split("wbi/").ToList().Last().Replace(".png", "");
-        }
+        public string SubKey => sub_url.Split("wbi/").ToList().Last().Replace(".png", "");
     }
 }
