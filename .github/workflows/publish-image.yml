@@ -33,7 +33,7 @@ jobs:
           if [ "${{ github.event.release.tag_name }}" ] ; then
             TargetVersion=${{ github.event.release.tag_name }}
           else
-            TargetVersion=$(echo "$GITHUB_REF" | sed 's/refs\/tags\///')
+            TargetVersion=$(grep -oP '(?<=<Version>).*?(?=<\/Version>)' ./common.props)
           fi
           echo "TargetVersion: $TargetVersion"
           echo "TargetVersion=$TargetVersion" >> $GITHUB_OUTPUT
