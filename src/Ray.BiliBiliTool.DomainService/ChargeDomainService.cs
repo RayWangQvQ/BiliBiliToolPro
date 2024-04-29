@@ -88,7 +88,7 @@ namespace Ray.BiliBiliTool.DomainService
             var request = new ChargeRequest(couponBalance, long.Parse(targetUpId), _cookie.BiliJct);
 
             //BiliApiResponse<ChargeResponse> response = await _chargeApi.Charge(decimal.ToInt32(couponBalance * 10), _dailyTaskOptions.AutoChargeUpId, _cookieOptions.UserId, _cookieOptions.BiliJct);
-            BiliApiResponse<ChargeV2Response> response = await _chargeApi.ChargeV2(request);
+            BiliApiResponse<ChargeV2Response> response = await _chargeApi.ChargeV2Async(request);
 
             if (response.Code == 0)
             {
@@ -123,7 +123,7 @@ namespace Ray.BiliBiliTool.DomainService
         {
             var comment = _dailyTaskOptions.ChargeComment ?? "";
             var request = new ChargeCommentRequest(orderNum, comment, _cookie.BiliJct);
-            await _chargeApi.ChargeComment(request);
+            await _chargeApi.ChargeCommentAsync(request);
 
             _logger.LogInformation("【留言】{comment}", comment);
         }

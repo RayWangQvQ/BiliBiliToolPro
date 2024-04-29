@@ -18,7 +18,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         [Header("Referer", "https://account.bilibili.com/account/home")]
         [Header("Origin", "https://account.bilibili.com")]
         [HttpGet("/x/member/web/exp/reward")]
-        Task<BiliApiResponse<DailyTaskInfo>> GetDailyTaskRewardInfo();
+        Task<BiliApiResponse<DailyTaskInfo>> GetDailyTaskRewardInfoAsync();
 
         /// <summary>
         /// 获取通过投币已获取的经验值
@@ -27,7 +27,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         [Header("Referer", "https://www.bilibili.com/")]
         [Header("Origin", "https://www.bilibili.com")]
         [HttpGet("/x/web-interface/coin/today/exp")]
-        Task<BiliApiResponse<int>> GetDonateCoinExp();
+        Task<BiliApiResponse<int>> GetDonateCoinExpAsync();
 
         /// <summary>
         /// 获取VIP特权
@@ -36,6 +36,6 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         /// <param name="csrf"></param>
         /// <returns></returns>
         [HttpPost("/x/vip/privilege/receive?type={type}&csrf={csrf}")]
-        Task<BiliApiResponse> ReceiveVipPrivilege(int type, string csrf);
+        Task<BiliApiResponse> ReceiveVipPrivilegeAsync(int type, string csrf);
     }
 }

@@ -11,6 +11,7 @@ using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Relation;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Services;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Dtos;
 using Ray.BiliBiliTool.DomainService.Interfaces;
@@ -33,7 +34,7 @@ namespace Ray.BiliBiliTool.DomainService
         private readonly DailyTaskOptions _dailyTaskOptions;
         private readonly SecurityOptions _securityOptions;
         private readonly BiliCookie _biliCookie;
-        private readonly IWbiDomainService _wbiDomainService;
+        private readonly IWbiService _wbiService;
 
         public LiveDomainService(ILogger<LiveDomainService> logger,
             ILiveApi liveApi,
@@ -44,7 +45,7 @@ namespace Ray.BiliBiliTool.DomainService
             IOptionsMonitor<LiveLotteryTaskOptions> liveLotteryTaskOptions,
             IOptionsMonitor<LiveFansMedalTaskOptions> liveFansMedalTaskOptions,
             IOptionsMonitor<SecurityOptions> securityOptions,
-            IWbiDomainService wbiDomainService,
+            IWbiService wbiService,
             BiliCookie biliCookie)
         {
             _logger = logger;
@@ -56,7 +57,7 @@ namespace Ray.BiliBiliTool.DomainService
             _dailyTaskOptions = dailyTaskOptions.CurrentValue;
             _liveFansMedalTaskOptions = liveFansMedalTaskOptions.CurrentValue;
             _securityOptions = securityOptions.CurrentValue;
-            _wbiDomainService = wbiDomainService;
+            _wbiService = wbiService;
             _biliCookie = biliCookie;
 
         }
@@ -413,16 +414,9 @@ namespace Ray.BiliBiliTool.DomainService
                 {
                     mid = liveHostUserId
                 };
+                await _wbiService.SetWridAsync(req);
 
-
-                var w_ridDto = await _wbiDomainService.GetWridAsync(req);
-                var fullDto = new GetSpaceInfoFullDto()
-                {
-                    mid = liveHostUserId,
-                    w_rid = w_ridDto.w_rid,
-                    wts = w_ridDto.wts
-                };
-                var spaceInfo = await _userInfoApi.GetSpaceInfo(fullDto);
+                var spaceInfo = await _userInfoApi.GetSpaceInfo(req);
                 if (spaceInfo.Code != 0)
                 {
                     _logger.LogError("【获取直播间信息】失败");
@@ -597,16 +591,9 @@ namespace Ray.BiliBiliTool.DomainService
                 {
                     mid = liveHostUserId
                 };
+                await _wbiService.SetWridAsync(req);
 
-
-                var w_ridDto = await _wbiDomainService.GetWridAsync(req);
-                var fullDto = new GetSpaceInfoFullDto()
-                {
-                    mid = liveHostUserId,
-                    w_rid = w_ridDto.w_rid,
-                    wts = w_ridDto.wts
-                };
-                var spaceInfo = await _userInfoApi.GetSpaceInfo(fullDto);
+                var spaceInfo = await _userInfoApi.GetSpaceInfo(req);
                 if (spaceInfo.Code != 0)
                 {
                     _logger.LogError("【获取空间信息】失败");

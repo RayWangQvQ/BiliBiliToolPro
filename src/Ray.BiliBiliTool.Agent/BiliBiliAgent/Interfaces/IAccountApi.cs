@@ -13,6 +13,6 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
         /// <returns></returns>
         [Header("Referer", "https://account.bilibili.com/account/coin")]
         [HttpGet("/site/getCoin")]
-        Task<BiliApiResponse<CoinBalance>> GetCoinBalance();
+        Task<BiliApiResponse<CoinBalance>> GetCoinBalanceAsync();
     }
 }

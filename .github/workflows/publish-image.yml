@@ -33,8 +33,8 @@ jobs:
           if [ "${{ github.event.release.tag_name }}" ] ; then
             TargetVersion=${{ github.event.release.tag_name }}
           fi
-          if [ "${{ github.event.inputs.manualTag }}" ] ; then
-            TargetVersion=${{ github.event.inputs.manualTag }}
+          then
+            TargetVersion=$(echo "$GITHUB_REF" | sed 's/refs\/tags\///')
           fi
           echo "TargetVersion: $TargetVersion"
           echo "TargetVersion=$TargetVersion" >> $GITHUB_OUTPUT

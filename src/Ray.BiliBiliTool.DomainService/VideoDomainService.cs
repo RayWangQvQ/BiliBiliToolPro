@@ -8,6 +8,7 @@ using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Video;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Services;
 using Ray.BiliBiliTool.Config;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Dtos;
@@ -28,7 +29,7 @@ namespace Ray.BiliBiliTool.DomainService
         private readonly IRelationApi _relationApi;
         private readonly IVideoApi _videoApi;
         private readonly IVideoWithoutCookieApi _videoWithoutCookieApi;
-        private readonly IWbiDomainService _wbiDomainService;
+        private readonly IWbiService _wbiService;
 
         public VideoDomainService(
             ILogger<VideoDomainService> logger,
@@ -39,7 +40,7 @@ namespace Ray.BiliBiliTool.DomainService
             IRelationApi relationApi,
             IVideoApi videoApi,
             IVideoWithoutCookieApi videoWithoutCookieApi,
-            IWbiDomainService wbiDomainService
+            IWbiService wbiService
             )
         {
             _logger = logger;
@@ -47,7 +48,7 @@ namespace Ray.BiliBiliTool.DomainService
             _relationApi = relationApi;
             _videoApi = videoApi;
             _videoWithoutCookieApi = videoWithoutCookieApi;
-            _wbiDomainService = wbiDomainService;
+            _wbiService = wbiService;
             _biliBiliCookie = biliBiliCookie;
             _expDic = dicOptions.Get(Constants.OptionsNames.ExpDictionaryName);
             _dailyTaskOptions = dailyTaskOptions.CurrentValue;
@@ -86,20 +87,9 @@ namespace Ray.BiliBiliTool.DomainService
                 ps = 1,
                 pn= new Random().Next(1, total + 1)
             };
+            await _wbiService.SetWridAsync(req);
 
-            var w_ridDto = await _wbiDomainService.GetWridAsync(req);
-
-            var fullDto = new SearchVideosByUpIdFullDto
-            {
-                mid = upId,
-                ps = req.ps,
-                pn = req.pn,
-
-                w_rid = w_ridDto.w_rid,
-                wts = w_ridDto.wts,
-            };
-
-            BiliApiResponse<SearchUpVideosResponse> re = await _videoApi.SearchVideosByUpId(fullDto);
+            BiliApiResponse<SearchUpVideosResponse> re = await _videoApi.SearchVideosByUpId(req);
 
             if (re.Code != 0)
             {
@@ -120,17 +110,9 @@ namespace Ray.BiliBiliTool.DomainService
             {
                 mid = upId
             };
+            await _wbiService.SetWridAsync(req);
 
-            var w_ridDto = await _wbiDomainService.GetWridAsync(req);
-
-            var fullDto = new SearchVideosByUpIdFullDto
-            {
-                mid = upId,
-                w_rid = w_ridDto.w_rid,
-                wts = w_ridDto.wts,
-            };
-
-            BiliApiResponse<SearchUpVideosResponse> re = await _videoApi.SearchVideosByUpId(fullDto);
+            BiliApiResponse<SearchUpVideosResponse> re = await _videoApi.SearchVideosByUpId(req);
             if (re.Code != 0)
             {
                 throw new Exception(re.Message);

@@ -5,178 +5,179 @@ using System.Net;
 using System.Net.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Polly;
 using Polly.Extensions.Http;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Services;
 using Ray.BiliBiliTool.Agent.HttpClientDelegatingHandlers;
 using Ray.BiliBiliTool.Agent.QingLong;
 using Ray.BiliBiliTool.Config.Options;
-using Ray.BiliBiliTool.Infrastructure;
 using Ray.BiliBiliTool.Infrastructure.Cookie;
 
-namespace Ray.BiliBiliTool.Agent.Extensions
+namespace Ray.BiliBiliTool.Agent.Extensions;
+
+public static class ServiceCollectionExtension
 {
-    public static class ServiceCollectionExtension
+    /// <summary>
+    /// 注册强类型api客户端
+    /// </summary>
+    /// <param name="services"></param>
+    /// <returns></returns>
+    public static IServiceCollection AddBiliBiliClientApi(this IServiceCollection services, IConfiguration configuration)
     {
-        /// <summary>
-        /// 注册强类型api客户端
-        /// </summary>
-        /// <param name="services"></param>
-        /// <returns></returns>
-        public static IServiceCollection AddBiliBiliClientApi(this IServiceCollection services, IConfiguration configuration)
+        //Cookie
+        services.AddSingleton<CookieStrFactory>(sp =>
         {
-            //Cookie
-            services.AddSingleton<CookieStrFactory>(sp =>
+            var list = new List<string>();
+            var config = sp.GetRequiredService<IConfiguration>();
+
+            //兼容老版
+            var old = config["BiliBiliCookie:CookieStr"];
+            if (!string.IsNullOrWhiteSpace(old)) list.Add(old);
+
+            var configList = config.GetSection("BiliBiliCookies")
+                .Get<List<string>>() ?? new List<string>()
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .ToList();
+            list.AddRange(configList);
+
+            return new CookieStrFactory(list);
+        });
+        services.AddTransient<BiliCookie>();
+
+        //全局代理
+        services.SetGlobalProxy(configuration);
+
+        //DelegatingHandler
+        services.Scan(scan => scan
+            .FromAssemblyOf<IBiliBiliApi>()
+            .AddClasses(classes => classes.AssignableTo<DelegatingHandler>())
+            .AsSelf()
+            .WithTransientLifetime()
+        );
+
+        //服务
+        services.AddScoped<IWbiService, WbiService>();
+
+        //bilibli
+        services.AddBiliBiliClientApi<IUserInfoApi>("https://api.bilibili.com");
+        services.AddBiliBiliClientApi<IDailyTaskApi>("https://api.bilibili.com");
+        services.AddBiliBiliClientApi<IMangaApi>("https://manga.bilibili.com");
+        services.AddBiliBiliClientApi<IAccountApi>("https://account.bilibili.com");
+        services.AddBiliBiliClientApi<ILiveApi>("https://api.live.bilibili.com");
+        services.AddBiliBiliClientApi<IRelationApi>("https://api.bilibili.com");
+        services.AddBiliBiliClientApi<IChargeApi>("https://api.bilibili.com");
+        services.AddBiliBiliClientApi<IVideoApi>("https://api.bilibili.com");
+        services.AddBiliBiliClientApi<IVideoWithoutCookieApi>("https://api.bilibili.com", false);
+        services.AddBiliBiliClientApi<IVipBigPointApi>("https://api.bilibili.com");
+        services.AddBiliBiliClientApi<IPassportApi>("http://passport.bilibili.com", false);
+        services.AddBiliBiliClientApi<ILiveTraceApi>("https://live-trace.bilibili.com");
+        services.AddBiliBiliClientApi<IHomeApi>("https://www.bilibili.com", false);
+
+        // 添加注入
+        services.AddBiliBiliClientApi<IArticleApi>("https://api.bilibili.com");
+        services.AddBiliBiliClientApi<IVipMallApi>("https://show.bilibili.com");
+
+        //qinglong
+        var qinglongHost = configuration["QL_URL"] ?? "http://localhost:5600";
+        services
+            .AddHttpApi<IQingLongApi>(o =>
             {
-                var list = new List<string>();
-                var config = sp.GetRequiredService<IConfiguration>();
+                o.HttpHost = new Uri(qinglongHost);
+                o.UseDefaultUserAgent = false;
+            })
+            .ConfigureHttpClient((sp, c) =>
+            {
+                c.DefaultRequestHeaders.Add("User-Agent",
+                    sp.GetRequiredService<IOptionsMonitor<SecurityOptions>>().CurrentValue.UserAgent);
+            })
+            .AddPolicyHandler(GetRetryPolicy());
 
-                //兼容老版
-                var old = config["BiliBiliCookie:CookieStr"];
-                if (!string.IsNullOrWhiteSpace(old)) list.Add(old);
+        return services;
+    }
 
-                var configList = config.GetSection("BiliBiliCookies")
-                    .Get<List<string>>() ?? new List<string>()
-                    .Where(x => !string.IsNullOrWhiteSpace(x))
-                    .ToList();
-                list.AddRange(configList);
+    /// <summary>
+    /// 封装Refit，默认将Cookie添加到Header中
+    /// </summary>
+    /// <typeparam name="TInterface"></typeparam>
+    /// <param name="services"></param>
+    /// <param name="host"></param>
+    /// <returns></returns>
+    private static IServiceCollection AddBiliBiliClientApi<TInterface>(this IServiceCollection services, string host, bool withCookie = true)
+        where TInterface : class
+    {
+        var uri = new Uri(host);
+        IHttpClientBuilder httpClientBuilder = services
+            .AddHttpApi<TInterface>(o =>
+            {
+                o.HttpHost = uri;
+                o.UseDefaultUserAgent = false;
+            })
+            .ConfigureHttpClient((sp, c) =>
+            {
+                c.DefaultRequestHeaders.Add("User-Agent",
+                    sp.GetRequiredService<IOptionsMonitor<SecurityOptions>>().CurrentValue.UserAgent);
+            })
+            .AddHttpMessageHandler<IntervalDelegatingHandler>()
+            .AddPolicyHandler(GetRetryPolicy());
 
-                return new CookieStrFactory(list);
+        if (withCookie)
+            httpClientBuilder.ConfigureHttpClient((sp, c) =>
+            {
+                var ck = sp.GetRequiredService<BiliCookie>();
+                c.DefaultRequestHeaders.Add("Cookie", ck.ToString());
             });
-            services.AddTransient<BiliCookie>();
 
-            //全局代理
-            services.SetGlobalProxy(configuration);
+        return services;
+    }
 
-            //DelegatingHandler
-            services.Scan(scan => scan
-                .FromAssemblyOf<IBiliBiliApi>()
-                .AddClasses(classes => classes.AssignableTo<DelegatingHandler>())
-                .AsSelf()
-                .WithTransientLifetime()
-            );
-
-            //bilibli
-            services.AddBiliBiliClientApi<IUserInfoApi>("https://api.bilibili.com");
-            services.AddBiliBiliClientApi<IDailyTaskApi>("https://api.bilibili.com");
-            services.AddBiliBiliClientApi<IMangaApi>("https://manga.bilibili.com");
-            services.AddBiliBiliClientApi<IAccountApi>("https://account.bilibili.com");
-            services.AddBiliBiliClientApi<ILiveApi>("https://api.live.bilibili.com");
-            services.AddBiliBiliClientApi<IRelationApi>("https://api.bilibili.com");
-            services.AddBiliBiliClientApi<IChargeApi>("https://api.bilibili.com");
-            services.AddBiliBiliClientApi<IVideoApi>("https://api.bilibili.com");
-            services.AddBiliBiliClientApi<IVideoWithoutCookieApi>("https://api.bilibili.com", false);
-            services.AddBiliBiliClientApi<IVipBigPointApi>("https://api.bilibili.com");
-            services.AddBiliBiliClientApi<IPassportApi>("http://passport.bilibili.com", false);
-            services.AddBiliBiliClientApi<ILiveTraceApi>("https://live-trace.bilibili.com");
-            services.AddBiliBiliClientApi<IHomeApi>("https://www.bilibili.com", false);
-
-            // 添加注入
-            services.AddBiliBiliClientApi<IArticleApi>("https://api.bilibili.com");
-            services.AddBiliBiliClientApi<IVipMallApi>("https://show.bilibili.com");
-
-            //qinglong
-            var qinglongHost = configuration["QL_URL"] ?? "http://localhost:5600";
-            services
-                .AddHttpApi<IQingLongApi>(o =>
-                {
-                    o.HttpHost = new Uri(qinglongHost);
-                    o.UseDefaultUserAgent = false;
-                })
-                .ConfigureHttpClient((sp, c) =>
-                {
-                    c.DefaultRequestHeaders.Add("User-Agent",
-                        sp.GetRequiredService<IOptionsMonitor<SecurityOptions>>().CurrentValue.UserAgent);
-                })
-                .AddPolicyHandler(GetRetryPolicy());
-
-            return services;
-        }
-
-        /// <summary>
-        /// 封装Refit，默认将Cookie添加到Header中
-        /// </summary>
-        /// <typeparam name="TInterface"></typeparam>
-        /// <param name="services"></param>
-        /// <param name="host"></param>
-        /// <returns></returns>
-        private static IServiceCollection AddBiliBiliClientApi<TInterface>(this IServiceCollection services, string host, bool withCookie = true)
-            where TInterface : class
+    /// <summary>
+    /// 设置全局代理(如果配置了代理)
+    /// </summary>
+    /// <param name="services"></param>
+    /// <returns></returns>
+    private static IServiceCollection SetGlobalProxy(this IServiceCollection services, IConfiguration configuration)
+    {
+        string proxyAddress = configuration["Security:WebProxy"];
+        if (proxyAddress.IsNotNullOrEmpty())
         {
-            var uri = new Uri(host);
-            IHttpClientBuilder httpClientBuilder = services
-                .AddHttpApi<TInterface>(o =>
-                {
-                    o.HttpHost = uri;
-                    o.UseDefaultUserAgent = false;
-                })
-                .ConfigureHttpClient((sp, c) =>
-                {
-                    c.DefaultRequestHeaders.Add("User-Agent",
-                        sp.GetRequiredService<IOptionsMonitor<SecurityOptions>>().CurrentValue.UserAgent);
-                })
-                .AddHttpMessageHandler<IntervalDelegatingHandler>()
-                .AddPolicyHandler(GetRetryPolicy());
+            WebProxy webProxy = new WebProxy();
 
-            if (withCookie)
-                httpClientBuilder.ConfigureHttpClient((sp, c) =>
-                {
-                    var ck = sp.GetRequiredService<BiliCookie>();
-                    c.DefaultRequestHeaders.Add("Cookie", ck.ToString());
-                });
-
-            return services;
-        }
-
-        /// <summary>
-        /// 设置全局代理(如果配置了代理)
-        /// </summary>
-        /// <param name="services"></param>
-        /// <returns></returns>
-        private static IServiceCollection SetGlobalProxy(this IServiceCollection services, IConfiguration configuration)
-        {
-            string proxyAddress = configuration["Security:WebProxy"];
-            if (proxyAddress.IsNotNullOrEmpty())
+            //user:password@host:port http proxy only .Tested with tinyproxy-1.11.0-rc1
+            if (proxyAddress.Contains("@"))
             {
-                WebProxy webProxy = new WebProxy();
+                string userPass = proxyAddress.Split("@")[0];
+                string address = proxyAddress.Split("@")[1];
 
-                //user:password@host:port http proxy only .Tested with tinyproxy-1.11.0-rc1
-                if (proxyAddress.Contains("@"))
+                string proxyUser = "";
+                string proxyPass = "";
+                if (userPass.Contains(":"))
                 {
-                    string userPass = proxyAddress.Split("@")[0];
-                    string address = proxyAddress.Split("@")[1];
-
-                    string proxyUser = "";
-                    string proxyPass = "";
-                    if (userPass.Contains(":"))
-                    {
-                        proxyUser = userPass?.Split(":")[0];
-                        proxyPass = userPass?.Split(":")[1];
-                    }
-
-                    webProxy.Address = new Uri("http://" + address);
-                    webProxy.Credentials = new NetworkCredential(proxyUser, proxyPass);
-                }
-                else
-                {
-                    webProxy.Address = new Uri(proxyAddress);
+                    proxyUser = userPass?.Split(":")[0];
+                    proxyPass = userPass?.Split(":")[1];
                 }
 
-                HttpClient.DefaultProxy = webProxy;
+                webProxy.Address = new Uri("http://" + address);
+                webProxy.Credentials = new NetworkCredential(proxyUser, proxyPass);
+            }
+            else
+            {
+                webProxy.Address = new Uri(proxyAddress);
             }
 
-            return services;
+            HttpClient.DefaultProxy = webProxy;
         }
 
-        static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
-        {
-            return HttpPolicyExtensions
-                .HandleTransientHttpError()
-                .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.NotFound)
-                .WaitAndRetryAsync(1, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2,
-                                                                            retryAttempt)));
-        }
+        return services;
+    }
+
+    static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
+    {
+        return HttpPolicyExtensions
+            .HandleTransientHttpError()
+            .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.NotFound)
+            .WaitAndRetryAsync(1, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2,
+                                                                        retryAttempt)));
     }
 }
