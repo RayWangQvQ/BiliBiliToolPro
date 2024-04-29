@@ -33,14 +33,16 @@ jobs:
         id: release_notes
         run: |
           content=$(grep -m1 "##" -A 1000 ./CHANGELOG.md)
+          version=$(echo "$GITHUB_REF" | sed 's/refs\/tags\///')
           echo "::set-output name=content::$content"
+          echo "::set-output name=version::$version"
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
           files: './src/Ray.BiliBiliTool.Console/bin/Publish/*.zip'
           token: ${{ secrets.GITHUB_TOKEN }}
-          name: "BiliBiliToolPro-V${{ github.event.inputs.version }}"
+          name: "BiliBiliToolPro-V${{ steps.release_notes.outputs.version }}"
           tag_name: ${{ github.event.inputs.version }}
           body: ${{ steps.release_notes.outputs.content }}
           discussion_category_name: Announcements
