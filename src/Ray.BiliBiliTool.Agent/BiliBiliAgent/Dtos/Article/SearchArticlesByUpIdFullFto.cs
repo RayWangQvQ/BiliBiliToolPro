@@ -4,7 +4,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Article;
 
 public class SearchArticlesByUpIdDto : IWrid
 {
-    public long Mid { get; set; }
+    public long mid { get; set; }
 
     public int pn { get; set; } = 1;
 

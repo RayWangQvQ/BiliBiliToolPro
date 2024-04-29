@@ -47,7 +47,7 @@ public class VideoApiTest
         var api = scope.ServiceProvider.GetRequiredService<IVideoApi>();
         var req = await api.GetBangumiBySsid(46508);
 
-        Assert.Equal(0,req.Code);
+        Assert.Equal(0, req.Code);
     }
 
     [Fact]
