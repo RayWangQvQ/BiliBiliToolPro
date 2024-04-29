@@ -47,7 +47,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
 
         [Header("Referer", "https://big.bilibili.com/mobile/bigPoint/task")]
         [HttpPost("/pgc/activity/score/task/complete")]
-        Task<BiliApiResponse> Complete([JsonContent] ReceiveOrCompleteTaskRequest request);
+        Task<BiliApiResponse> CompleteAsync([JsonContent] ReceiveOrCompleteTaskRequest request);
 
         [Header("Referer", "https://big.bilibili.com/mobile/bigPoint/task")]
         [HttpPost("/pgc/activity/score/task/complete/v2")]
@@ -60,11 +60,15 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
 
         [Header("Referer", "https://big.bilibili.com/mobile/bigPoint/task")]
         [HttpGet("/x/vip/privilege/my")]
-        Task<BiliApiResponse<VouchersInfoResponse>> GetVouchersInfo();
+        Task<BiliApiResponse<VouchersInfoResponse>> GetVouchersInfoAsync();
 
+        /// <summary>
+        /// 兑换大会员经验
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [Header("Referer", "https://big.bilibili.com/mobile/bigPoint/task")]
-        // [Header("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")]
         [HttpPost("/x/vip/experience/add")]
-        Task<BiliApiResponse> GetVipExperience([FormContent] VipExperienceRequest request);
+        Task<BiliApiResponse> ObtainVipExperienceAsync([FormContent] VipExperienceRequest request);
     }
 }

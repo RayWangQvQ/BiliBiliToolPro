@@ -62,7 +62,7 @@ public class VipBigPointAppService : AppService, IVipBigPointAppService
     public async Task VipExpress()
     {
         _logger.LogInformation("大会员经验领取任务开始");
-        var re = await _vipApi.GetVouchersInfo();
+        var re = await _vipApi.GetVouchersInfoAsync();
         if (re.Code == 0)
         {
             var state = re.Data.List.Find(x => x.Type == 9).State;
@@ -85,7 +85,7 @@ public class VipBigPointAppService : AppService, IVipBigPointAppService
                 case 0:
                     _logger.LogInformation("大会员经验未兑换");
                     //兑换api
-                    var response = await _vipApi.GetVipExperience(new VipExperienceRequest()
+                    var response = await _vipApi.ObtainVipExperienceAsync(new VipExperienceRequest()
                     {
                         csrf = _biliCookie.BiliJct
                     });
@@ -534,7 +534,7 @@ public class VipBigPointAppService : AppService, IVipBigPointAppService
     private async Task<bool> Complete(string taskCode)
     {
         var request = new ReceiveOrCompleteTaskRequest(taskCode);
-        var re = await _vipApi.Complete(request);
+        var re = await _vipApi.CompleteAsync(request);
         if (re.Code == 0)
         {
             _logger.LogInformation("已完成");

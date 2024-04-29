@@ -1,10 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.VipTask;
 using Ray.BiliBiliTool.Console;
-using Ray.BiliBiliTool.Infrastructure;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Xunit.Abstractions;
-using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.ViewMall;
 using Microsoft.Extensions.Hosting;
 using FluentAssertions;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
@@ -65,70 +63,44 @@ public class VipBigPointApiTest
     }
 
     [Fact]
-    public async Task VipInfoTest()
+    public async Task GetVouchersInfoAsync_Normal_Success()
     {
-        using var scope = Global.ServiceProviderRoot.CreateScope();
+        // Arrange
+        // Act
+        var re = await _api.GetVouchersInfoAsync();
 
-        var ck = scope.ServiceProvider.GetRequiredService<BiliCookie>();
-        var api = scope.ServiceProvider.GetRequiredService<IVipBigPointApi>();
-
-        var re = await api.GetVouchersInfo();
-        if (re.Code == 0)
-        {
-            var info = re.Data.List.Find(x => x.Type == 9);
-            if (info != null)
-            {
-                _output.WriteLine(info.State.ToString());
-            }
-            else
-            {
-                _output.WriteLine("error");
-            }
-        }
+        // Assert
+        re.Code.Should().Be(0);
+        re.Data.List.Should().Contain(x => x.Type == 9);
     }
 
 
     [Fact]
-    public async Task GetVipExperienceTest()
+    public async Task GetVipExperienceAsync_Normal_Success()
     {
-        using var scope = Global.ServiceProviderRoot.CreateScope();
-
-        var ck = scope.ServiceProvider.GetRequiredService<BiliCookie>();
-        var api = scope.ServiceProvider.GetRequiredService<IVipBigPointApi>();
-        var re = await api.GetVipExperience(new VipExperienceRequest()
+        // Arrange
+        var req = new VipExperienceRequest()
         {
-            csrf = ck.BiliJct
-        });
+            csrf = _ck.BiliJct
+        };
 
-        _output.WriteLine(re.Message);
+        // Act
+        BiliApiResponse re = await _api.ObtainVipExperienceAsync(req);
+
+        // Assert
+        re.Code.Should().Be(0);
     }
 
     [Fact]
-    public async Task ViewVipMallTest()
+    public async Task CompleteAsync_Normal_Success()
     {
-        using var scope = Global.ServiceProviderRoot.CreateScope();
+        // Arrange
+        var req = new ReceiveOrCompleteTaskRequest("dress-view");
 
-        var ck = scope.ServiceProvider.GetRequiredService<BiliCookie>();
-        var api = scope.ServiceProvider.GetRequiredService<IVipMallApi>();
-        // var test = await api.ViewvipMall("{\r\n\"csrf\":\"33e5d4564b6b69cb4ed829bc404158cb\",\r\n\"eventId\":\"hevent_oy4b7h3epeb\"\r\n}");
-        var re = await api.ViewVipMallAsync(new ViewVipMallRequest()
-        {
-            Csrf = ck.BiliJct,
-            EventId = "hevent_oy4b7h3epeb"
-        });
-        _output.WriteLine(re.Message);
+        // Act
+        var re = await _api.CompleteAsync(req);
 
-    }
-
-    [Fact]
-    public async Task DressViewTest()
-    {
-        using var scope = Global.ServiceProviderRoot.CreateScope();
-
-        var ck = scope.ServiceProvider.GetRequiredService<BiliCookie>();
-        var api = scope.ServiceProvider.GetRequiredService<IVipBigPointApi>();
-        var re = await api.Complete(new ReceiveOrCompleteTaskRequest(
-            "dress-view"));
-        _output.WriteLine(re.Message);
+        // Assert
+        re.Code.Should().Be(0);
     }
 }
