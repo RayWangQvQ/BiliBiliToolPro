@@ -61,6 +61,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{
 		.github\workflows\publish-image.yml = .github\workflows\publish-image.yml
 		.github\workflows\publish-release.yml = .github\workflows\publish-release.yml
 		.github\workflows\repo-sync.yml = .github\workflows\repo-sync.yml
+		.github\workflows\tag.yml = .github\workflows\tag.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker", "docker", "{A93210FD-27B6-40E4-B08D-391F96CA2754}"
@@ -135,7 +136,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DomainServiceTest", "test\D
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InfrastructureTest", "test\InfrastructureTest\InfrastructureTest.csproj", "{90C1DB73-B3DB-4BE5-AD1A-5248FE47860E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ray.BiliBiliTool.Agent.FunctionalTests", "test\Ray.BiliBiliTool.Agent.FunctionalTests\Ray.BiliBiliTool.Agent.FunctionalTests.csproj", "{16F315CF-056A-4B08-8C3C-A3177EA3CBB9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ray.BiliBiliTool.Agent.FunctionalTests", "test\Ray.BiliBiliTool.Agent.FunctionalTests\Ray.BiliBiliTool.Agent.FunctionalTests.csproj", "{16F315CF-056A-4B08-8C3C-A3177EA3CBB9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
