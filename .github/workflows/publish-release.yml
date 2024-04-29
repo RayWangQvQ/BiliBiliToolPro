@@ -35,7 +35,7 @@ jobs:
           content=$(grep -m1 "##" -A 1000 ./CHANGELOG.md)
           version=$(echo "$GITHUB_REF" | sed 's/refs\/tags\///')
           echo "::set-output name=content::$content"
-          echo "::set-output name=version::version"
+          echo "::set-output name=version::$version"
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
