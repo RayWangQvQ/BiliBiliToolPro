@@ -10,7 +10,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
     /// 大会员大积分
     /// </summary>
     [Header("Host", "api.bilibili.com")]
-    [Header("User-Agent", "Mozilla/5.0 (Linux; Android 12; SM-S9080 Build/V417IR; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/91.0.4472.114 Mobile Safari/537.36 os/android model/SM-S9080 build/7760700 osVer/12 sdkInt/32 network/2 BiliApp/7760700 mobi_app/android channel/bili Buvid/XZ286B42466A3AB0A8CC096DCF56101466E9A sessionID/811cdab4 innerVer/7760710 c_locale/zh_CN s_locale/zh_CN disable_rcmd/0 7.76.0 os/android model/SM-S9080 mobi_app/android build/7760700 channel/bili innerVer/7760710 osVer/12 network/2\nx-bili-trace-id: ba85aa511a87af24e23a771873662e7d:e23a771873662e7d:0:0")]
+    [Header("User-Agent", "Mozilla/5.0 (Linux; Android 12; SM-S9080 Build/V417IR; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/91.0.4472.114 Mobile Safari/537.36 os/android model/SM-S9080 build/7760700 osVer/12 sdkInt/32 network/2 BiliApp/7760700 mobi_app/android channel/bili innerVer/7760710 c_locale/zh_CN s_locale/zh_CN disable_rcmd/0 7.76.0 os/android model/SM-S9080 mobi_app/android build/7760700 channel/bili innerVer/7760710 osVer/12 network/2")]
     [LogFilter]
     public interface IVipBigPointApi
     {
