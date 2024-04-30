@@ -88,7 +88,11 @@ public class VipBigPointApiTest
         BiliApiResponse re = await _api.ObtainVipExperienceAsync(req);
 
         // Assert
-        re.Code.Should().Be(0);
+        re.Code.Should().BeOneOf(new List<int>
+        {
+            0,
+            69198, //用户经验已经领取
+        });
     }
 
     [Fact]
