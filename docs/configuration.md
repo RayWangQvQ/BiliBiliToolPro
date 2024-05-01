@@ -8,8 +8,7 @@
     - [1.1. 方式一：修改配置文件](#11-方式一修改配置文件)
     - [1.2. 方式二：命令启动时通过命令行参数配置](#12-方式二命令启动时通过命令行参数配置)
     - [1.3. 方式三：添加环境变量（推荐）](#13-方式三添加环境变量推荐)
-    - [1.4. ~~方式四：托管在GitHub Actions上，使用GitHub Secrets配置~~](#14-方式四托管在github-actions上使用github-secrets配置)
-    - [1.5. 方式五：托管在青龙面板上，使用面板的环境变量页或配置文件页进行配置](#15-方式五托管在青龙面板上使用面板的环境变量页或配置文件页进行配置)
+    - [1.4. 方式四：托管在青龙面板上，使用面板的环境变量页或配置文件页进行配置](#14-方式四托管在青龙面板上使用面板的环境变量页或配置文件页进行配置)
 - [2. 优先级](#2-优先级)
 - [3. 详细配置说明](#3-详细配置说明)
     - [3.1. Cookie字符串](#31-cookie字符串)
@@ -19,7 +18,8 @@
         - [3.2.3. 两次调用B站Api之间的间隔秒数](#323-两次调用b站api之间的间隔秒数)
         - [3.2.4. 间隔秒数所针对的HttpMethod](#324-间隔秒数所针对的httpmethod)
         - [3.2.5. 请求B站接口时头部传递的User-Agent](#325-请求b站接口时头部传递的user-agent)
-        - [3.2.6. WebProxy（代理）](#326-webproxy代理)
+        - [3.2.6. App请求B站接口时头部传递的User-Agent](#326-app请求b站接口时头部传递的user-agent)
+        - [3.2.7. WebProxy（代理）](#327-webproxy代理)
     - [3.3. 每日任务相关](#33-每日任务相关)
         - [3.3.1. 是否开启观看视频任务](#331-是否开启观看视频任务)
         - [3.3.2. 是否开启分享视频任务](#332-是否开启分享视频任务)
@@ -141,29 +141,8 @@ dotnet Ray.BiliBiliTool.Console.dll
 
 注意区分单下划线和双下划线，linux系统使用 `export` 关键字代替 `set` 。
 
-<a id="markdown-14-方式四托管在github-actions上使用github-secrets配置" name="14-方式四托管在github-actions上使用github-secrets配置"></a>
-### 1.4. ~~方式四：托管在GitHub Actions上，使用GitHub Secrets配置~~
-
-已废除，当前不支持使用`GitHub Action`直接运行应用，`GitHub Action`只用于部署
-
-<details>
-
-~~使用GitHub Actions，可以通过添加Secret实现配置。~~
-
-~~比如，配置微信推送的SCKEY，可以添加如下Secret：~~
-
-~~Secret Name：`PUSHSCKEY`~~
-
-~~Secret Value：`123abc`~~
-
-~~这些 Secrets 会通过 workflow 里的yml脚本映射为环境变量，在应用启动时作为环境变量配置源传入程序当中，所以使用 GitHub Secrets 配置的本质是使用环境变量配置。~~
-
-![添加GitHub Secrets](imgs/git-secrets.png)
-
-</details>
-
-<a id="markdown-15-方式五托管在青龙面板上使用面板的环境变量页或配置文件页进行配置" name="15-方式五托管在青龙面板上使用面板的环境变量页或配置文件页进行配置"></a>
-### 1.5. 方式五：托管在青龙面板上，使用面板的环境变量页或配置文件页进行配置
+<a id="markdown-14-方式四托管在青龙面板上使用面板的环境变量页或配置文件页进行配置" name="14-方式四托管在青龙面板上使用面板的环境变量页或配置文件页进行配置"></a>
+### 1.4. 方式四：托管在青龙面板上，使用面板的环境变量页或配置文件页进行配置
 
 青龙面板配置，其本质还是通过环境变量进行配置，有如下两种方式。
 
@@ -238,7 +217,6 @@ export Ray_Serilog__WriteTo__9__Args__token="abcde"
 | 值域   | [true,false] | |
 | 默认值   | false | |
 | 环境变量 | `Ray_Security__IsSkipDailyTask` | `set Ray_Security__IsSkipDailyTask=true` |
-| GitHub Secrets | `ISSKIPDAILYTASK` | Name:`ISSKIPDAILYTASK`  Value: `true`|
 
 <a id="markdown-322-随机睡眠的最大时长" name="322-随机睡眠的最大时长"></a>
 #### 3.2.2. 随机睡眠的最大时长
@@ -254,7 +232,6 @@ export Ray_Serilog__WriteTo__9__Args__token="abcde"
 | 值域   | 数字 |
 | 默认值   | 20 |
 | 环境变量 | `Ray_Security__RandomSleepMaxMin` |
-| GitHub Secrets | `RANDOMSLEEPMAXMIN`|
 
 <a id="markdown-323-两次调用b站api之间的间隔秒数" name="323-两次调用b站api之间的间隔秒数"></a>
 #### 3.2.3. 两次调用B站Api之间的间隔秒数
@@ -267,8 +244,6 @@ export Ray_Serilog__WriteTo__9__Args__token="abcde"
 | 值域   | [0,+] |
 | 默认值   | 20 |
 | 环境变量   | `Ray_Security__IntervalSecondsBetweenRequestApi` |
-| GitHub Secrets | `INTERVALSECONDSBETWEENREQUESTAPI` |
-
 
 <a id="markdown-324-间隔秒数所针对的httpmethod" name="324-间隔秒数所针对的httpmethod"></a>
 #### 3.2.4. 间隔秒数所针对的HttpMethod
@@ -280,7 +255,6 @@ export Ray_Serilog__WriteTo__9__Args__token="abcde"
 | 值域   | [GET,POST]，多个以英文逗号分隔 |
 | 默认值   | POST |
 | 环境变量   | `Ray_Security__IntervalMethodTypes` |
-| GitHub Secrets  | `INTERVALMETHODTYPES` |
 
 <a id="markdown-325-请求b站接口时头部传递的user-agent" name="325-请求b站接口时头部传递的user-agent"></a>
 #### 3.2.5. 请求B站接口时头部传递的User-Agent
@@ -291,15 +265,28 @@ export Ray_Serilog__WriteTo__9__Args__token="abcde"
 | 值域   | 字符串，可以F12从自己的浏览器获取 |
 | 默认值   | Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.66 Safari/537.36 Edg/87.0.664.41 |
 | 环境变量   | `Ray_Security__UserAgent` |
-| GitHub Secrets  | `USERAGENT`|
+
+获取浏览器中自己的UA的方法见下图：
+
+![获取User-Agent](imgs/get-user-agent.png)
+
+<a id="markdown-326-app请求b站接口时头部传递的user-agent" name="326-app请求b站接口时头部传递的user-agent"></a>
+#### 3.2.6. App请求B站接口时头部传递的User-Agent
+
+|   TITLE   | CONTENT   |
+| ---------- | -------------- |
+| 配置Key | `Security:UserAgentApp` |
+| 值域   | 字符串，可以F12从自己的浏览器获取 |
+| 默认值   | Mozilla/5.0 (Linux; Android 12; SM-S9080 Build/V417IR; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/91.0.4472.114 Mobile Safari/537.36 os/android model/SM-S9080 build/7760700 osVer/12 sdkInt/32 network/2 BiliApp/7760700 mobi_app/android channel/bili innerVer/7760710 c_locale/zh_CN s_locale/zh_CN disable_rcmd/0 7.76.0 os/android model/SM-S9080 mobi_app/android build/7760700 channel/bili innerVer/7760710 osVer/12 network/2 |
+| 环境变量   | `Ray_Security__UserAgentApp` |
 
 获取浏览器中自己的UA的方法见下图：
 
 ![获取User-Agent](imgs/get-user-agent.png)
 
 
-<a id="markdown-326-webproxy代理" name="326-webproxy代理"></a>
-#### 3.2.6. WebProxy（代理）
+<a id="markdown-327-webproxy代理" name="327-webproxy代理"></a>
+#### 3.2.7. WebProxy（代理）
 
 支持需要账户密码的代理。
 
