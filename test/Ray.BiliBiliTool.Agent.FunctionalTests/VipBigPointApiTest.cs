@@ -91,6 +91,7 @@ public class VipBigPointApiTest
         re.Code.Should().BeOneOf(new List<int>
         {
             0,
+            6034005, //任务未完成
             69198, //用户经验已经领取
         });
     }
