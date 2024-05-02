@@ -12,7 +12,7 @@ on:
         default: true
         type: boolean
   release:
-    types: [published]
+    types: [created]
 
 env:
   DOCKERHUB_USERNAME : ${{ secrets.DOCKERHUB_USERNAME }}
