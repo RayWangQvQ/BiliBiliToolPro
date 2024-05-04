@@ -5,5 +5,8 @@
 
 cd ./src/Ray.BiliBiliTool.Console
 
-export Ray_RunTasks=UnfollowBatched && \
-dotnet run
+if [ "$prefer_mode" == "dotnet" ]; then
+    export Ray_RunTasks=UnfollowBatched && dotnet run
+else
+    export Ray_RunTasks=UnfollowBatched && ../../bin/Ray.BiliBiliTool.Console
+fi

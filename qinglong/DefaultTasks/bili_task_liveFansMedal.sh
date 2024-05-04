@@ -5,5 +5,8 @@
 
 cd ./src/Ray.BiliBiliTool.Console
 
-export Ray_RunTasks=LiveFansMedal && \
-dotnet run
+if [ "$prefer_mode" == "dotnet" ]; then
+    export Ray_RunTasks=LiveFansMedal && dotnet run
+else
+    export Ray_RunTasks=LiveFansMedal && ../../bin/Ray.BiliBiliTool.Console
+fi
