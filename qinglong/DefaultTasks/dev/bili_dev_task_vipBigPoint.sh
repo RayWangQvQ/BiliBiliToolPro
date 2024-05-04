@@ -5,5 +5,8 @@
 
 cd ./src/Ray.BiliBiliTool.Console
 
-export Ray_RunTasks=VipBigPoint && \
-dotnet run --ENVIRONMENT=Production
+if [ "$prefer_mode" == "dotnet" ]; then
+    export Ray_RunTasks=VipBigPoint && dotnet run
+else
+    export Ray_RunTasks=VipBigPoint && ../../bin/Ray.BiliBiliTool.Console
+fi
