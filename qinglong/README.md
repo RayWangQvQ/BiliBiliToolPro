@@ -16,10 +16,7 @@
 - [2. 先行版](#2-先行版)
 - [3. GitHub加速](#3-github加速)
 - [4. 常见问题](#4-常见问题)
-    - [安装环境失败，怎么排查和解决](#安装环境失败怎么排查和解决)
-    - [安装过程中apk或apt网络太慢或异常，怎么配置国内镜像包源](#安装过程中apk或apt网络太慢或异常怎么配置国内镜像包源)
-        - [alpine apk设置国内源](#alpine-apk设置国内源)
-        - [debian apt设置国内源](#debian-apt设置国内源)
+    - [安装dotnet失败怎么办法](#安装dotnet失败怎么办法)
     - [4.1. Couldn't find a valid ICU package installed on the system](#41-couldnt-find-a-valid-icu-package-installed-on-the-system)
 
 <!-- /TOC -->
@@ -97,37 +94,37 @@
 其他选项同上。
 
 ## 3. GitHub加速
-拉库时，如果服务器在国内，访问GitHub速度慢，可以在仓库地址前加上 `https://ghproxy.com/` 进行加速, 如：`ql repo https://ghproxy.com/https://github.com/RayWangQvQ/BiliBiliToolPro.git "bili_task_"`
+
+拉库时，如果服务器在国内，访问GitHub速度慢，可在仓库地址前加上加速代理进行加速。
+
+如：
+
+```
+https://github.moeyy.xyz/https://github.com/RayWangQvQ/BiliBiliToolPro.git
+https://ghproxy.net/https://github.com/RayWangQvQ/BiliBiliToolPro.git
+...
+```
+
+加速代理地址通常不能保证长期稳定，请自行查找使用。
 
 ## 4. 常见问题
 
-### 安装环境失败，怎么排查和解决
+### 安装dotnet失败怎么办法
 
-出现异常的原因可能很多，需要视情况而定。
+先通过日志自行排查，不行就根据微软官方文档，进入qinglong容器后，手动安装。
 
-首先观察日志，
+如果还不行，那么可以切换到基于`bilitool`的二进制包运行方式，该方式不需要安装`dotnet`，方式：
 
-### 安装过程中apk或apt网络太慢或异常，怎么配置国内镜像包源
-
-青龙有2个版本，其基础镜像分别基于`alpine`和`debian`，如果你是首次安装，没有历史包袱，我建议优先考虑`debian`版。
-
-在安装过程中，如果是网络卡在了apk安装或apt安装那儿了，且你的机器在国内，那么可以通过切换包源到国内镜像源尝试解决。
-
-#### alpine apk设置国内源
+编辑青龙面板的`配置文件`，新增如下两行：
 
 ```
-# 先docker进入qinglong的容器内
-docker exec -it qinglong /bin/bash
-
-# 修改源
-sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories
-
-# 更新
-apk update
+export BILI_MODE="bilitool" # bili运行模式，dotnet或bilitool
+export BILI_GITHUB_PROXY="https://github.moeyy.xyz/" # 下载二进制包时使用的加速代理，不要的话则置空
 ```
 
-#### debian apt设置国内源
+其中加速代理形如：`https://github.moeyy.xyz/`或`https://ghproxy.net/`，因通常不能保证长期稳定，请自行查找使用。
 
+![qinglong-login.png](../docs/imgs/qinglong-run-as-bilitool.png)
 
 ### 4.1. Couldn't find a valid ICU package installed on the system
 
