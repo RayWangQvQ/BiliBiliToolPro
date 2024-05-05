@@ -10,15 +10,11 @@ set -u
 # This is causing it to fail
 set -o pipefail
 
-
-
-verbose=true # 开启debug日志
+verbose=true                           # 开启debug日志
 bili_repo="raywangqvq/bilibilitoolpro" # 仓库地址
-bili_branch="_develop" # 分支名，空或_develop
-prefer_mode=${BILI_MODE:-"dotnet"}    # dotnet或bilitool，需要通过环境变量配置
-github_proxy=${BILI_GITHUB_PROXY:-""} # 下载github release包时使用的代理，会拼在地址前面，需要通过环境变量配置
-
-
+bili_branch="_develop"                         # 分支名，空或_develop
+prefer_mode=${BILI_MODE:-"dotnet"}     # dotnet或bilitool，需要通过环境变量配置
+github_proxy=${BILI_GITHUB_PROXY:-""}  # 下载github release包时使用的代理，会拼在地址前面，需要通过环境变量配置
 
 # Use in the the functions: eval $invocation
 invocation='say_verbose "Calling: ${yellow:-}${FUNCNAME[0]} ${green:-}$*${normal:-}"'
@@ -222,9 +218,6 @@ check_os() {
         fi
     fi
 
-    if [ -f "./Ray.BiliBiliTool.Console" ]; then
-        prefer_mode="bilitool"
-    fi
     say "当前选择的运行方式：$prefer_mode"
 }
 
@@ -329,6 +322,21 @@ check() {
     return 1
 }
 
+install_dotnet_by_script() {
+    eval $invocation
+
+    say "再尝试使用官方脚本安装"
+    curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 6.0 --no-cdn --verbose
+
+    say "添加到PATH"
+    local exportFile="/root/.bashrc"
+    touch $exportFile
+    echo '' >>$exportFile
+    echo 'export DOTNET_ROOT=$HOME/.dotnet' >>$exportFile
+    echo 'export PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools' >>$exportFile
+    . $exportFile
+}
+
 # 安装dotnet环境
 install_dotnet() {
     eval $invocation
@@ -345,12 +353,15 @@ install_dotnet() {
             sed -i 's/http:\/\/deb.debian.org/https:\/\/mirrors.ustc.edu.cn/g' /etc/apt/sources.list
             apt-get update
         fi
-
-        . /etc/os-release
-        wget https://packages.microsoft.com/config/debian/$VERSION_ID/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
-        dpkg -i packages-microsoft-prod.deb
-        rm packages-microsoft-prod.deb
-        apt-get update && apt-get install -y dotnet-sdk-6.0
+        {
+            . /etc/os-release
+            wget https://packages.microsoft.com/config/debian/$VERSION_ID/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+            dpkg -i packages-microsoft-prod.deb
+            rm packages-microsoft-prod.deb
+            apt-get update && apt-get install -y dotnet-sdk-6.0
+        } || {
+            install_dotnet_by_script
+        }
     else
         say "使用apk安装"
         if ! (curl -s -m 5 www.google.com >/dev/nul); then
@@ -360,7 +371,12 @@ install_dotnet() {
             sed -i 's/http:\/\/dl-cdn.alpinelinux.org/https:\/\/mirrors.ustc.edu.cn/g' /etc/apk/repositories
             apk update
         fi
-        apk add dotnet6-sdk
+        {
+            apk add dotnet6-sdk
+
+        } || {
+            install_dotnet_by_script
+        }
     fi
     dotnet --version && say "which dotnet: $(which dotnet)" && say "安装成功"
     return $?
@@ -425,14 +441,17 @@ install() {
         # 先尝试使用install_dotnet安装，如果失败，就再尝试使用install_bilitool安装
         if [ "$prefer_mode" == "dotnet" ]; then
             install_dotnet || {
-                echo "安装失败，请根据文档自行在青龙容器中安装dotnet：https://learn.microsoft.com/zh-cn/dotnet/core/install/linux-$current_linux_os"
+                say_err "安装失败"
+                say_err "请根据文档自行在青龙容器中安装dotnet：https://learn.microsoft.com/zh-cn/dotnet/core/install/linux-$current_linux_os"
+                say_err "或者尝试切换运行模式为bilitool，它不需要安装dotnet：https://github.com/RayWangQvQ/BiliBiliToolPro/blob/develop/qinglong/README.md"
                 exit 1
             }
         fi
 
         if [ "$prefer_mode" == "bilitool" ]; then
             install_bilitool || {
-                echo "安装失败，请检查日志并重试"
+                say_err "安装失败，请检查日志并重试"
+                say_err "或者尝试切换运行模式为dotnet：https://github.com/RayWangQvQ/BiliBiliToolPro/blob/develop/qinglong/README.md"
                 exit 1
             }
         fi
