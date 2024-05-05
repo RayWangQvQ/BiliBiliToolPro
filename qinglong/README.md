@@ -11,13 +11,13 @@
     - [1.2. 在青龙面板中添加拉库定时任务](#12-在青龙面板中添加拉库定时任务)
         - [1.2.1. 方式一：订阅管理](#121-方式一订阅管理)
         - [1.2.2. 方式二：定时任务拉库](#122-方式二定时任务拉库)
-    - [检查定时任务](#检查定时任务)
-    - [1.3. 登录](#13-登录)
+    - [1.3. 检查定时任务](#13-检查定时任务)
+    - [1.4. 登录](#14-登录)
 - [2. 先行版](#2-先行版)
 - [3. GitHub加速](#3-github加速)
 - [4. 常见问题](#4-常见问题)
-    - [安装dotnet失败怎么办法](#安装dotnet失败怎么办法)
-    - [4.1. Couldn't find a valid ICU package installed on the system](#41-couldnt-find-a-valid-icu-package-installed-on-the-system)
+    - [4.1. 安装dotnet失败怎么办法](#41-安装dotnet失败怎么办法)
+    - [4.2. Couldn't find a valid ICU package installed on the system](#42-couldnt-find-a-valid-icu-package-installed-on-the-system)
 
 <!-- /TOC -->
 
@@ -63,13 +63,13 @@
 
 保存成功后，找到该定时任务，点击运行按钮，运行拉库。
 
-### 检查定时任务
+### 1.3. 检查定时任务
 
 如果正常，拉库成功后，会自动添加bilibili相关的task任务。
 
 ![qinglong-tasks.png](../docs/imgs/qinglong-tasks.png)
 
-### 1.3. 登录
+### 1.4. 登录
 
 在青龙定时任务中，点击运行`bili扫码登录`任务，查看运行日志，扫描日志中的二维码进行登录。
 ![qinglong-login.png](../docs/imgs/qinglong-login.png)
@@ -109,7 +109,7 @@ https://ghproxy.net/https://github.com/RayWangQvQ/BiliBiliToolPro.git
 
 ## 4. 常见问题
 
-### 安装dotnet失败怎么办法
+### 4.1. 安装dotnet失败怎么办法
 
 先通过日志自行排查，不行就根据微软官方文档，进入qinglong容器后，手动安装。
 
@@ -126,7 +126,7 @@ export BILI_GITHUB_PROXY="https://github.moeyy.xyz/" # 下载二进制包时使�
 
 ![qinglong-login.png](../docs/imgs/qinglong-run-as-bilitool.png)
 
-### 4.1. Couldn't find a valid ICU package installed on the system
+### 4.2. Couldn't find a valid ICU package installed on the system
 
 如 #266 ，需要在青龙面板的环境变量添加如下环境变量：
 
