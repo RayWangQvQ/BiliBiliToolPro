@@ -3,7 +3,5 @@
 # cron 0 12 1 * * bili_task_unfollowBatched.sh
 . bili_task_base.sh
 
-cd ./src/Ray.BiliBiliTool.Console
-
-export Ray_RunTasks=UnfollowBatched && \
-dotnet run
+target_task_code="UnfollowBatched"
+run_task "${target_task_code}"

@@ -3,7 +3,5 @@
 # cron 0 13 * * * bili_dev_task_liveLottery.sh
 . bili_dev_task_base.sh
 
-cd ./src/Ray.BiliBiliTool.Console
-
-export Ray_RunTasks=LiveLottery && \
-dotnet run --ENVIRONMENT=Production
+target_task_code="LiveLottery"
+run_task "${target_task_code}"

@@ -3,7 +3,5 @@
 # cron 7 1 * * * bili_task_vipBigPoint.sh
 . bili_task_base.sh
 
-cd ./src/Ray.BiliBiliTool.Console
-
-export Ray_RunTasks=VipBigPoint && \
-dotnet run
+target_task_code="VipBigPoint"
+run_task "${target_task_code}"

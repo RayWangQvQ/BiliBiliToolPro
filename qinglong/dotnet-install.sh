@@ -1314,6 +1314,7 @@ calculate_vars() {
     script_name=$(basename "$0")
     normalized_architecture="$(get_normalized_architecture_from_architecture "$architecture")"
     say_verbose "Normalized architecture: '$normalized_architecture'."
+    
     normalized_os="$(get_normalized_os "$user_defined_os")"
     say_verbose "Normalized OS: '$normalized_os'."
     normalized_quality="$(get_normalized_quality "$quality")"
