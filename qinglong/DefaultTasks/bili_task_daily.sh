@@ -3,10 +3,5 @@
 # cron 0 9 * * * bili_task_daily.sh
 . bili_task_base.sh
 
-cd ./src/Ray.BiliBiliTool.Console
-
-if [ "$prefer_mode" == "dotnet" ]; then
-    export Ray_RunTasks=Daily && dotnet run
-else
-    export Ray_RunTasks=Daily && ../../bin/Ray.BiliBiliTool.Console
-fi
+target_task_code="Daily"
+run_task "${target_task_code}"

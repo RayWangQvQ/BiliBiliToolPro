@@ -3,10 +3,5 @@
 # cron 7 1 * * * bili_dev_task_vipBigPoint.sh
 . bili_dev_task_base.sh
 
-cd ./src/Ray.BiliBiliTool.Console
-
-if [ "$prefer_mode" == "dotnet" ]; then
-    export Ray_RunTasks=VipBigPoint && dotnet run
-else
-    export Ray_RunTasks=VipBigPoint && ../../bin/Ray.BiliBiliTool.Console
-fi
+target_task_code="VipBigPoint"
+run_task "${target_task_code}"

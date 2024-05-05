@@ -10,6 +10,16 @@ set -u
 # This is causing it to fail
 set -o pipefail
 
+
+
+verbose=true # 开启debug日志
+bili_repo="raywangqvq/bilibilitoolpro" # 仓库地址
+bili_branch="_develop" # 分支名，空或_develop
+prefer_mode=${BILI_MODE:-"dotnet"}    # dotnet或bilitool，需要通过环境变量配置
+github_proxy=${BILI_GITHUB_PROXY:-""} # 下载github release包时使用的代理，会拼在地址前面，需要通过环境变量配置
+
+
+
 # Use in the the functions: eval $invocation
 invocation='say_verbose "Calling: ${yellow:-}${FUNCNAME[0]} ${green:-}$*${normal:-}"'
 
@@ -64,22 +74,19 @@ DefaultCronRule=${DefaultCronRule:-""}
 CpuWarn=${CpuWarn:-""}
 MemoryWarn=${MemoryWarn:-""}
 DiskWarn=${DiskWarn:-""}
+dir_repo=${dir_repo:-"$QL_DIR/data/repo"}
 
-verbose=false
 dir_shell=$QL_DIR/shell
 . $dir_shell/env.sh
-. $dir_shell/share.sh ""
 touch /root/.bashrc
 . /root/.bashrc
 
 # 目录
 say "青龙repo目录: $dir_repo"
-bili_repo="raywangqvq/bilibilitoolpro_develop"
-qinglong_bili_repo=$(echo "$bili_repo" | sed 's/\//_/g')
+qinglong_bili_repo="$(echo "$bili_repo" | sed 's/\//_/g')${bili_branch}"
 qinglong_bili_repo_dir="$(find $dir_repo -type d -iname $qinglong_bili_repo | head -1)"
 say "bili仓库目录: $qinglong_bili_repo_dir"
 
-prefer_mode=${BILI_MODE:-"dotnet"} # 或bilitool
 current_linux_os="debian"  # 或alpine
 current_os="linux"         # 或linux-musl
 machine_architecture="x64" # 或arm、arm64
@@ -90,23 +97,7 @@ bilitool_installed_version=0
 # 以下操作仅在bilitool仓库的根bin文件下执行
 cd $qinglong_bili_repo_dir
 mkdir -p bin
-cd bin
-
-# 读参数
-while [ $# -ne 0 ]; do
-    name="$1"
-    case "$name" in
-    --verbose | -[Vv]erbose)
-        verbose=true
-        ;;
-    *)
-        say_err "Unknown argument \`$name\`"
-        exit 1
-        ;;
-    esac
-
-    shift
-done
+cd $qinglong_bili_repo_dir/bin
 
 # 判断是否存在某指令
 machine_has() {
@@ -343,15 +334,32 @@ install_dotnet() {
     eval $invocation
 
     say "开始安装dotnet"
-    if [[ $current_linux_os == "linux" ]]; then
-        say "当前系统：debian"
+    say "当前系统：$current_linux_os"
+    if [[ $current_linux_os == "debian" ]]; then
+        say "使用apt安装"
+
+        if ! (curl -s -m 5 www.google.com >/dev/nul); then
+            say "机器位于墙内，切换为包源为国内镜像源"
+            cp /etc/apt/sources.list /etc/apt/sources.list.bak
+            sed -i 's/https:\/\/deb.debian.org/https:\/\/mirrors.ustc.edu.cn/g' /etc/apt/sources.list
+            sed -i 's/http:\/\/deb.debian.org/https:\/\/mirrors.ustc.edu.cn/g' /etc/apt/sources.list
+            apt-get update
+        fi
+
         . /etc/os-release
         wget https://packages.microsoft.com/config/debian/$VERSION_ID/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
         dpkg -i packages-microsoft-prod.deb
         rm packages-microsoft-prod.deb
         apt-get update && apt-get install -y dotnet-sdk-6.0
     else
-        say "当前系统：alpine"
+        say "使用apk安装"
+        if ! (curl -s -m 5 www.google.com >/dev/nul); then
+            say "机器位于墙内，切换为包源为国内镜像源"
+            cp /etc/apk/repositories /etc/apk/repositories.bak
+            sed -i 's/https:\/\/dl-cdn.alpinelinux.org/https:\/\/mirrors.ustc.edu.cn/g' /etc/apk/repositories
+            sed -i 's/http:\/\/dl-cdn.alpinelinux.org/https:\/\/mirrors.ustc.edu.cn/g' /etc/apk/repositories
+            apk update
+        fi
         apk add dotnet6-sdk
     fi
     dotnet --version && say "which dotnet: $(which dotnet)" && say "安装成功"
@@ -363,7 +371,8 @@ get_download_url() {
     eval $invocation
 
     tag=$1
-    url="https://github.com/RayWangQvQ/BiliBiliToolPro/releases/download/$tag/bilibili-tool-pro-v$tag-$current_os-$machine_architecture.zip"
+    url="${github_proxy}https://github.com/RayWangQvQ/BiliBiliToolPro/releases/download/$tag/bilibili-tool-pro-v$tag-$current_os-$machine_architecture.zip"
+    say "下载地址：$url"
     echo $url
     return 0
 }
@@ -392,9 +401,9 @@ install_bilitool() {
 
         # 解压
         check_unzip
-        unzip -jo "$zip_file_name" -d ./ \
-            && rm "$zip_file_name" \
-            && rm -f appsettings.*
+        unzip -jo "$zip_file_name" -d ./ &&
+            rm "$zip_file_name" &&
+            rm -f appsettings.*
 
         # 更新tag.txt文件
         echo $LATEST_TAG >./tag.txt
@@ -428,6 +437,20 @@ install() {
             }
         fi
         return $?
+    fi
+}
+
+run_task() {
+    eval $invocation
+
+    local target_code=$1
+    cd $qinglong_bili_repo_dir/src/Ray.BiliBiliTool.Console
+
+    if [ "$prefer_mode" == "dotnet" ]; then
+        export Ray_RunTasks=$target_code && dotnet run
+    else
+        cp -f $qinglong_bili_repo_dir/bin/Ray.BiliBiliTool.Console .
+        export Ray_RunTasks=$target_code && ./Ray.BiliBiliTool.Console
     fi
 }
 
