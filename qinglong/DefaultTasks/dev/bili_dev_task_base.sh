@@ -12,7 +12,7 @@ set -o pipefail
 
 verbose=true                           # 开启debug日志
 bili_repo="raywangqvq/bilibilitoolpro" # 仓库地址
-bili_branch="_develop"                         # 分支名，空或_develop
+bili_branch="_develop"                 # 分支名，空或_develop
 prefer_mode=${BILI_MODE:-"dotnet"}     # dotnet或bilitool，需要通过环境变量配置
 github_proxy=${BILI_GITHUB_PROXY:-""}  # 下载github release包时使用的代理，会拼在地址前面，需要通过环境变量配置
 
@@ -70,12 +70,11 @@ DefaultCronRule=${DefaultCronRule:-""}
 CpuWarn=${CpuWarn:-""}
 MemoryWarn=${MemoryWarn:-""}
 DiskWarn=${DiskWarn:-""}
-dir_repo=${dir_repo:-"$QL_DIR/data/repo"}
 
+dir_repo=${dir_repo:-"$QL_DIR/data/repo"}
 dir_shell=$QL_DIR/shell
 . $dir_shell/env.sh
-touch /root/.bashrc
-. /root/.bashrc
+touch /root/.bashrc && . /root/.bashrc
 
 # 目录
 say "青龙repo目录: $dir_repo"
@@ -86,14 +85,12 @@ say "bili仓库目录: $qinglong_bili_repo_dir"
 current_linux_os="debian"  # 或alpine
 current_os="linux"         # 或linux-musl
 machine_architecture="x64" # 或arm、arm64
-dotnet_installed=false
-bilitool_installed=false
+
 bilitool_installed_version=0
 
 # 以下操作仅在bilitool仓库的根bin文件下执行
 cd $qinglong_bili_repo_dir
-mkdir -p bin
-cd $qinglong_bili_repo_dir/bin
+mkdir -p bin && cd $qinglong_bili_repo_dir/bin
 
 # 判断是否存在某指令
 machine_has() {
@@ -193,12 +190,13 @@ get_current_os_name() {
     return 1
 }
 
+# 检查操作系统
 check_os() {
     eval $invocation
 
-    # 获取系统信息
     current_os="$(get_current_os_name)"
     say "当前系统：$current_os"
+
     machine_architecture="$(get_machine_architecture)"
     say "当前架构：$machine_architecture"
 
@@ -221,6 +219,7 @@ check_os() {
     say "当前选择的运行方式：$prefer_mode"
 }
 
+# 检查安装jq
 check_jq() {
     if [ "$current_linux_os" = "debian" ]; then
         if ! machine_has jq; then
@@ -237,6 +236,7 @@ check_jq() {
     fi
 }
 
+# 检查安装unzip
 check_unzip() {
     if [ "$current_linux_os" = "debian" ]; then
         if ! machine_has unzip; then
@@ -296,32 +296,23 @@ check_bilitool() {
 }
 
 # 检查环境
-check() {
+check_installed() {
     eval $invocation
 
     if [ "$prefer_mode" == "dotnet" ]; then
-        if check_dotnet; then
-            dotnet_installed=true
-            return 0
-        else
-            dotnet_installed=true
-            return 1
-        fi
+        check_dotnet
+        return $?
     fi
 
     if [ "$prefer_mode" == "bilitool" ]; then
-        if check_bilitool; then
-            bilitool_installed=true
-            return 0
-        else
-            bilitool_installed=false
-            return 1
-        fi
+        check_bilitool
+        return $?
     fi
 
     return 1
 }
 
+# 使用官方脚本安装dotnet
 install_dotnet_by_script() {
     eval $invocation
 
@@ -355,7 +346,7 @@ install_dotnet() {
         fi
         {
             . /etc/os-release
-            wget https://packages.microsoft.com/config/debian/$VERSION_ID/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+            curl -o packages-microsoft-prod.deb https://packages.microsoft.com/config/debian/$VERSION_ID/packages-microsoft-prod.deb
             dpkg -i packages-microsoft-prod.deb
             rm packages-microsoft-prod.deb
             apt-get update && apt-get install -y dotnet-sdk-6.0
@@ -373,7 +364,6 @@ install_dotnet() {
         fi
         {
             apk add dotnet6-sdk
-
         } || {
             install_dotnet_by_script
         }
@@ -432,13 +422,11 @@ install_bilitool() {
 install() {
     eval $invocation
 
-    # 调用check方法，如果通过则返回0，否则返回1
-    if check; then
+    if check_installed; then
         say "环境正常，本次无需安装"
         return 0
     else
         say "开始安装环境"
-        # 先尝试使用install_dotnet安装，如果失败，就再尝试使用install_bilitool安装
         if [ "$prefer_mode" == "dotnet" ]; then
             install_dotnet || {
                 say_err "安装失败"
@@ -459,6 +447,7 @@ install() {
     fi
 }
 
+# 运行bilitool任务
 run_task() {
     eval $invocation
 
