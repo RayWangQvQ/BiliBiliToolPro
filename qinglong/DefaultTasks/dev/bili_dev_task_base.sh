@@ -10,7 +10,7 @@ set -u
 # This is causing it to fail
 set -o pipefail
 
-verbose=true                           # 开启debug日志
+verbose=false                          # 开启debug日志
 bili_repo="raywangqvq/bilibilitoolpro" # 仓库地址
 bili_branch="_develop"                 # 分支名，空或_develop
 prefer_mode=${BILI_MODE:-"dotnet"}     # dotnet或bilitool，需要通过环境变量配置
@@ -452,18 +452,19 @@ run_task() {
     eval $invocation
 
     local target_code=$1
+
+    export Ray_PlateformType=QingLong
+    export Ray_RunTasks=$target_code
+
     cd $qinglong_bili_repo_dir/src/Ray.BiliBiliTool.Console
 
     if [ "$prefer_mode" == "dotnet" ]; then
-        export Ray_RunTasks=$target_code && dotnet run
+        dotnet run --ENVIRONMENT=Production
     else
         cp -f $qinglong_bili_repo_dir/bin/Ray.BiliBiliTool.Console .
-        export Ray_RunTasks=$target_code && ./Ray.BiliBiliTool.Console
+        chmod +x ./Ray.BiliBiliTool.Console && ./Ray.BiliBiliTool.Console --ENVIRONMENT=Production
     fi
 }
 
 check_os
 install
-
-export Ray_PlateformType=QingLong
-export DOTNET_ENVIRONMENT=Production
