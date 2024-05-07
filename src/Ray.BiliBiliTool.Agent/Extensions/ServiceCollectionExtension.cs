@@ -61,23 +61,33 @@ public static class ServiceCollectionExtension
         services.AddScoped<IWbiService, WbiService>();
 
         //bilibli
-        services.AddBiliBiliClientApi<IUserInfoApi>("https://api.bilibili.com");
-        services.AddBiliBiliClientApi<IDailyTaskApi>("https://api.bilibili.com");
-        services.AddBiliBiliClientApi<IMangaApi>("https://manga.bilibili.com");
-        services.AddBiliBiliClientApi<IAccountApi>("https://account.bilibili.com");
-        services.AddBiliBiliClientApi<ILiveApi>("https://api.live.bilibili.com");
-        services.AddBiliBiliClientApi<IRelationApi>("https://api.bilibili.com");
-        services.AddBiliBiliClientApi<IChargeApi>("https://api.bilibili.com");
-        services.AddBiliBiliClientApi<IVideoApi>("https://api.bilibili.com");
-        services.AddBiliBiliClientApi<IVideoWithoutCookieApi>("https://api.bilibili.com", false);
-        services.AddBiliBiliClientApi<IVipBigPointApi>("https://api.bilibili.com");
-        services.AddBiliBiliClientApi<IPassportApi>("http://passport.bilibili.com", false);
-        services.AddBiliBiliClientApi<ILiveTraceApi>("https://live-trace.bilibili.com");
-        services.AddBiliBiliClientApi<IHomeApi>("https://www.bilibili.com", false);
+        Action<IServiceProvider, HttpClient> config = (sp, c) => {
+            c.DefaultRequestHeaders.Add("User-Agent", sp.GetRequiredService<IOptionsMonitor<SecurityOptions>>().CurrentValue.UserAgent);
+            c.DefaultRequestHeaders.Add("Cookie", sp.GetRequiredService<BiliCookie>().ToString());
+        };
+        Action<IServiceProvider, HttpClient> configApp = (sp, c) => {
+            c.DefaultRequestHeaders.Add("User-Agent", sp.GetRequiredService<IOptionsMonitor<SecurityOptions>>().CurrentValue.UserAgentApp);
+            c.DefaultRequestHeaders.Add("Cookie", sp.GetRequiredService<BiliCookie>().ToString());
+        };
 
-        // 添加注入
-        services.AddBiliBiliClientApi<IArticleApi>("https://api.bilibili.com");
-        services.AddBiliBiliClientApi<IVipMallApi>("https://show.bilibili.com");
+        services.AddBiliBiliClientApi<IUserInfoApi>(BiliHosts.Api, config);
+        services.AddBiliBiliClientApi<IDailyTaskApi>(BiliHosts.Api, config);
+        services.AddBiliBiliClientApi<IRelationApi>(BiliHosts.Api, config);
+        services.AddBiliBiliClientApi<IChargeApi>(BiliHosts.Api, config);
+        services.AddBiliBiliClientApi<IVideoApi>(BiliHosts.Api, config);
+        services.AddBiliBiliClientApi<IVideoWithoutCookieApi>(BiliHosts.Api, config);
+        services.AddBiliBiliClientApi<IArticleApi>(BiliHosts.Api, config);
+
+        services.AddBiliBiliClientApi<IVipMallApi>(BiliHosts.Show, config);
+        services.AddBiliBiliClientApi<IPassportApi>(BiliHosts.Passport, config);
+        services.AddBiliBiliClientApi<ILiveTraceApi>(BiliHosts.LiveTrace,config);
+        services.AddBiliBiliClientApi<IHomeApi>(BiliHosts.Www, config);
+        services.AddBiliBiliClientApi<IMangaApi>(BiliHosts.Manga, config);
+        services.AddBiliBiliClientApi<IAccountApi>(BiliHosts.Account, config);
+        services.AddBiliBiliClientApi<ILiveApi>(BiliHosts.Live, config);
+
+        services.AddBiliBiliClientApi<IVipBigPointApi>(BiliHosts.Api, configApp);
+
 
         //qinglong
         var qinglongHost = configuration["QL_URL"] ?? "http://localhost:5600";
@@ -89,8 +99,7 @@ public static class ServiceCollectionExtension
             })
             .ConfigureHttpClient((sp, c) =>
             {
-                c.DefaultRequestHeaders.Add("User-Agent",
-                    sp.GetRequiredService<IOptionsMonitor<SecurityOptions>>().CurrentValue.UserAgent);
+                c.DefaultRequestHeaders.Add("User-Agent", sp.GetRequiredService<IOptionsMonitor<SecurityOptions>>().CurrentValue.UserAgent);
             })
             .AddPolicyHandler(GetRetryPolicy());
 
@@ -104,7 +113,7 @@ public static class ServiceCollectionExtension
     /// <param name="services"></param>
     /// <param name="host"></param>
     /// <returns></returns>
-    private static IServiceCollection AddBiliBiliClientApi<TInterface>(this IServiceCollection services, string host, bool withCookie = true)
+    private static IServiceCollection AddBiliBiliClientApi<TInterface>(this IServiceCollection services, string host, Action<IServiceProvider, HttpClient> config)
         where TInterface : class
     {
         var uri = new Uri(host);
@@ -114,20 +123,9 @@ public static class ServiceCollectionExtension
                 o.HttpHost = uri;
                 o.UseDefaultUserAgent = false;
             })
-            .ConfigureHttpClient((sp, c) =>
-            {
-                c.DefaultRequestHeaders.Add("User-Agent",
-                    sp.GetRequiredService<IOptionsMonitor<SecurityOptions>>().CurrentValue.UserAgent);
-            })
+            .ConfigureHttpClient(config)
             .AddHttpMessageHandler<IntervalDelegatingHandler>()
             .AddPolicyHandler(GetRetryPolicy());
-
-        if (withCookie)
-            httpClientBuilder.ConfigureHttpClient((sp, c) =>
-            {
-                var ck = sp.GetRequiredService<BiliCookie>();
-                c.DefaultRequestHeaders.Add("Cookie", ck.ToString());
-            });
 
         return services;
     }

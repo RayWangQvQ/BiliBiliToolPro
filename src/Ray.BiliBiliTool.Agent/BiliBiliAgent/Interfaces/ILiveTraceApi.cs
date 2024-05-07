@@ -4,19 +4,18 @@ using Ray.BiliBiliTool.Config.Options;
 using System.Threading.Tasks;
 using WebApiClientCore.Attributes;
 
-namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces
+namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
+
+[Header("Host", "live-trace.bilibili.com")]
+public interface ILiveTraceApi : IBiliBiliApi
 {
-    [Header("Host", "live-trace.bilibili.com")]
-    public interface ILiveTraceApi : IBiliBiliApi
-    {
 
-        [HttpGet("/xlive/rdata-interface/v1/heartbeat/webHeartBeat?hb={request}&pf=web")]
-        Task<BiliApiResponse<WebHeartBeatResponse>> WebHeartBeat(WebHeartBeatRequest request);
+    [HttpGet("/xlive/rdata-interface/v1/heartbeat/webHeartBeat?hb={request}&pf=web")]
+    Task<BiliApiResponse<WebHeartBeatResponse>> WebHeartBeat(WebHeartBeatRequest request);
 
-        [HttpPost("/xlive/data-interface/v1/x25Kn/E")]
-        Task<BiliApiResponse<HeartBeatResponse>> EnterRoom([FormContent] EnterRoomRequest request);
+    [HttpPost("/xlive/data-interface/v1/x25Kn/E")]
+    Task<BiliApiResponse<HeartBeatResponse>> EnterRoom([FormContent] EnterRoomRequest request);
 
-        [HttpPost("/xlive/data-interface/v1/x25Kn/X")]
-        Task<BiliApiResponse<HeartBeatResponse>> HeartBeat([FormContent] HeartBeatRequest request);
-    }
+    [HttpPost("/xlive/data-interface/v1/x25Kn/X")]
+    Task<BiliApiResponse<HeartBeatResponse>> HeartBeat([FormContent] HeartBeatRequest request);
 }

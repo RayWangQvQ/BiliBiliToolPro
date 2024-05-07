@@ -3,7 +3,5 @@
 # cron 0 8 * * * bili_task_test.sh
 . bili_task_base.sh
 
-cd ./src/Ray.BiliBiliTool.Console
-
-export Ray_RunTasks=Test && \
-dotnet run
+target_task_code="Test"
+run_task "${target_task_code}"

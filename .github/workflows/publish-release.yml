@@ -32,7 +32,7 @@ jobs:
       - name: Extract Release Notes
         id: release_notes
         run: |
-          content=$(grep -m1 "##" -A 1000 ./CHANGELOG.md)
+          content=$(sed -n '/^## /{p;:a;n;/^## /q;p;ba}' CHANGELOG.md)
           version=$(echo "$GITHUB_REF" | sed 's/refs\/tags\///')
           echo "::set-output name=content::$content"
           echo "::set-output name=version::$version"
