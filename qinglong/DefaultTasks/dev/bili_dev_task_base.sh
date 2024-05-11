@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# new Env("bili_dev_task_base")
-# cron 0 0 1 1 * bili_dev_task_base.sh
+#0 0 1 1 * bili_dev_task_base.sh
+#new Env("bili_dev_task_base");
+#
 
 # Stop script on NZEC
 set -e

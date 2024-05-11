@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
+# 0 0 1 1 * bili_task_tryFix.sh
 # new Env("bili尝试修复异常")
-# cron 0 0 1 1 * bili_task_tryFix.sh
 
 dir_shell=$QL_DIR/shell
 . $dir_shell/share.sh
