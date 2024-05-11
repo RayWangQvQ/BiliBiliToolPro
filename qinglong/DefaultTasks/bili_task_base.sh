@@ -73,13 +73,13 @@ DiskWarn=${DiskWarn:-""}
 
 dir_repo=${dir_repo:-"$QL_DIR/data/repo"}
 dir_shell=$QL_DIR/shell
-. $dir_shell/env.sh
+touch $dir_shell/env.sh && . $dir_shell/env.sh
 touch /root/.bashrc && . /root/.bashrc
 
 # 目录
 say "青龙repo目录: $dir_repo"
 qinglong_bili_repo="$(echo "$bili_repo" | sed 's/\//_/g')${bili_branch}"
-qinglong_bili_repo_dir="$(find $dir_repo -type d -iname $qinglong_bili_repo | head -1)"
+qinglong_bili_repo_dir="$(find $dir_repo -type d \( -iname $qinglong_bili_repo -o -iname ${qinglong_bili_repo}_main \) | head -1)"
 say "bili仓库目录: $qinglong_bili_repo_dir"
 
 current_linux_os="debian"  # 或alpine
