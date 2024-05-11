@@ -18,6 +18,7 @@
 - [4. 常见问题](#4-常见问题)
     - [4.1. 安装dotnet失败怎么办法](#41-安装dotnet失败怎么办法)
     - [4.2. Couldn't find a valid ICU package installed on the system](#42-couldnt-find-a-valid-icu-package-installed-on-the-system)
+    - [4.3. 提示文件不存在或路径异常，怎么排查](#43-提示文件不存在或路径异常怎么排查)
 
 <!-- /TOC -->
 
@@ -134,3 +135,21 @@ export BILI_GITHUB_PROXY="https://github.moeyy.xyz/" # 下载二进制包时使�
 名称：DOTNET_SYSTEM_GLOBALIZATION_INVARIANT
 值：1
 ```
+
+### 4.3. 提示文件不存在或路径异常，怎么排查
+
+需要`docker exec -it qinglong bash`后，查看几个常用路径：
+
+```
+/ql
+    /data
+        /repo
+    /scripts
+    /shell
+```
+
+- `/ql/dada/repo`目录下存储了拉库后，bilitool的源代码
+- `/ql/scripts`目录下存储了bilitool的定时运行脚本
+- `/ql/shell`目录下是青龙的基础脚本
+
+请cd到相应目录，查看该目录下文件是否存在，状态是否正常。
