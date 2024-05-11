@@ -1,5 +1,5 @@
 ---
-name: [QingLong]Bug report（缺陷）
+name: 【QingLong】Bug report（缺陷）
 about: 缺陷或异常（青龙专属）
 title: "【Bug】【青龙】<请在标题中清晰地概述你要反馈的异常或缺陷>"
 labels: ''
