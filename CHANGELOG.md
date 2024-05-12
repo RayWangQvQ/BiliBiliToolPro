@@ -1,3 +1,5 @@
+## 2.1.1
+- Feature: listen ctrl+c at the very beginning
 ## 2.1.0
 - Feature[#691]: 重构并优化基于qinglong的部署方式，尝试解决偶发的安装失败的问题
 - Feature[#670]: 新增针对App的AppUserAgent配置项，用于解决大会员大积分异常问题
