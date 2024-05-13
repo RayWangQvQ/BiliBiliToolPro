@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# cron:5 9 * * * bili_dev_task_daily.sh
+# cron:5 9 * * * qinglong/DefaultTasks/dev/bili_dev_task_daily.sh
 # new Env('bili每日任务[dev先行版]');
 #
 
