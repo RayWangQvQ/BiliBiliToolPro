@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 0 0 1 1 * bili_dev_task_login.sh
+# cron:0 0 1 1 *
 # new Env("bili扫码登录[dev先行版]")
 
 . bili_dev_task_base.sh
