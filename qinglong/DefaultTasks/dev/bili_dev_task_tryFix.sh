@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 0 0 1 1 * bili_dev_task_tryFix.sh
+# cron:0 0 1 1 *
 # new Env("bili尝试修复异常[dev先行版]")
 
 dir_shell=$QL_DIR/shell

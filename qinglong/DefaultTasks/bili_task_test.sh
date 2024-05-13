@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 0 8 * * * bili_task_test.sh
+# cron:0 8 * * *
 # new Env("bili测试ck")
 
 . bili_task_base.sh

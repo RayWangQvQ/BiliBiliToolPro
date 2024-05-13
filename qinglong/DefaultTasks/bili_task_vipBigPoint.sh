@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 7 1 * * * bili_task_vipBigPoint.sh
+# cron:7 1 * * *
 # new Env("bili大会员大积分")
 
 . bili_task_base.sh

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 5 0 * * * bili_task_liveFansMedal.sh
+# cron:5 0 * * *
 # new Env("bili直播粉丝牌")
 
 . bili_task_base.sh

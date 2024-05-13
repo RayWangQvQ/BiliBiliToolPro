@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,6 +19,12 @@ namespace Ray.BiliBiliTool.Console
     {
         public static async Task<int> Main(string[] args)
         {
+            System.Console.CancelKeyPress += (sender, eventArgs) =>
+            {
+                eventArgs.Cancel = true;
+                Environment.Exit(0);
+            };
+
             PrintLogo();
 
             IHost host = CreateHost(args);
