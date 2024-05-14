@@ -1,3 +1,5 @@
+## 2.1.2
+- Feature: enhancement CICD scripts
 ## 2.1.1
 - Feature: listen ctrl+c at the very beginning
 - Fix: fix qinglong read cron error

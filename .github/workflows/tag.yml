@@ -1,9 +1,7 @@
+# 合并main分支后打tag
 name: Tag
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
     types:
       - closed
@@ -29,5 +27,5 @@ jobs:
       - name: Tag and push
         run: |
           new_tag="${{ steps.current_version.outputs.current_version }}"
-          git tag "$new_tag"
-          git push origin "$new_tag"
+          git tag -f "$new_tag"
+          git push -f origin "$new_tag"

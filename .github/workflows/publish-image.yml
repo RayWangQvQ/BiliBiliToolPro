@@ -1,11 +1,9 @@
+# ·¢²¼¾µÏñ
 name: Publish image
 
 on:
   workflow_dispatch:
     inputs:
-      manualTag:
-        description: 'Manual Tag'
-        required: true
       autoWithLatestTag:
         description: 'Auto Add Latest Tag'
         required: true
