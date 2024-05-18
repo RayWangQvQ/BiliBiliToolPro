@@ -1,20 +1,10 @@
 # 自动关闭不规范PR
-name: AutocloserPR
+name: AutoSetPR
 on:
   pull_request_target:
     types: [opened, edited]
 
 jobs:
-  Autoclose:
-    runs-on: ubuntu-latest
-    if: github.repository == 'RayWangQvQ/BiliBiliToolPro'
-    steps:
-    - uses: roots/issue-closer@v1.1
-      with:
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
-        pr-close-message: "This PR was automatically closed because it did not meet the requirements, please check the requirements."
-        pr-pattern: ".*请问您是否明白：【yes】 -->.*"
-
   checkTargetBranch:
     runs-on: ubuntu-latest
     needs: Autoclose

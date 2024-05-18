@@ -72,6 +72,10 @@ MemoryWarn=${MemoryWarn:-""}
 DiskWarn=${DiskWarn:-""}
 
 dir_repo=${dir_repo:-"$QL_DIR/data/repo"}
+# 需要兼容老版本青龙，https://github.com/RayWangQvQ/BiliBiliToolPro/issues/728
+if [ ! -d "$dir_repo" ] && [ -d "$QL_DIR/repo" ]; then
+  dir_repo="$QL_DIR/repo"
+fi
 dir_shell=$QL_DIR/shell
 touch $dir_shell/env.sh && . $dir_shell/env.sh
 touch /root/.bashrc && . /root/.bashrc

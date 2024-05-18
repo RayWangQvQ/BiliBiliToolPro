@@ -34,8 +34,12 @@ jobs:
         run: |
           content=$(sed -n '/^## /{p;:a;n;/^## /q;p;ba}' CHANGELOG.md)
           version=$(echo "$GITHUB_REF" | sed 's/refs\/tags\///')
-          echo "::set-output name=content::$content"
-          echo "::set-output name=version::$version"
+          echo "version=$version" >> $GITHUB_OUTPUT
+          {
+            echo 'content<<EOF'
+            echo '$content'
+            echo EOF
+          } >> "$GITHUB_OUTPUT"
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
@@ -44,7 +48,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           name: "BiliBiliToolPro-V${{ steps.release_notes.outputs.version }}"
           tag_name: ${{ github.event.inputs.version }}
-          body: ${{ steps.release_notes.outputs.content }}
+          body: '${{ steps.release_notes.outputs.content }}'
           discussion_category_name: Announcements
           generate_release_notes: true
           fail_on_unmatched_files: true

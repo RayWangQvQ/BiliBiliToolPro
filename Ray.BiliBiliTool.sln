@@ -116,6 +116,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ISSUE_TEMPLATE", "ISSUE_TEMPLATE", "{830361B7-BCC1-4853-879A-761B0FD86826}"
 	ProjectSection(SolutionItems) = preProject
 		.github\ISSUE_TEMPLATE\bug-report----.md = .github\ISSUE_TEMPLATE\bug-report----.md
+		.github\ISSUE_TEMPLATE\bug-report-qinglong----.md = .github\ISSUE_TEMPLATE\bug-report-qinglong----.md
 		.github\ISSUE_TEMPLATE\feature-request----.md = .github\ISSUE_TEMPLATE\feature-request----.md
 		.github\ISSUE_TEMPLATE\other----.md = .github\ISSUE_TEMPLATE\other----.md
 	EndProjectSection
