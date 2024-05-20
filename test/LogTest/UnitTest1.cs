@@ -31,8 +31,6 @@ namespace LogTest
 
             logger.LogDebug(null);
             logger.LogDebug("123{0}{1}", null, "haha");
-
-            System.Console.ReadLine();
         }
 
         [Fact]
@@ -53,7 +51,6 @@ namespace LogTest
             logger.LogInformation("-----全部任务已执行结束-----\r\n");
 
             logger.LogInformation("开始推送");
-            System.Console.ReadLine();
         }
 
         private ILogger CreateLogger()

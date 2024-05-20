@@ -20,7 +20,7 @@ namespace LogTest
         public TestMicrosoftTeams()
         {
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
-            Program.CreateHost(new string[] { });
+            Program.CreateHost(new string[] { "ENVIRONMENT=Development" });
 
             _webhook = Global.ConfigurationRoot["Serilog:WriteTo:10:Args:webhook"];
         }

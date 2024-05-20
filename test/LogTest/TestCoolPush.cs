@@ -42,8 +42,6 @@ namespace LogTest
             CoolPushApiClient client = new CoolPushApiClient(_key);
             var result = client.PushMessage(msg8);
             Debug.WriteLine(result.Content.ReadAsStringAsync().Result);
-
-            System.Console.ReadLine();
         }
     }
 }

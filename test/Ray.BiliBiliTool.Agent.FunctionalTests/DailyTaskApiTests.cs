@@ -61,10 +61,10 @@ public class DailyTaskApiTests
         // Arrange
 
         // Assert
-        re.Code.Should().BeOneOf(new List<int>
-        {
+        re.Code.Should().BeOneOf(
             0,
             73319, //todo: sort out meannings
-        });
+            69801 //你已领取过该权益
+        );
     }
 }

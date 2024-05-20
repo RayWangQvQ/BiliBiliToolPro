@@ -34,8 +34,6 @@ namespace LogTest
 
             var result = client.PushMessage(msg);
             Debug.WriteLine(result.Content.ReadAsStringAsync().Result);
-
-            System.Console.ReadLine();
         }
     }
 }

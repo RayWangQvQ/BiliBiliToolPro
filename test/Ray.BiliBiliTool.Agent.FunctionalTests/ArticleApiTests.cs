@@ -117,8 +117,10 @@ public class ArticleApiTests
         BiliBiliAgent.Dtos.BiliApiResponse re = await _api.AddCoinForArticleAsync(req);
 
         // Assert
-        re.Code.Should().Be(0);
-        re.Message.Should().BeEquivalentTo("0");
+        re.Code.Should().BeOneOf(
+            0,// 成功
+            34005 // 超过投币上限啦~
+            );
     }
 
     #endregion
