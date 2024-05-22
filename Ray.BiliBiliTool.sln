@@ -39,7 +39,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 		.gitignore = .gitignore
 		CHANGELOG.md = CHANGELOG.md
-		clean.cmd = clean.cmd
 		common.props = common.props
 		Dockerfile = Dockerfile
 		LICENSE = LICENSE
@@ -139,6 +138,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InfrastructureTest", "test\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ray.BiliBiliTool.Agent.FunctionalTests", "test\Ray.BiliBiliTool.Agent.FunctionalTests\Ray.BiliBiliTool.Agent.FunctionalTests.csproj", "{16F315CF-056A-4B08-8C3C-A3177EA3CBB9}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{2B5FD099-CC28-4FBC-9F20-F20300C5DFD2}"
+	ProjectSection(SolutionItems) = preProject
+		scripts\clean.cmd = scripts\clean.cmd
+		scripts\publish.bat = scripts\publish.bat
+		scripts\publish.ps1 = scripts\publish.ps1
+		scripts\publish.sh = scripts\publish.sh
+		scripts\ut.ps1 = scripts\ut.ps1
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -233,6 +241,7 @@ Global
 		{26B21C30-7358-4E7B-A73E-2272F10A6CA8} = {E9BDDCBE-A57D-4E3B-8252-708088386ADF}
 		{90C1DB73-B3DB-4BE5-AD1A-5248FE47860E} = {E9BDDCBE-A57D-4E3B-8252-708088386ADF}
 		{16F315CF-056A-4B08-8C3C-A3177EA3CBB9} = {E9BDDCBE-A57D-4E3B-8252-708088386ADF}
+		{2B5FD099-CC28-4FBC-9F20-F20300C5DFD2} = {F3DE0D72-426B-4AD9-B3ED-3343CF4223F1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {197319DA-1148-4A99-847C-8B270B6A29AB}
