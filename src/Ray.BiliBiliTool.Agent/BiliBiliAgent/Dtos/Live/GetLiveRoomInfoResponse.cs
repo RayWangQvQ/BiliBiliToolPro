@@ -14,6 +14,8 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live
 
         public long Parent_area_id { get; set; }
 
+        public int Live_Status { get; set; }
+
         public long Uid { get; set; }
     }
 }
