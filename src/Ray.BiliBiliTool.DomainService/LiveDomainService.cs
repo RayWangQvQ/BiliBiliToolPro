@@ -59,7 +59,6 @@ namespace Ray.BiliBiliTool.DomainService
             _securityOptions = securityOptions.CurrentValue;
             _wbiService = wbiService;
             _biliCookie = biliCookie;
-
         }
 
         /// <summary>
@@ -146,6 +145,7 @@ namespace Ray.BiliBiliTool.DomainService
         }
 
         #region 天选时刻抽奖
+
         /// <summary>
         /// 天选抽奖
         /// </summary>
@@ -183,9 +183,11 @@ namespace Ray.BiliBiliTool.DomainService
 
                         await TryJoinTianXuan(item);
                     }
+
                     if (reData.Has_more != 1) break;
                     defaultSort = reData.New_tags.FirstOrDefault()?.Sort_type ?? "";
                 }
+
                 defaultSort = "";
             }
 
@@ -223,7 +225,8 @@ namespace Ray.BiliBiliTool.DomainService
                 }
 
                 //根据配置过滤
-                if (!check.AwardNameIsSatisfied(_liveLotteryTaskOptions.IncludeAwardNameList, _liveLotteryTaskOptions.ExcludeAwardNameList))
+                if (!check.AwardNameIsSatisfied(_liveLotteryTaskOptions.IncludeAwardNameList,
+                        _liveLotteryTaskOptions.ExcludeAwardNameList))
                 {
                     _logger.LogDebug("不满足配置的筛选条件，跳过{newLine}", Environment.NewLine);
                     return;
@@ -251,10 +254,7 @@ namespace Ray.BiliBiliTool.DomainService
 
                 var request = new JoinTianXuanRequest
                 {
-                    Id = check.Id,
-                    Gift_id = check.Gift_id,
-                    Gift_num = check.Gift_num,
-                    Csrf = _biliCookie.BiliJct
+                    Id = check.Id, Gift_id = check.Gift_id, Gift_num = check.Gift_num, Csrf = _biliCookie.BiliJct
                 };
                 var re = await _liveApi.Join(request);
                 if (re.Code == 0)
@@ -285,6 +285,7 @@ namespace Ray.BiliBiliTool.DomainService
                 _logger.LogInformation("未关注主播");
                 return;
             }
+
             _logger.LogInformation("【抽奖的主播】{ups}",
                 string.Join("，", _tianXuanFollowed.Select(x => x.Uname)));
 
@@ -319,7 +320,6 @@ namespace Ray.BiliBiliTool.DomainService
                 _logger.LogWarning("【原因】{msg}", re.Message);
             }
         }
-
 
 
         /// <summary>
@@ -381,7 +381,8 @@ namespace Ray.BiliBiliTool.DomainService
             {
                 _logger.LogInformation("“天选时刻”分组不存在，尝试创建...");
                 //创建一个
-                var createRe = await _relationApi.CreateTag(new CreateTagRequest { Tag = "天选时刻", Csrf = _biliCookie.BiliJct });
+                var createRe =
+                    await _relationApi.CreateTag(new CreateTagRequest { Tag = "天选时刻", Csrf = _biliCookie.BiliJct });
                 groupId = createRe.Data.Tagid;
                 _logger.LogInformation("创建成功");
             }
@@ -393,27 +394,26 @@ namespace Ray.BiliBiliTool.DomainService
 
             return groupId;
         }
+
         #endregion
 
         public async Task SendDanmakuToFansMedalLive()
         {
             if (!await CheckLiveCookie()) return;
 
-            (await GetFansMedalInfoList()).ForEach(async info =>
+            var infoList = await GetFansMedalInfoList();
+
+            foreach (var info in infoList)
             {
                 var medal = info.MedalInfo;
 
                 _logger.LogInformation("【直播间】{liveRoomName}", medal.Target_name);
                 _logger.LogInformation("【粉丝牌】{medalName}", medal.Medal_info.Medal_name);
-
                 _logger.LogInformation("正在发送弹幕...");
 
                 // 通过空间主页信息获取直播间 id
                 var liveHostUserId = medal.Medal_info.Target_id;
-                var req = new GetSpaceInfoDto()
-                {
-                    mid = liveHostUserId
-                };
+                var req = new GetSpaceInfoDto() { mid = liveHostUserId };
                 await _wbiService.SetWridAsync(req);
 
                 var spaceInfo = await _userInfoApi.GetSpaceInfo(req);
@@ -424,21 +424,35 @@ namespace Ray.BiliBiliTool.DomainService
                     return;
                 }
 
-                // 发送弹幕
-                var sendResult = await _liveApi.SendLiveDanmuku(new SendLiveDanmukuRequest(
-                    _biliCookie.BiliJct,
-                    spaceInfo.Data.Live_room.Roomid,
-                    _liveFansMedalTaskOptions.DanmakuContent));
+                var successCount = 0;
+                var failedCount = 0;
 
-                if (sendResult.Code != 0)
+                // 发送弹幕
+
+                while (successCount < _liveFansMedalTaskOptions.SendDanmakuNumber &&
+                       failedCount < _liveFansMedalTaskOptions.SendDanmakugiveUpThreshold)
                 {
-                    _logger.LogError("【弹幕发送】失败");
-                    _logger.LogError("【原因】{message}", sendResult.Message);
-                    return;
+                    await Task.Delay(2000);
+
+                    var sendResult = await _liveApi.SendLiveDanmuku(new SendLiveDanmukuRequest(
+                        _biliCookie.BiliJct,
+                        spaceInfo.Data.Live_room.Roomid,
+                        _liveFansMedalTaskOptions.DanmakuContent));
+
+                    if (sendResult.Code != 0)
+                    {
+                        _logger.LogError("【弹幕发送】失败");
+                        _logger.LogError("【原因】{message}", sendResult.Message);
+                        failedCount++;
+                    }
+                    else
+                        successCount++;
                 }
 
-                _logger.LogInformation("【弹幕发送】成功~，你和主播 {name} 的亲密值增加了100！", spaceInfo.Data.Name);
-            });
+
+                _logger.LogInformation("【弹幕发送】发送情况：你向主播 {name} 发送弹幕{success}/{total}", spaceInfo.Data.Name,
+                    successCount, successCount + failedCount);
+            }
         }
 
         public async Task SendHeartBeatToFansMedalLive()
@@ -448,7 +462,7 @@ namespace Ray.BiliBiliTool.DomainService
             var infoList = new List<HeartBeatIterationInfoDto>();
             (await GetFansMedalInfoList()).ForEach(medal =>
                 infoList.Add(new(medal.RoomId, medal.LiveRoomInfo, new(), 0, 0))
-                );
+            );
 
             if (infoList.Count == 0)
             {
@@ -460,8 +474,8 @@ namespace Ray.BiliBiliTool.DomainService
 
             while (infoList.Min(
                        info => info.FailedTimes >= _liveFansMedalTaskOptions.HeartBeatSendGiveUpThreshold
-                           ? int.MaxValue :
-                           info.HeartBeatCount)
+                           ? int.MaxValue
+                           : info.HeartBeatCount)
                    < _liveFansMedalTaskOptions.HeartBeatNumber)
             {
                 foreach (var info in infoList)
@@ -473,7 +487,8 @@ namespace Ray.BiliBiliTool.DomainService
                     var current = Now();
                     if (current - info.LastBeatTime <= (LiveFansMedalTaskOptions.HeartBeatInterval + 5) * 1000)
                     {
-                        int sleepTime = (int)((LiveFansMedalTaskOptions.HeartBeatInterval + 5) * 1000 - (current - info.LastBeatTime));
+                        int sleepTime = (int)((LiveFansMedalTaskOptions.HeartBeatInterval + 5) * 1000 -
+                                              (current - info.LastBeatTime));
                         _logger.LogDebug("【休眠】{time} 毫秒", sleepTime);
                         Thread.Sleep(sleepTime);
                     }
@@ -494,7 +509,7 @@ namespace Ray.BiliBiliTool.DomainService
                                 _biliCookie.BiliJct,
                                 info.RoomInfo.Uid,
                                 $"[\"{_biliCookie.LiveBuvid}\",\"{uuid}\"]")
-                            );
+                        );
                     }
                     else
                     {
@@ -513,7 +528,7 @@ namespace Ray.BiliBiliTool.DomainService
                                 _biliCookie.BiliJct,
                                 uuid,
                                 $"[\"{_biliCookie.LiveBuvid}\",\"{uuid}\"]")
-                            );
+                        );
                     }
 
                     info.LastBeatTime = Now();
@@ -548,19 +563,35 @@ namespace Ray.BiliBiliTool.DomainService
         {
             if (!await CheckLiveCookie()) return;
 
-            (await GetFansMedalInfoList()).ForEach(async info =>
+            var infoList = await GetFansMedalInfoList();
+            infoList = infoList.FindAll(info => info.LiveRoomInfo.Live_Status != 1);
+
+            foreach (var info in infoList)
             {
-                var result = await _liveApi.LikeLiveRoom(new LikeLiveRoomRequest(info.RoomId, _biliCookie.BiliJct));
-                if (result.Code == 0)
+                var successCount = 0;
+                var failedCount = 0;
+                while (successCount < _liveFansMedalTaskOptions.LikeNumber &&
+                       failedCount < _liveFansMedalTaskOptions.LikeGiveUpThreshold)
                 {
-                    _logger.LogInformation("【点赞直播间】{roomId} 完成", info.RoomId);
+                    var result = await _liveApi.LikeLiveRoom(new LikeLiveRoomRequest(info.RoomId, _biliCookie.BiliJct));
+                    if (result.Code == 0)
+                    {
+                        // _logger.LogInformation("【点赞直播间】{roomId} 完成", info.RoomId);
+                        successCount++;
+                    }
+                    else
+                    {
+                        _logger.LogError("【点赞直播间】{roomId} 时候出现错误", info.RoomId);
+                        _logger.LogError("【原因】{message}", result.Message);
+                        failedCount++;
+                    }
+
+                    await Task.Delay(500);
                 }
-                else
-                {
-                    _logger.LogError("【点赞直播间】{roomId} 时候出现错误", info.RoomId);
-                    _logger.LogError("【原因】{message}", result.Message);
-                }
-            });
+
+                _logger.LogInformation("【点赞直播间】{romeId}完成情况：{success}/{total}", info.RoomId, successCount,
+                    failedCount + successCount);
+            }
         }
 
         private async Task<List<FansMedalInfoDto>> GetFansMedalInfoList()
@@ -587,10 +618,7 @@ namespace Ray.BiliBiliTool.DomainService
 
                 // 通过空间主页信息获取直播间 id
                 var liveHostUserId = medal.Medal_info.Target_id;
-                var req = new GetSpaceInfoDto()
-                {
-                    mid = liveHostUserId
-                };
+                var req = new GetSpaceInfoDto() { mid = liveHostUserId };
                 await _wbiService.SetWridAsync(req);
 
                 var spaceInfo = await _userInfoApi.GetSpaceInfo(req);
@@ -604,11 +632,11 @@ namespace Ray.BiliBiliTool.DomainService
                 // 用以排除有牌子无直播间的up主
                 if (spaceInfo.Data.Live_room is null)
                 {
-                    _logger.LogInformation("【主播】{name} 直播间id获取失败，已跳过",medal.Target_name);
+                    _logger.LogInformation("【主播】{name} 直播间id获取失败，已跳过", medal.Target_name);
                     continue;
                 }
-                    
-                
+
+
                 var roomId = spaceInfo.Data.Live_room.Roomid;
 
                 // 获取直播间详细信息
@@ -643,13 +671,15 @@ namespace Ray.BiliBiliTool.DomainService
 
                 // 请求主播主页来正确配置 cookie
                 var liveHome = await _liveApi.GetLiveHome();
-                var liveHomeContent = JsonConvert.DeserializeObject<BiliApiResponse>(await liveHome.Content.ReadAsStringAsync());
+                var liveHomeContent =
+                    JsonConvert.DeserializeObject<BiliApiResponse>(await liveHome.Content.ReadAsStringAsync());
                 if (liveHomeContent.Code != 0)
                 {
                     throw new Exception(liveHomeContent.Message);
                 }
 
-                List<string> liveCookies = liveHome.Headers.SingleOrDefault(header => header.Key == "Set-Cookie").Value.ToList();
+                List<string> liveCookies = liveHome.Headers.SingleOrDefault(header => header.Key == "Set-Cookie").Value
+                    .ToList();
                 _biliCookie.MergeCurrentCookie(liveCookies);
 
                 _logger.LogDebug("LiveBuvid {value}", _biliCookie.LiveBuvid);
@@ -661,6 +691,7 @@ namespace Ray.BiliBiliTool.DomainService
                 _logger.LogError("【原因】{message}", exception.Message);
                 return false;
             }
+
             return true;
         }
     }
