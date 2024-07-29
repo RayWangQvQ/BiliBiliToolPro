@@ -39,17 +39,13 @@ namespace Ray.BiliBiliTool.Config.Options
         /// <summary>
         /// 点赞次数
         /// </summary>
-        public int LikeNumber { get; set; } = 55;
-
-        /// <summary>
-        /// 点赞发送失败多少次时放弃
-        /// </summary>
-        public int LikeGiveUpThreshold { get; set; } = 5;
+        public int LikeNumber { get; set; } = 50;
 
         /// <summary>
         /// 发送弹幕次数
         /// </summary>
         public int SendDanmakuNumber { get; set; } = 15;
+
         /// <summary>
         /// 弹幕发送失败多少次时放弃
         /// </summary>

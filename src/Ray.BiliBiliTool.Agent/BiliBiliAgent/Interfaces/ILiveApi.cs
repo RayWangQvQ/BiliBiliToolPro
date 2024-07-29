@@ -144,8 +144,8 @@ public interface ILiveApi : IBiliBiliApi
     /// <summary>
     /// 点赞直播间
     /// </summary>
-    [HttpPost("/xlive/web-ucenter/v1/interact/likeInteract")]
+    [HttpPost("/xlive/app-ucenter/v1/like_info_v3/like/likeReportV3")]
     [Header("Referer", "https://live.bilibili.com/")]
     [Header("Origin", "https://live.bilibili.com")]
-    Task<BiliApiResponse> LikeLiveRoom([FormContent] LikeLiveRoomRequest request);
+    Task<BiliApiResponse> LikeLiveRoom([RawFormContent] string request);
 }
