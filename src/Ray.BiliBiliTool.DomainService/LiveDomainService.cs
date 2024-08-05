@@ -461,7 +461,7 @@ namespace Ray.BiliBiliTool.DomainService
             if (!await CheckLiveCookie()) return;
 
             var infoList = new List<HeartBeatIterationInfoDto>();
-            (await GetFansMedalInfoList()).ForEach(medal =>
+            (await GetFansMedalInfoList()).FindAll(info => info.LiveRoomInfo.Live_Status != 0).ForEach(medal =>
                 infoList.Add(new(medal.RoomId, medal.LiveRoomInfo, new(), 0, 0))
             );
 
