@@ -42,7 +42,7 @@ P.S.这里的运行环境指的是 `.NET Runtime 6.0.0` ，安装方法可详见
 ```
 wget https://github.com/RayWangQvQ/BiliBiliToolPro/releases/download/0.3.1/bilibili-tool-pro-v0.3.1-linux-x64.zip
 unzip bilibili-tool-pro-v0.3.1-linux-x64.zip
-cd cd ./linux-x64/
+cd ./linux-x64/
 ./Ray.BiliBiliTool.Console --runTasks=Login
 ```
 
