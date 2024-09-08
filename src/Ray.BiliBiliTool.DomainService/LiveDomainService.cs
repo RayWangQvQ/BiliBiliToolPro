@@ -432,8 +432,6 @@ namespace Ray.BiliBiliTool.DomainService
                 while (successCount < _liveFansMedalTaskOptions.SendDanmakuNumber &&
                        failedCount < _liveFansMedalTaskOptions.SendDanmakugiveUpThreshold)
                 {
-                    await Task.Delay(2000);
-
                     var sendResult = await _liveApi.SendLiveDanmuku(new SendLiveDanmukuRequest(
                         _biliCookie.BiliJct,
                         spaceInfo.Data.Live_room.Roomid,
@@ -447,6 +445,9 @@ namespace Ray.BiliBiliTool.DomainService
                     }
                     else
                         successCount++;
+
+                    var delay = new Random().Next(2000, 4000);
+                    await Task.Delay(delay);
                 }
 
 
@@ -460,7 +461,7 @@ namespace Ray.BiliBiliTool.DomainService
             if (!await CheckLiveCookie()) return;
 
             var infoList = new List<HeartBeatIterationInfoDto>();
-            (await GetFansMedalInfoList()).ForEach(medal =>
+            (await GetFansMedalInfoList()).FindAll(info => info.LiveRoomInfo.Live_Status != 0).ForEach(medal =>
                 infoList.Add(new(medal.RoomId, medal.LiveRoomInfo, new(), 0, 0))
             );
 
@@ -559,38 +560,36 @@ namespace Ray.BiliBiliTool.DomainService
             _logger.LogInformation("【直播观看时长】完成情况：{success}/{total} ", successCount, infoList.Count);
         }
 
+        /// <summary>
+        /// 点赞直播间
+        /// </summary>
         public async Task LikeFansMedalLive()
         {
             if (!await CheckLiveCookie()) return;
 
             var infoList = await GetFansMedalInfoList();
-            infoList = infoList.FindAll(info => info.LiveRoomInfo.Live_Status != 1);
-
+            infoList = infoList.FindAll(info => info.LiveRoomInfo.Live_Status != 0);
+            _logger.LogInformation("当前开播直播间数量：{num}", infoList.Count);
             foreach (var info in infoList)
             {
-                var successCount = 0;
-                var failedCount = 0;
-                while (successCount < _liveFansMedalTaskOptions.LikeNumber &&
-                       failedCount < _liveFansMedalTaskOptions.LikeGiveUpThreshold)
-                {
-                    var result = await _liveApi.LikeLiveRoom(new LikeLiveRoomRequest(info.RoomId, _biliCookie.BiliJct));
-                    if (result.Code == 0)
-                    {
-                        // _logger.LogInformation("【点赞直播间】{roomId} 完成", info.RoomId);
-                        successCount++;
-                    }
-                    else
-                    {
-                        _logger.LogError("【点赞直播间】{roomId} 时候出现错误", info.RoomId);
-                        _logger.LogError("【原因】{message}", result.Message);
-                        failedCount++;
-                    }
+                // Clike_Time 暂时设置为等于设置的LikeNumber，不清楚是否会被风控，我自己抓包最大值为10
+                var request = new LikeLiveRoomRequest(info.RoomId, _biliCookie.BiliJct,
+                    _liveFansMedalTaskOptions.LikeNumber,
+                    info.LiveRoomInfo.Uid, _biliCookie.UserId);
 
-                    await Task.Delay(500);
+                var result = await _liveApi.LikeLiveRoom(request.RawTextBuild());
+                if (result.Code == 0)
+                {
+                    _logger.LogInformation("【点赞直播间】{roomId} 完成", info.RoomId);
+                }
+                else
+                {
+                    _logger.LogError("【点赞直播间】{roomId} 时候出现错误", info.RoomId);
+                    _logger.LogError("【原因】{message}", result.Message);
                 }
 
-                _logger.LogInformation("【点赞直播间】{romeId}完成情况：{success}/{total}", info.RoomId, successCount,
-                    failedCount + successCount);
+                var delay = new Random().Next(5000, 8000);
+                await Task.Delay(delay);
             }
         }
 

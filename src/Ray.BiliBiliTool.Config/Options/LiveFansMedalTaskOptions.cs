@@ -37,22 +37,18 @@ namespace Ray.BiliBiliTool.Config.Options
         public const int HeartBeatInterval = 60;
 
         /// <summary>
-        /// 点赞次数
+        /// 点赞次数，默认值为30（用于点亮粉丝勋章）
         /// </summary>
-        public int LikeNumber { get; set; } = 55;
-
-        /// <summary>
-        /// 点赞发送失败多少次时放弃
-        /// </summary>
-        public int LikeGiveUpThreshold { get; set; } = 5;
+        public int LikeNumber { get; set; } = 30;
 
         /// <summary>
         /// 发送弹幕次数
         /// </summary>
-        public int SendDanmakuNumber { get; set; } = 15;
+        public int SendDanmakuNumber { get; set; } = 1;
+
         /// <summary>
         /// 弹幕发送失败多少次时放弃
         /// </summary>
-        public int SendDanmakugiveUpThreshold { get; set; } = 5;
+        public int SendDanmakugiveUpThreshold { get; set; } = 3;
     }
 }
