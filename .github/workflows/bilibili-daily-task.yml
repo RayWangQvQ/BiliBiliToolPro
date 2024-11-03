@@ -67,15 +67,15 @@ jobs:
     steps:
     - id: check
       if: env.IsOpenDailyTask=='true'
-      run: |
-        echo "::set-output name=result::开启"
+      #run: |
+        #echo "::set-output name=result::开启"
 
   run-daily-task:
 
     runs-on: ubuntu-latest
     environment: Production
     needs: pre-check
-    if: needs.pre-check.outputs.result=='开启'
+    #if: needs.pre-check.outputs.result=='开启'
 
     steps:
 
