@@ -97,4 +97,5 @@ jobs:
     - name: Run APP
       run: |
         cd ./src/Ray.BiliBiliTool.Console
+        dotnet run --runTasks=Daily
         dotnet run --runTasks=LiveFansMedal
