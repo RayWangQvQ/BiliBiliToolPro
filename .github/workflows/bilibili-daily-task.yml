@@ -59,25 +59,8 @@ env:
   Ray_Serilog__WriteTo__0__Args__outputTemplate: ${{secrets.CONSOLELOGTEMPLATE}}         
 
 jobs:
-
-  pre-check:
-    runs-on: ubuntu-latest
-    outputs:
-      result: ${{ steps.check.outputs.result }} # 不能直接传递secrets的值，否则会被skip，需要转一下
-    steps:
-    - id: check
-      if: env.IsOpenDailyTask=='true'
-      run: |
-        echo "::set-output name=result::开启"
-
-  run-daily-task:
-
-    runs-on: ubuntu-latest
-    environment: Production
-    needs: pre-check
-    if: needs.pre-check.outputs.result=='开启'
-
-    steps:
+  
+  steps:
 
     # 设置服务器时区为东八区 
     - name: Set time zone
