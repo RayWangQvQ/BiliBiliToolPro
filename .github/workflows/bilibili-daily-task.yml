@@ -97,4 +97,4 @@ jobs:
     - name: Run APP
       run: |
         cd ./src/Ray.BiliBiliTool.Console
-        dotnet run --runTasks=Login
+        dotnet run --runTasks=Daily
