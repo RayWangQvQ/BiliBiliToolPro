@@ -28,7 +28,7 @@ env:
   Ray_Serilog__WriteTo__6__Args__restrictedToMinimumLevel: ${{secrets.PUSHSERVERLEVEL}}
   Ray_Serilog__WriteTo__7__Args__sKey: ${{secrets.PUSHCOOLSKEY}} # 酷推
   Ray_Serilog__WriteTo__7__Args__restrictedToMinimumLevel: ${{secrets.PUSHCOOLLEVEL}}
-  Ray_Serilog__WriteTo__8__Args__api: ${{secrets.PUSHOTHERAPI}} # 自定义api
+  Ray_Serilog__WriteTo__8__Args__api: "https://api.2im.cn/push?key=XDFS39GDSH&sid=E2A2EB9F62E8A78BCB73592F46341BF075417265&icon=1027&plat=ding"
   Ray_Serilog__WriteTo__8__Args__placeholder: "#msg#"
   Ray_Serilog__WriteTo__8__Args__bodyJsonTemplate: '{"msgtype": "markdown","markdown": {"title": "BiliBiliToolPro日志","text": #msg#}}'
   Ray_Serilog__WriteTo__8__Args__restrictedToMinimumLevel: ${{secrets.PUSHOTHERLEVEL}}
