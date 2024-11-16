@@ -29,8 +29,8 @@ env:
   Ray_Serilog__WriteTo__7__Args__sKey: ${{secrets.PUSHCOOLSKEY}} # 酷推
   Ray_Serilog__WriteTo__7__Args__restrictedToMinimumLevel: ${{secrets.PUSHCOOLLEVEL}}
   Ray_Serilog__WriteTo__8__Args__api: ${{secrets.PUSHOTHERAPI}} # 自定义api
-  Ray_Serilog__WriteTo__8__Args__placeholder: ${{secrets.PUSHOTHERPLACEHOLDER}}
-  Ray_Serilog__WriteTo__8__Args__bodyJsonTemplate: ${{secrets.PUSHOTHERBODYJSONTEMPLATE}}
+  Ray_Serilog__WriteTo__8__Args__placeholder: "#msg#"
+  Ray_Serilog__WriteTo__8__Args__bodyJsonTemplate: '{"msgtype": "markdown","markdown": {"title": "BiliBiliToolPro日志","text": #msg#}}'
   Ray_Serilog__WriteTo__8__Args__restrictedToMinimumLevel: ${{secrets.PUSHOTHERLEVEL}}
   Ray_Serilog__WriteTo__9__Args__token: ${{secrets.PUSHPLUSTOKEN}} # PushPlus
   Ray_Serilog__WriteTo__9__Args__topic: ${{secrets.PUSHPLUSTOPIC}}
