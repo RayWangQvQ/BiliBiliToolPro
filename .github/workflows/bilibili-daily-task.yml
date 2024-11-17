@@ -28,7 +28,7 @@ env:
   Ray_Serilog__WriteTo__6__Args__restrictedToMinimumLevel: ${{secrets.PUSHSERVERLEVEL}}
   Ray_Serilog__WriteTo__7__Args__sKey: ${{secrets.PUSHCOOLSKEY}} # 酷推
   Ray_Serilog__WriteTo__7__Args__restrictedToMinimumLevel: ${{secrets.PUSHCOOLLEVEL}}
-  Ray_Serilog__WriteTo__8__Args__api: "https://api.2im.cn/push?key=${{secrets.HUIXIAOKEY}}&sid=${{secrets.HUIXIAOSID}}&icon=1027&group=BiliBiliToolPro"
+  Ray_Serilog__WriteTo__8__Args__api: "https://api.2im.cn/push?key=${{secrets.HUIXIAOKEY}}&sid=${{secrets.HUIXIAOSID}}&icon=https://raw.githubusercontent.com/yujincheng08/BiliRoaming/refs/heads/master/imgs/icon.png&group=BiliBiliToolPro"
   Ray_Serilog__WriteTo__8__Args__placeholder: "#msg#"
   Ray_Serilog__WriteTo__8__Args__bodyJsonTemplate: '{"msgtype": "text","title": "运行日志","content": #msg#}'
   Ray_Serilog__WriteTo__8__Args__restrictedToMinimumLevel: ${{secrets.PUSHOTHERLEVEL}}
