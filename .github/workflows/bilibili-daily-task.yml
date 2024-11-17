@@ -43,17 +43,17 @@ env:
   Ray_Security__IntervalMethodTypes: ${{secrets.INTERVALMETHODTYPES}}
   Ray_Security__UserAgent: ${{secrets.USERAGENT}}
   Ray_Security__WebProxy: ${{secrets.WEBPROXY}}
-  Ray_Security__RandomSleepMaxMin: ${{secrets.RANDOMSLEEPMAXMIN}}
+  Ray_Security__RandomSleepMaxMin: 0
   # 每日任务：
   Ray_DailyTaskConfig__NumberOfCoins: ${{secrets.NUMBEROFCOINS}}
   Ray_DailyTaskConfig__SaveCoinsWhenLv6: ${{secrets.SAVECOINSWHENLV6}}
-  Ray_DailyTaskConfig__SelectLike: ${{secrets.SELECTLIKE}}
-  Ray_DailyTaskConfig__SupportUpIds: ${{secrets.SUPPORTUPIDS}}
+  Ray_DailyTaskConfig__SelectLike: true
+  Ray_DailyTaskConfig__SupportUpIds: 77257482,272654283,329319585,311864840,652598662,406636263,251013709,86205301,19577966,39275328
   Ray_DailyTaskConfig__DayOfAutoCharge: ${{secrets.DAYOFAUTOCHARGE}}
   Ray_DailyTaskConfig__AutoChargeUpId: ${{secrets.AUTOCHARGEUPID}}
   Ray_DailyTaskConfig__ChargeComment: ${{secrets.CHARGECOMMENT}}
   Ray_DailyTaskConfig__DayOfReceiveVipPrivilege: ${{secrets.DAYOFRECEIVEVIPPRIVILEGE}}
-  Ray_DailyTaskConfig__DayOfExchangeSilver2Coin: ${{secrets.DAYOFEXCHANGESILVER2COIN}}
+  Ray_DailyTaskConfig__DayOfExchangeSilver2Coin: -2
   Ray_DailyTaskConfig__DevicePlatform: ${{secrets.DEVICEPLATFORM}}
   Ray_Serilog__WriteTo__0__Args__restrictedToMinimumLevel: ${{secrets.CONSOLELOGLEVEL}}
   Ray_Serilog__WriteTo__0__Args__outputTemplate: ${{secrets.CONSOLELOGTEMPLATE}}         
@@ -85,11 +85,11 @@ jobs:
 
     # 检出
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4.1.5
       
     # .Net 环境
     - name: Setup .NET
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v1.1.0
       with:
         dotnet-version: 6.0.x
  
