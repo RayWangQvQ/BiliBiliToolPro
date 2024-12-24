@@ -1,3 +1,6 @@
+## 2.1.3
+- Code refactory
+- Fix[#791]：修复VipBigPoint任务异常导致终止的问题
 ## 2.1.2
 - Feature: enhancement CICD scripts
 - Fix[#728]: compatible with qinglong history versions 

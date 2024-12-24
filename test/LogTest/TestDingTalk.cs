@@ -20,7 +20,7 @@ namespace LogTest
         public TestDingTalk()
         {
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
-            Program.CreateHost(new string[] { });
+            Program.CreateHost(new string[] { "ENVIRONMENT=Development" });
 
             _key = Global.ConfigurationRoot["Serilog:WriteTo:5:Args:webHookUrl"];
         }
@@ -30,12 +30,11 @@ namespace LogTest
         {
             var client = new DingTalkApiClient(_key);
 
+            var title = "这是标题";
             var msg = LogConstants.Msg2 + "开始推送";
 
-            var result = client.PushMessage(msg);
+            var result = client.PushMessage(msg, title);
             Debug.WriteLine(result.Content.ReadAsStringAsync().Result);
-
-            System.Console.ReadLine();
         }
     }
 }

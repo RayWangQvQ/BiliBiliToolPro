@@ -369,3 +369,6 @@ kustomization.yaml
 
 # cookie config
 **/Ray.BiliBiliTool.Console/cookies.json
+
+# ut
+coveragereport

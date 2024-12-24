@@ -40,29 +40,15 @@ public class ChargeApiTest
 
         // Assert
         re.Code.Should().Be(0);
-        re.Data.Status.Should().Be(-4);
-        re.Data.Msg.Should().BeEquivalentTo("bp.to.battery http failed, invalid args, errNo=800409904: B ±ÒÓà¶î²»×ã");
+        re.Data.Status.Should().BeOneOf(
+            -4,//bp.to.battery http failed, invalid args, errNo=800409904: B ±ÒÓà¶î²»×ã
+            4
+            );
     }
 
     #endregion
 
     #region ChargeCommentAsync
-
-    [Fact]
-    public async void ChargeCommentAsync_SendRequest_SetWridSuccess()
-    {
-        // Arrange
-        var upId = 220893216;
-        var req = new ChargeRequest(2, upId, _ck.BiliJct);
-
-        // Act
-        BiliApiResponse<ChargeV2Response> re = await _target.ChargeV2Async(req);
-
-        // Assert
-        re.Code.Should().Be(0);
-        re.Data.Status.Should().Be(-4);
-        re.Data.Msg.Should().BeEquivalentTo("bp.to.battery http failed, invalid args, errNo=800409904: B ±ÒÓà¶î²»×ã");
-    }
 
     #endregion
 

@@ -17,8 +17,6 @@ namespace AppServiceTest.DailyTask
         {
             using var scope = Global.ServiceProviderRoot.CreateScope();
             var appService = scope.ServiceProvider.GetRequiredService<IDailyTaskAppService>();
-
-
         }
     }
 }

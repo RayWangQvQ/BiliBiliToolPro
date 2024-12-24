@@ -16,8 +16,8 @@ namespace LogTest
 
         public TestWorkWeiXin()
         {
-            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
-            Program.CreateHost(new string[] { });
+            Environment.SetEnvironmentVariable("DOTNET_ENVIRONMENT", "Development");
+            Program.CreateHost(new string[] { "ENVIRONMENT=Development" });
 
             _key = Global.ConfigurationRoot["Serilog:WriteTo:4:Args:webHookUrl"];
         }
@@ -25,7 +25,7 @@ namespace LogTest
         [Fact]
         public void Test2()
         {
-            WorkWeiXinApiClient client = new WorkWeiXinApiClient(_key);
+            var client = new WorkWeiXinApiClient(_key);
 
             //string msg = LogConstants.Msg;
             string msg = LogConstants.Msg2;

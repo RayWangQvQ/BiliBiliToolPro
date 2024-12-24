@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Ray.BiliBiliTool.Infrastructure.Cookie;
 using Xunit;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Services;
+using FluentAssertions;
 
 namespace BiliAgentTest
 {
@@ -116,11 +117,15 @@ namespace BiliAgentTest
             var biliCookie = scope.ServiceProvider.GetRequiredService<BiliCookie>();
 
             // 猫雷粉丝牌
-            var request = new WearMedalWallRequest(biliCookie.BiliJct, 365421);
+            var request = new WearMedalWallRequest(biliCookie.BiliJct, 365421); //todo
 
             BiliApiResponse re = api.WearMedalWall(request).Result;
 
             Assert.True(re.Code == 0);
+            re.Code.Should().BeOneOf(
+                0,
+                1500005
+                );
         }
 
         [Fact]

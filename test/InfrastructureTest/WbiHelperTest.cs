@@ -15,7 +15,7 @@ namespace InfrastructureTest
             string output = Regex.Replace(input, pattern, replacement);
             Debug.WriteLine(output);
 
-            Assert.Equal(output, "这是一段包含特殊字符@#$%^&的字符串");
+            Assert.Equal("这是一段包含特殊字符@#$%^&的字符串", output);
         }
     }
 }

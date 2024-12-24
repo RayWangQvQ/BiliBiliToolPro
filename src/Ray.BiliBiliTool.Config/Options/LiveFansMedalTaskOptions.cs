@@ -35,5 +35,20 @@ namespace Ray.BiliBiliTool.Config.Options
         //public const string UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36";
 
         public const int HeartBeatInterval = 60;
+
+        /// <summary>
+        /// 点赞次数，默认值为30（用于点亮粉丝勋章）
+        /// </summary>
+        public int LikeNumber { get; set; } = 30;
+
+        /// <summary>
+        /// 发送弹幕次数
+        /// </summary>
+        public int SendDanmakuNumber { get; set; } = 1;
+
+        /// <summary>
+        /// 弹幕发送失败多少次时放弃
+        /// </summary>
+        public int SendDanmakugiveUpThreshold { get; set; } = 3;
     }
 }
