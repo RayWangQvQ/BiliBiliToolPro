@@ -11,10 +11,17 @@ set -u
 set -o pipefail
 
 verbose=false                          # 开启debug日志
-bili_repo="raywangqvq/bilibilitoolpro" # 仓库地址
+#bili_repo="raywangqvq/bilibilitoolpro" # 仓库地址 输入官方分支，或者加速分支目录
+# 针对使用fock拉取分支的情况，建议把bili_repo做在环境变量中可以修改调整
+# 可更兼容性
+
+bili_repo=${BILI_TRUEUSE_NAME:-"raywangqvq/bilibilitoolpro"}
 bili_branch=""                         # 分支名，空或_develop
-prefer_mode=${BILI_MODE:-"dotnet"}     # dotnet或bilitool，需要通过环境变量配置
+prefer_mode=${BILI_MODE:-""}     # dotnet或bilitool，需要通过环境变量配置
 github_proxy=${BILI_GITHUB_PROXY:-""}  # 下载github release包时使用的代理，会拼在地址前面，需要通过环境变量配置
+
+
+
 
 # Use in the the functions: eval $invocation
 invocation='say_verbose "Calling: ${yellow:-}${FUNCNAME[0]} ${green:-}$*${normal:-}"'
@@ -83,7 +90,9 @@ touch /root/.bashrc && . /root/.bashrc
 # 目录
 say "青龙repo目录: $dir_repo"
 qinglong_bili_repo="$(echo "$bili_repo" | sed 's/\//_/g')${bili_branch}"
+
 qinglong_bili_repo_dir="$(find $dir_repo -type d \( -iname $qinglong_bili_repo -o -iname ${qinglong_bili_repo}_main \) | head -1)"
+
 say "bili仓库目录: $qinglong_bili_repo_dir"
 
 current_linux_os="debian"  # 或alpine
@@ -91,6 +100,8 @@ current_os="linux"         # 或linux-musl
 machine_architecture="x64" # 或arm、arm64
 
 bilitool_installed_version=0
+
+
 
 # 以下操作仅在bilitool仓库的根bin文件下执行
 cd $qinglong_bili_repo_dir
@@ -257,6 +268,9 @@ check_unzip() {
     fi
 }
 
+
+
+
 # 检查dotnet
 check_dotnet() {
     eval $invocation
@@ -279,14 +293,15 @@ check_bilitool() {
     TAG_FILE="./tag.txt"
     touch $TAG_FILE
     local STORED_TAG=$(cat $TAG_FILE 2>/dev/null)
-
+    echo $STORED_TAG
     #如果STORED_TAG为空，则返回1
     if [[ -z $STORED_TAG ]]; then
         say "tag.txt为空，未安装过"
         return 1
     fi
 
-    say "tag.txt记录的版本：$STORED_TAG"
+
+
 
     # 查找当前目录下是否有叫Ray.BiliBiliTool.Console的文件
     if [ -f "./Ray.BiliBiliTool.Console" ]; then
@@ -379,8 +394,9 @@ install_dotnet() {
 # 从github获取bilitool下载地址
 get_download_url() {
     eval $invocation
+    # 增加业务逻辑：主要为了解决完成抓不到版本号时造成的更新错误
 
-    tag=$1
+    tag=${BILI_STORED_TAG:-""}
     url="${github_proxy}https://github.com/RayWangQvQ/BiliBiliToolPro/releases/download/$tag/bilibili-tool-pro-v$tag-$current_os-$machine_architecture.zip"
     say "下载地址：$url"
     echo $url
@@ -398,7 +414,7 @@ install_bilitool() {
     # 解析最新的tag名称
     check_jq
     LATEST_TAG=$(echo $LATEST_RELEASE | jq -r '.tag_name')
-    say "最新版本：$LATEST_TAG"
+    say "最新版本：$LATEST_TAG , 如果显示为null，就读取环境变量中BILI_STORED_TAG参数手工设置的版本号，避免下载文件遇到 no found错误"
 
     # 读取之前存储的tag并比较
     if [ "$LATEST_TAG" != "$bilitool_installed_version" ]; then
@@ -472,3 +488,4 @@ run_task() {
 
 check_os
 install
+
