@@ -1,0 +1,64 @@
+meta {
+  name: combine
+  type: http
+  seq: 1
+}
+
+get {
+  url: https://api.bilibili.com/x/vip_point/task/combine?access_key={{access_key}}&appKey={{appKey}}&appkey={{appKey}}&bili_local_id={{device_id}}&build=7720200&buvid={{buvid}}&channel=yingyongbao&containerName=AbstractWebActivity&csrf={{csrf}}&device=phone&deviceId=f9abaee74692f9e9&deviceName=samsungNexus&devicePlatform=Android10samsungNexus&device_id={{device_id}}&device_name=samsungNexus&device_platform=Android10samsungNexus&disable_rcmd=0&fingerprint={{device_id}}&isPad=false&localFingerprint={{device_id}}&local_id={{buvid}}&mobi_app=android&modelName=Nexus&networkState=2&networkstate=2&osVer=10&platform=android&sessionID=029d1ab7&statistics={"appId":1,"platform":3,"version":"7.72.0","abtest":""}&statusBarHeight=77&ts=1735731151&sign=1bb77731bc5b2b6948da2c7361fabb26
+  body: none
+  auth: none
+}
+
+params:query {
+  access_key: {{access_key}}
+  appKey: {{appKey}}
+  appkey: {{appKey}}
+  bili_local_id: {{device_id}}
+  build: 7720200
+  buvid: {{buvid}}
+  channel: yingyongbao
+  containerName: AbstractWebActivity
+  csrf: {{csrf}}
+  device: phone
+  deviceId: f9abaee74692f9e9
+  deviceName: samsungNexus
+  devicePlatform: Android10samsungNexus
+  device_id: {{device_id}}
+  device_name: samsungNexus
+  device_platform: Android10samsungNexus
+  disable_rcmd: 0
+  fingerprint: {{device_id}}
+  isPad: false
+  localFingerprint: {{device_id}}
+  local_id: {{buvid}}
+  mobi_app: android
+  modelName: Nexus
+  networkState: 2
+  networkstate: 2
+  osVer: 10
+  platform: android
+  sessionID: 029d1ab7
+  statistics: {"appId":1,"platform":3,"version":"7.72.0","abtest":""}
+  statusBarHeight: 77
+  ts: 1735731151
+  sign: 1bb77731bc5b2b6948da2c7361fabb26
+}
+
+headers {
+  Host: api.bilibili.com
+  Cookie: {{cookieStr}}
+  native_api_from: h5
+  buvid: {{buvid}}
+  accept: application/json, text/plain, */*
+  referer: https://big.bilibili.com/mobile/bigPoint/task
+  content-type: application/json
+  user-agent: {{user-agent}}
+  x-bili-trace-id: be9823849864b71718b2fd385b677527:18b2fd385b677527:0:0
+  x-bili-aurora-eid: UlAAQFkMBVkH
+  x-bili-mid: {{mid}}
+  x-bili-aurora-zone: 
+  x-bili-gaia-vtoken: 
+  x-bili-ticket: eyJhbGciOiJIUzI1NiIsImtpZCI6InMwMyIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzU3NTk1NTIsImlhdCI6MTczNTczMDQ1MiwiYnV2aWQiOiJYVzcyNEQxNzI0Njg3MTlDQzI1NjA1REIyNDI0NzhEMkUxMjE5In0.wg0stqcv1_NO4GwHuC70gzuk-O_ROX5bJJoCKfa5EdA
+  bili-http-engine: cronet
+}
