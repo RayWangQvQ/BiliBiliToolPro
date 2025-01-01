@@ -1,0 +1,49 @@
+meta {
+  name: receive
+  type: http
+  seq: 1
+}
+
+post {
+  url: https://app.bilibili.com/pgc/activity/deliver/material/receive
+  body: formUrlEncoded
+  auth: none
+}
+
+headers {
+  Host: api.bilibili.com
+  buvid: {{buvid}}
+  fp_local: {{device_id}}
+  fp_remote: {{device_id}}
+  session_id: e04d2e05
+  env: prod
+  app-key: android64
+  user-agent: Mozilla/5.0 BiliDroid/7.72.0 (bbcallen@gmail.com) os/android model/Nexus mobi_app/android build/7720200 channel/yingyongbao innerVer/7720210 osVer/10 network/2
+  x-bili-trace-id: 0564afa825e0e1ec59164fe59367755a:59164fe59367755a:0:0
+  x-bili-aurora-eid: UlAAQFkMBVkH
+  x-bili-mid: {{mid}}
+  x-bili-aurora-zone: 
+  x-bili-gaia-vtoken: 
+  x-bili-ticket: eyJhbGciOiJIUzI1NiIsImtpZCI6InMwMyIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzU3NzI2NDcsImlhdCI6MTczNTc0MzU0NywiYnV2aWQiOiJYVzcyNEQxNzI0Njg3MTlDQzI1NjA1REIyNDI0NzhEMkUxMjE5In0.eafhpooLoe2q6cA45_Xrgq1VO-y490pxP5gwJ4qm_ik
+  bili-http-engine: cronet
+}
+
+body:form-urlencoded {
+  access_key: {{access_key}}
+  activity_code: 
+  appkey: {{appKey}}
+  build: 7720200
+  c_locale: zh_CN
+  channel: yingyongbao
+  disable_rcmd: 0
+  ep_id: 511578
+  from_spmid: united.player-video-detail.player.continue
+  mobi_app: android
+  platform: android
+  s_locale: zh_CN
+  season_id: 41410
+  spmid: united.player-video-detail.0.0
+  statistics: {"appId":1,"platform":3,"version":"7.72.0","abtest":""}
+  ts: 1735744215
+  sign: 132d2532467ef649a925aece247cdb4b
+}

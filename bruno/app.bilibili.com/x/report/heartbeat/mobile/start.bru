@@ -1,0 +1,76 @@
+meta {
+  name: start
+  type: http
+  seq: 2
+}
+
+post {
+  url: https://app.bilibili.com/x/report/heartbeat/mobile
+  body: formUrlEncoded
+  auth: none
+}
+
+headers {
+  Host: api.bilibili.com
+  buvid: {{buvid}}
+  fp_local: {{device_id}}
+  fp_remote: {{device_id}}
+  session_id: e04d2e05
+  env: prod
+  app-key: android64
+  user-agent: {{user-agent}}
+  x-bili-trace-id: 8fcda5ac30f6510905b2834bbb67755a:05b2834bbb67755a:0:0
+  x-bili-aurora-eid: UlAAQFkMBVkH
+  x-bili-mid: {{mid}}
+  x-bili-aurora-zone: 
+  x-bili-gaia-vtoken: 
+  x-bili-ticket: eyJhbGciOiJIUzI1NiIsImtpZCI6InMwMyIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzU3NzI2NDcsImlhdCI6MTczNTc0MzU0NywiYnV2aWQiOiJYVzcyNEQxNzI0Njg3MTlDQzI1NjA1REIyNDI0NzhEMkUxMjE5In0.eafhpooLoe2q6cA45_Xrgq1VO-y490pxP5gwJ4qm_ik
+  bili-http-engine: cronet
+}
+
+body:form-urlencoded {
+  access_key: {{access_key}}
+  actual_played_time: 0
+  aid: 726710400
+  appkey: {{appKey}}
+  auto_play: 99
+  build: 7720200
+  c_locale: zh_CN
+  channel: yingyongbao
+  cid: 785731972
+  disable_rcmd: 0
+  epid: 511578
+  epid_status: 13
+  extra: {"from_outer_spmid":"activity.h5.0.0"}
+  from: 12
+  from_spmid: united.player-video-detail.player.continue
+  last_play_progress_time: 0
+  list_play_time: 0
+  max_play_progress_time: 0
+  mid: {{mid}}
+  miniplayer_play_time: 0
+  mobi_app: android
+  network_type: 1
+  paused_time: 0
+  platform: android
+  play_mode: 1
+  play_status: 1
+  play_type: 
+  played_time: 0
+  quality: 64
+  report_flow_data: 
+  s_locale: zh_CN
+  session: 2edcb8dc8ff0b6f13dd685a23aff692b72bf2869
+  sid: 41410
+  spmid: united.player-video-detail.0.0
+  start_ts: 0
+  statistics: {"appId":1,"platform":3,"version":"7.72.0","abtest":""}
+  sub_type: 1
+  total_time: 0
+  track_id: 
+  ts: 1735744223
+  type: 4
+  user_status: 1
+  video_duration: 1450
+  sign: 37b0acd3bab7b40a082ce510041a0a2b
+}
