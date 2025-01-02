@@ -200,7 +200,7 @@ public class VipBigPointAppService : AppService, IVipBigPointAppService
 
         foreach (var targetTask in needReceiveTasks)
         {
-            _logger.LogInformation("开始领取任务");
+            _logger.LogInformation("开始领取任务：{task}", targetTask.title);
             await TryReceive(targetTask.task_code);
         }
 
@@ -493,7 +493,7 @@ public class VipBigPointAppService : AppService, IVipBigPointAppService
         try
         {
             var request = new ReceiveOrCompleteTaskRequest(taskCode);
-            re = await _vipApi.Receive(request);
+            re = await _vipApi.ReceiveV2(request);
             if (re.Code == 0)
                 _logger.LogInformation("领取任务成功");
             else

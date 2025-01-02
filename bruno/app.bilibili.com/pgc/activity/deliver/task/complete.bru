@@ -18,7 +18,7 @@ headers {
   session_id: e04d2e05
   env: prod
   app-key: android64
-  user-agent: Mozilla/5.0 BiliDroid/7.72.0 (bbcallen@gmail.com) os/android model/Nexus mobi_app/android build/7720200 channel/yingyongbao innerVer/7720210 osVer/10 network/2
+  user-agent: {{user-agent}}
   x-bili-trace-id: a301946d9621645a707b40973f67755c:707b40973f67755c:0:0
   x-bili-aurora-eid: UlAAQFkMBVkH
   x-bili-mid: {{mid}}
@@ -26,11 +26,9 @@ headers {
   x-bili-gaia-vtoken: 
   x-bili-ticket: eyJhbGciOiJIUzI1NiIsImtpZCI6InMwMyIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzU3NzI2NDcsImlhdCI6MTczNTc0MzU0NywiYnV2aWQiOiJYVzcyNEQxNzI0Njg3MTlDQzI1NjA1REIyNDI0NzhEMkUxMjE5In0.eafhpooLoe2q6cA45_Xrgq1VO-y490pxP5gwJ4qm_ik
   bili-http-engine: cronet
-  content-type: application/x-www-form-urlencoded; charset=utf-8
 }
 
 body:form-urlencoded {
-  access_key: {{access_key}}
   appkey: {{appKey}}
   build: 7720200
   c_locale: zh_CN
@@ -41,9 +39,40 @@ body:form-urlencoded {
   s_locale: zh_CN
   statistics: {"appId":1,"platform":3,"version":"7.72.0","abtest":""}
   task_id: 4320003
+  token: 6c54c1256a
+  access_key: {{access_key}}
   task_sign: 78cf66f2699393751c41c2fda27c2ccf
   timestamp: 1735744760834
-  token: 4c2cba3427
   ts: 1735744760
   sign: 2292d647d9b3f6dbd2f99b5a90cbddaf
+}
+
+script:pre-request {
+  const CryptoJS = require('crypto-js');
+  
+  console.log("start");
+  
+  const md5 = (str) => CryptoJS.MD5(str).toString(CryptoJS.enc.Hex);
+  
+  function appSign(params, appkey, appsec) {
+    console.log("appkey:"+appkey);
+    console.log("appsec:"+appsec);
+    params.appkey = appkey;
+    const sortedKeys = Object.keys(params).sort();
+    const sortedParams = sortedKeys.map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`).join('&');
+    console.log(sortedParams);
+    return md5(sortedParams + appsec);
+  }
+  
+  const body = req.getBody();
+  
+  if (body.hasOwnProperty('sign')) {
+    body.access_key=bru.getEnvVar("access_key");
+    const sign = appSign(body, bru.getEnvVar("appKey"), bru.getEnvVar("appSec"));
+    console.log("calculate sign:" + sign);
+  
+    body.sign = sign;
+  }
+  
+  req.setBody(body);
 }

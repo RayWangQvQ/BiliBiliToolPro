@@ -2,6 +2,7 @@
 using Ray.BiliBiliTool.Agent.Attributes;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.VipTask;
+using System;
 using WebApiClientCore.Attributes;
 
 namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
@@ -34,20 +35,39 @@ public interface IVipBigPointApi
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>
+    [Obsolete]
     [HttpPost("/pgc/activity/score/task/receive")]
     Task<BiliApiResponse> Receive([JsonContent] ReceiveOrCompleteTaskRequest request);
 
+    /// <summary>
+    /// 领取任务
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
     [HttpPost("/pgc/activity/score/task/receive/v2")]
     Task<BiliApiResponse> ReceiveV2([FormContent] ReceiveOrCompleteTaskRequest request);
 
-
+    /// <summary>
+    /// 完成任务
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
     [HttpPost("/pgc/activity/score/task/complete")]
     Task<BiliApiResponse> CompleteAsync([JsonContent] ReceiveOrCompleteTaskRequest request);
 
+    /// <summary>
+    /// 完成任务
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
     [HttpPost("/pgc/activity/score/task/complete/v2")]
     Task<BiliApiResponse> CompleteV2([FormContent] ReceiveOrCompleteTaskRequest request);
 
-
+    /// <summary>
+    /// 完成浏览页面任务
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
     [HttpPost("/pgc/activity/deliver/task/complete")]
     Task<BiliApiResponse> ViewComplete([FormContent] ViewRequest request);
 
