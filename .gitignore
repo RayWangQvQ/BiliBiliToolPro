@@ -372,3 +372,6 @@ kustomization.yaml
 
 # ut
 coveragereport
+
+# bruno
+bruno/.env

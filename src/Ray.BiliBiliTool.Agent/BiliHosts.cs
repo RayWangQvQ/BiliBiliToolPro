@@ -3,6 +3,7 @@
 public static class BiliHosts
 {
     public const string Api = "https://api.bilibili.com";
+    public const string App = "https://app.bilibili.com";
     public const string Show = "https://show.bilibili.com";
     public const string Passport = "http://passport.bilibili.com";
     public const string LiveTrace = "https://live-trace.bilibili.com";

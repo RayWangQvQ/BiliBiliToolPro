@@ -86,7 +86,7 @@ public static class ServiceCollectionExtension
         services.AddBiliBiliClientApi<IAccountApi>(BiliHosts.Account, config);
         services.AddBiliBiliClientApi<ILiveApi>(BiliHosts.Live, config);
 
-        services.AddBiliBiliClientApi<IVipBigPointApi>(BiliHosts.Api, configApp);
+        services.AddBiliBiliClientApi<IVipBigPointApi>(BiliHosts.App, configApp);
 
 
         //qinglong

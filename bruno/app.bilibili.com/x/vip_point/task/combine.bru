@@ -1,0 +1,73 @@
+meta {
+  name: combine
+  type: http
+  seq: 1
+}
+
+get {
+  url: https://app.bilibili.com/x/vip_point/task/combine?access_key={{access_key}}&appKey={{appKey}}&appkey={{appKey}}&bili_local_id={{device_id}}&build=7720200&buvid={{buvid}}&channel=yingyongbao&containerName=AbstractWebActivity&csrf={{csrf}}&device=phone&deviceId=f9abaee74692f9e9&deviceName=samsungNexus&devicePlatform=Android10samsungNexus&device_id={{device_id}}&device_name=samsungNexus&device_platform=Android10samsungNexus&disable_rcmd=0&fingerprint={{device_id}}&isPad=false&localFingerprint={{device_id}}&local_id={{buvid}}&mobi_app=android&modelName=Nexus&networkState=2&networkstate=2&osVer=10&platform=android&sessionID=120548f6&statistics={"appId":1,"platform":3,"version":"7.72.0","abtest":""}&statusBarHeight=77&ts=1735733022&sign=638c21a29c9b0da27b871f6fd30d22ae
+  body: none
+  auth: none
+}
+
+params:query {
+  access_key: {{access_key}}
+  appKey: {{appKey}}
+  appkey: {{appKey}}
+  bili_local_id: {{device_id}}
+  build: 7720200
+  buvid: {{buvid}}
+  channel: yingyongbao
+  containerName: AbstractWebActivity
+  csrf: {{csrf}}
+  device: phone
+  deviceId: f9abaee74692f9e9
+  deviceName: samsungNexus
+  devicePlatform: Android10samsungNexus
+  device_id: {{device_id}}
+  device_name: samsungNexus
+  device_platform: Android10samsungNexus
+  disable_rcmd: 0
+  fingerprint: {{device_id}}
+  isPad: false
+  localFingerprint: {{device_id}}
+  local_id: {{buvid}}
+  mobi_app: android
+  modelName: Nexus
+  networkState: 2
+  networkstate: 2
+  osVer: 10
+  platform: android
+  sessionID: 120548f6
+  statistics: {"appId":1,"platform":3,"version":"7.72.0","abtest":""}
+  statusBarHeight: 77
+  ts: 1735733022
+  sign: 638c21a29c9b0da27b871f6fd30d22ae
+}
+
+headers {
+  Host: api.bilibili.com
+  Cookie: {{cookieStr}}
+  native_api_from: h5
+  buvid: {{buvid}}
+  accept: application/json, text/plain, */*
+  referer: https://big.bilibili.com/mobile/bigPoint/task
+  content-type: application/json
+  user-agent: {{user-agent}}
+  x-bili-trace-id: a3f5253d65441a9b03cf42f84d67752f:03cf42f84d67752f:0:0
+  x-bili-aurora-eid: UlAAQFkMBVkH
+  x-bili-mid: {{mid}}
+  x-bili-aurora-zone: 
+  x-bili-gaia-vtoken: 
+  x-bili-ticket: eyJhbGciOiJIUzI1NiIsImtpZCI6InMwMyIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzU3NjE2NjQsImlhdCI6MTczNTczMjU2NCwiYnV2aWQiOiJYVzcyNEQxNzI0Njg3MTlDQzI1NjA1REIyNDI0NzhEMkUxMjE5In0.YVtwH53dLJ1l6n6aFcvwNZ4MBkgnBPtxE8UfD7u9J4I
+  bili-http-engine: cronet
+}
+
+docs {
+  终端：APP
+  
+  作用：获取大会员赚大积分的任务列表
+  
+  入口：
+    - 我的->会员中心->赚大积分->查看8项任务
+}

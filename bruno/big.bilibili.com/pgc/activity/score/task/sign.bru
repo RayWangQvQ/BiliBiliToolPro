@@ -1,0 +1,40 @@
+meta {
+  name: sign
+  type: http
+  seq: 1
+}
+
+post {
+  url: https://api.bilibili.com/pgc/activity/score/task/sign
+  body: formUrlEncoded
+  auth: none
+}
+
+headers {
+  Host: api.bilibili.com
+  Cookie: {{cookieStr}}
+  native_api_from: h5
+  buvid: {{buvid}}
+  accept: application/json, text/plain, */*
+  referer: https://big.bilibili.com/mobile/index?exp_symbol=release_version&oflAb=1
+  user-agent: {{user-agent}}
+  x-bili-trace-id: 9c642fae280ce80077653eef826774e3:77653eef826774e3:0:0
+  x-bili-aurora-eid: UlAAQFkMBVkH
+  x-bili-mid: {{mid}}
+  x-bili-aurora-zone: 
+  x-bili-gaia-vtoken: 
+  x-bili-ticket: eyJhbGciOiJIUzI1NiIsImtpZCI6InMwMyIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzU3MzgxMTEsImlhdCI6MTczNTcwOTAxMSwiYnV2aWQiOiJYVzcyNEQxNzI0Njg3MTlDQzI1NjA1REIyNDI0NzhEMkUxMjE5In0.J28IlxZ6SjllQEQkq_OvFUiRYAEL2VhQG_WWBcmNppE
+  bili-http-engine: cronet
+}
+
+body:form-urlencoded {
+  access_key: {{access_key}}
+  appkey: {{appKey}}
+  csrf: {{csrf}}
+  disable_rcmd: 0
+  mobi_app: android
+  platform: android
+  statistics: {"appId":1,"platform":3,"version":"7.72.0","abtest":""}
+  ts: 1735713546
+  sign: aeaeff881a147dd5cd2c6e24df9dc21b
+}
