@@ -81,4 +81,18 @@ public interface IVipBigPointApi
     /// <returns></returns>
     [HttpPost("/x/vip/experience/add")]
     Task<BiliApiResponse> ObtainVipExperienceAsync([FormContent] VipExperienceRequest request);
+
+    /// <summary>
+    /// 开始观看剧集任务
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    Task<BiliApiResponse<StartOgvWatchResponse>> StartOgvWatchAsync(StartOgvWatchRequest request);
+
+    /// <summary>
+    /// 完成观看剧集任务
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    Task<BiliApiResponse> CompleteOgvWatchAsync(CompleteOgvWatchRequest request);
 }

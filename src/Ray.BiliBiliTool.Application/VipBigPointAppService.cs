@@ -93,7 +93,7 @@ public class VipBigPointAppService : AppService, IVipBigPointAppService
         taskInfo = await ViewDressMall(taskInfo);
 
         //观看剧集内容
-        taskInfo = await ViewVideo(taskInfo);
+        taskInfo = await OgvWatchAsync(taskInfo);
 
         taskInfo.LogInfo(_logger);
     }
@@ -393,42 +393,6 @@ public class VipBigPointAppService : AppService, IVipBigPointAppService
         return info;
     }
 
-    [TaskInterceptor("观看剧集内容", TaskLevel.Two, false)]
-    private async Task<VipTaskInfo> ViewVideo(VipTaskInfo info)
-    {
-        const string moduleCode = "日常任务";
-        const string taskCode = "ogvwatchnew";
-
-        CommonTaskItem targetTask = GetTarget(info, moduleCode, taskCode);
-
-        if (targetTask == null)
-        {
-            _logger.LogInformation("任务失效");
-            return info;
-        }
-
-        // 如果状态不等于3，则做
-        if (targetTask.state == 3)
-        {
-            _logger.LogInformation("已完成，跳过");
-            return info;
-        }
-
-        //0需要领取
-        if (targetTask.state == 0)
-        {
-            _logger.LogInformation("开始领取任务");
-            await TryReceive(targetTask.task_code);
-        }
-
-        _logger.LogInformation("开始完成任务");
-
-        // 观看剧集内容
-        _logger.LogInformation("api变更，暂未实现");
-
-        return info;
-    }
-
     [TaskInterceptor("浏览装扮商城主页", TaskLevel.Two, false)]
     private async Task<VipTaskInfo> ViewDressMall(VipTaskInfo info)
     {
@@ -462,6 +426,58 @@ public class VipBigPointAppService : AppService, IVipBigPointAppService
 
         //确认
         if (re)
+        {
+            var infoResult = await _vipApi.GetTaskListAsync();
+            if (infoResult.Code != 0) throw new Exception(infoResult.ToJsonStr());
+            info = infoResult.Data;
+            targetTask = GetTarget(info, moduleCode, taskCode);
+
+            _logger.LogInformation("确认：{re}", targetTask.state == 3 && targetTask.complete_times >= 1);
+        }
+
+        return info;
+    }
+
+    [TaskInterceptor("观看剧集", TaskLevel.Two, false)]
+    private async Task<VipTaskInfo> OgvWatchAsync(VipTaskInfo info)
+    {
+        const string moduleCode = "日常任务";
+        const string taskCode = "ogvwatchnew";
+
+        CommonTaskItem targetTask = GetTarget(info, moduleCode, taskCode);
+
+        if (targetTask == null)
+        {
+            _logger.LogInformation("任务失效");
+            return info;
+        }
+
+        //如果状态不等于3，则做
+        if (targetTask.state == 3)
+        {
+            _logger.LogInformation("已完成，跳过");
+            return info;
+        }
+
+        //0需要领取
+        if (targetTask.state == 0)
+        {
+            _logger.LogInformation("开始领取任务");
+            await TryReceive(targetTask.task_code);
+        }
+
+        _logger.LogInformation("开始任务");
+        var startResult = await _vipApi.StartOgvWatchAsync(new StartOgvWatchRequest());
+
+        _logger.LogInformation("开始浏览");
+        await Task.Delay(10 * 1000);
+
+        _logger.LogInformation("开始上报");
+        var request = new CompleteOgvWatchRequest(startResult.Data.task_id, startResult.Data.token); // todo: sign
+        var re = await _vipApi.CompleteOgvWatchAsync(request);
+
+        //确认
+        if (re.Code == 0)
         {
             var infoResult = await _vipApi.GetTaskListAsync();
             if (infoResult.Code != 0) throw new Exception(infoResult.ToJsonStr());
