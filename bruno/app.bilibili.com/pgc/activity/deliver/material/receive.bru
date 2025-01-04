@@ -36,12 +36,12 @@ body:form-urlencoded {
   c_locale: zh_CN
   channel: yingyongbao
   disable_rcmd: 0
-  ep_id: 511578
+  ep_id: 328482
   from_spmid: united.player-video-detail.player.continue
   mobi_app: android
   platform: android
   s_locale: zh_CN
-  season_id: 41410
+  season_id: 12548
   spmid: united.player-video-detail.0.0
   statistics: {"appId":1,"platform":3,"version":"7.72.0","abtest":""}
   ts: 1735744215
@@ -54,5 +54,15 @@ docs {
   作用：开始大会员赚大积分任务-观看剧集内容
   
   入口：
-    - 我的->会员中心->赚大积分->查看8项任务，点击“观看剧集内容”后自动触发
+    - 我的->会员中心->赚大积分->查看8项任务，点击“观看剧集内容”，选择视频后触发
+    
+  传入剧集的id，会返回task_id和token，用于标识该次观看任务
+  
+  该sample的视频为《让子弹飞》
+  
+  完整的观看剧集内容任务调用接口如下：
+  
+  - 领取：app.bilibili.com/pgc/activity/score/task/receive/v2
+  - 开始：app.bilibili.com/pgc/activity/deliver/material/receive
+  - 上报完成：app.bilibili.com/pgc/activity/deliver/task/complete
 }

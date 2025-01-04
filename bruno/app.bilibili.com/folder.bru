@@ -28,7 +28,6 @@ script:pre-request {
   function appSign(params, appkey, appsec) {
     params.appkey = appkey;
     delete body.sign;
-    delete body.task_sign;
     const sortedKeys = Object.keys(params).sort();
     const sortedParams = sortedKeys.map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`).join('&');
     console.log(sortedParams);
@@ -37,13 +36,12 @@ script:pre-request {
   
   const body = req.getBody();
   
-  if (body.hasOwnProperty('sign')) {
+  if (body && body.hasOwnProperty('sign')) {
     replacePlaceholders(body);
     const sign = appSign(body, bru.getEnvVar("appKey"), bru.getEnvVar("appSec"));
     console.log("calculate sign:" + sign);
   
     body.sign = sign;
-    body.task_sign = sign;
   }
   
   req.setBody(body);
