@@ -50,7 +50,7 @@ namespace Ray.BiliBiliTool.DomainService
             _videoWithoutCookieApi = videoWithoutCookieApi;
             _wbiService = wbiService;
             _biliBiliCookie = biliBiliCookie;
-            _expDic = dicOptions.Get(Constants.OptionsNames.ExpDictionaryName);
+            _expDic = dicOptions.Get(Config.Constants.OptionsNames.ExpDictionaryName);
             _dailyTaskOptions = dailyTaskOptions.CurrentValue;
         }
 

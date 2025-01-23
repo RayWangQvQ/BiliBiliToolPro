@@ -95,7 +95,7 @@ namespace Ray.BiliBiliTool.Agent
             }
 
             if (!result)
-                throw new Exception($"请正确配置Cookie后再运行，配置方式见 {Constants.SourceCodeUrl}");
+                throw new Exception($"请正确配置Cookie后再运行，配置方式见 {Config.Constants.SourceCodeUrl}");
         }
 
         private string GetPropertyDescription(string propertyName)

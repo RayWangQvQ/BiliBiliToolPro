@@ -26,10 +26,10 @@ headers {
   x-bili-gaia-vtoken: 
   x-bili-ticket: eyJhbGciOiJIUzI1NiIsImtpZCI6InMwMyIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzU3NzI2NDcsImlhdCI6MTczNTc0MzU0NywiYnV2aWQiOiJYVzcyNEQxNzI0Njg3MTlDQzI1NjA1REIyNDI0NzhEMkUxMjE5In0.eafhpooLoe2q6cA45_Xrgq1VO-y490pxP5gwJ4qm_ik
   bili-http-engine: cronet
+  Cookie: {{cookieStr}}
 }
 
 body:form-urlencoded {
-  access_key: {{access_key}}
   activity_code: 
   appkey: {{appKey}}
   build: 7720200
@@ -44,8 +44,9 @@ body:form-urlencoded {
   season_id: 12548
   spmid: united.player-video-detail.0.0
   statistics: {"appId":1,"platform":3,"version":"7.72.0","abtest":""}
-  ts: 1735744215
+  ts: 1736179521
   sign: 132d2532467ef649a925aece247cdb4b
+  access_key: {{access_key}}
 }
 
 docs {
@@ -65,4 +66,31 @@ docs {
   - 领取：app.bilibili.com/pgc/activity/score/task/receive/v2
   - 开始：app.bilibili.com/pgc/activity/deliver/material/receive
   - 上报完成：app.bilibili.com/pgc/activity/deliver/task/complete
+  
+  Response Sample:
+  
+  ```json
+  {
+    "code": 0,
+    "data": {
+      "closeType": "close_win",
+      "container": [],
+      "showTime": "",
+      "watch_count_down_cfg": {
+        "action": "url",
+        "closeType": "close_win",
+        "complete_status_desc": "大积分已到账",
+        "complete_status_jump_url": "https://big.bilibili.com/mobile/bigPoint?navhide=1&closable=1",
+        "count_down_status_desc": "看${time}获大积分",
+        "login": true,
+        "milliseconds": 600000,
+        "pause_status_desc": "计时暂停",
+        "showTime": "ENTER",
+        "task_id": "4320003",
+        "token": "67ba5888e7"
+      }
+    },
+    "message": "success"
+  }
+  ```
 }
