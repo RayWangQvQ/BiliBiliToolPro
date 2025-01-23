@@ -466,26 +466,7 @@ public class VipBigPointAppService : AppService, IVipBigPointAppService
             await TryReceive(targetTask.task_code);
         }
 
-        _logger.LogInformation("开始任务");
-        var startResult = await _vipApi.StartOgvWatchAsync(new StartOgvWatchRequest());
-
-        _logger.LogInformation("开始浏览");
-        await Task.Delay(10 * 1000);
-
-        _logger.LogInformation("开始上报");
-        var request = new CompleteOgvWatchRequest(startResult.Data.task_id, startResult.Data.token); // todo: sign
-        var re = await _vipApi.CompleteOgvWatchAsync(request);
-
-        //确认
-        if (re.Code == 0)
-        {
-            var infoResult = await _vipApi.GetTaskListAsync();
-            if (infoResult.Code != 0) throw new Exception(infoResult.ToJsonStr());
-            info = infoResult.Data;
-            targetTask = GetTarget(info, moduleCode, taskCode);
-
-            _logger.LogInformation("确认：{re}", targetTask.state == 3 && targetTask.complete_times >= 1);
-        }
+        _logger.LogInformation("暂未实现");
 
         return info;
     }
