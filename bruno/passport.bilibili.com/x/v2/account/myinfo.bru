@@ -1,0 +1,43 @@
+meta {
+  name: myinfo
+  type: http
+  seq: 1
+}
+
+get {
+  url: https://passport.bilibili.com/x/v2/account/myinfo?access_key={{access_key}}&appkey=783bbb7264451d82&build=7720200&buvid={{buvid}}&c_locale=zh_CN&channel=yingyongbao&disable_rcmd=0&local_id={{buvid}}&mobi_app=android&platform=android&s_locale=zh_CN&statistics={"appId":1,"platform":3,"version":"7.72.0","abtest":""}&ts=1735704457&sign=b33e7a0aa1aef3d1d4284c759fa12857
+  body: none
+  auth: none
+}
+
+params:query {
+  access_key: {{access_key}}
+  appkey: 783bbb7264451d82
+  build: 7720200
+  buvid: {{buvid}}
+  c_locale: zh_CN
+  channel: yingyongbao
+  disable_rcmd: 0
+  local_id: {{buvid}}
+  mobi_app: android
+  platform: android
+  s_locale: zh_CN
+  statistics: {"appId":1,"platform":3,"version":"7.72.0","abtest":""}
+  ts: 1735704457
+  sign: b33e7a0aa1aef3d1d4284c759fa12857
+}
+
+headers {
+  Host: app.bilibili.com
+  buvid: {{buvid}}
+  env: prod
+  app-key: android64
+  user-agent: Mozilla/5.0 BiliDroid/7.72.0 (bbcallen@gmail.com) os/android model/Nexus mobi_app/android build/7720200 channel/yingyongbao innerVer/7720210 osVer/10 network/2
+  x-bili-trace-id: 46e70b4538aaf4001079cf97f86774bf:1079cf97f86774bf:0:0
+  x-bili-aurora-eid: UlAAQFkMBVkH
+  x-bili-mid: {{mid}}
+  x-bili-aurora-zone: 
+  x-bili-gaia-vtoken: 
+  x-bili-ticket: eyJhbGciOiJIUzI1NiIsImtpZCI6InMwMyIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzU3MzI4OTIsImlhdCI6MTczNTcwMzc5MiwiYnV2aWQiOiJYVzcyNEQxNzI0Njg3MTlDQzI1NjA1REIyNDI0NzhEMkUxMjE5In0.hEDtIHZoN5Wyoja2hNuPcfy-laa1r05ObiEhJ5gPSt4
+  bili-http-engine: cronet
+}

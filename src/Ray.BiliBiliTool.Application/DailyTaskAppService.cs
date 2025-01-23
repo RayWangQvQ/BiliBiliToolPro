@@ -52,7 +52,7 @@ public class DailyTaskAppService : AppService, IDailyTaskAppService
         BiliCookie biliCookie)
     {
         _logger = logger;
-        _expDic = dicOptions.Get(Constants.OptionsNames.ExpDictionaryName);
+        _expDic = dicOptions.Get(Config.Constants.OptionsNames.ExpDictionaryName);
         _accountDomainService = accountDomainService;
         _videoDomainService = videoDomainService;
         _articleDomainService = articleDomainService;

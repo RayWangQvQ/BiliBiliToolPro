@@ -1,0 +1,96 @@
+meta {
+  name: receive
+  type: http
+  seq: 1
+}
+
+post {
+  url: https://app.bilibili.com/pgc/activity/deliver/material/receive
+  body: formUrlEncoded
+  auth: none
+}
+
+headers {
+  Host: api.bilibili.com
+  buvid: {{buvid}}
+  fp_local: {{device_id}}
+  fp_remote: {{device_id}}
+  session_id: e04d2e05
+  env: prod
+  app-key: android64
+  user-agent: {{user-agent}}
+  x-bili-trace-id: 0564afa825e0e1ec59164fe59367755a:59164fe59367755a:0:0
+  x-bili-aurora-eid: UlAAQFkMBVkH
+  x-bili-mid: {{mid}}
+  x-bili-aurora-zone: 
+  x-bili-gaia-vtoken: 
+  x-bili-ticket: eyJhbGciOiJIUzI1NiIsImtpZCI6InMwMyIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzU3NzI2NDcsImlhdCI6MTczNTc0MzU0NywiYnV2aWQiOiJYVzcyNEQxNzI0Njg3MTlDQzI1NjA1REIyNDI0NzhEMkUxMjE5In0.eafhpooLoe2q6cA45_Xrgq1VO-y490pxP5gwJ4qm_ik
+  bili-http-engine: cronet
+  Cookie: {{cookieStr}}
+}
+
+body:form-urlencoded {
+  activity_code: 
+  appkey: {{appKey}}
+  build: 7720200
+  c_locale: zh_CN
+  channel: yingyongbao
+  disable_rcmd: 0
+  ep_id: 328482
+  from_spmid: united.player-video-detail.player.continue
+  mobi_app: android
+  platform: android
+  s_locale: zh_CN
+  season_id: 12548
+  spmid: united.player-video-detail.0.0
+  statistics: {"appId":1,"platform":3,"version":"7.72.0","abtest":""}
+  ts: 1736179521
+  sign: 132d2532467ef649a925aece247cdb4b
+  access_key: {{access_key}}
+}
+
+docs {
+  终端：APP
+  
+  作用：开始大会员赚大积分任务-观看剧集内容
+  
+  入口：
+    - 我的->会员中心->赚大积分->查看8项任务，点击“观看剧集内容”，选择视频后触发
+    
+  传入剧集的id，会返回task_id和token，用于标识该次观看任务
+  
+  该sample的视频为《让子弹飞》
+  
+  完整的观看剧集内容任务调用接口如下：
+  
+  - 领取：app.bilibili.com/pgc/activity/score/task/receive/v2
+  - 开始：app.bilibili.com/pgc/activity/deliver/material/receive
+  - 上报完成：app.bilibili.com/pgc/activity/deliver/task/complete
+  
+  Response Sample:
+  
+  ```json
+  {
+    "code": 0,
+    "data": {
+      "closeType": "close_win",
+      "container": [],
+      "showTime": "",
+      "watch_count_down_cfg": {
+        "action": "url",
+        "closeType": "close_win",
+        "complete_status_desc": "大积分已到账",
+        "complete_status_jump_url": "https://big.bilibili.com/mobile/bigPoint?navhide=1&closable=1",
+        "count_down_status_desc": "看${time}获大积分",
+        "login": true,
+        "milliseconds": 600000,
+        "pause_status_desc": "计时暂停",
+        "showTime": "ENTER",
+        "task_id": "4320003",
+        "token": "67ba5888e7"
+      }
+    },
+    "message": "success"
+  }
+  ```
+}

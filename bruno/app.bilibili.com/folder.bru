@@ -1,0 +1,48 @@
+meta {
+  name: app.bilibili.com
+}
+
+script:pre-request {
+  const CryptoJS = require('crypto-js');
+  
+  console.log("start");
+  
+  const md5 = (str) => CryptoJS.MD5(str).toString(CryptoJS.enc.Hex);
+  
+  const replacePlaceholders = (body) => {
+    for (const key in body) {
+      if (typeof body[key] === 'string') {
+        // Check if value contains {{}} placeholders
+        const matches = body[key].match(/{{(.*?)}}/g);
+        if (matches) {
+          matches.forEach(match => {
+            const placeholder = match.slice(2, -2); // Remove the {{ and }}
+            const value = bru.getEnvVar(placeholder);
+            body[key] = body[key].replace(match, value);
+          });
+        }
+      }
+    }
+  };
+  
+  function appSign(params, appkey, appsec) {
+    params.appkey = appkey;
+    delete body.sign;
+    const sortedKeys = Object.keys(params).sort();
+    const sortedParams = sortedKeys.map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`).join('&');
+    console.log(sortedParams);
+    return md5(sortedParams + appsec);
+  }
+  
+  const body = req.getBody();
+  
+  if (body && body.hasOwnProperty('sign')) {
+    replacePlaceholders(body);
+    const sign = appSign(body, bru.getEnvVar("appKey"), bru.getEnvVar("appSec"));
+    console.log("calculate sign:" + sign);
+  
+    body.sign = sign;
+  }
+  
+  req.setBody(body);
+}

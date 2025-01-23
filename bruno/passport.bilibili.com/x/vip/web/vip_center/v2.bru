@@ -1,0 +1,29 @@
+meta {
+  name: v2
+  type: http
+  seq: 1
+}
+
+get {
+  url: https://api.bilibili.com/x/vip/web/vip_center/v2
+  body: none
+  auth: none
+}
+
+headers {
+  Host: api.bilibili.com
+  Cookie: {{cookieStr}}
+  native_api_from: h5
+  buvid: {{buvid}}
+  accept: application/json, text/plain, */*
+  referer: https://big.bilibili.com/mobile/index?exp_symbol=release_version&oflAb=1
+  content-type: application/json
+  user-agent: {{user-agent}}
+  x-bili-trace-id: 0b9853d9388b01892edb6939c16774d4:2edb6939c16774d4:0:0
+  x-bili-aurora-eid: UlAAQFkMBVkH
+  x-bili-mid: {{mid}}
+  x-bili-aurora-zone: 
+  x-bili-gaia-vtoken: 
+  x-bili-ticket: eyJhbGciOiJIUzI1NiIsImtpZCI6InMwMyIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzU3MzgxMTEsImlhdCI6MTczNTcwOTAxMSwiYnV2aWQiOiJYVzcyNEQxNzI0Njg3MTlDQzI1NjA1REIyNDI0NzhEMkUxMjE5In0.J28IlxZ6SjllQEQkq_OvFUiRYAEL2VhQG_WWBcmNppE
+  bili-http-engine: cronet
+}

@@ -1,0 +1,26 @@
+meta {
+  name: key
+  type: http
+  seq: 1
+}
+
+get {
+  url: https://passport.bilibili.com/x/passport-login/web/key
+  body: none
+  auth: none
+}
+
+headers {
+  Host: passport.bilibili.com
+  buvid: {{buvid}}
+  env: prod
+  app-key: android64
+  user-agent: Mozilla/5.0 BiliDroid/7.72.0 (bbcallen@gmail.com) os/android model/Nexus mobi_app/android build/7720200 channel/yingyongbao innerVer/7720210 osVer/10 network/2
+  x-bili-trace-id: 43e1a54f60cfbf0bb9788d4d9e6774bf:b9788d4d9e6774bf:0:0
+  x-bili-aurora-eid: 
+  x-bili-mid: 
+  x-bili-aurora-zone: 
+  x-bili-gaia-vtoken: 
+  x-bili-ticket: eyJhbGciOiJIUzI1NiIsImtpZCI6InMwMyIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzU3MzI4OTIsImlhdCI6MTczNTcwMzc5MiwiYnV2aWQiOiJYVzcyNEQxNzI0Njg3MTlDQzI1NjA1REIyNDI0NzhEMkUxMjE5In0.hEDtIHZoN5Wyoja2hNuPcfy-laa1r05ObiEhJ5gPSt4
+  bili-http-engine: cronet
+}
