@@ -1,9 +1,9 @@
 #See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
 
-FROM mcr.microsoft.com/dotnet/runtime:6.0 AS base
+FROM mcr.microsoft.com/dotnet/runtime:8.0 AS base
 WORKDIR /app
 
-FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /code
 COPY ["src/Ray.BiliBiliTool.Console/Ray.BiliBiliTool.Console.csproj", "src/Ray.BiliBiliTool.Console/"]
 COPY ["src/Ray.BiliBiliTool.DomainService/Ray.BiliBiliTool.DomainService.csproj", "src/Ray.BiliBiliTool.DomainService/"]
@@ -25,11 +25,9 @@ WORKDIR /app
 ENV TIME_ZONE=Asia/Shanghai
 COPY --from=publish /app/publish .
 COPY ./docker/scripts/* ./docker/crontab /app/scripts/
+RUN apt-get update
 RUN ln -fs /usr/share/zoneinfo/$TIME_ZONE /etc/localtime \
     && echo $TIME_ZONE > /etc/timezone \
-    && cp /etc/apt/sources.list /etc/apt/sources.list.bak \
-	&& sed -i 's/deb.debian.org/mirrors.163.com/g' /etc/apt/sources.list \
-	&& sed -i 's/security.debian.org/mirrors.163.com/g' /etc/apt/sources.list \
 	&& apt-get clean \ 
     && apt-get update \
     && apt-get install -y cron tzdata tofrodos \

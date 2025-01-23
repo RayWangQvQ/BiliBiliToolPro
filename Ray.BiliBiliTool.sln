@@ -42,7 +42,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		common.props = common.props
 		Dockerfile = Dockerfile
 		LICENSE = LICENSE
-		publish.bat = publish.bat
 		README.md = README.md
 	EndProjectSection
 EndProject
@@ -66,7 +65,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker", "docker", "{A93210FD-27B6-40E4-B08D-391F96CA2754}"
 	ProjectSection(SolutionItems) = preProject
 		docker\crontab = docker\crontab
-		docker\entry.sh = docker\entry.sh
 		docker\README.md = docker\README.md
 	EndProjectSection
 EndProject
@@ -124,7 +122,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BiliAgentTest", "test\BiliA
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{75A9CC5C-DF92-4D72-A14C-625AA902855B}"
 	ProjectSection(SolutionItems) = preProject
-		docker\build\buildAndPushImage_multiArch.cmd = docker\build\buildAndPushImage_multiArch.cmd
 		docker\build\buildImage.cmd = docker\build\buildImage.cmd
 		docker\build\buildImage_amd64.cmd = docker\build\buildImage_amd64.cmd
 		docker\build\buildImage_arm64.cmd = docker\build\buildImage_arm64.cmd
