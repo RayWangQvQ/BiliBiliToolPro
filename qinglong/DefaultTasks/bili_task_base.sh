@@ -367,7 +367,7 @@ install_dotnet() {
             apk update
         fi
         {
-            apk add dotnet8-sdk
+            apk add dotnet8-sdk # https://pkgs.alpinelinux.org/packages
         } || {
             install_dotnet_by_script
         }
