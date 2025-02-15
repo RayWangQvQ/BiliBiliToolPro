@@ -262,7 +262,7 @@ check_dotnet() {
     eval $invocation
 
     dotnetVersion=$(dotnet --version)
-    if [[ $dotnetVersion == 6.* ]]; then
+    if [[ $dotnetVersion == 8.* ]]; then
         say "已安装dotnet，当前版本：$dotnetVersion"
         say "which dotnet: $(which dotnet)"
         return 0
@@ -321,7 +321,7 @@ install_dotnet_by_script() {
     eval $invocation
 
     say "再尝试使用官方脚本安装"
-    curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 6.0 --no-cdn --verbose
+    curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 8.0 --no-cdn --verbose
 
     say "添加到PATH"
     local exportFile="/root/.bashrc"
@@ -353,7 +353,7 @@ install_dotnet() {
             curl -o packages-microsoft-prod.deb https://packages.microsoft.com/config/debian/$VERSION_ID/packages-microsoft-prod.deb
             dpkg -i packages-microsoft-prod.deb
             rm packages-microsoft-prod.deb
-            apt-get update && apt-get install -y dotnet-sdk-6.0
+            apt-get update && apt-get install -y dotnet-sdk-8.0
         } || {
             install_dotnet_by_script
         }
@@ -367,7 +367,7 @@ install_dotnet() {
             apk update
         fi
         {
-            apk add dotnet6-sdk
+            apk add dotnet8-sdk
         } || {
             install_dotnet_by_script
         }
