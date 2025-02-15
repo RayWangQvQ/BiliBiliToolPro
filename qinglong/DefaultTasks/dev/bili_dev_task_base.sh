@@ -428,7 +428,6 @@ install() {
 
     if check_installed; then
         say "环境正常，本次无需安装"
-        return 0
     else
         say "开始安装环境"
         if [ "$prefer_mode" == "dotnet" ]; then
@@ -436,7 +435,6 @@ install() {
                 say_err "安装失败"
                 say_err "请根据文档自行在青龙容器中安装dotnet：https://learn.microsoft.com/zh-cn/dotnet/core/install/linux-$current_linux_os"
                 say_err "或者尝试切换运行模式为bilitool，它不需要安装dotnet：https://github.com/RayWangQvQ/BiliBiliToolPro/blob/develop/qinglong/README.md"
-                exit 1
             }
         fi
 
@@ -444,10 +442,8 @@ install() {
             install_bilitool || {
                 say_err "安装失败，请检查日志并重试"
                 say_err "或者尝试切换运行模式为dotnet：https://github.com/RayWangQvQ/BiliBiliToolPro/blob/develop/qinglong/README.md"
-                exit 1
             }
         fi
-        return $?
     fi
 }
 
