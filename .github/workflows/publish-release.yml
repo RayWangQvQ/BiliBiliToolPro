@@ -21,7 +21,7 @@ jobs:
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '6.0.x'
+          dotnet-version: '8.0.x'
         
       - name: Publish and Zip Release
         run: |
@@ -47,7 +47,7 @@ jobs:
           files: './src/Ray.BiliBiliTool.Console/bin/Publish/*.zip'
           token: ${{ secrets.GITHUB_TOKEN }}
           name: "BiliBiliToolPro-V${{ steps.release_notes.outputs.version }}"
-          tag_name: ${{ github.event.inputs.version }}
+          tag_name: ${{ steps.release_notes.outputs.version }}
           body: '${{ steps.release_notes.outputs.content }}'
           discussion_category_name: Announcements
           generate_release_notes: true

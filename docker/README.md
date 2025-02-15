@@ -156,9 +156,9 @@ docker run --rm \
 
 ## 7. 其他
 
-代码编译和发布环境: mcr.microsoft.com/dotnet/sdk:6.0
+代码编译和发布环境: mcr.microsoft.com/dotnet/sdk:8.0
 
-代码运行环境: mcr.microsoft.com/dotnet/runtime:6.0
+代码运行环境: mcr.microsoft.com/dotnet/runtime:8.0
 
 apt-get 包源用的国内网易的
 

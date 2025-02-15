@@ -1,4 +1,3 @@
-version: '3.9'
 services:
   bilibili_tool:
     image: ghcr.io/raywangqvq/bilibili_tool_pro
