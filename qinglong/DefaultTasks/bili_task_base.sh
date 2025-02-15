@@ -321,7 +321,7 @@ install_dotnet_by_script() {
     eval $invocation
 
     say "再尝试使用官方脚本安装"
-    curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 8.0 --no-cdn --verbose
+    curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 8.0 --verbose
 
     say "添加到PATH"
     local exportFile="/root/.bashrc"
