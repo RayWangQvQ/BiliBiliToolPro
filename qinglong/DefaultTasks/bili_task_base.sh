@@ -15,6 +15,7 @@ bili_repo="raywangqvq/bilibilitoolpro" # 仓库地址
 bili_branch=""                         # 分支名，空或_develop
 prefer_mode=${BILI_MODE:-"dotnet"}     # dotnet或bilitool，需要通过环境变量配置
 github_proxy=${BILI_GITHUB_PROXY:-""}  # 下载github release包时使用的代理，会拼在地址前面，需要通过环境变量配置
+export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1 # 解决抽风问题
 
 # Use in the the functions: eval $invocation
 invocation='say_verbose "Calling: ${yellow:-}${FUNCNAME[0]} ${green:-}$*${normal:-}"'
