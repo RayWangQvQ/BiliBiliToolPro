@@ -214,7 +214,7 @@ curl -sSL https://ghproxy.com/https://raw.githubusercontent.com/RayWangQvQ/BiliB
 Windows:
 ```
 # Run a separate PowerShell process because the script calls exit, so it will end the current PowerShell session.
-&powershell -NoProfile -ExecutionPolicy unrestricted -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; &([scriptblock]::Create((Invoke-WebRequest -UseBasicParsing 'https://dot.net/v1/dotnet-install.ps1'))) --channel 6.0 --no-cdn --verbose"
+&powershell -NoProfile -ExecutionPolicy unrestricted -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; &([scriptblock]::Create((Invoke-WebRequest -UseBasicParsing 'https://dot.net/v1/dotnet-install.ps1'))) --channel 8.0 --no-cdn --verbose"
 ```
 
 其他问题请见[官方文档](https://learn.microsoft.com/zh-cn/dotnet/core/tools/dotnet-install-script)

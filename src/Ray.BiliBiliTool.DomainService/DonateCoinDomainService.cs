@@ -60,8 +60,8 @@ namespace Ray.BiliBiliTool.DomainService
             _videoDomainService = videoDomainService;
             _relationApi = relationApi;
             _videoApi = videoApi;
-            _expDic = expDicOptions.Get(Constants.OptionsNames.ExpDictionaryName);
-            _donateContinueStatusDic = donateContinueStatusDicOptions.Get(Constants.OptionsNames.DonateCoinCanContinueStatusDictionaryName);
+            _expDic = expDicOptions.Get(Config.Constants.OptionsNames.ExpDictionaryName);
+            _donateContinueStatusDic = donateContinueStatusDicOptions.Get(Config.Constants.OptionsNames.DonateCoinCanContinueStatusDictionaryName);
         }
 
         /// <summary>

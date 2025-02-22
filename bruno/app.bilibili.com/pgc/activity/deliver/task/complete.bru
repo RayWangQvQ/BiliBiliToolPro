@@ -1,0 +1,70 @@
+meta {
+  name: complete
+  type: http
+  seq: 1
+}
+
+post {
+  url: https://app.bilibili.com/pgc/activity/deliver/task/complete
+  body: formUrlEncoded
+  auth: none
+}
+
+headers {
+  Host: api.bilibili.com
+  buvid: {{buvid}}
+  fp_local: {{device_id}}
+  fp_remote: {{device_id}}
+  session_id: e04d2e05
+  env: prod
+  app-key: android64
+  user-agent: {{user-agent}}
+  x-bili-trace-id: a301946d9621645a707b40973f67755c:707b40973f67755c:0:0
+  x-bili-aurora-eid: UlAAQFkMBVkH
+  x-bili-mid: {{mid}}
+  x-bili-aurora-zone: 
+  x-bili-gaia-vtoken: 
+  x-bili-ticket: eyJhbGciOiJIUzI1NiIsImtpZCI6InMwMyIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzU3NzI2NDcsImlhdCI6MTczNTc0MzU0NywiYnV2aWQiOiJYVzcyNEQxNzI0Njg3MTlDQzI1NjA1REIyNDI0NzhEMkUxMjE5In0.eafhpooLoe2q6cA45_Xrgq1VO-y490pxP5gwJ4qm_ik
+  bili-http-engine: cronet
+  Cookie: {{cookieStr}}
+}
+
+body:form-urlencoded {
+  build: 7720200
+  c_locale: zh_CN
+  channel: yingyongbao
+  disable_rcmd: 0
+  mobi_app: android
+  platform: android
+  s_locale: zh_CN
+  statistics: {"appId":1,"platform":3,"version":"7.72.0","abtest":""}
+  task_id: 4320003
+  token: abe88f72be
+  access_key: {{access_key}}
+  timestamp: 1735744760834
+  ts: 1735744760
+  sign: 2292d647d9b3f6dbd2f99b5a90cbddaf
+  appkey: {{appKey}}
+  task_sign: 93a1c64da4c02c31ca7575c08212e08f
+}
+
+docs {
+  终端：APP
+  
+  作用：上报完成大会员赚大积分任务-观看剧集内容
+  
+  入口：
+    - 我的->会员中心->赚大积分->查看8项任务，点击“观看剧集内容”，挑选视频，观看10分钟后，自动触发
+    
+  传入剧集的id，会返回task_id和token，用于标识该次观看任务
+  
+  task_sign必传，与sign的生成方式相同。即，先排除掉task_sign和sign，生成签名后赋值给task_sign，然后在签名一次得到sign
+  
+  且只能调用成功一次，第二次及之后会返回400
+  
+  完整的观看剧集内容任务调用接口如下：
+  
+  - 领取：app.bilibili.com/pgc/activity/score/task/receive/v2
+  - 开始：app.bilibili.com/pgc/activity/deliver/material/receive
+  - 上报完成：app.bilibili.com/pgc/activity/deliver/task/complete
+}

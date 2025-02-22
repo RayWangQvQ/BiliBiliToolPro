@@ -15,23 +15,6 @@ public class VipServiceTest
     }
 
     [Fact]
-    public async Task VipExpressTest()
-    {
-        using var scope = Global.ServiceProviderRoot.CreateScope();
-        var appService = scope.ServiceProvider.GetRequiredService<IVipBigPointAppService>();
-        await appService.VipExpress();
-    }
-
-    [Fact]
-    public async Task WatchVideo()
-    {
-        using var scope = Global.ServiceProviderRoot.CreateScope();
-        var appService = scope.ServiceProvider.GetRequiredService<IVipBigPointAppService>();
-        var res = await appService.WatchBangumi();
-    }
-
-
-    [Fact]
     public async Task CompleteV2Test()
     {
         using var scope = Global.ServiceProviderRoot.CreateScope();

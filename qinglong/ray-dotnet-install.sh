@@ -12,7 +12,7 @@ install_dependency() {
 # 通过官方脚本安装dotnet
 install_by_offical() {
     echo "install by offical script..."
-    curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 6.0 --no-cdn --verbose
+    curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 8.0 --no-cdn --verbose
 }
 
 # 创建软链接

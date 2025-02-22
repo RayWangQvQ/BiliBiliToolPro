@@ -15,6 +15,7 @@ bili_repo="raywangqvq/bilibilitoolpro" # 仓库地址
 bili_branch="_develop"                 # 分支名，空或_develop
 prefer_mode=${BILI_MODE:-"dotnet"}     # dotnet或bilitool，需要通过环境变量配置
 github_proxy=${BILI_GITHUB_PROXY:-""}  # 下载github release包时使用的代理，会拼在地址前面，需要通过环境变量配置
+export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1 # 解决抽风问题
 
 # Use in the the functions: eval $invocation
 invocation='say_verbose "Calling: ${yellow:-}${FUNCNAME[0]} ${green:-}$*${normal:-}"'
@@ -262,7 +263,7 @@ check_dotnet() {
     eval $invocation
 
     dotnetVersion=$(dotnet --version)
-    if [[ $dotnetVersion == 6.* ]]; then
+    if [[ $dotnetVersion == 8.* ]]; then
         say "已安装dotnet，当前版本：$dotnetVersion"
         say "which dotnet: $(which dotnet)"
         return 0
@@ -321,7 +322,7 @@ install_dotnet_by_script() {
     eval $invocation
 
     say "再尝试使用官方脚本安装"
-    curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 6.0 --no-cdn --verbose
+    curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 8.0 --verbose
 
     say "添加到PATH"
     local exportFile="/root/.bashrc"
@@ -353,7 +354,7 @@ install_dotnet() {
             curl -o packages-microsoft-prod.deb https://packages.microsoft.com/config/debian/$VERSION_ID/packages-microsoft-prod.deb
             dpkg -i packages-microsoft-prod.deb
             rm packages-microsoft-prod.deb
-            apt-get update && apt-get install -y dotnet-sdk-6.0
+            apt-get update && apt-get install -y dotnet-sdk-8.0
         } || {
             install_dotnet_by_script
         }
@@ -367,7 +368,7 @@ install_dotnet() {
             apk update
         fi
         {
-            apk add dotnet6-sdk
+            apk add dotnet8-sdk # https://pkgs.alpinelinux.org/packages
         } || {
             install_dotnet_by_script
         }
@@ -428,7 +429,6 @@ install() {
 
     if check_installed; then
         say "环境正常，本次无需安装"
-        return 0
     else
         say "开始安装环境"
         if [ "$prefer_mode" == "dotnet" ]; then
@@ -436,7 +436,6 @@ install() {
                 say_err "安装失败"
                 say_err "请根据文档自行在青龙容器中安装dotnet：https://learn.microsoft.com/zh-cn/dotnet/core/install/linux-$current_linux_os"
                 say_err "或者尝试切换运行模式为bilitool，它不需要安装dotnet：https://github.com/RayWangQvQ/BiliBiliToolPro/blob/develop/qinglong/README.md"
-                exit 1
             }
         fi
 
@@ -444,10 +443,8 @@ install() {
             install_bilitool || {
                 say_err "安装失败，请检查日志并重试"
                 say_err "或者尝试切换运行模式为dotnet：https://github.com/RayWangQvQ/BiliBiliToolPro/blob/develop/qinglong/README.md"
-                exit 1
             }
         fi
-        return $?
     fi
 }
 
