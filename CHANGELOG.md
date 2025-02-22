@@ -1,5 +1,6 @@
 ## 2.2.1
 -Fix[#847]: DefaultRequestHeaders can not be null or empty with dotnet 8
+-Fix[#849]: Temporary disable PublishTrimmed
 ## 2.2.0
 - Migrate from dotnet 6.0 to dotnet 8.0
 - Add Bruno to document the APIs
