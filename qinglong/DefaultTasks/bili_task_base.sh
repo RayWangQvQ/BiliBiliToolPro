@@ -263,7 +263,7 @@ check_dotnet() {
     eval $invocation
 
     dotnetVersion=$(dotnet --version)
-    if [[ $dotnetVersion == 6.* ]]; then
+    if [[ $dotnetVersion == 8.* ]]; then
         say "已安装dotnet，当前版本：$dotnetVersion"
         say "which dotnet: $(which dotnet)"
         return 0
