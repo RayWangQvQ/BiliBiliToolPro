@@ -35,9 +35,7 @@ public class VipBigPointAppService(
     [TaskInterceptor("大会员大积分", TaskLevel.One)]
     public override async Task DoTaskAsync(CancellationToken cancellationToken = default)
     {
-        // TODO 解决taskInfo在一个任务出错后，后续的任务均会报空引用错误
         var userInfo = await GetUserInfo();
-
         if (userInfo.GetVipType() == VipType.None)
         {
             logger.LogInformation("当前不是大会员，跳过任务");
