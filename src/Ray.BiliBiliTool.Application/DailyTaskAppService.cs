@@ -9,69 +9,37 @@ using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Application.Attributes;
 using Ray.BiliBiliTool.Application.Contracts;
-using Ray.BiliBiliTool.Config;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 using Ray.BiliBiliTool.Infrastructure.Enums;
 
 namespace Ray.BiliBiliTool.Application;
 
-public class DailyTaskAppService : AppService, IDailyTaskAppService
+public class DailyTaskAppService(
+    ILogger<DailyTaskAppService> logger,
+    IOptionsMonitor<Dictionary<string, int>> dicOptions,
+    IAccountDomainService accountDomainService,
+    IVideoDomainService videoDomainService,
+    IArticleDomainService articleDomainService,
+    IDonateCoinDomainService donateCoinDomainService,
+    IMangaDomainService mangaDomainService,
+    ILiveDomainService liveDomainService,
+    IVipPrivilegeDomainService vipPrivilegeDomainService,
+    IChargeDomainService chargeDomainService,
+    IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
+    ICoinDomainService coinDomainService,
+    ILoginDomainService loginDomainService,
+    IConfiguration configuration,
+    BiliCookie biliCookie)
+    : AppService, IDailyTaskAppService
 {
-    private readonly ILogger<DailyTaskAppService> _logger;
-    private readonly IAccountDomainService _accountDomainService;
-    private readonly IVideoDomainService _videoDomainService;
-    private readonly IArticleDomainService _articleDomainService;
-    private readonly IDonateCoinDomainService _donateCoinDomainService;
-    private readonly IMangaDomainService _mangaDomainService;
-    private readonly ILiveDomainService _liveDomainService;
-    private readonly IVipPrivilegeDomainService _vipPrivilegeDomainService;
-    private readonly IChargeDomainService _chargeDomainService;
-    private readonly DailyTaskOptions _dailyTaskOptions;
-    private readonly ICoinDomainService _coinDomainService;
-    private readonly Dictionary<string, int> _expDic;
-    private readonly ILoginDomainService _loginDomainService;
-    private readonly IConfiguration _configuration;
-    private readonly BiliCookie _biliCookie;
-
-    public DailyTaskAppService(
-        ILogger<DailyTaskAppService> logger,
-        IOptionsMonitor<Dictionary<string, int>> dicOptions,
-        IAccountDomainService accountDomainService,
-        IVideoDomainService videoDomainService,
-        IArticleDomainService articleDomainService,
-        IDonateCoinDomainService donateCoinDomainService,
-        IMangaDomainService mangaDomainService,
-        ILiveDomainService liveDomainService,
-        IVipPrivilegeDomainService vipPrivilegeDomainService,
-        IChargeDomainService chargeDomainService,
-        IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
-        ICoinDomainService coinDomainService,
-        ILoginDomainService loginDomainService,
-        IConfiguration configuration,
-        BiliCookie biliCookie)
-    {
-        _logger = logger;
-        _expDic = dicOptions.Get(Config.Constants.OptionsNames.ExpDictionaryName);
-        _accountDomainService = accountDomainService;
-        _videoDomainService = videoDomainService;
-        _articleDomainService = articleDomainService;
-        _donateCoinDomainService = donateCoinDomainService;
-        _mangaDomainService = mangaDomainService;
-        _liveDomainService = liveDomainService;
-        _vipPrivilegeDomainService = vipPrivilegeDomainService;
-        _chargeDomainService = chargeDomainService;
-        _dailyTaskOptions = dailyTaskOptions.CurrentValue;
-        _coinDomainService = coinDomainService;
-        _loginDomainService = loginDomainService;
-        _configuration = configuration;
-        _biliCookie = biliCookie;
-    }
+    private readonly DailyTaskOptions _dailyTaskOptions = dailyTaskOptions.CurrentValue;
+    private readonly Dictionary<string, int> _expDic = dicOptions.Get(Config.Constants.OptionsNames.ExpDictionaryName);
 
     [TaskInterceptor("每日任务", TaskLevel.One)]
     public override async Task DoTaskAsync(CancellationToken cancellationToken = default)
     {
-        await SetCookiesAsync(_biliCookie, cancellationToken);
+        await SetCookiesAsync(cancellationToken);
 
         //每日任务赚经验：
         UserInfo userInfo = await Login();
@@ -94,25 +62,23 @@ public class DailyTaskAppService : AppService, IDailyTaskAppService
     }
 
 
-    [TaskInterceptor("Set Cookie", TaskLevel.Two)]
-    protected async Task<BiliCookie> SetCookiesAsync(BiliCookie biliCookie, CancellationToken cancellationToken)
+    [TaskInterceptor("Set Cookie")]
+    private async Task SetCookiesAsync(CancellationToken cancellationToken)
     {
         //判断cookie是否完整
         if (biliCookie.Buvid.IsNotNullOrEmpty())
         {
-            _logger.LogInformation("Cookie完整，不需要Set Cookie");
-            return biliCookie;
+            logger.LogInformation("Cookie完整，不需要Set Cookie");
+            return;
         }
 
         //Set
-        _logger.LogInformation("开始Set Cookie");
-        var ck = await _loginDomainService.SetCookieAsync(biliCookie, cancellationToken);
+        logger.LogInformation("开始Set Cookie");
+        var ck = await loginDomainService.SetCookieAsync(biliCookie, cancellationToken);
 
         //持久化
-        _logger.LogInformation("持久化Cookie");
+        logger.LogInformation("持久化Cookie");
         await SaveCookieAsync(ck, cancellationToken);
-
-        return ck;
     }
 
     /// <summary>
@@ -122,11 +88,11 @@ public class DailyTaskAppService : AppService, IDailyTaskAppService
     [TaskInterceptor("登录")]
     private async Task<UserInfo> Login()
     {
-        UserInfo userInfo = await _accountDomainService.LoginByCookie();
+        UserInfo userInfo = await accountDomainService.LoginByCookie();
         if (userInfo == null) throw new Exception("登录失败，请检查Cookie"); //终止流程
 
         _expDic.TryGetValue("每日登录", out int exp);
-        _logger.LogInformation("登录成功，经验+{exp} √", exp);
+        logger.LogInformation("登录成功，经验+{exp} √", exp);
 
         return userInfo;
     }
@@ -135,10 +101,10 @@ public class DailyTaskAppService : AppService, IDailyTaskAppService
     /// 获取任务完成情况
     /// </summary>
     /// <returns></returns>
-    [TaskInterceptor(null, rethrowWhenException: false)]
+    [TaskInterceptor(rethrowWhenException: false)]
     private async Task<DailyTaskInfo> GetDailyTaskStatus()
     {
-        return await _accountDomainService.GetDailyTaskStatus();
+        return await accountDomainService.GetDailyTaskStatus();
     }
 
     /// <summary>
@@ -149,11 +115,11 @@ public class DailyTaskAppService : AppService, IDailyTaskAppService
     {
         if (!_dailyTaskOptions.IsWatchVideo && !_dailyTaskOptions.IsShareVideo)
         {
-            _logger.LogInformation("已配置为关闭，跳过任务");
+            logger.LogInformation("已配置为关闭，跳过任务");
             return;
         }
 
-        await _videoDomainService.WatchAndShareVideo(dailyTaskInfo);
+        await videoDomainService.WatchAndShareVideo(dailyTaskInfo);
     }
 
     /// <summary>
@@ -164,23 +130,23 @@ public class DailyTaskAppService : AppService, IDailyTaskAppService
     {
         if (_dailyTaskOptions.SaveCoinsWhenLv6 && userInfo.Level_info.Current_level >= 6)
         {
-            _logger.LogInformation("已经为LV6大佬，开始白嫖");
+            logger.LogInformation("已经为LV6大佬，开始白嫖");
             return;
         }
 
         if (_dailyTaskOptions.IsDonateCoinForArticle)
         {
-            _logger.LogInformation("专栏投币已开启");
+            logger.LogInformation("专栏投币已开启");
 
-            if (!await _articleDomainService.AddCoinForArticles())
+            if (!await articleDomainService.AddCoinForArticles())
             {
-                _logger.LogInformation("专栏投币结束，转入视频投币");
-                await _donateCoinDomainService.AddCoinsForVideos();
+                logger.LogInformation("专栏投币结束，转入视频投币");
+                await donateCoinDomainService.AddCoinsForVideos();
             }
         }
         else
         {
-            await _donateCoinDomainService.AddCoinsForVideos();
+            await donateCoinDomainService.AddCoinsForVideos();
         }
     }
 
@@ -190,12 +156,12 @@ public class DailyTaskAppService : AppService, IDailyTaskAppService
     [TaskInterceptor("银瓜子兑换硬币", rethrowWhenException: false)]
     private async Task ExchangeSilver2Coin()
     {
-        var success = await _liveDomainService.ExchangeSilver2Coin();
+        var success = await liveDomainService.ExchangeSilver2Coin();
         if (!success) return;
 
         //如果兑换成功，则打印硬币余额
-        var coinBalance = _coinDomainService.GetCoinBalance();
-        _logger.LogInformation("【硬币余额】 {coin}", coinBalance);
+        var coinBalance = coinDomainService.GetCoinBalance();
+        logger.LogInformation("【硬币余额】 {coin}", coinBalance);
     }
 
     /// <summary>
@@ -204,18 +170,18 @@ public class DailyTaskAppService : AppService, IDailyTaskAppService
     [TaskInterceptor("领取大会员福利", rethrowWhenException: false)]
     private async Task ReceiveVipPrivilege(UserInfo userInfo)
     {
-        var suc = await _vipPrivilegeDomainService.ReceiveVipPrivilege(userInfo);
+        var suc = await vipPrivilegeDomainService.ReceiveVipPrivilege(userInfo);
 
         //如果领取成功，需要刷新账户信息（比如B币余额）
         if (suc)
         {
             try
             {
-                userInfo = await _accountDomainService.LoginByCookie();
+                userInfo = await accountDomainService.LoginByCookie();
             }
             catch (Exception ex)
             {
-                _logger.LogError("领取福利成功，但之后刷新用户信息时异常，信息：{msg}", ex.Message);
+                logger.LogError("领取福利成功，但之后刷新用户信息时异常，信息：{msg}", ex.Message);
             }
         }
     }
@@ -226,7 +192,7 @@ public class DailyTaskAppService : AppService, IDailyTaskAppService
     [TaskInterceptor("B币券充电", rethrowWhenException: false)]
     private async Task Charge(UserInfo userInfo)
     {
-        await _chargeDomainService.Charge(userInfo);
+        await chargeDomainService.Charge(userInfo);
     }
 
     /// <summary>
@@ -235,7 +201,7 @@ public class DailyTaskAppService : AppService, IDailyTaskAppService
     [TaskInterceptor("漫画签到", rethrowWhenException: false)]
     private async Task MangaSign()
     {
-        await _mangaDomainService.MangaSign();
+        await mangaDomainService.MangaSign();
     }
 
     /// <summary>
@@ -244,7 +210,7 @@ public class DailyTaskAppService : AppService, IDailyTaskAppService
     [TaskInterceptor("漫画阅读", rethrowWhenException: false)]
     private async Task MangaRead()
     {
-        await _mangaDomainService.MangaRead();
+        await mangaDomainService.MangaRead();
     }
 
     /// <summary>
@@ -253,22 +219,22 @@ public class DailyTaskAppService : AppService, IDailyTaskAppService
     [TaskInterceptor("领取大会员漫画权益", rethrowWhenException: false)]
     private async Task ReceiveMangaVipReward(UserInfo userInfo)
     {
-        await _mangaDomainService.ReceiveMangaVipReward(1, userInfo);
+        await mangaDomainService.ReceiveMangaVipReward(1, userInfo);
     }
 
     private async Task SaveCookieAsync(BiliCookie ckInfo, CancellationToken cancellationToken)
     {
-        var platformType = _configuration.GetSection("PlateformType").Get<PlatformType>();
-        _logger.LogInformation("当前运行平台：{platform}", platformType);
+        var platformType = configuration.GetSection("PlateformType").Get<PlatformType>();
+        logger.LogInformation("当前运行平台：{platform}", platformType);
 
         //更新cookie到青龙env
         if (platformType == PlatformType.QingLong)
         {
-            await _loginDomainService.SaveCookieToQinLongAsync(ckInfo, cancellationToken);
+            await loginDomainService.SaveCookieToQinLongAsync(ckInfo, cancellationToken);
             return;
         }
 
         //更新cookie到json
-        await _loginDomainService.SaveCookieToJsonFileAsync(ckInfo, cancellationToken);
+        await loginDomainService.SaveCookieToJsonFileAsync(ckInfo, cancellationToken);
     }
 }

@@ -1,6 +1,5 @@
 ﻿using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live;
-using Ray.BiliBiliTool.Config.Options;
 using System.Threading.Tasks;
 using WebApiClientCore.Attributes;
 

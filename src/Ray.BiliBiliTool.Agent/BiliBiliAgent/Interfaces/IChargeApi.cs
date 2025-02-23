@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using WebApiClientCore.Attributes;
@@ -51,5 +50,4 @@ public interface IChargeApi : IBiliBiliApi
     [Header("Origin", "https://www.bilibili.com")]
     [HttpPost("/x/ugcpay/trade/elec/message")]
     Task<BiliApiResponse<ChargeResponse>> ChargeCommentAsync([FormContent] ChargeCommentRequest request);
-
 }

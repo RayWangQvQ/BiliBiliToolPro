@@ -7,6 +7,4 @@ namespace Ray.BiliBiliTool.Application.Contracts;
 /// </summary>
 [Description("VipBigPoint")]
 
-public interface IVipBigPointAppService : IAppService
-{
-}
+public interface IVipBigPointAppService : IAppService;

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Passport;
@@ -14,10 +13,11 @@ using System.IO;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
-using Newtonsoft.Json.Linq;
 using QRCoder;
 using Ray.BiliBiliTool.Agent.QingLong;
 using Ray.BiliBiliTool.Infrastructure.Cookie;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace Ray.BiliBiliTool.DomainService;
 
@@ -67,7 +67,7 @@ public class LoginDomainService(
                 continue;
             }
 
-            var content = JsonConvert.DeserializeObject<BiliApiResponse<TokenDto>>(await check.Content.ReadAsStringAsync(cancellationToken));
+            var content = JsonSerializer.Deserialize<BiliApiResponse<TokenDto>>(await check.Content.ReadAsStringAsync(cancellationToken));
             if (content.Code != 0)
             {
                 logger.LogWarning("调用检测接口异常：{msg}", check.ToJsonStr());
@@ -383,8 +383,8 @@ public class LoginDomainService(
 
         var authJson = await File.ReadAllTextAsync(authFile);
 
-        var jb = JsonConvert.DeserializeObject<JObject>(authJson);
-        token = jb["token"]?.ToString();
+        var jb = JsonNode.Parse(authJson);
+        token = jb?["token"]?.GetValue<string>();
 
         return token;
     }

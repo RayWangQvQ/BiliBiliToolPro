@@ -1,5 +1,4 @@
 ﻿using Ray.BiliBiliTool.Agent.Attributes;
-using WebApiClientCore.Attributes;
 
 namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 
@@ -14,6 +13,4 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 [AppendHeader("Connection", "keep-alive", AppendHeaderType.AddIfNotExist)]
 
 [LogFilter]
-public interface IBiliBiliApi
-{
-}
+public interface IBiliBiliApi;

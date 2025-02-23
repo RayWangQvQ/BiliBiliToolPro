@@ -1,8 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Threading.Tasks;
-using Ray.BiliBiliTool.Agent.Attributes;
-using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using WebApiClientCore.Attributes;
 
 namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
