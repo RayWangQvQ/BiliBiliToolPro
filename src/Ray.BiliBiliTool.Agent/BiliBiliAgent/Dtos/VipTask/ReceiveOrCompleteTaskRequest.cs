@@ -1,18 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.VipTask;
 
-namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.VipTask
+public class ReceiveOrCompleteTaskRequest
 {
-    public class ReceiveOrCompleteTaskRequest
+    public ReceiveOrCompleteTaskRequest(string taskCode)
     {
-        public ReceiveOrCompleteTaskRequest(string taskCode)
-        {
-            TaskCode=taskCode;
-        }
-
-        public string TaskCode { get; set; }
+        TaskCode=taskCode;
     }
+
+    public string TaskCode { get; set; }
 }

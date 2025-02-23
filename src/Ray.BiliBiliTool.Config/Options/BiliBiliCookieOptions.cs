@@ -1,11 +1,10 @@
 ﻿
-namespace Ray.BiliBiliTool.Config.Options
+namespace Ray.BiliBiliTool.Config.Options;
+
+/// <summary>
+/// Cookie信息
+/// </summary>
+public class BiliBiliCookieOptions
 {
-    /// <summary>
-    /// Cookie信息
-    /// </summary>
-    public class BiliBiliCookieOptions
-    {
-        public string CookieStr { get; set; }
-    }
+    public string CookieStr { get; set; }
 }

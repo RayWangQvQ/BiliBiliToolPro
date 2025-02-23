@@ -1,7 +1,6 @@
-﻿namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos
+﻿namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live;
+
+public class ExchangeSilverStatusResponse
 {
-    public class ExchangeSilverStatusResponse
-    {
-        public int Silver { get; set; }
-    }
+    public int Silver { get; set; }
 }

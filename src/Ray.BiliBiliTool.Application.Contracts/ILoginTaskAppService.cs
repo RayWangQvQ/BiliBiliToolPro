@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Text;
+﻿using System.ComponentModel;
 
-namespace Ray.BiliBiliTool.Application.Contracts
-{
-    /// <summary>
-    /// 登录任务
-    /// </summary>
-    [Description("Login")]
-    public interface ILoginTaskAppService : IAppService
-    {
-    }
-}
+namespace Ray.BiliBiliTool.Application.Contracts;
+
+/// <summary>
+/// 登录任务
+/// </summary>
+[Description("Login")]
+public interface ILoginTaskAppService : IAppService;

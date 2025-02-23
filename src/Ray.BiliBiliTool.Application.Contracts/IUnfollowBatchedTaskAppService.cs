@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Text;
+﻿using System.ComponentModel;
 
-namespace Ray.BiliBiliTool.Application.Contracts
-{
-    /// <summary>
-    /// 每日自动任务
-    /// </summary>
-    [Description("UnfollowBatched")]
+namespace Ray.BiliBiliTool.Application.Contracts;
 
-    public interface IUnfollowBatchedTaskAppService : IAppService
-    {
-    }
-}
+/// <summary>
+/// 每日自动任务
+/// </summary>
+[Description("UnfollowBatched")]
+
+public interface IUnfollowBatchedTaskAppService : IAppService;
