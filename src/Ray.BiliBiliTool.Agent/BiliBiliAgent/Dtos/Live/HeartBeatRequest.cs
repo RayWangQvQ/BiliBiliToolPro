@@ -1,6 +1,6 @@
-﻿using Ray.BiliBiliTool.Agent.BiliBiliAgent.Utils;
+﻿using Newtonsoft.Json;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Utils;
 using System.Collections.Generic;
-using System.Text.Json;
 
 namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live;
 
@@ -21,7 +21,7 @@ public class HeartBeatRequest
         string uuid,
         string device)
     {
-        Id = JsonSerializer.Serialize(new[] { parentId, areaID, seqNumber, roomId });
+        Id = JsonConvert.SerializeObject(new[] { parentId, areaID, seqNumber, roomId });
         Ets = ets;
         Benchmark = secretKey;
         Time = 60;
@@ -44,7 +44,7 @@ public class HeartBeatRequest
             time = 60,
             ts = timestamp,
         };
-        string jsonString = JsonSerializer.Serialize(json);
+        string jsonString = JsonConvert.SerializeObject(json);
         this.S = LiveHeartBeatCrypto.Sypder(jsonString, secretRule, secretKey);
 
         this.Visit_id = "";

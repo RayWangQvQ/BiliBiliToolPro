@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.Infrastructure;
+using System.Text.Json;
 
 namespace Ray.BiliBiliTool.Config.Extensions;
 
