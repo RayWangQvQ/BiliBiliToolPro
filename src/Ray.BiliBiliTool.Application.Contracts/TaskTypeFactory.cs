@@ -7,45 +7,53 @@ using System.Reflection;
 
 namespace Ray.BiliBiliTool.Application.Contracts;
 
-public class TaskTypeFactory
+public static class TaskTypeFactory
 {
-    private static Dictionary<string, Type> _dic = new();
-    private static Dictionary<int, string> _index = new();
+    private static readonly List<Type> TypeList =
+    [
+        typeof(ILoginTaskAppService),
+        typeof(ITestAppService),
+        typeof(IDailyTaskAppService),
+        typeof(ILiveFansMedalAppService),
+        typeof(ILiveLotteryTaskAppService),
+        typeof(IVipBigPointAppService),
+        typeof(IUnfollowBatchedTaskAppService)
+    ];
+
+    private static readonly List<TaskTypeItem> All = [];
 
     static TaskTypeFactory()
     {
-        Assembly assembly = Assembly.GetAssembly(typeof(TaskTypeFactory));
-        var types = assembly.GetTypes()
-            .Where(x => x.IsAssignableTo(typeof(IAppService))
-                        && x.IsInterface);
-        var index = 1;
-        foreach (var type in types)
+        for (int i = 0; i < TypeList.Count; i++)
         {
-            string code = type.GetCustomAttribute<DescriptionAttribute>()?.Description;
-            if (!string.IsNullOrWhiteSpace(code))
-            {
-                _dic.Add(code, type);
-                _index.Add(index, code);
-                index++;
-            }
+            All.Add(new TaskTypeItem(i + 1, TypeList[i].GetCustomAttribute<DescriptionAttribute>()?.Description, TypeList[i]));
         }
     }
 
-    public static Type Create(string code)
+    public static Type Get(string code)
     {
-        return _dic[code];
+        return All.First(x=>x.Code == code).Type;
     }
 
     public static void Show(ILogger logger)
     {
-        foreach (var item in _index)
+        foreach (var item in All)
         {
-            logger.LogInformation("{index}):{code}", item.Key, item.Value);
+            logger.LogInformation("{id}):{code}", item.Id, item.Code);
         }
     }
 
     public static string GetCodeByIndex(int index)
     {
-        return _index[index];
+        return All.First(x => x.Id == index).Code;
     }
+}
+
+public class TaskTypeItem(int id, string code, Type type)
+{
+    public int Id { get; } = id;
+
+    public string Code { get; } = code;
+
+    public Type Type { get; } = type;
 }

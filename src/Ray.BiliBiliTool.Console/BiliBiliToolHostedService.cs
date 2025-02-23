@@ -155,7 +155,7 @@ public class BiliBiliToolHostedService(
             {
                 string code = TaskTypeFactory.GetCodeByIndex(num);
                 configuration["RunTasks"] = code;
-                return Task.FromResult(new string[] { code });
+                return Task.FromResult(new[] { code });
             }
 
             logger.LogWarning("输入异常，请输入序号");
@@ -167,7 +167,7 @@ public class BiliBiliToolHostedService(
         using IServiceScope scope = serviceProvider.CreateScope();
         foreach (string task in tasks)
         {
-            Type type = TaskTypeFactory.Create(task);
+            Type type = TaskTypeFactory.Get(task);
             if (type == null)
             {
                 logger.LogWarning("任务不存在：{task}", task);
