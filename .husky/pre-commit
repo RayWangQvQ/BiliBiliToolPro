@@ -3,4 +3,3 @@
 
 echo "This is pre commit"
 dotnet husky run --group pre-commit
-git add '*.cs'
