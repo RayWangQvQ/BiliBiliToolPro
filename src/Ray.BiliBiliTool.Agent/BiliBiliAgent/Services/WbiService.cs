@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
-using System.Text.RegularExpressions;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
@@ -20,16 +20,14 @@ public class WbiService : IWbiService
     private readonly ILogger<WbiService> _logger;
     private readonly IUserInfoApi _userInfoApi;
 
-    public WbiService(
-        ILogger<WbiService> logger,
-        IUserInfoApi userInfoApi
-    )
+    public WbiService(ILogger<WbiService> logger, IUserInfoApi userInfoApi)
     {
         _logger = logger;
         _userInfoApi = userInfoApi;
     }
 
-    public async Task SetWridAsync<T>(T request) where T: IWrid
+    public async Task SetWridAsync<T>(T request)
+        where T : IWrid
     {
         //生成字典
         Dictionary<string, object> parameters = ObjectHelper.ObjectToDictionary(request);
@@ -53,7 +51,12 @@ public class WbiService : IWbiService
     /// <param name="imgKey"></param>
     /// <param name="subKey"></param>
     /// <returns></returns>
-    public WridDto EncWbi(Dictionary<string, object> parameters, string imgKey, string subKey, long timespan = 0)
+    public WridDto EncWbi(
+        Dictionary<string, object> parameters,
+        string imgKey,
+        string subKey,
+        long timespan = 0
+    )
     {
         var re = new WridDto();
 
@@ -70,10 +73,7 @@ public class WbiService : IWbiService
 
         var chrFilter = new Regex("[!'()*]");
 
-        var dic = new Dictionary<string, string>
-        {
-            { "wts", re.wts.ToString() }
-        };
+        var dic = new Dictionary<string, string> { { "wts", re.wts.ToString() } };
 
         foreach (var entry in parameters)
         {
@@ -106,7 +106,6 @@ public class WbiService : IWbiService
         return re;
     }
 
-
     private async Task<WbiImg> GetWbiKeysAsync()
     {
         BiliApiResponse<UserInfo> apiResponse = await _userInfoApi.LoginByCookie();
@@ -128,10 +127,70 @@ public class WbiService : IWbiService
     {
         int[] mixinKeyEncTab = new int[]
         {
-            46, 47, 18, 2, 53, 8, 23, 32, 15, 50, 10, 31, 58, 3, 45, 35, 27, 43, 5, 49,
-            33, 9, 42, 19, 29, 28, 14, 39,12, 38, 41, 13, 37, 48, 7, 16, 24, 55, 40,
-            61, 26, 17, 0, 1, 60, 51, 30, 4, 22, 25, 54, 21, 56, 59, 6, 63, 57, 62, 11,
-            36, 20, 34, 44, 52
+            46,
+            47,
+            18,
+            2,
+            53,
+            8,
+            23,
+            32,
+            15,
+            50,
+            10,
+            31,
+            58,
+            3,
+            45,
+            35,
+            27,
+            43,
+            5,
+            49,
+            33,
+            9,
+            42,
+            19,
+            29,
+            28,
+            14,
+            39,
+            12,
+            38,
+            41,
+            13,
+            37,
+            48,
+            7,
+            16,
+            24,
+            55,
+            40,
+            61,
+            26,
+            17,
+            0,
+            1,
+            60,
+            51,
+            30,
+            4,
+            22,
+            25,
+            54,
+            21,
+            56,
+            59,
+            6,
+            63,
+            57,
+            62,
+            11,
+            36,
+            20,
+            34,
+            44,
+            52,
         };
 
         var temp = new StringBuilder();
@@ -143,7 +202,7 @@ public class WbiService : IWbiService
     }
 }
 
-public class WridDto: IWrid
+public class WridDto : IWrid
 {
     public long wts { get; set; }
 

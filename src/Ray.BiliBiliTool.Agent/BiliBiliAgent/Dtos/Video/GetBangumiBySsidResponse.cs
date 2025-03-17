@@ -16,7 +16,6 @@ public class Result
     public List<Episode> episodes { get; set; }
 }
 
-
 public class Episode
 {
     public int aid { get; set; }
@@ -36,7 +35,4 @@ public class Episode
     public string share_copy { get; set; }
 
     public int status { get; set; }
-
-
-
 }

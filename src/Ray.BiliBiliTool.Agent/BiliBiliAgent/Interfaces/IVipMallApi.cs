@@ -1,7 +1,7 @@
-﻿using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
-using System.Threading.Tasks;
-using WebApiClientCore.Attributes;
+﻿using System.Threading.Tasks;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.ViewMall;
+using WebApiClientCore.Attributes;
 
 namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 

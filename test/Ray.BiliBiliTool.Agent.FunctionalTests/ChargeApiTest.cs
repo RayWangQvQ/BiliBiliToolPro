@@ -16,11 +16,11 @@ public class ChargeApiTest
     public ChargeApiTest()
     {
         var envs = new List<string>
-            {
-                "--ENVIRONMENT=Development",
-                //"HTTP_PROXY=localhost:8888",
-                //"HTTPS_PROXY=localhost:8888"
-            };
+        {
+            "--ENVIRONMENT=Development",
+            //"HTTP_PROXY=localhost:8888",
+            //"HTTPS_PROXY=localhost:8888"
+        };
         IHost host = Program.CreateHost(envs.ToArray());
         _ck = host.Services.GetRequiredService<BiliCookie>();
         _target = host.Services.GetRequiredService<IChargeApi>();
@@ -40,9 +40,10 @@ public class ChargeApiTest
 
         // Assert
         re.Code.Should().Be(0);
-        re.Data.Status.Should().BeOneOf(
-            -4,//bp.to.battery http failed, invalid args, errNo=800409904: B ±ÒÓà¶î²»×ã
-            4
+        re.Data.Status.Should()
+            .BeOneOf(
+                -4, //bp.to.battery http failed, invalid args, errNo=800409904: B ï¿½ï¿½ï¿½ï¿½î²»ï¿½ï¿½
+                4
             );
     }
 
@@ -51,5 +52,4 @@ public class ChargeApiTest
     #region ChargeCommentAsync
 
     #endregion
-
 }

@@ -10,7 +10,9 @@ public static class ConfigurationBuilderExtension
     /// </summary>
     /// <param name="configurationBuilder">The <see cref="IConfigurationBuilder"/> to add to.</param>
     /// <returns>The <see cref="IConfigurationBuilder"/>.</returns>
-    public static IConfigurationBuilder AddExcludeEmptyEnvironmentVariables(this IConfigurationBuilder configurationBuilder)
+    public static IConfigurationBuilder AddExcludeEmptyEnvironmentVariables(
+        this IConfigurationBuilder configurationBuilder
+    )
     {
         configurationBuilder.Add(new EnvironmentVariablesExcludeEmptyConfigurationSource());
         return configurationBuilder;
@@ -26,9 +28,16 @@ public static class ConfigurationBuilderExtension
     public static IConfigurationBuilder AddExcludeEmptyEnvironmentVariables(
         this IConfigurationBuilder configurationBuilder,
         string prefix,
-        bool removeKeyPrefix = true)
+        bool removeKeyPrefix = true
+    )
     {
-        configurationBuilder.Add(new EnvironmentVariablesExcludeEmptyConfigurationSource { Prefix = prefix, RemoveKeyPrefix = removeKeyPrefix });
+        configurationBuilder.Add(
+            new EnvironmentVariablesExcludeEmptyConfigurationSource
+            {
+                Prefix = prefix,
+                RemoveKeyPrefix = removeKeyPrefix,
+            }
+        );
         return configurationBuilder;
     }
 
@@ -38,6 +47,8 @@ public static class ConfigurationBuilderExtension
     /// <param name="builder">The <see cref="IConfigurationBuilder"/> to add to.</param>
     /// <param name="configureSource">Configures the source.</param>
     /// <returns>The <see cref="IConfigurationBuilder"/>.</returns>
-    public static IConfigurationBuilder AddExcludeEmptyEnvironmentVariables(this IConfigurationBuilder builder, Action<EnvironmentVariablesExcludeEmptyConfigurationSource> configureSource)
-        => builder.Add(configureSource);
+    public static IConfigurationBuilder AddExcludeEmptyEnvironmentVariables(
+        this IConfigurationBuilder builder,
+        Action<EnvironmentVariablesExcludeEmptyConfigurationSource> configureSource
+    ) => builder.Add(configureSource);
 }

@@ -1,9 +1,6 @@
 ﻿namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 
-public class BiliApiResponse : BiliApiResponse<object>
-{
-
-}
+public class BiliApiResponse : BiliApiResponse<object> { }
 
 public class BiliApiResponse<TData>
 {

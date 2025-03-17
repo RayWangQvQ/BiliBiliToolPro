@@ -13,7 +13,7 @@ public class UnfollowBatchedTaskOptions
     public string RetainUids { get; set; }
 
     public List<string> RetainUidList =>
-        RetainUids?.Split(",",
-            StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToList()
-        ?? new List<string>();
+        RetainUids
+            ?.Split(",", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+            .ToList() ?? new List<string>();
 }

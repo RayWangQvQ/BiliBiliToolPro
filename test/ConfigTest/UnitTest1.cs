@@ -1,17 +1,17 @@
 using System;
-using System.Text.Json;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
+using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Config;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.Console;
-using Xunit;
 using Ray.BiliBiliTool.Infrastructure;
-using Microsoft.Extensions.Hosting;
-using Ray.BiliBiliTool.Agent;
+using Xunit;
 
 namespace ConfigTest
 {
@@ -49,9 +49,10 @@ namespace ConfigTest
                 HttpClient httpClient = new HttpClient();
                 var response = httpClient.GetAsync("http://api.ipify.org/");
                 var resultIp = response.Result.Content.ReadAsStringAsync().Result;
-                Debug.WriteLine(String.Format("µ±Ç°IP£º {0}", resultIp));
+                Debug.WriteLine(String.Format("ï¿½ï¿½Ç°IPï¿½ï¿½ {0}", resultIp));
             }
         }
+
         [Fact]
         public void Test1()
         {
@@ -60,17 +61,21 @@ namespace ConfigTest
             string s = Global.ConfigurationRoot["BiliBiliCookie:UserId"];
             Debug.WriteLine(s);
 
-            string logLevel = Global.ConfigurationRoot["Serilog:WriteTo:0:Args:restrictedToMinimumLevel"];
+            string logLevel = Global.ConfigurationRoot[
+                "Serilog:WriteTo:0:Args:restrictedToMinimumLevel"
+            ];
             Debug.WriteLine(logLevel);
 
             var cookie = Global.ServiceProviderRoot.GetRequiredService<BiliCookie>();
 
-            Debug.WriteLine(JsonSerializer.Serialize(cookie, new JsonSerializerOptions { WriteIndented = true }));
+            Debug.WriteLine(
+                JsonSerializer.Serialize(cookie, new JsonSerializerOptions { WriteIndented = true })
+            );
             Assert.True(!string.IsNullOrWhiteSpace(cookie.UserId));
         }
 
         /// <summary>
-        /// ²âÊÔ»·¾³±äÁ¿KeyµÄ·Ö¸ô·û
+        /// ï¿½ï¿½ï¿½Ô»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Keyï¿½Ä·Ö¸ï¿½ï¿½ï¿½
         /// </summary>
         [Fact]
         public void TestEnvKeyDelimiter()
@@ -119,7 +124,7 @@ namespace ConfigTest
         }
 
         /// <summary>
-        /// ÎªÅäÖÃÊÖ¶¯¸³Öµ
+        /// Îªï¿½ï¿½ï¿½ï¿½ï¿½Ö¶ï¿½ï¿½ï¿½Öµ
         /// </summary>
         [Fact]
         public void TestSetConfiguration()
@@ -127,23 +132,29 @@ namespace ConfigTest
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
             Program.CreateHost(new string[] { });
 
-            var options = Global.ServiceProviderRoot.GetRequiredService<IOptionsMonitor<BiliBiliCookieOptions>>();
+            var options = Global.ServiceProviderRoot.GetRequiredService<
+                IOptionsMonitor<BiliBiliCookieOptions>
+            >();
             Debug.WriteLine(options.CurrentValue.ToJsonStr());
 
-            //ÊÖ¶¯¸³Öµ
+            //ï¿½Ö¶ï¿½ï¿½ï¿½Öµ
             //RayConfiguration.Root["BiliBiliCookie:UserId"] = "123456";
             //options.CurrentValue.UserId = "123456";
 
-            Debug.WriteLine($"´ÓConfiguration¶ÁÈ¡£º{Global.ConfigurationRoot["BiliBiliCookie:UserId"]}");
+            Debug.WriteLine(
+                $"ï¿½ï¿½Configurationï¿½ï¿½È¡ï¿½ï¿½{Global.ConfigurationRoot["BiliBiliCookie:UserId"]}"
+            );
 
-            Debug.WriteLine($"´ÓÀÏoptions¶ÁÈ¡£º{options.CurrentValue.ToJsonStr()}");
+            Debug.WriteLine($"ï¿½ï¿½ï¿½ï¿½optionsï¿½ï¿½È¡ï¿½ï¿½{options.CurrentValue.ToJsonStr()}");
 
-            var optionsNew = Global.ServiceProviderRoot.GetRequiredService<IOptionsMonitor<BiliBiliCookieOptions>>();
-            Debug.WriteLine($"´ÓÐÂoptions¶ÁÈ¡£º{optionsNew.CurrentValue.ToJsonStr()}");
+            var optionsNew = Global.ServiceProviderRoot.GetRequiredService<
+                IOptionsMonitor<BiliBiliCookieOptions>
+            >();
+            Debug.WriteLine($"ï¿½ï¿½ï¿½ï¿½optionsï¿½ï¿½È¡ï¿½ï¿½{optionsNew.CurrentValue.ToJsonStr()}");
         }
 
         /// <summary>
-        /// ÎªÅäÖÃÊÖ¶¯¸³Öµ
+        /// Îªï¿½ï¿½ï¿½ï¿½ï¿½Ö¶ï¿½ï¿½ï¿½Öµ
         /// </summary>
         [Fact]
         public void TestHostDefaults()

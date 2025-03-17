@@ -18,5 +18,4 @@ public class CopyUserToGroupRequest
     public string Csrf { get; set; }
 
     public string Jsonp { get; set; } = "jsonp";
-
 }

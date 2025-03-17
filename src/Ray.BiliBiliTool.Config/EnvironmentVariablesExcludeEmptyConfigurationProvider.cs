@@ -11,7 +11,8 @@ namespace Ray.BiliBiliTool.Config
     /// 自定义的排除空值的环境变量提供者<para></para>
     /// （使用GitHub Actions的脚本传入环境变量，空值会保留，所以这里自己写了一个用来替换掉默认的<see cref="EnvironmentVariablesConfigurationProvider"/>）
     /// </summary>
-    public class EnvironmentVariablesExcludeEmptyConfigurationProvider : EnvironmentVariablesConfigurationProvider
+    public class EnvironmentVariablesExcludeEmptyConfigurationProvider
+        : EnvironmentVariablesConfigurationProvider
     {
         private readonly bool _removeKeyPrefix;
         private readonly string _prefix;
@@ -21,7 +22,8 @@ namespace Ray.BiliBiliTool.Config
 
         public EnvironmentVariablesExcludeEmptyConfigurationProvider(
             string prefix = null,
-            bool removeKeyPrefix = true)
+            bool removeKeyPrefix = true
+        )
             : base(prefix)
         {
             _removeKeyPrefix = removeKeyPrefix;
@@ -34,12 +36,16 @@ namespace Ray.BiliBiliTool.Config
 
         public override void Load()
         {
-            Dictionary<string, string> dictionary = Environment.GetEnvironmentVariables()
-                .ToDictionary(otherAction: t => t
-                     .Where(_fifter)
-                     .Select(x => x.NewKey(key => NormalizeKey(key))));
+            Dictionary<string, string> dictionary = Environment
+                .GetEnvironmentVariables()
+                .ToDictionary(otherAction: t =>
+                    t.Where(_fifter).Select(x => x.NewKey(key => NormalizeKey(key)))
+                );
 
-            base.Data = new Dictionary<string, string>(dictionary, StringComparer.OrdinalIgnoreCase);
+            base.Data = new Dictionary<string, string>(
+                dictionary,
+                StringComparer.OrdinalIgnoreCase
+            );
         }
 
         /// <summary>
@@ -62,9 +68,7 @@ namespace Ray.BiliBiliTool.Config
         /// <returns></returns>
         private string RemoveKeyPrefix(string key)
         {
-            return _prefix.IsNullOrEmpty()
-                ? key
-                : key.Substring(_prefix.Length);
+            return _prefix.IsNullOrEmpty() ? key : key.Substring(_prefix.Length);
         }
 
         /// <summary>

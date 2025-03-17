@@ -36,22 +36,40 @@ public class BiliCookie : CookieInfo
     }
 
     [Description("DedeUserID")]
-    public string UserId => CookieItemDictionary.TryGetValue(GetPropertyDescription(nameof(UserId)), out string userId) ? userId : "";
+    public string UserId =>
+        CookieItemDictionary.TryGetValue(GetPropertyDescription(nameof(UserId)), out string userId)
+            ? userId
+            : "";
 
     /// <summary>
     /// SESSDATA
     /// </summary>
     [Description("SESSDATA")]
-    public string SessData => CookieItemDictionary.TryGetValue(GetPropertyDescription(nameof(SessData)), out string sess) ? sess : "";
+    public string SessData =>
+        CookieItemDictionary.TryGetValue(GetPropertyDescription(nameof(SessData)), out string sess)
+            ? sess
+            : "";
 
     [Description("bili_jct")]
-    public string BiliJct => CookieItemDictionary.TryGetValue(GetPropertyDescription(nameof(BiliJct)), out string jct) ? jct : "";
+    public string BiliJct =>
+        CookieItemDictionary.TryGetValue(GetPropertyDescription(nameof(BiliJct)), out string jct)
+            ? jct
+            : "";
 
     [Description("LIVE_BUVID")]
-    public string LiveBuvid => CookieItemDictionary.TryGetValue(GetPropertyDescription(nameof(LiveBuvid)), out string liveBuvid) ? liveBuvid : "";
+    public string LiveBuvid =>
+        CookieItemDictionary.TryGetValue(
+            GetPropertyDescription(nameof(LiveBuvid)),
+            out string liveBuvid
+        )
+            ? liveBuvid
+            : "";
 
     [Description("buvid3")]
-    public string Buvid => CookieItemDictionary.TryGetValue(GetPropertyDescription(nameof(Buvid)), out string buvid) ? buvid : "";
+    public string Buvid =>
+        CookieItemDictionary.TryGetValue(GetPropertyDescription(nameof(Buvid)), out string buvid)
+            ? buvid
+            : "";
 
     /// <summary>
     /// 检查是否已配置
@@ -61,7 +79,8 @@ public class BiliCookie : CookieInfo
     {
         base.Check();
 
-        if (CookieItemDictionary.Count == 0) throw new Exception("Cookie字符串格式异常，内部无等号");
+        if (CookieItemDictionary.Count == 0)
+            throw new Exception("Cookie字符串格式异常，内部无等号");
 
         bool result = true;
         string msg = "Cookie字符串异常，无[{1}]项";
@@ -73,9 +92,13 @@ public class BiliCookie : CookieInfo
 
             result = false;
         }
-        else if (!long.TryParse(UserId, out long uid))//不为空，但不能转换为long，警告
+        else if (!long.TryParse(UserId, out long uid)) //不为空，但不能转换为long，警告
         {
-            _logger.LogWarning("[{uidKey}]={uid} 不能转换为long型，请确认配置的是正确的Cookie值", GetPropertyDescription(nameof(UserId)), UserId);
+            _logger.LogWarning(
+                "[{uidKey}]={uid} 不能转换为long型，请确认配置的是正确的Cookie值",
+                GetPropertyDescription(nameof(UserId)),
+                UserId
+            );
         }
 
         //SessData为空，抛异常
@@ -93,7 +116,9 @@ public class BiliCookie : CookieInfo
         }
 
         if (!result)
-            throw new Exception($"请正确配置Cookie后再运行，配置方式见 {Config.Constants.SourceCodeUrl}");
+            throw new Exception(
+                $"请正确配置Cookie后再运行，配置方式见 {Config.Constants.SourceCodeUrl}"
+            );
     }
 
     private string GetPropertyDescription(string propertyName)

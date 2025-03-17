@@ -1,11 +1,11 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.VipTask;
-using Ray.BiliBiliTool.Console;
-using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
-using Xunit.Abstractions;
+﻿using FluentAssertions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using FluentAssertions;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.VipTask;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
+using Ray.BiliBiliTool.Console;
+using Xunit.Abstractions;
 
 namespace Ray.BiliBiliTool.Agent.FunctionalTests;
 
@@ -48,10 +48,7 @@ public class VipBigPointApiTest
     public async Task SignAsync_Normal_Success()
     {
         // Arrange
-        var req = new SignRequest()
-        {
-            csrf = _ck.BiliJct
-        };
+        var req = new SignRequest() { csrf = _ck.BiliJct };
 
         // Act
         BiliApiResponse re = await _api.SignAsync(req);
@@ -74,26 +71,25 @@ public class VipBigPointApiTest
         re.Data.List.Should().Contain(x => x.Type == 9);
     }
 
-
     [Fact]
     public async Task GetVipExperienceAsync_Normal_Success()
     {
         // Arrange
-        var req = new VipExperienceRequest()
-        {
-            csrf = _ck.BiliJct
-        };
+        var req = new VipExperienceRequest() { csrf = _ck.BiliJct };
 
         // Act
         BiliApiResponse re = await _api.ObtainVipExperienceAsync(req);
 
         // Assert
-        re.Code.Should().BeOneOf(new List<int>
-        {
-            0,
-            6034005, //任务未完成
-            69198, //用户经验已经领取
-        });
+        re.Code.Should()
+            .BeOneOf(
+                new List<int>
+                {
+                    0,
+                    6034005, //任务未完成
+                    69198, //用户经验已经领取
+                }
+            );
     }
 
     [Fact]

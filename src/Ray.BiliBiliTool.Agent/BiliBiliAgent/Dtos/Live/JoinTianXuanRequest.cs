@@ -35,7 +35,7 @@ public class JoinTianXuanRequest
     /// <sample>9zys612vo0c0</sample>
     /// <sample>3uu2mkxt21c0</sample>
     /// <sample>8orqn5vf4i00</sample>
-    public string Visit_id { get; set; } = _visitId;//todo
+    public string Visit_id { get; set; } = _visitId; //todo
 
     public string Platform { get; set; } = "pc";
 

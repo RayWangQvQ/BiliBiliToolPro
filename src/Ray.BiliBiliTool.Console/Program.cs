@@ -46,9 +46,7 @@ public class Program
 
     public static IHost CreateHost(string[] args)
     {
-        IHost host = CreateHostBuilder(args)
-            .UseConsoleLifetime()
-            .Build();
+        IHost host = CreateHostBuilder(args).UseConsoleLifetime().Build();
         Global.ServiceProviderRoot = host.Services;
         return host;
     }
@@ -70,58 +68,73 @@ public class Program
             }
         });
 
-        hostBuilder.ConfigureAppConfiguration((hostBuilderContext, configurationBuilder) =>
-        {
-            Global.HostingEnvironment = hostBuilderContext.HostingEnvironment;
-            IHostEnvironment env = hostBuilderContext.HostingEnvironment;
-
-            //json文件：
-            string envName = hostBuilderContext.HostingEnvironment.EnvironmentName;
-            configurationBuilder.AddJsonFile("appsettings.json", true, true)
-                .AddJsonFile($"appsettings.{envName}.json", true, true)
-                ;
-
-            //用户机密：
-            if (env.IsDevelopment() && env.ApplicationName?.Length > 0)
+        hostBuilder.ConfigureAppConfiguration(
+            (hostBuilderContext, configurationBuilder) =>
             {
-                //var appAssembly = Assembly.Load(new AssemblyName(env.ApplicationName));
-                var appAssembly = Assembly.GetAssembly(typeof(Program));
-                configurationBuilder.AddUserSecrets(appAssembly!, optional: true, reloadOnChange: true);
+                Global.HostingEnvironment = hostBuilderContext.HostingEnvironment;
+                IHostEnvironment env = hostBuilderContext.HostingEnvironment;
+
+                //json文件：
+                string envName = hostBuilderContext.HostingEnvironment.EnvironmentName;
+                configurationBuilder
+                    .AddJsonFile("appsettings.json", true, true)
+                    .AddJsonFile($"appsettings.{envName}.json", true, true);
+
+                //用户机密：
+                if (env.IsDevelopment() && env.ApplicationName?.Length > 0)
+                {
+                    //var appAssembly = Assembly.Load(new AssemblyName(env.ApplicationName));
+                    var appAssembly = Assembly.GetAssembly(typeof(Program));
+                    configurationBuilder.AddUserSecrets(
+                        appAssembly!,
+                        optional: true,
+                        reloadOnChange: true
+                    );
+                }
+
+                //环境变量：
+                configurationBuilder.AddExcludeEmptyEnvironmentVariables("QL_", false);
+                configurationBuilder.AddExcludeEmptyEnvironmentVariables("Ray_");
+
+                //命令行：
+                if (args is { Length: > 0 })
+                {
+                    configurationBuilder.AddCommandLine(
+                        args,
+                        Config.Constants.GetCommandLineMappingsDic()
+                    );
+                }
+
+                //本地cookie存储文件
+                configurationBuilder.AddJsonFile("cookies.json", true, true);
+
+                //内置配置
+                configurationBuilder.AddInMemoryCollection(Config.Constants.GetExpDic());
+                configurationBuilder.AddInMemoryCollection(
+                    Config.Constants.GetDonateCoinCanContinueStatusDic()
+                );
             }
-
-            //环境变量：
-            configurationBuilder.AddExcludeEmptyEnvironmentVariables("QL_", false);
-            configurationBuilder.AddExcludeEmptyEnvironmentVariables("Ray_");
-
-            //命令行：
-            if (args is {Length: > 0})
-            {
-                configurationBuilder.AddCommandLine(args, Config.Constants.GetCommandLineMappingsDic());
-            }
-
-            //本地cookie存储文件
-            configurationBuilder.AddJsonFile("cookies.json", true, true);
-
-            //内置配置
-            configurationBuilder.AddInMemoryCollection(Config.Constants.GetExpDic());
-            configurationBuilder.AddInMemoryCollection(Config.Constants.GetDonateCoinCanContinueStatusDic());
-        });
+        );
 
         SelfLog.Enable(x => System.Console.WriteLine(x ?? ""));
-        hostBuilder.UseSerilog((context, services, configuration) => configuration
-            .ReadFrom.Configuration(context.Configuration));
+        hostBuilder.UseSerilog(
+            (context, services, configuration) =>
+                configuration.ReadFrom.Configuration(context.Configuration)
+        );
 
-        hostBuilder.ConfigureServices((hostContext, services) =>
-        {
-            Global.ConfigurationRoot = (IConfigurationRoot)hostContext.Configuration;
+        hostBuilder.ConfigureServices(
+            (hostContext, services) =>
+            {
+                Global.ConfigurationRoot = (IConfigurationRoot)hostContext.Configuration;
 
-            services.AddHostedService<BiliBiliToolHostedService>();
+                services.AddHostedService<BiliBiliToolHostedService>();
 
-            services.AddBiliBiliConfigs(hostContext.Configuration);
-            services.AddBiliBiliClientApi(hostContext.Configuration);
-            services.AddDomainServices();
-            services.AddAppServices();
-        });
+                services.AddBiliBiliConfigs(hostContext.Configuration);
+                services.AddBiliBiliClientApi(hostContext.Configuration);
+                services.AddDomainServices();
+                services.AddAppServices();
+            }
+        );
 
         return hostBuilder;
     }

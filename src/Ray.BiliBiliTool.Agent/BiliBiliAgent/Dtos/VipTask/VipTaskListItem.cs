@@ -20,13 +20,14 @@ public class VipTaskInfo
             logger.LogInformation("-{title}", moduleItem.module_title);
             foreach (var commonTaskItem in moduleItem.common_task_item)
             {
-                logger.LogInformation("---{title}：{status}",
+                logger.LogInformation(
+                    "---{title}：{status}",
                     commonTaskItem.title,
-                    commonTaskItem.state == 3 ? "√" : "X");
+                    commonTaskItem.state == 3 ? "√" : "X"
+                );
             }
         }
         logger.LogInformation("------------------------{newLine}", Environment.NewLine);
-
     }
 }
 

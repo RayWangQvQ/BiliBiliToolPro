@@ -10,7 +10,8 @@ public static class JsonSerializerOptionsBuilderExtesions
 {
     private static JsonSerializerOptionsBuilder SetActionBase(
         [NotNull] JsonSerializerOptionsBuilder builder,
-        [NotNull] Action<JsonSerializerOptions> action)
+        [NotNull] Action<JsonSerializerOptions> action
+    )
     {
         builder.CheckNullWithException(nameof(builder));
         action.CheckNullWithException(nameof(action));
@@ -22,31 +23,31 @@ public static class JsonSerializerOptionsBuilderExtesions
 
     public static JsonSerializerOptionsBuilder SetEncoder(
         this JsonSerializerOptionsBuilder builder,
-        [NotNull] JavaScriptEncoder encoder)
+        [NotNull] JavaScriptEncoder encoder
+    )
     {
         encoder.CheckNullWithException(nameof(encoder));
-        return SetActionBase(
-            builder,
-            t => t.Encoder = encoder);
+        return SetActionBase(builder, t => t.Encoder = encoder);
     }
 
-    public static JsonSerializerOptionsBuilder SetCamelCase(this JsonSerializerOptionsBuilder builder)
+    public static JsonSerializerOptionsBuilder SetCamelCase(
+        this JsonSerializerOptionsBuilder builder
+    )
     {
-        return SetActionBase(
-            builder,
-            t => t.PropertyNamingPolicy = JsonNamingPolicy.CamelCase);
+        return SetActionBase(builder, t => t.PropertyNamingPolicy = JsonNamingPolicy.CamelCase);
     }
 
-    public static JsonSerializerOptionsBuilder SetEncoderToUnicodeRangeAll(this JsonSerializerOptionsBuilder builder)
+    public static JsonSerializerOptionsBuilder SetEncoderToUnicodeRangeAll(
+        this JsonSerializerOptionsBuilder builder
+    )
     {
-        return SetActionBase(
-            builder,
-            t => t.Encoder = JavaScriptEncoder.Create(UnicodeRanges.All));
+        return SetActionBase(builder, t => t.Encoder = JavaScriptEncoder.Create(UnicodeRanges.All));
     }
 
     public static JsonSerializerOptionsBuilder Configure(
         this JsonSerializerOptionsBuilder builder,
-        [NotNull] Action<JsonSerializerOptions> action)
+        [NotNull] Action<JsonSerializerOptions> action
+    )
     {
         return SetActionBase(builder, action);
     }
@@ -56,7 +57,8 @@ public static class JsonSerializerOptionsBuilderExtesions
     private static JsonSerializerOptions DefaultOptions;
 
     public static JsonSerializerOptions BuildAndSaveToDefault(
-        this JsonSerializerOptionsBuilder builder)
+        this JsonSerializerOptionsBuilder builder
+    )
     {
         JsonSerializerOptions option = builder.Build();
         JsonSerializerOptionsBuilderExtesions.DefaultOptions = option;
@@ -68,14 +70,13 @@ public static class JsonSerializerOptionsBuilderExtesions
         return JsonSerializerOptionsBuilderExtesions.DefaultOptions;
     }
 
-    public static JsonSerializerOptions GetOrBuildDefaultOptions(this JsonSerializerOptionsBuilder builder)
+    public static JsonSerializerOptions GetOrBuildDefaultOptions(
+        this JsonSerializerOptionsBuilder builder
+    )
     {
         if (JsonSerializerOptionsBuilderExtesions.DefaultOptions.IsNull())
         {
-            return builder
-                .SetCamelCase()
-                .SetEncoderToUnicodeRangeAll()
-                .BuildAndSaveToDefault();
+            return builder.SetCamelCase().SetEncoderToUnicodeRangeAll().BuildAndSaveToDefault();
         }
         else
         {

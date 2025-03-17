@@ -38,19 +38,22 @@ namespace LogTest
         {
             ILogger logger = CreateLogger();
 
-            logger.LogInformation("¿ªÔ´µØÖ·£º{url}", "https://github.com/RayWangQvQ/BiliBiliTool");
-            logger.LogInformation("µ±Ç°»·¾³£º{env} \r\n", Global.HostingEnvironment.EnvironmentName ?? "ÎÞ");
+            logger.LogInformation("ï¿½ï¿½Ô´ï¿½ï¿½Ö·ï¿½ï¿½{url}", "https://github.com/RayWangQvQ/BiliBiliTool");
+            logger.LogInformation(
+                "ï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½{env} \r\n",
+                Global.HostingEnvironment.EnvironmentName ?? "ï¿½ï¿½"
+            );
 
-            logger.LogInformation("-----¿ªÊ¼Ã¿ÈÕÈÎÎñ-----\r\n");
+            logger.LogInformation("-----ï¿½ï¿½Ê¼Ã¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½-----\r\n");
 
-            logger.LogInformation("---¿ªÊ¼¡¾{taskName}¡¿---", "µÇÂ¼");
-            logger.LogInformation("µÇÂ¼³É¹¦£¬¾­Ñé+5 ¡Ì");
-            logger.LogInformation("ÓÃ»§Ãû: ÔÚ*Â¥");
-            logger.LogInformation("---½áÊø---\r\n");
+            logger.LogInformation("---ï¿½ï¿½Ê¼ï¿½ï¿½{taskName}ï¿½ï¿½---", "ï¿½ï¿½Â¼");
+            logger.LogInformation("ï¿½ï¿½Â¼ï¿½É¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½+5 ï¿½ï¿½");
+            logger.LogInformation("ï¿½Ã»ï¿½ï¿½ï¿½: ï¿½ï¿½*Â¥");
+            logger.LogInformation("---ï¿½ï¿½ï¿½ï¿½---\r\n");
 
-            logger.LogInformation("-----È«²¿ÈÎÎñÒÑÖ´ÐÐ½áÊø-----\r\n");
+            logger.LogInformation("-----È«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö´ï¿½Ð½ï¿½ï¿½ï¿½-----\r\n");
 
-            logger.LogInformation("¿ªÊ¼ÍÆËÍ");
+            logger.LogInformation("ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½");
         }
 
         private ILogger CreateLogger()

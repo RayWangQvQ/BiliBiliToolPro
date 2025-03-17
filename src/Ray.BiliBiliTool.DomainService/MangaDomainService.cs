@@ -15,8 +15,8 @@ namespace Ray.BiliBiliTool.DomainService;
 public class MangaDomainService(
     ILogger<MangaDomainService> logger,
     IMangaApi mangaApi,
-    IOptionsMonitor<DailyTaskOptions> dailyTaskOptions)
-    : IMangaDomainService
+    IOptionsMonitor<DailyTaskOptions> dailyTaskOptions
+) : IMangaDomainService
 {
     private readonly DailyTaskOptions _dailyTaskOptions = dailyTaskOptions.CurrentValue;
 
@@ -55,8 +55,13 @@ public class MangaDomainService(
     /// </summary>
     public async Task MangaRead()
     {
-        if ( _dailyTaskOptions.CustomComicId <= 0 ) return;
-        BiliApiResponse response = await mangaApi.ReadManga(_dailyTaskOptions.DevicePlatform, _dailyTaskOptions.CustomComicId, _dailyTaskOptions.CustomEpId);
+        if (_dailyTaskOptions.CustomComicId <= 0)
+            return;
+        BiliApiResponse response = await mangaApi.ReadManga(
+            _dailyTaskOptions.DevicePlatform,
+            _dailyTaskOptions.CustomComicId,
+            _dailyTaskOptions.CustomEpId
+        );
 
         if (response.Code == 0)
         {
@@ -87,7 +92,10 @@ public class MangaDomainService(
         if (day != _dailyTaskOptions.DayOfReceiveVipPrivilege)
         {
             //一个月执行一次就行
-            logger.LogInformation("【目标日期】{target}号", _dailyTaskOptions.DayOfReceiveVipPrivilege);
+            logger.LogInformation(
+                "【目标日期】{target}号",
+                _dailyTaskOptions.DayOfReceiveVipPrivilege
+            );
             logger.LogInformation("【今天】{day}号", day);
             logger.LogInformation("跳过");
             return;

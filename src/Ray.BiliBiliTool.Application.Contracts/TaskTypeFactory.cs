@@ -1,9 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using Microsoft.Extensions.Logging;
 
 namespace Ray.BiliBiliTool.Application.Contracts;
 
@@ -17,7 +17,7 @@ public static class TaskTypeFactory
         typeof(ILiveFansMedalAppService),
         typeof(ILiveLotteryTaskAppService),
         typeof(IVipBigPointAppService),
-        typeof(IUnfollowBatchedTaskAppService)
+        typeof(IUnfollowBatchedTaskAppService),
     ];
 
     private static readonly List<TaskTypeItem> All = [];
@@ -26,13 +26,19 @@ public static class TaskTypeFactory
     {
         for (int i = 0; i < TypeList.Count; i++)
         {
-            All.Add(new TaskTypeItem(i + 1, TypeList[i].GetCustomAttribute<DescriptionAttribute>()?.Description, TypeList[i]));
+            All.Add(
+                new TaskTypeItem(
+                    i + 1,
+                    TypeList[i].GetCustomAttribute<DescriptionAttribute>()?.Description,
+                    TypeList[i]
+                )
+            );
         }
     }
 
     public static Type Get(string code)
     {
-        return All.First(x=>x.Code == code).Type;
+        return All.First(x => x.Code == code).Type;
     }
 
     public static void Show(ILogger logger)

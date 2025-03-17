@@ -18,7 +18,8 @@ public static class KeyValuePairExtensions
     public static KeyValuePair<TNewKey, TNewValue> New<TKey, TValue, TNewKey, TNewValue>(
         this KeyValuePair<TKey, TValue> oldKv,
         Func<TKey, TNewKey> key,
-        Func<TValue, TNewValue> value)
+        Func<TValue, TNewValue> value
+    )
     {
         return KeyValuePair.Create(key(oldKv.Key), value(oldKv.Value));
     }
@@ -34,7 +35,8 @@ public static class KeyValuePairExtensions
     /// <returns></returns>
     public static KeyValuePair<TNewKey, TValue> NewKey<TKey, TValue, TNewKey>(
         this KeyValuePair<TKey, TValue> oldKv,
-        Func<TKey, TNewKey> key)
+        Func<TKey, TNewKey> key
+    )
     {
         return KeyValuePairExtensions.New(oldKv, key, t => t);
     }
@@ -50,7 +52,8 @@ public static class KeyValuePairExtensions
     /// <returns></returns>
     public static KeyValuePair<TNewKey, TValue> NewKey<TKey, TValue, TNewKey>(
         this KeyValuePair<TKey, TValue> oldKv,
-        TNewKey key)
+        TNewKey key
+    )
     {
         return KeyValuePairExtensions.New(oldKv, t => key, t => t);
     }
@@ -66,7 +69,8 @@ public static class KeyValuePairExtensions
     /// <returns></returns>
     public static KeyValuePair<TKey, TNewValue> NewValue<TKey, TValue, TNewValue>(
         this KeyValuePair<TKey, TValue> oldKv,
-        Func<TValue, TNewValue> value)
+        Func<TValue, TNewValue> value
+    )
     {
         return KeyValuePairExtensions.New(oldKv, t => t, value);
     }
@@ -82,7 +86,8 @@ public static class KeyValuePairExtensions
     /// <returns></returns>
     public static KeyValuePair<TKey, TNewValue> NewValue<TKey, TValue, TNewValue>(
         this KeyValuePair<TKey, TValue> oldKv,
-        TNewValue value)
+        TNewValue value
+    )
     {
         return KeyValuePairExtensions.New(oldKv, t => t, t => value);
     }

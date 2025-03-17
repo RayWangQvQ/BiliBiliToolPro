@@ -13,10 +13,11 @@ public class LiveLotteryTaskAppService(
     ILiveDomainService liveDomainService,
     IOptionsMonitor<LiveLotteryTaskOptions> liveLotteryTaskOptions,
     ILogger<LiveLotteryTaskAppService> logger,
-    IAccountDomainService accountDomainService)
-    : AppService, ILiveLotteryTaskAppService
+    IAccountDomainService accountDomainService
+) : AppService, ILiveLotteryTaskAppService
 {
-    private readonly LiveLotteryTaskOptions _liveLotteryTaskOptions = liveLotteryTaskOptions.CurrentValue;
+    private readonly LiveLotteryTaskOptions _liveLotteryTaskOptions =
+        liveLotteryTaskOptions.CurrentValue;
 
     [TaskInterceptor("天选时刻抽奖", TaskLevel.One)]
     public override async Task DoTaskAsync(CancellationToken cancellationToken = default)

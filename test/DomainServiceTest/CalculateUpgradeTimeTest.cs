@@ -13,36 +13,34 @@ public class CalculateUpgradeTimeTest
     public void TestCalculateUpgradeTime()
     {
         using var scope = Global.ServiceProviderRoot.CreateScope();
-        var accountDomainService = scope.ServiceProvider.GetRequiredService<IAccountDomainService>();
-        int needDay = accountDomainService.CalculateUpgradeTime(new UserInfo()
-        {
-            Money = 7,
-            Level_info = new LevelInfo()
+        var accountDomainService =
+            scope.ServiceProvider.GetRequiredService<IAccountDomainService>();
+        int needDay = accountDomainService.CalculateUpgradeTime(
+            new UserInfo()
             {
-                Current_level = 5,
-                Current_exp = 100,
-                Next_exp = 200
+                Money = 7,
+                Level_info = new LevelInfo()
+                {
+                    Current_level = 5,
+                    Current_exp = 100,
+                    Next_exp = 200,
+                },
             }
-        });
-        int needDay2 = accountDomainService.CalculateUpgradeTime(new UserInfo()
-        {
-            Money = 7,
-            Level_info = new LevelInfo()
+        );
+        int needDay2 = accountDomainService.CalculateUpgradeTime(
+            new UserInfo()
             {
-                Current_level = 5,
-                Current_exp = 1000,
-                Next_exp = 2000
+                Money = 7,
+                Level_info = new LevelInfo()
+                {
+                    Current_level = 5,
+                    Current_exp = 1000,
+                    Next_exp = 2000,
+                },
             }
-        });
+        );
 
-        Assert.Equal(1,needDay);
-        Assert.Equal(37,needDay2);
-
+        Assert.Equal(1, needDay);
+        Assert.Equal(37, needDay2);
     }
 }
-
-
-
-
-
-

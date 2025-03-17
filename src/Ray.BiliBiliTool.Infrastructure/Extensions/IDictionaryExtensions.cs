@@ -19,7 +19,11 @@ public static class IDictionaryExtensions
         this IDictionary dictionary,
         Func<DictionaryEntry, TKey> keySetter,
         Func<DictionaryEntry, TValue> valueSetter,
-        Func<IEnumerable<KeyValuePair<TKey, TValue>>, IEnumerable<KeyValuePair<TKey, TValue>>> otherAction = null)
+        Func<
+            IEnumerable<KeyValuePair<TKey, TValue>>,
+            IEnumerable<KeyValuePair<TKey, TValue>>
+        > otherAction = null
+    )
     {
         if (dictionary == null)
         {
@@ -42,12 +46,17 @@ public static class IDictionaryExtensions
     /// <returns></returns>
     public static Dictionary<string, string> ToDictionary(
         this IDictionary dictionary,
-        Func<IEnumerable<KeyValuePair<string, string>>, IEnumerable<KeyValuePair<string, string>>> otherAction = null)
+        Func<
+            IEnumerable<KeyValuePair<string, string>>,
+            IEnumerable<KeyValuePair<string, string>>
+        > otherAction = null
+    )
     {
         return IDictionaryExtensions.ToDictionary(
             dictionary: dictionary,
             keySetter: k => k.Key as string,
             valueSetter: v => v.Value as string,
-            otherAction: otherAction);
+            otherAction: otherAction
+        );
     }
 }

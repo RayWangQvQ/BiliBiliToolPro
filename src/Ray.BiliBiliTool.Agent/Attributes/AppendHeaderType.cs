@@ -4,5 +4,5 @@ public enum AppendHeaderType
 {
     Add,
     AddIfNotExist,
-    AddOrReplace
+    AddOrReplace,
 }

@@ -37,10 +37,7 @@ public class ArticleApiTests
     {
         // Arrange
         var mid = 1585227649;
-        var req = new SearchArticlesByUpIdDto()
-        {
-            mid = mid,
-        };
+        var req = new SearchArticlesByUpIdDto() { mid = mid };
         await _wbiService.SetWridAsync(req);
 
         // Act
@@ -94,7 +91,7 @@ public class ArticleApiTests
     public async Task AddCoinForArticleAsync_CoinSelf_Fail()
     {
         // Arrange
-        var selfCvId = 34150576;//todo
+        var selfCvId = 34150576; //todo
         var req = new AddCoinForArticleRequest(selfCvId, long.Parse(_ck.UserId), _ck.BiliJct);
 
         // Act
@@ -109,17 +106,18 @@ public class ArticleApiTests
     public async Task AddCoinForArticleAsync_Normal_Success()
     {
         // Arrange
-        var cvId = 34049005;//todo
-        var upId = 25150765;//todo
+        var cvId = 34049005; //todo
+        var upId = 25150765; //todo
         var req = new AddCoinForArticleRequest(cvId, upId, _ck.BiliJct);
 
         // Act
         BiliBiliAgent.Dtos.BiliApiResponse re = await _api.AddCoinForArticleAsync(req);
 
         // Assert
-        re.Code.Should().BeOneOf(
-            0,// 成功
-            34005 // 超过投币上限啦~
+        re.Code.Should()
+            .BeOneOf(
+                0, // 成功
+                34005 // 超过投币上限啦~
             );
     }
 
@@ -137,13 +135,15 @@ public class ArticleApiTests
         var re = await _api.LikeAsync(cvid, _ck.BiliJct);
 
         // Assert
-        re.Code.Should().BeOneOf(new List<int>
-        {
-            0,
-            65006, //已赞过
-        });
+        re.Code.Should()
+            .BeOneOf(
+                new List<int>
+                {
+                    0,
+                    65006, //已赞过
+                }
+            );
     }
 
     #endregion
-
 }

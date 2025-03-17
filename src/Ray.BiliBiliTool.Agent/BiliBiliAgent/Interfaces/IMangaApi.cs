@@ -26,7 +26,9 @@ public interface IMangaApi : IBiliBiliApi
     /// </summary>
     /// <param name="platform"></param>
     /// <returns></returns>
-    [HttpPost("/twirp/bookshelf.v1.Bookshelf/AddHistory?platform={platform}&comic_id={comic_id}&ep_id={ep_id}")]
+    [HttpPost(
+        "/twirp/bookshelf.v1.Bookshelf/AddHistory?platform={platform}&comic_id={comic_id}&ep_id={ep_id}"
+    )]
     Task<BiliApiResponse> ReadManga(string platform, long comic_id, long ep_id);
 
     /// <summary>

@@ -19,9 +19,16 @@ public interface IChargeApi : IBiliBiliApi
     /// <param name="oid">充电来源代码(空间充电：充电对象用户UID;视频充电：稿件avID)</param>
     /// <param name="csrf"></param>
     /// <returns></returns>
-    [HttpPost("/x/ugcpay/trade/elec/pay/quick?elec_num={elec_num}&up_mid={up_mid}&otype=up&oid={oid}&csrf={csrf}")]
+    [HttpPost(
+        "/x/ugcpay/trade/elec/pay/quick?elec_num={elec_num}&up_mid={up_mid}&otype=up&oid={oid}&csrf={csrf}"
+    )]
     [Obsolete]
-    Task<BiliApiResponse<ChargeResponse>> Charge(int elec_num, string up_mid, string oid, string csrf);
+    Task<BiliApiResponse<ChargeResponse>> Charge(
+        int elec_num,
+        string up_mid,
+        string oid,
+        string csrf
+    );
 
     /// <summary>
     /// 充电V2
@@ -49,5 +56,7 @@ public interface IChargeApi : IBiliBiliApi
     [Header("Referer", "https://www.bilibili.com/")]
     [Header("Origin", "https://www.bilibili.com")]
     [HttpPost("/x/ugcpay/trade/elec/message")]
-    Task<BiliApiResponse<ChargeResponse>> ChargeCommentAsync([FormContent] ChargeCommentRequest request);
+    Task<BiliApiResponse<ChargeResponse>> ChargeCommentAsync(
+        [FormContent] ChargeCommentRequest request
+    );
 }

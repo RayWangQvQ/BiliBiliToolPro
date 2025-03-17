@@ -1,5 +1,6 @@
 ## 2.2.2
 - Code refactor
+- Integration Husky.Net and CSharpier
 ## 2.2.1
 - Fix[#847]: DefaultRequestHeaders can not be null or empty with dotnet 8
 - Fix[#849]: Temporary disable PublishTrimmed

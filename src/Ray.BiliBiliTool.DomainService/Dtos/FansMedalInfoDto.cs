@@ -4,7 +4,11 @@ namespace Ray.BiliBiliTool.DomainService.Dtos;
 
 public class FansMedalInfoDto
 {
-    public FansMedalInfoDto(long roomId, MedalWallDto medalInfo, GetLiveRoomInfoResponse liveRoomInfo)
+    public FansMedalInfoDto(
+        long roomId,
+        MedalWallDto medalInfo,
+        GetLiveRoomInfoResponse liveRoomInfo
+    )
     {
         RoomId = roomId;
         MedalInfo = medalInfo;

@@ -1,9 +1,9 @@
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Console;
 using Ray.BiliBiliTool.Infrastructure;
-using System.Threading.Tasks;
 using Ray.BiliBiliTool.Infrastructure.Cookie;
 using Xunit;
 
@@ -40,7 +40,6 @@ public class VideoApiTest
     [Fact]
     public async Task GetBangumiTest()
     {
-
         using var scope = Global.ServiceProviderRoot.CreateScope();
 
         var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory>();

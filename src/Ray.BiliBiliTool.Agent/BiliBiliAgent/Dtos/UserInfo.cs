@@ -11,7 +11,7 @@ public class UserInfo
     /// <summary>
     /// 用户Id
     /// </summary>
-    public long Mid { get; set; }//todo:这里登陆后可以获取到自己的UserId，后面可以考虑将配置Cookie项去除UserId的配置，改为登陆后获取
+    public long Mid { get; set; } //todo:这里登陆后可以获取到自己的UserId，后面可以考虑将配置Cookie项去除UserId的配置，改为登陆后获取
 
     /// <summary>
     /// 是否登录
@@ -48,8 +48,10 @@ public class UserInfo
         int s2 = (s1 + 1) / 2;
         for (int i = 0; i < Uname.Length; i++)
         {
-            if (i >= s2 && i < s1 + s2) sb.Append("x");
-            else sb.Append(Uname[i]);
+            if (i >= s2 && i < s1 + s2)
+                sb.Append("x");
+            else
+                sb.Append(Uname[i]);
         }
 
         return sb.ToString();
@@ -110,8 +112,12 @@ public class LevelInfo
         set
         {
             bool isLong = long.TryParse(value.ToString(), out long exp);
-            if (isLong) { _next_exp = exp; }
-            else _next_exp = long.MinValue;
+            if (isLong)
+            {
+                _next_exp = exp;
+            }
+            else
+                _next_exp = long.MinValue;
         }
     }
 
@@ -121,8 +127,10 @@ public class LevelInfo
     /// <returns></returns>
     public long GetNext_expLong()
     {
-        if (Current_level == 6) return long.MaxValue;
-        else return _next_exp;
+        if (Current_level == 6)
+            return long.MaxValue;
+        else
+            return _next_exp;
     }
 }
 

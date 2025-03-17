@@ -6,7 +6,9 @@ using Ray.BiliBiliTool.DomainService.Interfaces;
 
 namespace Ray.BiliBiliTool.Application;
 
-public class LiveFansMedalAppService(ILiveDomainService liveDomainService) : AppService, ILiveFansMedalAppService
+public class LiveFansMedalAppService(ILiveDomainService liveDomainService)
+    : AppService,
+        ILiveFansMedalAppService
 {
     [TaskInterceptor("直播间互动", TaskLevel.One)]
     public override async Task DoTaskAsync(CancellationToken cancellationToken = default)

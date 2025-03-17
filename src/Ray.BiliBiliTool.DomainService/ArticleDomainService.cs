@@ -21,11 +21,10 @@ public class ArticleDomainService(
     IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
     ICoinDomainService coinDomainService,
     IAccountApi accountApi,
-    IWbiService wbiService)
-    : IArticleDomainService
+    IWbiService wbiService
+) : IArticleDomainService
 {
     private readonly DailyTaskOptions _dailyTaskOptions = dailyTaskOptions.CurrentValue;
-
 
     /// <summary>
     /// up的专栏总数缓存
@@ -36,7 +35,6 @@ public class ArticleDomainService(
     /// 已对投币数量缓存
     /// </summary>
     private readonly Dictionary<string, int> _alreadyDonatedCoinCountCatch = new();
-
 
     public async Task LikeArticle(long cvid)
     {
@@ -57,7 +55,6 @@ public class ArticleDomainService(
             return true;
         }
 
-
         int success = 0;
         int tryCount = 10;
 
@@ -75,7 +72,7 @@ public class ArticleDomainService(
             var cvid = await GetRandomArticleFromUp(upId);
             if (cvid == 0)
             {
-                logger.LogDebug("第{num}次尝试，未能成功选择合适的专栏",i);
+                logger.LogDebug("第{num}次尝试，未能成功选择合适的专栏", i);
                 continue;
             }
 
@@ -100,12 +97,13 @@ public class ArticleDomainService(
             return false;
         }
 
-
-        logger.LogInformation("【硬币余额】{coin}", (await accountApi.GetCoinBalanceAsync()).Data.Money ?? 0);
+        logger.LogInformation(
+            "【硬币余额】{coin}",
+            (await accountApi.GetCoinBalanceAsync()).Data.Money ?? 0
+        );
 
         return true;
     }
-
 
     /// <summary>
     /// 给某一篇专栏投币
@@ -118,9 +116,12 @@ public class ArticleDomainService(
         BiliApiResponse result;
         try
         {
-            var refer = $"https://www.bilibili.com/read/cv{cvid}/?from=search&spm_id_from=333.337.0.0";
-            result = await articleApi.AddCoinForArticleAsync(new AddCoinForArticleRequest(cvid, mid, biliCookie.BiliJct),
-                refer);
+            var refer =
+                $"https://www.bilibili.com/read/cv{cvid}/?from=search&spm_id_from=333.337.0.0";
+            result = await articleApi.AddCoinForArticleAsync(
+                new AddCoinForArticleRequest(cvid, mid, biliCookie.BiliJct),
+                refer
+            );
         }
         catch (Exception)
         {
@@ -138,7 +139,6 @@ public class ArticleDomainService(
             return false;
         }
     }
-
 
     #region private
 
@@ -165,11 +165,13 @@ public class ArticleDomainService(
         {
             mid = mid,
             ps = 1,
-            pn = new Random().Next(1, articleCount + 1)
+            pn = new Random().Next(1, articleCount + 1),
         };
         await wbiService.SetWridAsync(req);
 
-        BiliApiResponse<SearchUpArticlesResponse> re = await articleApi.SearchUpArticlesByUpIdAsync(req);
+        BiliApiResponse<SearchUpArticlesResponse> re = await articleApi.SearchUpArticlesByUpIdAsync(
+            req
+        );
 
         if (re.Code != 0)
         {
@@ -189,7 +191,6 @@ public class ArticleDomainService(
         return articleInfo.Id;
     }
 
-
     // TODO 转变为异步代码
     /// <summary>
     /// 从支持UP主列表中随机挑选一位
@@ -197,17 +198,22 @@ public class ArticleDomainService(
     /// <returns>被挑选up主的mid</returns>
     private long GetUpFromConfigUps()
     {
-        if (_dailyTaskOptions.SupportUpIdList == null || _dailyTaskOptions.SupportUpIdList.Count == 0)
+        if (
+            _dailyTaskOptions.SupportUpIdList == null
+            || _dailyTaskOptions.SupportUpIdList.Count == 0
+        )
         {
             return 0;
         }
 
         try
         {
-            long randomUpId =
-                _dailyTaskOptions.SupportUpIdList[new Random().Next(0, _dailyTaskOptions.SupportUpIdList.Count)];
+            long randomUpId = _dailyTaskOptions.SupportUpIdList[
+                new Random().Next(0, _dailyTaskOptions.SupportUpIdList.Count)
+            ];
 
-            if (randomUpId is 0 or long.MinValue) return 0;
+            if (randomUpId is 0 or long.MinValue)
+                return 0;
 
             if (randomUpId.ToString() == biliCookie.UserId)
             {
@@ -234,14 +240,13 @@ public class ArticleDomainService(
     /// <exception cref="Exception"></exception>
     private async Task<int> GetArticleCountOfUp(long mid)
     {
-        var req = new SearchArticlesByUpIdDto()
-        {
-            mid = mid
-        };
+        var req = new SearchArticlesByUpIdDto() { mid = mid };
 
         await wbiService.SetWridAsync(req);
 
-        BiliApiResponse<SearchUpArticlesResponse> re = await articleApi.SearchUpArticlesByUpIdAsync(req);
+        BiliApiResponse<SearchUpArticlesResponse> re = await articleApi.SearchUpArticlesByUpIdAsync(
+            req
+        );
 
         if (re.Code != 0)
         {
@@ -260,12 +265,16 @@ public class ArticleDomainService(
         int needCoins = await GetNeedDonateCoinCounts();
 
         int protectedCoins = _dailyTaskOptions.NumberOfProtectedCoins;
-        if (needCoins <= 0) return 0;
+        if (needCoins <= 0)
+            return 0;
 
         //投币前硬币余额
         decimal coinBalance = await coinDomainService.GetCoinBalance();
         logger.LogInformation("【投币前余额】 : {coinBalance}", coinBalance);
-        _ = int.TryParse(decimal.Truncate(coinBalance - protectedCoins).ToString(), out int unprotectedCoins);
+        _ = int.TryParse(
+            decimal.Truncate(coinBalance - protectedCoins).ToString(),
+            out int unprotectedCoins
+        );
 
         if (coinBalance <= 0)
         {
@@ -294,7 +303,10 @@ public class ArticleDomainService(
             if (unprotectedCoins != needCoins)
             {
                 needCoins = unprotectedCoins;
-                logger.LogInformation("因硬币余额投币后将达到或低于保留值，目标投币数调整为: {needCoins}", needCoins);
+                logger.LogInformation(
+                    "因硬币余额投币后将达到或低于保留值，目标投币数调整为: {needCoins}",
+                    needCoins
+                );
                 return needCoins;
             }
         }
@@ -330,7 +342,6 @@ public class ArticleDomainService(
         logger.LogInformation("已完成投币任务，不需要再投啦~");
         return 0;
     }
-
 
     private async Task<bool> IsCanDonate(long cvid)
     {

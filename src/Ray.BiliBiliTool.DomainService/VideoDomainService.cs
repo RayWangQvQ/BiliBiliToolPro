@@ -79,13 +79,14 @@ public class VideoDomainService : IVideoDomainService
 
     public async Task<UpVideoInfo> GetRandomVideoOfUp(long upId, int total)
     {
-        if (total <= 0) return null;
+        if (total <= 0)
+            return null;
 
         var req = new SearchVideosByUpIdDto()
         {
             mid = upId,
             ps = 1,
-            pn= new Random().Next(1, total + 1)
+            pn = new Random().Next(1, total + 1),
         };
         await _wbiService.SetWridAsync(req);
 
@@ -106,10 +107,7 @@ public class VideoDomainService : IVideoDomainService
     /// <returns></returns>
     public async Task<int> GetVideoCountOfUp(long upId)
     {
-        var req = new SearchVideosByUpIdDto()
-        {
-            mid = upId
-        };
+        var req = new SearchVideosByUpIdDto() { mid = upId };
         await _wbiService.SetWridAsync(req);
 
         BiliApiResponse<SearchUpVideosResponse> re = await _videoApi.SearchVideosByUpId(req);
@@ -194,7 +192,11 @@ public class VideoDomainService : IVideoDomainService
         if (apiResponse.Code == 0)
         {
             _expDic.TryGetValue("每日观看视频", out int exp);
-            _logger.LogInformation("视频播放成功，已观看到第{playedTime}秒，经验+{exp} √", playedTime, exp);
+            _logger.LogInformation(
+                "视频播放成功，已观看到第{playedTime}秒，经验+{exp} √",
+                playedTime,
+                exp
+            );
         }
         else
         {
@@ -263,7 +265,8 @@ public class VideoDomainService : IVideoDomainService
     {
         //先从配置的或关注的up中取
         VideoInfoDto video = await GetRandomVideoOfFollowingUps();
-        if (video != null) return video;
+        if (video != null)
+            return video;
 
         //然后从排行榜中取
         RankingInfo t = await GetRandomVideoOfRanking();
@@ -285,7 +288,8 @@ public class VideoDomainService : IVideoDomainService
         if (configUpsCount > 0)
         {
             VideoInfoDto video = await GetRandomVideoOfUps(_dailyTaskOptions.SupportUpIdList);
-            if (video != null) return video;
+            if (video != null)
+                return video;
         }
 
         //关注列表
@@ -293,8 +297,11 @@ public class VideoDomainService : IVideoDomainService
         BiliApiResponse<GetFollowingsResponse> result = await _relationApi.GetFollowings(request);
         if (result.Data.Total > 0)
         {
-            VideoInfoDto video = await GetRandomVideoOfUps(result.Data.List.Select(x => x.Mid).ToList());
-            if (video != null) return video;
+            VideoInfoDto video = await GetRandomVideoOfUps(
+                result.Data.List.Select(x => x.Mid).ToList()
+            );
+            if (video != null)
+                return video;
         }
 
         return null;
@@ -309,14 +316,16 @@ public class VideoDomainService : IVideoDomainService
     {
         long upId = upIds[new Random().Next(0, upIds.Count)];
 
-        if (upId == 0 || upId == long.MinValue) return null;
+        if (upId == 0 || upId == long.MinValue)
+            return null;
 
         int count = await GetVideoCountOfUp(upId);
 
         if (count > 0)
         {
             UpVideoInfo video = await GetRandomVideoOfUp(upId, count);
-            if (video == null) return null;
+            if (video == null)
+                return null;
             return new VideoInfoDto
             {
                 Aid = video.Aid.ToString(),
@@ -324,7 +333,7 @@ public class VideoDomainService : IVideoDomainService
                 //Cid=,
                 //Copyright=
                 Title = video.Title,
-                Duration = video.Duration
+                Duration = video.Duration,
             };
         }
 

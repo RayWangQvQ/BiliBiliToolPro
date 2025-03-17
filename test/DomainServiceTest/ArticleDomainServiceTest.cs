@@ -5,6 +5,7 @@ namespace DomainServiceTest;
 public class ArticleDomainServiceTest
 {
     private readonly ITestOutputHelper _output;
+
     public ArticleDomainServiceTest(ITestOutputHelper output)
     {
         _output = output;
@@ -20,7 +21,6 @@ public class ArticleDomainServiceTest
         await domainService.LikeArticle(5806746);
     }
 
-
     [Fact]
     public async Task AddCoinForArticleTest()
     {
@@ -33,7 +33,6 @@ public class ArticleDomainServiceTest
         await domainService.AddCoinForArticle(5806746, 486980924);
     }
 
-
     [Fact]
     public async Task AddCoinForArticlesTest()
     {
@@ -42,6 +41,4 @@ public class ArticleDomainServiceTest
         var domainService = scope.ServiceProvider.GetRequiredService<IArticleDomainService>();
         await domainService.AddCoinForArticles();
     }
-
-
 }

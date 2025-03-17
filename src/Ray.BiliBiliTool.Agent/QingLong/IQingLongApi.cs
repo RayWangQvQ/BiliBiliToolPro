@@ -10,13 +10,22 @@ namespace Ray.BiliBiliTool.Agent.QingLong;
 public interface IQingLongApi
 {
     [HttpGet("/api/envs")]
-    Task<QingLongGenericResponse<List<QingLongEnv>>> GetEnvs(string searchValue, [Header("Authorization")] string token);
+    Task<QingLongGenericResponse<List<QingLongEnv>>> GetEnvs(
+        string searchValue,
+        [Header("Authorization")] string token
+    );
 
     [HttpPost("/api/envs")]
-    Task<QingLongGenericResponse<List<QingLongEnv>>> AddEnvs([JsonContent] List<AddQingLongEnv> envs, [Header("Authorization")] string token);
+    Task<QingLongGenericResponse<List<QingLongEnv>>> AddEnvs(
+        [JsonContent] List<AddQingLongEnv> envs,
+        [Header("Authorization")] string token
+    );
 
     [HttpPut("/api/envs")]
-    Task<QingLongGenericResponse<QingLongEnv>> UpdateEnvs([JsonContent] UpdateQingLongEnv env, [Header("Authorization")] string token);
+    Task<QingLongGenericResponse<QingLongEnv>> UpdateEnvs(
+        [JsonContent] UpdateQingLongEnv env,
+        [Header("Authorization")] string token
+    );
 }
 
 public class QingLongGenericResponse<T>
@@ -26,11 +35,11 @@ public class QingLongGenericResponse<T>
     public T Data { get; set; }
 }
 
-
 public class QingLongEnv : UpdateQingLongEnv
 {
     public string timestamp { get; set; }
     public int status { get; set; }
+
     //public long position { get; set; }
     public DateTime createdAt { get; set; }
     public DateTime updatedAt { get; set; }
