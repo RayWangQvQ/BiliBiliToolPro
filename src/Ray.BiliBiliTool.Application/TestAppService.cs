@@ -11,8 +11,8 @@ namespace Ray.BiliBiliTool.Application;
 public class TestAppService(
     IConfiguration configuration,
     ILogger<LiveLotteryTaskAppService> logger,
-    IAccountDomainService accountDomainService)
-    : AppService, ITestAppService
+    IAccountDomainService accountDomainService
+) : AppService, ITestAppService
 {
     [TaskInterceptor("测试Cookie")]
     public override async Task DoTaskAsync(CancellationToken cancellationToken = default)

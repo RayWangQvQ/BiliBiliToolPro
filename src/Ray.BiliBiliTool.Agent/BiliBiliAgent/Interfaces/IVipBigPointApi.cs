@@ -1,8 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Ray.BiliBiliTool.Agent.Attributes;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.VipTask;
-using System;
 using WebApiClientCore.Attributes;
 
 namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;

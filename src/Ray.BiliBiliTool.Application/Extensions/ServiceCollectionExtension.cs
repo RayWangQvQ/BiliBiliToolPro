@@ -7,11 +7,11 @@ public static class ServiceCollectionExtension
 {
     public static IServiceCollection AddAppServices(this IServiceCollection services)
     {
-        services.Scan(scan => scan
-            .FromAssemblyOf<DailyTaskAppService>()
-            .AddClasses(classes => classes.AssignableTo<IAppService>())
-            .AsImplementedInterfaces()
-            .WithTransientLifetime()
+        services.Scan(scan =>
+            scan.FromAssemblyOf<DailyTaskAppService>()
+                .AddClasses(classes => classes.AssignableTo<IAppService>())
+                .AsImplementedInterfaces()
+                .WithTransientLifetime()
         );
 
         return services;

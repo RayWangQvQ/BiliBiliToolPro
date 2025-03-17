@@ -5,5 +5,5 @@ public enum PlatformType
     Unknown,
     GitHubActions,
     Docker,
-    QingLong
+    QingLong,
 }

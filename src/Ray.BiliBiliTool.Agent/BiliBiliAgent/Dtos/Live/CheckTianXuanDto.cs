@@ -69,7 +69,8 @@ public class CheckTianXuanDto
         {
             foreach (var item in excludeKeys)
             {
-                if (this.Award_name.Contains(item)) return false;
+                if (this.Award_name.Contains(item))
+                    return false;
             }
         }
 
@@ -105,7 +106,7 @@ public enum TianXuanStatus
     /// <summary>
     /// 已结束
     /// </summary>
-    End = 2
+    End = 2,
 }
 
 /// <summary>
@@ -131,5 +132,5 @@ public enum RequireType
     /// <summary>
     /// 至少成为提督舰长等
     /// </summary>
-    TiDuOrJianZhang = 3
+    TiDuOrJianZhang = 3,
 }

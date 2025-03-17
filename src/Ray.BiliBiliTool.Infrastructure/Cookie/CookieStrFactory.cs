@@ -26,8 +26,10 @@ public class CookieStrFactory
 
     public bool Any()
     {
-        if (CurrentNum <= Count) return true;
-        else return false;
+        if (CurrentNum <= Count)
+            return true;
+        else
+            return false;
     }
 
     public Dictionary<string, string> GetCurrentCookieDic()
@@ -43,7 +45,8 @@ public class CookieStrFactory
 
     public string GetCurrentCookieStr()
     {
-        if (!Any()) throw new Exception($"第 {CurrentNum} 个cookie字符串不存在");
+        if (!Any())
+            throw new Exception($"第 {CurrentNum} 个cookie字符串不存在");
 
         var ckDic = _cookieDictionary[CurrentNum];
         return DictionaryToCkStr(ckDic);
@@ -122,5 +125,4 @@ public class CookieStrFactory
     }
 
     #endregion
-
 }

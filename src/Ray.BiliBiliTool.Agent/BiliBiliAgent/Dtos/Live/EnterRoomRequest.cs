@@ -13,7 +13,8 @@ public class EnterRoomRequest
         string userAgent,
         string csrf,
         long ruid,
-        string device)
+        string device
+    )
     {
         Id = JsonConvert.SerializeObject(new[] { parentId, areaID, seqNumber, roomId });
         Ts = timestamp;
@@ -26,6 +27,7 @@ public class EnterRoomRequest
         Visit_id = "";
         Device = device;
     }
+
     public string Id { get; set; }
 
     public long Ruid { get; set; }

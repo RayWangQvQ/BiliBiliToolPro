@@ -23,10 +23,11 @@ public class AccountDomainService(
     IUserInfoApi userInfoApi,
     IRelationApi relationApi,
     IOptionsMonitor<UnfollowBatchedTaskOptions> unfollowBatchedTaskOptions,
-    IOptionsMonitor<DailyTaskOptions> dailyTaskOptions)
-    : IAccountDomainService
+    IOptionsMonitor<DailyTaskOptions> dailyTaskOptions
+) : IAccountDomainService
 {
-    private readonly UnfollowBatchedTaskOptions _unfollowBatchedTaskOptions = unfollowBatchedTaskOptions.CurrentValue;
+    private readonly UnfollowBatchedTaskOptions _unfollowBatchedTaskOptions =
+        unfollowBatchedTaskOptions.CurrentValue;
     private readonly DailyTaskOptions _dailyTaskOptions = dailyTaskOptions.CurrentValue;
 
     /// <summary>
@@ -52,9 +53,11 @@ public class AccountDomainService(
 
         if (useInfo.Level_info.Current_level < 6)
         {
-            logger.LogInformation("【距升级Lv{0}】预计{1}天",
+            logger.LogInformation(
+                "【距升级Lv{0}】预计{1}天",
                 useInfo.Level_info.Current_level + 1,
-                CalculateUpgradeTime(useInfo));
+                CalculateUpgradeTime(useInfo)
+            );
         }
         else
         {
@@ -72,7 +75,8 @@ public class AccountDomainService(
     public async Task<DailyTaskInfo> GetDailyTaskStatus()
     {
         DailyTaskInfo result = new();
-        BiliApiResponse<DailyTaskInfo> apiResponse = await dailyTaskApi.GetDailyTaskRewardInfoAsync();
+        BiliApiResponse<DailyTaskInfo> apiResponse =
+            await dailyTaskApi.GetDailyTaskRewardInfoAsync();
         if (apiResponse.Code == 0)
         {
             logger.LogDebug("请求本日任务完成状态成功");
@@ -114,7 +118,8 @@ public class AccountDomainService(
             return;
         }
         int count = _unfollowBatchedTaskOptions.Count;
-        if (count == -1) count = total;
+        if (count == -1)
+            count = total;
 
         logger.LogInformation("【分组下共有】{count}人", total);
         logger.LogInformation("【目标取关】{count}人" + Environment.NewLine, count);
@@ -125,7 +130,7 @@ public class AccountDomainService(
         //从最后一页开始获取
         var req = new GetSpecialFollowingsRequest(long.Parse(cookie.UserId), tagId.Value)
         {
-            Pn = totalPage
+            Pn = totalPage,
         };
         List<UpInfo> followings = (await relationApi.GetFollowingsByTag(req)).Data;
         followings.Reverse();
@@ -145,7 +150,8 @@ public class AccountDomainService(
 
                 //获取前一页
                 pn -= 1;
-                if (pn <= 0) break;
+                if (pn <= 0)
+                    break;
                 req.Pn = pn;
                 followings = (await relationApi.GetFollowingsByTag(req)).Data;
                 followings.Reverse();
@@ -167,7 +173,11 @@ public class AccountDomainService(
                 continue;
             }
 
-            string modifyReferer = string.Format(RelationApiConstant.ModifyReferer, cookie.UserId, tagId);
+            string modifyReferer = string.Format(
+                RelationApiConstant.ModifyReferer,
+                cookie.UserId,
+                tagId
+            );
             var modifyReq = new ModifyRelationRequest(info.Mid, cookie.BiliJct);
             var re = await relationApi.ModifyRelation(modifyReq, modifyReferer);
 
@@ -210,12 +220,17 @@ public class AccountDomainService(
     /// <returns>升级时间</returns>
     public int CalculateUpgradeTime(UserInfo useInfo)
     {
-        double availableCoins = decimal.ToDouble(useInfo.Money ?? 0) - _dailyTaskOptions.NumberOfProtectedCoins;
+        double availableCoins =
+            decimal.ToDouble(useInfo.Money ?? 0) - _dailyTaskOptions.NumberOfProtectedCoins;
         long needExp = useInfo.Level_info.GetNext_expLong() - useInfo.Level_info.Current_exp;
         int needDay;
 
         if (availableCoins < 0)
-            needDay = (int)((double)needExp / 25 + _dailyTaskOptions.NumberOfProtectedCoins - Math.Abs(availableCoins));
+            needDay = (int)(
+                (double)needExp / 25
+                + _dailyTaskOptions.NumberOfProtectedCoins
+                - Math.Abs(availableCoins)
+            );
 
         switch (_dailyTaskOptions.NumberOfCoins)
         {
@@ -230,13 +245,14 @@ public class AccountDomainService(
                 double needFrontDay = availableCoins / (_dailyTaskOptions.NumberOfCoins - 1);
 
                 if ((double)needExp / dailyExpAvailable > needFrontDay)
-                    needDay = (int)(needFrontDay + (needExp - dailyExpAvailable * needFrontDay) / 25);
+                    needDay = (int)(
+                        needFrontDay + (needExp - dailyExpAvailable * needFrontDay) / 25
+                    );
                 else
-                    needDay= (int)(needExp / dailyExpAvailable );
+                    needDay = (int)(needExp / dailyExpAvailable);
                 break;
         }
 
         return needDay;
     }
-
 }

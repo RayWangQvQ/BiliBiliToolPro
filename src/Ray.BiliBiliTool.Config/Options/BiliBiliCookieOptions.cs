@@ -1,5 +1,4 @@
-﻿
-namespace Ray.BiliBiliTool.Config.Options;
+﻿namespace Ray.BiliBiliTool.Config.Options;
 
 /// <summary>
 /// Cookie信息

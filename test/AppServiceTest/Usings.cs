@@ -1,2 +1,2 @@
-global using Xunit;
 global using Ray.BiliBiliTool.Console;
+global using Xunit;

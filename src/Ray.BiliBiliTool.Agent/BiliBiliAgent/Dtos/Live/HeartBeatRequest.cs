@@ -1,6 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Utils;
-using System.Collections.Generic;
 
 namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live;
 
@@ -19,7 +19,8 @@ public class HeartBeatRequest
         string secretKey,
         string csrf,
         string uuid,
-        string device)
+        string device
+    )
     {
         Id = JsonConvert.SerializeObject(new[] { parentId, areaID, seqNumber, roomId });
         Ets = ets;

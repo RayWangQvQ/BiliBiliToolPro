@@ -15,11 +15,11 @@ public class WbiServiceTest
     public WbiServiceTest()
     {
         var envs = new List<string>
-            {
-                "--ENVIRONMENT=Development",
-                //"HTTP_PROXY=localhost:8888",
-                //"HTTPS_PROXY=localhost:8888"
-            };
+        {
+            "--ENVIRONMENT=Development",
+            //"HTTP_PROXY=localhost:8888",
+            //"HTTPS_PROXY=localhost:8888"
+        };
         IHost host = Program.CreateHost(envs.ToArray());
         _target = host.Services.GetRequiredService<IWbiService>();
     }
@@ -39,7 +39,7 @@ public class WbiServiceTest
             order = "pubdate",
             platform = "web",
             web_location = 1550101,
-            order_avoided = "true"
+            order_avoided = "true",
         };
 
         // Act
@@ -57,13 +57,13 @@ public class WbiServiceTest
         var wbiDto = new WbiImg()
         {
             img_url = "https://i0.hdslb.com/bfs/wbi/653657f524a547ac981ded72ea172057.png",
-            sub_url = "https://i0.hdslb.com/bfs/wbi/6e4909c702f846728e64f6007736a338.png"
+            sub_url = "https://i0.hdslb.com/bfs/wbi/6e4909c702f846728e64f6007736a338.png",
         };
         var dic = new Dictionary<string, object>()
         {
-            {"foo", "114"},
-            {"bar", "514"},
-            {"baz", "1919810"},
+            { "foo", "114" },
+            { "bar", "514" },
+            { "baz", "1919810" },
         };
         var timeSpan = 1684746387;
         var expectResult = "d3cbd2a2316089117134038bf4caf442";

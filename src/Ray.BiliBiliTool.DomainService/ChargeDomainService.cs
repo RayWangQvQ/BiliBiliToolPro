@@ -18,8 +18,8 @@ public class ChargeDomainService(
     IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
     IDailyTaskApi dailyTaskApi,
     BiliCookie cookie,
-    IChargeApi chargeApi)
-    : IChargeDomainService
+    IChargeApi chargeApi
+) : IChargeDomainService
 {
     private readonly DailyTaskOptions _dailyTaskOptions = dailyTaskOptions.CurrentValue;
     private readonly IDailyTaskApi _dailyTaskApi = dailyTaskApi;
@@ -44,9 +44,10 @@ public class ChargeDomainService(
             return;
         }
 
-        int targetDay = _dailyTaskOptions.DayOfAutoCharge == -1
-            ? DateTime.Today.LastDayOfMonth().Day
-            : _dailyTaskOptions.DayOfAutoCharge;
+        int targetDay =
+            _dailyTaskOptions.DayOfAutoCharge == -1
+                ? DateTime.Today.LastDayOfMonth().Day
+                : _dailyTaskOptions.DayOfAutoCharge;
 
         logger.LogInformation("【目标日期】{targetDay}号", targetDay);
         logger.LogInformation("【今天】{today}号", DateTime.Today.Day);
@@ -68,7 +69,10 @@ public class ChargeDomainService(
 
         string targetUpId = _dailyTaskOptions.AutoChargeUpId;
         //如果没有配置或配了-1，则为自己充电
-        if (_dailyTaskOptions.AutoChargeUpId.IsNullOrEmpty() | _dailyTaskOptions.AutoChargeUpId == "-1")
+        if (
+            _dailyTaskOptions.AutoChargeUpId.IsNullOrEmpty()
+            | _dailyTaskOptions.AutoChargeUpId == "-1"
+        )
             targetUpId = cookie.UserId;
 
         logger.LogDebug("【目标Up】{up}", targetUpId);

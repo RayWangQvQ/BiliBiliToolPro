@@ -10,7 +10,7 @@ public class LiveHeartBeatCrypto
     public static string Sypder(string text, ICollection<int> rules, string key)
     {
         string result = text;
-        foreach(var rule in rules)
+        foreach (var rule in rules)
         {
             switch (rule)
             {

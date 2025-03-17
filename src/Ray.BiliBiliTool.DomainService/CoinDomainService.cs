@@ -7,9 +7,8 @@ namespace Ray.BiliBiliTool.DomainService;
 /// <summary>
 /// 硬币
 /// </summary>
-public class CoinDomainService(
-    IAccountApi accountApi,
-    IDailyTaskApi dailyTaskApi) : ICoinDomainService
+public class CoinDomainService(IAccountApi accountApi, IDailyTaskApi dailyTaskApi)
+    : ICoinDomainService
 {
     /// <summary>
     /// 获取账户硬币余额

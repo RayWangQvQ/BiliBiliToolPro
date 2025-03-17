@@ -8,18 +8,25 @@ using WebApiClientCore.Attributes;
 namespace Ray.BiliBiliTool.Agent.Attributes;
 
 [DebuggerDisplay("{name} = {value}")]
-[AttributeUsage(AttributeTargets.Method | AttributeTargets.Interface | AttributeTargets.Parameter, AllowMultiple = true)]
+[AttributeUsage(
+    AttributeTargets.Method | AttributeTargets.Interface | AttributeTargets.Parameter,
+    AllowMultiple = true
+)]
 public class AppendHeaderAttribute(
     string name,
     string value,
-    AppendHeaderType appendHeaderType = AppendHeaderType.AddOrReplace)
-    : ApiActionAttribute, IApiParameterAttribute
+    AppendHeaderType appendHeaderType = AppendHeaderType.AddOrReplace
+) : ApiActionAttribute, IApiParameterAttribute
 {
     //添加的顺序为：子类、基类、子类函数、子类函数入参
 
     private readonly string _aliasName;
 
-    public AppendHeaderAttribute(string aliasName, AppendHeaderType appendHeaderType = AppendHeaderType.AddOrReplace) : this(null, null, appendHeaderType)
+    public AppendHeaderAttribute(
+        string aliasName,
+        AppendHeaderType appendHeaderType = AppendHeaderType.AddOrReplace
+    )
+        : this(null, null, appendHeaderType)
     {
         _aliasName = aliasName;
     }

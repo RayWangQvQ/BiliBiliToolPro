@@ -11,9 +11,7 @@ public class RandomHelper
         string str = string.Empty;
         long num2 = DateTime.Now.Ticks + this.rep;
         this.rep++;
-        Random random = new Random(
-            (int)((ulong)num2 & 0xffffffL) | (int)(num2 >> this.rep)
-        );
+        Random random = new Random((int)((ulong)num2 & 0xffffffL) | (int)(num2 >> this.rep));
         for (int i = 0; i < codeCount; i++)
         {
             char ch;

@@ -17,11 +17,12 @@ public class VipPrivilegeDomainService(
     IDailyTaskApi dailyTaskApi,
     BiliCookie biliBiliCookieOptions,
     IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
-    IOptionsMonitor<ReceiveVipPrivilegeOptions> receiveVipPrivilegeOptionsce)
-    : IVipPrivilegeDomainService
+    IOptionsMonitor<ReceiveVipPrivilegeOptions> receiveVipPrivilegeOptionsce
+) : IVipPrivilegeDomainService
 {
     private readonly DailyTaskOptions _dailyTaskOptions = dailyTaskOptions.CurrentValue;
-    private readonly ReceiveVipPrivilegeOptions _receiveVipPrivilegeOptionsce = receiveVipPrivilegeOptionsce.CurrentValue;
+    private readonly ReceiveVipPrivilegeOptions _receiveVipPrivilegeOptionsce =
+        receiveVipPrivilegeOptionsce.CurrentValue;
 
     /// <summary>
     /// 每月领取大会员福利（B币券、大会员权益）
@@ -62,7 +63,8 @@ public class VipPrivilegeDomainService(
         var suc1 = await ReceiveVipPrivilege(VipPrivilegeType.BCoinCoupon);
         var suc2 = await ReceiveVipPrivilege(VipPrivilegeType.MembershipBenefits);
 
-        if (suc1 | suc2) return true;
+        if (suc1 | suc2)
+            return true;
         return false;
     }
 
@@ -74,7 +76,10 @@ public class VipPrivilegeDomainService(
     /// <param name="type">1.大会员B币券；2.大会员福利</param>
     private async Task<bool> ReceiveVipPrivilege(VipPrivilegeType type)
     {
-        var response = await dailyTaskApi.ReceiveVipPrivilegeAsync((int)type, biliBiliCookieOptions.BiliJct);
+        var response = await dailyTaskApi.ReceiveVipPrivilegeAsync(
+            (int)type,
+            biliBiliCookieOptions.BiliJct
+        );
 
         var name = GetPrivilegeName(type);
         logger.LogInformation("【领取】{name}", name);

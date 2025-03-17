@@ -7,7 +7,8 @@ using Ray.BiliBiliTool.DomainService.Interfaces;
 namespace Ray.BiliBiliTool.Application;
 
 public class UnfollowBatchedTaskAppService(IAccountDomainService accountDomainService)
-    : AppService, IUnfollowBatchedTaskAppService
+    : AppService,
+        IUnfollowBatchedTaskAppService
 {
     [TaskInterceptor("批量取关", TaskLevel.One)]
     public override async Task DoTaskAsync(CancellationToken cancellationToken = default)

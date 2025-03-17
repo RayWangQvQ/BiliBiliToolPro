@@ -4,7 +4,7 @@ public class ReceiveOrCompleteTaskRequest
 {
     public ReceiveOrCompleteTaskRequest(string taskCode)
     {
-        TaskCode=taskCode;
+        TaskCode = taskCode;
     }
 
     public string TaskCode { get; set; }

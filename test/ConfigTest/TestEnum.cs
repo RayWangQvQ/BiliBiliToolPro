@@ -1,17 +1,17 @@
 using System;
-using System.Text.Json;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Text.Json;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Config;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.Console;
-using Xunit;
 using Ray.BiliBiliTool.Infrastructure;
-using Microsoft.Extensions.Hosting;
-using System.Collections.Generic;
-using Microsoft.Extensions.Configuration;
 using Ray.BiliBiliTool.Infrastructure.Enums;
+using Xunit;
 
 namespace ConfigTest
 {

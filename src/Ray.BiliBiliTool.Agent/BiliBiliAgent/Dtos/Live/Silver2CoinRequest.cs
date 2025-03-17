@@ -1,5 +1,5 @@
-﻿using Ray.BiliBiliTool.Infrastructure.Helpers;
-using System;
+﻿using System;
+using Ray.BiliBiliTool.Infrastructure.Helpers;
 
 namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live;
 
@@ -22,7 +22,7 @@ public class Silver2CoinRequest
     /// <sample>9zys612vo0c0</sample>
     /// <sample>3uu2mkxt21c0</sample>
     /// <sample>8orqn5vf4i00</sample>
-    public string Visit_id { get; set; } = _visitId;//todo
+    public string Visit_id { get; set; } = _visitId; //todo
 
     public static string GetRandomVisitId()
     {

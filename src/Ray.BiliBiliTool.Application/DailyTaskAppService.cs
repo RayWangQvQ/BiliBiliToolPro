@@ -30,11 +30,13 @@ public class DailyTaskAppService(
     ICoinDomainService coinDomainService,
     ILoginDomainService loginDomainService,
     IConfiguration configuration,
-    BiliCookie biliCookie)
-    : AppService, IDailyTaskAppService
+    BiliCookie biliCookie
+) : AppService, IDailyTaskAppService
 {
     private readonly DailyTaskOptions _dailyTaskOptions = dailyTaskOptions.CurrentValue;
-    private readonly Dictionary<string, int> _expDic = dicOptions.Get(Config.Constants.OptionsNames.ExpDictionaryName);
+    private readonly Dictionary<string, int> _expDic = dicOptions.Get(
+        Config.Constants.OptionsNames.ExpDictionaryName
+    );
 
     [TaskInterceptor("每日任务", TaskLevel.One)]
     public override async Task DoTaskAsync(CancellationToken cancellationToken = default)
@@ -60,7 +62,6 @@ public class DailyTaskAppService(
 
         await Charge(userInfo);
     }
-
 
     [TaskInterceptor("Set Cookie")]
     private async Task SetCookiesAsync(CancellationToken cancellationToken)
@@ -89,7 +90,8 @@ public class DailyTaskAppService(
     private async Task<UserInfo> Login()
     {
         UserInfo userInfo = await accountDomainService.LoginByCookie();
-        if (userInfo == null) throw new Exception("登录失败，请检查Cookie"); //终止流程
+        if (userInfo == null)
+            throw new Exception("登录失败，请检查Cookie"); //终止流程
 
         _expDic.TryGetValue("每日登录", out int exp);
         logger.LogInformation("登录成功，经验+{exp} √", exp);
@@ -157,7 +159,8 @@ public class DailyTaskAppService(
     private async Task ExchangeSilver2Coin()
     {
         var success = await liveDomainService.ExchangeSilver2Coin();
-        if (!success) return;
+        if (!success)
+            return;
 
         //如果兑换成功，则打印硬币余额
         var coinBalance = coinDomainService.GetCoinBalance();

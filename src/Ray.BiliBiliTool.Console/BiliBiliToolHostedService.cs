@@ -22,14 +22,16 @@ public class BiliBiliToolHostedService(
     IConfiguration configuration,
     ILogger<BiliBiliToolHostedService> logger,
     CookieStrFactory cookieStrFactory,
-    IOptionsMonitor<SecurityOptions> securityOptions)
-    : IHostedService
+    IOptionsMonitor<SecurityOptions> securityOptions
+) : IHostedService
 {
     private readonly SecurityOptions _securityOptions = securityOptions.CurrentValue;
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        bool isNotifySingle = configuration.GetSection("Notification:IsSingleAccountSingleNotify").Get<bool>();
+        bool isNotifySingle = configuration
+            .GetSection("Notification:IsSingleAccountSingleNotify")
+            .Get<bool>();
 
         try
         {
@@ -53,7 +55,11 @@ public class BiliBiliToolHostedService(
                 for (int i = 0; i < cookieStrFactory.Count; i++)
                 {
                     cookieStrFactory.CurrentNum = i + 1;
-                    logger.LogInformation("######### 账号 {num} #########{newLine}", cookieStrFactory.CurrentNum, Environment.NewLine);
+                    logger.LogInformation(
+                        "######### 账号 {num} #########{newLine}",
+                        cookieStrFactory.CurrentNum,
+                        Environment.NewLine
+                    );
 
                     try
                     {
@@ -62,8 +68,15 @@ public class BiliBiliToolHostedService(
                         {
                             LogAppInfo();
 
-                            string accountName = cookieStrFactory.Count > 1 ? $"账号【{cookieStrFactory.CurrentNum}】" : "";
-                            logger.LogInformation("·开始推送·{task}·{user}", $"{configuration["RunTasks"]}任务", accountName);
+                            string accountName =
+                                cookieStrFactory.Count > 1
+                                    ? $"账号【{cookieStrFactory.CurrentNum}】"
+                                    : "";
+                            logger.LogInformation(
+                                "·开始推送·{task}·{user}",
+                                $"{configuration["RunTasks"]}任务",
+                                accountName
+                            );
                         }
                     }
                     catch (Exception e)
@@ -84,11 +97,19 @@ public class BiliBiliToolHostedService(
             if (!isNotifySingle)
             {
                 LogAppInfo();
-                logger.LogInformation("·开始推送·{task}·{user}", $"{configuration["RunTasks"]}任务", "");
+                logger.LogInformation(
+                    "·开始推送·{task}·{user}",
+                    $"{configuration["RunTasks"]}任务",
+                    ""
+                );
             }
             //环境
             logger.LogInformation("运行环境：{env}", environment.EnvironmentName);
-            logger.LogInformation("应用目录：{path}{newLine}", environment.ContentRootPath, Environment.NewLine);
+            logger.LogInformation(
+                "应用目录：{path}{newLine}",
+                environment.ContentRootPath,
+                Environment.NewLine
+            );
             logger.LogInformation("运行结束");
 
             //自动退出
@@ -104,7 +125,11 @@ public class BiliBiliToolHostedService(
     private Task<bool> PreCheckAsync(CancellationToken cancellationToken)
     {
         //Cookie
-        logger.LogInformation("【账号个数】{count}个{newLine}", cookieStrFactory.Count, Environment.NewLine);
+        logger.LogInformation(
+            "【账号个数】{count}个{newLine}",
+            cookieStrFactory.Count,
+            Environment.NewLine
+        );
 
         //是否跳过
         if (_securityOptions.IsSkipDailyTask)
@@ -118,7 +143,10 @@ public class BiliBiliToolHostedService(
 
     private async Task RandomSleepAsync(CancellationToken cancellationToken)
     {
-        if (configuration["RunTasks"].Contains("Login") || configuration["RunTasks"].Contains("Test"))
+        if (
+            configuration["RunTasks"].Contains("Login")
+            || configuration["RunTasks"].Contains("Test")
+        )
             return;
 
         if (_securityOptions.RandomSleepMaxMin > 0)
@@ -185,7 +213,9 @@ public class BiliBiliToolHostedService(
             "{newLine}========================{newLine} v{version} 开源 by {url}",
             Environment.NewLine + Environment.NewLine,
             Environment.NewLine + Environment.NewLine,
-            typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion,
+            typeof(Program)
+                .Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+                ?.InformationalVersion,
             Constants.SourceCodeUrl + Environment.NewLine
         );
         //_logger.LogInformation("【当前IP】{ip} ", IpHelper.GetIp());

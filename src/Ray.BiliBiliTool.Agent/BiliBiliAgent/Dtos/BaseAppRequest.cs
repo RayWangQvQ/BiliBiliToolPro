@@ -21,7 +21,8 @@ public class BaseAppRequest
 
     public string s_locale { get; } = "zh_CN";
 
-    public string statistics { get; } = "{\"appId\":1,\"platform\":3,\"version\":\"7.72.0\",\"abtest\":\"\"}";
+    public string statistics { get; } =
+        "{\"appId\":1,\"platform\":3,\"version\":\"7.72.0\",\"abtest\":\"\"}";
 
     // public long ts { get; set; }
 

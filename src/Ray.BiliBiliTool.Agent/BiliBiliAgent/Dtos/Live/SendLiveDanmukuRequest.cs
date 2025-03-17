@@ -5,14 +5,15 @@ public class SendLiveDanmukuRequest
     public SendLiveDanmukuRequest(string csrf, long room_id, string message)
     {
         this.Csrf = csrf;
-        this.Msg= message;
-        this.Roomid= room_id;
+        this.Msg = message;
+        this.Roomid = room_id;
         this.Bubble = "0";
         this.Mode = "1";
         this.Fontsize = "25";
         this.Rnd = "1672305761";
         this.Color = "16777215";
     }
+
     public string Bubble { get; set; }
 
     public string Msg { get; set; }

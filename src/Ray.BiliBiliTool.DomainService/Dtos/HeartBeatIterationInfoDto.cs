@@ -9,7 +9,8 @@ public class HeartBeatIterationInfoDto
         GetLiveRoomInfoResponse roomInfo,
         HeartBeatResponse heartBeatInfo,
         int heartBeatCount,
-        long lastBeatTime)
+        long lastBeatTime
+    )
     {
         RoomId = roomId;
         RoomInfo = roomInfo;

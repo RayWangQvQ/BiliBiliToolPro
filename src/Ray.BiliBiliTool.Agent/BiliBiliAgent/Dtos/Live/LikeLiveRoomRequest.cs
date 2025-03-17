@@ -23,10 +23,8 @@ public class LikeLiveRoomRequest
 
     public string Uid { get; set; }
 
-
     public string RawTextBuild()
     {
-        return
-            $"click_time={Click_Time.ToString()}&room_id={Roomid.ToString()}&uid={Uid}&anchor_id={Anchor_Id}&csrf_token={Csrf_Token}&csrf={Csrf}";
+        return $"click_time={Click_Time.ToString()}&room_id={Roomid.ToString()}&uid={Uid}&anchor_id={Anchor_Id}&csrf_token={Csrf_Token}&csrf={Csrf}";
     }
 }

@@ -31,10 +31,7 @@ public class VipMallApiTests
     public async Task ViewVipMallAsync_Normal_Success()
     {
         // Arrange
-        var req = new ViewVipMallRequest()
-        {
-            Csrf = _ck.BiliJct
-        };
+        var req = new ViewVipMallRequest() { Csrf = _ck.BiliJct };
 
         // Act
         BiliApiResponse re = await _api.ViewVipMallAsync(req);

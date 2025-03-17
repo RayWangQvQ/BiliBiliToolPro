@@ -8,7 +8,7 @@ public class HeartBeatResponse
 
     public string Secret_key { get; set; }
 
-    public List<int> Secret_rule { get; set;}
+    public List<int> Secret_rule { get; set; }
 
     public long Timestamp { get; set; }
 }

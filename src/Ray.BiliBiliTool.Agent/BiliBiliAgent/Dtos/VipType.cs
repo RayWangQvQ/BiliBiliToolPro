@@ -11,5 +11,5 @@ public enum VipType
     Mensual = 1,
 
     [Description("年度大会员")]
-    Annual = 2
+    Annual = 2,
 }

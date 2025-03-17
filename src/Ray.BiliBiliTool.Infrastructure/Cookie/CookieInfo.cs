@@ -19,16 +19,25 @@ public class CookieInfo
 
     public virtual void Check()
     {
-        if (string.IsNullOrWhiteSpace(CookieStr)) throw new Exception("Cookie字符串为空");
+        if (string.IsNullOrWhiteSpace(CookieStr))
+            throw new Exception("Cookie字符串为空");
     }
 
-    public virtual string CkNameBuild(string name) { return name; }
+    public virtual string CkNameBuild(string name)
+    {
+        return name;
+    }
 
-    public virtual string CkValueBuild(string value) { return value; }
+    public virtual string CkValueBuild(string value)
+    {
+        return value;
+    }
 
     public override string ToString()
     {
-        var list = CookieItemDictionary.Select(d => $"{CkNameBuild(d.Key)}={CkValueBuild(d.Value)}");
+        var list = CookieItemDictionary.Select(d =>
+            $"{CkNameBuild(d.Key)}={CkValueBuild(d.Value)}"
+        );
         return string.Join("; ", list);
     }
 
@@ -104,12 +113,15 @@ public class CookieInfo
     /// </summary>
     /// <param name="ckItemList"></param>
     /// <returns></returns>
-    public static Dictionary<string, string> ConvertCkItemListToCkDic(IEnumerable<string> ckItemList)
+    public static Dictionary<string, string> ConvertCkItemListToCkDic(
+        IEnumerable<string> ckItemList
+    )
     {
-        return ckItemList.ToDictionary(k => k[..k.IndexOf("=", StringComparison.Ordinal)].Trim(),
-            v => v[(v.IndexOf("=", StringComparison.Ordinal) + 1)..].Trim().TrimEnd(';'));
+        return ckItemList.ToDictionary(
+            k => k[..k.IndexOf("=", StringComparison.Ordinal)].Trim(),
+            v => v[(v.IndexOf("=", StringComparison.Ordinal) + 1)..].Trim().TrimEnd(';')
+        );
     }
 
     #endregion
-
 }

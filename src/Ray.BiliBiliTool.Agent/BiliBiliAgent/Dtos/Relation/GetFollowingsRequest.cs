@@ -1,5 +1,5 @@
-﻿using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
-using System;
+﻿using System;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 
 namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Relation;
 

@@ -7,11 +7,11 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddDomainServices(this IServiceCollection services)
     {
-        services.Scan(scan => scan
-            .FromAssemblyOf<IAccountDomainService>()
-            .AddClasses(classes => classes.AssignableTo<IDomainService>())
-            .AsImplementedInterfaces()
-            .WithTransientLifetime()
+        services.Scan(scan =>
+            scan.FromAssemblyOf<IAccountDomainService>()
+                .AddClasses(classes => classes.AssignableTo<IDomainService>())
+                .AsImplementedInterfaces()
+                .WithTransientLifetime()
         );
 
         return services;

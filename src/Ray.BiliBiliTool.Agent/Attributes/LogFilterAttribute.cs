@@ -12,8 +12,10 @@ public class LogFilterAttribute(bool logError = true) : LoggingFilterAttribute
 {
     protected override Task WriteLogAsync(ApiResponseContext context, LogMessage logMessage)
     {
-        ILoggerFactory loggerFactory = context.HttpContext.ServiceProvider.GetService<ILoggerFactory>();
-        if (loggerFactory == null) return Task.CompletedTask;
+        ILoggerFactory loggerFactory =
+            context.HttpContext.ServiceProvider.GetService<ILoggerFactory>();
+        if (loggerFactory == null)
+            return Task.CompletedTask;
 
         MethodInfo member = context.ApiAction.Member;
         var strArray = new string[5];
@@ -29,7 +31,7 @@ public class LogFilterAttribute(bool logError = true) : LoggingFilterAttribute
 
         if (logMessage.Exception == null)
         {
-            logger.LogDebug(logMessage.ToString());//修改为Debug等级
+            logger.LogDebug(logMessage.ToString()); //修改为Debug等级
         }
         else
         {

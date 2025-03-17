@@ -13,8 +13,7 @@ public sealed class JsonSerializerOptionsBuilder
 {
     static JsonSerializerOptionsBuilder()
     {
-        DefaultOptions = JsonSerializerOptionsBuilder.Create()
-            .GetOrBuildDefaultOptions();
+        DefaultOptions = JsonSerializerOptionsBuilder.Create().GetOrBuildDefaultOptions();
     }
 
     /// <summary>
@@ -36,7 +35,7 @@ public sealed class JsonSerializerOptionsBuilder
 
     public JsonSerializerOptions Build()
     {
-        JsonSerializerOptions options = new();//这里没有使用 JsonSerializerDefaults.General 避免后续版本更新后设置改变
+        JsonSerializerOptions options = new(); //这里没有使用 JsonSerializerDefaults.General 避免后续版本更新后设置改变
 
         foreach (Action<JsonSerializerOptions> item in BuildActionList)
         {
@@ -55,11 +54,13 @@ public sealed class JsonSerializerOptionsBuilder
          * 详情可参考issue： https://github.com/dotnet/runtime/issues/31094
          */
 
-        JsonSerializerOptions jsonSerializerOptions = (JsonSerializerOptions)typeof(JsonSerializerOptions)
-            .GetField(
-                "s_defaultOptions",
-                System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic)
-            .GetValue(null);
+        JsonSerializerOptions jsonSerializerOptions = (JsonSerializerOptions)
+            typeof(JsonSerializerOptions)
+                .GetField(
+                    "s_defaultOptions",
+                    System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic
+                )
+                .GetValue(null);
 
         jsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
         jsonSerializerOptions.Encoder = JavaScriptEncoder.Create(UnicodeRanges.All);

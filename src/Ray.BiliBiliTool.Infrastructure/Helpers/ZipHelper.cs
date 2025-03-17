@@ -22,7 +22,12 @@ public class ZipHelper
         {
             using (GZipStream decompressedStream = new GZipStream(ms, CompressionMode.Decompress))
             {
-                using (StreamReader sr = new StreamReader(decompressedStream, Encoding.GetEncoding(encoding)))
+                using (
+                    StreamReader sr = new StreamReader(
+                        decompressedStream,
+                        Encoding.GetEncoding(encoding)
+                    )
+                )
                 {
                     result = sr.ReadToEnd();
                 }
