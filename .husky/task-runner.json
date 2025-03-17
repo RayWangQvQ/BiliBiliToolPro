@@ -1,0 +1,27 @@
+{
+   "$schema": "https://alirezanet.github.io/Husky.Net/schema.json",
+   "tasks": [
+      {
+         "name": "welcome-message-example",
+         "command": "bash",
+         "args": [ "-c", "echo Husky.Net is awesome!" ],
+         "windows": {
+            "command": "cmd",
+            "args": ["/c", "echo Husky.Net is awesome!" ]
+         }
+      },
+      {
+         "name": "csharpier-install",
+         "group": "pre-commit",
+         "command": "dotnet",
+         "args": [ "tool", "install", "csharpier" ]
+      },
+      {
+         "name": "csharpier-fotmat",
+         "group": "pre-commit",
+         "command": "dotnet",
+         "args": [ "csharpier", "${all-files}" ],
+         "include": [ "**/*.cs" ]
+      }
+   ]
+}
