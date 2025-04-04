@@ -264,7 +264,7 @@ dotnet Ray.BiliBiliTool.Console.dll --runTasks=Daily&LiveLottery
 
 <p align="center">
     <a href="https://yxvm.com/aff.php?aff=668">
-        <img src="https://yxvm.com/assets/img/logo.png" alt="NodeSeekDev logo" width="200">
+        <img src="https://yxvm.com/assets/img/logo.png" alt="YxVm logo" width="200">
     </a>
 </p>
 
