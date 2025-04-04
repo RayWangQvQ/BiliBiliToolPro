@@ -1,8 +1,7 @@
-﻿namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos
+﻿namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
+
+public enum VipPrivilegeType
 {
-    public enum VipPrivilegeType
-    {
-        BCoinCoupon = 1,
-        MembershipBenefits = 2
-    }
+    BCoinCoupon = 1,
+    MembershipBenefits = 2,
 }

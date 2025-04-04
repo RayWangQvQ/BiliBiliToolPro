@@ -1,28 +1,27 @@
 ﻿using System.Threading.Tasks;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 
-namespace Ray.BiliBiliTool.DomainService.Interfaces
+namespace Ray.BiliBiliTool.DomainService.Interfaces;
+
+/// <summary>
+/// 漫画
+/// </summary>
+public interface IMangaDomainService : IDomainService
 {
     /// <summary>
-    /// 漫画
+    /// 签到
     /// </summary>
-    public interface IMangaDomainService : IDomainService
-    {
-        /// <summary>
-        /// 签到
-        /// </summary>
-        Task MangaSign();
+    Task MangaSign();
 
-        /// <summary>
-        /// 阅读
-        /// </summary>
-        Task MangaRead();
+    /// <summary>
+    /// 阅读
+    /// </summary>
+    Task MangaRead();
 
-        /// <summary>
-        /// 获取大会员权益
-        /// </summary>
-        /// <param name="reason_id"></param>
-        /// <param name="userIfo"></param>
-        Task ReceiveMangaVipReward(int reason_id, UserInfo userIfo);
-    }
+    /// <summary>
+    /// 获取大会员权益
+    /// </summary>
+    /// <param name="reason_id"></param>
+    /// <param name="userIfo"></param>
+    Task ReceiveMangaVipReward(int reason_id, UserInfo userIfo);
 }

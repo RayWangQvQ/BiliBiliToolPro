@@ -11,7 +11,6 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 /// 直播相关接口
 /// </summary>
 [Header("Host", "api.live.bilibili.com")]
-
 public interface ILiveApi : IBiliBiliApi
 {
     /// <summary>
@@ -53,7 +52,9 @@ public interface ILiveApi : IBiliBiliApi
     [Header("Content-Type", "application/x-www-form-urlencoded")]
     [Header("Origin", "https://link.bilibili.com")]
     [HttpPost("/xlive/revenue/v1/wallet/silver2coin")]
-    Task<BiliApiResponse<Silver2CoinResponse>> Silver2Coin([FormContent] Silver2CoinRequest request);
+    Task<BiliApiResponse<Silver2CoinResponse>> Silver2Coin(
+        [FormContent] Silver2CoinRequest request
+    );
 
     /// <summary>
     /// 获取直播中心钱包状态
@@ -77,8 +78,16 @@ public interface ILiveApi : IBiliBiliApi
     /// <returns></returns>
     [Header("Referer", "https://live.bilibili.com/")]
     [Header("Origin", "https://live.bilibili.com")]
-    [HttpGet("/xlive/web-interface/v1/second/getList?platform=web&parent_area_id={parentAreaId}&area_id={areaId}&sort_type={sortType}&page={page}")]
-    Task<BiliApiResponse<GetListResponse>> GetList(long parentAreaId, int page, int areaId = 0, string sortType = "");
+    [HttpGet(
+        "/xlive/web-interface/v1/second/getList?platform=web&parent_area_id={parentAreaId}&area_id={areaId}&sort_type={sortType}&page={page}"
+    )]
+    Task<BiliApiResponse<GetListResponse>> GetList(
+        long parentAreaId,
+        int page,
+        int areaId = 0,
+        string sortType = ""
+    );
+
     //todo:Cookie比nav接口多了两项：Hm_lvt_8a6e55dbd2870f0f5bc9194cddf32a02、Hm_lvt_9e2a88dc69e0e55c353597501d2a4bbc
 
     /// <summary>

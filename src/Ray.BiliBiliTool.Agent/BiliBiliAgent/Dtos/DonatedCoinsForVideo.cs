@@ -1,7 +1,6 @@
-﻿namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos
+﻿namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
+
+public class DonatedCoinsForVideo
 {
-    public class DonatedCoinsForVideo
-    {
-        public int Multiply { get; set; }
-    }
+    public int Multiply { get; set; }
 }

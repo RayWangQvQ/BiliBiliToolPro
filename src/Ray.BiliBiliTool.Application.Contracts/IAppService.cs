@@ -1,13 +1,9 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace Ray.BiliBiliTool.Application.Contracts
+namespace Ray.BiliBiliTool.Application.Contracts;
+
+public interface IAppService
 {
-    /// <summary>
-    /// 定义一个AppService
-    /// </summary>
-    public interface IAppService
-    {
-        Task DoTaskAsync(CancellationToken cancellationToken);
-    }
+    Task DoTaskAsync(CancellationToken cancellationToken);
 }

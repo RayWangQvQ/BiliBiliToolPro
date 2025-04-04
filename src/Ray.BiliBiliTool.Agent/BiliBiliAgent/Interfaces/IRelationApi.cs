@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Ray.BiliBiliTool.Agent.Attributes;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
@@ -42,7 +39,9 @@ public interface IRelationApi : IBiliBiliApi
     [AppendHeader("Sec-Fetch-Mode", "no-cors")]
     [AppendHeader("Sec-Fetch-Dest", "script")]
     [HttpGet("/x/relation/tags?jsonp=jsonp")]
-    Task<BiliApiResponse<List<TagDto>>> GetTags([AppendHeader("Referer")] string referer = RelationApiConstant.GetTagsReferer);
+    Task<BiliApiResponse<List<TagDto>>> GetTags(
+        [AppendHeader("Referer")] string referer = RelationApiConstant.GetTagsReferer
+    );
 
     /// <summary>
     /// 添加关注分组（tag）
@@ -51,8 +50,10 @@ public interface IRelationApi : IBiliBiliApi
     /// <returns></returns>
     [AppendHeader("Origin", "https://space.bilibili.com")]
     [HttpPost("/x/relation/tag/create?cross_domain=true")]
-    Task<BiliApiResponse<CreateTagResponse>> CreateTag([FormContent] CreateTagRequest request,
-        [AppendHeader("Referer")] string referer = RelationApiConstant.GetTagsReferer);
+    Task<BiliApiResponse<CreateTagResponse>> CreateTag(
+        [FormContent] CreateTagRequest request,
+        [AppendHeader("Referer")] string referer = RelationApiConstant.GetTagsReferer
+    );
 
     /// <summary>
     /// 批量拷贝关注up到某指定分组
@@ -61,8 +62,10 @@ public interface IRelationApi : IBiliBiliApi
     /// <returns></returns>
     [AppendHeader("Origin", "https://space.bilibili.com")]
     [HttpPost("/x/relation/tags/copyUsers")]
-    Task<BiliApiResponse> CopyUpsToGroup([FormContent] CopyUserToGroupRequest request,
-        [AppendHeader("Referer")] string referer = RelationApiConstant.CopyReferer);
+    Task<BiliApiResponse> CopyUpsToGroup(
+        [FormContent] CopyUserToGroupRequest request,
+        [AppendHeader("Referer")] string referer = RelationApiConstant.CopyReferer
+    );
 
     /// <summary>
     /// 修改关系
@@ -70,8 +73,10 @@ public interface IRelationApi : IBiliBiliApi
     /// <returns></returns>
     [AppendHeader("Origin", "https://space.bilibili.com")]
     [HttpPost("/x/relation/modify")]
-    Task<BiliApiResponse> ModifyRelation([FormContent] ModifyRelationRequest request,
-        [AppendHeader("Referer")] string referer = RelationApiConstant.ModifyReferer);
+    Task<BiliApiResponse> ModifyRelation(
+        [FormContent] ModifyRelationRequest request,
+        [AppendHeader("Referer")] string referer = RelationApiConstant.ModifyReferer
+    );
 }
 
 public enum FollowingsOrderType
@@ -86,7 +91,7 @@ public enum FollowingsOrderType
     /// 关注时间倒序
     /// </summary>
     [DefaultValue("")]
-    TimeDesc
+    TimeDesc,
 }
 
 public class RelationApiConstant

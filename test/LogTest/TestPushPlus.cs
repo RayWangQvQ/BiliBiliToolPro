@@ -31,10 +31,7 @@ namespace LogTest
         [Fact]
         public void Test2()
         {
-            var client = new PushPlusApiClient(
-                _token,
-                channel: _channel,
-                webhook: _webhook);
+            var client = new PushPlusApiClient(_token, channel: _channel, webhook: _webhook);
 
             var msg = LogConstants.Msg2;
 

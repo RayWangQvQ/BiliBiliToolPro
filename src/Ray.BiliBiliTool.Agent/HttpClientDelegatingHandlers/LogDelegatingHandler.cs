@@ -3,34 +3,36 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
-namespace Ray.BiliBiliTool.Agent.HttpClientDelegatingHandlers
+namespace Ray.BiliBiliTool.Agent.HttpClientDelegatingHandlers;
+
+public class LogDelegatingHandler : DelegatingHandler
 {
-    public class LogDelegatingHandler : DelegatingHandler
+    private readonly ILogger<LogDelegatingHandler> _logger;
+
+    public LogDelegatingHandler(ILogger<LogDelegatingHandler> logger)
     {
-        private readonly ILogger<LogDelegatingHandler> _logger;
+        _logger = logger;
+    }
 
-        public LogDelegatingHandler(ILogger<LogDelegatingHandler> logger)
+    protected override async Task<HttpResponseMessage> SendAsync(
+        HttpRequestMessage request,
+        CancellationToken cancellationToken
+    )
+    {
+        //记录请求内容
+        _logger.LogDebug("发起请求：[{method}] {uri}", request.Method, request.RequestUri);
+
+        if (request.Content != null)
         {
-            _logger = logger;
+            var requestContent = await request.Content.ReadAsStringAsync(cancellationToken);
+            _logger.LogDebug("请求Content： {content}", requestContent);
         }
 
-        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
-        {
-            //记录请求内容
-            _logger.LogDebug("发起请求：[{method}] {uri}", request.Method, request.RequestUri);
+        HttpResponseMessage response = await base.SendAsync(request, cancellationToken);
 
-            if (request.Content != null)
-            {
-                var requestContent = await request.Content.ReadAsStringAsync(cancellationToken);
-                _logger.LogDebug("请求Content： {content}", requestContent);
-            }
+        var content = await response.Content.ReadAsStringAsync(cancellationToken);
+        _logger.LogDebug("返回Content：{content}", content);
 
-            HttpResponseMessage response = await base.SendAsync(request, cancellationToken);
-
-            var content = await response.Content.ReadAsStringAsync(cancellationToken);
-            _logger.LogDebug("返回Content：{content}", content);
-
-            return response;
-        }
+        return response;
     }
 }

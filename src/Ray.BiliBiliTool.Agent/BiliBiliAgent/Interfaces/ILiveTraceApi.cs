@@ -1,7 +1,6 @@
-﻿using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
+﻿using System.Threading.Tasks;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live;
-using Ray.BiliBiliTool.Config.Options;
-using System.Threading.Tasks;
 using WebApiClientCore.Attributes;
 
 namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
@@ -9,7 +8,6 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 [Header("Host", "live-trace.bilibili.com")]
 public interface ILiveTraceApi : IBiliBiliApi
 {
-
     [HttpGet("/xlive/rdata-interface/v1/heartbeat/webHeartBeat?hb={request}&pf=web")]
     Task<BiliApiResponse<WebHeartBeatResponse>> WebHeartBeat(WebHeartBeatRequest request);
 

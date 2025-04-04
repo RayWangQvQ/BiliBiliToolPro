@@ -15,7 +15,6 @@ public class VouchersInfoResponse
     public int Format060102 { get; set; }
 }
 
-
 public class List
 {
     public int Type { get; set; }
@@ -25,4 +24,3 @@ public class List
     public int NextReceiveDays { get; set; }
     public int PeriodEndUnix { get; set; }
 }
-

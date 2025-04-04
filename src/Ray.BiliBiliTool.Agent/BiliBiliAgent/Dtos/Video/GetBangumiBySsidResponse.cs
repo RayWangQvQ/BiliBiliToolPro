@@ -1,7 +1,4 @@
-﻿using static System.Collections.Specialized.BitVector32;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Xml.Linq;
+﻿using System.Collections.Generic;
 
 namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Video;
 
@@ -18,7 +15,6 @@ public class Result
 {
     public List<Episode> episodes { get; set; }
 }
-
 
 public class Episode
 {
@@ -39,7 +35,4 @@ public class Episode
     public string share_copy { get; set; }
 
     public int status { get; set; }
-
-
-
 }

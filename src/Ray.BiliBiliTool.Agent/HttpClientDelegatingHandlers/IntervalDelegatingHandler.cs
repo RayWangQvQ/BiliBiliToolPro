@@ -15,10 +15,11 @@ namespace Ray.BiliBiliTool.Agent.HttpClientDelegatingHandlers
     {
         private readonly SecurityOptions _securityOptions;
 
-        private readonly Dictionary<string, int> _special = new Dictionary<string, int>() {
-            {"/xlive/lottery-interface/v1/Anchor/Join",3 },//天选抽奖，有时效，不能间隔过久，使用默认3秒
-            {"/xlive/data-interface/v1/x25Kn/E", 1},
-            {"/xlive/data-interface/v1/x25Kn/X", 1},
+        private readonly Dictionary<string, int> _special = new Dictionary<string, int>()
+        {
+            { "/xlive/lottery-interface/v1/Anchor/Join", 3 }, //天选抽奖，有时效，不能间隔过久，使用默认3秒
+            { "/xlive/data-interface/v1/x25Kn/E", 1 },
+            { "/xlive/data-interface/v1/x25Kn/X", 1 },
         };
 
         public IntervalDelegatingHandler(IOptionsMonitor<SecurityOptions> securityOptions)
@@ -26,7 +27,10 @@ namespace Ray.BiliBiliTool.Agent.HttpClientDelegatingHandlers
             _securityOptions = securityOptions.CurrentValue;
         }
 
-        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        protected override async Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request,
+            CancellationToken cancellationToken
+        )
         {
             IntervalForSecurity(request);
             return await base.SendAsync(request, cancellationToken);
@@ -38,8 +42,10 @@ namespace Ray.BiliBiliTool.Agent.HttpClientDelegatingHandlers
         /// <param name="method"></param>
         private void IntervalForSecurity(HttpRequestMessage request)
         {
-            if (_securityOptions.IntervalSecondsBetweenRequestApi <= 0) return;
-            if (!_securityOptions.GetIntervalMethods().Contains(request.Method)) return;
+            if (_securityOptions.IntervalSecondsBetweenRequestApi <= 0)
+                return;
+            if (!_securityOptions.GetIntervalMethods().Contains(request.Method))
+                return;
 
             int seconds = 0;
             //需要特殊处理的接口

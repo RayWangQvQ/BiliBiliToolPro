@@ -1,6 +1,6 @@
 namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.VipTask;
 
-public class StartOgvWatchRequest: BaseAppRequest
+public class StartOgvWatchRequest : BaseAppRequest
 {
     public long ep_id { get; } = 328482;
 

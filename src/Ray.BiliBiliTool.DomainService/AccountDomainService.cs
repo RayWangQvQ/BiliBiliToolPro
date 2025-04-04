@@ -8,252 +8,251 @@ using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Relation;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
-using Ray.BiliBiliTool.Config;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 
-namespace Ray.BiliBiliTool.DomainService
+namespace Ray.BiliBiliTool.DomainService;
+
+/// <summary>
+/// 账户
+/// </summary>
+public class AccountDomainService(
+    ILogger<AccountDomainService> logger,
+    IDailyTaskApi dailyTaskApi,
+    BiliCookie cookie,
+    IUserInfoApi userInfoApi,
+    IRelationApi relationApi,
+    IOptionsMonitor<UnfollowBatchedTaskOptions> unfollowBatchedTaskOptions,
+    IOptionsMonitor<DailyTaskOptions> dailyTaskOptions
+) : IAccountDomainService
 {
+    private readonly UnfollowBatchedTaskOptions _unfollowBatchedTaskOptions =
+        unfollowBatchedTaskOptions.CurrentValue;
+    private readonly DailyTaskOptions _dailyTaskOptions = dailyTaskOptions.CurrentValue;
+
     /// <summary>
-    /// 账户
+    /// 登录
     /// </summary>
-    public class AccountDomainService : IAccountDomainService
+    /// <returns></returns>
+    public async Task<UserInfo> LoginByCookie()
     {
-        private readonly ILogger<AccountDomainService> _logger;
-        private readonly IDailyTaskApi _dailyTaskApi;
-        private readonly IUserInfoApi _userInfoApi;
-        private readonly IRelationApi _relationApi;
-        private readonly UnfollowBatchedTaskOptions _unfollowBatchedTaskOptions;
-        private readonly BiliCookie _cookie;
-        private readonly DailyTaskOptions _dailyTaskOptions;
+        BiliApiResponse<UserInfo> apiResponse = await userInfoApi.LoginByCookie();
 
-        public AccountDomainService(
-            ILogger<AccountDomainService> logger,
-            IDailyTaskApi dailyTaskApi,
-            BiliCookie cookie,
-            IUserInfoApi userInfoApi,
-            IRelationApi relationApi,
-            IOptionsMonitor<UnfollowBatchedTaskOptions> unfollowBatchedTaskOptions,
-            IOptionsMonitor<DailyTaskOptions> dailyTaskOptions)
+        if (apiResponse.Code != 0 || !apiResponse.Data.IsLogin)
         {
-            _logger = logger;
-            _dailyTaskApi = dailyTaskApi;
-            _cookie = cookie;
-            _userInfoApi = userInfoApi;
-            _relationApi = relationApi;
-            _dailyTaskOptions = dailyTaskOptions.CurrentValue;
-            _unfollowBatchedTaskOptions = unfollowBatchedTaskOptions.CurrentValue;
+            logger.LogWarning("登录异常，请检查Cookie是否错误或过期");
+            return null;
         }
 
-        /// <summary>
-        /// 登录
-        /// </summary>
-        /// <returns></returns>
-        public async Task<UserInfo> LoginByCookie()
-        {
-            BiliApiResponse<UserInfo> apiResponse = await _userInfoApi.LoginByCookie();
+        UserInfo useInfo = apiResponse.Data;
 
-            if (apiResponse.Code != 0 || !apiResponse.Data.IsLogin)
+        logger.LogInformation("【用户名】{0}", useInfo.GetFuzzyUname());
+        logger.LogInformation("【会员类型】{0}", useInfo.VipType.Description());
+        logger.LogInformation("【会员状态】{0}", useInfo.VipStatus.Description());
+        logger.LogInformation("【硬币余额】{0}", useInfo.Money ?? 0);
+
+        if (useInfo.Level_info.Current_level < 6)
+        {
+            logger.LogInformation(
+                "【距升级Lv{0}】预计{1}天",
+                useInfo.Level_info.Current_level + 1,
+                CalculateUpgradeTime(useInfo)
+            );
+        }
+        else
+        {
+            logger.LogInformation("【当前经验】{0}", useInfo.Level_info.Current_exp);
+            logger.LogInformation("您已是 Lv6 的大佬了，无敌是多么寂寞~");
+        }
+
+        return useInfo;
+    }
+
+    /// <summary>
+    /// 获取每日任务完成情况
+    /// </summary>
+    /// <returns></returns>
+    public async Task<DailyTaskInfo> GetDailyTaskStatus()
+    {
+        DailyTaskInfo result = new();
+        BiliApiResponse<DailyTaskInfo> apiResponse =
+            await dailyTaskApi.GetDailyTaskRewardInfoAsync();
+        if (apiResponse.Code == 0)
+        {
+            logger.LogDebug("请求本日任务完成状态成功");
+            result = apiResponse.Data;
+        }
+        else
+        {
+            logger.LogWarning("获取今日任务完成状态失败：{result}", apiResponse.ToJsonStr());
+            result = (await dailyTaskApi.GetDailyTaskRewardInfoAsync()).Data;
+            //todo:偶发性请求失败，再请求一次，这么写很丑陋，待用polly再框架层面实现
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// 取关
+    /// </summary>
+    /// <param name="groupName"></param>
+    /// <param name="count"></param>
+    public async Task UnfollowBatched()
+    {
+        logger.LogInformation("【分组名】{group}", _unfollowBatchedTaskOptions.GroupName);
+
+        //根据分组名称获取tag
+        TagDto tag = await GetTag(_unfollowBatchedTaskOptions.GroupName);
+        var tagId = tag?.Tagid;
+        int total = tag?.Count ?? 0;
+
+        if (!tagId.HasValue)
+        {
+            logger.LogWarning("分组名称不存在");
+            return;
+        }
+
+        if (total == 0)
+        {
+            logger.LogWarning("分组下不存在up");
+            return;
+        }
+        int count = _unfollowBatchedTaskOptions.Count;
+        if (count == -1)
+            count = total;
+
+        logger.LogInformation("【分组下共有】{count}人", total);
+        logger.LogInformation("【目标取关】{count}人" + Environment.NewLine, count);
+
+        //计算共几页
+        int totalPage = (int)Math.Ceiling(total / (double)20);
+
+        //从最后一页开始获取
+        var req = new GetSpecialFollowingsRequest(long.Parse(cookie.UserId), tagId.Value)
+        {
+            Pn = totalPage,
+        };
+        List<UpInfo> followings = (await relationApi.GetFollowingsByTag(req)).Data;
+        followings.Reverse();
+
+        var targetList = new List<UpInfo>();
+
+        if (count <= followings.Count)
+        {
+            targetList = followings.Take(count).ToList();
+        }
+        else
+        {
+            int pn = totalPage;
+            while (targetList.Count < count)
             {
-                _logger.LogWarning("登录异常，请检查Cookie是否错误或过期");
-                return null;
+                targetList.AddRange(followings);
+
+                //获取前一页
+                pn -= 1;
+                if (pn <= 0)
+                    break;
+                req.Pn = pn;
+                followings = (await relationApi.GetFollowingsByTag(req)).Data;
+                followings.Reverse();
+            }
+        }
+
+        logger.LogInformation("开始取关..." + Environment.NewLine);
+        int success = 0;
+        for (int i = 1; i <= targetList.Count && i <= count; i++)
+        {
+            UpInfo info = targetList[i - 1];
+
+            logger.LogInformation("【序号】{num}", i);
+            logger.LogInformation("【UP】{up}", info.Uname);
+
+            if (_unfollowBatchedTaskOptions.RetainUidList.Contains(info.Mid.ToString()))
+            {
+                logger.LogInformation("【取关结果】白名单，跳过" + Environment.NewLine);
+                continue;
             }
 
-            UserInfo useInfo = apiResponse.Data;
+            string modifyReferer = string.Format(
+                RelationApiConstant.ModifyReferer,
+                cookie.UserId,
+                tagId
+            );
+            var modifyReq = new ModifyRelationRequest(info.Mid, cookie.BiliJct);
+            var re = await relationApi.ModifyRelation(modifyReq, modifyReferer);
 
-            _logger.LogInformation("【用户名】{0}", useInfo.GetFuzzyUname());
-            _logger.LogInformation("【会员类型】{0}", useInfo.VipType.Description());
-            _logger.LogInformation("【会员状态】{0}", useInfo.VipStatus.Description());
-            _logger.LogInformation("【硬币余额】{0}", useInfo.Money ?? 0);
-
-            if (useInfo.Level_info.Current_level < 6)
+            if (re.Code == 0)
             {
-                _logger.LogInformation("【距升级Lv{0}】预计{1}天",
-                    useInfo.Level_info.Current_level + 1,
-                    CalculateUpgradeTime(useInfo));
+                logger.LogInformation("【取关结果】成功" + Environment.NewLine);
+                success++;
             }
             else
             {
-                _logger.LogInformation("【当前经验】{0}", useInfo.Level_info.Current_exp);
-                _logger.LogInformation("您已是 Lv6 的大佬了，无敌是多么寂寞~");
+                logger.LogInformation("【取关结果】失败");
+                logger.LogInformation("【原因】{msg}" + Environment.NewLine, re.Message);
             }
-
-            return useInfo;
         }
 
-        /// <summary>
-        /// 获取每日任务完成情况
-        /// </summary>
-        /// <returns></returns>
-        public async Task<DailyTaskInfo> GetDailyTaskStatus()
+        logger.LogInformation("【本次共取关】{count}人", success);
+
+        //计算剩余
+        tag = await GetTag(_unfollowBatchedTaskOptions.GroupName);
+        logger.LogInformation("【分组下剩余】{count}人", tag?.Count ?? 0);
+    }
+
+    /// <summary>
+    /// 获取分组（标签）
+    /// </summary>
+    /// <param name="groupName"></param>
+    /// <returns></returns>
+    private async Task<TagDto> GetTag(string groupName)
+    {
+        string getTagsReferer = string.Format(RelationApiConstant.GetTagsReferer, cookie.UserId);
+        List<TagDto> tagList = (await relationApi.GetTags(getTagsReferer)).Data;
+        TagDto tag = tagList.FirstOrDefault(x => x.Name == groupName);
+        return tag;
+    }
+
+    /// <summary>
+    /// 计算升级时间
+    /// </summary>
+    /// <param name="useInfo"></param>
+    /// <returns>升级时间</returns>
+    public int CalculateUpgradeTime(UserInfo useInfo)
+    {
+        double availableCoins =
+            decimal.ToDouble(useInfo.Money ?? 0) - _dailyTaskOptions.NumberOfProtectedCoins;
+        long needExp = useInfo.Level_info.GetNext_expLong() - useInfo.Level_info.Current_exp;
+        int needDay;
+
+        if (availableCoins < 0)
+            needDay = (int)(
+                (double)needExp / 25
+                + _dailyTaskOptions.NumberOfProtectedCoins
+                - Math.Abs(availableCoins)
+            );
+
+        switch (_dailyTaskOptions.NumberOfCoins)
         {
-            DailyTaskInfo result = new();
-            BiliApiResponse<DailyTaskInfo> apiResponse = await _dailyTaskApi.GetDailyTaskRewardInfoAsync();
-            if (apiResponse.Code == 0)
-            {
-                _logger.LogDebug("请求本日任务完成状态成功");
-                result = apiResponse.Data;
-            }
-            else
-            {
-                _logger.LogWarning("获取今日任务完成状态失败：{result}", apiResponse.ToJsonStr());
-                result = (await _dailyTaskApi.GetDailyTaskRewardInfoAsync()).Data;
-                //todo:偶发性请求失败，再请求一次，这么写很丑陋，待用polly再框架层面实现
-            }
+            case 0:
+                needDay = (int)(needExp / 15);
+                break;
+            case 1:
+                needDay = (int)(needExp / 25);
+                break;
+            default:
+                int dailyExpAvailable = 15 + _dailyTaskOptions.NumberOfCoins * 10;
+                double needFrontDay = availableCoins / (_dailyTaskOptions.NumberOfCoins - 1);
 
-            return result;
-        }
-
-        /// <summary>
-        /// 取关
-        /// </summary>
-        /// <param name="groupName"></param>
-        /// <param name="count"></param>
-        public async Task UnfollowBatched()
-        {
-            _logger.LogInformation("【分组名】{group}", _unfollowBatchedTaskOptions.GroupName);
-
-            //根据分组名称获取tag
-            TagDto tag = await GetTag(_unfollowBatchedTaskOptions.GroupName);
-            var tagId = tag?.Tagid;
-            int total = tag?.Count ?? 0;
-
-            if (!tagId.HasValue)
-            {
-                _logger.LogWarning("分组名称不存在");
-                return;
-            }
-
-            if (total == 0)
-            {
-                _logger.LogWarning("分组下不存在up");
-                return;
-            }
-            int count = _unfollowBatchedTaskOptions.Count;
-            if (count == -1) count = total;
-
-            _logger.LogInformation("【分组下共有】{count}人", total);
-            _logger.LogInformation("【目标取关】{count}人" + Environment.NewLine, count);
-
-            //计算共几页
-            int totalPage = (int)Math.Ceiling(total / (double)20);
-
-            //从最后一页开始获取
-            var req = new GetSpecialFollowingsRequest(long.Parse(_cookie.UserId), tagId.Value)
-            {
-                Pn = totalPage
-            };
-            List<UpInfo> followings = (await _relationApi.GetFollowingsByTag(req)).Data;
-            followings.Reverse();
-
-            var targetList = new List<UpInfo>();
-
-            if (count <= followings.Count)
-            {
-                targetList = followings.Take(count).ToList();
-            }
-            else
-            {
-                int pn = totalPage;
-                while (targetList.Count < count)
-                {
-                    targetList.AddRange(followings);
-
-                    //获取前一页
-                    pn -= 1;
-                    if (pn <= 0) break;
-                    req.Pn = pn;
-                    followings = (await _relationApi.GetFollowingsByTag(req)).Data;
-                    followings.Reverse();
-                }
-            }
-
-            _logger.LogInformation("开始取关..." + Environment.NewLine);
-            int success = 0;
-            for (int i = 1; i <= targetList.Count && i <= count; i++)
-            {
-                UpInfo info = targetList[i - 1];
-
-                _logger.LogInformation("【序号】{num}", i);
-                _logger.LogInformation("【UP】{up}", info.Uname);
-
-                if (_unfollowBatchedTaskOptions.RetainUidList.Contains(info.Mid.ToString()))
-                {
-                    _logger.LogInformation("【取关结果】白名单，跳过" + Environment.NewLine);
-                    continue;
-                }
-
-                string modifyReferer = string.Format(RelationApiConstant.ModifyReferer, _cookie.UserId, tagId);
-                var modifyReq = new ModifyRelationRequest(info.Mid, _cookie.BiliJct);
-                var re = await _relationApi.ModifyRelation(modifyReq, modifyReferer);
-
-                if (re.Code == 0)
-                {
-                    _logger.LogInformation("【取关结果】成功" + Environment.NewLine);
-                    success++;
-                }
+                if ((double)needExp / dailyExpAvailable > needFrontDay)
+                    needDay = (int)(
+                        needFrontDay + (needExp - dailyExpAvailable * needFrontDay) / 25
+                    );
                 else
-                {
-                    _logger.LogInformation("【取关结果】失败");
-                    _logger.LogInformation("【原因】{msg}" + Environment.NewLine, re.Message);
-                }
-            }
-
-            _logger.LogInformation("【本次共取关】{count}人", success);
-
-            //计算剩余
-            tag = await GetTag(_unfollowBatchedTaskOptions.GroupName);
-            _logger.LogInformation("【分组下剩余】{count}人", tag?.Count ?? 0);
+                    needDay = (int)(needExp / dailyExpAvailable);
+                break;
         }
 
-        /// <summary>
-        /// 获取分组（标签）
-        /// </summary>
-        /// <param name="groupName"></param>
-        /// <returns></returns>
-        private async Task<TagDto> GetTag(string groupName)
-        {
-            string getTagsReferer = string.Format(RelationApiConstant.GetTagsReferer, _cookie.UserId);
-            List<TagDto> tagList = (await _relationApi.GetTags(getTagsReferer)).Data;
-            TagDto tag = tagList.FirstOrDefault(x => x.Name == groupName);
-            return tag;
-        }
-
-        /// <summary>
-        /// 计算升级时间
-        /// </summary>
-        /// <param name="useInfo"></param>
-        /// <returns>升级时间</returns>
-        public int CalculateUpgradeTime(UserInfo useInfo)
-        {
-            double availableCoins = decimal.ToDouble(useInfo.Money ?? 0) - _dailyTaskOptions.NumberOfProtectedCoins;
-            long needExp = useInfo.Level_info.GetNext_expLong() - useInfo.Level_info.Current_exp;
-            int needDay;
-
-            if (availableCoins < 0)
-                needDay = (int)((double)needExp / 25 + _dailyTaskOptions.NumberOfProtectedCoins - Math.Abs(availableCoins));
-
-            switch (_dailyTaskOptions.NumberOfCoins)
-            {
-                case 0:
-                    needDay = (int)(needExp / 15);
-                    break;
-                case 1:
-                    needDay = (int)(needExp / 25);
-                    break;
-                default:
-                    int dailyExpAvailable = 15 + _dailyTaskOptions.NumberOfCoins * 10;
-                    double needFrontDay = availableCoins / (_dailyTaskOptions.NumberOfCoins - 1);
-
-                    if ((double)needExp / dailyExpAvailable > needFrontDay)
-                        needDay = (int)(needFrontDay + (needExp - dailyExpAvailable * needFrontDay) / 25);
-                    else
-                        needDay= (int)(needExp / dailyExpAvailable );
-                    break;
-            }
-
-            return needDay;
-        }
-
+        return needDay;
     }
 }

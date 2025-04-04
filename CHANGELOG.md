@@ -1,13 +1,16 @@
+## 2.2.2
+- Code refactor
+- Integration Husky.Net and CSharpier
 ## 2.2.1
--Fix[#847]: DefaultRequestHeaders can not be null or empty with dotnet 8
--Fix[#849]: Temporary disable PublishTrimmed
+- Fix[#847]: DefaultRequestHeaders can not be null or empty with dotnet 8
+- Fix[#849]: Temporary disable PublishTrimmed
 ## 2.2.0
 - Migrate from dotnet 6.0 to dotnet 8.0
 - Add Bruno to document the APIs
 - Fix[#824]: Log cookie when qinglong save env failed
 - Fix[#648]: Set DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1 in qinglong to ignore random "Couldn't find a valid ICU package" issue
 ## 2.1.3
-- Code refactory
+- Code refactor
 - Fix[#791]：修复VipBigPoint任务异常导致终止的问题
 ## 2.1.2
 - Feature: enhancement CICD scripts

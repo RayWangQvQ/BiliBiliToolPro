@@ -1,4 +1,3 @@
-
 namespace DomainServiceTest
 {
     public class DonateCoinDomainServiceTest
@@ -13,7 +12,8 @@ namespace DomainServiceTest
         {
             using var scope = Global.ServiceProviderRoot.CreateScope();
             var config = Global.ConfigurationRoot;
-            var domainService = scope.ServiceProvider.GetRequiredService<IDonateCoinDomainService>();
+            var domainService =
+                scope.ServiceProvider.GetRequiredService<IDonateCoinDomainService>();
 
             await domainService.AddCoinsForVideos();
         }

@@ -1,6 +1,6 @@
 namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.VipTask;
 
-public class CompleteOgvWatchRequest: BaseAppRequest
+public class CompleteOgvWatchRequest : BaseAppRequest
 {
     public CompleteOgvWatchRequest(long taskId, string token)
     {

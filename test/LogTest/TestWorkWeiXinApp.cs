@@ -29,7 +29,7 @@ namespace LogTest
         [Fact]
         public void Test()
         {
-            var client = new WorkWeiXinAppApiClient(_corpId,_agentId, _secret, _toUser);
+            var client = new WorkWeiXinAppApiClient(_corpId, _agentId, _secret, _toUser);
 
             var msg = LogConstants.Msg2;
 

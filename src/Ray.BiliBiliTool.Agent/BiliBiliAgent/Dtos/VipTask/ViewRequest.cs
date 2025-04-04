@@ -4,7 +4,7 @@ public class ViewRequest
 {
     public ViewRequest(string position)
     {
-        this.position=position;
+        this.position = position;
     }
 
     public string position { get; }
@@ -21,5 +21,6 @@ public class ViewRequest
 
     public string s_locale { get; } = "zh_CN";
 
-    public string statistics { get; } = "{\"appId\":1,\"platform\":3,\"version\":\"6.85.0\",\"abtest\":\"\"}";
+    public string statistics { get; } =
+        "{\"appId\":1,\"platform\":3,\"version\":\"6.85.0\",\"abtest\":\"\"}";
 }

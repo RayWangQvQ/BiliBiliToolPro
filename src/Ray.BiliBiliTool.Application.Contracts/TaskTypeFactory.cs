@@ -1,54 +1,65 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
-namespace Ray.BiliBiliTool.Application.Contracts
+namespace Ray.BiliBiliTool.Application.Contracts;
+
+public static class TaskTypeFactory
 {
-    public class TaskTypeFactory
+    private static readonly List<Type> TypeList =
+    [
+        typeof(ILoginTaskAppService),
+        typeof(ITestAppService),
+        typeof(IDailyTaskAppService),
+        typeof(ILiveFansMedalAppService),
+        typeof(ILiveLotteryTaskAppService),
+        typeof(IVipBigPointAppService),
+        typeof(IUnfollowBatchedTaskAppService),
+    ];
+
+    private static readonly List<TaskTypeItem> All = [];
+
+    static TaskTypeFactory()
     {
-        private static Dictionary<string, Type> _dic = new Dictionary<string, Type>();
-        private static Dictionary<int, string> _index = new Dictionary<int, string>();
-
-        static TaskTypeFactory()
+        for (int i = 0; i < TypeList.Count; i++)
         {
-            Assembly assembly = Assembly.GetAssembly(typeof(TaskTypeFactory));
-            var types = assembly.GetTypes()
-                .Where(x => x.IsAssignableTo(typeof(IAppService))
-                            && x.IsInterface);
-            var index = 1;
-            foreach (var type in types)
-            {
-                string code = type.GetCustomAttribute<DescriptionAttribute>()?.Description;
-                if (!string.IsNullOrWhiteSpace(code))
-                {
-                    _dic.Add(code, type);
-                    _index.Add(index, code);
-                    index++;
-                }
-            }
-        }
-
-        public static Type Create(string code)
-        {
-            return _dic[code];
-        }
-
-        public static void Show(ILogger logger)
-        {
-            foreach (var item in _index)
-            {
-                logger.LogInformation("{index}):{code}", item.Key, item.Value);
-            }
-        }
-
-        public static string GetCodeByIndex(int index)
-        {
-            return _index[index];
+            All.Add(
+                new TaskTypeItem(
+                    i + 1,
+                    TypeList[i].GetCustomAttribute<DescriptionAttribute>()?.Description,
+                    TypeList[i]
+                )
+            );
         }
     }
+
+    public static Type Get(string code)
+    {
+        return All.First(x => x.Code == code).Type;
+    }
+
+    public static void Show(ILogger logger)
+    {
+        foreach (var item in All)
+        {
+            logger.LogInformation("{id}):{code}", item.Id, item.Code);
+        }
+    }
+
+    public static string GetCodeByIndex(int index)
+    {
+        return All.First(x => x.Id == index).Code;
+    }
+}
+
+public class TaskTypeItem(int id, string code, Type type)
+{
+    public int Id { get; } = id;
+
+    public string Code { get; } = code;
+
+    public Type Type { get; } = type;
 }

@@ -1,22 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using QRCoder;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Passport;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
-using Ray.BiliBiliTool.DomainService.Interfaces;
-using System.IO;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.FileProviders;
-using Microsoft.Extensions.Hosting;
-using Newtonsoft.Json.Linq;
-using QRCoder;
 using Ray.BiliBiliTool.Agent.QingLong;
+using Ray.BiliBiliTool.DomainService.Interfaces;
 using Ray.BiliBiliTool.Infrastructure.Cookie;
 
 namespace Ray.BiliBiliTool.DomainService;
@@ -30,8 +30,8 @@ public class LoginDomainService(
     IHostEnvironment hostingEnvironment,
     IQingLongApi qingLongApi,
     IHomeApi homeApi,
-    IConfiguration configuration)
-    : ILoginDomainService
+    IConfiguration configuration
+) : ILoginDomainService
 {
     public async Task<BiliCookie> LoginByQrCodeAsync(CancellationToken cancellationToken)
     {
@@ -49,7 +49,9 @@ public class LoginDomainService(
 
         var online = GetOnlinePic(url);
         logger.LogInformation(Environment.NewLine + Environment.NewLine);
-        logger.LogInformation("如果上方二维码显示异常，或扫描失败，请使用浏览器访问如下链接，查看高清二维码：");
+        logger.LogInformation(
+            "如果上方二维码显示异常，或扫描失败，请使用浏览器访问如下链接，查看高清二维码："
+        );
         logger.LogInformation(online + Environment.NewLine + Environment.NewLine);
 
         var waitTimes = 10;
@@ -67,14 +69,15 @@ public class LoginDomainService(
                 continue;
             }
 
-            var content = JsonConvert.DeserializeObject<BiliApiResponse<TokenDto>>(await check.Content.ReadAsStringAsync(cancellationToken));
+            var contentStr = await check.Content.ReadAsStringAsync(cancellationToken);
+            var content = JsonConvert.DeserializeObject<BiliApiResponse<TokenDto>>(contentStr);
             if (content.Code != 0)
             {
                 logger.LogWarning("调用检测接口异常：{msg}", check.ToJsonStr());
                 break;
             }
 
-            if (content.Data.Code == 86038)//已失效
+            if (content.Data.Code == 86038) //已失效
             {
                 logger.LogInformation(content.Data.Message);
                 break;
@@ -83,7 +86,9 @@ public class LoginDomainService(
             if (content.Data.Code == 0)
             {
                 logger.LogInformation("扫描成功！");
-                IEnumerable<string> cookies = check.Headers.SingleOrDefault(header => header.Key == "Set-Cookie").Value;
+                IEnumerable<string> cookies = check
+                    .Headers.SingleOrDefault(header => header.Key == "Set-Cookie")
+                    .Value;
 
                 var cookieStr = CookieInfo.ConvertSetCkHeadersToCkStr(cookies);
                 cookieInfo = new BiliCookie(cookieStr);
@@ -98,7 +103,10 @@ public class LoginDomainService(
         return cookieInfo;
     }
 
-    public async Task<BiliCookie> SetCookieAsync(BiliCookie biliCookie, CancellationToken cancellationToken)
+    public async Task<BiliCookie> SetCookieAsync(
+        BiliCookie biliCookie,
+        CancellationToken cancellationToken
+    )
     {
         try
         {
@@ -106,7 +114,9 @@ public class LoginDomainService(
             if (homePage.IsSuccessStatusCode)
             {
                 logger.LogInformation("访问主站成功");
-                IEnumerable<string> setCookieHeaders = homePage.Headers.SingleOrDefault(header => header.Key == "Set-Cookie").Value;
+                IEnumerable<string> setCookieHeaders = homePage
+                    .Headers.SingleOrDefault(header => header.Key == "Set-Cookie")
+                    .Value;
                 biliCookie.MergeCurrentCookieBySetCookieHeaders(setCookieHeaders);
                 logger.LogInformation("SetCookie成功");
                 return biliCookie;
@@ -122,12 +132,16 @@ public class LoginDomainService(
         return biliCookie;
     }
 
-    public async Task SaveCookieToJsonFileAsync(BiliCookie ckInfo, CancellationToken cancellationToken)
+    public async Task SaveCookieToJsonFileAsync(
+        BiliCookie ckInfo,
+        CancellationToken cancellationToken
+    )
     {
         //读取json
         var path = hostingEnvironment.ContentRootPath;
         var indexOfBin = path.LastIndexOf("bin");
-        if (indexOfBin != -1) path = path[..indexOfBin];
+        if (indexOfBin != -1)
+            path = path[..indexOfBin];
         var fileProvider = new PhysicalFileProvider(path);
         IFileInfo fileInfo = fileProvider.GetFileInfo("cookies.json");
         logger.LogInformation("目标json地址：{path}", fileInfo.PhysicalPath);
@@ -147,18 +161,23 @@ public class LoginDomainService(
         }
         var lines = json.Split(Environment.NewLine).ToList();
 
-        var indexOfCkConfigKey = lines.FindIndex(x => x.TrimStart().StartsWith("\"BiliBiliCookies\""));
+        var indexOfCkConfigKey = lines.FindIndex(x =>
+            x.TrimStart().StartsWith("\"BiliBiliCookies\"")
+        );
         if (indexOfCkConfigKey == -1)
         {
             logger.LogInformation("未配置过cookie，初始化并新增");
 
             var indexOfInsert = lines.FindIndex(x => x.TrimStart().StartsWith("{"));
-            lines.InsertRange(indexOfInsert + 1, new List<string>()
-            {
-                "  \"BiliBiliCookies\":[",
-                $@"    ""{ckInfo.CookieStr}"",",
-                "  ],"
-            });
+            lines.InsertRange(
+                indexOfInsert + 1,
+                new List<string>()
+                {
+                    "  \"BiliBiliCookies\":[",
+                    $@"    ""{ckInfo.CookieStr}"",",
+                    "  ],",
+                }
+            );
 
             await SaveJson(lines, fileInfo);
             logger.LogInformation("新增成功！");
@@ -167,10 +186,15 @@ public class LoginDomainService(
 
         ckInfo.CookieItemDictionary.TryGetValue("DedeUserID", out string userId);
         userId ??= ckInfo.CookieStr;
-        var indexOfCkConfigEnd = lines.FindIndex(indexOfCkConfigKey, x => x.TrimStart().StartsWith("]"));
-        var indexOfTargetCk = lines.FindIndex(indexOfCkConfigKey,
+        var indexOfCkConfigEnd = lines.FindIndex(
+            indexOfCkConfigKey,
+            x => x.TrimStart().StartsWith("]")
+        );
+        var indexOfTargetCk = lines.FindIndex(
+            indexOfCkConfigKey,
             indexOfCkConfigEnd - indexOfCkConfigKey,
-            x => x.Contains(userId) && !x.TrimStart().StartsWith("//"));
+            x => x.Contains(userId) && !x.TrimStart().StartsWith("//")
+        );
 
         if (indexOfTargetCk == -1)
         {
@@ -187,7 +211,10 @@ public class LoginDomainService(
         logger.LogInformation("更新成功！");
     }
 
-    public async Task<bool> SaveCookieToQinLongAsync(BiliCookie ckInfo, CancellationToken cancellationToken)
+    public async Task<bool> SaveCookieToQinLongAsync(
+        BiliCookie ckInfo,
+        CancellationToken cancellationToken
+    )
     {
         try
         {
@@ -208,7 +235,9 @@ public class LoginDomainService(
             logger.LogDebug(qlEnvList.Data.ToJsonStr());
             logger.LogDebug(ckInfo.ToString());
 
-            var list = qlEnvList.Data.Where(x => x.name.StartsWith("Ray_BiliBiliCookies__")).ToList();
+            var list = qlEnvList
+                .Data.Where(x => x.name.StartsWith("Ray_BiliBiliCookies__"))
+                .ToList();
             QingLongEnv oldEnv = list.FirstOrDefault(x => x.value.Contains(ckInfo.UserId));
 
             if (oldEnv != null)
@@ -236,17 +265,23 @@ public class LoginDomainService(
             if (list.Any())
             {
                 maxNum = list.Select(x =>
-                {
-                    var num = x.name.Replace("Ray_BiliBiliCookies__", "");
-                    var parseSuc = int.TryParse(num, out int envNum);
-                    return parseSuc ? envNum : 0;
-                }).Max();
+                    {
+                        var num = x.name.Replace("Ray_BiliBiliCookies__", "");
+                        var parseSuc = int.TryParse(num, out int envNum);
+                        return parseSuc ? envNum : 0;
+                    })
+                    .Max();
             }
 
             var name = $"Ray_BiliBiliCookies__{maxNum + 1}";
             logger.LogInformation("Key：{key}", name);
 
-            var add = new AddQingLongEnv {name = name, value = ckInfo.CookieStr, remarks = $"bili-{ckInfo.UserId}"};
+            var add = new AddQingLongEnv
+            {
+                name = name,
+                value = ckInfo.CookieStr,
+                remarks = $"bili-{ckInfo.UserId}",
+            };
             var addRe = await qingLongApi.AddEnvs([add], token);
             logger.LogInformation(addRe.Code == 200 ? "新增成功！" : addRe.ToJsonStr());
             return true;
@@ -278,22 +313,26 @@ public class LoginDomainService(
     private void Print(QRCodeData qrCodeData)
     {
         Console.BackgroundColor = ConsoleColor.White;
-        for (int i = 0; i < qrCodeData.ModuleMatrix.Count + 2; i++) Console.Write("　");//中文全角的空格符
+        for (int i = 0; i < qrCodeData.ModuleMatrix.Count + 2; i++)
+            Console.Write("　"); //中文全角的空格符
         Console.WriteLine();
         for (int j = 0; j < qrCodeData.ModuleMatrix.Count; j++)
         {
             for (int i = 0; i < qrCodeData.ModuleMatrix.Count; i++)
             {
                 //char charToPoint = qrCode.Matrix[i, j] ? '█' : '　';
-                Console.Write(i == 0 ? "　" : "");//中文全角的空格符
-                Console.BackgroundColor = qrCodeData.ModuleMatrix[i][j] ? ConsoleColor.Black : ConsoleColor.White;
-                Console.Write('　');//中文全角的空格符
+                Console.Write(i == 0 ? "　" : ""); //中文全角的空格符
+                Console.BackgroundColor = qrCodeData.ModuleMatrix[i][j]
+                    ? ConsoleColor.Black
+                    : ConsoleColor.White;
+                Console.Write('　'); //中文全角的空格符
                 Console.BackgroundColor = ConsoleColor.White;
-                Console.Write(i == qrCodeData.ModuleMatrix.Count - 1 ? "　" : "");//中文全角的空格符
+                Console.Write(i == qrCodeData.ModuleMatrix.Count - 1 ? "　" : ""); //中文全角的空格符
             }
             Console.WriteLine();
         }
-        for (int i = 0; i < qrCodeData.ModuleMatrix.Count + 2; i++) Console.Write("　");//中文全角的空格符
+        for (int i = 0; i < qrCodeData.ModuleMatrix.Count + 2; i++)
+            Console.Write("　"); //中文全角的空格符
 
         Console.WriteLine();
     }
@@ -306,10 +345,10 @@ public class LoginDomainService(
         //白黑（"▀"）
         var dic = new Dictionary<string, char>()
         {
-            {"11", ' '},
-            {"00", '█'},
-            {"10", '▄'},
-            {"01", '▀'},//todo:win平台的cmd会显示？,是已知问题，待想办法解决
+            { "11", ' ' },
+            { "00", '█' },
+            { "10", '▄' },
+            { "01", '▀' }, //todo:win平台的cmd会显示？,是已知问题，待想办法解决
             //{"01", '^'},//▼▔
         };
 
@@ -337,7 +376,8 @@ public class LoginDomainService(
 
     private string GetOnlinePic(string str)
     {
-        var encode = System.Web.HttpUtility.UrlEncode(str); ;
+        var encode = System.Web.HttpUtility.UrlEncode(str);
+        ;
         return $"https://tool.lu/qrcode/basic.html?text={encode}";
     }
 
@@ -394,12 +434,13 @@ public class LoginDomainService(
         logger.LogError("持久化失败，青龙版本高于2.18，请手动添加环境变量到青龙");
         logger.LogWarning("变量Key：{key}", "Ray_BiliBiliCookies__0");
         logger.LogWarning("变量值：{value}", ckInfo.CookieStr);
-        logger.LogWarning("如果Key已存在，请自行+1，如Ray_BiliBiliCookies__1，Ray_BiliBiliCookies__2...");
+        logger.LogWarning(
+            "如果Key已存在，请自行+1，如Ray_BiliBiliCookies__1，Ray_BiliBiliCookies__2..."
+        );
         return Task.CompletedTask;
     }
 
     #endregion
 
     #endregion
-
 }

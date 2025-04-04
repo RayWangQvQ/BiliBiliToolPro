@@ -1,21 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live;
 
-namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live
+public class GetLiveRoomInfoResponse
 {
-    public class GetLiveRoomInfoResponse
-    {
-        public long Room_id { get; set; }
+    public long Room_id { get; set; }
 
-        public long Area_id { get; set; }
+    public long Area_id { get; set; }
 
-        public long Parent_area_id { get; set; }
+    public long Parent_area_id { get; set; }
 
-        public int Live_Status { get; set; }
+    public int Live_Status { get; set; }
 
-        public long Uid { get; set; }
-    }
+    public long Uid { get; set; }
 }

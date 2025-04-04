@@ -1,17 +1,17 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using FluentAssertions;
+using Microsoft.Extensions.DependencyInjection;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Services;
 using Ray.BiliBiliTool.Console;
 using Ray.BiliBiliTool.Infrastructure;
-using System;
-using System.Diagnostics;
-using System.Threading.Tasks;
 using Ray.BiliBiliTool.Infrastructure.Cookie;
 using Xunit;
-using Ray.BiliBiliTool.Agent.BiliBiliAgent.Services;
-using FluentAssertions;
 
 namespace BiliAgentTest
 {
@@ -19,7 +19,7 @@ namespace BiliAgentTest
     {
         public LiveApiTest()
         {
-            Program.CreateHost(new[] { "--ENVIRONMENT=Development" });//Ä¬ÈÏPrd»·¾³£¬ÕâÀïÖ¸¶¨ÎªDevºó£¬¿ÉÒÔ¶ÁÈ¡µ½ÓÃ»§»úÃÜÅäÖÃ
+            Program.CreateHost(new[] { "--ENVIRONMENT=Development" }); //Ä¬ÈÏPrd»·¾³£¬ÕâÀïÖ¸¶¨ÎªDevºó£¬¿ÉÒÔ¶ÁÈ¡µ½ÓÃ»§»úÃÜÅäÖÃ
         }
 
         [Fact]
@@ -122,10 +122,7 @@ namespace BiliAgentTest
             BiliApiResponse re = api.WearMedalWall(request).Result;
 
             Assert.True(re.Code == 0);
-            re.Code.Should().BeOneOf(
-                0,
-                1500005
-                );
+            re.Code.Should().BeOneOf(0, 1500005);
         }
 
         [Fact]
@@ -139,13 +136,9 @@ namespace BiliAgentTest
 
             var wbiService = scope.ServiceProvider.GetRequiredService<IWbiService>();
 
-            var req = new GetSpaceInfoDto()
-            {
-                mid = 919174L
-            };
+            var req = new GetSpaceInfoDto() { mid = 919174L };
 
             await wbiService.SetWridAsync(req);
-
 
             BiliApiResponse<GetSpaceInfoResponse> re = api.GetSpaceInfo(req).Result;
 

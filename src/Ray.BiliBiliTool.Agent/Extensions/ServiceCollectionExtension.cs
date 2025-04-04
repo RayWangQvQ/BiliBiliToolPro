@@ -24,7 +24,10 @@ public static class ServiceCollectionExtension
     /// </summary>
     /// <param name="services"></param>
     /// <returns></returns>
-    public static IServiceCollection AddBiliBiliClientApi(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddBiliBiliClientApi(
+        this IServiceCollection services,
+        IConfiguration configuration
+    )
     {
         //Cookie
         services.AddSingleton<CookieStrFactory>(sp =>
@@ -34,12 +37,12 @@ public static class ServiceCollectionExtension
 
             //兼容老版
             var old = config["BiliBiliCookie:CookieStr"];
-            if (!string.IsNullOrWhiteSpace(old)) list.Add(old);
+            if (!string.IsNullOrWhiteSpace(old))
+                list.Add(old);
 
-            var configList = config.GetSection("BiliBiliCookies")
-                .Get<List<string>>() ?? new List<string>()
-                .Where(x => !string.IsNullOrWhiteSpace(x))
-                .ToList();
+            var configList =
+                config.GetSection("BiliBiliCookies").Get<List<string>>()
+                ?? new List<string>().Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
             list.AddRange(configList);
 
             return new CookieStrFactory(list);
@@ -50,26 +53,36 @@ public static class ServiceCollectionExtension
         services.SetGlobalProxy(configuration);
 
         //DelegatingHandler
-        services.Scan(scan => scan
-            .FromAssemblyOf<IBiliBiliApi>()
-            .AddClasses(classes => classes.AssignableTo<DelegatingHandler>())
-            .AsSelf()
-            .WithTransientLifetime()
+        services.Scan(scan =>
+            scan.FromAssemblyOf<IBiliBiliApi>()
+                .AddClasses(classes => classes.AssignableTo<DelegatingHandler>())
+                .AsSelf()
+                .WithTransientLifetime()
         );
 
         //服务
         services.AddScoped<IWbiService, WbiService>();
 
         //bilibli
-        Action<IServiceProvider, HttpClient> config = (sp, c) => {
-            c.DefaultRequestHeaders.Add("User-Agent", sp.GetRequiredService<IOptionsMonitor<SecurityOptions>>().CurrentValue.UserAgent);
+        Action<IServiceProvider, HttpClient> config = (sp, c) =>
+        {
+            c.DefaultRequestHeaders.Add(
+                "User-Agent",
+                sp.GetRequiredService<IOptionsMonitor<SecurityOptions>>().CurrentValue.UserAgent
+            );
             var ck = sp.GetRequiredService<BiliCookie>().ToString();
-            if(!string.IsNullOrWhiteSpace(ck)) c.DefaultRequestHeaders.Add("Cookie", ck);
+            if (!string.IsNullOrWhiteSpace(ck))
+                c.DefaultRequestHeaders.Add("Cookie", ck);
         };
-        Action<IServiceProvider, HttpClient> configApp = (sp, c) => {
-            c.DefaultRequestHeaders.Add("User-Agent", sp.GetRequiredService<IOptionsMonitor<SecurityOptions>>().CurrentValue.UserAgentApp);
+        Action<IServiceProvider, HttpClient> configApp = (sp, c) =>
+        {
+            c.DefaultRequestHeaders.Add(
+                "User-Agent",
+                sp.GetRequiredService<IOptionsMonitor<SecurityOptions>>().CurrentValue.UserAgentApp
+            );
             var ck = sp.GetRequiredService<BiliCookie>().ToString();
-            if(!string.IsNullOrWhiteSpace(ck)) c.DefaultRequestHeaders.Add("Cookie", ck);
+            if (!string.IsNullOrWhiteSpace(ck))
+                c.DefaultRequestHeaders.Add("Cookie", ck);
         };
 
         services.AddBiliBiliClientApi<IUserInfoApi>(BiliHosts.Api, config);
@@ -82,14 +95,13 @@ public static class ServiceCollectionExtension
 
         services.AddBiliBiliClientApi<IVipMallApi>(BiliHosts.Show, config);
         services.AddBiliBiliClientApi<IPassportApi>(BiliHosts.Passport, config);
-        services.AddBiliBiliClientApi<ILiveTraceApi>(BiliHosts.LiveTrace,config);
+        services.AddBiliBiliClientApi<ILiveTraceApi>(BiliHosts.LiveTrace, config);
         services.AddBiliBiliClientApi<IHomeApi>(BiliHosts.Www, config);
         services.AddBiliBiliClientApi<IMangaApi>(BiliHosts.Manga, config);
         services.AddBiliBiliClientApi<IAccountApi>(BiliHosts.Account, config);
         services.AddBiliBiliClientApi<ILiveApi>(BiliHosts.Live, config);
 
         services.AddBiliBiliClientApi<IVipBigPointApi>(BiliHosts.App, configApp);
-
 
         //qinglong
         var qinglongHost = configuration["QL_URL"] ?? "http://localhost:5600";
@@ -99,10 +111,17 @@ public static class ServiceCollectionExtension
                 o.HttpHost = new Uri(qinglongHost);
                 o.UseDefaultUserAgent = false;
             })
-            .ConfigureHttpClient((sp, c) =>
-            {
-                c.DefaultRequestHeaders.Add("User-Agent", sp.GetRequiredService<IOptionsMonitor<SecurityOptions>>().CurrentValue.UserAgent);
-            })
+            .ConfigureHttpClient(
+                (sp, c) =>
+                {
+                    c.DefaultRequestHeaders.Add(
+                        "User-Agent",
+                        sp.GetRequiredService<
+                            IOptionsMonitor<SecurityOptions>
+                        >().CurrentValue.UserAgent
+                    );
+                }
+            )
             .AddPolicyHandler(GetRetryPolicy());
 
         return services;
@@ -115,7 +134,11 @@ public static class ServiceCollectionExtension
     /// <param name="services"></param>
     /// <param name="host"></param>
     /// <returns></returns>
-    private static IServiceCollection AddBiliBiliClientApi<TInterface>(this IServiceCollection services, string host, Action<IServiceProvider, HttpClient> config)
+    private static IServiceCollection AddBiliBiliClientApi<TInterface>(
+        this IServiceCollection services,
+        string host,
+        Action<IServiceProvider, HttpClient> config
+    )
         where TInterface : class
     {
         var uri = new Uri(host);
@@ -137,7 +160,10 @@ public static class ServiceCollectionExtension
     /// </summary>
     /// <param name="services"></param>
     /// <returns></returns>
-    private static IServiceCollection SetGlobalProxy(this IServiceCollection services, IConfiguration configuration)
+    private static IServiceCollection SetGlobalProxy(
+        this IServiceCollection services,
+        IConfiguration configuration
+    )
     {
         string proxyAddress = configuration["Security:WebProxy"];
         if (proxyAddress.IsNotNullOrEmpty())
@@ -177,7 +203,6 @@ public static class ServiceCollectionExtension
         return HttpPolicyExtensions
             .HandleTransientHttpError()
             .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.NotFound)
-            .WaitAndRetryAsync(1, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2,
-                                                                        retryAttempt)));
+            .WaitAndRetryAsync(1, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
     }
 }

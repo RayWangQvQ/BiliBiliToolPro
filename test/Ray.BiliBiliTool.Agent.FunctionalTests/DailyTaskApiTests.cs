@@ -56,15 +56,19 @@ public class DailyTaskApiTests
     public async Task ReceiveVipPrivilege_Normal_Success()
     {
         // Act
-        BiliApiResponse re = await _api.ReceiveVipPrivilegeAsync((int)VipPrivilegeType.BCoinCoupon, _ck.BiliJct);
+        BiliApiResponse re = await _api.ReceiveVipPrivilegeAsync(
+            (int)VipPrivilegeType.BCoinCoupon,
+            _ck.BiliJct
+        );
 
         // Arrange
 
         // Assert
-        re.Code.Should().BeOneOf(
-            0,
-            73319, //todo: sort out meannings
-            69801 //你已领取过该权益
-        );
+        re.Code.Should()
+            .BeOneOf(
+                0,
+                73319, //todo: sort out meannings
+                69801 //你已领取过该权益
+            );
     }
 }

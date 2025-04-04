@@ -2,10 +2,9 @@
 using System.Threading.Tasks;
 using Ray.BiliBiliTool.Application.Contracts;
 
-namespace Ray.BiliBiliTool.Application
+namespace Ray.BiliBiliTool.Application;
+
+public abstract class AppService : IAppService
 {
-    public abstract class AppService : IAppService
-    {
-        public abstract Task DoTaskAsync(CancellationToken cancellationToken = default);
-    }
+    public abstract Task DoTaskAsync(CancellationToken cancellationToken = default);
 }
