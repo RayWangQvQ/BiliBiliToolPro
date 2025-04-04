@@ -1,6 +1,6 @@
 ![2233](docs/imgs/2233.png)
 
-<div align="center">
+<div style="text-align: center;">
 
 <h1 align="center">
 
@@ -13,12 +13,13 @@ BiliBiliTool
 [![GitHub Issues](https://img.shields.io/github/issues/RayWangQvQ/BiliBiliToolPro?style=flat-square)](https://github.com/RayWangQvQ/BiliBiliToolPro/issues)
 [![GitHub Contributors](https://img.shields.io/github/contributors/RayWangQvQ/BiliBiliToolPro?style=flat-square)](https://github.com/RayWangQvQ/BiliBiliToolPro/graphs/contributors)
 [![GitHub All Releases](https://img.shields.io/github/downloads/RayWangQvQ/BiliBiliToolPro/total?style=flat-square)](https://github.com/RayWangQvQ/BiliBiliToolPro/releases)
-![GitHub Release (latest SemVer)](https://img.shields.io/github/v/release/RayWangQvQ/BiliBiliToolPro?style=flat-square)
+[![GitHub Release (latest SemVer)](https://img.shields.io/github/v/release/RayWangQvQ/BiliBiliToolPro?style=flat-square)](https://github.com/RayWangQvQ/BiliBiliToolPro/releases)
 [![GitHub License](https://img.shields.io/github/license/RayWangQvQ/BiliBiliToolPro?style=flat-square)](https://github.com/RayWangQvQ/BiliBiliToolPro/blob/main/LICENSE)
 
 </div>
 
-**BiliBiliTool 是一个自动执行任务的工具，当我们忘记做某项任务时，它会像一个贴心小助手，按照我们预先吩咐它的命令，在指定频率、时间范围内帮助我们完成计划的任务。**
+**BiliBiliTool 是一个自动执行任务的工具，当我们忘记做某项任务时，它会像一个贴心小助手，按照我们预先吩咐它的命令，在指定频率、时间范围内帮助我们完成计划的任务。**  
+**BiliBiliTool is an automated task execution tool that acts as a helpful assistant, following pre-configured commands to complete planned tasks within specified frequencies and timeframes when we forget to do them.**
 
 详细功能如下：
 
@@ -59,7 +60,7 @@ BiliBiliTool
     - [7.1. 贡献代码](#71-贡献代码)
     - [7.2. 贡献文档](#72-贡献文档)
 - [8. 捐赠支持](#8-捐赠支持)
-- [9. 其他](#9-其他)
+- [9. 其他sssssss](#9-其他sssssss)
 
 <!-- /TOC -->
 
@@ -74,7 +75,9 @@ BiliBiliTool
 
 本地运行图示：
 
-![运行图示](docs/imgs/run-exe.png)
+<p align="center">
+    <img src="docs/imgs/run-exe.png" alt="运行图示" width="500">
+</p>
 
 _（如果图片挂了，请自己架梯子，没有的也可以先参考 [我的博客](https://www.cnblogs.com/RayWang/p/13909784.html)，但内容不保证最新)_
 
@@ -122,7 +125,9 @@ GitHub官方反对并抵制对Actions的滥用，建议所有使用该方式运�
 
 如果配置了推送，执行成功后，指定的接收端会收到推送消息，推送效果如下所示：
 
-![微信推送图示](docs/imgs/wechat-push.png)
+<p align="center">
+    <img src="docs/imgs/wechat-push.png" alt="微信推送图示" width="500">
+</p>
 
 目前默认支持**PushPlus推送、企业微信应用推送、企业微信推送、钉钉推送、Microsoft Teams推送、Telegram推送、Server酱推送和酷推QQ推送**（以上顺序即为个人推荐的排序），如果需要推送到其他端，也可以配置为任意的可以接受消息的Api地址，关于如何配置推送请详见下面的**个性化自定义配置**章节。
 
@@ -200,7 +205,7 @@ dotnet Ray.BiliBiliTool.Console.dll --runTasks=Daily&LiveLottery
 
 当前正处于稳定的迭代开发中，详细待更新和计划内容可参见 [Projects](https://github.com/RayWangQvQ/BiliBiliToolPro/projects) 和 [Issues](https://github.com/RayWangQvQ/BiliBiliToolPro/issues) 。
 
-想要有重要更新时收到通知的话，可以把仓库右上角的`Star`或`Watch`按钮点亮。
+想要有重要更新时收到通知的话，可以把仓库右上角的`Star`按钮点亮。
 
 ## 7. 成为开源贡献成员
 
@@ -239,7 +244,7 @@ dotnet Ray.BiliBiliTool.Console.dll --runTasks=Daily&LiveLottery
 
 感谢支持~
 
-## 9. 其他
+## 9. 其他sssssss
 
 `API`参考：
 
@@ -249,9 +254,18 @@ dotnet Ray.BiliBiliTool.Console.dll --runTasks=Daily&LiveLottery
 
 - [JunzhouLiu/BILIBILI-HELPER](https://github.com/JunzhouLiu/BILIBILI-HELPER)
 
-感谢`JetBrain`提供的免费证书支持：
+❤️Thanks to `JetBrain` for the free certificate support:
 
-Thanks to `JetBrain` for the free certificate support:
+<p align="center">
+    <img src="https://resources.jetbrains.com/storage/products/company/brand/logos/ReSharper.svg" alt="ReSharper logo" width="200">
+</p>
 
-![ReSharper logo](https://resources.jetbrains.com/storage/products/company/brand/logos/ReSharper.svg)
+❤️Thanks to [YxVM](https://yxvm.com/aff.php?aff=668) & [NodeSeekDev](https://github.com/NodeSeekDev/NodeSupport) for sponsoring the server for testing support:
 
+<p align="center">
+    <a href="https://yxvm.com/aff.php?aff=668">
+        <img src="https://yxvm.com/assets/img/logo.png" alt="NodeSeekDev logo" width="200">
+    </a>
+</p>
+
+<iframe style="width:100%;height:auto;min-width:600px;min-height:400px;" src="https://www.star-history.com/embed?secret=Z2hwX29yc3ZYTnoxZlUwTkliZVprRDJHS1djaFozUnlhWjBZZzNyOA==#RayWangQvQ/BiliBiliToolPro&Date" frameBorder="0"></iframe>
