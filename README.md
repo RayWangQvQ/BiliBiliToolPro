@@ -1,6 +1,6 @@
 ![2233](docs/imgs/2233.png)
 
-<div style="text-align: center;">
+<div align="center">
 
 <h1 align="center">
 
