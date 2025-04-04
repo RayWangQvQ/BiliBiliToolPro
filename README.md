@@ -60,7 +60,7 @@ BiliBiliTool
     - [7.1. 贡献代码](#71-贡献代码)
     - [7.2. 贡献文档](#72-贡献文档)
 - [8. 捐赠支持](#8-捐赠支持)
-- [9. 其他sssssss](#9-其他sssssss)
+- [9. 其他](#9-其他)
 
 <!-- /TOC -->
 
@@ -244,7 +244,7 @@ dotnet Ray.BiliBiliTool.Console.dll --runTasks=Daily&LiveLottery
 
 感谢支持~
 
-## 9. 其他sssssss
+## 9. 其他
 
 `API`参考：
 
@@ -268,4 +268,4 @@ dotnet Ray.BiliBiliTool.Console.dll --runTasks=Daily&LiveLottery
     </a>
 </p>
 
-<iframe style="width:100%;height:auto;min-width:600px;min-height:400px;" src="https://www.star-history.com/embed?secret=Z2hwX29yc3ZYTnoxZlUwTkliZVprRDJHS1djaFozUnlhWjBZZzNyOA==#RayWangQvQ/BiliBiliToolPro&Date" frameBorder="0"></iframe>
+[![Star History Chart](https://api.star-history.com/svg?repos=RayWangQvQ/BiliBiliToolPro&type=Date)](https://www.star-history.com/#RayWangQvQ/BiliBiliToolPro&Date)
