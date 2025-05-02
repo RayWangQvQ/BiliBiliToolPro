@@ -20,7 +20,7 @@
          "name": "csharpier-fotmat",
          "group": "pre-commit",
          "command": "dotnet",
-         "args": [ "csharpier", "${staged}" ],
+         "args": [ "csharpier", "format", "${staged}" ],
          "include": [ "**/*.cs" ]
       }
    ]
