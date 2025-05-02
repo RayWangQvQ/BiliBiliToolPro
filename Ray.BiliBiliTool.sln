@@ -144,6 +144,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{2B5F
 		scripts\ut.ps1 = scripts\ut.ps1
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ray.BiliBiliTool.Web", "src\Ray.BiliBiliTool.Web\Ray.BiliBiliTool.Web\Ray.BiliBiliTool.Web.csproj", "{D47A27C5-A773-483D-BB36-FE44263FD6E9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ray.BiliBiliTool.Web.Client", "src\Ray.BiliBiliTool.Web\Ray.BiliBiliTool.Web.Client\Ray.BiliBiliTool.Web.Client.csproj", "{5B170281-8D71-4744-A03F-F05923144C47}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -206,6 +210,14 @@ Global
 		{16F315CF-056A-4B08-8C3C-A3177EA3CBB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{16F315CF-056A-4B08-8C3C-A3177EA3CBB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{16F315CF-056A-4B08-8C3C-A3177EA3CBB9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D47A27C5-A773-483D-BB36-FE44263FD6E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D47A27C5-A773-483D-BB36-FE44263FD6E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D47A27C5-A773-483D-BB36-FE44263FD6E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D47A27C5-A773-483D-BB36-FE44263FD6E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B170281-8D71-4744-A03F-F05923144C47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B170281-8D71-4744-A03F-F05923144C47}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B170281-8D71-4744-A03F-F05923144C47}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B170281-8D71-4744-A03F-F05923144C47}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -239,6 +251,8 @@ Global
 		{90C1DB73-B3DB-4BE5-AD1A-5248FE47860E} = {E9BDDCBE-A57D-4E3B-8252-708088386ADF}
 		{16F315CF-056A-4B08-8C3C-A3177EA3CBB9} = {E9BDDCBE-A57D-4E3B-8252-708088386ADF}
 		{2B5FD099-CC28-4FBC-9F20-F20300C5DFD2} = {F3DE0D72-426B-4AD9-B3ED-3343CF4223F1}
+		{D47A27C5-A773-483D-BB36-FE44263FD6E9} = {38736647-2196-417E-8519-C48A012A63D9}
+		{5B170281-8D71-4744-A03F-F05923144C47} = {38736647-2196-417E-8519-C48A012A63D9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {197319DA-1148-4A99-847C-8B270B6A29AB}
