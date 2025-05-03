@@ -1,3 +1,4 @@
+using MudBlazor.Services;
 using Quartz;
 using Ray.BiliBiliTool.Web.Client.Pages;
 using Ray.BiliBiliTool.Web.Components;
@@ -14,6 +15,8 @@ try
         .Services.AddRazorComponents()
         .AddInteractiveServerComponents()
         .AddInteractiveWebAssemblyComponents();
+
+    builder.Services.AddMudServices();
 
     builder.Services.AddSerilog(
         (services, lc) =>
