@@ -7,6 +7,7 @@
   <ItemGroup>
     <PackageReference Include="Quartz" Version="3.14.0" />
     <PackageReference Include="Quartz.AspNetCore" Version="3.14.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
     <ProjectReference Include="..\Ray.BiliBiliTool.Web.Client\Ray.BiliBiliTool.Web.Client.csproj" />
     <PackageReference
       Include="Microsoft.AspNetCore.Components.WebAssembly.Server"

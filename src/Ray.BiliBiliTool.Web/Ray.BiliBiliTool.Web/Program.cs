@@ -2,51 +2,72 @@ using Quartz;
 using Ray.BiliBiliTool.Web.Client.Pages;
 using Ray.BiliBiliTool.Web.Components;
 using Ray.BiliBiliTool.Web.Jobs;
+using Serilog;
 
-var builder = WebApplication.CreateBuilder(args);
+Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
 
-// Add services to the container.
-builder
-    .Services.AddRazorComponents()
-    .AddInteractiveServerComponents()
-    .AddInteractiveWebAssemblyComponents();
-
-builder.Services.AddQuartz(q =>
+try
 {
-    // Just use the name of your job that you created in the Jobs folder.
-    q.AddJob<TestJob>(opts => opts.WithIdentity(TestJob.Key));
+    var builder = WebApplication.CreateBuilder(args);
 
-    q.AddTrigger(opts =>
-        opts.ForJob(TestJob.Key)
-            .WithIdentity("SendEmailJob-trigger")
-            //This Cron interval can be described as "run every minute" (when second is zero)
-            .WithSimpleSchedule(o => o.WithRepeatCount(5).WithInterval(TimeSpan.FromMinutes(1)))
+    builder
+        .Services.AddRazorComponents()
+        .AddInteractiveServerComponents()
+        .AddInteractiveWebAssemblyComponents();
+
+    builder.Services.AddSerilog(
+        (services, lc) =>
+            lc
+                .ReadFrom.Configuration(builder.Configuration)
+                .ReadFrom.Services(services)
+                .Enrich.FromLogContext()
+                .WriteTo.Console()
     );
-});
-builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 
-var app = builder.Build();
+    builder.Services.AddQuartz(q =>
+    {
+        q.AddJob<TestJob>(opts => opts.WithIdentity(TestJob.Key));
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseWebAssemblyDebugging();
+        q.AddTrigger(opts =>
+            opts.ForJob(TestJob.Key)
+                .WithIdentity("SendEmailJob-trigger")
+                //This Cron interval can be described as "run every minute" (when second is zero)
+                .WithSimpleSchedule(o => o.WithRepeatCount(5).WithInterval(TimeSpan.FromMinutes(1)))
+        );
+    });
+    builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
+
+    var app = builder.Build();
+
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseWebAssemblyDebugging();
+    }
+    else
+    {
+        app.UseExceptionHandler("/Error", createScopeForErrors: true);
+        app.UseHsts();
+    }
+
+    app.UseHttpsRedirection();
+
+    app.UseStaticFiles();
+    app.UseAntiforgery();
+
+    app.UseSerilogRequestLogging();
+
+    app.MapRazorComponents<App>()
+        .AddInteractiveServerRenderMode()
+        .AddInteractiveWebAssemblyRenderMode()
+        .AddAdditionalAssemblies(typeof(Ray.BiliBiliTool.Web.Client._Imports).Assembly);
+
+    app.Run();
 }
-else
+catch (Exception ex)
 {
-    app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+    Log.Fatal(ex, "Application terminated unexpectedly");
 }
-
-app.UseHttpsRedirection();
-
-app.UseStaticFiles();
-app.UseAntiforgery();
-
-app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode()
-    .AddInteractiveWebAssemblyRenderMode()
-    .AddAdditionalAssemblies(typeof(Ray.BiliBiliTool.Web.Client._Imports).Assembly);
-
-app.Run();
+finally
+{
+    Log.CloseAndFlush();
+}
