@@ -375,3 +375,6 @@ coveragereport
 
 # bruno
 bruno/.env
+
+# db
+src/**/BiliBiliTool.db*
