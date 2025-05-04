@@ -6,17 +6,22 @@
     <UserSecretsId>1970628b-9d9e-45d1-b337-32d4d1e64e95</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="AppAny.Quartz.EntityFrameworkCore.Migrations.SQLite" Version="0.5.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.4">
+    <PackageReference
+      Include="AppAny.Quartz.EntityFrameworkCore.Migrations.SQLite"
+      Version="0.5.1"
+    />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.4" />
+    <PackageReference Include="MudBlazor" Version="8.6.0" />
     <PackageReference Include="Quartz" Version="3.14.0" />
     <PackageReference Include="Quartz.AspNetCore" Version="3.14.0" />
     <PackageReference Include="Quartz.Serialization.SystemTextJson" Version="3.14.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.119" />
+    <ProjectReference Include="..\BlazingQuartz.Core\BlazingQuartz.Core.csproj" />
+    <ProjectReference Include="..\Ray.BiliBiliTool.Infrastructure.EF\Ray.BiliBiliTool.Infrastructure.EF.csproj" />
     <ProjectReference Include="..\Ray.BiliBiliTool.Web.Client\Ray.BiliBiliTool.Web.Client.csproj" />
     <PackageReference
       Include="Microsoft.AspNetCore.Components.WebAssembly.Server"

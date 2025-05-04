@@ -8,14 +8,14 @@ namespace InfrastructureTest
         [Fact]
         public void Replace_Test()
         {
-            string input = "ÕâÊÇÒ»¶Î°üº¬ÌØÊâ×Ö·û!@#$%^&*(')µÄ×Ö·û´®";
+            string input = "ï¿½ï¿½ï¿½ï¿½Ò»ï¿½Î°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½!@#$%^&*(')ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½";
             string pattern = "[!'()*]";
             string replacement = "";
 
             string output = Regex.Replace(input, pattern, replacement);
             Debug.WriteLine(output);
 
-            Assert.Equal("ÕâÊÇÒ»¶Î°üº¬ÌØÊâ×Ö·û@#$%^&µÄ×Ö·û´®", output);
+            Assert.Equal("ï¿½ï¿½ï¿½ï¿½Ò»ï¿½Î°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½@#$%^&ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½", output);
         }
     }
 }

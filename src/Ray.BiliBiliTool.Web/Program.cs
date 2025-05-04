@@ -1,11 +1,15 @@
+using BlazingQuartz;
+using BlazingQuartz.Core;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor.Services;
 using Quartz;
 using Quartz.Impl.AdoJobStore;
+using Ray.BiliBiliTool.Infrastructure.EF;
 using Ray.BiliBiliTool.Web;
 using Ray.BiliBiliTool.Web.Client.Pages;
 using Ray.BiliBiliTool.Web.Components;
 using Ray.BiliBiliTool.Web.Jobs;
+using Ray.BiliBiliTool.Web.Services;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
@@ -37,14 +41,16 @@ try
             storeOptions.UseSQLite(sqlLiteOptions =>
             {
                 sqlLiteOptions.UseDriverDelegate<SQLiteDelegate>();
-                sqlLiteOptions.ConnectionString = builder.Configuration.GetConnectionString("Sqlite");
+                sqlLiteOptions.ConnectionString = builder.Configuration.GetConnectionString(
+                    "Sqlite"
+                );
                 sqlLiteOptions.TablePrefix = "QRTZ_";
             });
             storeOptions.UseSystemTextJsonSerializer();
         });
 
+        // Test job
         q.AddJob<TestJob>(opts => opts.WithIdentity(TestJob.Key));
-
         q.AddTrigger(opts =>
             opts.ForJob(TestJob.Key)
                 .WithIdentity($"{TestJob.Key}-trigger")
@@ -55,10 +61,28 @@ try
                 .WithIdentity($"{TestJob.Key}-cron-trigger")
                 .WithCronSchedule("0 0/5 * * * ?")
         );
+
+        // Login job
+        q.AddJob<LoginJob>(opts => opts.WithIdentity(LoginJob.Key));
+        q.AddTrigger(opts =>
+            opts.ForJob(LoginJob.Key)
+                .WithIdentity($"{LoginJob.Key}-cron-trigger")
+                .WithCronSchedule("0 0 0 1 1 ?")
+        );
     });
     builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 
-    builder.Services.AddDbContext<BiliDbContext>();
+    builder.Services.AddDbContextFactory<BiliDbContext>();
+
+    // Add BlazingQuartz
+    var blazingUIConfiguration = builder.Configuration.GetSection("BlazingQuartz");
+    builder.Services.Configure<BlazingQuartzUIOptions>(blazingUIConfiguration);
+    builder.Services.AddBlazingQuartz();
+    builder.Services.AddMudServices();
+
+    // builder.Services.AddScoped<LayoutService>();
+    // builder.Services.AddTransient<ITriggerDetailModelValidator, TriggerDetailModelValidator>();
+    // builder.Services.AddSingleton<IJobUIProvider, JobUIProvider>();
 
     var app = builder.Build();
 

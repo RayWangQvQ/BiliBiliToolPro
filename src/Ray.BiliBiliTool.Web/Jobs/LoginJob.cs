@@ -1,10 +1,11 @@
 using Quartz;
+using Ray.BiliBiliTool.Application.Contracts;
 
 namespace Ray.BiliBiliTool.Web.Jobs;
 
-public class TestJob(ILogger<TestJob> logger) : IJob
+public class LoginJob(ILogger<TestJob> logger, ILoginTaskAppService loginTaskAppService) : IJob
 {
-    public static readonly JobKey Key = new(nameof(TestJob));
+    public static readonly JobKey Key = new(nameof(LoginJob));
 
     public async Task Execute(IJobExecutionContext context)
     {
@@ -20,11 +21,7 @@ public class TestJob(ILogger<TestJob> logger) : IJob
 
     private async Task DoExecuteAsync(IJobExecutionContext context)
     {
-        logger.LogInformation("TestJob started.");
-        for (var i = 0; i < 10; i++)
-        {
-            logger.LogInformation($"TestJob: {i}");
-            await Task.Delay(5 * 1000);
-        }
+        logger.LogInformation($"{nameof(LoginJob)} started.");
+        await loginTaskAppService.DoTaskAsync();
     }
 }
