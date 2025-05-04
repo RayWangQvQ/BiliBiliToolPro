@@ -52,10 +52,10 @@
         </MudItem>
     </MudGrid>
 
-    <MudDataGrid @ref="_scheduleDataGrid"
-                 MultiSelection="true" Items="@ScheduledJobs" Filterable="false"
+    <MudDataGrid @ref="_scheduleDataGrid" Items="@ScheduledJobs"
+                 MultiSelection="true" Filterable="false"
                  ShowColumnOptions="false" SortMode="SortMode.None"
-                 RowStyleFunc="@_scheduleRowStyleFunc"
+                 RowStyleFunc="@ScheduleRowStyleFunc"
                  Breakpoint="Breakpoint.None"
                  Hideable="true" Groupable="true" GroupExpanded="true">
         <ColGroup>
@@ -145,8 +145,7 @@
                     }
                 </CellTemplate>
             </TemplateColumn>
-            <PropertyColumn Title="Job Name" Property="x => x.JobName"
-                            ShowColumnOptions="false">
+            <PropertyColumn Title="Job Name" Property="x => x.JobName" ShowColumnOptions="false">
                 <CellTemplate>
                     <MudTooltip Duration="1000" Text="@context.Item.JobDescription">
                         @context.Item.JobName
@@ -262,13 +261,6 @@
                             CellClass="tab__actions"
                             Sortable="false">
                 <CellTemplate>
-                    <MudTooltip Duration="1000" Text="Edit">
-                        <MudIconButton Icon="@Icons.Material.Filled.Edit"
-                                       Disabled="@IsEditActionDisabled(context.Item)"
-                                       OnClick="@(async () => await OnEditScheduleJob(context.Item))"
-                                       Size="Size.Small" aria-label="Edit"></MudIconButton>
-                    </MudTooltip>
-
                     @if (context.Item.JobStatus == JobStatus.Paused
                          || context.Item.JobStatus == JobStatus.NoTrigger)
                     {
@@ -289,48 +281,20 @@
                         </MudTooltip>
                     }
 
-                    <MudMenu Icon="@Icons.Material.Filled.MoreHoriz" Size="Size.Small"
-                             Style="display: inline-block;">
+                    <MudMenu Icon="@Icons.Material.Filled.MoreHoriz" Size="Size.Small" Style="display: inline-block;">
                         <MudMenuItem Disabled="@IsTriggerNowActionDisabled(context.Item)"
                                      OnClick="@(async () => await OnTriggerNow(context.Item))">
                             <div class="d-flex gap-1">
-                                <MudIcon Icon="@Icons.Material.Filled.PlayCircleOutline" Title="Trigger Now"
-                                         Size="Size.Small"/>
+                                <MudIcon Icon="@Icons.Material.Filled.PlayCircleOutline" Title="Trigger Now" Size="Size.Small"/>
                                 <MudText Typo="Typo.body1">Trigger Now</MudText>
                             </div>
                         </MudMenuItem>
-                        <MudMenuItem Disabled="@IsAddTriggerActionDisabled(context.Item)"
-                                     OnClick="@(async () => await OnAddTrigger(context.Item))">
-                            <div class="d-flex gap-1">
-                                <MudIcon Icon="@Icons.Material.Filled.AddAlarm" Title="Add Trigger"
-                                         Size="Size.Small"/>
-                                <MudText Typo="Typo.body1">Add Trigger</MudText>
-                            </div>
-                        </MudMenuItem>
-                        <MudMenuItem Disabled="@IsCopyActionDisabled(context.Item)"
-                                     OnClick="@(async () => await OnDuplicateScheduleJob(context.Item))">
-                            <div class="d-flex gap-1">
-                                <MudIcon Icon="@Icons.Material.Filled.ContentCopy" Title="Clone Schedule"
-                                         Size="Size.Small"/>
-                                <MudText Typo="Typo.body1">Clone Schedule</MudText>
-                            </div>
-                        </MudMenuItem>
-                        <MudMenuItem Disabled="@IsHistoryActionDisabled(context.Item)"
-                                     OnClick="@(() => OnJobHistory(context.Item))">
-                            <div class="d-flex gap-1">
-                                <MudIcon Icon="@Icons.Material.Filled.ListAlt" Title="History"
-                                         Size="Size.Small"/>
-                                <MudText Typo="Typo.body1">History</MudText>
-                            </div>
-                        </MudMenuItem>
-                        <MudMenuItem OnClick="@(async () => await OnDeleteScheduleJob(context.Item))"
-                                     Disabled="@IsDeleteActionDisabled(context.Item)">
-                            <div class="d-flex gap-1">
-                                <MudIcon Icon="@Icons.Material.Filled.Delete" Title="Delete Schedule"
-                                         Size="Size.Small"/>
-                                <MudText Typo="Typo.body1">Delete Schedule</MudText>
-                            </div>
-                        </MudMenuItem>
+                        @* <MudMenuItem Disabled="@IsHistoryActionDisabled(context.Item)" OnClick="@(() => OnJobHistory(context.Item))"> *@
+                        @*     <div class="d-flex gap-1"> *@
+                        @*         <MudIcon Icon="@Icons.Material.Filled.ListAlt" Title="History" Size="Size.Small"/> *@
+                        @*         <MudText Typo="Typo.body1">History</MudText> *@
+                        @*     </div> *@
+                        @* </MudMenuItem> *@
                     </MudMenu>
                 </CellTemplate>
             </TemplateColumn>

@@ -16,24 +16,15 @@ namespace Ray.BiliBiliTool.Web.Components.Pages.Schedules;
 public partial class Schedules : ComponentBase, IDisposable
 {
     private ScheduleJobFilter _filter = new();
-
-    // private TableGroupDefinition<ScheduleModel> _groupDefinition = new()
-    // {
-    //     GroupName = string.Empty,
-    //     Indentation = false,
-    //     Expandable = true,
-    //     Selector = (e) => e.JobGroup
-    // };
-
-    private readonly Func<ScheduleModel, object> _groupDefinition = x =>
-    {
-        return x.JobGroup;
-    };
+    private readonly Func<ScheduleModel, object> _groupDefinition = x => x.JobGroup;
 
     private bool _openFilter;
     private ScheduleJobFilter _origFilter = new();
-    private MudDataGrid<ScheduleModel>? _scheduleDataGrid;
     private string? SearchJobKeyword;
+    private MudDataGrid<ScheduleModel> _scheduleDataGrid = new();
+
+    [Inject]
+    private ILogger<Schedules> Logger { get; set; } = null!;
 
     [Inject]
     private ISchedulerService SchedulerSvc { get; set; } = null!;
@@ -48,14 +39,11 @@ public partial class Schedules : ComponentBase, IDisposable
     private IDialogService DialogSvc { get; set; } = null!;
 
     [Inject]
-    private ILogger<Schedules> Logger { get; set; } = null!;
-
-    [Inject]
     private ISnackbar Snackbar { get; set; } = null!;
 
     private ObservableCollection<ScheduleModel> ScheduledJobs { get; } = [];
 
-    private Func<ScheduleModel, int, string> _scheduleRowStyleFunc =>
+    private static Func<ScheduleModel, int, string> ScheduleRowStyleFunc =>
         (model, i) =>
         {
             if (model.JobStatus == JobStatus.NoSchedule || model.JobStatus == JobStatus.Error)
@@ -63,6 +51,12 @@ public partial class Schedules : ComponentBase, IDisposable
 
             return "";
         };
+
+    protected override async Task OnInitializedAsync()
+    {
+        RegisterEventListeners();
+        await RefreshJobs();
+    }
 
     public void Dispose() => UnRegisterEventListeners();
 
@@ -101,10 +95,32 @@ public partial class Schedules : ComponentBase, IDisposable
     internal bool IsDeleteActionDisabled(ScheduleModel model) =>
         model.JobStatus == JobStatus.Running;
 
-    protected override async Task OnInitializedAsync()
+    private void RegisterEventListeners()
     {
-        RegisterEventListeners();
-        await RefreshJobs();
+        SchedulerListenerSvc.OnJobToBeExecuted += SchedulerListenerSvc_OnJobToBeExecuted;
+        SchedulerListenerSvc.OnJobScheduled += SchedulerListenerSvc_OnJobScheduled;
+        SchedulerListenerSvc.OnJobWasExecuted += SchedulerListenerSvc_OnJobWasExecuted;
+        SchedulerListenerSvc.OnTriggerFinalized += SchedulerListenerSvc_OnTriggerFinalized;
+        SchedulerListenerSvc.OnJobDeleted += SchedulerListenerSvc_OnJobDeleted;
+        SchedulerListenerSvc.OnJobUnscheduled += SchedulerListenerSvc_OnJobUnscheduled;
+        SchedulerListenerSvc.OnTriggerResumed += SchedulerListenerSvc_OnTriggerResumed;
+        SchedulerListenerSvc.OnTriggerPaused += SchedulerListenerSvc_OnTriggerPaused;
+    }
+
+    private async Task RefreshJobs()
+    {
+        ScheduledJobs.Clear();
+
+        IAsyncEnumerable<ScheduleModel> jobs = SchedulerSvc.GetAllJobsAsync(_filter);
+        await foreach (ScheduleModel job in jobs)
+        {
+            ScheduledJobs.Add(job);
+        }
+
+        if (ScheduledJobs.Any())
+            await _scheduleDataGrid.ExpandAllGroupsAsync();
+
+        await UpdateScheduleModelsLastExecution();
     }
 
     private void UnRegisterEventListeners()
@@ -117,18 +133,6 @@ public partial class Schedules : ComponentBase, IDisposable
         SchedulerListenerSvc.OnJobUnscheduled -= SchedulerListenerSvc_OnJobUnscheduled;
         SchedulerListenerSvc.OnTriggerResumed -= SchedulerListenerSvc_OnTriggerResumed;
         SchedulerListenerSvc.OnTriggerPaused -= SchedulerListenerSvc_OnTriggerPaused;
-    }
-
-    private void RegisterEventListeners()
-    {
-        SchedulerListenerSvc.OnJobToBeExecuted += SchedulerListenerSvc_OnJobToBeExecuted;
-        SchedulerListenerSvc.OnJobScheduled += SchedulerListenerSvc_OnJobScheduled;
-        SchedulerListenerSvc.OnJobWasExecuted += SchedulerListenerSvc_OnJobWasExecuted;
-        SchedulerListenerSvc.OnTriggerFinalized += SchedulerListenerSvc_OnTriggerFinalized;
-        SchedulerListenerSvc.OnJobDeleted += SchedulerListenerSvc_OnJobDeleted;
-        SchedulerListenerSvc.OnJobUnscheduled += SchedulerListenerSvc_OnJobUnscheduled;
-        SchedulerListenerSvc.OnTriggerResumed += SchedulerListenerSvc_OnTriggerResumed;
-        SchedulerListenerSvc.OnTriggerPaused += SchedulerListenerSvc_OnTriggerPaused;
     }
 
     private async void SchedulerListenerSvc_OnTriggerPaused(object? sender, EventArgs<TriggerKey> e)
@@ -345,22 +349,6 @@ public partial class Schedules : ComponentBase, IDisposable
                 || (j.JobStatus == JobStatus.Error && j.TriggerName != null)
             )
         );
-
-    private async Task RefreshJobs()
-    {
-        ScheduledJobs.Clear();
-
-        IAsyncEnumerable<ScheduleModel> jobs = SchedulerSvc.GetAllJobsAsync(_filter);
-        await foreach (ScheduleModel job in jobs)
-        {
-            ScheduledJobs.Add(job);
-        }
-
-        if (ScheduledJobs.Any())
-            _scheduleDataGrid?.ExpandAllGroups();
-
-        await UpdateScheduleModelsLastExecution();
-    }
 
     private async Task UpdateScheduleModelsLastExecution()
     {
@@ -654,11 +642,7 @@ public partial class Schedules : ComponentBase, IDisposable
                     ? new Key(model.TriggerName, model.TriggerGroup ?? Constants.DEFAULT_GROUP)
                     : null,
         };
-        IDialogReference dlg = DialogSvc.Show<HistoryDialog>(
-            "Execution History",
-            parameters,
-            options
-        );
+        DialogSvc.ShowAsync<HistoryDialog>("Execution History", parameters, options);
     }
 
     private async Task OnTriggerNow(ScheduleModel model)
