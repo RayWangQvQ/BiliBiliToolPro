@@ -9,7 +9,6 @@ using Ray.BiliBiliTool.Web;
 using Ray.BiliBiliTool.Web.Client.Pages;
 using Ray.BiliBiliTool.Web.Components;
 using Ray.BiliBiliTool.Web.Jobs;
-using Ray.BiliBiliTool.Web.Services;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
@@ -75,14 +74,11 @@ try
     builder.Services.AddDbContextFactory<BiliDbContext>();
 
     // Add BlazingQuartz
-    var blazingUIConfiguration = builder.Configuration.GetSection("BlazingQuartz");
-    builder.Services.Configure<BlazingQuartzUIOptions>(blazingUIConfiguration);
+    builder.Services.Configure<BlazingQuartzUIOptions>(
+        builder.Configuration.GetSection("BlazingQuartz")
+    );
     builder.Services.AddBlazingQuartz();
     builder.Services.AddMudServices();
-
-    // builder.Services.AddScoped<LayoutService>();
-    // builder.Services.AddTransient<ITriggerDetailModelValidator, TriggerDetailModelValidator>();
-    // builder.Services.AddSingleton<IJobUIProvider, JobUIProvider>();
 
     var app = builder.Build();
 

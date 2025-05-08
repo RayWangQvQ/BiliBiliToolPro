@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using Quartz;
 using Ray.BiliBiliTool.Domain;
+using Ray.BiliBiliTool.Web.Client;
 using Ray.BiliBiliTool.Web.Components.Comps;
 using Ray.BiliBiliTool.Web.Extensions;
 
@@ -17,10 +18,6 @@ public partial class Schedules : ComponentBase, IDisposable
 {
     private ScheduleJobFilter _filter = new();
     private readonly Func<ScheduleModel, object> _groupDefinition = x => x.JobGroup;
-
-    private bool _openFilter;
-    private ScheduleJobFilter _origFilter = new();
-    private string? SearchJobKeyword;
     private MudDataGrid<ScheduleModel> _scheduleDataGrid = new();
 
     [Inject]
@@ -786,38 +783,4 @@ public partial class Schedules : ComponentBase, IDisposable
             triggerModel.EndTimeSpan = null;
         }
     }
-
-    #region Filter
-
-    private void OnFilterClicked()
-    {
-        // backup original filter
-        _origFilter = (ScheduleJobFilter)_filter.Clone();
-
-        _openFilter = true;
-    }
-
-    private void OnSaveFilter() => _openFilter = false;
-
-    private async Task OnClearFilter()
-    {
-        _filter = new ScheduleJobFilter();
-        await RefreshJobs();
-        _openFilter = false;
-    }
-
-    private async Task OnCancelFilter()
-    {
-        _filter = _origFilter;
-        await RefreshJobs();
-        _openFilter = false;
-    }
-
-    private async Task OnIncludeSystemJobsChanged(bool value)
-    {
-        _filter.IncludeSystemJobs = value;
-        await RefreshJobs();
-    }
-
-    #endregion Filter
 }
