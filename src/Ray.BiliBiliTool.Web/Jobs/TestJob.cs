@@ -1,4 +1,5 @@
 using Quartz;
+using Serilog.Context;
 
 namespace Ray.BiliBiliTool.Web.Jobs;
 
@@ -8,13 +9,20 @@ public class TestJob(ILogger<TestJob> logger) : IJob
 
     public async Task Execute(IJobExecutionContext context)
     {
-        try
+        // var correlationId = context.JobDetail.JobDataMap.GetString("CorrelationId");
+        var fireInstanceId = context.FireInstanceId;
+
+        // using (LogContext.PushProperty("CorrelationId", correlationId))
+        using (LogContext.PushProperty("FireInstanceId", fireInstanceId))
         {
-            await DoExecuteAsync(context);
-        }
-        catch (Exception e)
-        {
-            logger.LogError(e, e.Message);
+            try
+            {
+                await DoExecuteAsync(context);
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, e.Message);
+            }
         }
     }
 

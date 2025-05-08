@@ -22,6 +22,8 @@ try
         .AddInteractiveServerComponents()
         .AddInteractiveWebAssemblyComponents();
 
+    var sqliteConnStr = builder.Configuration.GetConnectionString("Sqlite");
+
     builder.Services.AddMudServices();
 
     builder.Services.AddSerilog(
@@ -31,6 +33,11 @@ try
                 .ReadFrom.Services(services)
                 .Enrich.FromLogContext()
                 .WriteTo.Console()
+                .WriteTo.SQLite(
+                    sqliteDbPath: sqliteConnStr.Split(';')[0].Split('=')[1],
+                    tableName: "bili_logs",
+                    storeTimestampInUtc: true
+                )
     );
 
     builder.Services.AddQuartz(q =>
@@ -40,9 +47,7 @@ try
             storeOptions.UseSQLite(sqlLiteOptions =>
             {
                 sqlLiteOptions.UseDriverDelegate<SQLiteDelegate>();
-                sqlLiteOptions.ConnectionString = builder.Configuration.GetConnectionString(
-                    "Sqlite"
-                );
+                sqlLiteOptions.ConnectionString = sqliteConnStr;
                 sqlLiteOptions.TablePrefix = "QRTZ_";
             });
             storeOptions.UseSystemTextJsonSerializer();
