@@ -5,6 +5,7 @@ using MudBlazor.Services;
 using Quartz;
 using Quartz.Impl.AdoJobStore;
 using Ray.BiliBiliTool.Infrastructure.EF;
+using Ray.BiliBiliTool.Infrastructure.EF.Extensions;
 using Ray.BiliBiliTool.Web;
 using Ray.BiliBiliTool.Web.Client.Pages;
 using Ray.BiliBiliTool.Web.Components;
@@ -25,6 +26,8 @@ try
     var sqliteConnStr = builder.Configuration.GetConnectionString("Sqlite");
 
     builder.Services.AddMudServices();
+
+    builder.Services.AddEF();
 
     builder.Services.AddSerilog(
         (services, lc) =>
@@ -75,8 +78,6 @@ try
         );
     });
     builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
-
-    builder.Services.AddDbContextFactory<BiliDbContext>();
 
     // Add BlazingQuartz
     builder.Services.Configure<BlazingQuartzUIOptions>(
