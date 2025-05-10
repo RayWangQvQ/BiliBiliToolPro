@@ -221,9 +221,14 @@
                 <CellTemplate>
                     <MudTooltip Duration="1000" Text="Trigger Now">
                         <MudIconButton Icon="@Icons.Material.Filled.PlayCircleOutline"
-                                       Title="Trigger Now" Size="Size.Small"
+                                       Size="Size.Small"
                                        Disabled="@IsTriggerNowActionDisabled(context.Item)"
                                        OnClick="@(async () => await OnTriggerNow(context.Item))"></MudIconButton>
+                    </MudTooltip>
+                    <MudTooltip Duration="1000" Text="Logs">
+                        <MudIconButton Icon="@Icons.Material.Filled.History"
+                                       Size="Size.Small"
+                                       OnClick="@(() => OnLogs(context.Item))"></MudIconButton>
                     </MudTooltip>
                     <MudMenu Icon="@Icons.Material.Filled.MoreHoriz" Size="Size.Small" Style="display: inline-block;">
                         @if (context.Item.JobStatus is JobStatus.Paused or JobStatus.NoTrigger)

@@ -642,6 +642,31 @@ public partial class Schedules : ComponentBase, IDisposable
         DialogSvc.ShowAsync<HistoryDialog>("Execution History", parameters, options);
     }
 
+    private void OnLogs(ScheduleModel model)
+    {
+        if (model.JobName == null)
+        {
+            return;
+        }
+
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            FullWidth = true,
+            MaxWidth = MaxWidth.Medium,
+        };
+
+        var parameters = new DialogParameters
+        {
+            ["JobKey"] = new Key(model.JobName, model.JobGroup),
+            ["TriggerKey"] =
+                model.TriggerName != null
+                    ? new Key(model.TriggerName, model.TriggerGroup ?? Constants.DEFAULT_GROUP)
+                    : null,
+        };
+        DialogSvc.ShowAsync<LogsDialog>("Logs", parameters, options);
+    }
+
     private async Task OnTriggerNow(ScheduleModel model)
     {
         if (model.JobName == null)
