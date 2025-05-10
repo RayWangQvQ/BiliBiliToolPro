@@ -9,7 +9,8 @@ namespace Ray.BiliBiliTool.Infrastructure.EF;
 
 public class BiliDbContext(IConfiguration config) : DbContext
 {
-    public DbSet<ExecutionLog> ExecutionLogs { get; set; } = null!;
+    public DbSet<ExecutionLog> ExecutionLogs { get; set; }
+    public DbSet<BiliLogs> BiliLogs { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -54,6 +55,20 @@ public class BiliDbContext(IConfiguration config) : DbContext
             });
 
         modelBuilder.Entity<ExecutionLog>().Property(e => e.LogType).HasConversion<string>();
+
+        modelBuilder.Entity<BiliLogs>(entity =>
+        {
+            entity
+                .Property<string>(x => x.FireInstanceIdComputed) // 定义一个影子属性
+                .HasComputedColumnSql(
+                    "json_extract(Properties, '$.FireInstanceId')",
+                    stored: false
+                ); // stored: true 表示持久化存储，利于索引；false (或省略) 为虚拟列
+
+            entity
+                .HasIndex(x => x.FireInstanceIdComputed) // 在计算列上创建索引
+                .HasDatabaseName("IX_Logs_FireInstanceIdComputed");
+        });
     }
 
     private void AddSqliteDateTimeOffsetSupport(ModelBuilder builder)

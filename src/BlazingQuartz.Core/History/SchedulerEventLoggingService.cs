@@ -213,7 +213,7 @@ internal class SchedulerEventLoggingService : BackgroundService, ISchedulerEvent
 
     private async Task AddHousekeepingSchedule(IScheduler scheduler)
     {
-        var housekeepingJobName = "Housekeep ExecutionLogs (bqz)";
+        var housekeepingJobName = "Housekeep ExecutionLogs (bili)";
         var triggerKey = new TriggerKey(housekeepingJobName, Constants.SYSTEM_GROUP);
 
         if (!string.IsNullOrEmpty(_options.HousekeepingCronSchedule))
@@ -250,7 +250,7 @@ internal class SchedulerEventLoggingService : BackgroundService, ISchedulerEvent
 
                 ITrigger nowTrigger = TriggerBuilder
                     .Create()
-                    .WithIdentity("Housekeep ExecutionLogs now (bqz)", Constants.SYSTEM_GROUP)
+                    .WithIdentity("Housekeep ExecutionLogs now (bili)", Constants.SYSTEM_GROUP)
                     .StartNow()
                     .Build();
 

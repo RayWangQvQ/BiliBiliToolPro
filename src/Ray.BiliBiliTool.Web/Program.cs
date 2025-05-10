@@ -11,7 +11,9 @@ using Ray.BiliBiliTool.Web.Client.Pages;
 using Ray.BiliBiliTool.Web.Components;
 using Ray.BiliBiliTool.Web.Jobs;
 using Serilog;
+using Serilog.Debugging;
 
+SelfLog.Enable(Console.Error);
 Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
 
 try
@@ -47,7 +49,7 @@ try
     {
         q.UsePersistentStore(storeOptions =>
         {
-            storeOptions.UseSQLite(sqlLiteOptions =>
+            storeOptions.UseMicrosoftSQLite(sqlLiteOptions =>
             {
                 sqlLiteOptions.UseDriverDelegate<SQLiteDelegate>();
                 sqlLiteOptions.ConnectionString = sqliteConnStr;

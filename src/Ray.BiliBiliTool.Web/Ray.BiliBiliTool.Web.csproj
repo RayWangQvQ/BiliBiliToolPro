@@ -6,10 +6,6 @@
     <UserSecretsId>1970628b-9d9e-45d1-b337-32d4d1e64e95</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference
-      Include="AppAny.Quartz.EntityFrameworkCore.Migrations.SQLite"
-      Version="0.5.1"
-    />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -19,7 +15,7 @@
     <PackageReference Include="Quartz.AspNetCore" Version="3.14.0" />
     <PackageReference Include="Quartz.Serialization.SystemTextJson" Version="3.14.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
-    <PackageReference Include="Serilog.Sinks.SQLite" Version="6.0.0" />
+    <PackageReference Include="Serilog.Sinks.SQLite.Microsoft" Version="1.0.0" />
     <ProjectReference Include="..\BlazingQuartz.Core\BlazingQuartz.Core.csproj" />
     <ProjectReference Include="..\Ray.BiliBiliTool.Infrastructure.EF\Ray.BiliBiliTool.Infrastructure.EF.csproj" />
     <ProjectReference Include="..\Ray.BiliBiliTool.Web.Client\Ray.BiliBiliTool.Web.Client.csproj" />
