@@ -41,7 +41,7 @@
                             <span class="log-message">@log.RenderedMessage</span>
                             @if (!string.IsNullOrEmpty(log.Exception))
                             {
-                                <span class="log-source">[from: @log.Exception]</span>
+                                <span class="log-message">@log.Exception</span>
                             }
                         </div>
                     }

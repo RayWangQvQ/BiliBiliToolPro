@@ -51,8 +51,13 @@ public partial class LogsDialog : ComponentBase
             .OrderByDescending(x => x.FireTimeUtc)
             .FirstOrDefaultAsync();
         _fireInstanceId = excution?.RunInstanceId;
-        await OnRefreshLogs();
 
+        if (_fireInstanceId == null)
+        {
+            return;
+        }
+
+        await OnRefreshLogs();
         _timer = new Timer(
             async _ =>
             {
