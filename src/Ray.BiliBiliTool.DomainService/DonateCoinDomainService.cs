@@ -10,6 +10,7 @@ using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Relation;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Interfaces;
+using Ray.BiliBiliTool.Infrastructure.Cookie;
 
 namespace Ray.BiliBiliTool.DomainService
 {
@@ -18,7 +19,7 @@ namespace Ray.BiliBiliTool.DomainService
     /// </summary>
     public class DonateCoinDomainService(
         ILogger<DonateCoinDomainService> logger,
-        BiliCookie cookie,
+        CookieStrFactory<BiliCookie> cookieFactory,
         IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
         IAccountApi accountApi,
         ICoinDomainService coinDomainService,
@@ -168,7 +169,10 @@ namespace Ray.BiliBiliTool.DomainService
             BiliApiResponse result;
             try
             {
-                var request = new AddCoinRequest(video.Aid, cookie.BiliJct)
+                var request = new AddCoinRequest(
+                    video.Aid,
+                    cookieFactory.GetCurrentCookie().BiliJct
+                )
                 {
                     Select_like = select_like ? 1 : 0,
                 };
@@ -263,7 +267,9 @@ namespace Ray.BiliBiliTool.DomainService
         private async Task<UpVideoInfo> TryGetCanDonateVideoBySpecialUps(int tryCount)
         {
             //获取特别关注列表
-            var request = new GetSpecialFollowingsRequest(long.Parse(cookie.UserId));
+            var request = new GetSpecialFollowingsRequest(
+                long.Parse(cookieFactory.GetCurrentCookie().UserId)
+            );
             BiliApiResponse<List<UpInfo>> specials = await relationApi.GetFollowingsByTag(request);
             if (specials.Data == null || specials.Data.Count == 0)
                 return null;
@@ -282,7 +288,9 @@ namespace Ray.BiliBiliTool.DomainService
         private async Task<UpVideoInfo> TryGetCanDonateVideoByFollowingUps(int tryCount)
         {
             //获取特别关注列表
-            var request = new GetFollowingsRequest(long.Parse(cookie.UserId));
+            var request = new GetFollowingsRequest(
+                long.Parse(cookieFactory.GetCurrentCookie().UserId)
+            );
             BiliApiResponse<GetFollowingsResponse> result = await relationApi.GetFollowings(
                 request
             );
@@ -347,7 +355,7 @@ namespace Ray.BiliBiliTool.DomainService
                     if (randomUpId == 0 || randomUpId == long.MinValue)
                         continue;
 
-                    if (randomUpId.ToString() == cookie.UserId)
+                    if (randomUpId.ToString() == cookieFactory.GetCurrentCookie().UserId)
                     {
                         logger.LogDebug("不能为自己投币");
                         continue;

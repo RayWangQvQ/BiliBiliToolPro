@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Application.Contracts;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.Infrastructure.Cookie;
@@ -21,7 +22,7 @@ public class BiliBiliToolHostedService(
     IHostEnvironment environment,
     IConfiguration configuration,
     ILogger<BiliBiliToolHostedService> logger,
-    CookieStrFactory cookieStrFactory,
+    CookieStrFactory<BiliCookie> cookieStrFactory,
     IOptionsMonitor<SecurityOptions> securityOptions
 ) : IHostedService
 {

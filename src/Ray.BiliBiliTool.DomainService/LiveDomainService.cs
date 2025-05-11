@@ -15,6 +15,7 @@ using Ray.BiliBiliTool.Agent.BiliBiliAgent.Services;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Dtos;
 using Ray.BiliBiliTool.DomainService.Interfaces;
+using Ray.BiliBiliTool.Infrastructure.Cookie;
 
 namespace Ray.BiliBiliTool.DomainService;
 
@@ -32,7 +33,7 @@ public class LiveDomainService(
     IOptionsMonitor<LiveFansMedalTaskOptions> liveFansMedalTaskOptions,
     IOptionsMonitor<SecurityOptions> securityOptions,
     IWbiService wbiService,
-    BiliCookie biliCookie
+    CookieStrFactory<BiliCookie> cookieFactory
 ) : ILiveDomainService
 {
     private readonly LiveLotteryTaskOptions _liveLotteryTaskOptions =
@@ -112,7 +113,7 @@ public class LiveDomainService(
             return false;
 
         logger.LogInformation("开始尝试兑换...");
-        Silver2CoinRequest request = new(biliCookie.BiliJct);
+        Silver2CoinRequest request = new(cookieFactory.GetCurrentCookie().BiliJct);
         var response = await liveApi.Silver2Coin(request);
         if (response.Code == 0)
         {
@@ -254,7 +255,7 @@ public class LiveDomainService(
                 Id = check.Id,
                 Gift_id = check.Gift_id,
                 Gift_num = check.Gift_num,
-                Csrf = biliCookie.BiliJct,
+                Csrf = cookieFactory.GetCurrentCookie().BiliJct,
             };
             var re = await liveApi.Join(request);
             if (re.Code == 0)
@@ -312,11 +313,14 @@ public class LiveDomainService(
         long targetGroupId = await GetOrCreateTianXuanGroupId();
 
         //执行批量分组
-        var referer = string.Format(RelationApiConstant.CopyReferer, biliCookie.UserId);
+        var referer = string.Format(
+            RelationApiConstant.CopyReferer,
+            cookieFactory.GetCurrentCookie().UserId
+        );
         var req = new CopyUserToGroupRequest(
             targetUps.Select(x => x.Uid).ToList(),
             targetGroupId.ToString(),
-            biliCookie.BiliJct
+            cookieFactory.GetCurrentCookie().BiliJct
         );
         var re = await relationApi.CopyUpsToGroup(req, referer);
 
@@ -338,7 +342,10 @@ public class LiveDomainService(
     private async Task<long> GetLastFollowUpId()
     {
         var followings = await relationApi.GetFollowings(
-            new GetFollowingsRequest(long.Parse(biliCookie.UserId), FollowingsOrderType.TimeDesc)
+            new GetFollowingsRequest(
+                long.Parse(cookieFactory.GetCurrentCookie().UserId),
+                FollowingsOrderType.TimeDesc
+            )
         );
         return followings.Data.List.FirstOrDefault()?.Mid ?? 0;
     }
@@ -353,7 +360,10 @@ public class LiveDomainService(
 
         //获取最后一个upId之后关注的所有upId
         var followings = await relationApi.GetFollowings(
-            new GetFollowingsRequest(long.Parse(biliCookie.UserId), FollowingsOrderType.TimeDesc)
+            new GetFollowingsRequest(
+                long.Parse(cookieFactory.GetCurrentCookie().UserId),
+                FollowingsOrderType.TimeDesc
+            )
         );
 
         foreach (UpInfo item in followings.Data.List)
@@ -385,7 +395,10 @@ public class LiveDomainService(
     {
         //获取天选分组Id，没有就创建
         long groupId = 0;
-        string referer = string.Format(RelationApiConstant.GetTagsReferer, biliCookie.UserId);
+        string referer = string.Format(
+            RelationApiConstant.GetTagsReferer,
+            cookieFactory.GetCurrentCookie().UserId
+        );
         var groups = await relationApi.GetTags(referer);
         var tianXuanGroup = groups.Data.FirstOrDefault(x => x.Name == "天选时刻");
         if (tianXuanGroup == null)
@@ -393,7 +406,11 @@ public class LiveDomainService(
             logger.LogInformation("“天选时刻”分组不存在，尝试创建...");
             //创建一个
             var createRe = await relationApi.CreateTag(
-                new CreateTagRequest { Tag = "天选时刻", Csrf = biliCookie.BiliJct }
+                new CreateTagRequest
+                {
+                    Tag = "天选时刻",
+                    Csrf = cookieFactory.GetCurrentCookie().BiliJct,
+                }
             );
             groupId = createRe.Data.Tagid;
             logger.LogInformation("创建成功");
@@ -449,7 +466,7 @@ public class LiveDomainService(
             {
                 var sendResult = await liveApi.SendLiveDanmuku(
                     new SendLiveDanmukuRequest(
-                        biliCookie.BiliJct,
+                        cookieFactory.GetCurrentCookie().BiliJct,
                         spaceInfo.Data.Live_room.Roomid,
                         _liveFansMedalTaskOptions.DanmakuContent
                     )
@@ -537,9 +554,9 @@ public class LiveDomainService(
                             info.HeartBeatCount,
                             timestamp,
                             _securityOptions.UserAgent,
-                            biliCookie.BiliJct,
+                            cookieFactory.GetCurrentCookie().BiliJct,
                             info.RoomInfo.Uid,
-                            $"[\"{biliCookie.LiveBuvid}\",\"{uuid}\"]"
+                            $"[\"{cookieFactory.GetCurrentCookie().LiveBuvid}\",\"{uuid}\"]"
                         )
                     );
                 }
@@ -551,15 +568,15 @@ public class LiveDomainService(
                             info.RoomInfo.Parent_area_id,
                             info.RoomInfo.Area_id,
                             info.HeartBeatCount,
-                            biliCookie.LiveBuvid,
+                            cookieFactory.GetCurrentCookie().LiveBuvid,
                             timestamp,
                             info.HeartBeatInfo.Timestamp,
                             _securityOptions.UserAgent,
                             info.HeartBeatInfo.Secret_rule,
                             info.HeartBeatInfo.Secret_key,
-                            biliCookie.BiliJct,
+                            cookieFactory.GetCurrentCookie().BiliJct,
                             uuid,
-                            $"[\"{biliCookie.LiveBuvid}\",\"{uuid}\"]"
+                            $"[\"{cookieFactory.GetCurrentCookie().LiveBuvid}\",\"{uuid}\"]"
                         )
                     );
                 }
@@ -621,10 +638,10 @@ public class LiveDomainService(
             // Clike_Time 暂时设置为等于设置的LikeNumber，不清楚是否会被风控，我自己抓包最大值为10
             var request = new LikeLiveRoomRequest(
                 info.RoomId,
-                biliCookie.BiliJct,
+                cookieFactory.GetCurrentCookie().BiliJct,
                 _liveFansMedalTaskOptions.LikeNumber,
                 info.LiveRoomInfo.Uid,
-                biliCookie.UserId
+                cookieFactory.GetCurrentCookie().UserId
             );
 
             var result = await liveApi.LikeLiveRoom(request.RawTextBuild());
@@ -646,7 +663,7 @@ public class LiveDomainService(
     private async Task<List<FansMedalInfoDto>> GetFansMedalInfoList()
     {
         logger.LogInformation("【获取直播列表】获取拥有粉丝牌的直播列表");
-        var medalWallInfo = await liveApi.GetMedalWall(biliCookie.UserId);
+        var medalWallInfo = await liveApi.GetMedalWall(cookieFactory.GetCurrentCookie().UserId);
 
         if (medalWallInfo.Code != 0)
         {
@@ -714,7 +731,7 @@ public class LiveDomainService(
     private async Task<bool> CheckLiveCookie()
     {
         // 检测 _biliCookie 是否正确配置
-        if (!string.IsNullOrWhiteSpace(biliCookie.LiveBuvid))
+        if (!string.IsNullOrWhiteSpace(cookieFactory.GetCurrentCookie().LiveBuvid))
             return true;
 
         try
@@ -734,9 +751,9 @@ public class LiveDomainService(
             List<string> liveCookies = liveHome
                 .Headers.SingleOrDefault(header => header.Key == "Set-Cookie")
                 .Value.ToList();
-            biliCookie.MergeCurrentCookie(liveCookies);
+            cookieFactory.GetCurrentCookie().MergeCurrentCookie(liveCookies);
 
-            logger.LogDebug("LiveBuvid {value}", biliCookie.LiveBuvid);
+            logger.LogDebug("LiveBuvid {value}", cookieFactory.GetCurrentCookie().LiveBuvid);
             logger.LogInformation("直播 Cookie 配置成功！");
         }
         catch (Exception exception)

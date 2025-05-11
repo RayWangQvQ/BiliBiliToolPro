@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Application.Attributes;
 using Ray.BiliBiliTool.Application.Contracts;
 using Ray.BiliBiliTool.DomainService.Interfaces;
@@ -14,7 +15,7 @@ public class TestAppService(
     IConfiguration configuration,
     ILogger<TestAppService> logger,
     IAccountDomainService accountDomainService,
-    CookieStrFactory cookieStrFactory
+    CookieStrFactory<BiliCookie> cookieStrFactory
 ) : AppService, ITestAppService
 {
     [TaskInterceptor("测试Cookie")]

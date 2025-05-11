@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Application.Attributes;
 using Ray.BiliBiliTool.Application.Contracts;
 using Ray.BiliBiliTool.DomainService.Interfaces;
@@ -12,7 +13,7 @@ namespace Ray.BiliBiliTool.Application;
 public class UnfollowBatchedTaskAppService(
     ILogger<UnfollowBatchedTaskAppService> logger,
     IAccountDomainService accountDomainService,
-    CookieStrFactory cookieStrFactory
+    CookieStrFactory<BiliCookie> cookieStrFactory
 ) : AppService, IUnfollowBatchedTaskAppService
 {
     [TaskInterceptor("批量取关", TaskLevel.One)]

@@ -30,8 +30,7 @@ public static class ServiceCollectionExtension
     )
     {
         //Cookie
-        services.AddSingleton<CookieStrFactory>();
-        services.AddTransient<BiliCookie>();
+        services.AddSingleton<CookieStrFactory<BiliCookie>>();
 
         //全局代理
         services.SetGlobalProxy(configuration);
@@ -54,7 +53,9 @@ public static class ServiceCollectionExtension
                 "User-Agent",
                 sp.GetRequiredService<IOptionsMonitor<SecurityOptions>>().CurrentValue.UserAgent
             );
-            var ck = sp.GetRequiredService<BiliCookie>().ToString();
+            var ck = sp.GetRequiredService<CookieStrFactory<BiliCookie>>()
+                .GetCurrentCookie()
+                .ToString();
             if (!string.IsNullOrWhiteSpace(ck))
                 c.DefaultRequestHeaders.Add("Cookie", ck);
         };
@@ -64,7 +65,9 @@ public static class ServiceCollectionExtension
                 "User-Agent",
                 sp.GetRequiredService<IOptionsMonitor<SecurityOptions>>().CurrentValue.UserAgentApp
             );
-            var ck = sp.GetRequiredService<BiliCookie>().ToString();
+            var ck = sp.GetRequiredService<CookieStrFactory<BiliCookie>>()
+                .GetCurrentCookie()
+                .ToString();
             if (!string.IsNullOrWhiteSpace(ck))
                 c.DefaultRequestHeaders.Add("Cookie", ck);
         };

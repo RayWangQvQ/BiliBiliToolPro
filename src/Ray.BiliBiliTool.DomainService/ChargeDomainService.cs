@@ -7,6 +7,7 @@ using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Interfaces;
+using Ray.BiliBiliTool.Infrastructure.Cookie;
 
 namespace Ray.BiliBiliTool.DomainService;
 
@@ -17,7 +18,7 @@ public class ChargeDomainService(
     ILogger<ChargeDomainService> logger,
     IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
     IDailyTaskApi dailyTaskApi,
-    BiliCookie cookie,
+    CookieStrFactory<BiliCookie> cookieFactory,
     IChargeApi chargeApi
 ) : IChargeDomainService
 {
@@ -73,11 +74,17 @@ public class ChargeDomainService(
             _dailyTaskOptions.AutoChargeUpId.IsNullOrEmpty()
             | _dailyTaskOptions.AutoChargeUpId == "-1"
         )
-            targetUpId = cookie.UserId;
+        {
+            targetUpId = cookieFactory.GetCurrentCookie().UserId;
+        }
 
         logger.LogDebug("【目标Up】{up}", targetUpId);
 
-        var request = new ChargeRequest(couponBalance, long.Parse(targetUpId), cookie.BiliJct);
+        var request = new ChargeRequest(
+            couponBalance,
+            long.Parse(targetUpId),
+            cookieFactory.GetCurrentCookie().BiliJct
+        );
 
         //BiliApiResponse<ChargeResponse> response = await _chargeApi.Charge(decimal.ToInt32(couponBalance * 10), _dailyTaskOptions.AutoChargeUpId, _cookieOptions.UserId, _cookieOptions.BiliJct);
         BiliApiResponse<ChargeV2Response> response = await chargeApi.ChargeV2Async(request);
@@ -114,7 +121,11 @@ public class ChargeDomainService(
     public async Task ChargeComments(string orderNum)
     {
         var comment = _dailyTaskOptions.ChargeComment ?? "";
-        var request = new ChargeCommentRequest(orderNum, comment, cookie.BiliJct);
+        var request = new ChargeCommentRequest(
+            orderNum,
+            comment,
+            cookieFactory.GetCurrentCookie().BiliJct
+        );
         await chargeApi.ChargeCommentAsync(request);
 
         logger.LogInformation("【留言】{comment}", comment);

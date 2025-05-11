@@ -31,8 +31,7 @@ public class DailyTaskAppService(
     ICoinDomainService coinDomainService,
     ILoginDomainService loginDomainService,
     IConfiguration configuration,
-    BiliCookie biliCookie,
-    CookieStrFactory cookieStrFactory
+    CookieStrFactory<BiliCookie> cookieStrFactory
 ) : AppService, IDailyTaskAppService
 {
     private readonly DailyTaskOptions _dailyTaskOptions = dailyTaskOptions.CurrentValue;
@@ -52,10 +51,10 @@ public class DailyTaskAppService(
                 cookieStrFactory.CurrentNum,
                 Environment.NewLine
             );
-
+            var ck = cookieStrFactory.GetCurrentCookie();
             try
             {
-                await SetCookiesAsync(cancellationToken);
+                await SetCookiesAsync(ck, cancellationToken);
 
                 //每日任务赚经验：
                 UserInfo userInfo = await Login();
@@ -85,7 +84,7 @@ public class DailyTaskAppService(
     }
 
     [TaskInterceptor("Set Cookie")]
-    private async Task SetCookiesAsync(CancellationToken cancellationToken)
+    private async Task SetCookiesAsync(BiliCookie biliCookie, CancellationToken cancellationToken)
     {
         //判断cookie是否完整
         if (biliCookie.Buvid.IsNotNullOrEmpty())
@@ -248,7 +247,7 @@ public class DailyTaskAppService(
 
     private async Task SaveCookieAsync(BiliCookie ckInfo, CancellationToken cancellationToken)
     {
-        var platformType = configuration.GetSection("PlateformType").Get<PlatformType>();
+        var platformType = configuration.GetSection("PlatformType").Get<PlatformType>();
         logger.LogInformation("当前运行平台：{platform}", platformType);
 
         //更新cookie到青龙env

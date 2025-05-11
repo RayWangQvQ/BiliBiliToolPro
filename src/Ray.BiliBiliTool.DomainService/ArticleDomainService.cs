@@ -11,12 +11,13 @@ using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Services;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Interfaces;
+using Ray.BiliBiliTool.Infrastructure.Cookie;
 
 namespace Ray.BiliBiliTool.DomainService;
 
 public class ArticleDomainService(
     IArticleApi articleApi,
-    BiliCookie biliCookie,
+    CookieStrFactory<BiliCookie> cookieFactory,
     ILogger<ArticleDomainService> logger,
     IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
     ICoinDomainService coinDomainService,
@@ -38,7 +39,7 @@ public class ArticleDomainService(
 
     public async Task LikeArticle(long cvid)
     {
-        await articleApi.LikeAsync(cvid, biliCookie.BiliJct);
+        await articleApi.LikeAsync(cvid, cookieFactory.GetCurrentCookie().BiliJct);
     }
 
     /// <summary>
@@ -119,7 +120,7 @@ public class ArticleDomainService(
             var refer =
                 $"https://www.bilibili.com/read/cv{cvid}/?from=search&spm_id_from=333.337.0.0";
             result = await articleApi.AddCoinForArticleAsync(
-                new AddCoinForArticleRequest(cvid, mid, biliCookie.BiliJct),
+                new AddCoinForArticleRequest(cvid, mid, cookieFactory.GetCurrentCookie().BiliJct),
                 refer
             );
         }
@@ -215,7 +216,7 @@ public class ArticleDomainService(
             if (randomUpId is 0 or long.MinValue)
                 return 0;
 
-            if (randomUpId.ToString() == biliCookie.UserId)
+            if (randomUpId.ToString() == cookieFactory.GetCurrentCookie().UserId)
             {
                 logger.LogDebug("不能为自己投币");
                 return 0;

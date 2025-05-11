@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Application.Attributes;
 using Ray.BiliBiliTool.Application.Contracts;
 using Ray.BiliBiliTool.DomainService.Interfaces;
@@ -12,7 +13,7 @@ namespace Ray.BiliBiliTool.Application;
 public class LiveFansMedalAppService(
     ILogger<LiveFansMedalAppService> logger,
     ILiveDomainService liveDomainService,
-    CookieStrFactory cookieStrFactory
+    CookieStrFactory<BiliCookie> cookieStrFactory
 ) : AppService, ILiveFansMedalAppService
 {
     [TaskInterceptor("直播间互动", TaskLevel.One)]

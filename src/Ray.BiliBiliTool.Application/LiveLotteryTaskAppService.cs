@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Application.Attributes;
 using Ray.BiliBiliTool.Application.Contracts;
 using Ray.BiliBiliTool.Config.Options;
@@ -16,7 +17,7 @@ public class LiveLotteryTaskAppService(
     IOptionsMonitor<LiveLotteryTaskOptions> liveLotteryTaskOptions,
     ILogger<LiveLotteryTaskAppService> logger,
     IAccountDomainService accountDomainService,
-    CookieStrFactory cookieStrFactory
+    CookieStrFactory<BiliCookie> cookieStrFactory
 ) : AppService, ILiveLotteryTaskAppService
 {
     private readonly LiveLotteryTaskOptions _liveLotteryTaskOptions =

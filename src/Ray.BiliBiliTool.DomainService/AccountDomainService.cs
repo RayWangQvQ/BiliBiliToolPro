@@ -10,6 +10,7 @@ using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Relation;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Interfaces;
+using Ray.BiliBiliTool.Infrastructure.Cookie;
 
 namespace Ray.BiliBiliTool.DomainService;
 
@@ -19,11 +20,11 @@ namespace Ray.BiliBiliTool.DomainService;
 public class AccountDomainService(
     ILogger<AccountDomainService> logger,
     IDailyTaskApi dailyTaskApi,
-    BiliCookie cookie,
     IUserInfoApi userInfoApi,
     IRelationApi relationApi,
     IOptionsMonitor<UnfollowBatchedTaskOptions> unfollowBatchedTaskOptions,
-    IOptionsMonitor<DailyTaskOptions> dailyTaskOptions
+    IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
+    CookieStrFactory<BiliCookie> cookieFactory
 ) : IAccountDomainService
 {
     private readonly UnfollowBatchedTaskOptions _unfollowBatchedTaskOptions =
@@ -100,6 +101,8 @@ public class AccountDomainService(
     public async Task UnfollowBatched()
     {
         logger.LogInformation("【分组名】{group}", _unfollowBatchedTaskOptions.GroupName);
+
+        var cookie = cookieFactory.GetCurrentCookie();
 
         //根据分组名称获取tag
         TagDto tag = await GetTag(_unfollowBatchedTaskOptions.GroupName);
@@ -207,7 +210,10 @@ public class AccountDomainService(
     /// <returns></returns>
     private async Task<TagDto> GetTag(string groupName)
     {
-        string getTagsReferer = string.Format(RelationApiConstant.GetTagsReferer, cookie.UserId);
+        string getTagsReferer = string.Format(
+            RelationApiConstant.GetTagsReferer,
+            cookieFactory.GetCurrentCookie().UserId
+        );
         List<TagDto> tagList = (await relationApi.GetTags(getTagsReferer)).Data;
         TagDto tag = tagList.FirstOrDefault(x => x.Name == groupName);
         return tag;

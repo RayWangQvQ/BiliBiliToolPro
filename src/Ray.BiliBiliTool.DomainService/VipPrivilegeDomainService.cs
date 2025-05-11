@@ -6,6 +6,7 @@ using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Interfaces;
+using Ray.BiliBiliTool.Infrastructure.Cookie;
 
 namespace Ray.BiliBiliTool.DomainService;
 
@@ -15,7 +16,7 @@ namespace Ray.BiliBiliTool.DomainService;
 public class VipPrivilegeDomainService(
     ILogger<VipPrivilegeDomainService> logger,
     IDailyTaskApi dailyTaskApi,
-    BiliCookie biliBiliCookieOptions,
+    CookieStrFactory<BiliCookie> cookieFactory,
     IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
     IOptionsMonitor<VipPrivilegeOptions> receiveVipPrivilegeOptionsce
 ) : IVipPrivilegeDomainService
@@ -78,7 +79,7 @@ public class VipPrivilegeDomainService(
     {
         var response = await dailyTaskApi.ReceiveVipPrivilegeAsync(
             (int)type,
-            biliBiliCookieOptions.BiliJct
+            cookieFactory.GetCurrentCookie().BiliJct
         );
 
         var name = GetPrivilegeName(type);
