@@ -17,6 +17,7 @@
     <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
     <PackageReference Include="Serilog.Sinks.SQLite.Microsoft" Version="1.0.0" />
     <ProjectReference Include="..\BlazingQuartz.Core\BlazingQuartz.Core.csproj" />
+    <ProjectReference Include="..\Ray.BiliBiliTool.Application\Ray.BiliBiliTool.Application.csproj" />
     <ProjectReference Include="..\Ray.BiliBiliTool.Infrastructure.EF\Ray.BiliBiliTool.Infrastructure.EF.csproj" />
     <ProjectReference Include="..\Ray.BiliBiliTool.Web.Client\Ray.BiliBiliTool.Web.Client.csproj" />
     <PackageReference

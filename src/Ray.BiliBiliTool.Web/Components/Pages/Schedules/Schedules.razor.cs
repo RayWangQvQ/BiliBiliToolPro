@@ -653,7 +653,7 @@ public partial class Schedules : ComponentBase, IDisposable
         {
             CloseOnEscapeKey = true,
             FullWidth = true,
-            MaxWidth = MaxWidth.Medium,
+            MaxWidth = MaxWidth.Large,
         };
 
         var parameters = new DialogParameters

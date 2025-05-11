@@ -3,25 +3,15 @@ using Ray.BiliBiliTool.Application.Contracts;
 
 namespace Ray.BiliBiliTool.Web.Jobs;
 
-public class LoginJob(ILogger<TestJob> logger, ILoginTaskAppService loginTaskAppService) : IJob
+public class LoginJob(ILogger<LoginJob> logger, ILoginTaskAppService loginTaskAppService)
+    : BaseJob<LoginJob>(logger)
 {
+    private readonly ILogger<LoginJob> _logger = logger;
     public static readonly JobKey Key = new(nameof(LoginJob));
 
-    public async Task Execute(IJobExecutionContext context)
+    protected override async Task DoExecuteAsync(IJobExecutionContext context)
     {
-        try
-        {
-            await DoExecuteAsync(context);
-        }
-        catch (Exception e)
-        {
-            logger.LogError(e, e.Message);
-        }
-    }
-
-    private async Task DoExecuteAsync(IJobExecutionContext context)
-    {
-        logger.LogInformation($"{nameof(LoginJob)} started.");
+        _logger.LogInformation($"{nameof(LoginJob)} started.");
         await loginTaskAppService.DoTaskAsync();
     }
 }

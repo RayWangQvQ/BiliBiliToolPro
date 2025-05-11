@@ -14,7 +14,9 @@ namespace Ray.BiliBiliTool.Web.Components.Pages.Schedules;
 
 public partial class LogsDialog : ComponentBase
 {
-    // [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = null!;
+
     [Inject]
     private IDialogService DialogSvc { get; set; } = null!;
 
@@ -32,7 +34,7 @@ public partial class LogsDialog : ComponentBase
     [Parameter]
     public Key? TriggerKey { get; set; }
 
-    // void Close() => MudDialog.Cancel();
+    void Close() => MudDialog.Cancel();
 
     private List<BiliLogs> _logs = new();
     private bool _loading = true;

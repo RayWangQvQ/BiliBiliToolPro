@@ -4,6 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using MudBlazor.Services;
 using Quartz;
 using Quartz.Impl.AdoJobStore;
+using Ray.BiliBiliTool.Agent.Extensions;
+using Ray.BiliBiliTool.Application.Extensions;
+using Ray.BiliBiliTool.Config.Extensions;
+using Ray.BiliBiliTool.DomainService.Extensions;
+using Ray.BiliBiliTool.Infrastructure;
 using Ray.BiliBiliTool.Infrastructure.EF;
 using Ray.BiliBiliTool.Infrastructure.EF.Extensions;
 using Ray.BiliBiliTool.Web;
@@ -58,19 +63,6 @@ try
             storeOptions.UseSystemTextJsonSerializer();
         });
 
-        // Test job
-        q.AddJob<TestJob>(opts => opts.WithIdentity(TestJob.Key));
-        q.AddTrigger(opts =>
-            opts.ForJob(TestJob.Key)
-                .WithIdentity($"{TestJob.Key}-trigger")
-                .WithSimpleSchedule(o => o.WithRepeatCount(3).WithInterval(TimeSpan.FromMinutes(1)))
-        );
-        q.AddTrigger(opts =>
-            opts.ForJob(TestJob.Key)
-                .WithIdentity($"{TestJob.Key}-cron-trigger")
-                .WithCronSchedule("0 0/5 * * * ?")
-        );
-
         // Login job
         q.AddJob<LoginJob>(opts => opts.WithIdentity(LoginJob.Key));
         q.AddTrigger(opts =>
@@ -88,7 +80,17 @@ try
     builder.Services.AddBlazingQuartz();
     builder.Services.AddMudServices();
 
+    builder
+        .Services.AddAppServices()
+        .AddDomainServices()
+        .AddBiliBiliConfigs(builder.Configuration)
+        .AddBiliBiliClientApi(builder.Configuration);
+
+    builder.Services.AddAppServices();
+
     var app = builder.Build();
+
+    Global.ServiceProviderRoot = app.Services;
 
     using var scope = app.Services.CreateScope();
     var databaseContext = scope.ServiceProvider.GetRequiredService<BiliDbContext>();

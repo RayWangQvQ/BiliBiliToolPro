@@ -12,7 +12,9 @@ namespace Ray.BiliBiliTool.Web.Components.Pages.Schedules;
 
 public partial class HistoryDialog : ComponentBase
 {
-    // [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
+    [CascadingParameter]
+    IMudDialogInstance MudDialog { get; set; } = null!;
+
     [Inject]
     private IDialogService DialogSvc { get; set; } = null!;
 
@@ -33,7 +35,7 @@ public partial class HistoryDialog : ComponentBase
     private PageMetadata? _lastPageMeta;
     private long _firstLogId;
 
-    // void Close() => MudDialog.Cancel();
+    void Close() => MudDialog.Cancel();
 
     protected override async Task OnInitializedAsync()
     {
