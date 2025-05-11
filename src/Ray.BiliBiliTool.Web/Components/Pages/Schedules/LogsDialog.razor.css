@@ -3,16 +3,22 @@
  * 放置在wwwroot/css/terminal.css
  */
 
-/* 终端窗口 */
+.terminal-container {
+    display: flex;
+    flex-direction: column;
+    height: 75vh;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
 .terminal-window {
     background-color: #0c0c0c;
     color: #cccccc;
     font-family: 'Consolas', 'Courier New', monospace;
     padding: 16px;
-    height: 75vh;
     overflow-y: auto;
-    border-radius: 0 0 0 0;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    flex: 1;
+    min-height: 0;
 }
 
 /* 日志条目 */
@@ -36,6 +42,7 @@
     padding: 0 6px;
     border-radius: 3px;
     white-space: nowrap;
+    min-width: 50px;
 }
 
 /* 不同日志级别的颜色 */

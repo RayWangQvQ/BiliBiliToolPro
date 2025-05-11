@@ -48,11 +48,11 @@ public partial class LogsDialog : ComponentBase
     protected override async Task OnInitializedAsync()
     {
         await using var context = await DbFactory.CreateDbContextAsync();
-        var excution = await context
+        var execution = await context
             .ExecutionLogs.Where(x => x.JobName == JobKey.Name && x.TriggerName == TriggerKey.Name)
             .OrderByDescending(x => x.FireTimeUtc)
             .FirstOrDefaultAsync();
-        _fireInstanceId = excution?.RunInstanceId;
+        _fireInstanceId = execution?.RunInstanceId;
 
         if (_fireInstanceId == null)
         {
@@ -67,7 +67,6 @@ public partial class LogsDialog : ComponentBase
                 {
                     await OnRefreshLogs();
                     StateHasChanged();
-                    await ScrollToBottom();
                 });
             },
             null,
@@ -100,26 +99,6 @@ public partial class LogsDialog : ComponentBase
         {
             _loading = false;
             StateHasChanged();
-        }
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            await ScrollToBottom();
-        }
-    }
-
-    private async Task ScrollToBottom()
-    {
-        try
-        {
-            // await JSRuntime.InvokeVoidAsync("scrollToBottom", _logContainerReference);
-        }
-        catch
-        {
-            // 如果JS互操作失败，静默忽略
         }
     }
 

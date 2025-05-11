@@ -3,11 +3,11 @@ using Ray.BiliBiliTool.Application.Contracts;
 
 namespace Ray.BiliBiliTool.Web.Jobs;
 
-public class LoginJob(ILogger<LoginJob> logger, ILoginTaskAppService appService)
-    : BaseJob<LoginJob>(logger)
+public class DailyJob(ILogger<DailyJob> logger, IDailyTaskAppService appService)
+    : BaseJob<DailyJob>(logger)
 {
-    private readonly ILogger<LoginJob> _logger = logger;
-    public static readonly JobKey Key = new(nameof(LoginJob));
+    private readonly ILogger<DailyJob> _logger = logger;
+    public static readonly JobKey Key = new(nameof(DailyJob));
 
     protected override async Task DoExecuteAsync(IJobExecutionContext context)
     {

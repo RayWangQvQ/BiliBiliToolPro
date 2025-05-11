@@ -27,4 +27,16 @@ public class BiliLogs
 
     [Column("fireInstanceIdComputed")]
     public string? FireInstanceIdComputed { get; set; }
+
+    public string FormattedLogLevel =>
+        Level.ToLower() switch
+        {
+            "verbose" => "VERB",
+            "debug" => "DBG",
+            "information" => "INFO",
+            "warning" => "WARN",
+            "error" => "ERR",
+            "fatal" => "FATAL",
+            _ => Level.ToUpper(),
+        };
 }

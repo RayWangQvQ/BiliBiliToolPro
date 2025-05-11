@@ -12,7 +12,7 @@
         </div>
     </TitleContent>
     <DialogContent>
-        <MudContainer Style="max-height: 800px; overflow-y: scroll">
+        <div class="terminal-container">
             <div class="terminal-header">
                 <div class="terminal-title">BILI_LOGS - Terminal</div>
                 <div class="terminal-controls">
@@ -37,7 +37,7 @@
                     {
                         <div class="log-entry">
                             <span class="log-timestamp">@log.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</span>
-                            <span class="log-level @GetLogLevelClass(log.Level)">@log.Level</span>
+                            <span class="log-level @GetLogLevelClass(log.Level)">@log.FormattedLogLevel</span>
                             <span class="log-message">@log.RenderedMessage</span>
                             @if (!string.IsNullOrEmpty(log.Exception))
                             {
@@ -68,7 +68,7 @@
                     <span>Auto-refresh: 3s</span>
                 </div>
             </div>
-        </MudContainer>
+        </div>
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Close">Close</MudButton>

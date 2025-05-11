@@ -11,6 +11,7 @@ using Ray.BiliBiliTool.Application.Attributes;
 using Ray.BiliBiliTool.Application.Contracts;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Interfaces;
+using Ray.BiliBiliTool.Infrastructure.Cookie;
 using Ray.BiliBiliTool.Infrastructure.Enums;
 
 namespace Ray.BiliBiliTool.Application;
@@ -30,7 +31,8 @@ public class DailyTaskAppService(
     ICoinDomainService coinDomainService,
     ILoginDomainService loginDomainService,
     IConfiguration configuration,
-    BiliCookie biliCookie
+    BiliCookie biliCookie,
+    CookieStrFactory cookieStrFactory
 ) : AppService, IDailyTaskAppService
 {
     private readonly DailyTaskOptions _dailyTaskOptions = dailyTaskOptions.CurrentValue;
@@ -41,26 +43,44 @@ public class DailyTaskAppService(
     [TaskInterceptor("每日任务", TaskLevel.One)]
     public override async Task DoTaskAsync(CancellationToken cancellationToken = default)
     {
-        await SetCookiesAsync(cancellationToken);
+        for (int i = 0; i < cookieStrFactory.Count; i++)
+        {
+            cookieStrFactory.CurrentNum = i + 1;
+            logger.LogInformation(
+                "######### 账号 {num} #########{newLine}",
+                cookieStrFactory.CurrentNum,
+                Environment.NewLine
+            );
 
-        //每日任务赚经验：
-        UserInfo userInfo = await Login();
+            try
+            {
+                await SetCookiesAsync(cancellationToken);
 
-        DailyTaskInfo dailyTaskInfo = await GetDailyTaskStatus();
-        await WatchAndShareVideo(dailyTaskInfo);
+                //每日任务赚经验：
+                UserInfo userInfo = await Login();
 
-        await AddCoins(userInfo);
+                DailyTaskInfo dailyTaskInfo = await GetDailyTaskStatus();
+                await WatchAndShareVideo(dailyTaskInfo);
 
-        //签到：
-        await MangaSign();
-        await MangaRead();
-        await ExchangeSilver2Coin();
+                await AddCoins(userInfo);
 
-        //领福利：
-        await ReceiveVipPrivilege(userInfo);
-        await ReceiveMangaVipReward(userInfo);
+                //签到：
+                await MangaSign();
+                await MangaRead();
+                await ExchangeSilver2Coin();
 
-        await Charge(userInfo);
+                //领福利：
+                await ReceiveVipPrivilege(userInfo);
+                await ReceiveMangaVipReward(userInfo);
+
+                await Charge(userInfo);
+            }
+            catch (Exception e)
+            {
+                //ignore
+                logger.LogWarning("异常：{msg}", e);
+            }
+        }
     }
 
     [TaskInterceptor("Set Cookie")]

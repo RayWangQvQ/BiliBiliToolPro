@@ -70,6 +70,14 @@ try
                 .WithIdentity($"{LoginJob.Key}-cron-trigger")
                 .WithCronSchedule("0 0 0 1 1 ?")
         );
+
+        // Daily job
+        q.AddJob<DailyJob>(opts => opts.WithIdentity(DailyJob.Key));
+        q.AddTrigger(opts =>
+            opts.ForJob(DailyJob.Key)
+                .WithIdentity($"{DailyJob.Key}-cron-trigger")
+                .WithCronSchedule("0 0 0 1 1 ?")
+        );
     });
     builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 
