@@ -56,7 +56,7 @@ public partial class HistoryDialog : ComponentBase
 
         var result = await LogSvc.GetLatestExecutionLog(
             JobKey.Name,
-            JobKey.Group ?? Constants.DEFAULT_GROUP,
+            JobKey.Group ?? BlazingQuartz.Constants.DEFAULT_GROUP,
             TriggerKey?.Name,
             TriggerKey?.Group,
             pageMeta,

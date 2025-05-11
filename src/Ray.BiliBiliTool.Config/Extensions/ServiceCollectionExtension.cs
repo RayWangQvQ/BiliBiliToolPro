@@ -31,9 +31,7 @@ public static class ServiceCollectionExtension
             )
             .Configure<VipBigPointOptions>(configuration.GetSection("VipBigPointConfig"))
             .Configure<SecurityOptions>(configuration.GetSection("Security"))
-            .Configure<ReceiveVipPrivilegeOptions>(
-                configuration.GetSection("ReceiveVipPrivilegeConfig")
-            )
+            .Configure<VipPrivilegeOptions>(configuration.GetSection("VipPrivilegeConfig"))
             .Configure<LiveFansMedalTaskOptions>(
                 configuration.GetSection("LiveFansMedalTaskOptions")
             )

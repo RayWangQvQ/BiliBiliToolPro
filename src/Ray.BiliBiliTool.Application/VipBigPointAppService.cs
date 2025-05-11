@@ -14,6 +14,7 @@ using Ray.BiliBiliTool.Application.Contracts;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Dtos;
 using Ray.BiliBiliTool.DomainService.Interfaces;
+using Ray.BiliBiliTool.Infrastructure.Cookie;
 
 namespace Ray.BiliBiliTool.Application;
 
@@ -26,7 +27,8 @@ public class VipBigPointAppService(
     IAccountDomainService accountDomainService,
     IVipMallApi vipMallApi,
     IVideoApi videoApi,
-    IOptionsMonitor<VipBigPointOptions> vipBigPointOptions
+    IOptionsMonitor<VipBigPointOptions> vipBigPointOptions,
+    CookieStrFactory cookieStrFactory
 ) : AppService, IVipBigPointAppService
 {
     private readonly VipBigPointOptions _vipBigPointOptions = vipBigPointOptions.CurrentValue;
@@ -35,6 +37,24 @@ public class VipBigPointAppService(
     [TaskInterceptor("大会员大积分", TaskLevel.One)]
     public override async Task DoTaskAsync(CancellationToken cancellationToken = default)
     {
+        logger.LogInformation("账号数：{count}", cookieStrFactory.Count);
+        for (int i = 0; i < cookieStrFactory.Count; i++)
+        {
+            cookieStrFactory.CurrentNum = i + 1;
+            logger.LogInformation(
+                "######### 账号 {num} #########{newLine}",
+                cookieStrFactory.CurrentNum,
+                Environment.NewLine
+            );
+
+            try { }
+            catch (Exception e)
+            {
+                //ignore
+                logger.LogWarning("异常：{msg}", e);
+            }
+        }
+
         var userInfo = await GetUserInfo();
         if (userInfo.GetVipType() == VipType.None)
         {

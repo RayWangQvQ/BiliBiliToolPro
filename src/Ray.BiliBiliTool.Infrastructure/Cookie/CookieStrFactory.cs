@@ -1,22 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Configuration;
 
 namespace Ray.BiliBiliTool.Infrastructure.Cookie;
 
 public class CookieStrFactory
 {
-    private readonly Dictionary<int, Dictionary<string, string>> _cookieDictionary;
+    private IConfiguration _configuration;
+    private List<string> _strList;
+
+    private Dictionary<int, Dictionary<string, string>> _cookieDictionary => GetCookieDictionary();
 
     public CookieStrFactory(List<string> strList)
     {
-        _cookieDictionary = new Dictionary<int, Dictionary<string, string>>();
+        _strList = strList ?? [];
+        CurrentNum = 1;
+    }
 
-        for (int i = 0; i < strList?.Count; i++)
-        {
-            _cookieDictionary.Add(i + 1, CkStrToDictionary(strList[i]));
-        }
-
+    public CookieStrFactory(IConfiguration configuration)
+    {
+        _configuration = configuration;
         CurrentNum = 1;
     }
 
@@ -104,6 +108,31 @@ public class CookieStrFactory
     #endregion
 
     #region private
+
+    private Dictionary<int, Dictionary<string, string>> GetCookieDictionary()
+    {
+        if (_strList != null && _strList.Count != 0)
+        {
+            return CookeStrListToCookieDic(_strList);
+        }
+
+        var list = _configuration.GetSection("BiliBiliCookies").Get<List<string>>();
+        return CookeStrListToCookieDic(list);
+    }
+
+    private Dictionary<int, Dictionary<string, string>> CookeStrListToCookieDic(List<string> ckList)
+    {
+        Dictionary<int, Dictionary<string, string>> dic =
+            new Dictionary<int, Dictionary<string, string>>();
+        ckList ??= new List<string>();
+
+        for (int i = 0; i < ckList?.Count; i++)
+        {
+            dic.Add(i + 1, CkStrToDictionary(ckList[i]));
+        }
+
+        return dic;
+    }
 
     private Dictionary<string, string> CkStrToDictionary(string ckStr)
     {

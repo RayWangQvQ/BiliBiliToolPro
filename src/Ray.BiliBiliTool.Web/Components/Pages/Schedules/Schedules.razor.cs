@@ -61,7 +61,7 @@ public partial class Schedules : ComponentBase, IDisposable
         model.JobStatus == JobStatus.NoSchedule
         || model.JobStatus == JobStatus.Error
         || model.JobStatus == JobStatus.Running
-        || model.JobGroup == Constants.SYSTEM_GROUP;
+        || model.JobGroup == BlazingQuartz.Constants.SYSTEM_GROUP;
 
     internal bool IsRunActionDisabled(ScheduleModel model) =>
         model.JobStatus == JobStatus.NoSchedule || model.JobStatus == JobStatus.NoTrigger;
@@ -79,12 +79,12 @@ public partial class Schedules : ComponentBase, IDisposable
     internal bool IsAddTriggerActionDisabled(ScheduleModel model) =>
         model.JobStatus == JobStatus.NoSchedule
         || model.JobStatus == JobStatus.Error
-        || model.JobGroup == Constants.SYSTEM_GROUP;
+        || model.JobGroup == BlazingQuartz.Constants.SYSTEM_GROUP;
 
     internal bool IsCopyActionDisabled(ScheduleModel model) =>
         model.JobStatus == JobStatus.NoSchedule
         || model.JobStatus == JobStatus.Error
-        || model.JobGroup == Constants.SYSTEM_GROUP;
+        || model.JobGroup == BlazingQuartz.Constants.SYSTEM_GROUP;
 
     internal bool IsHistoryActionDisabled(ScheduleModel model) =>
         model.JobStatus == JobStatus.NoSchedule;
@@ -295,8 +295,8 @@ public partial class Schedules : ComponentBase, IDisposable
         if (
             !_filter.IncludeSystemJobs
             && (
-                e.Args.JobKey.Group == Constants.SYSTEM_GROUP
-                || e.Args.Key.Group == Constants.SYSTEM_GROUP
+                e.Args.JobKey.Group == BlazingQuartz.Constants.SYSTEM_GROUP
+                || e.Args.Key.Group == BlazingQuartz.Constants.SYSTEM_GROUP
             )
         )
         {
@@ -446,7 +446,7 @@ public partial class Schedules : ComponentBase, IDisposable
         {
             currentTriggerModel = await SchedulerSvc.GetTriggerDetail(
                 model.TriggerName,
-                model?.TriggerGroup ?? Constants.DEFAULT_GROUP
+                model?.TriggerGroup ?? BlazingQuartz.Constants.DEFAULT_GROUP
             );
 
             if (currentTriggerModel != null)
@@ -575,7 +575,7 @@ public partial class Schedules : ComponentBase, IDisposable
         {
             currentTriggerModel = await SchedulerSvc.GetTriggerDetail(
                 model.TriggerName,
-                model?.TriggerGroup ?? Constants.DEFAULT_GROUP
+                model?.TriggerGroup ?? BlazingQuartz.Constants.DEFAULT_GROUP
             );
             if (currentTriggerModel != null)
             {
@@ -636,7 +636,10 @@ public partial class Schedules : ComponentBase, IDisposable
             ["JobKey"] = new Key(model.JobName, model.JobGroup),
             ["TriggerKey"] =
                 model.TriggerName != null
-                    ? new Key(model.TriggerName, model.TriggerGroup ?? Constants.DEFAULT_GROUP)
+                    ? new Key(
+                        model.TriggerName,
+                        model.TriggerGroup ?? BlazingQuartz.Constants.DEFAULT_GROUP
+                    )
                     : null,
         };
         DialogSvc.ShowAsync<HistoryDialog>("Execution History", parameters, options);
@@ -661,7 +664,10 @@ public partial class Schedules : ComponentBase, IDisposable
             ["JobKey"] = new Key(model.JobName, model.JobGroup),
             ["TriggerKey"] =
                 model.TriggerName != null
-                    ? new Key(model.TriggerName, model.TriggerGroup ?? Constants.DEFAULT_GROUP)
+                    ? new Key(
+                        model.TriggerName,
+                        model.TriggerGroup ?? BlazingQuartz.Constants.DEFAULT_GROUP
+                    )
                     : null,
         };
         DialogSvc.ShowAsync<LogsDialog>("Logs", parameters, options);

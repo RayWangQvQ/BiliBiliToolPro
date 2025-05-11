@@ -11,10 +11,8 @@ using Ray.BiliBiliTool.DomainService.Extensions;
 using Ray.BiliBiliTool.Infrastructure;
 using Ray.BiliBiliTool.Infrastructure.EF;
 using Ray.BiliBiliTool.Infrastructure.EF.Extensions;
-using Ray.BiliBiliTool.Web;
-using Ray.BiliBiliTool.Web.Client.Pages;
 using Ray.BiliBiliTool.Web.Components;
-using Ray.BiliBiliTool.Web.Jobs;
+using Ray.BiliBiliTool.Web.Extensions;
 using Serilog;
 using Serilog.Debugging;
 
@@ -24,6 +22,8 @@ Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
 try
 {
     var builder = WebApplication.CreateBuilder(args);
+
+    builder.Configuration.AddJsonFile("cookies.json", optional: true, reloadOnChange: true);
 
     builder
         .Services.AddRazorComponents()
@@ -63,21 +63,7 @@ try
             storeOptions.UseSystemTextJsonSerializer();
         });
 
-        // Login job
-        q.AddJob<LoginJob>(opts => opts.WithIdentity(LoginJob.Key));
-        q.AddTrigger(opts =>
-            opts.ForJob(LoginJob.Key)
-                .WithIdentity($"{LoginJob.Key}-cron-trigger")
-                .WithCronSchedule("0 0 0 1 1 ?")
-        );
-
-        // Daily job
-        q.AddJob<DailyJob>(opts => opts.WithIdentity(DailyJob.Key));
-        q.AddTrigger(opts =>
-            opts.ForJob(DailyJob.Key)
-                .WithIdentity($"{DailyJob.Key}-cron-trigger")
-                .WithCronSchedule("0 0 0 1 1 ?")
-        );
+        q.AddBiliJobs(builder.Configuration);
     });
     builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 

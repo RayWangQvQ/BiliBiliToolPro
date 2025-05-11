@@ -1,6 +1,6 @@
 ﻿namespace Ray.BiliBiliTool.Config.Options;
 
-public class ReceiveVipPrivilegeOptions
+public class VipPrivilegeOptions
 {
     public bool IsEnable { get; set; } = true;
 }

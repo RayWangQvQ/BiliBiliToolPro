@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Ray.BiliBiliTool.Config.Options;
 
-public class UnfollowBatchedTaskOptions
+public class UnfollowBatchedTaskOptions : IHasCron
 {
     public string GroupName { get; set; }
 
@@ -16,4 +16,6 @@ public class UnfollowBatchedTaskOptions
         RetainUids
             ?.Split(",", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
             .ToList() ?? new List<string>();
+
+    public string Cron { get; set; }
 }

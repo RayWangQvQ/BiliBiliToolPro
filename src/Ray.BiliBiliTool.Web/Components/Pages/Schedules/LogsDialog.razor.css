@@ -40,6 +40,7 @@
 .log-level {
     margin-right: 8px;
     padding: 0 6px;
+    text-align: center;
     border-radius: 3px;
     white-space: nowrap;
     min-width: 50px;

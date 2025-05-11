@@ -134,7 +134,7 @@ public static class ModelExtensions
             return model.TriggerName == triggerKey.Name
                 && model.TriggerGroup == triggerKey.Group
                 && model.JobName == null
-                && model.JobGroup == Constants.DEFAULT_GROUP;
+                && model.JobGroup == BlazingQuartz.Constants.DEFAULT_GROUP;
 
         return model.JobName == null && model.TriggerName == null && model.TriggerGroup == null;
     }

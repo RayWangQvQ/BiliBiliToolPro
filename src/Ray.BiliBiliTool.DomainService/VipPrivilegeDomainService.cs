@@ -17,11 +17,11 @@ public class VipPrivilegeDomainService(
     IDailyTaskApi dailyTaskApi,
     BiliCookie biliBiliCookieOptions,
     IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
-    IOptionsMonitor<ReceiveVipPrivilegeOptions> receiveVipPrivilegeOptionsce
+    IOptionsMonitor<VipPrivilegeOptions> receiveVipPrivilegeOptionsce
 ) : IVipPrivilegeDomainService
 {
     private readonly DailyTaskOptions _dailyTaskOptions = dailyTaskOptions.CurrentValue;
-    private readonly ReceiveVipPrivilegeOptions _receiveVipPrivilegeOptionsce =
+    private readonly VipPrivilegeOptions _vipPrivilegeOptionsce =
         receiveVipPrivilegeOptionsce.CurrentValue;
 
     /// <summary>
@@ -30,7 +30,7 @@ public class VipPrivilegeDomainService(
     /// <param name="useInfo"></param>
     public async Task<bool> ReceiveVipPrivilege(UserInfo userInfo)
     {
-        if (!_receiveVipPrivilegeOptionsce.IsEnable)
+        if (!_vipPrivilegeOptionsce.IsEnable)
         {
             logger.LogInformation("已配置为关闭，跳过");
             return false;

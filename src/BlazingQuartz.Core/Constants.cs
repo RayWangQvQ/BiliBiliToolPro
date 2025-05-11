@@ -5,7 +5,7 @@ namespace BlazingQuartz;
 
 public static class Constants
 {
-    public const string SYSTEM_GROUP = "BlazingQuartz";
+    public const string SYSTEM_GROUP = "System";
     public const string DEFAULT_GROUP = "No Group";
 }
 

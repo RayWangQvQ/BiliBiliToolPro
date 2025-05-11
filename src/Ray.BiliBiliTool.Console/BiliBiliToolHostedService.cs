@@ -45,47 +45,7 @@ public class BiliBiliToolHostedService(
 
             string[] tasks = await ReadTargetTasksAsync(cancellationToken);
             logger.LogInformation("【目标任务】{tasks}", string.Join(",", tasks));
-
-            if (tasks.Contains("Login"))
-            {
-                await DoTasksAsync(tasks, cancellationToken);
-            }
-            else
-            {
-                for (int i = 0; i < cookieStrFactory.Count; i++)
-                {
-                    cookieStrFactory.CurrentNum = i + 1;
-                    logger.LogInformation(
-                        "######### 账号 {num} #########{newLine}",
-                        cookieStrFactory.CurrentNum,
-                        Environment.NewLine
-                    );
-
-                    try
-                    {
-                        await DoTasksAsync(tasks, cancellationToken);
-                        if (isNotifySingle)
-                        {
-                            LogAppInfo();
-
-                            string accountName =
-                                cookieStrFactory.Count > 1
-                                    ? $"账号【{cookieStrFactory.CurrentNum}】"
-                                    : "";
-                            logger.LogInformation(
-                                "·开始推送·{task}·{user}",
-                                $"{configuration["RunTasks"]}任务",
-                                accountName
-                            );
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        //ignore
-                        logger.LogWarning("异常：{msg}", e);
-                    }
-                }
-            }
+            await DoTasksAsync(tasks, cancellationToken);
         }
         catch (Exception ex)
         {

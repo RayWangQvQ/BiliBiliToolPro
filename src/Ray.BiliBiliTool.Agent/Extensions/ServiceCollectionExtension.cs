@@ -30,23 +30,7 @@ public static class ServiceCollectionExtension
     )
     {
         //Cookie
-        services.AddSingleton<CookieStrFactory>(sp =>
-        {
-            var list = new List<string>();
-            var config = sp.GetRequiredService<IConfiguration>();
-
-            //兼容老版
-            var old = config["BiliBiliCookie:CookieStr"];
-            if (!string.IsNullOrWhiteSpace(old))
-                list.Add(old);
-
-            var configList =
-                config.GetSection("BiliBiliCookies").Get<List<string>>()
-                ?? new List<string>().Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
-            list.AddRange(configList);
-
-            return new CookieStrFactory(list);
-        });
+        services.AddSingleton<CookieStrFactory>();
         services.AddTransient<BiliCookie>();
 
         //全局代理

@@ -43,6 +43,7 @@ public class DailyTaskAppService(
     [TaskInterceptor("每日任务", TaskLevel.One)]
     public override async Task DoTaskAsync(CancellationToken cancellationToken = default)
     {
+        logger.LogInformation("账号数：{count}", cookieStrFactory.Count);
         for (int i = 0; i < cookieStrFactory.Count; i++)
         {
             cookieStrFactory.CurrentNum = i + 1;

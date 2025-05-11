@@ -1,13 +1,8 @@
 namespace Ray.BiliBiliTool.Web;
 
-public enum BasePage
+public static class Constants
 {
-    Overview,
-    Schedules,
-    Triggers,
-    History,
-    Calendars,
-    None,
+    public const string BiliJobGroup = "BiliJob";
 }
 
 public enum ScheduleDialogTab
