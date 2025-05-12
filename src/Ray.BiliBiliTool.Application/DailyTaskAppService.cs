@@ -32,7 +32,7 @@ public class DailyTaskAppService(
     ILoginDomainService loginDomainService,
     IConfiguration configuration,
     CookieStrFactory<BiliCookie> cookieStrFactory
-) : AppService, IDailyTaskAppService
+) : BaseMultiAccountsAppService(logger, cookieStrFactory), IDailyTaskAppService
 {
     private readonly DailyTaskOptions _dailyTaskOptions = dailyTaskOptions.CurrentValue;
     private readonly Dictionary<string, int> _expDic = dicOptions.Get(
@@ -40,47 +40,31 @@ public class DailyTaskAppService(
     );
 
     [TaskInterceptor("每日任务", TaskLevel.One)]
-    public override async Task DoTaskAsync(CancellationToken cancellationToken = default)
+    protected override async Task DoTaskAccountAsync(
+        BiliCookie ck,
+        CancellationToken cancellationToken = default
+    )
     {
-        logger.LogInformation("账号数：{count}", cookieStrFactory.Count);
-        for (int i = 0; i < cookieStrFactory.Count; i++)
-        {
-            cookieStrFactory.CurrentNum = i + 1;
-            logger.LogInformation(
-                "######### 账号 {num} #########{newLine}",
-                cookieStrFactory.CurrentNum,
-                Environment.NewLine
-            );
-            var ck = cookieStrFactory.GetCurrentCookie();
-            try
-            {
-                await SetCookiesAsync(ck, cancellationToken);
+        await SetCookiesAsync(ck, cancellationToken);
 
-                //每日任务赚经验：
-                UserInfo userInfo = await Login();
+        //每日任务赚经验：
+        UserInfo userInfo = await Login();
 
-                DailyTaskInfo dailyTaskInfo = await GetDailyTaskStatus();
-                await WatchAndShareVideo(dailyTaskInfo);
+        DailyTaskInfo dailyTaskInfo = await GetDailyTaskStatus();
+        await WatchAndShareVideo(dailyTaskInfo, ck);
 
-                await AddCoins(userInfo);
+        await AddCoins(userInfo, ck);
 
-                //签到：
-                await MangaSign();
-                await MangaRead();
-                await ExchangeSilver2Coin();
+        //签到：
+        await MangaSign();
+        await MangaRead();
+        await ExchangeSilver2Coin(ck);
 
-                //领福利：
-                await ReceiveVipPrivilege(userInfo);
-                await ReceiveMangaVipReward(userInfo);
+        //领福利：
+        await ReceiveVipPrivilege(userInfo, ck);
+        await ReceiveMangaVipReward(userInfo);
 
-                await Charge(userInfo);
-            }
-            catch (Exception e)
-            {
-                //ignore
-                logger.LogWarning("异常：{msg}", e);
-            }
-        }
+        await Charge(userInfo, ck);
     }
 
     [TaskInterceptor("Set Cookie")]
@@ -109,7 +93,7 @@ public class DailyTaskAppService(
     [TaskInterceptor("登录")]
     private async Task<UserInfo> Login()
     {
-        UserInfo userInfo = await accountDomainService.LoginByCookie();
+        UserInfo userInfo = await accountDomainService.LoginByCookie(null); // todo
         if (userInfo == null)
             throw new Exception("登录失败，请检查Cookie"); //终止流程
 
@@ -133,7 +117,7 @@ public class DailyTaskAppService(
     /// 观看、分享视频
     /// </summary>
     [TaskInterceptor("观看、分享视频", rethrowWhenException: false)]
-    private async Task WatchAndShareVideo(DailyTaskInfo dailyTaskInfo)
+    private async Task WatchAndShareVideo(DailyTaskInfo dailyTaskInfo, BiliCookie ck)
     {
         if (!_dailyTaskOptions.IsWatchVideo && !_dailyTaskOptions.IsShareVideo)
         {
@@ -141,14 +125,14 @@ public class DailyTaskAppService(
             return;
         }
 
-        await videoDomainService.WatchAndShareVideo(dailyTaskInfo);
+        await videoDomainService.WatchAndShareVideo(dailyTaskInfo, ck);
     }
 
     /// <summary>
     /// 投币任务
     /// </summary>
     [TaskInterceptor("投币", rethrowWhenException: false)]
-    private async Task AddCoins(UserInfo userInfo)
+    private async Task AddCoins(UserInfo userInfo, BiliCookie ck)
     {
         if (_dailyTaskOptions.SaveCoinsWhenLv6 && userInfo.Level_info.Current_level >= 6)
         {
@@ -160,15 +144,15 @@ public class DailyTaskAppService(
         {
             logger.LogInformation("专栏投币已开启");
 
-            if (!await articleDomainService.AddCoinForArticles())
+            if (!await articleDomainService.AddCoinForArticles(ck))
             {
                 logger.LogInformation("专栏投币结束，转入视频投币");
-                await donateCoinDomainService.AddCoinsForVideos();
+                await donateCoinDomainService.AddCoinsForVideos(ck);
             }
         }
         else
         {
-            await donateCoinDomainService.AddCoinsForVideos();
+            await donateCoinDomainService.AddCoinsForVideos(ck);
         }
     }
 
@@ -176,9 +160,9 @@ public class DailyTaskAppService(
     /// 直播中心的银瓜子兑换硬币
     /// </summary>
     [TaskInterceptor("银瓜子兑换硬币", rethrowWhenException: false)]
-    private async Task ExchangeSilver2Coin()
+    private async Task ExchangeSilver2Coin(BiliCookie ck)
     {
-        var success = await liveDomainService.ExchangeSilver2Coin();
+        var success = await liveDomainService.ExchangeSilver2Coin(ck);
         if (!success)
             return;
 
@@ -191,16 +175,16 @@ public class DailyTaskAppService(
     /// 每月领取大会员福利
     /// </summary>
     [TaskInterceptor("领取大会员福利", rethrowWhenException: false)]
-    private async Task ReceiveVipPrivilege(UserInfo userInfo)
+    private async Task ReceiveVipPrivilege(UserInfo userInfo, BiliCookie ck)
     {
-        var suc = await vipPrivilegeDomainService.ReceiveVipPrivilege(userInfo);
+        var suc = await vipPrivilegeDomainService.ReceiveVipPrivilege(userInfo, ck);
 
         //如果领取成功，需要刷新账户信息（比如B币余额）
         if (suc)
         {
             try
             {
-                userInfo = await accountDomainService.LoginByCookie();
+                userInfo = await accountDomainService.LoginByCookie(null); // todo
             }
             catch (Exception ex)
             {
@@ -213,9 +197,9 @@ public class DailyTaskAppService(
     /// 每月为自己充电
     /// </summary>
     [TaskInterceptor("B币券充电", rethrowWhenException: false)]
-    private async Task Charge(UserInfo userInfo)
+    private async Task Charge(UserInfo userInfo, BiliCookie ck)
     {
-        await chargeDomainService.Charge(userInfo);
+        await chargeDomainService.Charge(userInfo, ck);
     }
 
     /// <summary>

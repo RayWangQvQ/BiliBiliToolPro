@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 
 namespace Ray.BiliBiliTool.DomainService.Interfaces;
@@ -8,9 +9,9 @@ namespace Ray.BiliBiliTool.DomainService.Interfaces;
 /// </summary>
 public interface IDonateCoinDomainService : IDomainService
 {
-    Task AddCoinsForVideos();
+    Task AddCoinsForVideos(BiliCookie ck);
 
-    Task<UpVideoInfo> TryGetCanDonatedVideo();
+    Task<UpVideoInfo> TryGetCanDonatedVideo(BiliCookie ck);
 
-    Task<bool> DoAddCoinForVideo(UpVideoInfo video, bool select_like);
+    Task<bool> DoAddCoinForVideo(UpVideoInfo video, bool select_like, BiliCookie ck);
 }

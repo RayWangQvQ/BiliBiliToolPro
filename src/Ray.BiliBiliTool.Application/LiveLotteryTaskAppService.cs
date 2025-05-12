@@ -18,56 +18,40 @@ public class LiveLotteryTaskAppService(
     ILogger<LiveLotteryTaskAppService> logger,
     IAccountDomainService accountDomainService,
     CookieStrFactory<BiliCookie> cookieStrFactory
-) : AppService, ILiveLotteryTaskAppService
+) : BaseMultiAccountsAppService(logger, cookieStrFactory), ILiveLotteryTaskAppService
 {
     private readonly LiveLotteryTaskOptions _liveLotteryTaskOptions =
         liveLotteryTaskOptions.CurrentValue;
 
     [TaskInterceptor("天选时刻抽奖", TaskLevel.One)]
-    public override async Task DoTaskAsync(CancellationToken cancellationToken = default)
+    protected override async Task DoTaskAccountAsync(
+        BiliCookie ck,
+        CancellationToken cancellationToken = default
+    )
     {
-        logger.LogInformation("账号数：{count}", cookieStrFactory.Count);
-        for (int i = 0; i < cookieStrFactory.Count; i++)
-        {
-            cookieStrFactory.CurrentNum = i + 1;
-            logger.LogInformation(
-                "######### 账号 {num} #########{newLine}",
-                cookieStrFactory.CurrentNum,
-                Environment.NewLine
-            );
-
-            try
-            {
-                await LogUserInfo();
-                await LotteryTianXuan();
-                await AutoGroupFollowings();
-            }
-            catch (Exception e)
-            {
-                //ignore
-                logger.LogWarning("异常：{msg}", e);
-            }
-        }
+        await LogUserInfo(ck);
+        await LotteryTianXuan(ck);
+        await AutoGroupFollowings(ck);
     }
 
     [TaskInterceptor("打印用户信息")]
-    private async Task LogUserInfo()
+    private async Task LogUserInfo(BiliCookie ck)
     {
-        await accountDomainService.LoginByCookie();
+        await accountDomainService.LoginByCookie(ck);
     }
 
     [TaskInterceptor("抽奖")]
-    private async Task LotteryTianXuan()
+    private async Task LotteryTianXuan(BiliCookie ck)
     {
-        await liveDomainService.TianXuan();
+        await liveDomainService.TianXuan(ck);
     }
 
     [TaskInterceptor("自动分组关注的主播")]
-    private async Task AutoGroupFollowings()
+    private async Task AutoGroupFollowings(BiliCookie ck)
     {
         if (_liveLotteryTaskOptions.AutoGroupFollowings)
         {
-            await liveDomainService.GroupFollowing();
+            await liveDomainService.GroupFollowing(ck);
         }
         else
         {

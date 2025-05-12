@@ -29,7 +29,7 @@ public class ChargeDomainService(
     /// 月底自动己充电
     /// 仅充会到期的B币券，低于2的时候不会充
     /// </summary>
-    public async Task Charge(UserInfo userInfo)
+    public async Task Charge(UserInfo userInfo, BiliCookie ck)
     {
         if (_dailyTaskOptions.DayOfAutoCharge == 0)
         {
@@ -75,16 +75,12 @@ public class ChargeDomainService(
             | _dailyTaskOptions.AutoChargeUpId == "-1"
         )
         {
-            targetUpId = cookieFactory.GetCurrentCookie().UserId;
+            targetUpId = ck.UserId;
         }
 
         logger.LogDebug("【目标Up】{up}", targetUpId);
 
-        var request = new ChargeRequest(
-            couponBalance,
-            long.Parse(targetUpId),
-            cookieFactory.GetCurrentCookie().BiliJct
-        );
+        var request = new ChargeRequest(couponBalance, long.Parse(targetUpId), ck.BiliJct);
 
         //BiliApiResponse<ChargeResponse> response = await _chargeApi.Charge(decimal.ToInt32(couponBalance * 10), _dailyTaskOptions.AutoChargeUpId, _cookieOptions.UserId, _cookieOptions.BiliJct);
         BiliApiResponse<ChargeV2Response> response = await chargeApi.ChargeV2Async(request);
@@ -99,7 +95,7 @@ public class ChargeDomainService(
                 logger.LogInformation("在过期前使用成功，赠送的B币券没有浪费哦~");
 
                 //充电留言
-                await ChargeComments(response.Data.Order_no);
+                await ChargeComments(response.Data.Order_no, ck);
             }
             else
             {
@@ -118,14 +114,10 @@ public class ChargeDomainService(
     /// 充电后留言
     /// </summary>
     /// <param name="token"></param>
-    public async Task ChargeComments(string orderNum)
+    public async Task ChargeComments(string orderNum, BiliCookie ck)
     {
         var comment = _dailyTaskOptions.ChargeComment ?? "";
-        var request = new ChargeCommentRequest(
-            orderNum,
-            comment,
-            cookieFactory.GetCurrentCookie().BiliJct
-        );
+        var request = new ChargeCommentRequest(orderNum, comment, ck.BiliJct);
         await chargeApi.ChargeCommentAsync(request);
 
         logger.LogInformation("【留言】{comment}", comment);

@@ -14,50 +14,34 @@ public class LiveFansMedalAppService(
     ILogger<LiveFansMedalAppService> logger,
     ILiveDomainService liveDomainService,
     CookieStrFactory<BiliCookie> cookieStrFactory
-) : AppService, ILiveFansMedalAppService
+) : BaseMultiAccountsAppService(logger, cookieStrFactory), ILiveFansMedalAppService
 {
     [TaskInterceptor("直播间互动", TaskLevel.One)]
-    public override async Task DoTaskAsync(CancellationToken cancellationToken = default)
+    protected override async Task DoTaskAccountAsync(
+        BiliCookie ck,
+        CancellationToken cancellationToken = default
+    )
     {
-        logger.LogInformation("账号数：{count}", cookieStrFactory.Count);
-        for (int i = 0; i < cookieStrFactory.Count; i++)
-        {
-            cookieStrFactory.CurrentNum = i + 1;
-            logger.LogInformation(
-                "######### 账号 {num} #########{newLine}",
-                cookieStrFactory.CurrentNum,
-                Environment.NewLine
-            );
-
-            try
-            {
-                await SendDanmaku();
-                await Like();
-                await HeartBeat();
-            }
-            catch (Exception e)
-            {
-                //ignore
-                logger.LogWarning("异常：{msg}", e);
-            }
-        }
+        await SendDanmaku(ck);
+        await Like(ck);
+        await HeartBeat(ck);
     }
 
     [TaskInterceptor("发送弹幕", TaskLevel.Two, false)]
-    private async Task SendDanmaku()
+    private async Task SendDanmaku(BiliCookie ck)
     {
-        await liveDomainService.SendDanmakuToFansMedalLive();
+        await liveDomainService.SendDanmakuToFansMedalLive(ck);
     }
 
     [TaskInterceptor("点赞直播间", TaskLevel.Two, false)]
-    private async Task Like()
+    private async Task Like(BiliCookie ck)
     {
-        await liveDomainService.LikeFansMedalLive();
+        await liveDomainService.LikeFansMedalLive(ck);
     }
 
     [TaskInterceptor("直播时长挂机", TaskLevel.Two, false)]
-    private async Task HeartBeat()
+    private async Task HeartBeat(BiliCookie ck)
     {
-        await liveDomainService.SendHeartBeatToFansMedalLive();
+        await liveDomainService.SendHeartBeatToFansMedalLive(ck);
     }
 }

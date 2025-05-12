@@ -16,30 +16,14 @@ public class TestAppService(
     ILogger<TestAppService> logger,
     IAccountDomainService accountDomainService,
     CookieStrFactory<BiliCookie> cookieStrFactory
-) : AppService, ITestAppService
+) : BaseMultiAccountsAppService(logger, cookieStrFactory), ITestAppService
 {
     [TaskInterceptor("测试Cookie")]
-    public override async Task DoTaskAsync(CancellationToken cancellationToken = default)
+    protected override async Task DoTaskAccountAsync(
+        BiliCookie ck,
+        CancellationToken cancellationToken = default
+    )
     {
-        logger.LogInformation("账号数：{count}", cookieStrFactory.Count);
-        for (int i = 0; i < cookieStrFactory.Count; i++)
-        {
-            cookieStrFactory.CurrentNum = i + 1;
-            logger.LogInformation(
-                "######### 账号 {num} #########{newLine}",
-                cookieStrFactory.CurrentNum,
-                Environment.NewLine
-            );
-
-            try
-            {
-                await accountDomainService.LoginByCookie();
-            }
-            catch (Exception e)
-            {
-                //ignore
-                logger.LogWarning("异常：{msg}", e);
-            }
-        }
+        await accountDomainService.LoginByCookie(ck);
     }
 }

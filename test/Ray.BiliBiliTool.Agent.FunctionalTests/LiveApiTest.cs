@@ -28,7 +28,7 @@ namespace BiliAgentTest
         {
             using var scope = Global.ServiceProviderRoot.CreateScope();
             var api = scope.ServiceProvider.GetRequiredService<ILiveApi>();
-            var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory>();
+            var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory<BiliCookie>>();
 
             BiliApiResponse<ExchangeSilverStatusResponse> re = api.GetExchangeSilverStatus().Result;
 
@@ -48,7 +48,7 @@ namespace BiliAgentTest
         {
             using var scope = Global.ServiceProviderRoot.CreateScope();
 
-            var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory>();
+            var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory<BiliCookie>>();
             var api = scope.ServiceProvider.GetRequiredService<ILiveApi>();
             var biliCookie = scope.ServiceProvider.GetRequiredService<BiliCookie>();
 
@@ -71,7 +71,7 @@ namespace BiliAgentTest
         {
             using var scope = Global.ServiceProviderRoot.CreateScope();
 
-            var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory>();
+            var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory<BiliCookie>>();
             var api = scope.ServiceProvider.GetRequiredService<ILiveApi>();
 
             BiliApiResponse<LiveWalletStatusResponse> re = api.GetLiveWalletStatus().Result;
@@ -91,7 +91,7 @@ namespace BiliAgentTest
         {
             using var scope = Global.ServiceProviderRoot.CreateScope();
 
-            var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory>();
+            var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory<BiliCookie>>();
             var api = scope.ServiceProvider.GetRequiredService<ILiveApi>();
 
             BiliApiResponse<MedalWallResponse> re = api.GetMedalWall("919174").Result;
@@ -112,7 +112,7 @@ namespace BiliAgentTest
         {
             using var scope = Global.ServiceProviderRoot.CreateScope();
 
-            var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory>();
+            var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory<BiliCookie>>();
             var api = scope.ServiceProvider.GetRequiredService<ILiveApi>();
             var biliCookie = scope.ServiceProvider.GetRequiredService<BiliCookie>();
 
@@ -130,7 +130,7 @@ namespace BiliAgentTest
         {
             using var scope = Global.ServiceProviderRoot.CreateScope();
 
-            var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory>();
+            var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory<BiliCookie>>();
             var api = scope.ServiceProvider.GetRequiredService<IUserInfoApi>();
             var biliCookie = scope.ServiceProvider.GetRequiredService<BiliCookie>();
 
@@ -156,7 +156,7 @@ namespace BiliAgentTest
         {
             using var scope = Global.ServiceProviderRoot.CreateScope();
 
-            var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory>();
+            var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory<BiliCookie>>();
             var api = scope.ServiceProvider.GetRequiredService<ILiveApi>();
             var biliCookie = scope.ServiceProvider.GetRequiredService<BiliCookie>();
 

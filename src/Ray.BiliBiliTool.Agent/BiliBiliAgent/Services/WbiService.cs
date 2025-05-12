@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
+using Ray.BiliBiliTool.Infrastructure.Cookie;
 using Ray.BiliBiliTool.Infrastructure.Helpers;
 
 namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Services;
@@ -19,11 +20,17 @@ public class WbiService : IWbiService
 {
     private readonly ILogger<WbiService> _logger;
     private readonly IUserInfoApi _userInfoApi;
+    private readonly CookieStrFactory<BiliCookie> _cookieStrFactory;
 
-    public WbiService(ILogger<WbiService> logger, IUserInfoApi userInfoApi)
+    public WbiService(
+        ILogger<WbiService> logger,
+        IUserInfoApi userInfoApi,
+        CookieStrFactory<BiliCookie> cookieStrFactory
+    )
     {
         _logger = logger;
         _userInfoApi = userInfoApi;
+        _cookieStrFactory = cookieStrFactory;
     }
 
     public async Task SetWridAsync<T>(T request)
@@ -35,7 +42,7 @@ public class WbiService : IWbiService
         parameters.Remove(nameof(IWrid.w_rid));
 
         //根据当前用户信息取加密key
-        WbiImg wbi = await GetWbiKeysAsync();
+        WbiImg wbi = await GetWbiKeysAsync(null); // todo
 
         //生成
         var re = EncWbi(parameters, wbi.ImgKey, wbi.SubKey);
@@ -106,9 +113,9 @@ public class WbiService : IWbiService
         return re;
     }
 
-    private async Task<WbiImg> GetWbiKeysAsync()
+    private async Task<WbiImg> GetWbiKeysAsync(BiliCookie cookie)
     {
-        BiliApiResponse<UserInfo> apiResponse = await _userInfoApi.LoginByCookie();
+        BiliApiResponse<UserInfo> apiResponse = await _userInfoApi.LoginByCookie(cookie.ToString());
 
         UserInfo useInfo = apiResponse.Data;
 

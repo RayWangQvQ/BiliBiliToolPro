@@ -37,16 +37,16 @@ public class ArticleDomainService(
     /// </summary>
     private readonly Dictionary<string, int> _alreadyDonatedCoinCountCatch = new();
 
-    public async Task LikeArticle(long cvid)
+    public async Task LikeArticle(long cvid, BiliCookie ck)
     {
-        await articleApi.LikeAsync(cvid, cookieFactory.GetCurrentCookie().BiliJct);
+        await articleApi.LikeAsync(cvid, ck.BiliJct);
     }
 
     /// <summary>
     /// 投币专栏任务
     /// </summary>
     /// <returns></returns>
-    public async Task<bool> AddCoinForArticles()
+    public async Task<bool> AddCoinForArticles(BiliCookie ck)
     {
         var donateCoinsCounts = await CalculateDonateCoinsCounts();
 
@@ -63,7 +63,7 @@ public class ArticleDomainService(
         {
             logger.LogDebug("开始尝试第{num}次", i);
 
-            var upId = GetUpFromConfigUps();
+            var upId = GetUpFromConfigUps(ck);
             if (upId == 0)
             {
                 logger.LogDebug("未能成功选择支持的Up主");
@@ -77,12 +77,12 @@ public class ArticleDomainService(
                 continue;
             }
 
-            if (await AddCoinForArticle(cvid, upId))
+            if (await AddCoinForArticle(cvid, upId, ck))
             {
                 // 点赞
                 if (_dailyTaskOptions.SelectLike)
                 {
-                    await LikeArticle(cvid);
+                    await LikeArticle(cvid, ck);
                     logger.LogInformation("专栏点赞成功");
                 }
 
@@ -112,7 +112,7 @@ public class ArticleDomainService(
     /// <param name="cvid">文章cvid</param>
     /// <param name="mid">文章作者mid</param>
     /// <returns>投币是否成功（false 投币失败，true 投币成功）</returns>
-    public async Task<bool> AddCoinForArticle(long cvid, long mid)
+    public async Task<bool> AddCoinForArticle(long cvid, long mid, BiliCookie ck)
     {
         BiliApiResponse result;
         try
@@ -120,7 +120,7 @@ public class ArticleDomainService(
             var refer =
                 $"https://www.bilibili.com/read/cv{cvid}/?from=search&spm_id_from=333.337.0.0";
             result = await articleApi.AddCoinForArticleAsync(
-                new AddCoinForArticleRequest(cvid, mid, cookieFactory.GetCurrentCookie().BiliJct),
+                new AddCoinForArticleRequest(cvid, mid, ck.BiliJct),
                 refer
             );
         }
@@ -197,7 +197,7 @@ public class ArticleDomainService(
     /// 从支持UP主列表中随机挑选一位
     /// </summary>
     /// <returns>被挑选up主的mid</returns>
-    private long GetUpFromConfigUps()
+    private long GetUpFromConfigUps(BiliCookie ck)
     {
         if (
             _dailyTaskOptions.SupportUpIdList == null
@@ -216,7 +216,7 @@ public class ArticleDomainService(
             if (randomUpId is 0 or long.MinValue)
                 return 0;
 
-            if (randomUpId.ToString() == cookieFactory.GetCurrentCookie().UserId)
+            if (randomUpId.ToString() == ck.UserId)
             {
                 logger.LogDebug("不能为自己投币");
                 return 0;

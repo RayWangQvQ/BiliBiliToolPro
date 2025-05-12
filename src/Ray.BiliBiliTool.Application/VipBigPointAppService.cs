@@ -28,80 +28,64 @@ public class VipBigPointAppService(
     IVideoApi videoApi,
     IOptionsMonitor<VipBigPointOptions> vipBigPointOptions,
     CookieStrFactory<BiliCookie> cookieFactory
-) : AppService, IVipBigPointAppService
+) : BaseMultiAccountsAppService(logger, cookieFactory), IVipBigPointAppService
 {
     private readonly VipBigPointOptions _vipBigPointOptions = vipBigPointOptions.CurrentValue;
     private VipTaskInfo _info;
 
     [TaskInterceptor("大会员大积分", TaskLevel.One)]
-    public override async Task DoTaskAsync(CancellationToken cancellationToken = default)
+    protected override async Task DoTaskAccountAsync(
+        BiliCookie ck,
+        CancellationToken cancellationToken = default
+    )
     {
-        logger.LogInformation("账号数：{count}", cookieFactory.Count);
-        for (int i = 0; i < cookieFactory.Count; i++)
+        var userInfo = await GetUserInfo();
+        if (userInfo.GetVipType() == VipType.None)
         {
-            cookieFactory.CurrentNum = i + 1;
-            logger.LogInformation(
-                "######### 账号 {num} #########{newLine}",
-                cookieFactory.CurrentNum,
-                Environment.NewLine
-            );
-            var ck = cookieFactory.GetCurrentCookie();
-            try
-            {
-                var userInfo = await GetUserInfo();
-                if (userInfo.GetVipType() == VipType.None)
-                {
-                    logger.LogInformation("当前不是大会员，跳过任务");
-                    return;
-                }
-
-                var allTasks = await vipApi.GetTaskListAsync();
-                if (allTasks.Code != 0)
-                    throw new Exception(allTasks.ToJsonStr());
-                _info = allTasks.Data;
-                _info.LogInfo(logger);
-
-                await VipExpressAsync(ck);
-
-                //签到
-                await Sign();
-
-                //领取
-                await ReceiveTasksAsync();
-
-                //福利任务
-                await Bonus();
-
-                //体验任务
-                await Privilege();
-
-                //日常任务
-                //浏览追番频道页10秒
-                await ViewAnimate();
-
-                //浏览会员购页面10秒
-                await ViewVipMall();
-
-                //浏览装扮商城
-                await ViewDressMall();
-
-                //观看剧集内容
-                await OgvWatchAsync();
-
-                _info.LogInfo(logger);
-            }
-            catch (Exception e)
-            {
-                //ignore
-                logger.LogWarning("异常：{msg}", e);
-            }
+            logger.LogInformation("当前不是大会员，跳过任务");
+            return;
         }
+
+        var allTasks = await vipApi.GetTaskListAsync();
+        if (allTasks.Code != 0)
+            throw new Exception(allTasks.ToJsonStr());
+        _info = allTasks.Data;
+        _info.LogInfo(logger);
+
+        await VipExpressAsync(ck);
+
+        //签到
+        await Sign();
+
+        //领取
+        await ReceiveTasksAsync();
+
+        //福利任务
+        await Bonus();
+
+        //体验任务
+        await Privilege();
+
+        //日常任务
+        //浏览追番频道页10秒
+        await ViewAnimate();
+
+        //浏览会员购页面10秒
+        await ViewVipMall(ck);
+
+        //浏览装扮商城
+        await ViewDressMall();
+
+        //观看剧集内容
+        await OgvWatchAsync();
+
+        _info.LogInfo(logger);
     }
 
     [TaskInterceptor("测试Cookie")]
     private async Task<UserInfo> GetUserInfo()
     {
-        UserInfo userInfo = await loginDomainService.LoginByCookie();
+        UserInfo userInfo = await loginDomainService.LoginByCookie(null); // todo
         if (userInfo == null)
             throw new Exception("登录失败，请检查Cookie"); //终止流程
 
@@ -126,7 +110,7 @@ public class VipBigPointAppService(
                     logger.LogInformation("开始观看视频");
                     // 观看视频，暂时没有好办法解决，先这样使着
                     DailyTaskInfo dailyTaskInfo = await accountDomainService.GetDailyTaskStatus();
-                    await videoDomainService.WatchAndShareVideo(dailyTaskInfo);
+                    await videoDomainService.WatchAndShareVideo(dailyTaskInfo, biliCookie);
                     // 跳转到未兑换，执行兑换任务
                     goto case 0;
 
@@ -357,7 +341,7 @@ public class VipBigPointAppService(
     }
 
     [TaskInterceptor("浏览会员购页面10秒", TaskLevel.Two, false)]
-    private async Task ViewVipMall()
+    private async Task ViewVipMall(BiliCookie ck)
     {
         const string moduleCode = "日常任务";
         const string taskCode = "vipmallview";
@@ -385,9 +369,7 @@ public class VipBigPointAppService(
         }
 
         logger.LogInformation("开始完成任务");
-        var re = await vipMallApi.ViewVipMallAsync(
-            new ViewVipMallRequest() { Csrf = cookieFactory.GetCurrentCookie().BiliJct }
-        );
+        var re = await vipMallApi.ViewVipMallAsync(new ViewVipMallRequest() { Csrf = ck.BiliJct });
         if (re.Code != 0)
             throw new Exception(re.ToJsonStr());
 
@@ -566,7 +548,7 @@ public class VipBigPointAppService(
         }
     }
 
-    private async Task<bool> WatchBangumi()
+    private async Task<bool> WatchBangumi(BiliCookie ck)
     {
         if (
             _vipBigPointOptions.ViewBangumiList == null
@@ -594,10 +576,10 @@ public class VipBigPointAppService(
             Aid = long.Parse(videoInfo.Aid),
             Bvid = videoInfo.Bvid,
             Cid = videoInfo.Cid,
-            Mid = long.Parse(cookieFactory.GetCurrentCookie().UserId),
+            Mid = long.Parse(ck.UserId),
             Sid = randomSsid,
             Epid = res.Value.Item2,
-            Csrf = cookieFactory.GetCurrentCookie().BiliJct,
+            Csrf = ck.BiliJct,
             Type = 4,
             Sub_type = 1,
             Start_ts = DateTime.Now.ToTimeStamp() - playedTime,

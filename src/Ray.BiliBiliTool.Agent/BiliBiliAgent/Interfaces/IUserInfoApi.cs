@@ -17,7 +17,7 @@ public interface IUserInfoApi : IBiliBiliApi
     /// </summary>
     /// <returns></returns>
     [HttpGet("/x/web-interface/nav")]
-    Task<BiliApiResponse<UserInfo>> LoginByCookie();
+    Task<BiliApiResponse<UserInfo>> LoginByCookie([Header("Cookie")] string ck);
 
     /// <summary>
     /// 获取用户空间信息

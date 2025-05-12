@@ -53,11 +53,6 @@ public static class ServiceCollectionExtension
                 "User-Agent",
                 sp.GetRequiredService<IOptionsMonitor<SecurityOptions>>().CurrentValue.UserAgent
             );
-            var ck = sp.GetRequiredService<CookieStrFactory<BiliCookie>>()
-                .GetCurrentCookie()
-                .ToString();
-            if (!string.IsNullOrWhiteSpace(ck))
-                c.DefaultRequestHeaders.Add("Cookie", ck);
         };
         Action<IServiceProvider, HttpClient> configApp = (sp, c) =>
         {
@@ -65,11 +60,6 @@ public static class ServiceCollectionExtension
                 "User-Agent",
                 sp.GetRequiredService<IOptionsMonitor<SecurityOptions>>().CurrentValue.UserAgentApp
             );
-            var ck = sp.GetRequiredService<CookieStrFactory<BiliCookie>>()
-                .GetCurrentCookie()
-                .ToString();
-            if (!string.IsNullOrWhiteSpace(ck))
-                c.DefaultRequestHeaders.Add("Cookie", ck);
         };
 
         services.AddBiliBiliClientApi<IUserInfoApi>(BiliHosts.Api, config);

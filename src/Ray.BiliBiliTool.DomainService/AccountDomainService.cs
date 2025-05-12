@@ -35,9 +35,9 @@ public class AccountDomainService(
     /// 登录
     /// </summary>
     /// <returns></returns>
-    public async Task<UserInfo> LoginByCookie()
+    public async Task<UserInfo> LoginByCookie(BiliCookie cookie)
     {
-        BiliApiResponse<UserInfo> apiResponse = await userInfoApi.LoginByCookie();
+        BiliApiResponse<UserInfo> apiResponse = await userInfoApi.LoginByCookie(cookie.ToString());
 
         if (apiResponse.Code != 0 || !apiResponse.Data.IsLogin)
         {
@@ -98,14 +98,12 @@ public class AccountDomainService(
     /// </summary>
     /// <param name="groupName"></param>
     /// <param name="count"></param>
-    public async Task UnfollowBatched()
+    public async Task UnfollowBatched(BiliCookie cookie)
     {
         logger.LogInformation("【分组名】{group}", _unfollowBatchedTaskOptions.GroupName);
 
-        var cookie = cookieFactory.GetCurrentCookie();
-
         //根据分组名称获取tag
-        TagDto tag = await GetTag(_unfollowBatchedTaskOptions.GroupName);
+        TagDto tag = await GetTag(_unfollowBatchedTaskOptions.GroupName, cookie);
         var tagId = tag?.Tagid;
         int total = tag?.Count ?? 0;
 
@@ -199,7 +197,7 @@ public class AccountDomainService(
         logger.LogInformation("【本次共取关】{count}人", success);
 
         //计算剩余
-        tag = await GetTag(_unfollowBatchedTaskOptions.GroupName);
+        tag = await GetTag(_unfollowBatchedTaskOptions.GroupName, cookie);
         logger.LogInformation("【分组下剩余】{count}人", tag?.Count ?? 0);
     }
 
@@ -208,12 +206,9 @@ public class AccountDomainService(
     /// </summary>
     /// <param name="groupName"></param>
     /// <returns></returns>
-    private async Task<TagDto> GetTag(string groupName)
+    private async Task<TagDto> GetTag(string groupName, BiliCookie cookie)
     {
-        string getTagsReferer = string.Format(
-            RelationApiConstant.GetTagsReferer,
-            cookieFactory.GetCurrentCookie().UserId
-        );
+        string getTagsReferer = string.Format(RelationApiConstant.GetTagsReferer, cookie.UserId);
         List<TagDto> tagList = (await relationApi.GetTags(getTagsReferer)).Data;
         TagDto tag = tagList.FirstOrDefault(x => x.Name == groupName);
         return tag;

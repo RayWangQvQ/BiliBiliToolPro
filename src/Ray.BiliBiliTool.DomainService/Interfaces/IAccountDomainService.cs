@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 
 namespace Ray.BiliBiliTool.DomainService.Interfaces;
@@ -12,7 +13,7 @@ public interface IAccountDomainService : IDomainService
     /// 使用Cookie登录
     /// </summary>
     /// <returns></returns>
-    Task<UserInfo> LoginByCookie();
+    Task<UserInfo> LoginByCookie(BiliCookie cookie);
 
     /// <summary>
     /// 获取每日任务完成情况
@@ -23,7 +24,7 @@ public interface IAccountDomainService : IDomainService
     /// <summary>
     /// 批量取关
     /// </summary>
-    Task UnfollowBatched();
+    Task UnfollowBatched(BiliCookie cookie);
 
     /// <summary>
     /// 计算升级时间

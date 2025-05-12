@@ -103,14 +103,14 @@ public class VideoDomainService(
         return re.Data.Page.Count;
     }
 
-    public async Task WatchAndShareVideo(DailyTaskInfo dailyTaskStatus)
+    public async Task WatchAndShareVideo(DailyTaskInfo dailyTaskStatus, BiliCookie ck)
     {
         VideoInfoDto targetVideo = null;
 
         //至少有一项未完成，获取视频
         if (!dailyTaskStatus.Watch || !dailyTaskStatus.Share)
         {
-            targetVideo = await GetRandomVideoForWatchAndShare();
+            targetVideo = await GetRandomVideoForWatchAndShare(ck);
             logger.LogInformation("【随机视频】{title}", targetVideo.Title);
         }
 
@@ -118,7 +118,7 @@ public class VideoDomainService(
         //观看
         if (!dailyTaskStatus.Watch && _dailyTaskOptions.IsWatchVideo)
         {
-            await WatchVideo(targetVideo);
+            await WatchVideo(targetVideo, ck);
             watched = true;
         }
         else
@@ -132,7 +132,7 @@ public class VideoDomainService(
             {
                 try
                 {
-                    await OpenVideo(targetVideo);
+                    await OpenVideo(targetVideo, ck);
                 }
                 catch (Exception e)
                 {
@@ -140,7 +140,7 @@ public class VideoDomainService(
                     logger.LogError("打开视频异常：{msg}", e.Message);
                 }
             }
-            await ShareVideo(targetVideo);
+            await ShareVideo(targetVideo, ck);
         }
         else
             logger.LogInformation("今天已经分享过了，不用再分享啦");
@@ -149,10 +149,10 @@ public class VideoDomainService(
     /// <summary>
     /// 观看视频
     /// </summary>
-    public async Task WatchVideo(VideoInfoDto videoInfo)
+    public async Task WatchVideo(VideoInfoDto videoInfo, BiliCookie ck)
     {
         //开始上报一次
-        await OpenVideo(videoInfo);
+        await OpenVideo(videoInfo, ck);
 
         //结束上报一次
         videoInfo.Duration = videoInfo.Duration ?? 15;
@@ -164,8 +164,8 @@ public class VideoDomainService(
             Aid = long.Parse(videoInfo.Aid),
             Bvid = videoInfo.Bvid,
             Cid = videoInfo.Cid,
-            Mid = long.Parse(cookieFactory.GetCurrentCookie().UserId),
-            Csrf = cookieFactory.GetCurrentCookie().BiliJct,
+            Mid = long.Parse(ck.UserId),
+            Csrf = ck.BiliJct,
 
             Played_time = playedTime,
             Realtime = playedTime,
@@ -192,12 +192,9 @@ public class VideoDomainService(
     /// 分享视频
     /// </summary>
     /// <param name="videoInfo">视频</param>
-    public async Task ShareVideo(VideoInfoDto videoInfo)
+    public async Task ShareVideo(VideoInfoDto videoInfo, BiliCookie ck)
     {
-        var request = new ShareVideoRequest(
-            long.Parse(videoInfo.Aid),
-            cookieFactory.GetCurrentCookie().BiliJct
-        );
+        var request = new ShareVideoRequest(long.Parse(videoInfo.Aid), ck.BiliJct);
         BiliApiResponse apiResponse = await videoApi.ShareVideo(request);
 
         if (apiResponse.Code == 0)
@@ -216,7 +213,7 @@ public class VideoDomainService(
     /// </summary>
     /// <param name="videoInfo"></param>
     /// <returns></returns>
-    private async Task<bool> OpenVideo(VideoInfoDto videoInfo)
+    private async Task<bool> OpenVideo(VideoInfoDto videoInfo, BiliCookie ck)
     {
         var request = new UploadVideoHeartbeatRequest
         {
@@ -224,8 +221,8 @@ public class VideoDomainService(
             Bvid = videoInfo.Bvid,
             Cid = videoInfo.Cid,
 
-            Mid = long.Parse(cookieFactory.GetCurrentCookie().UserId),
-            Csrf = cookieFactory.GetCurrentCookie().BiliJct,
+            Mid = long.Parse(ck.UserId),
+            Csrf = ck.BiliJct,
         };
 
         //开始上报一次
@@ -248,10 +245,10 @@ public class VideoDomainService(
     /// 获取一个视频用来观看并分享
     /// </summary>
     /// <returns></returns>
-    private async Task<VideoInfoDto> GetRandomVideoForWatchAndShare()
+    private async Task<VideoInfoDto> GetRandomVideoForWatchAndShare(BiliCookie ck)
     {
         //先从配置的或关注的up中取
-        VideoInfoDto video = await GetRandomVideoOfFollowingUps();
+        VideoInfoDto video = await GetRandomVideoOfFollowingUps(ck);
         if (video != null)
             return video;
 
@@ -268,7 +265,7 @@ public class VideoDomainService(
         };
     }
 
-    private async Task<VideoInfoDto> GetRandomVideoOfFollowingUps()
+    private async Task<VideoInfoDto> GetRandomVideoOfFollowingUps(BiliCookie ck)
     {
         //配置的UpId
         int configUpsCount = _dailyTaskOptions.SupportUpIdList.Count;
@@ -280,7 +277,7 @@ public class VideoDomainService(
         }
 
         //关注列表
-        var request = new GetFollowingsRequest(long.Parse(cookieFactory.GetCurrentCookie().UserId));
+        var request = new GetFollowingsRequest(long.Parse(ck.UserId));
         BiliApiResponse<GetFollowingsResponse> result = await relationApi.GetFollowings(request);
         if (result.Data.Total > 0)
         {

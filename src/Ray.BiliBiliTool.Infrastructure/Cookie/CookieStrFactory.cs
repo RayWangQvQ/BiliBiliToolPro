@@ -10,28 +10,11 @@ public class CookieStrFactory<TCookieInfo>(IConfiguration configuration)
 {
     private Dictionary<int, Dictionary<string, string>> CookieDictionary => GetCookieDictionary();
 
-    public int CurrentNum { get; set; } = 1;
-
     public int Count => CookieDictionary.Count;
 
-    public bool Any()
+    public TCookieInfo GetCookie(int index)
     {
-        if (CurrentNum <= Count)
-            return true;
-        else
-            return false;
-    }
-
-    public TCookieInfo GetCurrentCookie()
-    {
-        Dictionary<string, string> dic;
-        if (!Any())
-        {
-            dic = new Dictionary<string, string>(); //todo
-            //throw new Exception($"第 {CurrentNum} 个cookie不存在");
-        }
-
-        dic = GetCookieDictionary()[CurrentNum];
+        var dic = GetCookieDictionary()[index];
         return (TCookieInfo)Activator.CreateInstance(typeof(TCookieInfo), dic);
     }
 
@@ -51,13 +34,12 @@ public class CookieStrFactory<TCookieInfo>(IConfiguration configuration)
 
     private Dictionary<int, Dictionary<string, string>> CookeStrListToCookieDic(List<string> ckList)
     {
-        Dictionary<int, Dictionary<string, string>> dic =
-            new Dictionary<int, Dictionary<string, string>>();
-        ckList ??= new List<string>();
+        var dic = new Dictionary<int, Dictionary<string, string>>();
+        ckList ??= [];
 
         for (int i = 0; i < ckList?.Count; i++)
         {
-            dic.Add(i + 1, CkStrToDictionary(ckList[i]));
+            dic.Add(i, CkStrToDictionary(ckList[i]));
         }
 
         return dic;
