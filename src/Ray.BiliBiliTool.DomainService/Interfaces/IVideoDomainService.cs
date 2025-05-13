@@ -29,9 +29,9 @@ public interface IVideoDomainService : IDomainService
     /// <param name="upId"></param>
     /// <param name="total"></param>
     /// <returns></returns>
-    Task<UpVideoInfo> GetRandomVideoOfUp(long upId, int total);
+    Task<UpVideoInfo> GetRandomVideoOfUp(long upId, int total, BiliCookie ck);
 
-    Task<int> GetVideoCountOfUp(long upId);
+    Task<int> GetVideoCountOfUp(long upId, BiliCookie ck);
 
     /// <summary>
     /// 观看并分享视频

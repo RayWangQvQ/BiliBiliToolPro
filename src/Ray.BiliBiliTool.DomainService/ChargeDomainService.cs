@@ -83,7 +83,10 @@ public class ChargeDomainService(
         var request = new ChargeRequest(couponBalance, long.Parse(targetUpId), ck.BiliJct);
 
         //BiliApiResponse<ChargeResponse> response = await _chargeApi.Charge(decimal.ToInt32(couponBalance * 10), _dailyTaskOptions.AutoChargeUpId, _cookieOptions.UserId, _cookieOptions.BiliJct);
-        BiliApiResponse<ChargeV2Response> response = await chargeApi.ChargeV2Async(request);
+        BiliApiResponse<ChargeV2Response> response = await chargeApi.ChargeV2Async(
+            request,
+            ck.ToString()
+        );
 
         if (response.Code == 0)
         {
@@ -118,7 +121,7 @@ public class ChargeDomainService(
     {
         var comment = _dailyTaskOptions.ChargeComment ?? "";
         var request = new ChargeCommentRequest(orderNum, comment, ck.BiliJct);
-        await chargeApi.ChargeCommentAsync(request);
+        await chargeApi.ChargeCommentAsync(request, ck.ToString());
 
         logger.LogInformation("【留言】{comment}", comment);
     }

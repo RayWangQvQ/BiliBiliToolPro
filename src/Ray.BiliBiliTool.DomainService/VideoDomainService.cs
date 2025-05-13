@@ -61,7 +61,7 @@ public class VideoDomainService(
         return data;
     }
 
-    public async Task<UpVideoInfo> GetRandomVideoOfUp(long upId, int total)
+    public async Task<UpVideoInfo> GetRandomVideoOfUp(long upId, int total, BiliCookie ck)
     {
         if (total <= 0)
             return null;
@@ -72,9 +72,12 @@ public class VideoDomainService(
             ps = 1,
             pn = new Random().Next(1, total + 1),
         };
-        await wbiService.SetWridAsync(req);
+        await wbiService.SetWridAsync(req, ck);
 
-        BiliApiResponse<SearchUpVideosResponse> re = await videoApi.SearchVideosByUpId(req);
+        BiliApiResponse<SearchUpVideosResponse> re = await videoApi.SearchVideosByUpId(
+            req,
+            ck.ToString()
+        );
 
         if (re.Code != 0)
         {
@@ -89,12 +92,15 @@ public class VideoDomainService(
     /// </summary>
     /// <param name="upId"></param>
     /// <returns></returns>
-    public async Task<int> GetVideoCountOfUp(long upId)
+    public async Task<int> GetVideoCountOfUp(long upId, BiliCookie ck)
     {
         var req = new SearchVideosByUpIdDto() { mid = upId };
-        await wbiService.SetWridAsync(req);
+        await wbiService.SetWridAsync(req, ck);
 
-        BiliApiResponse<SearchUpVideosResponse> re = await videoApi.SearchVideosByUpId(req);
+        BiliApiResponse<SearchUpVideosResponse> re = await videoApi.SearchVideosByUpId(
+            req,
+            ck.ToString()
+        );
         if (re.Code != 0)
         {
             throw new Exception(re.Message);
@@ -171,7 +177,7 @@ public class VideoDomainService(
             Realtime = playedTime,
             Real_played_time = playedTime,
         };
-        BiliApiResponse apiResponse = await videoApi.UploadVideoHeartbeat(request);
+        BiliApiResponse apiResponse = await videoApi.UploadVideoHeartbeat(request, ck.ToString());
 
         if (apiResponse.Code == 0)
         {
@@ -195,7 +201,7 @@ public class VideoDomainService(
     public async Task ShareVideo(VideoInfoDto videoInfo, BiliCookie ck)
     {
         var request = new ShareVideoRequest(long.Parse(videoInfo.Aid), ck.BiliJct);
-        BiliApiResponse apiResponse = await videoApi.ShareVideo(request);
+        BiliApiResponse apiResponse = await videoApi.ShareVideo(request, ck.ToString());
 
         if (apiResponse.Code == 0)
         {
@@ -226,7 +232,7 @@ public class VideoDomainService(
         };
 
         //开始上报一次
-        BiliApiResponse apiResponse = await videoApi.UploadVideoHeartbeat(request);
+        BiliApiResponse apiResponse = await videoApi.UploadVideoHeartbeat(request, ck.ToString());
 
         if (apiResponse.Code == 0)
         {
@@ -271,18 +277,22 @@ public class VideoDomainService(
         int configUpsCount = _dailyTaskOptions.SupportUpIdList.Count;
         if (configUpsCount > 0)
         {
-            VideoInfoDto video = await GetRandomVideoOfUps(_dailyTaskOptions.SupportUpIdList);
+            VideoInfoDto video = await GetRandomVideoOfUps(_dailyTaskOptions.SupportUpIdList, ck);
             if (video != null)
                 return video;
         }
 
         //关注列表
         var request = new GetFollowingsRequest(long.Parse(ck.UserId));
-        BiliApiResponse<GetFollowingsResponse> result = await relationApi.GetFollowings(request);
+        BiliApiResponse<GetFollowingsResponse> result = await relationApi.GetFollowings(
+            request,
+            ck.ToString()
+        );
         if (result.Data.Total > 0)
         {
             VideoInfoDto video = await GetRandomVideoOfUps(
-                result.Data.List.Select(x => x.Mid).ToList()
+                result.Data.List.Select(x => x.Mid).ToList(),
+                ck
             );
             if (video != null)
                 return video;
@@ -296,18 +306,18 @@ public class VideoDomainService(
     /// </summary>
     /// <param name="upIds"></param>
     /// <returns></returns>
-    private async Task<VideoInfoDto> GetRandomVideoOfUps(List<long> upIds)
+    private async Task<VideoInfoDto> GetRandomVideoOfUps(List<long> upIds, BiliCookie ck)
     {
         long upId = upIds[new Random().Next(0, upIds.Count)];
 
         if (upId == 0 || upId == long.MinValue)
             return null;
 
-        int count = await GetVideoCountOfUp(upId);
+        int count = await GetVideoCountOfUp(upId, ck);
 
         if (count > 0)
         {
-            UpVideoInfo video = await GetRandomVideoOfUp(upId, count);
+            UpVideoInfo video = await GetRandomVideoOfUp(upId, count, ck);
             if (video == null)
                 return null;
             return new VideoInfoDto

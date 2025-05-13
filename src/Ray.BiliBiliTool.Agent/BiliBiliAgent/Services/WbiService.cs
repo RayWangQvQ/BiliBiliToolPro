@@ -33,7 +33,7 @@ public class WbiService : IWbiService
         _cookieStrFactory = cookieStrFactory;
     }
 
-    public async Task SetWridAsync<T>(T request)
+    public async Task SetWridAsync<T>(T request, BiliCookie ck)
         where T : IWrid
     {
         //生成字典
@@ -42,7 +42,7 @@ public class WbiService : IWbiService
         parameters.Remove(nameof(IWrid.w_rid));
 
         //根据当前用户信息取加密key
-        WbiImg wbi = await GetWbiKeysAsync(null); // todo
+        WbiImg wbi = await GetWbiKeysAsync(ck);
 
         //生成
         var re = EncWbi(parameters, wbi.ImgKey, wbi.SubKey);

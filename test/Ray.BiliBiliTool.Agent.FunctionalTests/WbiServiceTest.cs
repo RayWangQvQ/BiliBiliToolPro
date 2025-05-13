@@ -43,7 +43,7 @@ public class WbiServiceTest
         };
 
         // Act
-        await _target.SetWridAsync(req);
+        await _target.SetWridAsync(req, null);
 
         // Assert
         req.w_rid.Should().NotBeNullOrWhiteSpace();

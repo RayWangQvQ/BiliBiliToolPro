@@ -77,7 +77,11 @@ public class VipPrivilegeDomainService(
     /// <param name="type">1.大会员B币券；2.大会员福利</param>
     private async Task<bool> ReceiveVipPrivilege(VipPrivilegeType type, BiliCookie ck)
     {
-        var response = await dailyTaskApi.ReceiveVipPrivilegeAsync((int)type, ck.BiliJct);
+        var response = await dailyTaskApi.ReceiveVipPrivilegeAsync(
+            (int)type,
+            ck.BiliJct,
+            ck.ToString()
+        );
 
         var name = GetPrivilegeName(type);
         logger.LogInformation("【领取】{name}", name);

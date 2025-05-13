@@ -27,7 +27,7 @@ namespace BiliAgentTest
 
             var request = new WebHeartBeatRequest(63666, 60);
 
-            var re = api.WebHeartBeat(request).Result;
+            var re = api.WebHeartBeat(request, null).Result;
 
             Assert.Equal(0, re.Code);
             Assert.Equal("0", re.Message);

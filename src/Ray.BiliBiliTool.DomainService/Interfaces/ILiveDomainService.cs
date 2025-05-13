@@ -12,7 +12,7 @@ public interface ILiveDomainService : IDomainService
     /// <summary>
     /// 签到
     /// </summary>
-    Task LiveSign();
+    Task LiveSign(BiliCookie ck);
 
     /// <summary>
     /// 银瓜子兑换硬币

@@ -9,5 +9,8 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 public interface IVipMallApi
 {
     [HttpPost("/api/activity/fire/common/event/dispatch")]
-    Task<BiliApiResponse> ViewVipMallAsync([JsonContent] ViewVipMallRequest request);
+    Task<BiliApiResponse> ViewVipMallAsync(
+        [JsonContent] ViewVipMallRequest request,
+        [Header("Cookie")] string ck
+    );
 }

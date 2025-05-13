@@ -36,7 +36,7 @@ public class VipBigPointApiTest
     {
         // Arrange
         // Act
-        BiliApiResponse<VipTaskInfo> re = await _api.GetTaskListAsync();
+        BiliApiResponse<VipTaskInfo> re = await _api.GetTaskListAsync(null);
 
         // Assert
         re.Code.Should().Be(0);
@@ -51,7 +51,7 @@ public class VipBigPointApiTest
         var req = new SignRequest() { csrf = _ck.BiliJct };
 
         // Act
-        BiliApiResponse re = await _api.SignAsync(req);
+        BiliApiResponse re = await _api.SignAsync(req, null);
         _output.WriteLine(re.ToJsonStr());
 
         // Assert
@@ -64,7 +64,7 @@ public class VipBigPointApiTest
     {
         // Arrange
         // Act
-        var re = await _api.GetVouchersInfoAsync();
+        var re = await _api.GetVouchersInfoAsync(null);
 
         // Assert
         re.Code.Should().Be(0);
@@ -78,7 +78,7 @@ public class VipBigPointApiTest
         var req = new VipExperienceRequest() { csrf = _ck.BiliJct };
 
         // Act
-        BiliApiResponse re = await _api.ObtainVipExperienceAsync(req);
+        BiliApiResponse re = await _api.ObtainVipExperienceAsync(req, null);
 
         // Assert
         re.Code.Should()
@@ -99,7 +99,7 @@ public class VipBigPointApiTest
         var req = new ReceiveOrCompleteTaskRequest("dress-view");
 
         // Act
-        var re = await _api.CompleteAsync(req);
+        var re = await _api.CompleteAsync(req, null);
 
         // Assert
         re.Code.Should().Be(0);

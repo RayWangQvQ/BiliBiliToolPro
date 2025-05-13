@@ -56,9 +56,9 @@ public class LiveDomainService(
     /// <summary>
     /// 直播签到
     /// </summary>
-    public async Task LiveSign()
+    public async Task LiveSign(BiliCookie ck)
     {
-        var response = await liveApi.Sign();
+        var response = await liveApi.Sign(ck.ToString());
 
         if (response.Code == 0)
         {
@@ -114,7 +114,7 @@ public class LiveDomainService(
 
         logger.LogInformation("开始尝试兑换...");
         Silver2CoinRequest request = new(ck.BiliJct);
-        var response = await liveApi.Silver2Coin(request);
+        var response = await liveApi.Silver2Coin(request, ck.ToString());
         if (response.Code == 0)
         {
             result = true;
@@ -146,7 +146,7 @@ public class LiveDomainService(
         }
 
         //获取直播的分区
-        List<AreaDto> areaList = (await liveApi.GetAreaList()).Data.Data;
+        List<AreaDto> areaList = (await liveApi.GetAreaList(ck.ToString())).Data.Data;
 
         //遍历分区
         int count = 0;
@@ -204,7 +204,9 @@ public class LiveDomainService(
                 return;
             }
 
-            CheckTianXuanDto check = (await liveApi.CheckTianXuan(target.Roomid)).Data;
+            CheckTianXuanDto check = (
+                await liveApi.CheckTianXuan(target.Roomid, ck.ToString())
+            ).Data;
 
             if (check == null)
             {
@@ -343,7 +345,8 @@ public class LiveDomainService(
     private async Task<long> GetLastFollowUpId(BiliCookie ck)
     {
         var followings = await relationApi.GetFollowings(
-            new GetFollowingsRequest(long.Parse(ck.UserId), FollowingsOrderType.TimeDesc)
+            new GetFollowingsRequest(long.Parse(ck.UserId), FollowingsOrderType.TimeDesc),
+            ck.ToString()
         );
         return followings.Data.List.FirstOrDefault()?.Mid ?? 0;
     }
@@ -358,7 +361,8 @@ public class LiveDomainService(
 
         //获取最后一个upId之后关注的所有upId
         var followings = await relationApi.GetFollowings(
-            new GetFollowingsRequest(long.Parse(ck.UserId), FollowingsOrderType.TimeDesc)
+            new GetFollowingsRequest(long.Parse(ck.UserId), FollowingsOrderType.TimeDesc),
+            ck.ToString()
         );
 
         foreach (UpInfo item in followings.Data.List)
@@ -398,7 +402,8 @@ public class LiveDomainService(
             logger.LogInformation("“天选时刻”分组不存在，尝试创建...");
             //创建一个
             var createRe = await relationApi.CreateTag(
-                new CreateTagRequest { Tag = "天选时刻", Csrf = ck.BiliJct }
+                new CreateTagRequest { Tag = "天选时刻", Csrf = ck.BiliJct },
+                ck.ToString()
             );
             groupId = createRe.Data.Tagid;
             logger.LogInformation("创建成功");
@@ -432,9 +437,9 @@ public class LiveDomainService(
             // 通过空间主页信息获取直播间 id
             var liveHostUserId = medal.Medal_info.Target_id;
             var req = new GetSpaceInfoDto() { mid = liveHostUserId };
-            await wbiService.SetWridAsync(req);
+            await wbiService.SetWridAsync(req, ck);
 
-            var spaceInfo = await userInfoApi.GetSpaceInfo(req);
+            var spaceInfo = await userInfoApi.GetSpaceInfo(req, ck.ToString());
             if (spaceInfo.Code != 0)
             {
                 logger.LogError("【获取直播间信息】失败");
@@ -457,7 +462,8 @@ public class LiveDomainService(
                         ck.BiliJct,
                         spaceInfo.Data.Live_room.Roomid,
                         _liveFansMedalTaskOptions.DanmakuContent
-                    )
+                    ),
+                    ck.ToString()
                 );
 
                 if (sendResult.Code != 0)
@@ -545,7 +551,8 @@ public class LiveDomainService(
                             ck.BiliJct,
                             info.RoomInfo.Uid,
                             $"[\"{ck.LiveBuvid}\",\"{uuid}\"]"
-                        )
+                        ),
+                        ck.ToString()
                     );
                 }
                 else
@@ -565,7 +572,8 @@ public class LiveDomainService(
                             ck.BiliJct,
                             uuid,
                             $"[\"{ck.LiveBuvid}\",\"{uuid}\"]"
-                        )
+                        ),
+                        ck.ToString()
                     );
                 }
 
@@ -632,7 +640,7 @@ public class LiveDomainService(
                 ck.UserId
             );
 
-            var result = await liveApi.LikeLiveRoom(request.RawTextBuild());
+            var result = await liveApi.LikeLiveRoom(request.RawTextBuild(), ck.ToString());
             if (result.Code == 0)
             {
                 logger.LogInformation("【点赞直播间】{roomId} 完成", info.RoomId);
@@ -651,7 +659,7 @@ public class LiveDomainService(
     private async Task<List<FansMedalInfoDto>> GetFansMedalInfoList(BiliCookie ck)
     {
         logger.LogInformation("【获取直播列表】获取拥有粉丝牌的直播列表");
-        var medalWallInfo = await liveApi.GetMedalWall(ck.UserId);
+        var medalWallInfo = await liveApi.GetMedalWall(ck.UserId, ck.ToString());
 
         if (medalWallInfo.Code != 0)
         {
@@ -676,9 +684,9 @@ public class LiveDomainService(
             // 通过空间主页信息获取直播间 id
             var liveHostUserId = medal.Medal_info.Target_id;
             var req = new GetSpaceInfoDto() { mid = liveHostUserId };
-            await wbiService.SetWridAsync(req);
+            await wbiService.SetWridAsync(req, ck);
 
-            var spaceInfo = await userInfoApi.GetSpaceInfo(req);
+            var spaceInfo = await userInfoApi.GetSpaceInfo(req, ck.ToString());
             if (spaceInfo.Code != 0)
             {
                 logger.LogError("【获取空间信息】失败");
@@ -727,7 +735,7 @@ public class LiveDomainService(
             logger.LogInformation("检测到直播 Cookie 未正确配置，尝试自动配置中...");
 
             // 请求主播主页来正确配置 cookie
-            var liveHome = await liveApi.GetLiveHome();
+            var liveHome = await liveApi.GetLiveHome(ck.ToString());
             var liveHomeContent = JsonConvert.DeserializeObject<BiliApiResponse>(
                 await liveHome.Content.ReadAsStringAsync()
             );

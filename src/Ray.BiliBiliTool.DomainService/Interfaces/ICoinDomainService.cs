@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Ray.BiliBiliTool.Agent;
 
 namespace Ray.BiliBiliTool.DomainService.Interfaces;
 
@@ -11,11 +12,11 @@ public interface ICoinDomainService : IDomainService
     /// 获取账户硬币余额
     /// </summary>
     /// <returns></returns>
-    Task<decimal> GetCoinBalance();
+    Task<decimal> GetCoinBalance(BiliCookie ck);
 
     /// <summary>
     /// 获取今日已投币数量
     /// </summary>
     /// <returns></returns>
-    Task<int> GetDonatedCoins();
+    Task<int> GetDonatedCoins(BiliCookie ck);
 }

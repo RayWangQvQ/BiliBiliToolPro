@@ -48,7 +48,7 @@ public class ArticleDomainService(
     /// <returns></returns>
     public async Task<bool> AddCoinForArticles(BiliCookie ck)
     {
-        var donateCoinsCounts = await CalculateDonateCoinsCounts();
+        var donateCoinsCounts = await CalculateDonateCoinsCounts(ck);
 
         if (donateCoinsCounts == 0)
         {
@@ -70,7 +70,7 @@ public class ArticleDomainService(
                 continue;
             }
             // 当upId不符合时，会直接报错，需要将两者的判断分隔开
-            var cvid = await GetRandomArticleFromUp(upId);
+            var cvid = await GetRandomArticleFromUp(upId, ck);
             if (cvid == 0)
             {
                 logger.LogDebug("第{num}次尝试，未能成功选择合适的专栏", i);
@@ -100,7 +100,7 @@ public class ArticleDomainService(
 
         logger.LogInformation(
             "【硬币余额】{coin}",
-            (await accountApi.GetCoinBalanceAsync()).Data.Money ?? 0
+            (await accountApi.GetCoinBalanceAsync(ck.ToString())).Data.Money ?? 0
         );
 
         return true;
@@ -148,11 +148,11 @@ public class ArticleDomainService(
     /// </summary>
     /// <param name="mid"></param>
     /// <returns>专栏的cvid</returns>
-    private async Task<long> GetRandomArticleFromUp(long mid)
+    private async Task<long> GetRandomArticleFromUp(long mid, BiliCookie ck)
     {
         if (!_upArticleCountDicCatch.TryGetValue(mid, out int articleCount))
         {
-            articleCount = await GetArticleCountOfUp(mid);
+            articleCount = await GetArticleCountOfUp(mid, ck);
             _upArticleCountDicCatch.Add(mid, articleCount);
         }
 
@@ -168,7 +168,7 @@ public class ArticleDomainService(
             ps = 1,
             pn = new Random().Next(1, articleCount + 1),
         };
-        await wbiService.SetWridAsync(req);
+        await wbiService.SetWridAsync(req, ck);
 
         BiliApiResponse<SearchUpArticlesResponse> re = await articleApi.SearchUpArticlesByUpIdAsync(
             req
@@ -239,11 +239,11 @@ public class ArticleDomainService(
     /// <param name="mid">up主mid</param>
     /// <returns>专栏总数</returns>
     /// <exception cref="Exception"></exception>
-    private async Task<int> GetArticleCountOfUp(long mid)
+    private async Task<int> GetArticleCountOfUp(long mid, BiliCookie ck)
     {
         var req = new SearchArticlesByUpIdDto() { mid = mid };
 
-        await wbiService.SetWridAsync(req);
+        await wbiService.SetWridAsync(req, ck);
 
         BiliApiResponse<SearchUpArticlesResponse> re = await articleApi.SearchUpArticlesByUpIdAsync(
             req
@@ -261,16 +261,16 @@ public class ArticleDomainService(
     /// 计算所需要投的硬币数量
     /// </summary>
     /// <returns>硬币数量</returns>
-    private async Task<int> CalculateDonateCoinsCounts()
+    private async Task<int> CalculateDonateCoinsCounts(BiliCookie ck)
     {
-        int needCoins = await GetNeedDonateCoinCounts();
+        int needCoins = await GetNeedDonateCoinCounts(ck);
 
         int protectedCoins = _dailyTaskOptions.NumberOfProtectedCoins;
         if (needCoins <= 0)
             return 0;
 
         //投币前硬币余额
-        decimal coinBalance = await coinDomainService.GetCoinBalance();
+        decimal coinBalance = await coinDomainService.GetCoinBalance(ck);
         logger.LogInformation("【投币前余额】 : {coinBalance}", coinBalance);
         _ = int.TryParse(
             decimal.Truncate(coinBalance - protectedCoins).ToString(),
@@ -315,7 +315,7 @@ public class ArticleDomainService(
         return needCoins;
     }
 
-    private async Task<int> GetNeedDonateCoinCounts()
+    private async Task<int> GetNeedDonateCoinCounts(BiliCookie ck)
     {
         int configCoins = _dailyTaskOptions.NumberOfCoins;
 
@@ -326,7 +326,7 @@ public class ArticleDomainService(
         }
 
         //已投的硬币
-        int alreadyCoins = await coinDomainService.GetDonatedCoins();
+        int alreadyCoins = await coinDomainService.GetDonatedCoins(ck);
 
         int targetCoins = configCoins;
 

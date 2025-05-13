@@ -19,12 +19,12 @@ public interface IAccountDomainService : IDomainService
     /// 获取每日任务完成情况
     /// </summary>
     /// <returns></returns>
-    Task<DailyTaskInfo> GetDailyTaskStatus();
+    Task<DailyTaskInfo> GetDailyTaskStatus(BiliCookie ck);
 
     /// <summary>
     /// 批量取关
     /// </summary>
-    Task UnfollowBatched(BiliCookie cookie);
+    Task UnfollowBatched(BiliCookie ck);
 
     /// <summary>
     /// 计算升级时间

@@ -87,7 +87,7 @@ public partial class LogsDialog : ComponentBase
             _logs = await context
                 .BiliLogs.Where(x => x.FireInstanceIdComputed == _fireInstanceId)
                 .OrderBy(l => l.Timestamp)
-                .Take(100) // 限制记录数量，避免加载过多数据
+                .Take(300) // 限制记录数量，避免加载过多数据
                 .ToListAsync(_cancellationTokenSource.Token);
         }
         catch (Exception ex)

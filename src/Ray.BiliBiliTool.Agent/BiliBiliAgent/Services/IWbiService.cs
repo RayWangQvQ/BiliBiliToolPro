@@ -12,7 +12,7 @@ public interface IWbiService
     /// 获取WbiKey
     /// </summary>
     /// <returns></returns>
-    Task SetWridAsync<T>(T ob)
+    Task SetWridAsync<T>(T ob, BiliCookie ck)
         where T : IWrid;
 
     WridDto EncWbi(

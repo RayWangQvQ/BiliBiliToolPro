@@ -48,21 +48,21 @@ public class DailyTaskAppService(
         await SetCookiesAsync(ck, cancellationToken);
 
         //每日任务赚经验：
-        UserInfo userInfo = await Login();
+        UserInfo userInfo = await Login(ck);
 
-        DailyTaskInfo dailyTaskInfo = await GetDailyTaskStatus();
+        DailyTaskInfo dailyTaskInfo = await GetDailyTaskStatus(ck);
         await WatchAndShareVideo(dailyTaskInfo, ck);
 
         await AddCoins(userInfo, ck);
 
         //签到：
-        await MangaSign();
-        await MangaRead();
+        await MangaSign(ck);
+        await MangaRead(ck);
         await ExchangeSilver2Coin(ck);
 
         //领福利：
         await ReceiveVipPrivilege(userInfo, ck);
-        await ReceiveMangaVipReward(userInfo);
+        await ReceiveMangaVipReward(userInfo, ck);
 
         await Charge(userInfo, ck);
     }
@@ -91,9 +91,9 @@ public class DailyTaskAppService(
     /// </summary>
     /// <returns></returns>
     [TaskInterceptor("登录")]
-    private async Task<UserInfo> Login()
+    private async Task<UserInfo> Login(BiliCookie ck)
     {
-        UserInfo userInfo = await accountDomainService.LoginByCookie(null); // todo
+        UserInfo userInfo = await accountDomainService.LoginByCookie(ck);
         if (userInfo == null)
             throw new Exception("登录失败，请检查Cookie"); //终止流程
 
@@ -108,9 +108,9 @@ public class DailyTaskAppService(
     /// </summary>
     /// <returns></returns>
     [TaskInterceptor(rethrowWhenException: false)]
-    private async Task<DailyTaskInfo> GetDailyTaskStatus()
+    private async Task<DailyTaskInfo> GetDailyTaskStatus(BiliCookie ck)
     {
-        return await accountDomainService.GetDailyTaskStatus();
+        return await accountDomainService.GetDailyTaskStatus(ck);
     }
 
     /// <summary>
@@ -167,7 +167,7 @@ public class DailyTaskAppService(
             return;
 
         //如果兑换成功，则打印硬币余额
-        var coinBalance = coinDomainService.GetCoinBalance();
+        var coinBalance = coinDomainService.GetCoinBalance(ck);
         logger.LogInformation("【硬币余额】 {coin}", coinBalance);
     }
 
@@ -184,7 +184,7 @@ public class DailyTaskAppService(
         {
             try
             {
-                userInfo = await accountDomainService.LoginByCookie(null); // todo
+                userInfo = await accountDomainService.LoginByCookie(ck);
             }
             catch (Exception ex)
             {
@@ -206,27 +206,27 @@ public class DailyTaskAppService(
     /// 漫画签到
     /// </summary>
     [TaskInterceptor("漫画签到", rethrowWhenException: false)]
-    private async Task MangaSign()
+    private async Task MangaSign(BiliCookie ck)
     {
-        await mangaDomainService.MangaSign();
+        await mangaDomainService.MangaSign(ck);
     }
 
     /// <summary>
     /// 漫画阅读
     /// </summary>
     [TaskInterceptor("漫画阅读", rethrowWhenException: false)]
-    private async Task MangaRead()
+    private async Task MangaRead(BiliCookie ck)
     {
-        await mangaDomainService.MangaRead();
+        await mangaDomainService.MangaRead(ck);
     }
 
     /// <summary>
     /// 每月获取大会员漫画权益
     /// </summary>
     [TaskInterceptor("领取大会员漫画权益", rethrowWhenException: false)]
-    private async Task ReceiveMangaVipReward(UserInfo userInfo)
+    private async Task ReceiveMangaVipReward(UserInfo userInfo, BiliCookie ck)
     {
-        await mangaDomainService.ReceiveMangaVipReward(1, userInfo);
+        await mangaDomainService.ReceiveMangaVipReward(1, userInfo, ck);
     }
 
     private async Task SaveCookieAsync(BiliCookie ckInfo, CancellationToken cancellationToken)

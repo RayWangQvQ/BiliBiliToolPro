@@ -39,14 +39,14 @@ public class VipBigPointAppService(
         CancellationToken cancellationToken = default
     )
     {
-        var userInfo = await GetUserInfo();
+        var userInfo = await GetUserInfo(ck);
         if (userInfo.GetVipType() == VipType.None)
         {
             logger.LogInformation("当前不是大会员，跳过任务");
             return;
         }
 
-        var allTasks = await vipApi.GetTaskListAsync();
+        var allTasks = await vipApi.GetTaskListAsync(ck.ToString());
         if (allTasks.Code != 0)
             throw new Exception(allTasks.ToJsonStr());
         _info = allTasks.Data;
@@ -55,37 +55,37 @@ public class VipBigPointAppService(
         await VipExpressAsync(ck);
 
         //签到
-        await Sign();
+        await Sign(ck);
 
         //领取
-        await ReceiveTasksAsync();
+        await ReceiveTasksAsync(ck);
 
         //福利任务
-        await Bonus();
+        await Bonus(ck);
 
         //体验任务
-        await Privilege();
+        await Privilege(ck);
 
         //日常任务
         //浏览追番频道页10秒
-        await ViewAnimate();
+        await ViewAnimate(ck);
 
         //浏览会员购页面10秒
         await ViewVipMall(ck);
 
         //浏览装扮商城
-        await ViewDressMall();
+        await ViewDressMall(ck);
 
         //观看剧集内容
-        await OgvWatchAsync();
+        await OgvWatchAsync(ck);
 
         _info.LogInfo(logger);
     }
 
     [TaskInterceptor("测试Cookie")]
-    private async Task<UserInfo> GetUserInfo()
+    private async Task<UserInfo> GetUserInfo(BiliCookie ck)
     {
-        UserInfo userInfo = await loginDomainService.LoginByCookie(null); // todo
+        UserInfo userInfo = await loginDomainService.LoginByCookie(ck);
         if (userInfo == null)
             throw new Exception("登录失败，请检查Cookie"); //终止流程
 
@@ -96,9 +96,9 @@ public class VipBigPointAppService(
     /// 领取大会员专属经验包
     /// </summary>
     [TaskInterceptor("大会员经验领取任务", TaskLevel.Two, false)]
-    private async Task VipExpressAsync(BiliCookie biliCookie)
+    private async Task VipExpressAsync(BiliCookie ck)
     {
-        var re = await vipApi.GetVouchersInfoAsync();
+        var re = await vipApi.GetVouchersInfoAsync(ck.ToString());
         if (re.Code == 0)
         {
             var state = re.Data.List.Find(x => x.Type == 9).State;
@@ -109,8 +109,8 @@ public class VipBigPointAppService(
                     logger.LogInformation("大会员经验观看任务未完成");
                     logger.LogInformation("开始观看视频");
                     // 观看视频，暂时没有好办法解决，先这样使着
-                    DailyTaskInfo dailyTaskInfo = await accountDomainService.GetDailyTaskStatus();
-                    await videoDomainService.WatchAndShareVideo(dailyTaskInfo, biliCookie);
+                    DailyTaskInfo dailyTaskInfo = await accountDomainService.GetDailyTaskStatus(ck);
+                    await videoDomainService.WatchAndShareVideo(dailyTaskInfo, ck);
                     // 跳转到未兑换，执行兑换任务
                     goto case 0;
 
@@ -122,7 +122,8 @@ public class VipBigPointAppService(
                     logger.LogInformation("大会员经验未兑换");
                     //兑换api
                     var response = await vipApi.ObtainVipExperienceAsync(
-                        new VipExperienceRequest() { csrf = biliCookie.BiliJct }
+                        new VipExperienceRequest() { csrf = ck.BiliJct },
+                        ck.ToString()
                     );
                     if (response.Code != 0)
                     {
@@ -144,7 +145,7 @@ public class VipBigPointAppService(
     }
 
     [TaskInterceptor("签到", TaskLevel.Two, false)]
-    private async Task Sign()
+    private async Task Sign(BiliCookie ck)
     {
         if (_info.Task_info.Sing_task_item.IsTodaySigned)
         {
@@ -157,12 +158,12 @@ public class VipBigPointAppService(
             return;
         }
 
-        var re = await vipApi.SignAsync(new SignRequest());
+        var re = await vipApi.SignAsync(new SignRequest(), ck.ToString());
         if (re.Code != 0)
             throw new Exception(re.ToJsonStr());
 
         //确认
-        var infoResult = await vipApi.GetTaskListAsync();
+        var infoResult = await vipApi.GetTaskListAsync(ck.ToString());
         if (infoResult.Code != 0)
             throw new Exception(infoResult.ToJsonStr());
         _info = infoResult.Data;
@@ -178,7 +179,7 @@ public class VipBigPointAppService(
     }
 
     [TaskInterceptor("领取任务", TaskLevel.Two, false)]
-    private async Task ReceiveTasksAsync()
+    private async Task ReceiveTasksAsync(BiliCookie ck)
     {
         const string moduleCode = "日常任务";
 
@@ -193,12 +194,12 @@ public class VipBigPointAppService(
         foreach (var targetTask in needReceiveTasks)
         {
             logger.LogInformation("开始领取任务：{task}", targetTask.title);
-            await TryReceive(targetTask.task_code);
+            await TryReceive(targetTask.task_code, ck);
         }
     }
 
     [TaskInterceptor("福利任务", TaskLevel.Two, false)]
-    private async Task Bonus()
+    private async Task Bonus(BiliCookie ck)
     {
         const string moduleCode = "福利任务";
         const string taskCode = "bonus";
@@ -222,16 +223,16 @@ public class VipBigPointAppService(
         if (bonusTask.state == 0)
         {
             logger.LogInformation("开始领取任务");
-            await TryReceive(bonusTask.task_code);
+            await TryReceive(bonusTask.task_code, ck);
         }
 
         logger.LogInformation("开始完成任务");
-        var re = await Complete(bonusTask.task_code);
+        var re = await Complete(bonusTask.task_code, ck);
 
         //确认
         if (re)
         {
-            var infoResult = await vipApi.GetTaskListAsync();
+            var infoResult = await vipApi.GetTaskListAsync(ck.ToString());
             if (infoResult.Code != 0)
                 throw new Exception(infoResult.ToJsonStr());
             _info = infoResult.Data;
@@ -245,7 +246,7 @@ public class VipBigPointAppService(
     }
 
     [TaskInterceptor("体验任务", TaskLevel.Two, false)]
-    private async Task Privilege()
+    private async Task Privilege(BiliCookie ck)
     {
         const string moduleCode = "体验任务";
         const string taskCode = "privilege";
@@ -269,16 +270,16 @@ public class VipBigPointAppService(
         if (privilegeTask.state == 0)
         {
             logger.LogInformation("开始领取任务");
-            await TryReceive(privilegeTask.task_code);
+            await TryReceive(privilegeTask.task_code, ck);
         }
 
         logger.LogInformation("开始完成任务");
-        var re = await Complete(privilegeTask.task_code);
+        var re = await Complete(privilegeTask.task_code, ck);
 
         //确认
         if (re)
         {
-            var infoResult = await vipApi.GetTaskListAsync();
+            var infoResult = await vipApi.GetTaskListAsync(ck.ToString());
             if (infoResult.Code != 0)
                 throw new Exception(infoResult.ToJsonStr());
             _info = infoResult.Data;
@@ -292,7 +293,7 @@ public class VipBigPointAppService(
     }
 
     [TaskInterceptor("浏览追番频道页10秒", TaskLevel.Two, false)]
-    private async Task ViewAnimate()
+    private async Task ViewAnimate(BiliCookie ck)
     {
         const string moduleCode = "日常任务";
         const string taskCode = "animatetab";
@@ -318,7 +319,7 @@ public class VipBigPointAppService(
         if (targetTask.state == 0)
         {
             logger.LogInformation("开始领取任务");
-            await TryReceive(targetTask.task_code);
+            await TryReceive(targetTask.task_code, ck);
         }
 
         logger.LogInformation("开始完成任务");
@@ -327,7 +328,7 @@ public class VipBigPointAppService(
         //确认
         if (re)
         {
-            var infoResult = await vipApi.GetTaskListAsync();
+            var infoResult = await vipApi.GetTaskListAsync(ck.ToString());
             if (infoResult.Code != 0)
                 throw new Exception(infoResult.ToJsonStr());
             _info = infoResult.Data;
@@ -365,18 +366,21 @@ public class VipBigPointAppService(
         if (targetTask.state == 0)
         {
             logger.LogInformation("开始领取任务");
-            await TryReceive(targetTask.task_code);
+            await TryReceive(targetTask.task_code, ck);
         }
 
         logger.LogInformation("开始完成任务");
-        var re = await vipMallApi.ViewVipMallAsync(new ViewVipMallRequest() { Csrf = ck.BiliJct });
+        var re = await vipMallApi.ViewVipMallAsync(
+            new ViewVipMallRequest() { Csrf = ck.BiliJct },
+            ck.ToString()
+        );
         if (re.Code != 0)
             throw new Exception(re.ToJsonStr());
 
         //确认
         if (re.Code == 0)
         {
-            var infoResult = await vipApi.GetTaskListAsync();
+            var infoResult = await vipApi.GetTaskListAsync(ck.ToString());
             if (infoResult.Code != 0)
                 throw new Exception(infoResult.ToJsonStr());
             _info = infoResult.Data;
@@ -390,7 +394,7 @@ public class VipBigPointAppService(
     }
 
     [TaskInterceptor("浏览装扮商城主页", TaskLevel.Two, false)]
-    private async Task ViewDressMall()
+    private async Task ViewDressMall(BiliCookie ck)
     {
         const string moduleCode = "日常任务";
         const string taskCode = "dress-view";
@@ -414,16 +418,16 @@ public class VipBigPointAppService(
         if (targetTask.state == 0)
         {
             logger.LogInformation("开始领取任务");
-            await TryReceive(targetTask.task_code);
+            await TryReceive(targetTask.task_code, ck);
         }
 
         logger.LogInformation("开始完成任务");
-        var re = await CompleteV2(targetTask.task_code);
+        var re = await CompleteV2(targetTask.task_code, ck);
 
         //确认
         if (re)
         {
-            var infoResult = await vipApi.GetTaskListAsync();
+            var infoResult = await vipApi.GetTaskListAsync(ck.ToString());
             if (infoResult.Code != 0)
                 throw new Exception(infoResult.ToJsonStr());
             _info = infoResult.Data;
@@ -437,7 +441,7 @@ public class VipBigPointAppService(
     }
 
     [TaskInterceptor("观看剧集", TaskLevel.Two, false)]
-    private async Task OgvWatchAsync()
+    private async Task OgvWatchAsync(BiliCookie ck)
     {
         const string moduleCode = "日常任务";
         const string taskCode = "ogvwatchnew";
@@ -461,7 +465,7 @@ public class VipBigPointAppService(
         if (targetTask.state == 0)
         {
             logger.LogInformation("开始领取任务");
-            await TryReceive(targetTask.task_code);
+            await TryReceive(targetTask.task_code, ck);
         }
 
         logger.LogInformation("暂未实现");
@@ -478,13 +482,13 @@ public class VipBigPointAppService(
     /// <summary>
     /// 领取任务
     /// </summary>
-    private async Task TryReceive(string taskCode)
+    private async Task TryReceive(string taskCode, BiliCookie ck)
     {
         BiliApiResponse re = null;
         try
         {
             var request = new ReceiveOrCompleteTaskRequest(taskCode);
-            re = await vipApi.ReceiveV2(request);
+            re = await vipApi.ReceiveV2(request, ck.ToString());
             if (re.Code == 0)
                 logger.LogInformation("领取任务成功");
             else
@@ -497,10 +501,10 @@ public class VipBigPointAppService(
         }
     }
 
-    private async Task<bool> Complete(string taskCode)
+    private async Task<bool> Complete(string taskCode, BiliCookie ck)
     {
         var request = new ReceiveOrCompleteTaskRequest(taskCode);
-        var re = await vipApi.CompleteAsync(request);
+        var re = await vipApi.CompleteAsync(request, ck.ToString());
         if (re.Code == 0)
         {
             logger.LogInformation("已完成");
@@ -513,10 +517,10 @@ public class VipBigPointAppService(
         }
     }
 
-    private async Task<bool> CompleteV2(string taskCode)
+    private async Task<bool> CompleteV2(string taskCode, BiliCookie ck)
     {
         var request = new ReceiveOrCompleteTaskRequest(taskCode);
-        var re = await vipApi.CompleteV2(request);
+        var re = await vipApi.CompleteV2(request, ck.ToString());
         if (re.Code == 0)
         {
             logger.LogInformation("已完成");
@@ -560,7 +564,7 @@ public class VipBigPointAppService(
             new Random().Next(0, _vipBigPointOptions.ViewBangumiList.Count)
         ];
 
-        var res = await GetBangumi(randomSsid);
+        var res = await GetBangumi(randomSsid, ck);
         if (res is null)
         {
             return false;
@@ -587,7 +591,7 @@ public class VipBigPointAppService(
             Realtime = playedTime,
             Real_played_time = playedTime,
         };
-        BiliApiResponse apiResponse = await videoApi.UploadVideoHeartbeat(request);
+        BiliApiResponse apiResponse = await videoApi.UploadVideoHeartbeat(request, ck.ToString());
         if (apiResponse.Code == 0)
         {
             return true;
@@ -601,13 +605,13 @@ public class VipBigPointAppService(
     /// </summary>
     /// <param name="randomSsid">番剧ssid</param>
     /// <returns></returns>
-    private async Task<(VideoInfoDto, long)?> GetBangumi(long randomSsid)
+    private async Task<(VideoInfoDto, long)?> GetBangumi(long randomSsid, BiliCookie ck)
     {
         try
         {
             if (randomSsid is 0 or long.MinValue)
                 return null;
-            var bangumiInfo = await videoApi.GetBangumiBySsid(randomSsid);
+            var bangumiInfo = await videoApi.GetBangumiBySsid(randomSsid, ck.ToString());
 
             // 从获取的剧集中随机获得其中的一集
 

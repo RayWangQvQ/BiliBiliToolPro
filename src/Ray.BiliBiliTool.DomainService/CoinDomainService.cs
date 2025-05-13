@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 
@@ -14,9 +15,9 @@ public class CoinDomainService(IAccountApi accountApi, IDailyTaskApi dailyTaskAp
     /// 获取账户硬币余额
     /// </summary>
     /// <returns></returns>
-    public async Task<decimal> GetCoinBalance()
+    public async Task<decimal> GetCoinBalance(BiliCookie ck)
     {
-        var response = await accountApi.GetCoinBalanceAsync();
+        var response = await accountApi.GetCoinBalanceAsync(ck.ToString());
         return response.Data.Money ?? 0;
     }
 
@@ -24,9 +25,9 @@ public class CoinDomainService(IAccountApi accountApi, IDailyTaskApi dailyTaskAp
     /// 获取今日已投币数
     /// </summary>
     /// <returns></returns>
-    public async Task<int> GetDonatedCoins()
+    public async Task<int> GetDonatedCoins(BiliCookie ck)
     {
-        return (await GetDonateCoinExp()) / 10;
+        return (await GetDonateCoinExp(ck)) / 10;
     }
 
     #region private
@@ -34,9 +35,9 @@ public class CoinDomainService(IAccountApi accountApi, IDailyTaskApi dailyTaskAp
     /// 获取今日通过投币已获取的经验值
     /// </summary>
     /// <returns></returns>
-    private async Task<int> GetDonateCoinExp()
+    private async Task<int> GetDonateCoinExp(BiliCookie ck)
     {
-        return (await dailyTaskApi.GetDonateCoinExpAsync()).Data;
+        return (await dailyTaskApi.GetDonateCoinExpAsync(ck.ToString())).Data;
     }
     #endregion
 }
