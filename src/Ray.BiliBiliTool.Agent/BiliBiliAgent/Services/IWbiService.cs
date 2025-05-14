@@ -8,6 +8,8 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Services;
 /// </summary>
 public interface IWbiService
 {
+    Task<WridDto> GetWridAsync(Dictionary<string, string> parameters, BiliCookie ck);
+
     /// <summary>
     /// 获取WbiKey
     /// </summary>
@@ -16,7 +18,7 @@ public interface IWbiService
         where T : IWrid;
 
     WridDto EncWbi(
-        Dictionary<string, object> parameters,
+        Dictionary<string, string> parameters,
         string imgKey,
         string subKey,
         long timespan = 0

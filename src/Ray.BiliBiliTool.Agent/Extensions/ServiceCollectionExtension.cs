@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Polly;
 using Polly.Extensions.Http;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Services;
 using Ray.BiliBiliTool.Agent.HttpClientDelegatingHandlers;
@@ -62,7 +63,8 @@ public static class ServiceCollectionExtension
             );
         };
 
-        services.AddBiliBiliClientApi<IUserInfoApi>(BiliHosts.Api, config);
+        services.AddBiliBiliClientApi<IUserInfoApi>(BiliHosts.Api, config, true);
+
         services.AddBiliBiliClientApi<IDailyTaskApi>(BiliHosts.Api, config);
         services.AddBiliBiliClientApi<IRelationApi>(BiliHosts.Api, config);
         services.AddBiliBiliClientApi<IChargeApi>(BiliHosts.Api, config);
@@ -114,7 +116,8 @@ public static class ServiceCollectionExtension
     private static IServiceCollection AddBiliBiliClientApi<TInterface>(
         this IServiceCollection services,
         string host,
-        Action<IServiceProvider, HttpClient> config
+        Action<IServiceProvider, HttpClient> config,
+        bool ignorWrid = false
     )
         where TInterface : class
     {
@@ -128,6 +131,11 @@ public static class ServiceCollectionExtension
             .ConfigureHttpClient(config)
             .AddHttpMessageHandler<IntervalDelegatingHandler>()
             .AddPolicyHandler(GetRetryPolicy());
+
+        if (!ignorWrid)
+        {
+            httpClientBuilder.AddHttpMessageHandler<WridEncryptionDelegatingHandler>();
+        }
 
         return services;
     }

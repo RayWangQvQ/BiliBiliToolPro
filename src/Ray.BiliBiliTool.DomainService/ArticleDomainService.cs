@@ -168,7 +168,6 @@ public class ArticleDomainService(
             ps = 1,
             pn = new Random().Next(1, articleCount + 1),
         };
-        await wbiService.SetWridAsync(req, ck);
 
         BiliApiResponse<SearchUpArticlesResponse> re = await articleApi.SearchUpArticlesByUpIdAsync(
             req
@@ -242,8 +241,6 @@ public class ArticleDomainService(
     private async Task<int> GetArticleCountOfUp(long mid, BiliCookie ck)
     {
         var req = new SearchArticlesByUpIdDto() { mid = mid };
-
-        await wbiService.SetWridAsync(req, ck);
 
         BiliApiResponse<SearchUpArticlesResponse> re = await articleApi.SearchUpArticlesByUpIdAsync(
             req

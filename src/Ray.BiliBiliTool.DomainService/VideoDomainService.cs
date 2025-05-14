@@ -72,7 +72,6 @@ public class VideoDomainService(
             ps = 1,
             pn = new Random().Next(1, total + 1),
         };
-        await wbiService.SetWridAsync(req, ck);
 
         BiliApiResponse<SearchUpVideosResponse> re = await videoApi.SearchVideosByUpId(
             req,
@@ -95,7 +94,6 @@ public class VideoDomainService(
     public async Task<int> GetVideoCountOfUp(long upId, BiliCookie ck)
     {
         var req = new SearchVideosByUpIdDto() { mid = upId };
-        await wbiService.SetWridAsync(req, ck);
 
         BiliApiResponse<SearchUpVideosResponse> re = await videoApi.SearchVideosByUpId(
             req,

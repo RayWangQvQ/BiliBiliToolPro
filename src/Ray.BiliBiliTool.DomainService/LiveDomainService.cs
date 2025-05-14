@@ -437,7 +437,6 @@ public class LiveDomainService(
             // 通过空间主页信息获取直播间 id
             var liveHostUserId = medal.Medal_info.Target_id;
             var req = new GetSpaceInfoDto() { mid = liveHostUserId };
-            await wbiService.SetWridAsync(req, ck);
 
             var spaceInfo = await userInfoApi.GetSpaceInfo(req, ck.ToString());
             if (spaceInfo.Code != 0)
@@ -684,7 +683,6 @@ public class LiveDomainService(
             // 通过空间主页信息获取直播间 id
             var liveHostUserId = medal.Medal_info.Target_id;
             var req = new GetSpaceInfoDto() { mid = liveHostUserId };
-            await wbiService.SetWridAsync(req, ck);
 
             var spaceInfo = await userInfoApi.GetSpaceInfo(req, ck.ToString());
             if (spaceInfo.Code != 0)

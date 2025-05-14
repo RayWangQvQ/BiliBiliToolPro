@@ -30,8 +30,7 @@ public class LoginDomainService(
     IHostEnvironment hostingEnvironment,
     IQingLongApi qingLongApi,
     IHomeApi homeApi,
-    IConfiguration configuration,
-    CookieStrFactory<BiliCookie> cookieFactory
+    IConfiguration configuration
 ) : ILoginDomainService
 {
     public async Task<BiliCookie> LoginByQrCodeAsync(CancellationToken cancellationToken)
@@ -93,7 +92,7 @@ public class LoginDomainService(
 
                 var cookieStr = CookieInfo.ConvertSetCkHeadersToCkStr(cookies);
 
-                cookieInfo = cookieFactory.CreateNew(cookieStr);
+                cookieInfo = CookieStrFactory<BiliCookie>.CreateNew(cookieStr);
                 cookieInfo.Check();
 
                 break;

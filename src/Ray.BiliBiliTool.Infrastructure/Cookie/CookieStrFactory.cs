@@ -18,7 +18,7 @@ public class CookieStrFactory<TCookieInfo>(IConfiguration configuration)
         return (TCookieInfo)Activator.CreateInstance(typeof(TCookieInfo), dic);
     }
 
-    public TCookieInfo CreateNew(string cookie)
+    public static TCookieInfo CreateNew(string cookie)
     {
         Dictionary<string, string> dic = CkStrToDictionary(cookie);
         return (TCookieInfo)Activator.CreateInstance(typeof(TCookieInfo), dic);
@@ -45,7 +45,7 @@ public class CookieStrFactory<TCookieInfo>(IConfiguration configuration)
         return dic;
     }
 
-    private Dictionary<string, string> CkStrToDictionary(string ckStr)
+    private static Dictionary<string, string> CkStrToDictionary(string ckStr)
     {
         var dic = new Dictionary<string, string>();
         var ckItemList = ckStr.Split(";", StringSplitOptions.TrimEntries).Distinct();
