@@ -18,6 +18,8 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Services;
 /// </summary>
 public class WbiService(ILogger<WbiService> logger, IUserInfoApi userInfoApi) : IWbiService
 {
+    private Dictionary<BiliCookie, WbiImg> _cache = new();
+
     public async Task<WridDto> GetWridAsync(Dictionary<string, string> parameters, BiliCookie ck)
     {
         parameters.Remove(nameof(IWrid.wts));
@@ -104,16 +106,20 @@ public class WbiService(ILogger<WbiService> logger, IUserInfoApi userInfoApi) : 
         return re;
     }
 
-    private async Task<WbiImg> GetWbiKeysAsync(BiliCookie cookie)
+    private async Task<WbiImg> GetWbiKeysAsync(BiliCookie ck)
     {
-        BiliApiResponse<UserInfo> apiResponse = await userInfoApi.LoginByCookie(cookie.ToString());
+        _cache.TryGetValue(ck, out var wbiImg);
 
+        if (wbiImg != null)
+            return wbiImg;
+
+        BiliApiResponse<UserInfo> apiResponse = await userInfoApi.LoginByCookie(ck.ToString());
         UserInfo useInfo = apiResponse.Data;
-
         logger.LogDebug("【img_url】{0}", useInfo.Wbi_img?.img_url);
         logger.LogDebug("【sub_url】{0}", useInfo.Wbi_img?.sub_url);
-
-        return useInfo.Wbi_img;
+        wbiImg = useInfo.Wbi_img;
+        _cache[ck] = wbiImg;
+        return wbiImg;
     }
 
     /// <summary>
