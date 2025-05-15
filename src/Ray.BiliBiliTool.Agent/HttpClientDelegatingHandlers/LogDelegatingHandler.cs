@@ -5,33 +5,26 @@ using Microsoft.Extensions.Logging;
 
 namespace Ray.BiliBiliTool.Agent.HttpClientDelegatingHandlers;
 
-public class LogDelegatingHandler : DelegatingHandler
+public class LogDelegatingHandler(ILogger<LogDelegatingHandler> logger) : DelegatingHandler
 {
-    private readonly ILogger<LogDelegatingHandler> _logger;
-
-    public LogDelegatingHandler(ILogger<LogDelegatingHandler> logger)
-    {
-        _logger = logger;
-    }
-
     protected override async Task<HttpResponseMessage> SendAsync(
         HttpRequestMessage request,
         CancellationToken cancellationToken
     )
     {
         //记录请求内容
-        _logger.LogDebug("发起请求：[{method}] {uri}", request.Method, request.RequestUri);
+        logger.LogDebug("发起请求：[{method}] {uri}", request.Method, request.RequestUri);
 
         if (request.Content != null)
         {
             var requestContent = await request.Content.ReadAsStringAsync(cancellationToken);
-            _logger.LogDebug("请求Content： {content}", requestContent);
+            logger.LogDebug("请求Content： {content}", requestContent);
         }
 
         HttpResponseMessage response = await base.SendAsync(request, cancellationToken);
 
         var content = await response.Content.ReadAsStringAsync(cancellationToken);
-        _logger.LogDebug("返回Content：{content}", content);
+        logger.LogDebug("返回Content：{content}", content);
 
         return response;
     }

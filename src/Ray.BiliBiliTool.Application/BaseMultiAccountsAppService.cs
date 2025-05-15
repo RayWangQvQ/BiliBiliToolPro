@@ -17,11 +17,7 @@ public abstract class BaseMultiAccountsAppService(
         logger.LogInformation("账号数：{count}", cookieStrFactory.Count);
         for (int i = 0; i < cookieStrFactory.Count; i++)
         {
-            logger.LogInformation(
-                "######### 账号 {num} #########{newLine}",
-                i,
-                Environment.NewLine
-            );
+            logger.LogInformation("######### 账号 {num} #########" + Environment.NewLine, i);
             var ck = cookieStrFactory.GetCookie(i);
             try
             {
