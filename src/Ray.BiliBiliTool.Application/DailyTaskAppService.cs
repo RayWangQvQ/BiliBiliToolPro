@@ -18,7 +18,6 @@ namespace Ray.BiliBiliTool.Application;
 
 public class DailyTaskAppService(
     ILogger<DailyTaskAppService> logger,
-    IOptionsMonitor<Dictionary<string, int>> dicOptions,
     IAccountDomainService accountDomainService,
     IVideoDomainService videoDomainService,
     IArticleDomainService articleDomainService,
@@ -35,9 +34,7 @@ public class DailyTaskAppService(
 ) : BaseMultiAccountsAppService(logger, cookieStrFactory), IDailyTaskAppService
 {
     private readonly DailyTaskOptions _dailyTaskOptions = dailyTaskOptions.CurrentValue;
-    private readonly Dictionary<string, int> _expDic = dicOptions.Get(
-        Config.Constants.OptionsNames.ExpDictionaryName
-    );
+    private readonly Dictionary<string, int> _expDic = Config.Constants.ExpDic;
 
     [TaskInterceptor("每日任务", TaskLevel.One)]
     protected override async Task DoTaskAccountAsync(

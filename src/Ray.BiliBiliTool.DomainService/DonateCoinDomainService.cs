@@ -10,7 +10,6 @@ using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Relation;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Interfaces;
-using Ray.BiliBiliTool.Infrastructure.Cookie;
 
 namespace Ray.BiliBiliTool.DomainService
 {
@@ -19,25 +18,19 @@ namespace Ray.BiliBiliTool.DomainService
     /// </summary>
     public class DonateCoinDomainService(
         ILogger<DonateCoinDomainService> logger,
-        CookieStrFactory<BiliCookie> cookieFactory,
         IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
         IAccountApi accountApi,
         ICoinDomainService coinDomainService,
         IVideoDomainService videoDomainService,
         IRelationApi relationApi,
-        IOptionsMonitor<Dictionary<string, int>> expDicOptions,
-        IOptionsMonitor<Dictionary<string, string>> donateContinueStatusDicOptions,
         IVideoApi videoApi
     ) : IDonateCoinDomainService
     {
         private readonly DailyTaskOptions _dailyTaskOptions = dailyTaskOptions.CurrentValue;
-        private readonly Dictionary<string, int> _expDic = expDicOptions.Get(
-            Config.Constants.OptionsNames.ExpDictionaryName
-        );
-        private readonly Dictionary<string, string> _donateContinueStatusDic =
-            donateContinueStatusDicOptions.Get(
-                Config.Constants.OptionsNames.DonateCoinCanContinueStatusDictionaryName
-            );
+        private readonly Dictionary<string, int> _expDic = Config.Constants.ExpDic;
+        private readonly Dictionary<string, string> _donateContinueStatusDic = Config
+            .Constants
+            .DonateCoinCanContinueStatusDic;
 
         /// <summary>
         /// up的视频稿件总数缓存

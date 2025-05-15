@@ -101,18 +101,12 @@ public class Program
                 {
                     configurationBuilder.AddCommandLine(
                         args,
-                        Config.Constants.GetCommandLineMappingsDic()
+                        Config.Constants.CommandLineMappingsDic
                     );
                 }
 
                 //本地cookie存储文件
                 configurationBuilder.AddJsonFile("cookies.json", true, true);
-
-                //内置配置
-                configurationBuilder.AddInMemoryCollection(Config.Constants.GetExpDic());
-                configurationBuilder.AddInMemoryCollection(
-                    Config.Constants.GetDonateCoinCanContinueStatusDic()
-                );
             }
         );
 

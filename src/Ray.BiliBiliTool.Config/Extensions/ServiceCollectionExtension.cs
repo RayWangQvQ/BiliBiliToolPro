@@ -34,16 +34,6 @@ public static class ServiceCollectionExtension
             .Configure<VipPrivilegeOptions>(configuration.GetSection("VipPrivilegeConfig"))
             .Configure<LiveFansMedalTaskOptions>(
                 configuration.GetSection("LiveFansMedalTaskOptions")
-            )
-            .Configure<Dictionary<string, int>>(
-                Constants.OptionsNames.ExpDictionaryName,
-                configuration.GetSection(Constants.OptionsNames.ExpDictionaryName)
-            )
-            .Configure<Dictionary<string, string>>(
-                Constants.OptionsNames.DonateCoinCanContinueStatusDictionaryName,
-                configuration.GetSection(
-                    Constants.OptionsNames.DonateCoinCanContinueStatusDictionaryName
-                )
             );
 
         return services;
