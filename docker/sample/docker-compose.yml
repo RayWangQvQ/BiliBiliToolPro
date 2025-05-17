@@ -11,4 +11,4 @@ services:
       - "22330:8080"
     environment:
       TZ: "Asia/Shanghai"
-      Ray_DailyTaskConfig__Cron: "0 0 15 * * ?"
+      DailyTaskConfig__Cron: "0 0 15 * * ?"

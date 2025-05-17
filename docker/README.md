@@ -134,6 +134,8 @@ docker run --rm \
 
 扫码进行登录。
 
+![trigger](../docs/imgs/web-trigger-login.png)
+
 ![login](../docs/imgs/docker-login.png)
 
 ## 6. 自己构建镜像（非必须）
