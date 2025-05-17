@@ -23,7 +23,7 @@ try
 {
     var builder = WebApplication.CreateBuilder(args);
 
-    builder.Configuration.AddJsonFile("cookies.json", optional: true, reloadOnChange: true);
+    builder.Configuration.AddJsonFile("config/cookies.json", optional: true, reloadOnChange: true);
 
     builder
         .Services.AddRazorComponents()

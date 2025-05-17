@@ -267,8 +267,11 @@ downloadResources() {
     [ -f "docker-compose.yml" ] || download $remote_compose_url ./docker-compose.yml
 
     # ckJson
+    mkdir -p config
+    cd ./config
     [ -f "cookies.json" ] || download $remote_ckJson_url ./cookies.json
     chmod +x ./cookies.json
+    cd ..
 
     ls -l
 }
@@ -289,7 +292,7 @@ runContainer() {
             -p 22330:8080 \
             -e TZ=Asia/Shanghai \
             -v $base_dir/Logs:/app/Logs \
-            -v $base_dir/cookies.json:/app/cookies.json \
+            -v $base_dir/config:/app/config \
             $docker_img_name
     } || {
         say_err "创建容器失败，请检查"

@@ -6,6 +6,7 @@ services:
     tty: true
     volumes:
       - ./Logs:/app/Logs
+      - ./config:/app/config
     ports:
       - "22330:8080"
     environment:
