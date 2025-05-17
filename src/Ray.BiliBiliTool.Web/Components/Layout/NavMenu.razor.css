@@ -24,6 +24,11 @@
     font-size: 1.1rem;
 }
 
+.navbar-logo {
+    height: 40px;
+    margin-right: 10px;
+}
+
 .bi {
     display: inline-block;
     position: relative;
