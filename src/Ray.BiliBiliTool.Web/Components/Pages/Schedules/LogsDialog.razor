@@ -36,7 +36,7 @@
                     @foreach (var log in _logs)
                     {
                         <div class="log-entry">
-                            <span class="log-timestamp">@log.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</span>
+                            <span class="log-timestamp">@log.Timestamp.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")</span>
                             <span class="log-level @GetLogLevelClass(log.Level)">@log.FormattedLogLevel</span>
                             <span class="log-message">@((MarkupString)log.RenderedMessage.Replace(Environment.NewLine, "<br />"))</span>
                             @if (!string.IsNullOrEmpty(log.Exception))
@@ -47,7 +47,7 @@
                     }
                 }
                 <div class="log-entry cursor">
-                    <span class="log-timestamp">@DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")</span>
+                    <span class="log-timestamp">@DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")</span>
                 </div>
             </div>
 

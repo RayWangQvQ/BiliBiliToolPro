@@ -43,6 +43,7 @@ try
                 .ReadFrom.Services(services)
                 .Enrich.FromLogContext()
                 .WriteTo.Console()
+                .WriteTo.File("Logs/log.txt", rollingInterval: RollingInterval.Day)
                 .WriteTo.SQLite(
                     sqliteDbPath: sqliteConnStr.Split(';')[0].Split('=')[1],
                     tableName: "bili_logs",
