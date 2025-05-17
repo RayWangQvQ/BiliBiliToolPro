@@ -681,6 +681,18 @@ public partial class Schedules : ComponentBase, IDisposable
             return;
         }
 
+        bool? result = await DialogSvc.ShowMessageBox(
+            title: "Confirm",
+            markupMessage: (MarkupString)"Do you want to trigger this job now?",
+            yesText: "Trigger",
+            cancelText: "Cancel"
+        );
+
+        if (result != true)
+        {
+            return;
+        }
+
         await SchedulerSvc.TriggerJob(model.JobName, model.JobGroup);
     }
 
