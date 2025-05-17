@@ -1,13 +1,14 @@
 services:
   bilibili_tool:
-    image: ghcr.io/raywangqvq/bilibili_tool_pro
+    image: ghcr.io/raywangqvq/bilibili_tool_web
     container_name: bili
     restart: unless-stopped
     tty: true
     volumes:
       - ./Logs:/app/Logs
-      - ./appsettings.json:/app/appsettings.json
       - ./cookies.json:/app/cookies.json
+    ports:
+      - 8080:8080
     environment:
       # 定时任务
       - Ray_DailyTaskConfig__Cron=0 15 * * *
