@@ -1,5 +1,4 @@
 #See https://learn.microsoft.com/en-us/aspnet/core/host-and-deploy/docker/building-net-docker-images
-
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
 EXPOSE 8080
@@ -29,11 +28,7 @@ RUN dotnet publish "Ray.BiliBiliTool.Web.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
-ENV TIME_ZONE=Asia/Shanghai
 COPY --from=publish /app/publish .
-COPY ./docker/scripts/* /app/scripts/
 RUN apt-get update \
-    && apt-get clean \
-    && ln -fs /usr/share/zoneinfo/$TIME_ZONE /etc/localtime \
-    && echo $TIME_ZONE > /etc/timezone
+    && apt-get clean
 ENTRYPOINT ["dotnet", "Ray.BiliBiliTool.Web.dll"]
