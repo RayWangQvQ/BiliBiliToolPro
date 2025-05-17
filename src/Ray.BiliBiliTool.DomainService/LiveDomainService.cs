@@ -11,11 +11,9 @@ using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Relation;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
-using Ray.BiliBiliTool.Agent.BiliBiliAgent.Services;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Dtos;
 using Ray.BiliBiliTool.DomainService.Interfaces;
-using Ray.BiliBiliTool.Infrastructure.Cookie;
 
 namespace Ray.BiliBiliTool.DomainService;
 
@@ -27,13 +25,11 @@ public class LiveDomainService(
     ILiveApi liveApi,
     IRelationApi relationApi,
     ILiveTraceApi liveTraceApi,
-    IUserInfoApi userInfoApi,
     IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
     IOptionsMonitor<LiveLotteryTaskOptions> liveLotteryTaskOptions,
     IOptionsMonitor<LiveFansMedalTaskOptions> liveFansMedalTaskOptions,
     IOptionsMonitor<SecurityOptions> securityOptions,
-    IWbiService wbiService,
-    CookieStrFactory<BiliCookie> cookieFactory
+    IUpInfoApi upInfoApi
 ) : ILiveDomainService
 {
     private readonly LiveLotteryTaskOptions _liveLotteryTaskOptions =
@@ -433,7 +429,7 @@ public class LiveDomainService(
             var liveHostUserId = medal.Medal_info.Target_id;
             var req = new GetSpaceInfoDto() { mid = liveHostUserId };
 
-            var spaceInfo = await userInfoApi.GetSpaceInfo(req, ck.ToString());
+            var spaceInfo = await upInfoApi.GetSpaceInfo(req, ck.ToString());
             if (spaceInfo.Code != 0)
             {
                 logger.LogError("【获取直播间信息】失败");
@@ -679,7 +675,7 @@ public class LiveDomainService(
             var liveHostUserId = medal.Medal_info.Target_id;
             var req = new GetSpaceInfoDto() { mid = liveHostUserId };
 
-            var spaceInfo = await userInfoApi.GetSpaceInfo(req, ck.ToString());
+            var spaceInfo = await upInfoApi.GetSpaceInfo(req, ck.ToString());
             if (spaceInfo.Code != 0)
             {
                 logger.LogError("【获取空间信息】失败");

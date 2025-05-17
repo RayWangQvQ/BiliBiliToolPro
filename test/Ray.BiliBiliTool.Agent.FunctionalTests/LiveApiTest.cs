@@ -133,16 +133,16 @@ namespace BiliAgentTest
             using var scope = Global.ServiceProviderRoot.CreateScope();
 
             var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory<BiliCookie>>();
-            var api = scope.ServiceProvider.GetRequiredService<IUserInfoApi>();
-            var biliCookie = scope.ServiceProvider.GetRequiredService<BiliCookie>();
+            var api = scope.ServiceProvider.GetRequiredService<IUpInfoApi>();
 
             var wbiService = scope.ServiceProvider.GetRequiredService<IWbiService>();
 
             var req = new GetSpaceInfoDto() { mid = 919174L };
 
-            await wbiService.SetWridAsync(req, null);
-
-            BiliApiResponse<GetSpaceInfoResponse> re = api.GetSpaceInfo(req, null).Result;
+            BiliApiResponse<GetSpaceInfoResponse> re = api.GetSpaceInfo(
+                req,
+                ck.GetCookie(0).ToString()
+            ).Result;
 
             Assert.True(re.Code == 0);
             Assert.NotNull(re.Data);
