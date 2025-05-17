@@ -29,7 +29,7 @@ public class SecurityOptions
     /// 间隔秒数所针对的HttpMethod，多个用英文逗号隔开，当前有GET和POST两种，可配置如“GET,POST”
     /// 服务器一般对GET请求不是很敏感，建议只针对POST请求做间隔就可以了
     /// </summary>
-    public string IntervalMethodTypes { get; set; } = "POST";
+    public string IntervalMethodTypes { get; set; } = "GET,POST";
 
     public List<HttpMethod> GetIntervalMethods()
     {
