@@ -287,6 +287,7 @@ runContainer() {
     } || {
         docker run -d --name="${container_name}" \
             -p 22330:8080 \
+            -e TZ=Asia/Shanghai \
             -v $base_dir/Logs:/app/Logs \
             -v $base_dir/cookies.json:/app/cookies.json \
             $docker_img_name
