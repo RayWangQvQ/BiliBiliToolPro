@@ -36,7 +36,7 @@ public class BiliBiliToolHostedService(
 
         try
         {
-            logger.LogInformation("BiliBiliToolPro 开始运行...{newLine}", Environment.NewLine);
+            logger.LogInformation("BiliBiliToolPro 开始运行..." + Environment.NewLine);
 
             bool pass = await PreCheckAsync(cancellationToken);
             if (!pass)
@@ -67,9 +67,8 @@ public class BiliBiliToolHostedService(
             //环境
             logger.LogInformation("运行环境：{env}", environment.EnvironmentName);
             logger.LogInformation(
-                "应用目录：{path}{newLine}",
-                environment.ContentRootPath,
-                Environment.NewLine
+                "应用目录：{path}" + Environment.NewLine,
+                environment.ContentRootPath
             );
             logger.LogInformation("运行结束");
 
@@ -87,15 +86,14 @@ public class BiliBiliToolHostedService(
     {
         //Cookie
         logger.LogInformation(
-            "【账号个数】{count}个{newLine}",
-            cookieStrFactory.Count,
-            Environment.NewLine
+            "【账号个数】{count}个" + Environment.NewLine,
+            cookieStrFactory.Count
         );
 
         //是否跳过
         if (_securityOptions.IsSkipDailyTask)
         {
-            logger.LogWarning("已配置为跳过任务{newLine}", Environment.NewLine);
+            logger.LogWarning("已配置为跳过任务" + Environment.NewLine);
             return Task.FromResult(false);
         }
 
@@ -113,7 +111,7 @@ public class BiliBiliToolHostedService(
         if (_securityOptions.RandomSleepMaxMin > 0)
         {
             int randomMin = new Random().Next(1, ++_securityOptions.RandomSleepMaxMin);
-            logger.LogInformation("随机休眠{min}分钟{newLine}", randomMin, Environment.NewLine);
+            logger.LogInformation("随机休眠{min}分钟" + Environment.NewLine, randomMin);
             await Task.Delay(randomMin * 1000 * 60, cancellationToken);
         }
     }
@@ -170,10 +168,9 @@ public class BiliBiliToolHostedService(
 
     private void LogAppInfo()
     {
+        logger.LogInformation(Environment.NewLine + "========================");
         logger.LogInformation(
-            "{newLine}========================{newLine} v{version} 开源 by {url}",
-            Environment.NewLine + Environment.NewLine,
-            Environment.NewLine + Environment.NewLine,
+            "v{version} 开源 by {url}",
             typeof(Program)
                 .Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
                 ?.InformationalVersion,

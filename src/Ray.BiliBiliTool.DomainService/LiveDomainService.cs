@@ -152,7 +152,7 @@ public class LiveDomainService(
         int count = 0;
         foreach (var area in areaList)
         {
-            logger.LogInformation("【扫描分区】{area}...{newLine}", area.Name, Environment.NewLine);
+            logger.LogInformation("【扫描分区】{area}..." + Environment.NewLine, area.Name);
 
             string defaultSort = "";
             //每个分区下搜索5页
@@ -216,7 +216,7 @@ public class LiveDomainService(
 
             if (check.Status != TianXuanStatus.Enable)
             {
-                logger.LogDebug("已开奖，跳过{newLine}", Environment.NewLine);
+                logger.LogDebug("已开奖，跳过" + Environment.NewLine);
                 return;
             }
 
@@ -228,7 +228,7 @@ public class LiveDomainService(
                 )
             )
             {
-                logger.LogDebug("不满足配置的筛选条件，跳过{newLine}", Environment.NewLine);
+                logger.LogDebug("不满足配置的筛选条件，跳过" + Environment.NewLine);
                 return;
             }
 
@@ -236,7 +236,7 @@ public class LiveDomainService(
             if (check.Gift_price > 0)
             {
                 logger.LogDebug("【赠礼】{gift}", check.GiftDesc);
-                logger.LogDebug("需赠送礼物，跳过{newLine}", Environment.NewLine);
+                logger.LogDebug("需赠送礼物，跳过" + Environment.NewLine);
                 return;
             }
 
@@ -266,23 +266,18 @@ public class LiveDomainService(
             var re = await liveApi.Join(request);
             if (re.Code == 0)
             {
-                logger.LogInformation("【抽奖】成功 √{newLine}", Environment.NewLine);
+                logger.LogInformation("【抽奖】成功 √" + Environment.NewLine);
                 if (check.Require_type == RequireType.Follow)
                     _tianXuanFollowed.AddIfNotExist(target, x => x.Uid == target.Uid);
                 return;
             }
 
             logger.LogInformation("【抽奖】失败");
-            logger.LogInformation("【原因】{msg}{newLine}", re.Message, Environment.NewLine);
+            logger.LogInformation("【原因】{msg}" + Environment.NewLine, re.Message);
         }
         catch (Exception ex)
         {
-            logger.LogWarning(
-                "【异常】{msg}，{detail}{newLine}",
-                ex.Message,
-                ex,
-                Environment.NewLine
-            );
+            logger.LogWarning("【异常】{msg}，{detail}" + Environment.NewLine, ex.Message, ex);
             //ignore
         }
     }
