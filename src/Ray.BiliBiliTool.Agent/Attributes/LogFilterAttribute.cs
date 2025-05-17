@@ -12,7 +12,7 @@ public class LogFilterAttribute(bool logError = true) : LoggingFilterAttribute
 {
     protected override Task WriteLogAsync(ApiResponseContext context, LogMessage logMessage)
     {
-        using var loggerFactory = context.HttpContext.ServiceProvider.GetService<ILoggerFactory>();
+        var loggerFactory = context.HttpContext.ServiceProvider.GetService<ILoggerFactory>();
         if (loggerFactory == null)
         {
             return Task.CompletedTask;

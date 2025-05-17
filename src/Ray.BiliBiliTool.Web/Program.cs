@@ -46,9 +46,17 @@ try
                 .WriteTo.SQLite(
                     sqliteDbPath: sqliteConnStr.Split(';')[0].Split('=')[1],
                     tableName: "bili_logs",
-                    storeTimestampInUtc: true
+                    storeTimestampInUtc: true,
+                    batchSize: 7
                 )
     );
+
+    // Add BlazingQuartz
+    builder.Services.Configure<BlazingQuartzUIOptions>(
+        builder.Configuration.GetSection("BlazingQuartz")
+    );
+    builder.Services.AddBlazingQuartz();
+    builder.Services.AddMudServices();
 
     builder.Services.AddQuartz(q =>
     {
@@ -66,13 +74,6 @@ try
         q.AddBiliJobs(builder.Configuration);
     });
     builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
-
-    // Add BlazingQuartz
-    builder.Services.Configure<BlazingQuartzUIOptions>(
-        builder.Configuration.GetSection("BlazingQuartz")
-    );
-    builder.Services.AddBlazingQuartz();
-    builder.Services.AddMudServices();
 
     builder
         .Services.AddAppServices()

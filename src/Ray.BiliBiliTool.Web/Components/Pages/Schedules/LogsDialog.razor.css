@@ -137,7 +137,7 @@
 
 /* 光标效果 */
 .cursor::after {
-    content: "_";
+    content: "$_";
     animation: blink 1s step-end infinite;
 }
 
