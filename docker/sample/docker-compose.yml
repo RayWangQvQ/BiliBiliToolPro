@@ -1,12 +1,12 @@
 services:
   bilibili_tool:
-    image: ghcr.io/raywangqvq/bilibili_tool_web
-    container_name: bili
+    image: ghcr.io/raywangqvq/bili_tool_web
+    container_name: bili_tool_web
     restart: unless-stopped
     tty: true
     volumes:
       - ./Logs:/app/Logs
     ports:
-      - 22333:8080
+      - 22330:8080
     environment:
       - Ray_DailyTaskConfig__Cron="0 0 15 * * ?"
