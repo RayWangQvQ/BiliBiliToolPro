@@ -178,7 +178,7 @@
                     }
                     else
                     {
-                        @context.Item.NextTriggerTime?.LocalDateTime
+                        @context.Item.NextTriggerTime?.LocalDateTime.ToString("yyyy-MM-dd HH:mm:ss")
                     }
                 </CellTemplate>
             </TemplateColumn>
@@ -209,7 +209,7 @@
                         }
                         else
                         {
-                            @context.Item.PreviousTriggerTime?.LocalDateTime
+                            @context.Item.PreviousTriggerTime?.LocalDateTime.ToString("yyyy-MM-dd HH:mm:ss")
                         }
                     </div>
                 </CellTemplate>
