@@ -18,7 +18,7 @@ BiliTool
 
 </div>
 
-**BiliTool 是一个自动执行任务的工具，当我们忘记做某项任务时，它会像一个贴心小助手，按照我们预先吩咐它的命令，在指定频率、时间范围内帮助我们完成计划的任务。**  
+**BiliTool 是一个自动执行任务的工具，当我们忘记做某项任务时，它会像一个贴心小助手，按照我们预先吩咐它的命令，在指定频率、时间范围内帮助我们完成计划的任务。**
 **BiliTool is an automated task execution tool that acts as a helpful assistant, following pre-configured commands to complete planned tasks within specified frequencies and timeframes when we forget to do them.**
 
 主要功能如下：
@@ -111,10 +111,10 @@ BiliTool 实现自动完成任务的原理，是通过调用一系列开放的ap
 如果配置了推送，执行成功后，指定的接收端会收到推送消息，推送效果如下所示：
 
 <p align="center">
-    <img src="docs/imgs/wechat-push.png" alt="微信推送图示" width="500">
+    <img src="docs/imgs/push-tg.png" alt="微信推送图示" width="300">
 </p>
 
-目前默认支持**PushPlus推送、企业微信应用推送、企业微信推送、钉钉推送、Microsoft Teams推送、Telegram推送、Server酱推送和酷推QQ推送**（以上顺序即为个人推荐的排序），如果需要推送到其他端，也可以配置为任意的可以接受消息的Api地址，关于如何配置推送请详见下面的**个性化自定义配置**章节。
+目前默认支持**Telegram推送、PushPlus推送、企业微信应用推送、企业微信推送、钉钉推送、Microsoft Teams推送、Server酱推送和酷推QQ推送**（以上顺序即为个人推荐的排序），如果需要推送到其他端，也可以配置为任意的可以接受消息的Api地址，关于如何配置推送请详见下面的**个性化自定义配置**章节。
 
 ## 2. 功能任务说明
 
