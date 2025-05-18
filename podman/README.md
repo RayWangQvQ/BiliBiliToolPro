@@ -53,7 +53,7 @@ Podman可以和Docker共存，命令也基本可以通用。
 
 ```
 # 生成并运行容器
-podman run -itd --name="bili_tool_web" docker.io/zai7lou/bilibili_tool_web
+podman run -itd --name="bili_tool_web" docker.io/zai7lou/bili_tool_web
 
 # 查看实时日志
 podman logs -f bili_tool_web
@@ -81,7 +81,7 @@ podman run -itd --name="bili_tool_web" \
     -e UnfollowBatchedTaskConfig__Cron="0 0 6 1 * ?" \
     -e VipBigPointConfig__Cron="0 7 1 * * *" \
     -e DailyTaskConfig__NumberOfCoins="5"
-    docker.io/zai7lou/bilibili_tool_web
+    docker.io/zai7lou/bili_tool_web
 
 # 查看实时日志
 podman logs -f bili

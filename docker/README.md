@@ -22,7 +22,7 @@ apt-get update
 apt-get install curl
 ```
 
-## 2. 方式一：一键脚本(推荐) 
+## 2. 方式一：一键脚本(推荐)
 
 ```
 bash <(curl -sSL https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/docker/install.sh)
@@ -40,7 +40,7 @@ mkdir bili_tool_web && cd bili_tool_web
 wget https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/docker/sample/docker-compose.yml
 mkdir -p config
 cd ./config
-wget https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/docker/sample/cookies.json
+wget https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/docker/sample/config/cookies.json
 cd ..
 
 # 启动
