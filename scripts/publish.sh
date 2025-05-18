@@ -61,7 +61,7 @@ extract_release_notes() {
     mkdir -p $publishDir
 
     # 提取最新的 changelog (从第一个 ## 标题到下一个 ## 标题之间的所有内容)
-    sed -n '/^## /{p;:a;n;/^## /q;p;ba}' $repoDir/CHANGELOG.md > $publishDir/release_notes.md
+    sed -n '/^## /{p;:a;n;/^## /q;p;ba}' "$repoDir/CHANGELOG.md" > "$publishDir/release_notes.md"
 
     echo "Release notes saved to $publishDir/release_notes.md"
 }
