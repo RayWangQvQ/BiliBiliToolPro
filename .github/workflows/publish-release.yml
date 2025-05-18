@@ -30,7 +30,7 @@ jobs:
 
       - name: Read Version
         id: version
-        run: $(sed -n '/^## /{p;:a;n;/^## /q;p;ba}' CHANGELOG.md)
+        run: echo "version=$(cat ./src/Ray.BiliBiliTool.Console/bin/Publish/version.txt)" >> $GITHUB_OUTPUT
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
