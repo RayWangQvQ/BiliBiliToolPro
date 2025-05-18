@@ -218,8 +218,8 @@ download() {
             break
         fi
 
-        say "Download attempt #$attempts has failed: $http_code $download_error_msg"
-        say "Attempt #$((attempts + 1)) will start in $((attempts * 10)) seconds."
+        say_info "Download attempt #$attempts has failed: $http_code $download_error_msg"
+        say_info "Attempt #$((attempts + 1)) will start in $((attempts * 10)) seconds."
         sleep $((attempts * 10))
     done
 
