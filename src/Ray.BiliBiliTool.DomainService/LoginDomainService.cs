@@ -150,7 +150,13 @@ public class LoginDomainService(
         var path = hostingEnvironment.ContentRootPath;
         var indexOfBin = path.LastIndexOf("bin");
         if (indexOfBin != -1)
+        {
             path = path[..indexOfBin];
+        }
+        if (string.Equals(configuration["PlatformType"], "Web", StringComparison.OrdinalIgnoreCase))
+        {
+            path = Path.Combine(path, "config");
+        }
         var fileProvider = new PhysicalFileProvider(path);
         IFileInfo fileInfo = fileProvider.GetFileInfo("cookies.json");
         logger.LogInformation("目标json地址：{path}", fileInfo.PhysicalPath);

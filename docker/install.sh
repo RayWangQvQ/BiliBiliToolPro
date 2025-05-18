@@ -18,7 +18,7 @@ echo ' | |_) | | | | | | (_) | (_) | | '
 echo ' |____/|_|_|_| |_|\___/ \___/|_| '
 
 current_dir=$(pwd)
-base_dir="${current_dir}/bili_web"
+base_dir="${current_dir}/bili_tool_web"
 github_proxy=""
 github_branch="main"
 remote_compose_url="${github_proxy}https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/refs/heads/${github_branch}/docker/sample/docker-compose.yml"
@@ -308,7 +308,7 @@ checkResult() {
 
     containerId=$(docker ps -q --filter "name=^${container_name}$")
     if [ -n "$containerId" ]; then
-        docker logs bili
+        docker logs ${container_name}
         echo ""
         echo "==============================================="
         echo "Congratulations! 恭喜！"
