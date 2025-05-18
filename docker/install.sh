@@ -22,7 +22,7 @@ base_dir="${current_dir}/bili_web"
 github_proxy=""
 github_branch="main"
 remote_compose_url="${github_proxy}https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/refs/heads/${github_branch}/docker/sample/docker-compose.yml"
-remote_ckJson_url="${github_proxy}https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/refs/heads/${github_branch}/docker/sample/cookies.json"
+remote_ckJson_url="${github_proxy}https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/refs/heads/${github_branch}/docker/sample/config/cookies.json"
 docker_img_name="ghcr.io/raywangqvq/bili_tool_web"
 container_name="bili_tool_web"
 
