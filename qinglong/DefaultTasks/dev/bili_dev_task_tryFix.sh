@@ -28,7 +28,7 @@ if [[ $(echo "$dotnetVersion" | grep -oE '^[0-9]+') -ge 8 ]]; then
     echo "已安装，且版本满足"
 else
     echo "which dotnet: $(which dotnet)"
-    echo "Paht: $PATH"
+    echo "Path: $PATH"
     rm -f /usr/local/bin/dotnet
 fi
 echo "检测dotnet结束"
