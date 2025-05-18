@@ -103,7 +103,7 @@
 
 ```
 https://github.moeyy.xyz/https://github.com/RayWangQvQ/BiliBiliToolPro.git
-https://ghproxy.net/https://github.com/RayWangQvQ/BiliBiliToolPro.git
+https://gh-proxy.com/https://github.com/RayWangQvQ/BiliBiliToolPro.git
 ...
 ```
 
@@ -123,8 +123,6 @@ https://ghproxy.net/https://github.com/RayWangQvQ/BiliBiliToolPro.git
 export BILI_MODE="bilitool" # bili运行模式，dotnet或bilitool
 export BILI_GITHUB_PROXY="https://github.moeyy.xyz/" # 下载二进制包时使用的加速代理，不要的话则置空
 ```
-
-其中加速代理形如：`https://github.moeyy.xyz/`或`https://ghproxy.net/`，因通常不能保证长期稳定，请自行查找使用。
 
 ![qinglong-login.png](../docs/imgs/qinglong-run-as-bilitool.png)
 
