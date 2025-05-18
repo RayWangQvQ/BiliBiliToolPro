@@ -8,10 +8,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Application.Contracts;
 using Ray.BiliBiliTool.Config.Options;
-using Ray.BiliBiliTool.Infrastructure.Cookie;
 using Constants = Ray.BiliBiliTool.Config.Constants;
 
 namespace Ray.BiliBiliTool.Console;
@@ -22,7 +20,6 @@ public class BiliBiliToolHostedService(
     IHostEnvironment environment,
     IConfiguration configuration,
     ILogger<BiliBiliToolHostedService> logger,
-    CookieStrFactory<BiliCookie> cookieStrFactory,
     IOptionsMonitor<SecurityOptions> securityOptions
 ) : IHostedService
 {
@@ -30,10 +27,6 @@ public class BiliBiliToolHostedService(
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        bool isNotifySingle = configuration
-            .GetSection("Notification:IsSingleAccountSingleNotify")
-            .Get<bool>();
-
         try
         {
             logger.LogInformation("BiliBiliToolPro 开始运行..." + Environment.NewLine);
@@ -55,15 +48,12 @@ public class BiliBiliToolHostedService(
         }
         finally
         {
-            if (!isNotifySingle)
-            {
-                LogAppInfo();
-                logger.LogInformation(
-                    "·开始推送·{task}·{user}",
-                    $"{configuration["RunTasks"]}任务",
-                    ""
-                );
-            }
+            LogAppInfo();
+            logger.LogInformation(
+                "·开始推送·{task}·{user}",
+                $"{configuration["RunTasks"]}任务",
+                ""
+            );
             //环境
             logger.LogInformation("运行环境：{env}", environment.EnvironmentName);
             logger.LogInformation(
@@ -84,12 +74,6 @@ public class BiliBiliToolHostedService(
 
     private Task<bool> PreCheckAsync(CancellationToken cancellationToken)
     {
-        //Cookie
-        logger.LogInformation(
-            "【账号个数】{count}个" + Environment.NewLine,
-            cookieStrFactory.Count
-        );
-
         //是否跳过
         if (_securityOptions.IsSkipDailyTask)
         {
