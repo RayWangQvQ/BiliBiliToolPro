@@ -51,7 +51,7 @@ get_version() {
     mkdir -p $publishDir
 
     # 将版本号保存到文件
-    echo "$version" > $publishDir/version.txt
+    echo "$version" > "$publishDir/version.txt"
 
     echo "Version saved to $publishDir/version.txt"
 }
