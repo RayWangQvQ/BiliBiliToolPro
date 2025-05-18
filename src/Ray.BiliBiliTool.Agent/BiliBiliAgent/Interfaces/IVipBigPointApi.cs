@@ -84,7 +84,10 @@ public interface IVipBigPointApi
     /// <param name="request"></param>
     /// <returns></returns>
     [HttpPost("/pgc/activity/deliver/task/complete")]
-    Task<BiliApiResponse> ViewComplete([FormContent] ViewRequest request);
+    Task<BiliApiResponse> ViewComplete(
+        [FormContent] ViewRequest request,
+        [Header("Cookie")] string ck
+    );
 
     [HttpGet("/x/vip/privilege/my")]
     Task<BiliApiResponse<VouchersInfoResponse>> GetVouchersInfoAsync([Header("Cookie")] string ck);

@@ -53,5 +53,5 @@ public interface IArticleApi : IBiliBiliApi
     )]
     [Header("Origin", "https://www.bilibili.com")]
     [HttpPost("/x/article/like?id={cvid}&type=1&csrf={csrf}")]
-    Task<BiliApiResponse> LikeAsync(long cvid, string csrf);
+    Task<BiliApiResponse> LikeAsync(long cvid, string csrf, [Header("Cookie")] string ck);
 }

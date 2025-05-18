@@ -132,7 +132,7 @@ public class ArticleApiTests
         var cvid = 34150576;
 
         // Act
-        var re = await _api.LikeAsync(cvid, _ck.BiliJct);
+        var re = await _api.LikeAsync(cvid, _ck.BiliJct, null);
 
         // Assert
         re.Code.Should()
