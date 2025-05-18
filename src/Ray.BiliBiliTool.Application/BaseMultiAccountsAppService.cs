@@ -14,7 +14,10 @@ public abstract class BaseMultiAccountsAppService(
 {
     public override async Task DoTaskAsync(CancellationToken cancellationToken = default)
     {
-        logger.LogInformation("账号数：{count}", cookieStrFactory.Count);
+        logger.LogInformation(
+            "【账号个数】{count}个" + Environment.NewLine,
+            cookieStrFactory.Count
+        );
         for (int i = 0; i < cookieStrFactory.Count; i++)
         {
             logger.LogInformation("######### 账号 {num} #########" + Environment.NewLine, i);
