@@ -1,0 +1,74 @@
+@rendermode InteractiveServer
+@attribute [StreamRendering]
+@using Ray.BiliBiliTool.Domain
+@using Ray.BiliBiliTool.Web.Extensions
+
+<MudDialog>
+    <TitleContent>
+        <div class="d-flex">
+            <MudText Typo="Typo.h5">Logs</MudText>
+            <MudIconButton Icon="@Icons.Material.Filled.Refresh"
+                           OnClick="OnRefreshLogs" />
+        </div>
+    </TitleContent>
+    <DialogContent>
+        <div class="terminal-container">
+            <div class="terminal-header">
+                <div class="terminal-title">Logs Terminal</div>
+                <div class="terminal-controls">
+                    <div class="control-dot dot-red"></div>
+                    <div class="control-dot dot-yellow"></div>
+                    <div class="control-dot dot-green"></div>
+                </div>
+            </div>
+
+            <div class="terminal-window" id="logContainer" @ref="_logContainerReference">
+                @if (_loading && _logs.Count == 0)
+                {
+                    <div class="log-entry">
+                        <span class="log-timestamp">@DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")</span>
+                        <span class="log-level log-level-info">SYSTEM</span>
+                        <span class="log-message">Loading logs from database...</span>
+                    </div>
+                }
+                else
+                {
+                    @foreach (var log in _logs)
+                    {
+                        <div class="log-entry">
+                            <span class="log-timestamp">@log.Timestamp.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")</span>
+                            <span class="log-level @GetLogLevelClass(log.Level)">@log.FormattedLogLevel</span>
+                            <span class="log-message">@((MarkupString)log.RenderedMessage.Replace(Environment.NewLine, "<br />"))</span>
+                            @if (!string.IsNullOrEmpty(log.Exception))
+                            {
+                                <span class="log-message">@log.Exception</span>
+                            }
+                        </div>
+                    }
+                }
+                <div class="log-entry cursor">
+                    <span class="log-timestamp">@DateTime.Now.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")</span>
+                </div>
+            </div>
+
+            <div class="terminal-footer">
+                <div class="connection-status">
+                    <span class="status-indicator status-connected"></span>
+                    <span>LIVE</span>
+                </div>
+                <div>
+                    <MudIconButton Icon="@Icons.Material.Filled.Refresh" Color="Color.Inherit" Size="Size.Small"
+                                   Class="clear-button" OnClick="OnRefreshLogs" />
+                    <MudIconButton Icon="@Icons.Material.Filled.Clear" Color="Color.Inherit" Size="Size.Small"
+                                   Class="clear-button" OnClick="ClearDisplay" />
+                </div>
+                <div>
+                    <span>Auto-refresh: 3s</span>
+                </div>
+            </div>
+        </div>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Close">Close</MudButton>
+    </DialogActions>
+</MudDialog>

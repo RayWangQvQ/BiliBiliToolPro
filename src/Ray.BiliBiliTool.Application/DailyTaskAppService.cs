@@ -11,13 +11,13 @@ using Ray.BiliBiliTool.Application.Attributes;
 using Ray.BiliBiliTool.Application.Contracts;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Interfaces;
+using Ray.BiliBiliTool.Infrastructure.Cookie;
 using Ray.BiliBiliTool.Infrastructure.Enums;
 
 namespace Ray.BiliBiliTool.Application;
 
 public class DailyTaskAppService(
     ILogger<DailyTaskAppService> logger,
-    IOptionsMonitor<Dictionary<string, int>> dicOptions,
     IAccountDomainService accountDomainService,
     IVideoDomainService videoDomainService,
     IArticleDomainService articleDomainService,
@@ -30,41 +30,42 @@ public class DailyTaskAppService(
     ICoinDomainService coinDomainService,
     ILoginDomainService loginDomainService,
     IConfiguration configuration,
-    BiliCookie biliCookie
-) : AppService, IDailyTaskAppService
+    CookieStrFactory<BiliCookie> cookieStrFactory
+) : BaseMultiAccountsAppService(logger, cookieStrFactory), IDailyTaskAppService
 {
     private readonly DailyTaskOptions _dailyTaskOptions = dailyTaskOptions.CurrentValue;
-    private readonly Dictionary<string, int> _expDic = dicOptions.Get(
-        Config.Constants.OptionsNames.ExpDictionaryName
-    );
+    private readonly Dictionary<string, int> _expDic = Config.Constants.ExpDic;
 
     [TaskInterceptor("每日任务", TaskLevel.One)]
-    public override async Task DoTaskAsync(CancellationToken cancellationToken = default)
+    protected override async Task DoTaskAccountAsync(
+        BiliCookie ck,
+        CancellationToken cancellationToken = default
+    )
     {
-        await SetCookiesAsync(cancellationToken);
+        await SetCookiesAsync(ck, cancellationToken);
 
         //每日任务赚经验：
-        UserInfo userInfo = await Login();
+        UserInfo userInfo = await Login(ck);
 
-        DailyTaskInfo dailyTaskInfo = await GetDailyTaskStatus();
-        await WatchAndShareVideo(dailyTaskInfo);
+        DailyTaskInfo dailyTaskInfo = await GetDailyTaskStatus(ck);
+        await WatchAndShareVideo(dailyTaskInfo, ck);
 
-        await AddCoins(userInfo);
+        await AddCoins(userInfo, ck);
 
         //签到：
-        await MangaSign();
-        await MangaRead();
-        await ExchangeSilver2Coin();
+        await MangaSign(ck);
+        await MangaRead(ck);
+        await ExchangeSilver2Coin(ck);
 
         //领福利：
-        await ReceiveVipPrivilege(userInfo);
-        await ReceiveMangaVipReward(userInfo);
+        await ReceiveVipPrivilege(userInfo, ck);
+        await ReceiveMangaVipReward(userInfo, ck);
 
-        await Charge(userInfo);
+        await Charge(userInfo, ck);
     }
 
     [TaskInterceptor("Set Cookie")]
-    private async Task SetCookiesAsync(CancellationToken cancellationToken)
+    private async Task SetCookiesAsync(BiliCookie biliCookie, CancellationToken cancellationToken)
     {
         //判断cookie是否完整
         if (biliCookie.Buvid.IsNotNullOrEmpty())
@@ -87,9 +88,9 @@ public class DailyTaskAppService(
     /// </summary>
     /// <returns></returns>
     [TaskInterceptor("登录")]
-    private async Task<UserInfo> Login()
+    private async Task<UserInfo> Login(BiliCookie ck)
     {
-        UserInfo userInfo = await accountDomainService.LoginByCookie();
+        UserInfo userInfo = await accountDomainService.LoginByCookie(ck);
         if (userInfo == null)
             throw new Exception("登录失败，请检查Cookie"); //终止流程
 
@@ -104,16 +105,16 @@ public class DailyTaskAppService(
     /// </summary>
     /// <returns></returns>
     [TaskInterceptor(rethrowWhenException: false)]
-    private async Task<DailyTaskInfo> GetDailyTaskStatus()
+    private async Task<DailyTaskInfo> GetDailyTaskStatus(BiliCookie ck)
     {
-        return await accountDomainService.GetDailyTaskStatus();
+        return await accountDomainService.GetDailyTaskStatus(ck);
     }
 
     /// <summary>
     /// 观看、分享视频
     /// </summary>
     [TaskInterceptor("观看、分享视频", rethrowWhenException: false)]
-    private async Task WatchAndShareVideo(DailyTaskInfo dailyTaskInfo)
+    private async Task WatchAndShareVideo(DailyTaskInfo dailyTaskInfo, BiliCookie ck)
     {
         if (!_dailyTaskOptions.IsWatchVideo && !_dailyTaskOptions.IsShareVideo)
         {
@@ -121,14 +122,14 @@ public class DailyTaskAppService(
             return;
         }
 
-        await videoDomainService.WatchAndShareVideo(dailyTaskInfo);
+        await videoDomainService.WatchAndShareVideo(dailyTaskInfo, ck);
     }
 
     /// <summary>
     /// 投币任务
     /// </summary>
     [TaskInterceptor("投币", rethrowWhenException: false)]
-    private async Task AddCoins(UserInfo userInfo)
+    private async Task AddCoins(UserInfo userInfo, BiliCookie ck)
     {
         if (_dailyTaskOptions.SaveCoinsWhenLv6 && userInfo.Level_info.Current_level >= 6)
         {
@@ -140,15 +141,15 @@ public class DailyTaskAppService(
         {
             logger.LogInformation("专栏投币已开启");
 
-            if (!await articleDomainService.AddCoinForArticles())
+            if (!await articleDomainService.AddCoinForArticles(ck))
             {
                 logger.LogInformation("专栏投币结束，转入视频投币");
-                await donateCoinDomainService.AddCoinsForVideos();
+                await donateCoinDomainService.AddCoinsForVideos(ck);
             }
         }
         else
         {
-            await donateCoinDomainService.AddCoinsForVideos();
+            await donateCoinDomainService.AddCoinsForVideos(ck);
         }
     }
 
@@ -156,14 +157,14 @@ public class DailyTaskAppService(
     /// 直播中心的银瓜子兑换硬币
     /// </summary>
     [TaskInterceptor("银瓜子兑换硬币", rethrowWhenException: false)]
-    private async Task ExchangeSilver2Coin()
+    private async Task ExchangeSilver2Coin(BiliCookie ck)
     {
-        var success = await liveDomainService.ExchangeSilver2Coin();
+        var success = await liveDomainService.ExchangeSilver2Coin(ck);
         if (!success)
             return;
 
         //如果兑换成功，则打印硬币余额
-        var coinBalance = coinDomainService.GetCoinBalance();
+        var coinBalance = coinDomainService.GetCoinBalance(ck);
         logger.LogInformation("【硬币余额】 {coin}", coinBalance);
     }
 
@@ -171,16 +172,16 @@ public class DailyTaskAppService(
     /// 每月领取大会员福利
     /// </summary>
     [TaskInterceptor("领取大会员福利", rethrowWhenException: false)]
-    private async Task ReceiveVipPrivilege(UserInfo userInfo)
+    private async Task ReceiveVipPrivilege(UserInfo userInfo, BiliCookie ck)
     {
-        var suc = await vipPrivilegeDomainService.ReceiveVipPrivilege(userInfo);
+        var suc = await vipPrivilegeDomainService.ReceiveVipPrivilege(userInfo, ck);
 
         //如果领取成功，需要刷新账户信息（比如B币余额）
         if (suc)
         {
             try
             {
-                userInfo = await accountDomainService.LoginByCookie();
+                userInfo = await accountDomainService.LoginByCookie(ck);
             }
             catch (Exception ex)
             {
@@ -193,41 +194,41 @@ public class DailyTaskAppService(
     /// 每月为自己充电
     /// </summary>
     [TaskInterceptor("B币券充电", rethrowWhenException: false)]
-    private async Task Charge(UserInfo userInfo)
+    private async Task Charge(UserInfo userInfo, BiliCookie ck)
     {
-        await chargeDomainService.Charge(userInfo);
+        await chargeDomainService.Charge(userInfo, ck);
     }
 
     /// <summary>
     /// 漫画签到
     /// </summary>
     [TaskInterceptor("漫画签到", rethrowWhenException: false)]
-    private async Task MangaSign()
+    private async Task MangaSign(BiliCookie ck)
     {
-        await mangaDomainService.MangaSign();
+        await mangaDomainService.MangaSign(ck);
     }
 
     /// <summary>
     /// 漫画阅读
     /// </summary>
     [TaskInterceptor("漫画阅读", rethrowWhenException: false)]
-    private async Task MangaRead()
+    private async Task MangaRead(BiliCookie ck)
     {
-        await mangaDomainService.MangaRead();
+        await mangaDomainService.MangaRead(ck);
     }
 
     /// <summary>
     /// 每月获取大会员漫画权益
     /// </summary>
     [TaskInterceptor("领取大会员漫画权益", rethrowWhenException: false)]
-    private async Task ReceiveMangaVipReward(UserInfo userInfo)
+    private async Task ReceiveMangaVipReward(UserInfo userInfo, BiliCookie ck)
     {
-        await mangaDomainService.ReceiveMangaVipReward(1, userInfo);
+        await mangaDomainService.ReceiveMangaVipReward(1, userInfo, ck);
     }
 
     private async Task SaveCookieAsync(BiliCookie ckInfo, CancellationToken cancellationToken)
     {
-        var platformType = configuration.GetSection("PlateformType").Get<PlatformType>();
+        var platformType = configuration.GetSection("PlatformType").Get<PlatformType>();
         logger.LogInformation("当前运行平台：{platform}", platformType);
 
         //更新cookie到青龙env

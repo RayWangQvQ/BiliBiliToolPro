@@ -2,7 +2,7 @@
 
 namespace Ray.BiliBiliTool.Config.Options;
 
-public class VipBigPointOptions
+public class VipBigPointOptions : IHasCron
 {
     public string ViewBangumis { get; set; }
 
@@ -25,4 +25,6 @@ public class VipBigPointOptions
             return re;
         }
     }
+
+    public string Cron { get; set; }
 }

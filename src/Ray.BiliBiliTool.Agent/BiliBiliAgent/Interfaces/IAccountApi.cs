@@ -13,5 +13,5 @@ public interface IAccountApi : IBiliBiliApi
     /// <returns></returns>
     [Header("Referer", "https://account.bilibili.com/account/coin")]
     [HttpGet("/site/getCoin")]
-    Task<BiliApiResponse<CoinBalance>> GetCoinBalanceAsync();
+    Task<BiliApiResponse<CoinBalance>> GetCoinBalanceAsync([Header("Cookie")] string ck);
 }

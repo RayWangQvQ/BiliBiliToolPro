@@ -6,7 +6,7 @@ namespace Ray.BiliBiliTool.Config.Options;
 /// <summary>
 /// 程序自定义个性化配置
 /// </summary>
-public class DailyTaskOptions
+public class DailyTaskOptions : IHasCron
 {
     /// <summary>
     /// 是否观看视频
@@ -139,4 +139,6 @@ public class DailyTaskOptions
         ">.<",
         "^_~",
     };
+
+    public string Cron { get; set; }
 }

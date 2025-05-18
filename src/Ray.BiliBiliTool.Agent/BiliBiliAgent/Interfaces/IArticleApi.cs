@@ -34,6 +34,7 @@ public interface IArticleApi : IBiliBiliApi
     [HttpPost("/x/web-interface/coin/add")]
     Task<BiliApiResponse> AddCoinForArticleAsync(
         [FormContent] AddCoinForArticleRequest request,
+        [Header("Cookie")] string ck,
         [Header("referer")]
             string refer =
             "https://www.bilibili.com/read/cv5806746/?from=search&spm_id_from=333.337.0.0"

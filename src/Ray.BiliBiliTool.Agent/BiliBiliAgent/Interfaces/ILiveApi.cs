@@ -20,7 +20,7 @@ public interface ILiveApi : IBiliBiliApi
     [Header("Referer", "https://link.bilibili.com/")]
     [Header("Origin", "https://link.bilibili.com")]
     [HttpGet("/xlive/web-ucenter/v1/sign/DoSign")]
-    Task<BiliApiResponse<LiveSignResponse>> Sign();
+    Task<BiliApiResponse<LiveSignResponse>> Sign([Header("Cookie")] string ck);
 
     /// <summary>
     /// 银瓜子兑换硬币
@@ -31,7 +31,7 @@ public interface ILiveApi : IBiliBiliApi
     [Header("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")]
     [HttpGet("/pay/v1/Exchange/silver2coin")]
     [Obsolete]
-    Task<BiliApiResponse> ExchangeSilver2Coin();
+    Task<BiliApiResponse> ExchangeSilver2Coin([Header("Cookie")] string ck);
 
     /// <summary>
     /// 获取银瓜子余额
@@ -41,7 +41,9 @@ public interface ILiveApi : IBiliBiliApi
     [Header("Origin", "https://link.bilibili.com")]
     [HttpGet("/pay/v1/Exchange/getStatus")]
     [Obsolete]
-    Task<BiliApiResponse<ExchangeSilverStatusResponse>> GetExchangeSilverStatus();
+    Task<BiliApiResponse<ExchangeSilverStatusResponse>> GetExchangeSilverStatus(
+        [Header("Cookie")] string ck
+    );
 
     /// <summary>
     /// 银瓜子兑换硬币
@@ -53,7 +55,8 @@ public interface ILiveApi : IBiliBiliApi
     [Header("Origin", "https://link.bilibili.com")]
     [HttpPost("/xlive/revenue/v1/wallet/silver2coin")]
     Task<BiliApiResponse<Silver2CoinResponse>> Silver2Coin(
-        [FormContent] Silver2CoinRequest request
+        [FormContent] Silver2CoinRequest request,
+        [Header("Cookie")] string ck
     );
 
     /// <summary>
@@ -66,7 +69,7 @@ public interface ILiveApi : IBiliBiliApi
     Task<BiliApiResponse<LiveWalletStatusResponse>> GetLiveWalletStatus();
 
     [HttpGet("/xlive/web-interface/v1/index/getWebAreaList?source_id=2")]
-    Task<BiliApiResponse<GetArteaListResponse>> GetAreaList();
+    Task<BiliApiResponse<GetArteaListResponse>> GetAreaList([Header("Cookie")] string ck);
 
     /// <summary>
     /// 获取直播列表
@@ -98,7 +101,10 @@ public interface ILiveApi : IBiliBiliApi
     [Header("Referer", "https://live.bilibili.com/")]
     [Header("Origin", "https://live.bilibili.com")]
     [HttpGet("/xlive/lottery-interface/v1/Anchor/Check?roomid={roomId}")]
-    Task<BiliApiResponse<CheckTianXuanDto>> CheckTianXuan(long roomId);
+    Task<BiliApiResponse<CheckTianXuanDto>> CheckTianXuan(
+        long roomId,
+        [Header("Cookie")] string ck
+    );
 
     /// <summary>
     /// 参加天选时刻抽奖
@@ -116,7 +122,10 @@ public interface ILiveApi : IBiliBiliApi
     [Header("Referer", "https://live.bilibili.com/")]
     [Header("Origin", "https://live.bilibili.com")]
     [HttpGet("/xlive/web-ucenter/user/MedalWall?target_id={userId}")]
-    Task<BiliApiResponse<MedalWallResponse>> GetMedalWall(string userId);
+    Task<BiliApiResponse<MedalWallResponse>> GetMedalWall(
+        string userId,
+        [Header("Cookie")] string ck
+    );
 
     /// <summary>
     /// 佩戴粉丝勋章
@@ -126,7 +135,10 @@ public interface ILiveApi : IBiliBiliApi
     [Header("Referer", "https://live.bilibili.com/")]
     [Header("Origin", "https://live.bilibili.com")]
     [HttpPost("/xlive/app-ucenter/v1/fansMedal/wear")]
-    Task<BiliApiResponse> WearMedalWall([FormContent] WearMedalWallRequest request);
+    Task<BiliApiResponse> WearMedalWall(
+        [FormContent] WearMedalWallRequest request,
+        [Header("Cookie")] string ck
+    );
 
     /// <summary>
     /// 发送弹幕
@@ -134,7 +146,10 @@ public interface ILiveApi : IBiliBiliApi
     /// <param name="request">request</param>
     /// <returns></returns>
     [HttpPost("/msg/send")]
-    Task<BiliApiResponse> SendLiveDanmuku([FormContent] SendLiveDanmukuRequest request);
+    Task<BiliApiResponse> SendLiveDanmuku(
+        [FormContent] SendLiveDanmukuRequest request,
+        [Header("Cookie")] string ck
+    );
 
     /// <summary>
     /// 获取直播间信息
@@ -148,7 +163,7 @@ public interface ILiveApi : IBiliBiliApi
     /// 请求直播主页用于配置直播相关 Cookie
     /// </summary>
     [HttpGet("/news/v1/notice/recom?product=live")]
-    Task<HttpResponseMessage> GetLiveHome();
+    Task<HttpResponseMessage> GetLiveHome([Header("Cookie")] string ck);
 
     /// <summary>
     /// 点赞直播间
@@ -156,5 +171,8 @@ public interface ILiveApi : IBiliBiliApi
     [HttpPost("/xlive/app-ucenter/v1/like_info_v3/like/likeReportV3")]
     [Header("Referer", "https://live.bilibili.com/")]
     [Header("Origin", "https://live.bilibili.com")]
-    Task<BiliApiResponse> LikeLiveRoom([RawFormContent] string request);
+    Task<BiliApiResponse> LikeLiveRoom(
+        [RawFormContent] string request,
+        [Header("Cookie")] string ck
+    );
 }

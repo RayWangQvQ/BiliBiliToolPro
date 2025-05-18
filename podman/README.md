@@ -53,36 +53,35 @@ Podman可以和Docker共存，命令也基本可以通用。
 
 ```
 # 生成并运行容器
-podman run -itd --name="bili" docker.io/zai7lou/bilibili_tool_pro
+podman run -itd --name="bili_tool_web" docker.io/zai7lou/bilibili_tool_web
 
 # 查看实时日志
-podman logs -f bili
+podman logs -f bili_tool_web
 ```
-
-其中，`cookie`需要替换为自己真实的cookie字符串
 
 ### 2.2. 综合版
 
 ```
 # 创建文件和文件夹
-mkdir -p /bili && cd /bili
+mkdir -p /bili_tool_web && cd /bili_tool_web
 mkdir -p Logs
 
 # 下载appsettings.json
-wget https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/src/Ray.BiliBiliTool.Console/appsettings.json
-wget https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/docker/sample/cookies.json
+mkdir -p config
+cd ./config
+wget https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/docker/sample/config/cookies.json
+cd ..
 
 # 运行
-podman run -itd --name="bili" \
-    -v /bili/Logs:/app/Logs \
-    -v /bili/appsettings.json:/app/appsettings.json \
-    -v /bili/cookies.json:/app/cookies.json \
-    -e Ray_DailyTaskConfig__Cron="0 15 * * *" \
-    -e Ray_LiveLotteryTaskConfig__Cron="0 22 * * *" \
-    -e Ray_UnfollowBatchedTaskConfig__Cron="0 6 1 * *" \
-    -e Ray_VipBigPointConfig__Cron="7 1 * * *" \
-    -e Ray_DailyTaskConfig__NumberOfCoins="5"
-    docker.io/zai7lou/bilibili_tool_pro
+podman run -itd --name="bili_tool_web" \
+    -v ./Logs:/app/Logs \
+    -v ./config:/app/config \
+    -e DailyTaskConfig__Cron="0 0 15 * * ?" \
+    -e LiveLotteryTaskConfig__Cron="0 0 22 * * ?" \
+    -e UnfollowBatchedTaskConfig__Cron="0 0 6 1 * ?" \
+    -e VipBigPointConfig__Cron="0 7 1 * * *" \
+    -e DailyTaskConfig__NumberOfCoins="5"
+    docker.io/zai7lou/bilibili_tool_web
 
 # 查看实时日志
 podman logs -f bili
@@ -100,15 +99,15 @@ podman exec -it bili bash
 
 ## 登录
 
-在宿主机运行`podman exec -it bili bash -c "dotnet Ray.BiliBiliTool.Console.dll --runTasks=Login"`
-
 扫码进行登录。
+
+![trigger](../docs/imgs/web-trigger-login.png)
 
 ![login](../docs/imgs/docker-login.png)
 
 ## 3. 自己构建镜像（非必须）
 
-目前我提供和维护的镜像：`[zai7lou/bilibili_tool_pro](https://hub.docker.com/repository/docker/zai7lou/bilibili_tool_pro)`;
+目前我提供和维护的镜像：`[zai7lou/bilibili_tool_web](https://hub.docker.com/repository/docker/zai7lou/bilibili_tool_web)`;
 
 如果有需要（大部分都不需要），可以使用源码自己构建镜像，如下：
 

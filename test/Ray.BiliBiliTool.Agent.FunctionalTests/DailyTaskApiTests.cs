@@ -30,7 +30,7 @@ public class DailyTaskApiTests
     public async Task GetDailyTaskRewardInfo_Normal_Success()
     {
         // Act
-        BiliApiResponse<DailyTaskInfo> re = await _api.GetDailyTaskRewardInfoAsync();
+        BiliApiResponse<DailyTaskInfo> re = await _api.GetDailyTaskRewardInfoAsync(null);
 
         // Arrange
 
@@ -43,7 +43,7 @@ public class DailyTaskApiTests
     public async Task GetDonateCoinExp_Normal_Success()
     {
         // Act
-        BiliApiResponse<int> re = await _api.GetDonateCoinExpAsync();
+        BiliApiResponse<int> re = await _api.GetDonateCoinExpAsync(null);
 
         // Arrange
 
@@ -58,7 +58,8 @@ public class DailyTaskApiTests
         // Act
         BiliApiResponse re = await _api.ReceiveVipPrivilegeAsync(
             (int)VipPrivilegeType.BCoinCoupon,
-            _ck.BiliJct
+            _ck.BiliJct,
+            null
         );
 
         // Arrange

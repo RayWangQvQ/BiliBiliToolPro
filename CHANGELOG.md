@@ -1,3 +1,5 @@
+## 3.0.0
+- 上线 bili_tool_web
 ## 2.2.2
 - Code refactor
 - Integration Husky.Net and CSharpier

@@ -1,0 +1,181 @@
+/*
+ * 终端风格日志显示的全局样式
+ * 放置在wwwroot/css/terminal.css
+ */
+
+.terminal-container {
+    display: flex;
+    flex-direction: column;
+    height: 75vh;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.terminal-window {
+    background-color: #0c0c0c;
+    color: #cccccc;
+    font-family: 'Consolas', 'Courier New', monospace;
+    padding: 16px;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+}
+
+/* 日志条目 */
+.log-entry {
+    padding: 2px 0;
+    border-bottom: 1px solid #333333;
+    animation: fadeIn 0.3s ease-in-out;
+    display: flex;
+}
+
+/* 时间戳 */
+.log-timestamp {
+    color: #888888;
+    margin-right: 8px;
+    white-space: nowrap;
+}
+
+/* 日志级别通用样式 */
+.log-level {
+    margin-right: 8px;
+    padding: 0 6px;
+    text-align: center;
+    border-radius: 3px;
+    white-space: nowrap;
+    min-width: 50px;
+}
+
+/* 不同日志级别的颜色 */
+.log-level-info {
+    background-color: #2d5a8a;
+    color: #a8d7ff;
+}
+
+.log-level-error {
+    background-color: #8a2d2d;
+    color: #ffbaba;
+}
+
+.log-level-warning {
+    background-color: #8a7d2d;
+    color: #ffe7a8;
+}
+
+.log-level-debug {
+    background-color: #444444;
+    color: #cccccc;
+}
+
+/* 日志消息 */
+.log-message {
+    flex-grow: 1;
+    word-break: break-word;
+}
+
+/* 日志来源 */
+.log-source {
+    color: #888888;
+    margin-left: 8px;
+    white-space: nowrap;
+}
+
+/* 终端标题栏 */
+.terminal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 16px;
+    background-color: #333;
+    border-radius: 6px 6px 0 0;
+}
+
+.terminal-title {
+    color: white;
+    font-weight: bold;
+}
+
+/* 终端控制按钮 */
+.terminal-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.control-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.dot-red {
+    background-color: #ff5f56;
+}
+
+.dot-yellow {
+    background-color: #ffbd2e;
+}
+
+.dot-green {
+    background-color: #27c93f;
+}
+
+/* 闪烁效果 */
+.blink {
+    animation: blink-animation 1s steps(5, start) infinite;
+}
+
+/* 终端底部状态栏 */
+.terminal-footer {
+    background-color: #333;
+    color: #ccc;
+    padding: 8px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 0 0 6px 6px;
+}
+
+/* 光标效果 */
+.cursor::after {
+    content: "$_";
+    animation: blink 1s step-end infinite;
+}
+
+/* 动画定义 */
+@keyframes blink {
+    from, to { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* 连接状态样式 */
+.connection-status {
+    display: flex;
+    align-items: center;
+    font-size: 0.8rem;
+}
+
+.status-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 6px;
+}
+
+.status-connected {
+    background-color: #27c93f;
+}
+
+.status-icon {
+    font-size: 16px;
+    margin-right: 4px;
+}
+
+/* 按钮悬停效果 */
+.clear-button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}

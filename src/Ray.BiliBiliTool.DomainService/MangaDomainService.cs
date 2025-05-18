@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Config.Options;
@@ -23,12 +24,12 @@ public class MangaDomainService(
     /// <summary>
     /// 漫画签到
     /// </summary>
-    public async Task MangaSign()
+    public async Task MangaSign(BiliCookie ck)
     {
         BiliApiResponse response;
         try
         {
-            response = await mangaApi.ClockIn(_dailyTaskOptions.DevicePlatform);
+            response = await mangaApi.ClockIn(_dailyTaskOptions.DevicePlatform, ck.ToString());
         }
         catch (Exception)
         {
@@ -53,14 +54,15 @@ public class MangaDomainService(
     /// <summary>
     /// 漫画阅读
     /// </summary>
-    public async Task MangaRead()
+    public async Task MangaRead(BiliCookie ck)
     {
         if (_dailyTaskOptions.CustomComicId <= 0)
             return;
         BiliApiResponse response = await mangaApi.ReadManga(
             _dailyTaskOptions.DevicePlatform,
             _dailyTaskOptions.CustomComicId,
-            _dailyTaskOptions.CustomEpId
+            _dailyTaskOptions.CustomEpId,
+            ck.ToString()
         );
 
         if (response.Code == 0)
@@ -79,7 +81,7 @@ public class MangaDomainService(
     /// </summary>
     /// <param name="reason_id">权益号，由https://api.bilibili.com/x/vip/privilege/my得到权益号数组，取值范围为数组中的整数
     /// 这里为方便直接取1，为领取漫读劵，暂时不取其他的值</param>
-    public async Task ReceiveMangaVipReward(int reason_id, UserInfo userInfo)
+    public async Task ReceiveMangaVipReward(int reason_id, UserInfo userInfo, BiliCookie ck)
     {
         if (userInfo.GetVipType() == 0)
         {
@@ -101,7 +103,7 @@ public class MangaDomainService(
             return;
         }
 
-        var response = await mangaApi.ReceiveMangaVipReward(reason_id);
+        var response = await mangaApi.ReceiveMangaVipReward(reason_id, ck.ToString());
         if (response.Code == 0)
         {
             logger.LogInformation("【领取结果】成功");

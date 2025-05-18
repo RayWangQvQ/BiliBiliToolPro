@@ -4,31 +4,30 @@ using System.Linq;
 
 namespace Ray.BiliBiliTool.Infrastructure.Cookie;
 
-public class CookieInfo
+public class CookieInfo(Dictionary<string, string> cookieDic)
 {
-    private readonly CookieStrFactory _ckFactory;
+    public Dictionary<string, string> CookieItemDictionary { get; private set; } = cookieDic;
 
-    public CookieInfo(CookieStrFactory ckFactory)
-    {
-        _ckFactory = ckFactory;
-    }
-
-    public string CookieStr => _ckFactory.GetCurrentCookieStr();
-
-    public Dictionary<string, string> CookieItemDictionary => _ckFactory.GetCurrentCookieDic();
+    public string CookieStr =>
+        string.Join(
+            "; ",
+            CookieItemDictionary
+                .Select(item => $"{CkNameBuild(item.Key)}={CkValueBuild(item.Value)}")
+                .ToList()
+        );
 
     public virtual void Check()
     {
-        if (string.IsNullOrWhiteSpace(CookieStr))
+        if (CookieItemDictionary == null || CookieItemDictionary.Count == 0)
             throw new Exception("Cookie字符串为空");
     }
 
-    public virtual string CkNameBuild(string name)
+    protected virtual string CkNameBuild(string name)
     {
         return name;
     }
 
-    public virtual string CkValueBuild(string value)
+    protected virtual string CkValueBuild(string value)
     {
         return value;
     }
@@ -45,22 +44,25 @@ public class CookieInfo
 
     public void MergeCurrentCookieBySetCookieHeaders(IEnumerable<string> setCookieList)
     {
-        _ckFactory.MergeCurrentCookieBySetCookieHeaders(setCookieList);
+        MergeCurrentCookie(ConvertSetCkHeadersToCkItemList(setCookieList));
     }
 
     public void MergeCurrentCookie(string ckStr)
     {
-        _ckFactory.MergeCurrentCookie(ckStr);
+        MergeCurrentCookie(ConvertCkStrToCkItemList(ckStr));
     }
 
     public void MergeCurrentCookie(List<string> ckItemList)
     {
-        _ckFactory.MergeCurrentCookie(ckItemList);
+        MergeCurrentCookie(ConvertCkItemListToCkDic(ckItemList));
     }
 
     public void MergeCurrentCookie(Dictionary<string, string> ckDic)
     {
-        _ckFactory.MergeCurrentCookie(ckDic);
+        foreach (var item in ckDic)
+        {
+            CookieItemDictionary[item.Key] = item.Value;
+        }
     }
 
     #endregion

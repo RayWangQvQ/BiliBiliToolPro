@@ -1,0 +1,138 @@
+@using BlazingQuartz.Core.Models
+@using BlazingQuartz.Core.Services
+@inject ISchedulerService SchSvc
+
+<MudDialog>
+    <DialogContent>
+        <MudButtonGroup OverrideStyles="false" Class="pb-4">
+            <MudButton Color="Color.Default" Size="Size.Large" DisableElevation="true"
+                    Variant="@(SelectedTab == ScheduleDialogTab.Job ? Variant.Filled : Variant.Text)"
+                    OnClick="() => OnSelectedTabChanged(ScheduleDialogTab.Job)">Job Details</MudButton>
+            <MudButton Color="Color.Default" Size="Size.Large" DisableElevation="true"
+                    Variant="@(SelectedTab == ScheduleDialogTab.Trigger ? Variant.Filled : Variant.Text)"
+                    OnClick="() => OnSelectedTabChanged(ScheduleDialogTab.Trigger)">Trigger Details</MudButton>
+        </MudButtonGroup>
+
+        @if (SelectedTab == ScheduleDialogTab.Job)
+        {
+            <BlazingJob @ref="_jobPanel" JobDetail="JobDetail" @bind-IsValid="_jobDetailIsValid"
+                        IsReadOnly="IsReadOnlyJobDetail"/>
+        }
+        else
+        {
+            <BlazingTrigger @ref="_triggerPanel" TriggerDetail="TriggerDetail" @bind-IsValid="_triggerDetailIsValid" />
+        }
+    </DialogContent>
+    <DialogActions>
+        <div class="d-flex justify-space-between flex-grow-1 pa-3">
+            <MudButton OnClick="OnCancel" Variant="Variant.Filled"
+                Style="width: 100px;">Cancel</MudButton>
+            <div class="d-flex gap-4">
+                <MudButton @ref="_backBtn"
+                    Style="width: 100px;"
+                    Disabled="@(SelectedTab == ScheduleDialogTab.Job)"
+                    Color="Color.Secondary"
+                    StartIcon="@Icons.Material.Filled.NavigateBefore"
+                    Variant="Variant.Filled"
+                    OnClick="OnBack">Back</MudButton>
+                <MudButton Color="Color.Primary"
+                    Style="width: 100px;"
+                    OnClick="OnSubmit"
+                    EndIcon="@_nextIcon"
+                    Variant="Variant.Filled">@_nextText</MudButton>
+            </div>
+        </div>
+
+
+    </DialogActions>
+</MudDialog>
+@code {
+    [CascadingParameter] MudDialog MudDialog { get; set; } = null!;
+    [Parameter] public JobDetailModel JobDetail { get; set; } = new();
+    [Parameter] public TriggerDetailModel TriggerDetail { get; set; } = new();
+    [Parameter] public bool IsReadOnlyJobDetail { get; set; } = false;
+    [Parameter] public ScheduleDialogTab SelectedTab { get; set; } = ScheduleDialogTab.Job;
+
+    private bool _jobDetailIsValid;
+    private bool _triggerDetailIsValid;
+
+    private MudButton _backBtn = null!;
+    private string _nextText = "Next";
+    private string? _nextIcon = Icons.Material.Filled.NavigateNext;
+
+    private BlazingJob _jobPanel = null!;
+    private BlazingTrigger _triggerPanel = null!;
+
+    protected override void OnInitialized()
+    {
+        if (SelectedTab == ScheduleDialogTab.Trigger)
+        {
+            _jobDetailIsValid = true;
+            _nextText = "Save";
+            _nextIcon = null;
+        }
+    }
+
+    private async Task OnSelectedTabChanged(ScheduleDialogTab tab)
+    {
+        if (SelectedTab == tab)
+            return;
+
+        // validate before change tab
+        if (SelectedTab == ScheduleDialogTab.Job)
+        {
+            await _jobPanel.Validate();
+            if (!_jobDetailIsValid)
+                return;
+        }
+
+        SelectedTab = tab;
+
+        // update text
+        if (SelectedTab == ScheduleDialogTab.Job)
+        {
+            _nextText = "Next";
+            _nextIcon = Icons.Material.Filled.NavigateNext;
+        }
+        else if (SelectedTab == ScheduleDialogTab.Trigger)
+        {
+            if (string.IsNullOrEmpty(TriggerDetail.Name) &&
+                !string.IsNullOrEmpty(JobDetail.Name))
+            {
+                // use job name as trigger name when trigger name not yet specified
+                // determine if trigger name can be used
+                var exists = await SchSvc.ContainsTriggerKey(JobDetail.Name, TriggerDetail.Group);
+                if (!exists)
+                    TriggerDetail.Name = JobDetail.Name;
+            }
+            _nextText = "Save";
+            _nextIcon = null;
+        }
+    }
+
+    async Task OnBack()
+    {
+        await OnSelectedTabChanged(ScheduleDialogTab.Job);
+    }
+
+    async Task OnSubmit()
+    {
+        if (SelectedTab == ScheduleDialogTab.Job)
+        {
+            await OnSelectedTabChanged(ScheduleDialogTab.Trigger);
+            return;
+        }
+
+        await _triggerPanel.Validate();
+
+        if (!_jobDetailIsValid || !_triggerDetailIsValid)
+        {
+            return;
+        }
+
+        await MudDialog.CloseAsync(DialogResult.Ok((JobDetail, TriggerDetail)));
+    }
+
+    void OnCancel() => MudDialog.CloseAsync();
+}
+

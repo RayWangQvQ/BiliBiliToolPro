@@ -6,4 +6,5 @@ public enum PlatformType
     GitHubActions,
     Docker,
     QingLong,
+    Web,
 }

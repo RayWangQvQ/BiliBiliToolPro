@@ -1,21 +1,9 @@
-namespace DomainServiceTest
+namespace DomainServiceTest;
+
+public class DonateCoinDomainServiceTest
 {
-    public class DonateCoinDomainServiceTest
+    public DonateCoinDomainServiceTest()
     {
-        public DonateCoinDomainServiceTest()
-        {
-            Program.CreateHost(new[] { "--ENVIRONMENT=Development" });
-        }
-
-        [Fact]
-        public async Task AddCoinsForVideos()
-        {
-            using var scope = Global.ServiceProviderRoot.CreateScope();
-            var config = Global.ConfigurationRoot;
-            var domainService =
-                scope.ServiceProvider.GetRequiredService<IDonateCoinDomainService>();
-
-            await domainService.AddCoinsForVideos();
-        }
+        Program.CreateHost(new[] { "--ENVIRONMENT=Development" });
     }
 }

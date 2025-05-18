@@ -43,7 +43,7 @@ public class WbiServiceTest
         };
 
         // Act
-        await _target.SetWridAsync(req);
+        await _target.SetWridAsync(req, null);
 
         // Assert
         req.w_rid.Should().NotBeNullOrWhiteSpace();
@@ -59,7 +59,7 @@ public class WbiServiceTest
             img_url = "https://i0.hdslb.com/bfs/wbi/653657f524a547ac981ded72ea172057.png",
             sub_url = "https://i0.hdslb.com/bfs/wbi/6e4909c702f846728e64f6007736a338.png",
         };
-        var dic = new Dictionary<string, object>()
+        var dic = new Dictionary<string, string>()
         {
             { "foo", "114" },
             { "bar", "514" },
