@@ -1,4 +1,3 @@
-# 打包发布Release
 name: Publish release
 
 on:
@@ -13,42 +12,34 @@ jobs:
     name: Publish Release
     if: ${{ github.repository == 'RayWangQvQ/BiliBiliToolPro' }}
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
-    
+
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '8.0.x'
-        
+
       - name: Publish and Zip Release
         run: |
           cd ./scripts
           chmod +x ./publish.sh
           ./publish.sh --runtime all
-          
-      - name: Extract Release Notes
-        id: release_notes
-        run: |
-          content=$(sed -n '/^## /{p;:a;n;/^## /q;p;ba}' CHANGELOG.md)
-          version=$(echo "$GITHUB_REF" | sed 's/refs\/tags\///')
-          echo "version=$version" >> $GITHUB_OUTPUT
-          {
-            echo 'content<<EOF'
-            echo '$content'
-            echo EOF
-          } >> "$GITHUB_OUTPUT"
+
+      - name: Read Version
+        id: version
+        run: $(sed -n '/^## /{p;:a;n;/^## /q;p;ba}' CHANGELOG.md)
 
       - name: Create Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: './src/Ray.BiliBiliTool.Console/bin/Publish/*.zip'
           token: ${{ secrets.GITHUB_TOKEN }}
-          name: "BiliBiliToolPro-V${{ steps.release_notes.outputs.version }}"
-          tag_name: ${{ steps.release_notes.outputs.version }}
-          body: '${{ steps.release_notes.outputs.content }}'
+          name: "BiliBiliToolPro-V${{ steps.version.outputs.version }}"
+          tag_name: ${{ steps.version.outputs.version }}
+          body_path: './src/Ray.BiliBiliTool.Console/bin/Publish/release_notes.md'
           discussion_category_name: Announcements
           generate_release_notes: true
           fail_on_unmatched_files: true
