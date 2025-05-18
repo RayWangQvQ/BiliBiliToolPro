@@ -156,7 +156,16 @@ public class LiveDomainService(
             //每个分区下搜索5页
             for (int i = 1; i < 6; i++)
             {
-                var reData = (await liveApi.GetList(area.Id, i, sortType: defaultSort)).Data;
+                var request = new GetListRequest
+                {
+                    platform = "web",
+                    parent_area_id = area.Id,
+                    area_id = 0,
+                    sort_type = defaultSort,
+                    page = i,
+                    wts = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+                };
+                var reData = (await liveApi.GetList(request, ck.ToString())).Data;
                 if (reData == null)
                 {
                     continue;
