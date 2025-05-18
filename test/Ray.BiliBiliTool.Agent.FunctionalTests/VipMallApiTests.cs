@@ -34,7 +34,7 @@ public class VipMallApiTests
         var req = new ViewVipMallRequest() { Csrf = _ck.BiliJct };
 
         // Act
-        BiliApiResponse re = await _api.ViewVipMallAsync(req);
+        BiliApiResponse re = await _api.ViewVipMallAsync(req, null);
 
         // Assert
         re.Code.Should().Be(0);

@@ -51,7 +51,7 @@ public class LoginTaskAppService(
     [TaskInterceptor("持久化Cookie")]
     private async Task SaveCookieAsync(BiliCookie ckInfo, CancellationToken cancellationToken)
     {
-        var platformType = configuration.GetSection("PlateformType").Get<PlatformType>();
+        var platformType = configuration.GetSection("PlatformType").Get<PlatformType>();
         logger.LogInformation("当前运行平台：{platform}", platformType);
 
         //更新cookie到青龙env

@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 
 namespace Ray.BiliBiliTool.DomainService.Interfaces;
@@ -12,5 +13,5 @@ public interface IVipPrivilegeDomainService : IDomainService
     /// 获取大会员权益
     /// </summary>
     /// <param name="useInfo"></param>
-    Task<bool> ReceiveVipPrivilege(UserInfo userInfo);
+    Task<bool> ReceiveVipPrivilege(UserInfo userInfo, BiliCookie ck);
 }

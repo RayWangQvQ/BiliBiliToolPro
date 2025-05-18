@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.DomainService.Dtos;
 
@@ -28,27 +29,27 @@ public interface IVideoDomainService : IDomainService
     /// <param name="upId"></param>
     /// <param name="total"></param>
     /// <returns></returns>
-    Task<UpVideoInfo> GetRandomVideoOfUp(long upId, int total);
+    Task<UpVideoInfo> GetRandomVideoOfUp(long upId, int total, BiliCookie ck);
 
-    Task<int> GetVideoCountOfUp(long upId);
+    Task<int> GetVideoCountOfUp(long upId, BiliCookie ck);
 
     /// <summary>
     /// 观看并分享视频
     /// </summary>
     /// <param name="dailyTaskStatus"></param>
-    Task WatchAndShareVideo(DailyTaskInfo dailyTaskStatus);
+    Task WatchAndShareVideo(DailyTaskInfo dailyTaskStatus, BiliCookie ck);
 
     /// <summary>
     /// 观看
     /// </summary>
     /// <param name="aid"></param>
     /// <param name="dailyTaskStatus"></param>
-    Task WatchVideo(VideoInfoDto videoInfo);
+    Task WatchVideo(VideoInfoDto videoInfo, BiliCookie ck);
 
     /// <summary>
     /// 分享
     /// </summary>
     /// <param name="aid"></param>
     /// <param name="dailyTaskStatus"></param>
-    Task ShareVideo(VideoInfoDto videoInfo);
+    Task ShareVideo(VideoInfoDto videoInfo, BiliCookie ck);
 }

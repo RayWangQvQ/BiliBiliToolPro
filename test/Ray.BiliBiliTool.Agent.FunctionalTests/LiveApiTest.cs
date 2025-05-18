@@ -28,9 +28,11 @@ namespace BiliAgentTest
         {
             using var scope = Global.ServiceProviderRoot.CreateScope();
             var api = scope.ServiceProvider.GetRequiredService<ILiveApi>();
-            var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory>();
+            var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory<BiliCookie>>();
 
-            BiliApiResponse<ExchangeSilverStatusResponse> re = api.GetExchangeSilverStatus().Result;
+            BiliApiResponse<ExchangeSilverStatusResponse> re = api.GetExchangeSilverStatus(
+                null
+            ).Result;
 
             if (ck.Count > 0)
             {
@@ -48,13 +50,13 @@ namespace BiliAgentTest
         {
             using var scope = Global.ServiceProviderRoot.CreateScope();
 
-            var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory>();
+            var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory<BiliCookie>>();
             var api = scope.ServiceProvider.GetRequiredService<ILiveApi>();
             var biliCookie = scope.ServiceProvider.GetRequiredService<BiliCookie>();
 
             Silver2CoinRequest request = new(biliCookie.BiliJct);
 
-            BiliApiResponse<Silver2CoinResponse> re = api.Silver2Coin(request).Result;
+            BiliApiResponse<Silver2CoinResponse> re = api.Silver2Coin(request, null).Result;
 
             if (re.Code == 0)
             {
@@ -71,10 +73,10 @@ namespace BiliAgentTest
         {
             using var scope = Global.ServiceProviderRoot.CreateScope();
 
-            var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory>();
+            var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory<BiliCookie>>();
             var api = scope.ServiceProvider.GetRequiredService<ILiveApi>();
 
-            BiliApiResponse<LiveWalletStatusResponse> re = api.GetLiveWalletStatus().Result;
+            BiliApiResponse<LiveWalletStatusResponse> re = api.GetLiveWalletStatus(null).Result;
 
             if (ck.Count > 0)
             {
@@ -91,10 +93,10 @@ namespace BiliAgentTest
         {
             using var scope = Global.ServiceProviderRoot.CreateScope();
 
-            var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory>();
+            var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory<BiliCookie>>();
             var api = scope.ServiceProvider.GetRequiredService<ILiveApi>();
 
-            BiliApiResponse<MedalWallResponse> re = api.GetMedalWall("919174").Result;
+            BiliApiResponse<MedalWallResponse> re = api.GetMedalWall("919174", null).Result;
 
             Assert.NotEmpty(re.Data.List);
 
@@ -112,14 +114,14 @@ namespace BiliAgentTest
         {
             using var scope = Global.ServiceProviderRoot.CreateScope();
 
-            var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory>();
+            var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory<BiliCookie>>();
             var api = scope.ServiceProvider.GetRequiredService<ILiveApi>();
             var biliCookie = scope.ServiceProvider.GetRequiredService<BiliCookie>();
 
             // 猫雷粉丝牌
             var request = new WearMedalWallRequest(biliCookie.BiliJct, 365421); //todo
 
-            BiliApiResponse re = api.WearMedalWall(request).Result;
+            BiliApiResponse re = api.WearMedalWall(request, null).Result;
 
             Assert.True(re.Code == 0);
             re.Code.Should().BeOneOf(0, 1500005);
@@ -130,17 +132,17 @@ namespace BiliAgentTest
         {
             using var scope = Global.ServiceProviderRoot.CreateScope();
 
-            var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory>();
-            var api = scope.ServiceProvider.GetRequiredService<IUserInfoApi>();
-            var biliCookie = scope.ServiceProvider.GetRequiredService<BiliCookie>();
+            var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory<BiliCookie>>();
+            var api = scope.ServiceProvider.GetRequiredService<IUpInfoApi>();
 
             var wbiService = scope.ServiceProvider.GetRequiredService<IWbiService>();
 
             var req = new GetSpaceInfoDto() { mid = 919174L };
 
-            await wbiService.SetWridAsync(req);
-
-            BiliApiResponse<GetSpaceInfoResponse> re = api.GetSpaceInfo(req).Result;
+            BiliApiResponse<GetSpaceInfoResponse> re = api.GetSpaceInfo(
+                req,
+                ck.GetCookie(0).ToString()
+            ).Result;
 
             Assert.True(re.Code == 0);
             Assert.NotNull(re.Data);
@@ -156,13 +158,13 @@ namespace BiliAgentTest
         {
             using var scope = Global.ServiceProviderRoot.CreateScope();
 
-            var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory>();
+            var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory<BiliCookie>>();
             var api = scope.ServiceProvider.GetRequiredService<ILiveApi>();
             var biliCookie = scope.ServiceProvider.GetRequiredService<BiliCookie>();
 
             var request = new SendLiveDanmukuRequest(biliCookie.BiliJct, 63666, "63666");
 
-            BiliApiResponse re = api.SendLiveDanmuku(request).Result;
+            BiliApiResponse re = api.SendLiveDanmuku(request, null).Result;
 
             Assert.True(re.Code == 0);
         }

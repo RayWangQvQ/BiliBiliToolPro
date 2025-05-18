@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Ray.BiliBiliTool.Config.Options;
 
-public class LiveLotteryTaskOptions
+public class LiveLotteryTaskOptions : IHasCron
 {
     public string IncludeAwardNames { get; set; }
 
@@ -28,4 +28,6 @@ public class LiveLotteryTaskOptions
         DenyUids
             ?.Split(",", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
             .ToList() ?? new List<string>();
+
+    public string Cron { get; set; }
 }

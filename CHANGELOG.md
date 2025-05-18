@@ -1,3 +1,8 @@
+## 3.0.0
+- Feature[#884]: 上线 bili_tool_web
+- Fix[#875]: 青龙检测 dotnet 版本只需要大于等于 8.0
+- Fix[#876]: 升级 VipBigPoint 接口，解决风控
+- Fix[#881]: 升级 LiveLottery 接口，解决风控
 ## 2.2.2
 - Code refactor
 - Integration Husky.Net and CSharpier

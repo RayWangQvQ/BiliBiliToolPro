@@ -20,7 +20,10 @@ public interface IRelationApi : IBiliBiliApi
     /// </summary>
     /// <returns></returns>
     [HttpGet("/x/relation/followings")]
-    Task<BiliApiResponse<GetFollowingsResponse>> GetFollowings(GetFollowingsRequest request);
+    Task<BiliApiResponse<GetFollowingsResponse>> GetFollowings(
+        GetFollowingsRequest request,
+        [Header("Cookie")] string ck
+    );
 
     /// <summary>
     /// 获取特别关注列表
@@ -30,7 +33,10 @@ public interface IRelationApi : IBiliBiliApi
     [Header("Pragma", "no-cache")]
     [JsonReturn(EnsureMatchAcceptContentType = false)]
     [HttpGet("/x/relation/tag")]
-    Task<BiliApiResponse<List<UpInfo>>> GetFollowingsByTag(GetSpecialFollowingsRequest request);
+    Task<BiliApiResponse<List<UpInfo>>> GetFollowingsByTag(
+        GetSpecialFollowingsRequest request,
+        [Header("Cookie")] string ck
+    );
 
     /// <summary>
     /// 获取关注分组
@@ -40,6 +46,7 @@ public interface IRelationApi : IBiliBiliApi
     [AppendHeader("Sec-Fetch-Dest", "script")]
     [HttpGet("/x/relation/tags?jsonp=jsonp")]
     Task<BiliApiResponse<List<TagDto>>> GetTags(
+        [Header("Cookie")] string ck,
         [AppendHeader("Referer")] string referer = RelationApiConstant.GetTagsReferer
     );
 
@@ -52,6 +59,7 @@ public interface IRelationApi : IBiliBiliApi
     [HttpPost("/x/relation/tag/create?cross_domain=true")]
     Task<BiliApiResponse<CreateTagResponse>> CreateTag(
         [FormContent] CreateTagRequest request,
+        [Header("Cookie")] string ck,
         [AppendHeader("Referer")] string referer = RelationApiConstant.GetTagsReferer
     );
 
@@ -64,6 +72,7 @@ public interface IRelationApi : IBiliBiliApi
     [HttpPost("/x/relation/tags/copyUsers")]
     Task<BiliApiResponse> CopyUpsToGroup(
         [FormContent] CopyUserToGroupRequest request,
+        [Header("Cookie")] string ck,
         [AppendHeader("Referer")] string referer = RelationApiConstant.CopyReferer
     );
 
@@ -75,6 +84,7 @@ public interface IRelationApi : IBiliBiliApi
     [HttpPost("/x/relation/modify")]
     Task<BiliApiResponse> ModifyRelation(
         [FormContent] ModifyRelationRequest request,
+        [Header("Cookie")] string ck,
         [AppendHeader("Referer")] string referer = RelationApiConstant.ModifyReferer
     );
 }

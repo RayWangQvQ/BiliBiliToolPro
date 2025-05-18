@@ -27,7 +27,8 @@ public interface IChargeApi : IBiliBiliApi
         int elec_num,
         string up_mid,
         string oid,
-        string csrf
+        string csrf,
+        [Header("Cookie")] string ck
     );
 
     /// <summary>
@@ -42,7 +43,10 @@ public interface IChargeApi : IBiliBiliApi
     [Header("Referer", "https://www.bilibili.com/")]
     [Header("Origin", "https://www.bilibili.com")]
     [HttpPost("/x/ugcpay/web/v2/trade/elec/pay/quick")]
-    Task<BiliApiResponse<ChargeV2Response>> ChargeV2Async([FormContent] ChargeRequest request);
+    Task<BiliApiResponse<ChargeV2Response>> ChargeV2Async(
+        [FormContent] ChargeRequest request,
+        [Header("Cookie")] string ck
+    );
 
     /// <summary>
     /// 充电后留言
@@ -57,6 +61,7 @@ public interface IChargeApi : IBiliBiliApi
     [Header("Origin", "https://www.bilibili.com")]
     [HttpPost("/x/ugcpay/trade/elec/message")]
     Task<BiliApiResponse<ChargeResponse>> ChargeCommentAsync(
-        [FormContent] ChargeCommentRequest request
+        [FormContent] ChargeCommentRequest request,
+        [Header("Cookie")] string ck
     );
 }

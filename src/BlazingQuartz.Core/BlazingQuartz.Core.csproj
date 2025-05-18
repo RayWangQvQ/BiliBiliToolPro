@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Quartz" Version="3.8.1" />
+    <PackageReference
+      Include="Microsoft.Extensions.DependencyInjection.Abstractions"
+      Version="8.0.2"
+    />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="8.0.2" />
+    <PackageReference Include="CronExpressionDescriptor" Version="2.33.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="8.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.3" />
+    <PackageReference
+      Include="Microsoft.Extensions.Options.ConfigurationExtensions"
+      Version="8.0.0"
+    />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.2" />
+    <PackageReference Include="EFCore.NamingConventions" Version="8.0.3" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BlazingQuartz.Jobs.Abstractions\BlazingQuartz.Jobs.Abstractions.csproj" />
+    <ProjectReference Include="..\Ray.BiliBiliTool.Application.Contracts\Ray.BiliBiliTool.Application.Contracts.csproj" />
+    <ProjectReference Include="..\Ray.BiliBiliTool.Domain\Ray.BiliBiliTool.Domain.csproj" />
+    <ProjectReference Include="..\Ray.BiliBiliTool.Infrastructure.EF\Ray.BiliBiliTool.Infrastructure.EF.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>$(AssemblyName).Test</_Parameter1>
+      <!-- We use the value of AssemblyName to declare the value of the attribute -->
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>DynamicProxyGenAssembly2</_Parameter1>
+      <!-- We use the value of AssemblyName to declare the value of the attribute -->
+    </AssemblyAttribute>
+  </ItemGroup>
+</Project>

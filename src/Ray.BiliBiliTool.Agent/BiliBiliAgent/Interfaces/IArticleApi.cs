@@ -34,6 +34,7 @@ public interface IArticleApi : IBiliBiliApi
     [HttpPost("/x/web-interface/coin/add")]
     Task<BiliApiResponse> AddCoinForArticleAsync(
         [FormContent] AddCoinForArticleRequest request,
+        [Header("Cookie")] string ck,
         [Header("referer")]
             string refer =
             "https://www.bilibili.com/read/cv5806746/?from=search&spm_id_from=333.337.0.0"
@@ -52,5 +53,5 @@ public interface IArticleApi : IBiliBiliApi
     )]
     [Header("Origin", "https://www.bilibili.com")]
     [HttpPost("/x/article/like?id={cvid}&type=1&csrf={csrf}")]
-    Task<BiliApiResponse> LikeAsync(long cvid, string csrf);
+    Task<BiliApiResponse> LikeAsync(long cvid, string csrf, [Header("Cookie")] string ck);
 }

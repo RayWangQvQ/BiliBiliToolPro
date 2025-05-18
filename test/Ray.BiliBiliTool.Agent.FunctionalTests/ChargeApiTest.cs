@@ -36,7 +36,7 @@ public class ChargeApiTest
         var req = new ChargeRequest(2, upId, _ck.BiliJct);
 
         // Act
-        BiliApiResponse<ChargeV2Response> re = await _target.ChargeV2Async(req);
+        BiliApiResponse<ChargeV2Response> re = await _target.ChargeV2Async(req, null);
 
         // Assert
         re.Code.Should().Be(0);

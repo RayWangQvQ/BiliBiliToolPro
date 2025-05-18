@@ -38,7 +38,7 @@ public class ArticleApiTests
         // Arrange
         var mid = 1585227649;
         var req = new SearchArticlesByUpIdDto() { mid = mid };
-        await _wbiService.SetWridAsync(req);
+        await _wbiService.SetWridAsync(req, null);
 
         // Act
         BiliApiResponse<SearchUpArticlesResponse> re = await _api.SearchUpArticlesByUpIdAsync(req);
@@ -95,7 +95,7 @@ public class ArticleApiTests
         var req = new AddCoinForArticleRequest(selfCvId, long.Parse(_ck.UserId), _ck.BiliJct);
 
         // Act
-        BiliBiliAgent.Dtos.BiliApiResponse re = await _api.AddCoinForArticleAsync(req);
+        BiliBiliAgent.Dtos.BiliApiResponse re = await _api.AddCoinForArticleAsync(req, null);
 
         // Assert
         re.Code.Should().Be(34002);
@@ -111,7 +111,7 @@ public class ArticleApiTests
         var req = new AddCoinForArticleRequest(cvId, upId, _ck.BiliJct);
 
         // Act
-        BiliBiliAgent.Dtos.BiliApiResponse re = await _api.AddCoinForArticleAsync(req);
+        BiliBiliAgent.Dtos.BiliApiResponse re = await _api.AddCoinForArticleAsync(req, null);
 
         // Assert
         re.Code.Should()
@@ -132,7 +132,7 @@ public class ArticleApiTests
         var cvid = 34150576;
 
         // Act
-        var re = await _api.LikeAsync(cvid, _ck.BiliJct);
+        var re = await _api.LikeAsync(cvid, _ck.BiliJct, null);
 
         // Assert
         re.Code.Should()

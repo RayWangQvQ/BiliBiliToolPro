@@ -7,6 +7,7 @@ using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Interfaces;
+using Ray.BiliBiliTool.Infrastructure.Cookie;
 
 namespace Ray.BiliBiliTool.DomainService;
 
@@ -17,7 +18,7 @@ public class ChargeDomainService(
     ILogger<ChargeDomainService> logger,
     IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
     IDailyTaskApi dailyTaskApi,
-    BiliCookie cookie,
+    CookieStrFactory<BiliCookie> cookieFactory,
     IChargeApi chargeApi
 ) : IChargeDomainService
 {
@@ -28,7 +29,7 @@ public class ChargeDomainService(
     /// 月底自动己充电
     /// 仅充会到期的B币券，低于2的时候不会充
     /// </summary>
-    public async Task Charge(UserInfo userInfo)
+    public async Task Charge(UserInfo userInfo, BiliCookie ck)
     {
         if (_dailyTaskOptions.DayOfAutoCharge == 0)
         {
@@ -73,14 +74,19 @@ public class ChargeDomainService(
             _dailyTaskOptions.AutoChargeUpId.IsNullOrEmpty()
             | _dailyTaskOptions.AutoChargeUpId == "-1"
         )
-            targetUpId = cookie.UserId;
+        {
+            targetUpId = ck.UserId;
+        }
 
         logger.LogDebug("【目标Up】{up}", targetUpId);
 
-        var request = new ChargeRequest(couponBalance, long.Parse(targetUpId), cookie.BiliJct);
+        var request = new ChargeRequest(couponBalance, long.Parse(targetUpId), ck.BiliJct);
 
         //BiliApiResponse<ChargeResponse> response = await _chargeApi.Charge(decimal.ToInt32(couponBalance * 10), _dailyTaskOptions.AutoChargeUpId, _cookieOptions.UserId, _cookieOptions.BiliJct);
-        BiliApiResponse<ChargeV2Response> response = await chargeApi.ChargeV2Async(request);
+        BiliApiResponse<ChargeV2Response> response = await chargeApi.ChargeV2Async(
+            request,
+            ck.ToString()
+        );
 
         if (response.Code == 0)
         {
@@ -92,7 +98,7 @@ public class ChargeDomainService(
                 logger.LogInformation("在过期前使用成功，赠送的B币券没有浪费哦~");
 
                 //充电留言
-                await ChargeComments(response.Data.Order_no);
+                await ChargeComments(response.Data.Order_no, ck);
             }
             else
             {
@@ -111,11 +117,11 @@ public class ChargeDomainService(
     /// 充电后留言
     /// </summary>
     /// <param name="token"></param>
-    public async Task ChargeComments(string orderNum)
+    public async Task ChargeComments(string orderNum, BiliCookie ck)
     {
         var comment = _dailyTaskOptions.ChargeComment ?? "";
-        var request = new ChargeCommentRequest(orderNum, comment, cookie.BiliJct);
-        await chargeApi.ChargeCommentAsync(request);
+        var request = new ChargeCommentRequest(orderNum, comment, ck.BiliJct);
+        await chargeApi.ChargeCommentAsync(request, ck.ToString());
 
         logger.LogInformation("【留言】{comment}", comment);
     }

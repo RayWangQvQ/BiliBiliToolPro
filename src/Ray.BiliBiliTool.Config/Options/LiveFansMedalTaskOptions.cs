@@ -3,7 +3,7 @@
 /// <summary>
 /// 粉丝牌等级任务相关配置
 /// </summary>
-public class LiveFansMedalTaskOptions
+public class LiveFansMedalTaskOptions : IHasCron
 {
     /// <summary>
     /// 自定义发送弹幕内容，如 “打卡” 等来触发直播间内机器人关键词
@@ -43,4 +43,6 @@ public class LiveFansMedalTaskOptions
     /// 弹幕发送失败多少次时放弃
     /// </summary>
     public int SendDanmakugiveUpThreshold { get; set; } = 3;
+
+    public string Cron { get; set; }
 }

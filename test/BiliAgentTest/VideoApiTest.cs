@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Console;
@@ -21,11 +22,11 @@ public class VideoApiTest
     {
         using var scope = Global.ServiceProviderRoot.CreateScope();
 
-        var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory>();
+        var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory<BiliCookie>>();
         var api = scope.ServiceProvider.GetRequiredService<IVideoApi>();
 
         var req = new GetAlreadyDonatedCoinsRequest(248097491);
-        BiliApiResponse<DonatedCoinsForVideo>? re = api.GetDonatedCoinsForVideo(req).Result;
+        BiliApiResponse<DonatedCoinsForVideo>? re = api.GetDonatedCoinsForVideo(req, null).Result;
 
         if (ck.Count > 0)
         {
@@ -42,9 +43,9 @@ public class VideoApiTest
     {
         using var scope = Global.ServiceProviderRoot.CreateScope();
 
-        var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory>();
+        var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory<BiliCookie>>();
         var api = scope.ServiceProvider.GetRequiredService<IVideoApi>();
-        var req = await api.GetBangumiBySsid(46508);
+        var req = await api.GetBangumiBySsid(46508, null);
 
         Assert.Equal(0, req.Code);
     }
@@ -54,7 +55,7 @@ public class VideoApiTest
     {
         using var scope = Global.ServiceProviderRoot.CreateScope();
 
-        var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory>();
+        var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory<BiliCookie>>();
         var api = scope.ServiceProvider.GetRequiredService<IVideoWithoutCookieApi>();
         var req = await api.GetRegionRankingVideosV2();
 

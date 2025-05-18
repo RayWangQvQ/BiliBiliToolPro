@@ -27,7 +27,7 @@ public class AccountApiTests
     public async Task GetCoinBalance_Normal_GetCoinBalance()
     {
         // Act
-        BiliApiResponse<CoinBalance> re = await _api.GetCoinBalanceAsync();
+        BiliApiResponse<CoinBalance> re = await _api.GetCoinBalanceAsync(null);
 
         // Arrange
 

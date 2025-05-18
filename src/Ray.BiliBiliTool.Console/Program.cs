@@ -101,18 +101,12 @@ public class Program
                 {
                     configurationBuilder.AddCommandLine(
                         args,
-                        Config.Constants.GetCommandLineMappingsDic()
+                        Config.Constants.CommandLineMappingsDic
                     );
                 }
 
                 //本地cookie存储文件
                 configurationBuilder.AddJsonFile("cookies.json", true, true);
-
-                //内置配置
-                configurationBuilder.AddInMemoryCollection(Config.Constants.GetExpDic());
-                configurationBuilder.AddInMemoryCollection(
-                    Config.Constants.GetDonateCoinCanContinueStatusDic()
-                );
             }
         );
 
@@ -144,12 +138,11 @@ public class Program
     /// </summary>
     private static void PrintLogo()
     {
-        System.Console.WriteLine(@"  ____               ____    _   _____           _  ");
-        System.Console.WriteLine(@" |  _ \ __ _ _   _  | __ ) _| |_|_   _|__   ___ | | ");
-        System.Console.WriteLine(@" | |_) / _` | | | | |  _ \(_) (_) | |/ _ \ / _ \| | ");
-        System.Console.WriteLine(@" |  _ < (_| | |_| | | |_) | | | | | | (_) | (_) | | ");
-        System.Console.WriteLine(@" |_| \_\__,_|\__, | |____/|_|_|_| |_|\___/ \___/|_| ");
-        System.Console.WriteLine(@"             |___/                                  ");
+        System.Console.WriteLine(@"  ____    _   _____           _  ");
+        System.Console.WriteLine(@" | __ ) _| |_|_   _|__   ___ | | ");
+        System.Console.WriteLine(@" |  _ \(_) (_) | |/ _ \ / _ \| | ");
+        System.Console.WriteLine(@" | |_) | | | | | | (_) | (_) | | ");
+        System.Console.WriteLine(@" |____/|_|_|_| |_|\___/ \___/|_| ");
         System.Console.WriteLine();
     }
 }

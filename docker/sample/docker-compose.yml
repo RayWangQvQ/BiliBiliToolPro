@@ -1,17 +1,14 @@
 services:
-  bilibili_tool:
-    image: ghcr.io/raywangqvq/bilibili_tool_pro
-    container_name: bili
+  bili_tool_web:
+    image: ghcr.io/raywangqvq/bili_tool_web
+    container_name: bili_tool_web
     restart: unless-stopped
     tty: true
     volumes:
       - ./Logs:/app/Logs
-      - ./appsettings.json:/app/appsettings.json
-      - ./cookies.json:/app/cookies.json
+      - ./config:/app/config
+    ports:
+      - "22330:8080"
     environment:
-      # 定时任务
-      - Ray_DailyTaskConfig__Cron=0 15 * * *
-      - Ray_LiveLotteryTaskConfig__Cron=0 22 * * *
-      - Ray_UnfollowBatchedTaskConfig__Cron=0 6 1 * *
-      - Ray_VipBigPointConfig__Cron=7 1 * * *
-      - Ray_LiveFansMedalTaskConfig__Cron=5 0 * * *
+      TZ: "Asia/Shanghai"
+      DailyTaskConfig__Cron: "0 0 15 * * ?"

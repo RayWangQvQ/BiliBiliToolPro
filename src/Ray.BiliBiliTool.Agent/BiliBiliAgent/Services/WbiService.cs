@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
+using Ray.BiliBiliTool.Infrastructure.Cookie;
 using Ray.BiliBiliTool.Infrastructure.Helpers;
 
 namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Services;
@@ -15,30 +16,30 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Services;
 /// <summary>
 /// 防爬
 /// </summary>
-public class WbiService : IWbiService
+public class WbiService(ILogger<WbiService> logger, IUserInfoApi userInfoApi) : IWbiService
 {
-    private readonly ILogger<WbiService> _logger;
-    private readonly IUserInfoApi _userInfoApi;
+    private Dictionary<BiliCookie, WbiImg> _cache = new();
 
-    public WbiService(ILogger<WbiService> logger, IUserInfoApi userInfoApi)
+    public async Task<WridDto> GetWridAsync(Dictionary<string, string> parameters, BiliCookie ck)
     {
-        _logger = logger;
-        _userInfoApi = userInfoApi;
-    }
-
-    public async Task SetWridAsync<T>(T request)
-        where T : IWrid
-    {
-        //生成字典
-        Dictionary<string, object> parameters = ObjectHelper.ObjectToDictionary(request);
         parameters.Remove(nameof(IWrid.wts));
         parameters.Remove(nameof(IWrid.w_rid));
 
-        //根据当前用户信息取加密key
-        WbiImg wbi = await GetWbiKeysAsync();
+        WbiImg wbi = await GetWbiKeysAsync(ck);
+
+        return EncWbi(parameters, wbi.ImgKey, wbi.SubKey);
+    }
+
+    public async Task SetWridAsync<T>(T request, BiliCookie ck)
+        where T : IWrid
+    {
+        //生成字典
+        Dictionary<string, string> parameters = ObjectHelper
+            .ObjectToDictionary(request)
+            .ToDictionary(kvp => kvp.Key, kvp => kvp.Value?.ToString() ?? "");
 
         //生成
-        var re = EncWbi(parameters, wbi.ImgKey, wbi.SubKey);
+        var re = await GetWridAsync(parameters, ck);
 
         request.w_rid = re.w_rid;
         request.wts = re.wts;
@@ -50,9 +51,10 @@ public class WbiService : IWbiService
     /// <param name="parameters"></param>
     /// <param name="imgKey"></param>
     /// <param name="subKey"></param>
+    /// <param name="timespan"></param>
     /// <returns></returns>
     public WridDto EncWbi(
-        Dictionary<string, object> parameters,
+        Dictionary<string, string> parameters,
         string imgKey,
         string subKey,
         long timespan = 0
@@ -78,7 +80,7 @@ public class WbiService : IWbiService
         foreach (var entry in parameters)
         {
             var key = entry.Key;
-            var value = entry.Value.ToString();
+            var value = entry.Value;
 
             var encodedValue = chrFilter.Replace(value, "");
 
@@ -88,17 +90,15 @@ public class WbiService : IWbiService
         var keyList = dic.Keys.ToList();
         keyList.Sort();
 
-        var queryList = new List<string>();
-        foreach (var item in keyList)
-        {
-            var value = dic[item];
-            queryList.Add($"{item}={value}");
-        }
+        var queryList = (
+            from item in keyList
+            let value = dic[item]
+            select $"{item}={value}"
+        ).ToList();
 
         var queryString = string.Join("&", queryList);
-        var md5Hasher = MD5.Create();
         var hashStr = queryString + mixinKey;
-        var hashedQueryString = md5Hasher.ComputeHash(Encoding.UTF8.GetBytes(hashStr));
+        var hashedQueryString = MD5.HashData(Encoding.UTF8.GetBytes(hashStr));
         var wbiSign = BitConverter.ToString(hashedQueryString).Replace("-", "").ToLower();
 
         re.w_rid = wbiSign;
@@ -106,16 +106,20 @@ public class WbiService : IWbiService
         return re;
     }
 
-    private async Task<WbiImg> GetWbiKeysAsync()
+    private async Task<WbiImg> GetWbiKeysAsync(BiliCookie ck)
     {
-        BiliApiResponse<UserInfo> apiResponse = await _userInfoApi.LoginByCookie();
+        _cache.TryGetValue(ck, out var wbiImg);
 
+        if (wbiImg != null)
+            return wbiImg;
+
+        BiliApiResponse<UserInfo> apiResponse = await userInfoApi.LoginByCookie(ck.ToString());
         UserInfo useInfo = apiResponse.Data;
-
-        _logger.LogDebug("【img_url】{0}", useInfo.Wbi_img?.img_url);
-        _logger.LogDebug("【sub_url】{0}", useInfo.Wbi_img?.sub_url);
-
-        return useInfo.Wbi_img;
+        logger.LogDebug("【img_url】{0}", useInfo.Wbi_img?.img_url);
+        logger.LogDebug("【sub_url】{0}", useInfo.Wbi_img?.sub_url);
+        wbiImg = useInfo.Wbi_img;
+        _cache[ck] = wbiImg;
+        return wbiImg;
     }
 
     /// <summary>

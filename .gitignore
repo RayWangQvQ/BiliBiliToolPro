@@ -369,9 +369,13 @@ kustomization.yaml
 
 # cookie config
 **/Ray.BiliBiliTool.Console/cookies.json
+**/Ray.BiliBiliTool.Web/config/cookies.json
 
 # ut
 coveragereport
 
 # bruno
 bruno/.env
+
+# db
+src/**/BiliBiliTool.db*

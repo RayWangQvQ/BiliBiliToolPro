@@ -21,7 +21,10 @@ public interface IVideoApi : IBiliBiliApi
     /// <returns></returns>
     [Header("Origin", "https://www.bilibili.com")]
     [HttpPost("/x/web-interface/share/add")]
-    Task<BiliApiResponse> ShareVideo([FormContent] ShareVideoRequest request);
+    Task<BiliApiResponse> ShareVideo(
+        [FormContent] ShareVideoRequest request,
+        [Header("Cookie")] string ck
+    );
 
     /// <summary>
     /// 上传视频观看进度
@@ -33,7 +36,10 @@ public interface IVideoApi : IBiliBiliApi
     [Header("Referer", "https://www.bilibili.com/")]
     [Header("Origin", "https://www.bilibili.com")]
     [HttpPost("/x/click-interface/web/heartbeat?aid={aid}&played_time={playedTime}")]
-    Task<BiliApiResponse> UploadVideoHeartbeat([FormContent] UploadVideoHeartbeatRequest request);
+    Task<BiliApiResponse> UploadVideoHeartbeat(
+        [FormContent] UploadVideoHeartbeatRequest request,
+        [Header("Cookie")] string ck
+    );
 
     #region 投币相关
     /// <summary>
@@ -50,6 +56,7 @@ public interface IVideoApi : IBiliBiliApi
     [HttpPost("/x/web-interface/coin/add")]
     Task<BiliApiResponse> AddCoinForVideo(
         [FormContent] AddCoinRequest request,
+        [Header("Cookie")] string ck,
         [Header("referer")]
             string refer =
             "https://www.bilibili.com/video/BV123456/?spm_id_from=333.1007.tianma.1-1-1.click&vd_source=80c1601a7003934e7a90709c18dfcffd"
@@ -63,7 +70,8 @@ public interface IVideoApi : IBiliBiliApi
     [Header("Referer", "https://www.bilibili.com/")]
     [HttpGet("/x/web-interface/archive/coins")]
     Task<BiliApiResponse<DonatedCoinsForVideo>> GetDonatedCoinsForVideo(
-        GetAlreadyDonatedCoinsRequest request
+        GetAlreadyDonatedCoinsRequest request,
+        [Header("Cookie")] string ck
     );
     #endregion
 
@@ -80,7 +88,8 @@ public interface IVideoApi : IBiliBiliApi
     //[HttpGet("/x/space/wbi/arc/search?mid={upId}&ps={pageSize}&tid=0&pn={pageNumber}&keyword={keyword}&order=pubdate&platform=web&web_location=1550101&order_avoided=true&w_rid=5df06b1c48e2be86a96e9d0f99bf06f4&wts=1684854929")]
     [HttpGet("/x/space/wbi/arc/search")]
     Task<BiliApiResponse<SearchUpVideosResponse>> SearchVideosByUpId(
-        [PathQuery] SearchVideosByUpIdDto request
+        [PathQuery] SearchVideosByUpIdDto request,
+        [Header("Cookie")] string ck
     );
 
     /// <summary>
@@ -89,7 +98,7 @@ public interface IVideoApi : IBiliBiliApi
     /// <param name="Ssid"></param>
     /// <returns></returns>
     [HttpGet("/pgc/view/web/season?season_id={ssid}")]
-    Task<GetBangumiBySsidResponse> GetBangumiBySsid(long ssid);
+    Task<GetBangumiBySsidResponse> GetBangumiBySsid(long ssid, [Header("Cookie")] string ck);
 }
 
 /// <summary>

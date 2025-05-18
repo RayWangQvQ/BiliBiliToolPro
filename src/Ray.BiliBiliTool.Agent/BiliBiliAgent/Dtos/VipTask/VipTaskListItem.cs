@@ -27,7 +27,7 @@ public class VipTaskInfo
                 );
             }
         }
-        logger.LogInformation("------------------------{newLine}", Environment.NewLine);
+        logger.LogInformation("------------------------" + Environment.NewLine);
     }
 }
 

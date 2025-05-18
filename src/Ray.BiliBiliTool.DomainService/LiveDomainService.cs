@@ -11,7 +11,6 @@ using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Relation;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
-using Ray.BiliBiliTool.Agent.BiliBiliAgent.Services;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Dtos;
 using Ray.BiliBiliTool.DomainService.Interfaces;
@@ -26,13 +25,11 @@ public class LiveDomainService(
     ILiveApi liveApi,
     IRelationApi relationApi,
     ILiveTraceApi liveTraceApi,
-    IUserInfoApi userInfoApi,
     IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
     IOptionsMonitor<LiveLotteryTaskOptions> liveLotteryTaskOptions,
     IOptionsMonitor<LiveFansMedalTaskOptions> liveFansMedalTaskOptions,
     IOptionsMonitor<SecurityOptions> securityOptions,
-    IWbiService wbiService,
-    BiliCookie biliCookie
+    IUpInfoApi upInfoApi
 ) : ILiveDomainService
 {
     private readonly LiveLotteryTaskOptions _liveLotteryTaskOptions =
@@ -55,9 +52,9 @@ public class LiveDomainService(
     /// <summary>
     /// 直播签到
     /// </summary>
-    public async Task LiveSign()
+    public async Task LiveSign(BiliCookie ck)
     {
-        var response = await liveApi.Sign();
+        var response = await liveApi.Sign(ck.ToString());
 
         if (response.Code == 0)
         {
@@ -79,7 +76,7 @@ public class LiveDomainService(
     /// 直播中心银瓜子兑换B币
     /// </summary>
     /// <returns>兑换银瓜子后硬币余额</returns>
-    public async Task<bool> ExchangeSilver2Coin()
+    public async Task<bool> ExchangeSilver2Coin(BiliCookie ck)
     {
         var result = false;
 
@@ -103,7 +100,9 @@ public class LiveDomainService(
             return false;
         }
 
-        BiliApiResponse<LiveWalletStatusResponse> queryStatus = await liveApi.GetLiveWalletStatus();
+        BiliApiResponse<LiveWalletStatusResponse> queryStatus = await liveApi.GetLiveWalletStatus(
+            ck.ToString()
+        );
         logger.LogInformation("【银瓜子余额】 {silver}", queryStatus.Data.Silver);
         logger.LogInformation("【硬币余额】 {coin}", queryStatus.Data.Coin);
         logger.LogInformation("【今日剩余兑换次数】 {left}", queryStatus.Data.Silver_2_coin_left);
@@ -112,8 +111,8 @@ public class LiveDomainService(
             return false;
 
         logger.LogInformation("开始尝试兑换...");
-        Silver2CoinRequest request = new(biliCookie.BiliJct);
-        var response = await liveApi.Silver2Coin(request);
+        Silver2CoinRequest request = new(ck.BiliJct);
+        var response = await liveApi.Silver2Coin(request, ck.ToString());
         if (response.Code == 0)
         {
             result = true;
@@ -134,30 +133,43 @@ public class LiveDomainService(
     /// <summary>
     /// 天选抽奖
     /// </summary>
-    public async Task TianXuan()
+    public async Task TianXuan(BiliCookie ck)
     {
         _tianXuanFollowed = new List<ListItemDto>();
 
         if (_liveLotteryTaskOptions.AutoGroupFollowings)
         {
             //获取此时最后一个关注的up，此后再新增的关注，与参与成功的抽奖，取交集，就是本地新增的天选关注
-            _lastFollowUpId = await GetLastFollowUpId();
+            _lastFollowUpId = await GetLastFollowUpId(ck);
         }
 
         //获取直播的分区
-        List<AreaDto> areaList = (await liveApi.GetAreaList()).Data.Data;
+        List<AreaDto> areaList = (await liveApi.GetAreaList(ck.ToString())).Data.Data;
 
         //遍历分区
         int count = 0;
         foreach (var area in areaList)
         {
-            logger.LogInformation("【扫描分区】{area}...{newLine}", area.Name, Environment.NewLine);
+            logger.LogInformation("【扫描分区】{area}..." + Environment.NewLine, area.Name);
 
             string defaultSort = "";
             //每个分区下搜索5页
             for (int i = 1; i < 6; i++)
             {
-                var reData = (await liveApi.GetList(area.Id, i, sortType: defaultSort)).Data;
+                var request = new GetListRequest
+                {
+                    platform = "web",
+                    parent_area_id = area.Id,
+                    area_id = 0,
+                    sort_type = defaultSort,
+                    page = i,
+                    wts = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+                };
+                var reData = (await liveApi.GetList(request, ck.ToString())).Data;
+                if (reData == null)
+                {
+                    continue;
+                }
                 foreach (var item in reData.List ?? new List<ListItemDto>())
                 {
                     if (item.Pendant_info == null || item.Pendant_info.Count == 0)
@@ -169,7 +181,7 @@ public class LiveDomainService(
                         continue;
                     count++;
 
-                    await TryJoinTianXuan(item);
+                    await TryJoinTianXuan(item, ck);
                 }
 
                 if (reData.Has_more != 1)
@@ -187,7 +199,7 @@ public class LiveDomainService(
         }
     }
 
-    public async Task TryJoinTianXuan(ListItemDto target)
+    public async Task TryJoinTianXuan(ListItemDto target, BiliCookie ck)
     {
         logger.LogDebug("【房间】{name}", target.Title);
         try
@@ -199,7 +211,9 @@ public class LiveDomainService(
                 return;
             }
 
-            CheckTianXuanDto check = (await liveApi.CheckTianXuan(target.Roomid)).Data;
+            CheckTianXuanDto check = (
+                await liveApi.CheckTianXuan(target.Roomid, ck.ToString())
+            ).Data;
 
             if (check == null)
             {
@@ -209,7 +223,7 @@ public class LiveDomainService(
 
             if (check.Status != TianXuanStatus.Enable)
             {
-                logger.LogDebug("已开奖，跳过{newLine}", Environment.NewLine);
+                logger.LogDebug("已开奖，跳过" + Environment.NewLine);
                 return;
             }
 
@@ -221,7 +235,7 @@ public class LiveDomainService(
                 )
             )
             {
-                logger.LogDebug("不满足配置的筛选条件，跳过{newLine}", Environment.NewLine);
+                logger.LogDebug("不满足配置的筛选条件，跳过" + Environment.NewLine);
                 return;
             }
 
@@ -229,7 +243,7 @@ public class LiveDomainService(
             if (check.Gift_price > 0)
             {
                 logger.LogDebug("【赠礼】{gift}", check.GiftDesc);
-                logger.LogDebug("需赠送礼物，跳过{newLine}", Environment.NewLine);
+                logger.LogDebug("需赠送礼物，跳过" + Environment.NewLine);
                 return;
             }
 
@@ -254,28 +268,23 @@ public class LiveDomainService(
                 Id = check.Id,
                 Gift_id = check.Gift_id,
                 Gift_num = check.Gift_num,
-                Csrf = biliCookie.BiliJct,
+                Csrf = ck.BiliJct,
             };
-            var re = await liveApi.Join(request);
+            var re = await liveApi.Join(request, ck.ToString());
             if (re.Code == 0)
             {
-                logger.LogInformation("【抽奖】成功 √{newLine}", Environment.NewLine);
+                logger.LogInformation("【抽奖】成功 √" + Environment.NewLine);
                 if (check.Require_type == RequireType.Follow)
                     _tianXuanFollowed.AddIfNotExist(target, x => x.Uid == target.Uid);
                 return;
             }
 
             logger.LogInformation("【抽奖】失败");
-            logger.LogInformation("【原因】{msg}{newLine}", re.Message, Environment.NewLine);
+            logger.LogInformation("【原因】{msg}" + Environment.NewLine, re.Message);
         }
         catch (Exception ex)
         {
-            logger.LogWarning(
-                "【异常】{msg}，{detail}{newLine}",
-                ex.Message,
-                ex,
-                Environment.NewLine
-            );
+            logger.LogWarning("【异常】{msg}，{detail}" + Environment.NewLine, ex.Message, ex);
             //ignore
         }
     }
@@ -283,7 +292,7 @@ public class LiveDomainService(
     /// <summary>
     /// 将本次抽奖新增的关注统一转移到指定分组中
     /// </summary>
-    public async Task GroupFollowing()
+    public async Task GroupFollowing(BiliCookie ck)
     {
         if (!_tianXuanFollowed.Any())
         {
@@ -297,7 +306,7 @@ public class LiveDomainService(
         );
 
         //目标分组up集合
-        List<ListItemDto> targetUps = await GetNeedGroup();
+        List<ListItemDto> targetUps = await GetNeedGroup(ck);
         logger.LogInformation(
             "【将自动分组】{ups}",
             string.Join("，", targetUps.Select(x => x.Uname))
@@ -309,16 +318,16 @@ public class LiveDomainService(
         }
 
         //目标分组Id
-        long targetGroupId = await GetOrCreateTianXuanGroupId();
+        long targetGroupId = await GetOrCreateTianXuanGroupId(ck);
 
         //执行批量分组
-        var referer = string.Format(RelationApiConstant.CopyReferer, biliCookie.UserId);
+        var referer = string.Format(RelationApiConstant.CopyReferer, ck.UserId);
         var req = new CopyUserToGroupRequest(
             targetUps.Select(x => x.Uid).ToList(),
             targetGroupId.ToString(),
-            biliCookie.BiliJct
+            ck.BiliJct
         );
-        var re = await relationApi.CopyUpsToGroup(req, referer);
+        var re = await relationApi.CopyUpsToGroup(req, ck.ToString(), referer);
 
         if (re.Code == 0)
         {
@@ -335,10 +344,11 @@ public class LiveDomainService(
     /// 获取抽奖前最后一个关注的up
     /// </summary>
     /// <returns></returns>
-    private async Task<long> GetLastFollowUpId()
+    private async Task<long> GetLastFollowUpId(BiliCookie ck)
     {
         var followings = await relationApi.GetFollowings(
-            new GetFollowingsRequest(long.Parse(biliCookie.UserId), FollowingsOrderType.TimeDesc)
+            new GetFollowingsRequest(long.Parse(ck.UserId), FollowingsOrderType.TimeDesc),
+            ck.ToString()
         );
         return followings.Data.List.FirstOrDefault()?.Mid ?? 0;
     }
@@ -347,13 +357,14 @@ public class LiveDomainService(
     /// 获取本次需要自动分组的主播
     /// </summary>
     /// <returns></returns>
-    private async Task<List<ListItemDto>> GetNeedGroup()
+    private async Task<List<ListItemDto>> GetNeedGroup(BiliCookie ck)
     {
         List<long> addUpIds = new();
 
         //获取最后一个upId之后关注的所有upId
         var followings = await relationApi.GetFollowings(
-            new GetFollowingsRequest(long.Parse(biliCookie.UserId), FollowingsOrderType.TimeDesc)
+            new GetFollowingsRequest(long.Parse(ck.UserId), FollowingsOrderType.TimeDesc),
+            ck.ToString()
         );
 
         foreach (UpInfo item in followings.Data.List)
@@ -381,11 +392,11 @@ public class LiveDomainService(
     /// 获取或创建天选时刻分组
     /// </summary>
     /// <returns></returns>
-    private async Task<long> GetOrCreateTianXuanGroupId()
+    private async Task<long> GetOrCreateTianXuanGroupId(BiliCookie ck)
     {
         //获取天选分组Id，没有就创建
         long groupId = 0;
-        string referer = string.Format(RelationApiConstant.GetTagsReferer, biliCookie.UserId);
+        string referer = string.Format(RelationApiConstant.GetTagsReferer, ck.UserId);
         var groups = await relationApi.GetTags(referer);
         var tianXuanGroup = groups.Data.FirstOrDefault(x => x.Name == "天选时刻");
         if (tianXuanGroup == null)
@@ -393,7 +404,8 @@ public class LiveDomainService(
             logger.LogInformation("“天选时刻”分组不存在，尝试创建...");
             //创建一个
             var createRe = await relationApi.CreateTag(
-                new CreateTagRequest { Tag = "天选时刻", Csrf = biliCookie.BiliJct }
+                new CreateTagRequest { Tag = "天选时刻", Csrf = ck.BiliJct },
+                ck.ToString()
             );
             groupId = createRe.Data.Tagid;
             logger.LogInformation("创建成功");
@@ -409,12 +421,12 @@ public class LiveDomainService(
 
     #endregion
 
-    public async Task SendDanmakuToFansMedalLive()
+    public async Task SendDanmakuToFansMedalLive(BiliCookie ck)
     {
-        if (!await CheckLiveCookie())
+        if (!await CheckLiveCookie(ck))
             return;
 
-        var infoList = await GetFansMedalInfoList();
+        var infoList = await GetFansMedalInfoList(ck);
 
         foreach (var info in infoList)
         {
@@ -427,9 +439,8 @@ public class LiveDomainService(
             // 通过空间主页信息获取直播间 id
             var liveHostUserId = medal.Medal_info.Target_id;
             var req = new GetSpaceInfoDto() { mid = liveHostUserId };
-            await wbiService.SetWridAsync(req);
 
-            var spaceInfo = await userInfoApi.GetSpaceInfo(req);
+            var spaceInfo = await upInfoApi.GetSpaceInfo(req, ck.ToString());
             if (spaceInfo.Code != 0)
             {
                 logger.LogError("【获取直播间信息】失败");
@@ -449,10 +460,11 @@ public class LiveDomainService(
             {
                 var sendResult = await liveApi.SendLiveDanmuku(
                     new SendLiveDanmukuRequest(
-                        biliCookie.BiliJct,
+                        ck.BiliJct,
                         spaceInfo.Data.Live_room.Roomid,
                         _liveFansMedalTaskOptions.DanmakuContent
-                    )
+                    ),
+                    ck.ToString()
                 );
 
                 if (sendResult.Code != 0)
@@ -477,13 +489,13 @@ public class LiveDomainService(
         }
     }
 
-    public async Task SendHeartBeatToFansMedalLive()
+    public async Task SendHeartBeatToFansMedalLive(BiliCookie ck)
     {
-        if (!await CheckLiveCookie())
+        if (!await CheckLiveCookie(ck))
             return;
 
         var infoList = new List<HeartBeatIterationInfoDto>();
-        (await GetFansMedalInfoList())
+        (await GetFansMedalInfoList(ck))
             .FindAll(info => info.LiveRoomInfo.Live_Status != 0)
             .ForEach(medal => infoList.Add(new(medal.RoomId, medal.LiveRoomInfo, new(), 0, 0)));
 
@@ -537,10 +549,11 @@ public class LiveDomainService(
                             info.HeartBeatCount,
                             timestamp,
                             _securityOptions.UserAgent,
-                            biliCookie.BiliJct,
+                            ck.BiliJct,
                             info.RoomInfo.Uid,
-                            $"[\"{biliCookie.LiveBuvid}\",\"{uuid}\"]"
-                        )
+                            $"[\"{ck.LiveBuvid}\",\"{uuid}\"]"
+                        ),
+                        ck.ToString()
                     );
                 }
                 else
@@ -551,16 +564,17 @@ public class LiveDomainService(
                             info.RoomInfo.Parent_area_id,
                             info.RoomInfo.Area_id,
                             info.HeartBeatCount,
-                            biliCookie.LiveBuvid,
+                            ck.LiveBuvid,
                             timestamp,
                             info.HeartBeatInfo.Timestamp,
                             _securityOptions.UserAgent,
                             info.HeartBeatInfo.Secret_rule,
                             info.HeartBeatInfo.Secret_key,
-                            biliCookie.BiliJct,
+                            ck.BiliJct,
                             uuid,
-                            $"[\"{biliCookie.LiveBuvid}\",\"{uuid}\"]"
-                        )
+                            $"[\"{ck.LiveBuvid}\",\"{uuid}\"]"
+                        ),
+                        ck.ToString()
                     );
                 }
 
@@ -608,12 +622,12 @@ public class LiveDomainService(
     /// <summary>
     /// 点赞直播间
     /// </summary>
-    public async Task LikeFansMedalLive()
+    public async Task LikeFansMedalLive(BiliCookie ck)
     {
-        if (!await CheckLiveCookie())
+        if (!await CheckLiveCookie(ck))
             return;
 
-        var infoList = await GetFansMedalInfoList();
+        var infoList = await GetFansMedalInfoList(ck);
         infoList = infoList.FindAll(info => info.LiveRoomInfo.Live_Status != 0);
         logger.LogInformation("当前开播直播间数量：{num}", infoList.Count);
         foreach (var info in infoList)
@@ -621,13 +635,13 @@ public class LiveDomainService(
             // Clike_Time 暂时设置为等于设置的LikeNumber，不清楚是否会被风控，我自己抓包最大值为10
             var request = new LikeLiveRoomRequest(
                 info.RoomId,
-                biliCookie.BiliJct,
+                ck.BiliJct,
                 _liveFansMedalTaskOptions.LikeNumber,
                 info.LiveRoomInfo.Uid,
-                biliCookie.UserId
+                ck.UserId
             );
 
-            var result = await liveApi.LikeLiveRoom(request.RawTextBuild());
+            var result = await liveApi.LikeLiveRoom(request.RawTextBuild(), ck.ToString());
             if (result.Code == 0)
             {
                 logger.LogInformation("【点赞直播间】{roomId} 完成", info.RoomId);
@@ -643,10 +657,10 @@ public class LiveDomainService(
         }
     }
 
-    private async Task<List<FansMedalInfoDto>> GetFansMedalInfoList()
+    private async Task<List<FansMedalInfoDto>> GetFansMedalInfoList(BiliCookie ck)
     {
         logger.LogInformation("【获取直播列表】获取拥有粉丝牌的直播列表");
-        var medalWallInfo = await liveApi.GetMedalWall(biliCookie.UserId);
+        var medalWallInfo = await liveApi.GetMedalWall(ck.UserId, ck.ToString());
 
         if (medalWallInfo.Code != 0)
         {
@@ -671,9 +685,8 @@ public class LiveDomainService(
             // 通过空间主页信息获取直播间 id
             var liveHostUserId = medal.Medal_info.Target_id;
             var req = new GetSpaceInfoDto() { mid = liveHostUserId };
-            await wbiService.SetWridAsync(req);
 
-            var spaceInfo = await userInfoApi.GetSpaceInfo(req);
+            var spaceInfo = await upInfoApi.GetSpaceInfo(req, ck.ToString());
             if (spaceInfo.Code != 0)
             {
                 logger.LogError("【获取空间信息】失败");
@@ -711,10 +724,10 @@ public class LiveDomainService(
     /// <returns>
     /// bool 成功配置 or not
     /// </returns>
-    private async Task<bool> CheckLiveCookie()
+    private async Task<bool> CheckLiveCookie(BiliCookie ck)
     {
         // 检测 _biliCookie 是否正确配置
-        if (!string.IsNullOrWhiteSpace(biliCookie.LiveBuvid))
+        if (!string.IsNullOrWhiteSpace(ck.LiveBuvid))
             return true;
 
         try
@@ -722,7 +735,7 @@ public class LiveDomainService(
             logger.LogInformation("检测到直播 Cookie 未正确配置，尝试自动配置中...");
 
             // 请求主播主页来正确配置 cookie
-            var liveHome = await liveApi.GetLiveHome();
+            var liveHome = await liveApi.GetLiveHome(ck.ToString());
             var liveHomeContent = JsonConvert.DeserializeObject<BiliApiResponse>(
                 await liveHome.Content.ReadAsStringAsync()
             );
@@ -731,12 +744,10 @@ public class LiveDomainService(
                 throw new Exception(liveHomeContent.Message);
             }
 
-            List<string> liveCookies = liveHome
-                .Headers.SingleOrDefault(header => header.Key == "Set-Cookie")
-                .Value.ToList();
-            biliCookie.MergeCurrentCookie(liveCookies);
+            var setHeader = liveHome.Headers.FirstOrDefault(header => header.Key == "Set-Cookie");
+            ck.MergeCurrentCookie(setHeader.Value.ToList());
 
-            logger.LogDebug("LiveBuvid {value}", biliCookie.LiveBuvid);
+            logger.LogDebug("LiveBuvid {value}", ck.LiveBuvid);
             logger.LogInformation("直播 Cookie 配置成功！");
         }
         catch (Exception exception)

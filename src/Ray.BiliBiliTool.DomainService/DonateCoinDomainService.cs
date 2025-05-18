@@ -18,25 +18,19 @@ namespace Ray.BiliBiliTool.DomainService
     /// </summary>
     public class DonateCoinDomainService(
         ILogger<DonateCoinDomainService> logger,
-        BiliCookie cookie,
         IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
         IAccountApi accountApi,
         ICoinDomainService coinDomainService,
         IVideoDomainService videoDomainService,
         IRelationApi relationApi,
-        IOptionsMonitor<Dictionary<string, int>> expDicOptions,
-        IOptionsMonitor<Dictionary<string, string>> donateContinueStatusDicOptions,
         IVideoApi videoApi
     ) : IDonateCoinDomainService
     {
         private readonly DailyTaskOptions _dailyTaskOptions = dailyTaskOptions.CurrentValue;
-        private readonly Dictionary<string, int> _expDic = expDicOptions.Get(
-            Config.Constants.OptionsNames.ExpDictionaryName
-        );
-        private readonly Dictionary<string, string> _donateContinueStatusDic =
-            donateContinueStatusDicOptions.Get(
-                Config.Constants.OptionsNames.DonateCoinCanContinueStatusDictionaryName
-            );
+        private readonly Dictionary<string, int> _expDic = Config.Constants.ExpDic;
+        private readonly Dictionary<string, string> _donateContinueStatusDic = Config
+            .Constants
+            .DonateCoinCanContinueStatusDic;
 
         /// <summary>
         /// up的视频稿件总数缓存
@@ -51,15 +45,15 @@ namespace Ray.BiliBiliTool.DomainService
         /// <summary>
         /// 完成投币任务
         /// </summary>
-        public async Task AddCoinsForVideos()
+        public async Task AddCoinsForVideos(BiliCookie ck)
         {
-            int needCoins = await GetNeedDonateCoinNum();
+            int needCoins = await GetNeedDonateCoinNum(ck);
             int protectedCoins = _dailyTaskOptions.NumberOfProtectedCoins;
             if (needCoins <= 0)
                 return;
 
             //投币前硬币余额
-            decimal coinBalance = await coinDomainService.GetCoinBalance();
+            decimal coinBalance = await coinDomainService.GetCoinBalance(ck);
             logger.LogInformation("【投币前余额】 : {coinBalance}", coinBalance);
             _ = int.TryParse(
                 decimal.Truncate(coinBalance - protectedCoins).ToString(),
@@ -105,13 +99,13 @@ namespace Ray.BiliBiliTool.DomainService
             {
                 logger.LogDebug("开始尝试第{num}次", i);
 
-                UpVideoInfo video = await TryGetCanDonatedVideo();
+                UpVideoInfo video = await TryGetCanDonatedVideo(ck);
                 if (video == null)
                     continue;
 
                 logger.LogInformation("【视频】{title}", video.Title);
 
-                bool re = await DoAddCoinForVideo(video, _dailyTaskOptions.SelectLike);
+                bool re = await DoAddCoinForVideo(video, _dailyTaskOptions.SelectLike, ck);
                 if (re)
                     success++;
             }
@@ -123,7 +117,7 @@ namespace Ray.BiliBiliTool.DomainService
 
             logger.LogInformation(
                 "【硬币余额】{coin}",
-                (await accountApi.GetCoinBalanceAsync()).Data.Money ?? 0
+                (await accountApi.GetCoinBalanceAsync(ck.ToString())).Data.Money ?? 0
             );
         }
 
@@ -131,27 +125,27 @@ namespace Ray.BiliBiliTool.DomainService
         /// 尝试获取一个可以投币的视频
         /// </summary>
         /// <returns></returns>
-        public async Task<UpVideoInfo> TryGetCanDonatedVideo()
+        public async Task<UpVideoInfo> TryGetCanDonatedVideo(BiliCookie ck)
         {
             UpVideoInfo result;
 
             //从配置的up中随机尝试获取1次
-            result = await TryGetCanDonateVideoByConfigUps(1);
+            result = await TryGetCanDonateVideoByConfigUps(1, ck);
             if (result != null)
                 return result;
 
             //然后从特别关注列表尝试获取1次
-            result = await TryGetCanDonateVideoBySpecialUps(1);
+            result = await TryGetCanDonateVideoBySpecialUps(1, ck);
             if (result != null)
                 return result;
 
             //然后从普通关注列表获取1次
-            result = await TryGetCanDonateVideoByFollowingUps(1);
+            result = await TryGetCanDonateVideoByFollowingUps(1, ck);
             if (result != null)
                 return result;
 
             //最后从排行榜尝试5次
-            result = await TryGetCanDonateVideoByRegion(5);
+            result = await TryGetCanDonateVideoByRegion(5, ck);
 
             return result;
         }
@@ -163,18 +157,22 @@ namespace Ray.BiliBiliTool.DomainService
         /// <param name="multiply">投币数量</param>
         /// <param name="select_like">是否同时点赞 1是0否</param>
         /// <returns>是否投币成功</returns>
-        public async Task<bool> DoAddCoinForVideo(UpVideoInfo video, bool select_like)
+        public async Task<bool> DoAddCoinForVideo(
+            UpVideoInfo video,
+            bool select_like,
+            BiliCookie ck
+        )
         {
             BiliApiResponse result;
             try
             {
-                var request = new AddCoinRequest(video.Aid, cookie.BiliJct)
+                var request = new AddCoinRequest(video.Aid, ck.BiliJct)
                 {
                     Select_like = select_like ? 1 : 0,
                 };
                 var referer =
                     $"https://www.bilibili.com/video/{video.Bvid}/?spm_id_from=333.1007.tianma.1-1-1.click&vd_source=80c1601a7003934e7a90709c18dfcffd";
-                result = await videoApi.AddCoinForVideo(request, referer);
+                result = await videoApi.AddCoinForVideo(request, ck.ToString(), referer);
             }
             catch (Exception)
             {
@@ -207,7 +205,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// 获取今日的目标投币数
         /// </summary>
         /// <returns></returns>
-        private async Task<int> GetNeedDonateCoinNum()
+        private async Task<int> GetNeedDonateCoinNum(BiliCookie ck)
         {
             //获取自定义配置投币数
             int configCoins = _dailyTaskOptions.NumberOfCoins;
@@ -219,7 +217,7 @@ namespace Ray.BiliBiliTool.DomainService
             }
 
             //已投的硬币
-            int alreadyCoins = await coinDomainService.GetDonatedCoins();
+            int alreadyCoins = await coinDomainService.GetDonatedCoins(ck);
             //目标
             //int targetCoins = configCoins > Constants.MaxNumberOfDonateCoins
             //    ? Constants.MaxNumberOfDonateCoins
@@ -245,13 +243,13 @@ namespace Ray.BiliBiliTool.DomainService
         /// </summary>
         /// <param name="tryCount"></param>
         /// <returns></returns>
-        private async Task<UpVideoInfo> TryGetCanDonateVideoByConfigUps(int tryCount)
+        private async Task<UpVideoInfo> TryGetCanDonateVideoByConfigUps(int tryCount, BiliCookie ck)
         {
             //是否配置了up主
             if (_dailyTaskOptions.SupportUpIdList.Count == 0)
                 return null;
 
-            return await TryCanDonateVideoByUps(_dailyTaskOptions.SupportUpIdList, tryCount);
+            return await TryCanDonateVideoByUps(_dailyTaskOptions.SupportUpIdList, tryCount, ck);
             ;
         }
 
@@ -260,17 +258,24 @@ namespace Ray.BiliBiliTool.DomainService
         /// </summary>
         /// <param name="tryCount"></param>
         /// <returns></returns>
-        private async Task<UpVideoInfo> TryGetCanDonateVideoBySpecialUps(int tryCount)
+        private async Task<UpVideoInfo> TryGetCanDonateVideoBySpecialUps(
+            int tryCount,
+            BiliCookie ck
+        )
         {
             //获取特别关注列表
-            var request = new GetSpecialFollowingsRequest(long.Parse(cookie.UserId));
-            BiliApiResponse<List<UpInfo>> specials = await relationApi.GetFollowingsByTag(request);
+            var request = new GetSpecialFollowingsRequest(long.Parse(ck.UserId));
+            BiliApiResponse<List<UpInfo>> specials = await relationApi.GetFollowingsByTag(
+                request,
+                ck.ToString()
+            );
             if (specials.Data == null || specials.Data.Count == 0)
                 return null;
 
             return await TryCanDonateVideoByUps(
                 specials.Data.Select(x => x.Mid).ToList(),
-                tryCount
+                tryCount,
+                ck
             );
         }
 
@@ -279,19 +284,24 @@ namespace Ray.BiliBiliTool.DomainService
         /// </summary>
         /// <param name="tryCount"></param>
         /// <returns></returns>
-        private async Task<UpVideoInfo> TryGetCanDonateVideoByFollowingUps(int tryCount)
+        private async Task<UpVideoInfo> TryGetCanDonateVideoByFollowingUps(
+            int tryCount,
+            BiliCookie ck
+        )
         {
             //获取特别关注列表
-            var request = new GetFollowingsRequest(long.Parse(cookie.UserId));
+            var request = new GetFollowingsRequest(long.Parse(ck.UserId));
             BiliApiResponse<GetFollowingsResponse> result = await relationApi.GetFollowings(
-                request
+                request,
+                ck.ToString()
             );
             if (result.Data.Total == 0)
                 return null;
 
             return await TryCanDonateVideoByUps(
                 result.Data.List.Select(x => x.Mid).ToList(),
-                tryCount
+                tryCount,
+                ck
             );
         }
 
@@ -300,14 +310,14 @@ namespace Ray.BiliBiliTool.DomainService
         /// </summary>
         /// <param name="tryCount"></param>
         /// <returns></returns>
-        private async Task<UpVideoInfo> TryGetCanDonateVideoByRegion(int tryCount)
+        private async Task<UpVideoInfo> TryGetCanDonateVideoByRegion(int tryCount, BiliCookie ck)
         {
             try
             {
                 for (int i = 0; i < tryCount; i++)
                 {
                     RankingInfo video = await videoDomainService.GetRandomVideoOfRanking();
-                    if (!await IsCanDonate(video.Aid.ToString()))
+                    if (!await IsCanDonate(video.Aid.ToString(), ck))
                         continue;
                     return new UpVideoInfo()
                     {
@@ -331,7 +341,11 @@ namespace Ray.BiliBiliTool.DomainService
         /// <param name="upIds"></param>
         /// <param name="tryCount"></param>
         /// <returns></returns>
-        private async Task<UpVideoInfo> TryCanDonateVideoByUps(List<long> upIds, int tryCount)
+        private async Task<UpVideoInfo> TryCanDonateVideoByUps(
+            List<long> upIds,
+            int tryCount,
+            BiliCookie ck
+        )
         {
             if (upIds == null || upIds.Count == 0)
                 return null;
@@ -347,7 +361,7 @@ namespace Ray.BiliBiliTool.DomainService
                     if (randomUpId == 0 || randomUpId == long.MinValue)
                         continue;
 
-                    if (randomUpId.ToString() == cookie.UserId)
+                    if (randomUpId.ToString() == ck.UserId)
                     {
                         logger.LogDebug("不能为自己投币");
                         continue;
@@ -356,7 +370,7 @@ namespace Ray.BiliBiliTool.DomainService
                     //该up的视频总数
                     if (!_upVideoCountDicCatch.TryGetValue(randomUpId, out int videoCount))
                     {
-                        videoCount = await videoDomainService.GetVideoCountOfUp(randomUpId);
+                        videoCount = await videoDomainService.GetVideoCountOfUp(randomUpId, ck);
                         _upVideoCountDicCatch.Add(randomUpId, videoCount);
                     }
                     if (videoCount == 0)
@@ -364,12 +378,13 @@ namespace Ray.BiliBiliTool.DomainService
 
                     UpVideoInfo videoInfo = await videoDomainService.GetRandomVideoOfUp(
                         randomUpId,
-                        videoCount
+                        videoCount,
+                        ck
                     );
                     logger.LogDebug("获取到视频{aid}({title})", videoInfo.Aid, videoInfo.Title);
 
                     //检查是否可以投
-                    if (!await IsCanDonate(videoInfo.Aid.ToString()))
+                    if (!await IsCanDonate(videoInfo.Aid.ToString(), ck))
                         continue;
 
                     return videoInfo;
@@ -389,7 +404,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// </summary>
         /// <param name="aid">av号</param>
         /// <returns></returns>
-        private async Task<bool> IsDonatedLessThenLimitCoinsForVideo(string aid)
+        private async Task<bool> IsDonatedLessThenLimitCoinsForVideo(string aid, BiliCookie ck)
         {
             try
             {
@@ -398,7 +413,8 @@ namespace Ray.BiliBiliTool.DomainService
                 {
                     multiply = (
                         await videoApi.GetDonatedCoinsForVideo(
-                            new GetAlreadyDonatedCoinsRequest(long.Parse(aid))
+                            new GetAlreadyDonatedCoinsRequest(long.Parse(aid)),
+                            ck.ToString()
                         )
                     )
                         .Data
@@ -433,7 +449,7 @@ namespace Ray.BiliBiliTool.DomainService
         /// </summary>
         /// <param name="aid"></param>
         /// <returns></returns>
-        private async Task<bool> IsCanDonate(string aid)
+        private async Task<bool> IsCanDonate(string aid, BiliCookie ck)
         {
             //本次运行已经尝试投过的,不进行重复投（不管成功还是失败，凡取过尝试过的，不重复尝试）
             if (_alreadyDonatedCoinCountCatch.Any(x => x.Key == aid))
@@ -443,7 +459,7 @@ namespace Ray.BiliBiliTool.DomainService
             }
 
             //已经投满2个币的，不能再投
-            if (!await IsDonatedLessThenLimitCoinsForVideo(aid))
+            if (!await IsDonatedLessThenLimitCoinsForVideo(aid, ck))
             {
                 logger.LogDebug("超出单个视频投币数量限制，丢弃处理");
                 return false;

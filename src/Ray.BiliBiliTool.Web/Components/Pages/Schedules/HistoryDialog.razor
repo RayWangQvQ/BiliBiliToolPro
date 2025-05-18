@@ -1,0 +1,103 @@
+@rendermode InteractiveServer
+@attribute [StreamRendering]
+@using Ray.BiliBiliTool.Domain
+@using Ray.BiliBiliTool.Web.Extensions
+
+<MudDialog>
+    <TitleContent>
+        <div class="d-flex">
+            <MudText Typo="Typo.h5">Execution History</MudText>
+            <MudIconButton Icon="@Icons.Material.Filled.Refresh"
+                           OnClick="OnRefreshHistory" />
+        </div>
+    </TitleContent>
+    <DialogContent>
+        <MudContainer Style="max-height: 300px; overflow-y: scroll">
+            <MudTimeline TimelinePosition="TimelinePosition.Start" TimelineAlign="TimelineAlign.Start">
+                @{
+                    DateTimeOffset? lastDate = null;
+
+                    foreach (var log in ExecutionLogs)
+                    {
+                        if (lastDate == null ||
+                            lastDate.Value.Date != (log.FireTimeUtc?.Date ?? log.DateAddedUtc.Date))
+                        {
+                            lastDate = log.FireTimeUtc.HasValue ? log.FireTimeUtc.Value.Date : log.DateAddedUtc.Date;
+                            <MudTimelineItem Color="Color.Primary" Size="Size.Medium">
+                                <MudText Typo="Typo.button">
+                                    @lastDate.Value.Date.ToLongDateString()
+                                </MudText>
+                            </MudTimelineItem>
+                        }
+                        var finishTimeUtc = log.GetFinishTimeUtc();
+                        @if (log.IsException ?? false)
+                        {
+                            <MudTimelineItem Color="Color.Transparent"
+                                TimelineAlign="TimelineAlign.End">
+                                <ItemDot>
+                                    <MudIcon Size="Size.Small" Color="Color.Error" Icon="@Icons.Material.Filled.Error"/>
+                                </ItemDot>
+                                <ItemContent>
+                                    <MudText Typo="Typo.button">
+                                        @GetExecutionTime(log)
+                                        @if (log.JobRunTime.HasValue)
+                                        {
+                                            <span class="pl-1" style="text-transform: none;">
+                                                (@log.JobRunTime.Value.ToHumanTimeString(4))
+                                            </span>
+                                        }
+                                    </MudText>
+                                    <MudText Typo="Typo.body2" Class="mud-text-secondary">@log.GetShortExceptionMessage()</MudText>
+                                    <MudButton Variant="Variant.Text"
+                                            Class="pa-0 ma-0"
+                                            Style="text-transform:none;"
+                                            OnClick="@(() => OnMoreDetails(log, "Error Details"))"
+                                            Color="Color.Primary">Error Details</MudButton>
+                                </ItemContent>
+                            </MudTimelineItem>
+                        }
+                        else
+                        {
+                            <MudTimelineItem Color="@GetTimelineDotColor(log)"
+                                            TimelineAlign="TimelineAlign.End">
+                                <MudText Typo="Typo.button">
+                                    @GetExecutionTime(log)
+                                    @if(log.JobRunTime.HasValue)
+                                    {
+                                        <span class="pl-1" style="text-transform: none;">
+                                            (@log.JobRunTime.Value.ToHumanTimeString(4))
+                                        </span>
+                                    }
+                                </MudText>
+                                <MudText Typo="Typo.body2" Class="mud-text-secondary">
+                                    @log.GetShortResultMessage()
+                                </MudText>
+                                @if (log.ShowExecutionDetailButton())
+                                {
+                                    <MudButton Variant="Variant.Text"
+                                            Class="pa-0 ma-0"
+                                            Style="text-transform:none;"
+                                            OnClick="@(() => OnMoreDetails(log, "Execution Details"))"
+                                            Color="Color.Primary">Execution Details</MudButton>
+                                }
+                            </MudTimelineItem>
+                        }
+                    }
+                }
+
+                @if (HasMore)
+                {
+                    <MudTimelineItem TimelineAlign="TimelineAlign.End">
+                        <MudButton Variant="Variant.Text"
+                                   Style="text-transform:none;"
+                                   OnClick="GetMoreLogs"
+                                   Color="Color.Primary">Load More</MudButton>
+                    </MudTimelineItem>
+                }
+            </MudTimeline>
+        </MudContainer>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Close">Close</MudButton>
+    </DialogActions>
+</MudDialog>

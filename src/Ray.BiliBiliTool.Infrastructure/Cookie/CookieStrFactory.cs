@@ -1,111 +1,51 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Configuration;
 
 namespace Ray.BiliBiliTool.Infrastructure.Cookie;
 
-public class CookieStrFactory
+public class CookieStrFactory<TCookieInfo>(IConfiguration configuration)
+    where TCookieInfo : CookieInfo
 {
-    private readonly Dictionary<int, Dictionary<string, string>> _cookieDictionary;
+    private Dictionary<int, Dictionary<string, string>> CookieDictionary => GetCookieDictionary();
 
-    public CookieStrFactory(List<string> strList)
+    public int Count => CookieDictionary.Count;
+
+    public TCookieInfo GetCookie(int index)
     {
-        _cookieDictionary = new Dictionary<int, Dictionary<string, string>>();
-
-        for (int i = 0; i < strList?.Count; i++)
-        {
-            _cookieDictionary.Add(i + 1, CkStrToDictionary(strList[i]));
-        }
-
-        CurrentNum = 1;
+        var dic = GetCookieDictionary()[index];
+        return (TCookieInfo)Activator.CreateInstance(typeof(TCookieInfo), dic);
     }
 
-    public int CurrentNum { get; set; }
-
-    public int Count => _cookieDictionary.Count;
-
-    public bool Any()
+    public static TCookieInfo CreateNew(string cookie)
     {
-        if (CurrentNum <= Count)
-            return true;
-        else
-            return false;
+        Dictionary<string, string> dic = CkStrToDictionary(cookie);
+        return (TCookieInfo)Activator.CreateInstance(typeof(TCookieInfo), dic);
     }
-
-    public Dictionary<string, string> GetCurrentCookieDic()
-    {
-        if (!Any())
-        {
-            return new Dictionary<string, string>(); //todo
-            //throw new Exception($"第 {CurrentNum} 个cookie不存在");
-        }
-
-        return _cookieDictionary[CurrentNum];
-    }
-
-    public string GetCurrentCookieStr()
-    {
-        if (!Any())
-            throw new Exception($"第 {CurrentNum} 个cookie字符串不存在");
-
-        var ckDic = _cookieDictionary[CurrentNum];
-        return DictionaryToCkStr(ckDic);
-    }
-
-    #region merge
-
-    /// <summary>
-    /// 根据请求返回header中的set-cookie来merge cookie
-    /// </summary>
-    /// <param name="setCookieList">["ak=av; expire=abc;"]</param>
-    public void MergeCurrentCookieBySetCookieHeaders(IEnumerable<string> setCookieList)
-    {
-        MergeCurrentCookie(CookieInfo.ConvertSetCkHeadersToCkItemList(setCookieList));
-    }
-
-    /// <summary>
-    /// 根据cookie字符串merge
-    /// </summary>
-    /// <param name="ckStr"></param>
-    public void MergeCurrentCookie(string ckStr)
-    {
-        MergeCurrentCookie(CookieInfo.ConvertCkStrToCkItemList(ckStr));
-    }
-
-    /// <summary>
-    /// 根据cookie item集合merge（一个“ak=av”为一个cookie item）
-    /// </summary>
-    /// <param name="ckItemList">["ak=av","bk=bv"]</param>
-    public void MergeCurrentCookie(List<string> ckItemList)
-    {
-        MergeCurrentCookie(CookieInfo.ConvertCkItemListToCkDic(ckItemList));
-    }
-
-    /// <summary>
-    /// 根据cookie dic来merge
-    /// </summary>
-    /// <param name="ckDic">{{"ak":"av"}}</param>
-    public void MergeCurrentCookie(Dictionary<string, string> ckDic)
-    {
-        var currentCkDic = GetCurrentCookieDic();
-        foreach (var item in ckDic)
-        {
-            if (currentCkDic.ContainsKey(item.Key))
-            {
-                currentCkDic[item.Key] = item.Value;
-            }
-            else
-            {
-                currentCkDic.Add(item.Key, item.Value);
-            }
-        }
-    }
-
-    #endregion
 
     #region private
 
-    private Dictionary<string, string> CkStrToDictionary(string ckStr)
+    private Dictionary<int, Dictionary<string, string>> GetCookieDictionary()
+    {
+        var list = configuration.GetSection("BiliBiliCookies").Get<List<string>>();
+        return CookeStrListToCookieDic(list);
+    }
+
+    private Dictionary<int, Dictionary<string, string>> CookeStrListToCookieDic(List<string> ckList)
+    {
+        var dic = new Dictionary<int, Dictionary<string, string>>();
+        ckList ??= [];
+
+        for (int i = 0; i < ckList?.Count; i++)
+        {
+            dic.Add(i, CkStrToDictionary(ckList[i]));
+        }
+
+        return dic;
+    }
+
+    private static Dictionary<string, string> CkStrToDictionary(string ckStr)
     {
         var dic = new Dictionary<string, string>();
         var ckItemList = ckStr.Split(";", StringSplitOptions.TrimEntries).Distinct();
