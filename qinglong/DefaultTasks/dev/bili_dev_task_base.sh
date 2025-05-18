@@ -263,8 +263,9 @@ check_dotnet() {
     eval $invocation
 
     dotnetVersion=$(dotnet --version)
-    if [[ $(echo "$dotnetVersion" | grep -oE '^[0-9]\+') -ge 8 ]]; then
-        say "已安装dotnet，当前版本：$dotnetVersion"
+    say "当前dotnet版本：$dotnetVersion"
+    if [[ $(echo "$dotnetVersion" | grep -oE '^[0-9]+') -ge 8 ]]; then
+        say "已安装，且版本满足"
         say "which dotnet: $(which dotnet)"
         return 0
     else
