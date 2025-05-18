@@ -76,24 +76,16 @@ public interface ILiveApi : IBiliBiliApi
     /// <summary>
     /// 获取直播列表
     /// </summary>
-    /// <param name="parentAreaId"></param>
-    /// <param name="page"></param>
-    /// <param name="areaId"></param>
-    /// <param name="sortType">sort_type_124</param>
+    /// <param name="request"></param>
+    /// <param name="ck"></param>
     /// <returns></returns>
     [Header("Referer", "https://live.bilibili.com/")]
     [Header("Origin", "https://live.bilibili.com")]
-    [HttpGet(
-        "/xlive/web-interface/v1/second/getList?platform=web&parent_area_id={parentAreaId}&area_id={areaId}&sort_type={sortType}&page={page}"
-    )]
+    [HttpGet("/xlive/web-interface/v1/second/getList")]
     Task<BiliApiResponse<GetListResponse>> GetList(
-        long parentAreaId,
-        int page,
-        int areaId = 0,
-        string sortType = ""
+        [PathQuery] GetListRequest request,
+        [Header("Cookie")] string ck
     );
-
-    //todo:Cookie比nav接口多了两项：Hm_lvt_8a6e55dbd2870f0f5bc9194cddf32a02、Hm_lvt_9e2a88dc69e0e55c353597501d2a4bbc
 
     /// <summary>
     /// 检查天选时刻抽奖
