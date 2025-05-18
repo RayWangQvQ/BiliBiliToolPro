@@ -19,6 +19,7 @@
     - [4.1. 安装dotnet失败怎么办法](#41-安装dotnet失败怎么办法)
     - [4.2. Couldn't find a valid ICU package installed on the system](#42-couldnt-find-a-valid-icu-package-installed-on-the-system)
     - [4.3. 提示文件不存在或路径异常，怎么排查](#43-提示文件不存在或路径异常怎么排查)
+    - [4.4. The configured user limit (128) on the number of inotify instances has been reached](#44-the-configured-user-limit-128-on-the-number-of-inotify-instances-has-been-reached)
 
 <!-- /TOC -->
 
@@ -153,3 +154,19 @@ export BILI_GITHUB_PROXY="https://github.moeyy.xyz/" # 下载二进制包时使�
 - `/ql/shell`目录下是青龙的基础脚本
 
 请cd到相应目录，查看该目录下文件是否存在，状态是否正常。
+
+### 4.4. The configured user limit (128) on the number of inotify instances has been reached
+
+报错：
+
+```
+Asp.Net Core - The configured user limit (128) on the number of inotify instances has been reached
+```
+
+可以尝试添加如下环境变量解决：
+
+```
+DOTNET_USE_POLLING_FILE_WATCHER=1
+```
+
+添加后，配置更新，会从监听 Linux 系统的 inotify 事件，变成定时轮询。
