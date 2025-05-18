@@ -100,7 +100,9 @@ public class LiveDomainService(
             return false;
         }
 
-        BiliApiResponse<LiveWalletStatusResponse> queryStatus = await liveApi.GetLiveWalletStatus();
+        BiliApiResponse<LiveWalletStatusResponse> queryStatus = await liveApi.GetLiveWalletStatus(
+            ck.ToString()
+        );
         logger.LogInformation("【银瓜子余额】 {silver}", queryStatus.Data.Silver);
         logger.LogInformation("【硬币余额】 {coin}", queryStatus.Data.Coin);
         logger.LogInformation("【今日剩余兑换次数】 {left}", queryStatus.Data.Silver_2_coin_left);
@@ -259,7 +261,7 @@ public class LiveDomainService(
                 Gift_num = check.Gift_num,
                 Csrf = ck.BiliJct,
             };
-            var re = await liveApi.Join(request);
+            var re = await liveApi.Join(request, ck.ToString());
             if (re.Code == 0)
             {
                 logger.LogInformation("【抽奖】成功 √" + Environment.NewLine);
@@ -316,7 +318,7 @@ public class LiveDomainService(
             targetGroupId.ToString(),
             ck.BiliJct
         );
-        var re = await relationApi.CopyUpsToGroup(req, referer);
+        var re = await relationApi.CopyUpsToGroup(req, ck.ToString(), referer);
 
         if (re.Code == 0)
         {

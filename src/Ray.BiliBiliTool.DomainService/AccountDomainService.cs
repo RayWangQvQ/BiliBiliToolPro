@@ -181,7 +181,7 @@ public class AccountDomainService(
                 tagId
             );
             var modifyReq = new ModifyRelationRequest(info.Mid, ck.BiliJct);
-            var re = await relationApi.ModifyRelation(modifyReq, modifyReferer);
+            var re = await relationApi.ModifyRelation(modifyReq, ck.ToString(), modifyReferer);
 
             if (re.Code == 0)
             {
@@ -207,10 +207,10 @@ public class AccountDomainService(
     /// </summary>
     /// <param name="groupName"></param>
     /// <returns></returns>
-    private async Task<TagDto> GetTag(string groupName, BiliCookie cookie)
+    private async Task<TagDto> GetTag(string groupName, BiliCookie ck)
     {
-        string getTagsReferer = string.Format(RelationApiConstant.GetTagsReferer, cookie.UserId);
-        List<TagDto> tagList = (await relationApi.GetTags(getTagsReferer)).Data;
+        string getTagsReferer = string.Format(RelationApiConstant.GetTagsReferer, ck.UserId);
+        List<TagDto> tagList = (await relationApi.GetTags(getTagsReferer, ck.ToString())).Data;
         TagDto tag = tagList.FirstOrDefault(x => x.Name == groupName);
         return tag;
     }

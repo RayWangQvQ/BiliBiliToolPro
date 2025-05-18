@@ -66,7 +66,9 @@ public interface ILiveApi : IBiliBiliApi
     //[Header("Referer", "https://link.bilibili.com/p/center/index?visit_id=1ddo4yl01q00")]
     [Header("Origin", "https://link.bilibili.com")]
     [HttpGet("/xlive/revenue/v1/wallet/getStatus")]
-    Task<BiliApiResponse<LiveWalletStatusResponse>> GetLiveWalletStatus();
+    Task<BiliApiResponse<LiveWalletStatusResponse>> GetLiveWalletStatus(
+        [Header("Cookie")] string ck
+    );
 
     [HttpGet("/xlive/web-interface/v1/index/getWebAreaList?source_id=2")]
     Task<BiliApiResponse<GetArteaListResponse>> GetAreaList([Header("Cookie")] string ck);
@@ -112,7 +114,10 @@ public interface ILiveApi : IBiliBiliApi
     /// <param name="request"></param>
     /// <returns></returns>
     [HttpPost("/xlive/lottery-interface/v1/Anchor/Join")]
-    Task<BiliApiResponse<JoinTianXuanResponse>> Join([FormContent] JoinTianXuanRequest request);
+    Task<BiliApiResponse<JoinTianXuanResponse>> Join(
+        [FormContent] JoinTianXuanRequest request,
+        [Header("Cookie")] string ck
+    );
 
     /// <summary>
     /// 获取用户的粉丝勋章

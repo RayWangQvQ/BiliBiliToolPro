@@ -39,7 +39,7 @@ public class ArticleDomainService(
 
     public async Task LikeArticle(long cvid, BiliCookie ck)
     {
-        await articleApi.LikeAsync(cvid, ck.BiliJct);
+        await articleApi.LikeAsync(cvid, ck.BiliJct, ck.ToString());
     }
 
     /// <summary>
@@ -121,6 +121,7 @@ public class ArticleDomainService(
                 $"https://www.bilibili.com/read/cv{cvid}/?from=search&spm_id_from=333.337.0.0";
             result = await articleApi.AddCoinForArticleAsync(
                 new AddCoinForArticleRequest(cvid, mid, ck.BiliJct),
+                ck.ToString(),
                 refer
             );
         }

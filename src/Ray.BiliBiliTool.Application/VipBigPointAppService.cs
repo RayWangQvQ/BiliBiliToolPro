@@ -323,7 +323,7 @@ public class VipBigPointAppService(
         }
 
         logger.LogInformation("开始完成任务");
-        var re = await CompleteView(code);
+        var re = await CompleteView(code, ck);
 
         //确认
         if (re)
@@ -533,13 +533,13 @@ public class VipBigPointAppService(
         }
     }
 
-    private async Task<bool> CompleteView(string code)
+    private async Task<bool> CompleteView(string code, BiliCookie ck)
     {
         logger.LogInformation("开始浏览");
         await Task.Delay(10 * 1000);
 
         var request = new ViewRequest(code);
-        var re = await vipApi.ViewComplete(request);
+        var re = await vipApi.ViewComplete(request, ck.ToString());
         if (re.Code == 0)
         {
             logger.LogInformation("浏览完成");

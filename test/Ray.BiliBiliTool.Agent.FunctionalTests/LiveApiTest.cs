@@ -76,7 +76,7 @@ namespace BiliAgentTest
             var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory<BiliCookie>>();
             var api = scope.ServiceProvider.GetRequiredService<ILiveApi>();
 
-            BiliApiResponse<LiveWalletStatusResponse> re = api.GetLiveWalletStatus().Result;
+            BiliApiResponse<LiveWalletStatusResponse> re = api.GetLiveWalletStatus(null).Result;
 
             if (ck.Count > 0)
             {
