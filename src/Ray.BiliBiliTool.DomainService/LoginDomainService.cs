@@ -421,6 +421,33 @@ public class LoginDomainService(
 
     private async Task<string> GetQingLongAuthTokenAsync()
     {
+        var qlDir = configuration["QL_DIR"] ?? "/ql";
+        string authFile = qlDir;
+        if (hostingEnvironment.ContentRootPath.Contains($"{qlDir}/data/"))
+        {
+            authFile = Path.Combine(authFile, "data");
+        }
+        authFile = Path.Combine(authFile, "config/auth.json");
+
+        if (File.Exists(authFile))
+        {
+            return await GetTokenFromFileAsync(authFile);
+        }
+
+        return await GetTokenFromOpenApiAsync();
+    }
+
+    private async Task<string> GetTokenFromFileAsync(string authFile)
+    {
+        logger.LogWarning("老版本青龙，使用auth文件鉴权：{authFile}", authFile);
+        var authJson = await File.ReadAllTextAsync(authFile);
+        var jb = JsonConvert.DeserializeObject<JObject>(authJson);
+        return $"Bearer {jb["token"]}";
+    }
+
+    private async Task<string> GetTokenFromOpenApiAsync()
+    {
+        logger.LogWarning("新版青龙，使用OpenAPI鉴权");
         if (
             qingLongOptions.Value.ClientId.IsNullOrWhiteSpace()
             || qingLongOptions.Value.ClientSecret.IsNullOrWhiteSpace()
