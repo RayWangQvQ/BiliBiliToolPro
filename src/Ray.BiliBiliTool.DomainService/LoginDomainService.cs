@@ -16,6 +16,7 @@ using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Passport;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Agent.QingLong;
+using Ray.BiliBiliTool.Agent.QingLong.Dtos;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 using Ray.BiliBiliTool.Infrastructure.Cookie;
 

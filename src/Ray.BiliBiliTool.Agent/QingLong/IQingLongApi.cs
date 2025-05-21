@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Ray.BiliBiliTool.Agent.Attributes;
+using Ray.BiliBiliTool.Agent.QingLong.Dtos;
 using WebApiClientCore.Attributes;
 
 namespace Ray.BiliBiliTool.Agent.QingLong;
@@ -26,33 +26,4 @@ public interface IQingLongApi
         [JsonContent] UpdateQingLongEnv env,
         [Header("Authorization")] string token
     );
-}
-
-public class QingLongGenericResponse<T>
-{
-    public int Code { get; set; }
-
-    public T Data { get; set; }
-}
-
-public class QingLongEnv : UpdateQingLongEnv
-{
-    public string timestamp { get; set; }
-    public int status { get; set; }
-
-    //public long position { get; set; }
-    public DateTime createdAt { get; set; }
-    public DateTime updatedAt { get; set; }
-}
-
-public class AddQingLongEnv
-{
-    public string value { get; set; }
-    public string name { get; set; }
-    public string remarks { get; set; }
-}
-
-public class UpdateQingLongEnv : AddQingLongEnv
-{
-    public long id { get; set; }
 }
