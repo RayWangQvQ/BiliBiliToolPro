@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using QRCoder;
@@ -17,6 +18,7 @@ using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Passport;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Agent.QingLong;
 using Ray.BiliBiliTool.Agent.QingLong.Dtos;
+using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 using Ray.BiliBiliTool.Infrastructure.Cookie;
 
@@ -31,7 +33,8 @@ public class LoginDomainService(
     IHostEnvironment hostingEnvironment,
     IQingLongApi qingLongApi,
     IHomeApi homeApi,
-    IConfiguration configuration
+    IConfiguration configuration,
+    IOptions<QingLongOptions> qingLongOptions
 ) : ILoginDomainService
 {
     public async Task<BiliCookie> LoginByQrCodeAsync(CancellationToken cancellationToken)
@@ -240,9 +243,7 @@ public class LoginDomainService(
                 throw new Exception("获取青龙token失败");
             }
 
-            token = $"Bearer {token}";
-
-            var qlEnvList = await qingLongApi.GetEnvs("Ray_BiliBiliCookies__", token);
+            var qlEnvList = await qingLongApi.GetEnvsAsync("Ray_BiliBiliCookies__", token);
             if (qlEnvList.Code != 200)
             {
                 throw new Exception($"查询环境变量失败：{qlEnvList.ToJsonStr()}");
@@ -270,7 +271,7 @@ public class LoginDomainService(
                         : oldEnv.remarks,
                 };
 
-                var updateRe = await qingLongApi.UpdateEnvs(update, token);
+                var updateRe = await qingLongApi.UpdateEnvsAsync(update, token);
                 logger.LogInformation(updateRe.Code == 200 ? "更新成功！" : updateRe.ToJsonStr());
 
                 return true;
@@ -298,7 +299,7 @@ public class LoginDomainService(
                 value = ckInfo.CookieStr,
                 remarks = $"bili-{ckInfo.UserId}",
             };
-            var addRe = await qingLongApi.AddEnvs([add], token);
+            var addRe = await qingLongApi.AddEnvsAsync([add], token);
             logger.LogInformation(addRe.Code == 200 ? "新增成功！" : addRe.ToJsonStr());
             return true;
         }
@@ -420,29 +421,22 @@ public class LoginDomainService(
 
     private async Task<string> GetQingLongAuthTokenAsync()
     {
-        var token = "";
-
-        var qlDir = configuration["QL_DIR"] ?? "/ql";
-
-        string authFile = qlDir;
-        if (hostingEnvironment.ContentRootPath.Contains($"{qlDir}/data/"))
+        if (
+            qingLongOptions.Value.ClientId.IsNullOrWhiteSpace()
+            || qingLongOptions.Value.ClientSecret.IsNullOrWhiteSpace()
+        )
         {
-            authFile = Path.Combine(authFile, "data");
-        }
-        authFile = Path.Combine(authFile, "config/auth.json");
-
-        if (!File.Exists(authFile))
-        {
-            logger.LogWarning("获取青龙授权失败，文件不存在：{authFile}", authFile);
-            return token;
+            logger.LogWarning("未配置青龙的ClientId和ClientSecret，无法自动获取token");
+            logger.LogWarning("教程：{qingDoc}", "https://qinglong.online/api/preparation");
+            return "";
         }
 
-        var authJson = await File.ReadAllTextAsync(authFile);
+        var token = await qingLongApi.GetTokenAsync(
+            qingLongOptions.Value.ClientId,
+            qingLongOptions.Value.ClientSecret
+        );
 
-        var jb = JsonConvert.DeserializeObject<JObject>(authJson);
-        token = jb["token"]?.ToString();
-
-        return token;
+        return $"{token.Data.token_type} {token.Data.token}";
     }
 
     private Task PrintIfSaveCookieFailAsync(BiliCookie ckInfo, CancellationToken cancellationToken)

@@ -1,3 +1,5 @@
+## 3.0.6
+- Feature[#842]: 对接青龙新的OpenAPI，实现青龙版Bili登录后自动存储Cookie
 ## 3.0.5
 - Fix: Bruno 脚本错误
 ## 3.0.4

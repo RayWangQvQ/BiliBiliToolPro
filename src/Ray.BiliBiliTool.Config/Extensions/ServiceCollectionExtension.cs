@@ -34,7 +34,8 @@ public static class ServiceCollectionExtension
             .Configure<VipPrivilegeOptions>(configuration.GetSection("VipPrivilegeConfig"))
             .Configure<LiveFansMedalTaskOptions>(
                 configuration.GetSection("LiveFansMedalTaskOptions")
-            );
+            )
+            .Configure<QingLongOptions>(configuration.GetSection("QingLongConfig"));
 
         return services;
     }
