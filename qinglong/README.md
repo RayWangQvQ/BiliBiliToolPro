@@ -1,6 +1,6 @@
 # 在青龙中运行
 
-思路是，在青龙容器中安装`dotnet`环境或`bilitool`的二进制包，利用青龙的拉库命令，拉取本仓库源码，添加cron定时任务，定时运行相应的Task。
+原理是，利用青龙的拉库命令，拉取本仓库源码，自动添加cron定时任务，然后在青龙容器中安装`dotnet`环境或`bilitool`的二进制包，定时运行相应的Task。
 
 开始前，请先确保你的青龙面板是运行正常的。
 
@@ -12,7 +12,10 @@
         - [1.2.1. 方式一：订阅管理](#121-方式一订阅管理)
         - [1.2.2. 方式二：定时任务拉库](#122-方式二定时任务拉库)
     - [1.3. 检查定时任务](#13-检查定时任务)
-    - [1.4. 登录](#14-登录)
+    - [1.4. 配置青龙Client Secret（可选）](#14-配置青龙client-secret可选)
+        - [1.4.1. 新建 Application](#141-新建-application)
+        - [1.4.2. 密钥配置到环境变量](#142-密钥配置到环境变量)
+    - [1.5. Bili登录](#15-bili登录)
 - [2. 先行版](#2-先行版)
 - [3. GitHub加速](#3-github加速)
 - [4. 常见问题](#4-常见问题)
@@ -71,14 +74,40 @@
 
 ![qinglong-tasks.png](../docs/imgs/qinglong-tasks.png)
 
-### 1.4. 登录
+### 1.4. 配置青龙Client Secret（可选）
+
+扫码登录Bili后，需要有权限向青龙的环境变量中持久化Cookie，所以需要添加一个鉴权。
+
+青龙官方说明：https://qinglong.online/api/preparation
+
+#### 1.4.1. 新建 Application
+
+青龙 -> 系统设置 -> 应用设置，点击新建。
+
+![qinglong-application](../docs/imgs/qinglong-application.png)
+
+#### 1.4.2. 密钥配置到环境变量
+
+将上面2个值添加到环境变量中即可。
+
+Name分别为：
+
+- Ray_QingLongConfig__ClientId
+- Ray_QingLongConfig__ClientSecret
+
+![qinglong-app-env](../docs/imgs/qinglong-application-key.png)
+
+
+### 1.5. Bili登录
 
 在青龙定时任务中，点击运行`bili扫码登录`任务，查看运行日志，扫描日志中的二维码进行登录。
 ![qinglong-login.png](../docs/imgs/qinglong-login.png)
 
-登录成功后，会将cookie保存到青龙的环境变量中：
+登录成功后，如果已配置了上述的Application，会将cookie保存到青龙的环境变量中：
 
 ![qinglong-env.png](../docs/imgs/qinglong-env.png)
+
+如果未配置Application，会打印出cookie，请手动自己到环境变量中添加。
 
 首次运行会自动安装环境，时间可能长一点，之后就不需要重复安装了。
 
@@ -86,7 +115,7 @@
 
 青龙拉库时可以指定分支，develop分支的代码会超前于默认的main分支，包含当前正在开发的新功能。
 
-想提前体验新功能的朋友可以尝试切换先行版，但同时也意味着稳定性会相应降低（其实是相当于在帮我内测测试bug了~🤨）。
+想提前体验新功能，或想要Bug能快速得到解决的朋友，可以尝试切换先行版，但同时也意味着稳定性会相应降低（其实可以忽略不计~🤨）。
 
 ```
 分支：develop
@@ -113,7 +142,14 @@ https://gh-proxy.com/https://github.com/RayWangQvQ/BiliBiliToolPro.git
 
 ### 4.1. 安装dotnet失败怎么办法
 
-先通过日志自行排查，不行就根据微软官方文档，进入qinglong容器后，手动安装。
+首先，青龙有两个版本的镜像：
+
+- alpine：whyour/qinglong:latest
+- debian：whyour/qinglong:debian
+
+安装dotnet失败的情况，几乎全发生在alpine版上。。。
+
+所以，如果你“执迷不悟”，就是一定要用alpine版，那请先通过日志自行排查，不行就根据微软官方文档，进入qinglong容器后，手动安装。
 
 如果还不行，那么可以切换到基于`bilitool`的二进制包运行方式，该方式不需要安装`dotnet`，方式：
 
@@ -125,6 +161,10 @@ export BILI_GITHUB_PROXY="https://github.moeyy.xyz/" # 下载二进制包时使�
 ```
 
 ![qinglong-login.png](../docs/imgs/qinglong-run-as-bilitool.png)
+
+bilitool没有先行版的概念，因为只有main分支才会打包，更新会稍慢一点。
+
+另外，alpine版的问题，我不建议来提交issue，因为已经大大超出本项目的scope了，建议可以去给alpine官方或微软的dotnet官方提交issue。
 
 ### 4.2. Couldn't find a valid ICU package installed on the system
 
@@ -167,4 +207,4 @@ Asp.Net Core - The configured user limit (128) on the number of inotify instance
 DOTNET_USE_POLLING_FILE_WATCHER=1
 ```
 
-添加后，配置更新，会从监听 Linux 系统的 inotify 事件，变成定时轮询。
+添加后，对配置变更事件的监听，会从监听 Linux 系统的 inotify 事件，变成定时轮询。
