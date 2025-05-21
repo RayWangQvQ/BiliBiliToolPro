@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Ray.BiliBiliTool.Agent.Attributes;
 using Ray.BiliBiliTool.Agent.QingLong.Dtos;
@@ -28,6 +29,29 @@ public interface IQingLongApi
     );
 
     [HttpPut("/open/envs")]
+    Task<QingLongGenericResponse<QingLongEnv>> UpdateEnvsAsync(
+        [JsonContent] UpdateQingLongEnv env,
+        [Header("Authorization")] string token
+    );
+}
+
+[LogFilter]
+[Obsolete]
+public interface IQingLongOldApi
+{
+    [HttpGet("/api/envs")]
+    Task<QingLongGenericResponse<List<QingLongEnv>>> GetEnvsAsync(
+        string searchValue,
+        [Header("Authorization")] string token
+    );
+
+    [HttpPost("/api/envs")]
+    Task<QingLongGenericResponse<List<QingLongEnv>>> AddEnvsAsync(
+        [JsonContent] List<AddQingLongEnv> envs,
+        [Header("Authorization")] string token
+    );
+
+    [HttpPut("/api/envs")]
     Task<QingLongGenericResponse<QingLongEnv>> UpdateEnvsAsync(
         [JsonContent] UpdateQingLongEnv env,
         [Header("Authorization")] string token

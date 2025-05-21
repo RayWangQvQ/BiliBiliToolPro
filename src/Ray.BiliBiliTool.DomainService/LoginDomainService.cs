@@ -32,6 +32,7 @@ public class LoginDomainService(
     IPassportApi passportApi,
     IHostEnvironment hostingEnvironment,
     IQingLongApi qingLongApi,
+    IQingLongOldApi qingLongOldApi,
     IHomeApi homeApi,
     IConfiguration configuration,
     IOptions<QingLongOptions> qingLongOptions
@@ -237,13 +238,15 @@ public class LoginDomainService(
     {
         try
         {
-            var token = await GetQingLongAuthTokenAsync();
+            var (token, isNewQingLong) = await GetQingLongAuthTokenAsync();
             if (token.IsNullOrEmpty())
             {
                 throw new Exception("获取青龙token失败");
             }
 
-            var qlEnvList = await qingLongApi.GetEnvsAsync("Ray_BiliBiliCookies__", token);
+            var qlEnvList = isNewQingLong
+                ? await qingLongApi.GetEnvsAsync("Ray_BiliBiliCookies__", token)
+                : await qingLongOldApi.GetEnvsAsync("Ray_BiliBiliCookies__", token);
             if (qlEnvList.Code != 200)
             {
                 throw new Exception($"查询环境变量失败：{qlEnvList.ToJsonStr()}");
@@ -271,7 +274,9 @@ public class LoginDomainService(
                         : oldEnv.remarks,
                 };
 
-                var updateRe = await qingLongApi.UpdateEnvsAsync(update, token);
+                var updateRe = isNewQingLong
+                    ? await qingLongApi.UpdateEnvsAsync(update, token)
+                    : await qingLongOldApi.UpdateEnvsAsync(update, token);
                 logger.LogInformation(updateRe.Code == 200 ? "更新成功！" : updateRe.ToJsonStr());
 
                 return true;
@@ -299,7 +304,9 @@ public class LoginDomainService(
                 value = ckInfo.CookieStr,
                 remarks = $"bili-{ckInfo.UserId}",
             };
-            var addRe = await qingLongApi.AddEnvsAsync([add], token);
+            var addRe = isNewQingLong
+                ? await qingLongApi.AddEnvsAsync([add], token)
+                : await qingLongOldApi.AddEnvsAsync([add], token);
             logger.LogInformation(addRe.Code == 200 ? "新增成功！" : addRe.ToJsonStr());
             return true;
         }
@@ -419,8 +426,10 @@ public class LoginDomainService(
 
     #region qinglong
 
-    private async Task<string> GetQingLongAuthTokenAsync()
+    private async Task<(string, bool)> GetQingLongAuthTokenAsync()
     {
+        var token = "";
+
         var qlDir = configuration["QL_DIR"] ?? "/ql";
         string authFile = qlDir;
         if (hostingEnvironment.ContentRootPath.Contains($"{qlDir}/data/"))
@@ -431,10 +440,12 @@ public class LoginDomainService(
 
         if (File.Exists(authFile))
         {
-            return await GetTokenFromFileAsync(authFile);
+            token = await GetTokenFromFileAsync(authFile);
+            return (token, false);
         }
 
-        return await GetTokenFromOpenApiAsync();
+        token = await GetTokenFromOpenApiAsync();
+        return (token, true);
     }
 
     private async Task<string> GetTokenFromFileAsync(string authFile)
