@@ -199,25 +199,7 @@ Pull App 可以指定是否保留自己已经修改的内容，分为下面两�
 
 ## 6. 本地或服务器如何安装.net环境
 
-macOS/Linux:
-```
-curl -sSL https://ghproxy.com/https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/qinglong/ray-dotnet-install.sh | bash /dev/stdin
-```
-如果出现下载缓慢的情况，可以将上面指令改为：
-
-```
-curl -sSL https://ghproxy.com/https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/qinglong/ray-dotnet-install.sh | bash /dev/stdin --no-official
-```
-
-`--no-official`表示不会使用官方脚本去安装，而是通过手动下载二进制文件的形式来安装。
-
-Windows:
-```
-# Run a separate PowerShell process because the script calls exit, so it will end the current PowerShell session.
-&powershell -NoProfile -ExecutionPolicy unrestricted -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; &([scriptblock]::Create((Invoke-WebRequest -UseBasicParsing 'https://dot.net/v1/dotnet-install.ps1'))) --channel 8.0 --no-cdn --verbose"
-```
-
-其他问题请见[官方文档](https://learn.microsoft.com/zh-cn/dotnet/core/tools/dotnet-install-script)
+请见[官方文档](https://learn.microsoft.com/zh-cn/dotnet/core/tools/dotnet-install-script)
 
 ## 7. 如何关停Actions运行
 推荐做法有两种：一是使用配置关停应用的每日任务，二是关停Actions。

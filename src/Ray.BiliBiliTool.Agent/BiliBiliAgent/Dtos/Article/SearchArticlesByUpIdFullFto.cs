@@ -16,6 +16,6 @@ public class SearchArticlesByUpIdDto : IWrid
 
     public string platform { get; set; } = "web";
 
-    public string w_rid { get; set; }
+    public string? w_rid { get; set; }
     public long wts { get; set; }
 }

@@ -10,5 +10,5 @@ public class GetListRequest : IWrid
     public string sort_type { get; set; }
     public int page { get; set; }
     public long wts { get; set; }
-    public string w_rid { get; set; }
+    public string? w_rid { get; set; }
 }

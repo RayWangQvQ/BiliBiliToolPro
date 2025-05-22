@@ -1,16 +1,14 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Text.Encodings.Web;
+﻿using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Unicode;
 
 namespace Ray.BiliBiliTool.Infrastructure;
 
-public static class JsonSerializerOptionsBuilderExtesions
+public static class JsonSerializerOptionsBuilderExtensions
 {
     private static JsonSerializerOptionsBuilder SetActionBase(
-        [NotNull] JsonSerializerOptionsBuilder builder,
-        [NotNull] Action<JsonSerializerOptions> action
+        JsonSerializerOptionsBuilder builder,
+        Action<JsonSerializerOptions> action
     )
     {
         builder.CheckNullWithException(nameof(builder));
@@ -23,7 +21,7 @@ public static class JsonSerializerOptionsBuilderExtesions
 
     public static JsonSerializerOptionsBuilder SetEncoder(
         this JsonSerializerOptionsBuilder builder,
-        [NotNull] JavaScriptEncoder encoder
+        JavaScriptEncoder encoder
     )
     {
         encoder.CheckNullWithException(nameof(encoder));
@@ -46,7 +44,7 @@ public static class JsonSerializerOptionsBuilderExtesions
 
     public static JsonSerializerOptionsBuilder Configure(
         this JsonSerializerOptionsBuilder builder,
-        [NotNull] Action<JsonSerializerOptions> action
+        Action<JsonSerializerOptions> action
     )
     {
         return SetActionBase(builder, action);
@@ -54,33 +52,28 @@ public static class JsonSerializerOptionsBuilderExtesions
 
     #endregion 设置区
 
-    private static JsonSerializerOptions DefaultOptions;
+    private static JsonSerializerOptions? _defaultOptions;
 
-    public static JsonSerializerOptions BuildAndSaveToDefault(
+    private static JsonSerializerOptions BuildAndSaveToDefault(
         this JsonSerializerOptionsBuilder builder
     )
     {
         JsonSerializerOptions option = builder.Build();
-        JsonSerializerOptionsBuilderExtesions.DefaultOptions = option;
+        _defaultOptions = option;
         return option;
     }
 
-    public static JsonSerializerOptions GetDefaultOptions(this JsonSerializerOptionsBuilder builder)
+    public static JsonSerializerOptions? GetDefaultOptions(this JsonSerializerOptionsBuilder builder)
     {
-        return JsonSerializerOptionsBuilderExtesions.DefaultOptions;
+        return _defaultOptions;
     }
 
     public static JsonSerializerOptions GetOrBuildDefaultOptions(
         this JsonSerializerOptionsBuilder builder
     )
     {
-        if (JsonSerializerOptionsBuilderExtesions.DefaultOptions.IsNull())
-        {
-            return builder.SetCamelCase().SetEncoderToUnicodeRangeAll().BuildAndSaveToDefault();
-        }
-        else
-        {
-            return JsonSerializerOptionsBuilderExtesions.DefaultOptions;
-        }
+        return _defaultOptions.IsNull()
+            ? builder.SetCamelCase().SetEncoderToUnicodeRangeAll().BuildAndSaveToDefault()
+            : _defaultOptions!;
     }
 }

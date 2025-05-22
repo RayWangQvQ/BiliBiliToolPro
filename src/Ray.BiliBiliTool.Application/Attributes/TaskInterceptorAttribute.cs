@@ -11,12 +11,12 @@ namespace Ray.BiliBiliTool.Application.Attributes;
 /// 任务拦截器
 /// </summary>
 public class TaskInterceptorAttribute(
-    string taskName = null,
+    string? taskName = null,
     TaskLevel taskLevel = TaskLevel.Two,
     bool rethrowWhenException = true
 ) : MoAttribute
 {
-    private readonly ILogger _logger = Global.ServiceProviderRoot.GetRequiredService<
+    private readonly ILogger _logger = Global.ServiceProviderRoot!.GetRequiredService<
         ILogger<TaskInterceptorAttribute>
     >();
 

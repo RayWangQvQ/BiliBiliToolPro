@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace Ray.BiliBiliTool.Infrastructure.Cookie;
+﻿namespace Ray.BiliBiliTool.Infrastructure.Cookie;
 
 public class CookieInfo(Dictionary<string, string> cookieDic)
 {
@@ -57,7 +53,7 @@ public class CookieInfo(Dictionary<string, string> cookieDic)
         MergeCurrentCookie(ConvertCkItemListToCkDic(ckItemList));
     }
 
-    public void MergeCurrentCookie(Dictionary<string, string> ckDic)
+    private void MergeCurrentCookie(Dictionary<string, string> ckDic)
     {
         foreach (var item in ckDic)
         {
@@ -70,17 +66,20 @@ public class CookieInfo(Dictionary<string, string> cookieDic)
     #region convert
 
     /// <summary>
-    /// List<setCkHeader>—>List<ckItem>
+    /// List of setCkHeader —> list of ckItem
     /// </summary>
     /// <param name="setCookieList"></param>
     /// <returns></returns>
-    public static List<string> ConvertSetCkHeadersToCkItemList(IEnumerable<string> setCookieList)
+    private static List<string> ConvertSetCkHeadersToCkItemList(IEnumerable<string> setCookieList)
     {
-        return setCookieList.Select(item => item.Split(';').FirstOrDefault()?.Trim()).ToList();
+        return setCookieList
+            .Select(item => item.Split(';').FirstOrDefault()?.Trim() ?? "")
+            .Where(x => !x.IsNullOrWhiteSpace())
+            .ToList();
     }
 
     /// <summary>
-    /// List<setCkHeader>—>ckStr
+    /// List of setCkHeader —> ckStr
     /// </summary>
     /// <param name="setCookieList"></param>
     /// <returns></returns>
@@ -91,31 +90,31 @@ public class CookieInfo(Dictionary<string, string> cookieDic)
     }
 
     /// <summary>
-    /// ckStr—>List<ckItem>
+    /// ckStr—>List of ckItem
     /// </summary>
     /// <param name="ckStr"></param>
     /// <returns></returns>
-    public static List<string> ConvertCkStrToCkItemList(string ckStr)
+    private static List<string> ConvertCkStrToCkItemList(string ckStr)
     {
         return ckStr.Split(";", StringSplitOptions.TrimEntries).ToList();
     }
 
     /// <summary>
-    /// List<ckItem>—>ckStr
+    /// List of ckItem —> ckStr
     /// </summary>
     /// <param name="ckItemList"></param>
     /// <returns></returns>
-    public static string ConvertCkItemListToCkStr(IEnumerable<string> ckItemList)
+    private static string ConvertCkItemListToCkStr(IEnumerable<string> ckItemList)
     {
         return string.Join("; ", ckItemList);
     }
 
     /// <summary>
-    /// List<ckItem>—>Dictionary<>
+    /// List of ckItem —> Dictionary
     /// </summary>
     /// <param name="ckItemList"></param>
     /// <returns></returns>
-    public static Dictionary<string, string> ConvertCkItemListToCkDic(
+    private static Dictionary<string, string> ConvertCkItemListToCkDic(
         IEnumerable<string> ckItemList
     )
     {

@@ -1,11 +1,8 @@
-﻿using System;
-using System.Net.Http;
-
-namespace Ray.BiliBiliTool.Infrastructure.Helpers;
+﻿namespace Ray.BiliBiliTool.Infrastructure.Helpers;
 
 public class IpHelper
 {
-    public static string GetIp()
+    public static string? GetIp()
     {
         try
         {

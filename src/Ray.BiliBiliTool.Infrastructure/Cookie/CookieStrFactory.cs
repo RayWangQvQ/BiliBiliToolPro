@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
+using Ray.BiliBiliTool.Infrastructure.Extensions;
 
 namespace Ray.BiliBiliTool.Infrastructure.Cookie;
 
@@ -15,20 +13,22 @@ public class CookieStrFactory<TCookieInfo>(IConfiguration configuration)
     public TCookieInfo GetCookie(int index)
     {
         var dic = GetCookieDictionary()[index];
-        return (TCookieInfo)Activator.CreateInstance(typeof(TCookieInfo), dic);
+        return (TCookieInfo)Activator.CreateInstance(typeof(TCookieInfo), dic)!
+            ?? throw new InvalidOperationException();
     }
 
     public static TCookieInfo CreateNew(string cookie)
     {
         Dictionary<string, string> dic = CkStrToDictionary(cookie);
-        return (TCookieInfo)Activator.CreateInstance(typeof(TCookieInfo), dic);
+        return (TCookieInfo)Activator.CreateInstance(typeof(TCookieInfo), dic)!
+            ?? throw new InvalidOperationException();
     }
 
     #region private
 
     private Dictionary<int, Dictionary<string, string>> GetCookieDictionary()
     {
-        var list = configuration.GetSection("BiliBiliCookies").Get<List<string>>();
+        var list = configuration.GetSection("BiliBiliCookies").Get<List<string>>() ?? [];
         return CookeStrListToCookieDic(list);
     }
 

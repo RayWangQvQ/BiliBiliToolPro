@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Ray.BiliBiliTool.Config.Options;
+﻿namespace Ray.BiliBiliTool.Config.Options;
 
 /// <summary>
 /// 程序自定义个性化配置
@@ -46,7 +43,7 @@ public class DailyTaskOptions : IHasCron
     /// <summary>
     /// 优先选择支持的up主Id集合，配置后会优先从指定的up主下挑选视频进行观看、分享和投币，不配置则从排行耪随机获取支持视频
     /// </summary>
-    public string SupportUpIds { get; set; }
+    public string? SupportUpIds { get; set; }
 
     /// <summary>
     /// 每月几号自动充电[-1,31]，-1表示不指定，默认月底最后一天；0表示不充电
@@ -56,9 +53,9 @@ public class DailyTaskOptions : IHasCron
     /// <summary>
     /// 充电Up主Id
     /// </summary>
-    public string AutoChargeUpId { get; set; }
+    public string? AutoChargeUpId { get; set; }
 
-    private string _chargeComment;
+    private string? _chargeComment;
 
     /// <summary>
     /// 充电后留言
@@ -101,24 +98,21 @@ public class DailyTaskOptions : IHasCron
     {
         get
         {
-            List<long> re = new();
+            List<long> re = [];
             if (string.IsNullOrWhiteSpace(SupportUpIds) | SupportUpIds == "-1")
                 return re;
 
-            string[] array = SupportUpIds.Split(',');
+            string[] array = SupportUpIds?.Split(',') ?? [];
             foreach (string item in array)
             {
-                if (long.TryParse(item.Trim(), out long upId))
-                    re.Add(upId);
-                else
-                    re.Add(long.MinValue);
+                re.Add(long.TryParse(item.Trim(), out long upId) ? upId : long.MinValue);
             }
             return re;
         }
     }
 
-    private static List<string> DefaultComments = new List<string>
-    {
+    private static readonly List<string> DefaultComments =
+    [
         "棒",
         "棒唉",
         "棒耶",
@@ -138,7 +132,7 @@ public class DailyTaskOptions : IHasCron
         "(ง •_•)ง",
         ">.<",
         "^_~",
-    };
+    ];
 
-    public string Cron { get; set; }
+    public string? Cron { get; set; }
 }

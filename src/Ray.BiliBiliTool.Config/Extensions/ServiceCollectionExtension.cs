@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Text.Json;
+﻿using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Ray.BiliBiliTool.Config.Options;
@@ -34,7 +33,8 @@ public static class ServiceCollectionExtension
             .Configure<VipPrivilegeOptions>(configuration.GetSection("VipPrivilegeConfig"))
             .Configure<LiveFansMedalTaskOptions>(
                 configuration.GetSection("LiveFansMedalTaskOptions")
-            );
+            )
+            .Configure<QingLongOptions>(configuration.GetSection("QingLongConfig"));
 
         return services;
     }

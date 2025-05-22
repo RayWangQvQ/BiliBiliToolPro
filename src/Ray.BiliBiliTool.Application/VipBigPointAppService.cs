@@ -31,7 +31,6 @@ public class VipBigPointAppService(
 ) : BaseMultiAccountsAppService(logger, cookieFactory), IVipBigPointAppService
 {
     private readonly VipBigPointOptions _vipBigPointOptions = vipBigPointOptions.CurrentValue;
-    private VipTaskInfo _info;
 
     [TaskInterceptor("大会员大积分", TaskLevel.One)]
     protected override async Task DoTaskAccountAsync(
@@ -49,37 +48,38 @@ public class VipBigPointAppService(
         var allTasks = await vipApi.GetTaskListAsync(ck.ToString());
         if (allTasks.Code != 0)
             throw new Exception(allTasks.ToJsonStr());
-        _info = allTasks.Data;
-        _info.LogInfo(logger);
+
+        VipTaskInfo info = allTasks.Data!;
+        info.LogInfo(logger);
 
         await VipExpressAsync(ck);
 
         //签到
-        await Sign(ck);
+        await Sign(info, ck);
 
         //领取
-        await ReceiveTasksAsync(ck);
+        await ReceiveTasksAsync(info, ck);
 
         //福利任务
-        await Bonus(ck);
+        await Bonus(info, ck);
 
         //体验任务
-        await Privilege(ck);
+        await Privilege(info, ck);
 
         //日常任务
         //浏览追番频道页10秒
-        await ViewAnimate(ck);
+        await ViewAnimate(info, ck);
 
         //浏览会员购页面10秒
-        await ViewVipMall(ck);
+        await ViewVipMall(info, ck);
 
         //浏览装扮商城
-        await ViewDressMall(ck);
+        await ViewDressMall(info, ck);
 
         //观看剧集内容
-        await OgvWatchAsync(ck);
+        await OgvWatchAsync(info, ck);
 
-        _info.LogInfo(logger);
+        info.LogInfo(logger);
     }
 
     [TaskInterceptor("测试Cookie")]
@@ -101,7 +101,7 @@ public class VipBigPointAppService(
         var re = await vipApi.GetVouchersInfoAsync(ck.ToString());
         if (re.Code == 0)
         {
-            var state = re.Data.List.Find(x => x.Type == 9).State;
+            var state = re.Data!.List.Find(x => x.Type == 9)?.State;
 
             switch (state)
             {
@@ -145,16 +145,16 @@ public class VipBigPointAppService(
     }
 
     [TaskInterceptor("签到", TaskLevel.Two, false)]
-    private async Task Sign(BiliCookie ck)
+    private async Task Sign(VipTaskInfo info, BiliCookie ck)
     {
-        if (_info.Task_info.Sing_task_item.IsTodaySigned)
+        if (info.Task_info.Sing_task_item.IsTodaySigned)
         {
             logger.LogInformation("已完成，跳过");
             logger.LogInformation(
                 "今日获得签到积分：{score}",
-                _info.Task_info.Sing_task_item.TodayHistory?.Score
+                info.Task_info.Sing_task_item.TodayHistory?.Score
             );
-            logger.LogInformation("累计签到{count}天", _info.Task_info.Sing_task_item.Count);
+            logger.LogInformation("累计签到{count}天", info.Task_info.Sing_task_item.Count);
             return;
         }
 
@@ -166,24 +166,24 @@ public class VipBigPointAppService(
         var infoResult = await vipApi.GetTaskListAsync(ck.ToString());
         if (infoResult.Code != 0)
             throw new Exception(infoResult.ToJsonStr());
-        _info = infoResult.Data;
+        info = infoResult.Data!;
 
         logger.LogInformation(
             "今日可获得签到积分：{score}",
-            _info.Task_info.Sing_task_item.TodayHistory?.Score
+            info.Task_info.Sing_task_item.TodayHistory?.Score
         );
         logger.LogInformation(
-            _info.Task_info.Sing_task_item.IsTodaySigned ? "签到成功" : "签到失败"
+            info.Task_info.Sing_task_item.IsTodaySigned ? "签到成功" : "签到失败"
         );
-        logger.LogInformation("累计签到{count}天", _info.Task_info.Sing_task_item.Count);
+        logger.LogInformation("累计签到{count}天", info.Task_info.Sing_task_item.Count);
     }
 
     [TaskInterceptor("领取任务", TaskLevel.Two, false)]
-    private async Task ReceiveTasksAsync(BiliCookie ck)
+    private async Task ReceiveTasksAsync(VipTaskInfo info, BiliCookie ck)
     {
         const string moduleCode = "日常任务";
 
-        var module = _info.Task_info.Modules.FirstOrDefault(x => x.module_title == moduleCode);
+        var module = info.Task_info.Modules.FirstOrDefault(x => x.module_title == moduleCode);
         var needReceiveTasks = module?.common_task_item.Where(x => x.state == 0).ToList();
         if (needReceiveTasks == null || !needReceiveTasks.Any())
         {
@@ -199,12 +199,12 @@ public class VipBigPointAppService(
     }
 
     [TaskInterceptor("福利任务", TaskLevel.Two, false)]
-    private async Task Bonus(BiliCookie ck)
+    private async Task Bonus(VipTaskInfo info, BiliCookie ck)
     {
         const string moduleCode = "福利任务";
         const string taskCode = "bonus";
 
-        var bonusTask = GetTarget(_info, moduleCode, taskCode);
+        var bonusTask = GetTarget(info, moduleCode, taskCode);
 
         if (bonusTask == null)
         {
@@ -235,8 +235,8 @@ public class VipBigPointAppService(
             var infoResult = await vipApi.GetTaskListAsync(ck.ToString());
             if (infoResult.Code != 0)
                 throw new Exception(infoResult.ToJsonStr());
-            _info = infoResult.Data;
-            bonusTask = GetTarget(_info, moduleCode, taskCode);
+            info = infoResult.Data!;
+            bonusTask = GetTarget(info, moduleCode, taskCode);
 
             logger.LogInformation(
                 "确认：{re}",
@@ -246,12 +246,12 @@ public class VipBigPointAppService(
     }
 
     [TaskInterceptor("体验任务", TaskLevel.Two, false)]
-    private async Task Privilege(BiliCookie ck)
+    private async Task Privilege(VipTaskInfo info, BiliCookie ck)
     {
         const string moduleCode = "体验任务";
         const string taskCode = "privilege";
 
-        var privilegeTask = GetTarget(_info, moduleCode, taskCode);
+        var privilegeTask = GetTarget(info, moduleCode, taskCode);
 
         if (privilegeTask == null)
         {
@@ -282,8 +282,8 @@ public class VipBigPointAppService(
             var infoResult = await vipApi.GetTaskListAsync(ck.ToString());
             if (infoResult.Code != 0)
                 throw new Exception(infoResult.ToJsonStr());
-            _info = infoResult.Data;
-            privilegeTask = GetTarget(_info, moduleCode, taskCode);
+            info = infoResult.Data;
+            privilegeTask = GetTarget(info, moduleCode, taskCode);
 
             logger.LogInformation(
                 "确认：{re}",
@@ -293,14 +293,14 @@ public class VipBigPointAppService(
     }
 
     [TaskInterceptor("浏览追番频道页10秒", TaskLevel.Two, false)]
-    private async Task ViewAnimate(BiliCookie ck)
+    private async Task ViewAnimate(VipTaskInfo info, BiliCookie ck)
     {
         const string moduleCode = "日常任务";
         const string taskCode = "animatetab";
 
         var code = "jp_channel";
 
-        CommonTaskItem targetTask = GetTarget(_info, moduleCode, taskCode);
+        CommonTaskItem targetTask = GetTarget(info, moduleCode, taskCode);
 
         if (targetTask == null)
         {
@@ -331,8 +331,8 @@ public class VipBigPointAppService(
             var infoResult = await vipApi.GetTaskListAsync(ck.ToString());
             if (infoResult.Code != 0)
                 throw new Exception(infoResult.ToJsonStr());
-            _info = infoResult.Data;
-            targetTask = GetTarget(_info, moduleCode, taskCode);
+            info = infoResult.Data;
+            targetTask = GetTarget(info, moduleCode, taskCode);
 
             logger.LogInformation(
                 "确认：{re}",
@@ -342,12 +342,12 @@ public class VipBigPointAppService(
     }
 
     [TaskInterceptor("浏览会员购页面10秒", TaskLevel.Two, false)]
-    private async Task ViewVipMall(BiliCookie ck)
+    private async Task ViewVipMall(VipTaskInfo info, BiliCookie ck)
     {
         const string moduleCode = "日常任务";
         const string taskCode = "vipmallview";
 
-        CommonTaskItem targetTask = GetTarget(_info, moduleCode, taskCode);
+        CommonTaskItem targetTask = GetTarget(info, moduleCode, taskCode);
 
         if (targetTask == null)
         {
@@ -383,8 +383,8 @@ public class VipBigPointAppService(
             var infoResult = await vipApi.GetTaskListAsync(ck.ToString());
             if (infoResult.Code != 0)
                 throw new Exception(infoResult.ToJsonStr());
-            _info = infoResult.Data;
-            targetTask = GetTarget(_info, moduleCode, taskCode);
+            info = infoResult.Data;
+            targetTask = GetTarget(info, moduleCode, taskCode);
 
             logger.LogInformation(
                 "确认：{re}",
@@ -394,12 +394,12 @@ public class VipBigPointAppService(
     }
 
     [TaskInterceptor("浏览装扮商城主页", TaskLevel.Two, false)]
-    private async Task ViewDressMall(BiliCookie ck)
+    private async Task ViewDressMall(VipTaskInfo info, BiliCookie ck)
     {
         const string moduleCode = "日常任务";
         const string taskCode = "dress-view";
 
-        CommonTaskItem targetTask = GetTarget(_info, moduleCode, taskCode);
+        CommonTaskItem targetTask = GetTarget(info, moduleCode, taskCode);
 
         if (targetTask == null)
         {
@@ -430,8 +430,8 @@ public class VipBigPointAppService(
             var infoResult = await vipApi.GetTaskListAsync(ck.ToString());
             if (infoResult.Code != 0)
                 throw new Exception(infoResult.ToJsonStr());
-            _info = infoResult.Data;
-            targetTask = GetTarget(_info, moduleCode, taskCode);
+            info = infoResult.Data;
+            targetTask = GetTarget(info, moduleCode, taskCode);
 
             logger.LogInformation(
                 "确认：{re}",
@@ -441,12 +441,12 @@ public class VipBigPointAppService(
     }
 
     [TaskInterceptor("观看剧集", TaskLevel.Two, false)]
-    private async Task OgvWatchAsync(BiliCookie ck)
+    private async Task OgvWatchAsync(VipTaskInfo info, BiliCookie ck)
     {
         const string moduleCode = "日常任务";
         const string taskCode = "ogvwatchnew";
 
-        CommonTaskItem targetTask = GetTarget(_info, moduleCode, taskCode);
+        var targetTask = GetTarget(info, moduleCode, taskCode);
 
         if (targetTask == null)
         {
@@ -473,7 +473,7 @@ public class VipBigPointAppService(
 
     #region private
 
-    private static CommonTaskItem GetTarget(VipTaskInfo info, string moduleCode, string taskCode)
+    private static CommonTaskItem? GetTarget(VipTaskInfo info, string moduleCode, string taskCode)
     {
         var module = info.Task_info.Modules.FirstOrDefault(x => x.module_title == moduleCode);
         return module?.common_task_item.FirstOrDefault(x => x.task_code == taskCode);
@@ -484,7 +484,7 @@ public class VipBigPointAppService(
     /// </summary>
     private async Task TryReceive(string taskCode, BiliCookie ck)
     {
-        BiliApiResponse re = null;
+        BiliApiResponse? re = null;
         try
         {
             var request = new ReceiveOrCompleteTaskRequest(taskCode);
@@ -554,10 +554,7 @@ public class VipBigPointAppService(
 
     private async Task<bool> WatchBangumi(BiliCookie ck)
     {
-        if (
-            _vipBigPointOptions.ViewBangumiList == null
-            || _vipBigPointOptions.ViewBangumiList.Count == 0
-        )
+        if (_vipBigPointOptions.ViewBangumiList.Count == 0)
             return false;
 
         long randomSsid = _vipBigPointOptions.ViewBangumiList[
