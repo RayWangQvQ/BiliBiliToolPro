@@ -1,23 +1,14 @@
-## 3.0.10
-- Feature: 临时取消null warning
-## 3.0.9
-- Feature: 开启Nullable特性，在编译阶段检查潜在的 NullReferenceException 问题
-## 3.0.8
-- Feature[#842]: 新增新版青龙添加鉴权的说明文档
-## 3.0.7
+## 3.1.0
+- Feature[#842]: 对接青龙新的 OpenAPI，实现青龙版 Bili 登录后自动存储 Cookie
 - Feature[#842]: 兼容老版本青龙的文件鉴权方式
-## 3.0.6
-- Feature[#842]: 对接青龙新的OpenAPI，实现青龙版Bili登录后自动存储Cookie
-## 3.0.5
-- Fix: Bruno 脚本错误
-## 3.0.4
-- Fix: 尝试修复发布包时 CICD 丢失 change log 问题
-## 3.0.3
-- Fix[#879]: 移除文档内过期的加速器地址
-## 3.0.2
-- Fix[#863]: 修复青龙尝试修复异常任务
-## 3.0.1
+- Feature[#842]: 新增新版青龙添加鉴权的说明文档
 - Feature[#820]: 更新文档解决配置文件边缘场景下的刷新问题
+- Fix[#863]: 修复青龙尝试修复异常任务
+- Fix[#879]: 移除文档内过期的加速器地址
+- Feature: 开启 Nullable 特性，在编译阶段检查潜在的 NullReferenceException 问题
+- Feature: 临时取消 Null warning
+- Fix: Bruno 脚本错误
+- Fix: 尝试修复发布包时 CI/CD 丢失 change log 问题
 ## 3.0.0
 - Feature[#884]: 上线 bili_tool_web
 - Fix[#875]: 青龙检测 dotnet 版本只需要大于等于 8.0
