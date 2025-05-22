@@ -59,7 +59,7 @@ public class BiliDbContext(IConfiguration config) : DbContext
         modelBuilder.Entity<BiliLogs>(entity =>
         {
             entity
-                .Property<string>(x => x.FireInstanceIdComputed) // 定义一个影子属性
+                .Property<string?>(x => x.FireInstanceIdComputed) // 定义一个影子属性
                 .HasComputedColumnSql(
                     "json_extract(Properties, '$.FireInstanceId')",
                     stored: false
