@@ -1,28 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Article;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
-using Ray.BiliBiliTool.Agent.BiliBiliAgent.Services;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Interfaces;
-using Ray.BiliBiliTool.Infrastructure.Cookie;
 
 namespace Ray.BiliBiliTool.DomainService;
 
 public class ArticleDomainService(
     IArticleApi articleApi,
-    CookieStrFactory<BiliCookie> cookieFactory,
     ILogger<ArticleDomainService> logger,
     IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
     ICoinDomainService coinDomainService,
-    IAccountApi accountApi,
-    IWbiService wbiService
+    IAccountApi accountApi
 ) : IArticleDomainService
 {
     private readonly DailyTaskOptions _dailyTaskOptions = dailyTaskOptions.CurrentValue;
