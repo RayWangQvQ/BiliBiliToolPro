@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 
 namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.VipTask;
 
 public class VipTaskInfo
 {
-    public TaskInfo Task_info { get; set; }
+    public required TaskInfo Task_info { get; set; }
 
     public void LogInfo(ILogger logger)
     {
@@ -37,9 +34,9 @@ public class TaskInfo
 
     public int Score_limit { get; set; }
 
-    public List<ModuleItem> Modules { get; set; }
+    public List<ModuleItem> Modules { get; set; } = [];
 
-    public SingTaskItem Sing_task_item { get; set; }
+    public required SingTaskItem Sing_task_item { get; set; }
 }
 
 public class SingTaskItem
@@ -48,29 +45,29 @@ public class SingTaskItem
 
     public int Base_score { get; set; }
 
-    public List<Histtory> Histories { get; set; } = new List<Histtory>();
+    public List<Histtory> Histories { get; set; } = [];
 
-    public Histtory TodayHistory => Histories.FirstOrDefault(x => x.Is_today);
+    public Histtory? TodayHistory => Histories.FirstOrDefault(x => x.Is_today);
 
     public bool IsTodaySigned => TodayHistory?.Signed == true;
 }
 
 public class ModuleItem
 {
-    public string module_title { get; set; }
+    public required string module_title { get; set; }
 
-    public List<CommonTaskItem> common_task_item { get; set; }
+    public List<CommonTaskItem> common_task_item { get; set; } = [];
 }
 
 public class CommonTaskItem
 {
-    public string title { get; set; }
+    public required string title { get; set; }
 
-    public string subtitle { get; set; }
+    public string? subtitle { get; set; }
 
-    public string explain { get; set; }
+    public string? explain { get; set; }
 
-    public string task_code { get; set; }
+    public required string task_code { get; set; }
 
     public int state { get; set; }
 

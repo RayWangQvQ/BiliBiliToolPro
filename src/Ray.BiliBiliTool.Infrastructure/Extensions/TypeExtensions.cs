@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel;
-using System.Linq;
 
-namespace System;
+namespace Ray.BiliBiliTool.Infrastructure.Extensions;
 
 public static class TypeExtensions
 {
@@ -13,12 +12,11 @@ public static class TypeExtensions
     /// <returns></returns>
     public static string GetPropertyDescription(this Type type, string propertyName)
     {
-        DescriptionAttribute desc = (DescriptionAttribute)
-            type
-                ?.GetProperty(propertyName)
+        var desc = (DescriptionAttribute?)
+            type.GetProperty(propertyName)
                 ?.GetCustomAttributes(typeof(DescriptionAttribute), false)
                 .FirstOrDefault();
 
-        return desc?.Description;
+        return desc?.Description ?? "";
     }
 }

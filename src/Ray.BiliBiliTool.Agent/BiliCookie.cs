@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using Ray.BiliBiliTool.Infrastructure.Cookie;
+using Ray.BiliBiliTool.Infrastructure.Extensions;
 
 namespace Ray.BiliBiliTool.Agent;
 
@@ -23,7 +22,7 @@ public class BiliCookie(Dictionary<string, string> cookieDic) : CookieInfo(cooki
 
     [Description("DedeUserID")]
     public string UserId =>
-        CookieItemDictionary.TryGetValue(GetPropertyDescription(nameof(UserId)), out string userId)
+        CookieItemDictionary.TryGetValue(GetPropertyDescription(nameof(UserId)), out string? userId)
             ? userId
             : "";
 
@@ -32,13 +31,13 @@ public class BiliCookie(Dictionary<string, string> cookieDic) : CookieInfo(cooki
     /// </summary>
     [Description("SESSDATA")]
     public string SessData =>
-        CookieItemDictionary.TryGetValue(GetPropertyDescription(nameof(SessData)), out string sess)
+        CookieItemDictionary.TryGetValue(GetPropertyDescription(nameof(SessData)), out string? sess)
             ? sess
             : "";
 
     [Description("bili_jct")]
     public string BiliJct =>
-        CookieItemDictionary.TryGetValue(GetPropertyDescription(nameof(BiliJct)), out string jct)
+        CookieItemDictionary.TryGetValue(GetPropertyDescription(nameof(BiliJct)), out string? jct)
             ? jct
             : "";
 
@@ -46,14 +45,14 @@ public class BiliCookie(Dictionary<string, string> cookieDic) : CookieInfo(cooki
     public string LiveBuvid =>
         CookieItemDictionary.TryGetValue(
             GetPropertyDescription(nameof(LiveBuvid)),
-            out string liveBuvid
+            out string? liveBuvid
         )
             ? liveBuvid
             : "";
 
     [Description("buvid3")]
     public string Buvid =>
-        CookieItemDictionary.TryGetValue(GetPropertyDescription(nameof(Buvid)), out string buvid)
+        CookieItemDictionary.TryGetValue(GetPropertyDescription(nameof(Buvid)), out string? buvid)
             ? buvid
             : "";
 

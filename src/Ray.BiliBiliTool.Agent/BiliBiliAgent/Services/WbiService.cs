@@ -210,12 +210,12 @@ public class WridDto : IWrid
 {
     public long wts { get; set; }
 
-    public string w_rid { get; set; }
+    public string? w_rid { get; set; }
 }
 
 public interface IWrid
 {
     public long wts { get; set; }
 
-    public string w_rid { get; set; }
+    public string? w_rid { get; set; }
 }

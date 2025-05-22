@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace Ray.BiliBiliTool.Infrastructure.Helpers;

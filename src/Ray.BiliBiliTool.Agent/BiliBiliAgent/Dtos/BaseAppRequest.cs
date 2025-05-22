@@ -26,5 +26,5 @@ public class BaseAppRequest
 
     // public long ts { get; set; }
 
-    public string sign { get; set; }
+    public string? sign { get; set; }
 }

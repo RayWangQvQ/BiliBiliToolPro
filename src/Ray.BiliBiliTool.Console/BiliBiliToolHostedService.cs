@@ -1,8 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -87,8 +83,8 @@ public class BiliBiliToolHostedService(
     private async Task RandomSleepAsync(CancellationToken cancellationToken)
     {
         if (
-            configuration["RunTasks"].Contains("Login")
-            || configuration["RunTasks"].Contains("Test")
+            configuration["RunTasks"]!.Contains("Login")
+            || configuration["RunTasks"]!.Contains("Test")
         )
             return;
 
@@ -107,8 +103,10 @@ public class BiliBiliToolHostedService(
     /// <returns></returns>
     private Task<string[]> ReadTargetTasksAsync(CancellationToken cancellationToken)
     {
-        string[] tasks = configuration["RunTasks"]
-            .Split("&", options: StringSplitOptions.RemoveEmptyEntries);
+        string[] tasks = configuration["RunTasks"]!.Split(
+            "&",
+            options: StringSplitOptions.RemoveEmptyEntries
+        );
         if (tasks.Any())
         {
             return Task.FromResult(tasks);
@@ -120,7 +118,7 @@ public class BiliBiliToolHostedService(
 
         while (true)
         {
-            string index = System.Console.ReadLine();
+            var index = System.Console.ReadLine();
             bool suc = int.TryParse(index, out int num);
             if (suc)
             {
@@ -138,15 +136,10 @@ public class BiliBiliToolHostedService(
         using IServiceScope scope = serviceProvider.CreateScope();
         foreach (string task in tasks)
         {
-            Type type = TaskTypeFactory.Get(task);
-            if (type == null)
-            {
-                logger.LogWarning("任务不存在：{task}", task);
-                continue;
-            }
+            var type = TaskTypeFactory.Get(task);
 
             IAppService appService = (IAppService)scope.ServiceProvider.GetRequiredService(type);
-            await appService?.DoTaskAsync(cancellationToken);
+            await appService.DoTaskAsync(cancellationToken);
         }
     }
 

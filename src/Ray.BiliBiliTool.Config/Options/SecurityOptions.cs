@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
-
-namespace Ray.BiliBiliTool.Config.Options;
+﻿namespace Ray.BiliBiliTool.Config.Options;
 
 /// <summary>
 /// 安全相关配置
@@ -69,5 +65,5 @@ public class SecurityOptions
     /// <summary>
     /// 代理
     /// </summary>
-    public string WebProxy { get; set; }
+    public string? WebProxy { get; set; }
 }
