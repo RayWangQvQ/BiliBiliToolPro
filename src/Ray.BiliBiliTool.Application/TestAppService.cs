@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Application.Attributes;
@@ -12,7 +11,6 @@ using Ray.BiliBiliTool.Infrastructure.Cookie;
 namespace Ray.BiliBiliTool.Application;
 
 public class TestAppService(
-    IConfiguration configuration,
     ILogger<TestAppService> logger,
     IAccountDomainService accountDomainService,
     CookieStrFactory<BiliCookie> cookieStrFactory
