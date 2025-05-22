@@ -1,3 +1,5 @@
+## 3.0.10
+- Feature: 临时取消null warning
 ## 3.0.9
 - Feature: 开启Nullable特性，在编译阶段检查潜在的 NullReferenceException 问题
 ## 3.0.8
