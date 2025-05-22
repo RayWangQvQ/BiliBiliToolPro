@@ -1,3 +1,5 @@
+## 3.0.9
+- Feature: 开启Nullable特性，在编译阶段检查潜在的 NullReferenceException 问题
 ## 3.0.8
 - Feature[#842]: 新增新版青龙添加鉴权的说明文档
 ## 3.0.7

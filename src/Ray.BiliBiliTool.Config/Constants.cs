@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Ray.BiliBiliTool.Config;
+﻿namespace Ray.BiliBiliTool.Config;
 
 public static class Constants
 {
@@ -18,6 +16,8 @@ public static class Constants
     /// 开源地址
     /// </summary>
     public static string SourceCodeUrl = "https://github.com/RayWangQvQ/BiliBiliToolPro";
+
+    public static string FallbackAutoChargeUpId = "341688380";
 
     /// <summary>
     /// 每日任务exp

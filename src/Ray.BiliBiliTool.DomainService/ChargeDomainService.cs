@@ -68,15 +68,12 @@ public class ChargeDomainService(
             return;
         }
 
-        string targetUpId = _dailyTaskOptions.AutoChargeUpId;
-        //如果没有配置或配了-1，则为自己充电
-        if (
-            _dailyTaskOptions.AutoChargeUpId.IsNullOrEmpty()
-            | _dailyTaskOptions.AutoChargeUpId == "-1"
-        )
-        {
-            targetUpId = ck.UserId;
-        }
+        //如果没有配置或配了-1，则使用fallback值（B站最新策略已不允许为自己充电）
+        string targetUpId =
+            _dailyTaskOptions.AutoChargeUpId.IsNullOrWhiteSpace()
+            || _dailyTaskOptions.AutoChargeUpId == "-1"
+                ? Config.Constants.FallbackAutoChargeUpId
+                : _dailyTaskOptions.AutoChargeUpId!;
 
         logger.LogDebug("【目标Up】{up}", targetUpId);
 

@@ -4,7 +4,7 @@ public class ChargeResponse
 {
     public int Status { get; set; }
 
-    public string Order_no { get; set; }
+    public required string Order_no { get; set; }
 }
 
 public class ChargeV2Response

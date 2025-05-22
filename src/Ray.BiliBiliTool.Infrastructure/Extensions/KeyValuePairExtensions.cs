@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace System.Collections;
+﻿namespace Ray.BiliBiliTool.Infrastructure.Extensions;
 
 public static class KeyValuePairExtensions
 {

@@ -44,5 +44,5 @@ public class LiveFansMedalTaskOptions : IHasCron
     /// </summary>
     public int SendDanmakugiveUpThreshold { get; set; } = 3;
 
-    public string Cron { get; set; }
+    public string? Cron { get; set; }
 }

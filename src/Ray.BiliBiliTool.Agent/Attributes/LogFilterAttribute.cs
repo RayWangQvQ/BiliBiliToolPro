@@ -1,6 +1,4 @@
-﻿using System;
-using System.Reflection;
-using System.Threading.Tasks;
+﻿using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using WebApiClientCore;
@@ -18,13 +16,13 @@ public class LogFilterAttribute(bool logError = true) : LoggingFilterAttribute
             return Task.CompletedTask;
         }
 
-        MethodInfo member = context.ApiAction.Member;
-        var strArray = new string[5];
-        Type declaringType1 = member.DeclaringType;
-        strArray[0] = (object)declaringType1 != null ? declaringType1.Namespace : null;
+        MethodInfo member = context.ActionDescriptor.Member;
+        var strArray = new string?[5];
+        var declaringType1 = member.DeclaringType;
+        strArray[0] = declaringType1?.Namespace;
         strArray[1] = ".";
-        Type declaringType2 = member.DeclaringType;
-        strArray[2] = (object)declaringType2 != null ? declaringType2.Name : null;
+        var declaringType2 = member.DeclaringType;
+        strArray[2] = declaringType2?.Name;
         strArray[3] = ".";
         strArray[4] = member.Name;
         string categoryName = string.Concat(strArray);

@@ -1,7 +1,5 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Net.Http.Headers;
-using System.Threading.Tasks;
 using WebApiClientCore;
 using WebApiClientCore.Attributes;
 
@@ -14,19 +12,19 @@ namespace Ray.BiliBiliTool.Agent.Attributes;
 )]
 public class AppendHeaderAttribute(
     string name,
-    string value,
+    string? value,
     AppendHeaderType appendHeaderType = AppendHeaderType.AddOrReplace
 ) : ApiActionAttribute, IApiParameterAttribute
 {
     //添加的顺序为：子类、基类、子类函数、子类函数入参
 
-    private readonly string _aliasName;
+    private readonly string? _aliasName;
 
     public AppendHeaderAttribute(
         string aliasName,
         AppendHeaderType appendHeaderType = AppendHeaderType.AddOrReplace
     )
-        : this(null, null, appendHeaderType)
+        : this("", null, appendHeaderType)
     {
         _aliasName = aliasName;
     }
@@ -39,13 +37,13 @@ public class AppendHeaderAttribute(
 
     public Task OnRequestAsync(ApiParameterContext context)
     {
-        string parameterName = _aliasName;
+        var parameterName = _aliasName;
         if (string.IsNullOrEmpty(parameterName))
         {
             parameterName = context.ParameterName;
         }
 
-        string text = context.ParameterValue?.ToString();
+        var text = context.ParameterValue?.ToString();
         if (!string.IsNullOrEmpty(text))
         {
             AddByAppendType(context.HttpContext.RequestMessage.Headers, parameterName, text);
@@ -54,7 +52,7 @@ public class AppendHeaderAttribute(
         return Task.CompletedTask;
     }
 
-    private void AddByAppendType(HttpRequestHeaders headers, string key, string value)
+    private void AddByAppendType(HttpRequestHeaders headers, string key, string? value)
     {
         switch (appendHeaderType)
         {

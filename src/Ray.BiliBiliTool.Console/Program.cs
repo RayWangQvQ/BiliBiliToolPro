@@ -1,6 +1,4 @@
-﻿using System;
-using System.Reflection;
-using System.Threading.Tasks;
+﻿using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -71,7 +69,6 @@ public class Program
         hostBuilder.ConfigureAppConfiguration(
             (hostBuilderContext, configurationBuilder) =>
             {
-                Global.HostingEnvironment = hostBuilderContext.HostingEnvironment;
                 IHostEnvironment env = hostBuilderContext.HostingEnvironment;
 
                 //json文件：
@@ -93,8 +90,8 @@ public class Program
                 }
 
                 //环境变量：
-                configurationBuilder.AddExcludeEmptyEnvironmentVariables("QL_", false);
-                configurationBuilder.AddExcludeEmptyEnvironmentVariables("Ray_");
+                configurationBuilder.AddEnvironmentVariables("Ray_");
+                configurationBuilder.AddEnvironmentVariables();
 
                 //命令行：
                 if (args is { Length: > 0 })
@@ -119,8 +116,6 @@ public class Program
         hostBuilder.ConfigureServices(
             (hostContext, services) =>
             {
-                Global.ConfigurationRoot = (IConfigurationRoot)hostContext.Configuration;
-
                 services.AddHostedService<BiliBiliToolHostedService>();
 
                 services.AddBiliBiliConfigs(hostContext.Configuration);

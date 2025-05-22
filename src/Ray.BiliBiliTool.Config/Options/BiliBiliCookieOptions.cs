@@ -5,5 +5,5 @@
 /// </summary>
 public class BiliBiliCookieOptions
 {
-    public string CookieStr { get; set; }
+    public string? CookieStr { get; set; }
 }
