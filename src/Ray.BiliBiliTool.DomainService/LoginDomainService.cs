@@ -32,7 +32,6 @@ public class LoginDomainService(
     IPassportApi passportApi,
     IHostEnvironment hostingEnvironment,
     IQingLongApi qingLongApi,
-    IQingLongOldApi qingLongOldApi,
     IHomeApi homeApi,
     IConfiguration configuration,
     IOptions<QingLongOptions> qingLongOptions
@@ -238,15 +237,13 @@ public class LoginDomainService(
     {
         try
         {
-            var (token, isNewQingLong) = await GetQingLongAuthTokenAsync();
+            var token = await GetQingLongAuthTokenAsync();
             if (token.IsNullOrEmpty())
             {
                 throw new Exception("获取青龙token失败");
             }
 
-            var qlEnvList = isNewQingLong
-                ? await qingLongApi.GetEnvsAsync("Ray_BiliBiliCookies__", token)
-                : await qingLongOldApi.GetEnvsAsync("Ray_BiliBiliCookies__", token);
+            var qlEnvList = await qingLongApi.GetEnvsAsync("Ray_BiliBiliCookies__", token);
             if (qlEnvList.Code != 200)
             {
                 throw new Exception($"查询环境变量失败：{qlEnvList.ToJsonStr()}");
@@ -274,9 +271,7 @@ public class LoginDomainService(
                         : oldEnv.remarks,
                 };
 
-                var updateRe = isNewQingLong
-                    ? await qingLongApi.UpdateEnvsAsync(update, token)
-                    : await qingLongOldApi.UpdateEnvsAsync(update, token);
+                var updateRe = await qingLongApi.UpdateEnvsAsync(update, token);
                 logger.LogInformation(updateRe.Code == 200 ? "更新成功！" : updateRe.ToJsonStr());
 
                 return true;
@@ -304,9 +299,7 @@ public class LoginDomainService(
                 value = ckInfo.CookieStr,
                 remarks = $"bili-{ckInfo.UserId}",
             };
-            var addRe = isNewQingLong
-                ? await qingLongApi.AddEnvsAsync([add], token)
-                : await qingLongOldApi.AddEnvsAsync([add], token);
+            var addRe = await qingLongApi.AddEnvsAsync([add], token);
             logger.LogInformation(addRe.Code == 200 ? "新增成功！" : addRe.ToJsonStr());
             return true;
         }
@@ -426,39 +419,9 @@ public class LoginDomainService(
 
     #region qinglong
 
-    private async Task<(string, bool)> GetQingLongAuthTokenAsync()
+    private async Task<string> GetQingLongAuthTokenAsync()
     {
-        var token = "";
-
-        var qlDir = configuration["QL_DIR"] ?? "/ql";
-        string authFile = qlDir;
-        if (hostingEnvironment.ContentRootPath.Contains($"{qlDir}/data/"))
-        {
-            authFile = Path.Combine(authFile, "data");
-        }
-        authFile = Path.Combine(authFile, "config/auth.json");
-
-        if (File.Exists(authFile))
-        {
-            token = await GetTokenFromFileAsync(authFile);
-            return (token, false);
-        }
-
-        token = await GetTokenFromOpenApiAsync();
-        return (token, true);
-    }
-
-    private async Task<string> GetTokenFromFileAsync(string authFile)
-    {
-        logger.LogWarning("老版本青龙，使用auth文件鉴权：{authFile}", authFile);
-        var authJson = await File.ReadAllTextAsync(authFile);
-        var jb = JsonConvert.DeserializeObject<JObject>(authJson);
-        return $"Bearer {jb["token"]}";
-    }
-
-    private async Task<string> GetTokenFromOpenApiAsync()
-    {
-        logger.LogWarning("新版青龙，使用OpenAPI鉴权");
+        logger.LogWarning("使用OpenAPI鉴权");
         if (
             qingLongOptions.Value.ClientId.IsNullOrWhiteSpace()
             || qingLongOptions.Value.ClientSecret.IsNullOrWhiteSpace()

@@ -103,24 +103,6 @@ public static class ServiceCollectionExtension
                 }
             )
             .AddPolicyHandler(GetRetryPolicy());
-        services
-            .AddHttpApi<IQingLongOldApi>(o =>
-            {
-                o.HttpHost = new Uri(qinglongHost);
-                o.UseDefaultUserAgent = false;
-            })
-            .ConfigureHttpClient(
-                (sp, c) =>
-                {
-                    c.DefaultRequestHeaders.Add(
-                        "User-Agent",
-                        sp.GetRequiredService<
-                            IOptionsMonitor<SecurityOptions>
-                        >().CurrentValue.UserAgent
-                    );
-                }
-            )
-            .AddPolicyHandler(GetRetryPolicy());
 
         return services;
     }

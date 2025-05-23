@@ -1,3 +1,5 @@
+## 3.1.1
+- Feature: 鉴权不再兼容老版本青龙（老版本需要手动添加bili cookie）
 ## 3.1.0
 - Feature[#842]: 对接青龙新的 OpenAPI，实现青龙版 Bili 登录后自动存储 Cookie
 - Feature[#842]: 兼容老版本青龙的文件鉴权方式
