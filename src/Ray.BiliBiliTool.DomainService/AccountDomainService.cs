@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
@@ -10,7 +6,6 @@ using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Relation;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Interfaces;
-using Ray.BiliBiliTool.Infrastructure.Cookie;
 
 namespace Ray.BiliBiliTool.DomainService;
 
@@ -23,8 +18,7 @@ public class AccountDomainService(
     IUserInfoApi userInfoApi,
     IRelationApi relationApi,
     IOptionsMonitor<UnfollowBatchedTaskOptions> unfollowBatchedTaskOptions,
-    IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
-    CookieStrFactory<BiliCookie> cookieFactory
+    IOptionsMonitor<DailyTaskOptions> dailyTaskOptions
 ) : IAccountDomainService
 {
     private readonly UnfollowBatchedTaskOptions _unfollowBatchedTaskOptions =

@@ -1,13 +1,10 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Interfaces;
-using Ray.BiliBiliTool.Infrastructure.Cookie;
 
 namespace Ray.BiliBiliTool.DomainService;
 
@@ -18,7 +15,6 @@ public class ChargeDomainService(
     ILogger<ChargeDomainService> logger,
     IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
     IDailyTaskApi dailyTaskApi,
-    CookieStrFactory<BiliCookie> cookieFactory,
     IChargeApi chargeApi
 ) : IChargeDomainService
 {

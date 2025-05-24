@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Utils;
 
 namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live;
@@ -46,9 +45,9 @@ public class HeartBeatRequest
             ts = timestamp,
         };
         string jsonString = JsonConvert.SerializeObject(json);
-        this.S = LiveHeartBeatCrypto.Sypder(jsonString, secretRule, secretKey);
+        S = LiveHeartBeatCrypto.Sypder(jsonString, secretRule, secretKey);
 
-        this.Visit_id = "";
+        Visit_id = "";
     }
 
     public string S { get; set; }

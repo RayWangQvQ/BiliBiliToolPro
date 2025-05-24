@@ -9,7 +9,6 @@ using MudBlazor;
 using Quartz;
 using Ray.BiliBiliTool.Domain;
 using Ray.BiliBiliTool.Web.Client;
-using Ray.BiliBiliTool.Web.Components.Comps;
 using Ray.BiliBiliTool.Web.Extensions;
 
 namespace Ray.BiliBiliTool.Web.Components.Pages.Schedules;
@@ -57,12 +56,6 @@ public partial class Schedules : ComponentBase, IDisposable
 
     public void Dispose() => UnRegisterEventListeners();
 
-    internal bool IsEditActionDisabled(ScheduleModel model) =>
-        model.JobStatus == JobStatus.NoSchedule
-        || model.JobStatus == JobStatus.Error
-        || model.JobStatus == JobStatus.Running
-        || model.JobGroup == BlazingQuartz.Constants.SYSTEM_GROUP;
-
     internal bool IsRunActionDisabled(ScheduleModel model) =>
         model.JobStatus == JobStatus.NoSchedule || model.JobStatus == JobStatus.NoTrigger;
 
@@ -76,21 +69,8 @@ public partial class Schedules : ComponentBase, IDisposable
         || model.JobStatus == JobStatus.Error
         || model.JobStatus == JobStatus.Running;
 
-    internal bool IsAddTriggerActionDisabled(ScheduleModel model) =>
-        model.JobStatus == JobStatus.NoSchedule
-        || model.JobStatus == JobStatus.Error
-        || model.JobGroup == BlazingQuartz.Constants.SYSTEM_GROUP;
-
-    internal bool IsCopyActionDisabled(ScheduleModel model) =>
-        model.JobStatus == JobStatus.NoSchedule
-        || model.JobStatus == JobStatus.Error
-        || model.JobGroup == BlazingQuartz.Constants.SYSTEM_GROUP;
-
     internal bool IsHistoryActionDisabled(ScheduleModel model) =>
         model.JobStatus == JobStatus.NoSchedule;
-
-    internal bool IsDeleteActionDisabled(ScheduleModel model) =>
-        model.JobStatus == JobStatus.Running;
 
     private void RegisterEventListeners()
     {
@@ -386,116 +366,6 @@ public partial class Schedules : ComponentBase, IDisposable
         }
     }
 
-    private async Task OnNewSchedule()
-    {
-        var options = new DialogOptions
-        {
-            CloseOnEscapeKey = true,
-            FullWidth = true,
-            MaxWidth = MaxWidth.Medium,
-        };
-        IDialogReference dlg = DialogSvc.Show<ScheduleDialog>("Create Schedule Job", options);
-        DialogResult? result = await dlg.Result;
-
-        if (result == null || result.Canceled)
-            return;
-
-        // create schedule
-        (JobDetailModel jobDetail, TriggerDetailModel triggerDetail) = ((
-            JobDetailModel,
-            TriggerDetailModel
-        ))
-            result.Data;
-
-        try
-        {
-            await SchedulerSvc.CreateSchedule(jobDetail, triggerDetail);
-        }
-        catch (Exception ex)
-        {
-            Snackbar.Add($"Failed to create new schedule. {ex.Message}", Severity.Error);
-            Logger.LogError(ex, "Failed to create new schedule.");
-            // TODO show schedule dialog again?
-        }
-    }
-
-    private async Task OnEditScheduleJob(ScheduleModel model)
-    {
-        if (model.JobName == null)
-        {
-            Snackbar.Add("Cannot edit schedule. Check if job still exists.", Severity.Error);
-            return;
-        }
-
-        JobDetailModel? currentJobDetail = await SchedulerSvc.GetJobDetail(
-            model.JobName,
-            model.JobGroup
-        );
-
-        if (currentJobDetail == null)
-        {
-            Snackbar.Add("Cannot edit schedule. Check if job still exists.", Severity.Error);
-            return;
-        }
-
-        var origJobKey = new Key(currentJobDetail.Name, currentJobDetail.Group);
-
-        TriggerDetailModel? currentTriggerModel = null;
-        Key? origTriggerKey = null;
-        if (model.TriggerName != null)
-        {
-            currentTriggerModel = await SchedulerSvc.GetTriggerDetail(
-                model.TriggerName,
-                model?.TriggerGroup ?? BlazingQuartz.Constants.DEFAULT_GROUP
-            );
-
-            if (currentTriggerModel != null)
-            {
-                origTriggerKey = new Key(currentTriggerModel.Name, currentTriggerModel.Group);
-
-                ResetStartEndDateTimeIfEarlier(ref currentTriggerModel);
-            }
-        }
-
-        var options = new DialogOptions
-        {
-            CloseOnEscapeKey = true,
-            FullWidth = true,
-            MaxWidth = MaxWidth.Medium,
-        };
-        var parameters = new DialogParameters
-        {
-            ["JobDetail"] = currentJobDetail,
-            ["TriggerDetail"] = currentTriggerModel ?? new TriggerDetailModel(),
-        };
-        IDialogReference dlg = DialogSvc.Show<ScheduleDialog>(
-            "Edit Schedule Job",
-            parameters,
-            options
-        );
-        DialogResult? result = await dlg.Result;
-
-        if (result == null || result.Canceled)
-            return;
-
-        // update schedule
-        (JobDetailModel jobDetail, TriggerDetailModel triggerDetail) = ((
-            JobDetailModel,
-            TriggerDetailModel
-        ))
-            result.Data;
-        try
-        {
-            await SchedulerSvc.UpdateSchedule(origJobKey, origTriggerKey, jobDetail, triggerDetail);
-        }
-        catch (Exception ex)
-        {
-            Snackbar.Add($"Failed to update schedule. {ex.Message}", Severity.Error);
-            Logger.LogError(ex, "Failed to update schedule.");
-            // TODO display the dialog again?
-        }
-    }
-
     private async Task OnResumeScheduleJob(ScheduleModel model)
     {
         if (model.TriggerName == null)
@@ -516,104 +386,6 @@ public partial class Schedules : ComponentBase, IDisposable
         }
 
         await SchedulerSvc.PauseTrigger(model.TriggerName, model.TriggerGroup);
-    }
-
-    private async Task OnDeleteScheduleJob(ScheduleModel model)
-    {
-        if (model.JobStatus == JobStatus.NoSchedule)
-        {
-            ScheduledJobs.Remove(model);
-        }
-        else
-        {
-            // confirm delete
-            bool? yes = await DialogSvc.ShowMessageBox(
-                "Confirm Delete",
-                "Do you want to delete this schedule?",
-                "Yes",
-                cancelText: "No"
-            );
-            if (yes == null || !yes.Value)
-            {
-                return;
-            }
-
-            bool success = await SchedulerSvc.DeleteSchedule(model);
-
-            if (!success)
-            {
-                Snackbar.Add($"Failed to delete schedule '{model.JobName}'", Severity.Error);
-            }
-            else
-            {
-                Snackbar.Add("Deleted schedule", Severity.Info);
-            }
-        }
-    }
-
-    private async Task OnDuplicateScheduleJob(ScheduleModel model)
-    {
-        if (model.JobName == null)
-        {
-            Snackbar.Add("Cannot clone schedule. Check if job still exists.", Severity.Error);
-            return;
-        }
-
-        JobDetailModel? currentJobDetail = await SchedulerSvc.GetJobDetail(
-            model.JobName,
-            model.JobGroup
-        );
-
-        if (currentJobDetail == null)
-        {
-            Snackbar.Add("Cannot clone schedule. Check if job still exists.", Severity.Error);
-            return;
-        }
-
-        TriggerDetailModel? currentTriggerModel = null;
-        if (model.TriggerName != null)
-        {
-            currentTriggerModel = await SchedulerSvc.GetTriggerDetail(
-                model.TriggerName,
-                model?.TriggerGroup ?? BlazingQuartz.Constants.DEFAULT_GROUP
-            );
-            if (currentTriggerModel != null)
-            {
-                currentTriggerModel.Name = string.Empty;
-                ResetStartEndDateTimeIfEarlier(ref currentTriggerModel);
-            }
-        }
-
-        currentJobDetail.Name = string.Empty;
-
-        var options = new DialogOptions
-        {
-            CloseOnEscapeKey = true,
-            FullWidth = true,
-            MaxWidth = MaxWidth.Medium,
-        };
-        var parameters = new DialogParameters
-        {
-            ["JobDetail"] = currentJobDetail,
-            ["TriggerDetail"] = currentTriggerModel ?? new TriggerDetailModel(),
-        };
-        IDialogReference dlg = DialogSvc.Show<ScheduleDialog>(
-            "Create Schedule Job",
-            parameters,
-            options
-        );
-        DialogResult? result = await dlg.Result;
-
-        if (result == null || result.Canceled)
-            return;
-
-        // create schedule
-        (JobDetailModel jobDetail, TriggerDetailModel triggerDetail) = ((
-            JobDetailModel,
-            TriggerDetailModel
-        ))
-            result.Data;
-        await SchedulerSvc.CreateSchedule(jobDetail, triggerDetail);
     }
 
     private void OnJobHistory(ScheduleModel model)
@@ -694,136 +466,5 @@ public partial class Schedules : ComponentBase, IDisposable
         }
 
         await SchedulerSvc.TriggerJob(model.JobName, model.JobGroup);
-    }
-
-    private async Task OnAddTrigger(ScheduleModel model)
-    {
-        if (model.JobName == null)
-        {
-            Snackbar.Add("Cannot add trigger. Check if job still exists.", Severity.Error);
-            return;
-        }
-
-        JobDetailModel? currentJobDetail = await SchedulerSvc.GetJobDetail(
-            model.JobName,
-            model.JobGroup
-        );
-
-        var options = new DialogOptions
-        {
-            CloseOnEscapeKey = true,
-            FullWidth = true,
-            MaxWidth = MaxWidth.Medium,
-        };
-        var parameters = new DialogParameters
-        {
-            ["JobDetail"] = currentJobDetail,
-            ["IsReadOnlyJobDetail"] = true,
-            ["SelectedTab"] = ScheduleDialogTab.Trigger,
-        };
-        IDialogReference dlg = DialogSvc.Show<ScheduleDialog>(
-            "Add New Trigger",
-            parameters,
-            options
-        );
-        DialogResult? result = await dlg.Result;
-
-        if (result == null || result.Canceled)
-            return;
-
-        // create schedule
-        (JobDetailModel jobDetail, TriggerDetailModel triggerDetail) = ((
-            JobDetailModel,
-            TriggerDetailModel
-        ))
-            result.Data;
-        await SchedulerSvc.CreateSchedule(jobDetail, triggerDetail);
-    }
-
-    private async Task OnDeleteSelectedScheduleJobs()
-    {
-        if (_scheduleDataGrid is null)
-            return;
-
-        HashSet<ScheduleModel>? selectedItems = _scheduleDataGrid.SelectedItems;
-
-        if (selectedItems == null || selectedItems.Count == 0)
-            return;
-
-        // confirm delete
-        bool? yes = await DialogSvc.ShowMessageBox(
-            "Confirm Delete",
-            $"Do you want to delete selected {selectedItems.Count} schedules?",
-            "Yes",
-            cancelText: "No"
-        );
-        if (yes == null || !yes.Value)
-        {
-            return;
-        }
-
-        int skipCount = 0;
-
-        IEnumerable<Task<bool>> deleteTasks = selectedItems.Select(model =>
-        {
-            if (model.JobStatus == JobStatus.Running)
-            {
-                skipCount++;
-                return Task.FromResult(true);
-            }
-
-            ScheduledJobs.Remove(model);
-            return SchedulerSvc.DeleteSchedule(model);
-        });
-        bool[] results = await Task.WhenAll(deleteTasks);
-
-        if (results == null)
-        {
-            await RefreshJobs();
-            Snackbar.Add("Failed to delete schedules", Severity.Error);
-        }
-        else
-        {
-            int deletedCount = results.Where(t => t).Count();
-            int notDeletedCount = results.Count() - deletedCount - skipCount;
-
-            if (skipCount > 0)
-            {
-                Snackbar.Add(
-                    $"Deleted {deletedCount} schedule(s). Skip {skipCount} executing schedule(s)",
-                    Severity.Info
-                );
-            }
-            else
-            {
-                Snackbar.Add($"Deleted {deletedCount} schedule(s)", Severity.Info);
-            }
-
-            if (notDeletedCount > 0)
-            {
-                await RefreshJobs();
-                Snackbar.Add($"Failed to deleted {notDeletedCount} schedule(s)", Severity.Warning);
-            }
-        }
-    }
-
-    private void ResetStartEndDateTimeIfEarlier(ref TriggerDetailModel triggerModel)
-    {
-        DateTimeOffset? startDtime = triggerModel.StartDateTimeUtc;
-        if (startDtime.HasValue && startDtime <= DateTimeOffset.UtcNow)
-        {
-            // clear start date if already past
-            triggerModel.StartTimeSpan = null;
-            triggerModel.StartDate = null;
-            triggerModel.StartTimezone = TimeZoneInfo.Utc;
-        }
-
-        DateTimeOffset? endTime = triggerModel.EndDateTimeUtc;
-        if (endTime.HasValue && endTime <= DateTimeOffset.UtcNow)
-        {
-            // clear end date if already past
-            triggerModel.EndDate = null;
-            triggerModel.EndTimeSpan = null;
-        }
     }
 }
