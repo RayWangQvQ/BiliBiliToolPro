@@ -1,3 +1,5 @@
+## 3.1.2
+- Feature: Fix warnings
 ## 3.1.1
 - Feature: 鉴权不再兼容老版本青龙（老版本需要手动添加bili cookie）
 ## 3.1.0

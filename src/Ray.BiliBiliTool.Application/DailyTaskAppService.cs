@@ -91,8 +91,6 @@ public class DailyTaskAppService(
     private async Task<UserInfo> Login(BiliCookie ck)
     {
         UserInfo userInfo = await accountDomainService.LoginByCookie(ck);
-        if (userInfo == null)
-            throw new Exception("登录失败，请检查Cookie"); //终止流程
 
         _expDic.TryGetValue("每日登录", out int exp);
         logger.LogInformation("登录成功，经验+{exp} √", exp);
@@ -181,7 +179,7 @@ public class DailyTaskAppService(
         {
             try
             {
-                userInfo = await accountDomainService.LoginByCookie(ck);
+                await accountDomainService.LoginByCookie(ck);
             }
             catch (Exception ex)
             {

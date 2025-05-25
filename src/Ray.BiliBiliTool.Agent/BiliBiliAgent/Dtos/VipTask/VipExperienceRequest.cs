@@ -2,5 +2,5 @@
 
 public class VipExperienceRequest
 {
-    public string csrf { get; set; }
+    public required string csrf { get; set; }
 }

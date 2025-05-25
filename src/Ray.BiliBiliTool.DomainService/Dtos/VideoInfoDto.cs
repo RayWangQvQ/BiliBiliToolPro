@@ -2,13 +2,13 @@
 
 public class VideoInfoDto
 {
-    public string Aid { get; set; }
+    public required string Aid { get; set; }
 
-    public string Bvid { get; set; }
+    public required string Bvid { get; set; }
 
     public long Cid { get; set; }
 
-    public string Title { get; set; }
+    public required string Title { get; set; }
 
     public int? Duration { get; set; }
 

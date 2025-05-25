@@ -4,5 +4,5 @@ public class UpInfo
 {
     public long Mid { get; set; }
 
-    public string Uname { get; set; }
+    public required string Uname { get; set; }
 }

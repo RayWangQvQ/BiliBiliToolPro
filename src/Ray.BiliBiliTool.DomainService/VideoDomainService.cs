@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
@@ -37,7 +33,7 @@ public class VideoDomainService(
     public async Task<VideoDetail> GetVideoDetail(string aid)
     {
         var re = await videoWithoutCookieApi.GetVideoDetail(aid);
-        return re.Data;
+        return re.Data!;
     }
 
     /// <summary>
@@ -48,11 +44,11 @@ public class VideoDomainService(
     {
         var apiResponse = await videoWithoutCookieApi.GetRegionRankingVideosV2();
         logger.LogDebug("获取排行榜成功");
-        RankingInfo data = apiResponse.Data.List[new Random().Next(apiResponse.Data.List.Count)];
+        var data = apiResponse.Data.List[new Random().Next(apiResponse.Data.List.Count)];
         return data;
     }
 
-    public async Task<UpVideoInfo> GetRandomVideoOfUp(long upId, int total, BiliCookie ck)
+    public async Task<UpVideoInfo?> GetRandomVideoOfUp(long upId, int total, BiliCookie ck)
     {
         if (total <= 0)
             return null;
@@ -74,7 +70,7 @@ public class VideoDomainService(
             throw new Exception(re.Message);
         }
 
-        return re.Data.List.Vlist.FirstOrDefault();
+        return re.Data?.List?.Vlist.FirstOrDefault();
     }
 
     /// <summary>
@@ -95,7 +91,7 @@ public class VideoDomainService(
             throw new Exception(re.Message);
         }
 
-        return re.Data.Page.Count;
+        return re.Data!.Page.Count;
     }
 
     public async Task WatchAndShareVideo(DailyTaskInfo dailyTaskStatus, BiliCookie ck)
@@ -113,7 +109,7 @@ public class VideoDomainService(
         //观看
         if (!dailyTaskStatus.Watch && _dailyTaskOptions.IsWatchVideo)
         {
-            await WatchVideo(targetVideo, ck);
+            await WatchVideo(targetVideo!, ck);
             watched = true;
         }
         else
@@ -127,7 +123,7 @@ public class VideoDomainService(
             {
                 try
                 {
-                    await OpenVideo(targetVideo, ck);
+                    await OpenVideo(targetVideo!, ck);
                 }
                 catch (Exception e)
                 {
@@ -135,7 +131,7 @@ public class VideoDomainService(
                     logger.LogError("打开视频异常：{msg}", e.Message);
                 }
             }
-            await ShareVideo(targetVideo, ck);
+            await ShareVideo(targetVideo!, ck);
         }
         else
             logger.LogInformation("今天已经分享过了，不用再分享啦");
@@ -248,7 +244,7 @@ public class VideoDomainService(
             return video;
 
         //然后从排行榜中取
-        RankingInfo t = await GetRandomVideoOfRanking();
+        var t = await GetRandomVideoOfRanking();
         return new VideoInfoDto
         {
             Aid = t.Aid.ToString(),
@@ -260,7 +256,7 @@ public class VideoDomainService(
         };
     }
 
-    private async Task<VideoInfoDto> GetRandomVideoOfFollowingUps(BiliCookie ck)
+    private async Task<VideoInfoDto?> GetRandomVideoOfFollowingUps(BiliCookie ck)
     {
         //配置的UpId
         int configUpsCount = _dailyTaskOptions.SupportUpIdList.Count;
@@ -295,7 +291,7 @@ public class VideoDomainService(
     /// </summary>
     /// <param name="upIds"></param>
     /// <returns></returns>
-    private async Task<VideoInfoDto> GetRandomVideoOfUps(List<long> upIds, BiliCookie ck)
+    private async Task<VideoInfoDto?> GetRandomVideoOfUps(List<long> upIds, BiliCookie ck)
     {
         long upId = upIds[new Random().Next(0, upIds.Count)];
 

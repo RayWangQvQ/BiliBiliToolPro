@@ -33,10 +33,10 @@ public class AccountDomainService(
     {
         BiliApiResponse<UserInfo> apiResponse = await userInfoApi.LoginByCookie(cookie.ToString());
 
-        if (apiResponse.Code != 0 || !apiResponse.Data.IsLogin)
+        if (apiResponse.Code != 0 || !apiResponse.Data!.IsLogin)
         {
-            logger.LogWarning("登录异常，请检查Cookie是否错误或过期");
-            return null;
+            throw new Exception("登录失败，请检查Cookie");
+            ;
         }
 
         UserInfo useInfo = apiResponse.Data;
@@ -85,7 +85,7 @@ public class AccountDomainService(
             //todo:偶发性请求失败，再请求一次，这么写很丑陋，待用polly再框架层面实现
         }
 
-        return result;
+        return result!;
     }
 
     /// <summary>
@@ -193,7 +193,7 @@ public class AccountDomainService(
 
         //计算剩余
         tag = await GetTag(_unfollowBatchedTaskOptions.GroupName, ck);
-        logger.LogInformation("【分组下剩余】{count}人", tag?.Count ?? 0);
+        logger.LogInformation("【分组下剩余】{count}人", tag?.Count);
     }
 
     /// <summary>
@@ -202,10 +202,10 @@ public class AccountDomainService(
     /// <param name="groupName"></param>
     /// <param name="ck"></param>
     /// <returns></returns>
-    private async Task<TagDto> GetTag(string groupName, BiliCookie ck)
+    private async Task<TagDto?> GetTag(string groupName, BiliCookie ck)
     {
         string getTagsReferer = string.Format(RelationApiConstant.GetTagsReferer, ck.UserId);
-        List<TagDto> tagList = (await relationApi.GetTags(ck.ToString(), getTagsReferer)).Data;
+        List<TagDto> tagList = (await relationApi.GetTags(ck.ToString(), getTagsReferer)).Data!;
         TagDto tag = tagList.FirstOrDefault(x => x.Name == groupName);
         return tag;
     }

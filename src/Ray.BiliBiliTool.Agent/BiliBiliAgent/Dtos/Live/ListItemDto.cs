@@ -1,12 +1,10 @@
-﻿using System.Collections.Generic;
-
-namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live;
+﻿namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live;
 
 public class GetListResponse
 {
-    public List<LiveSortTag> New_tags { get; set; }
+    public List<LiveSortTag> New_tags { get; set; } = [];
 
-    public List<ListItemDto> List { get; set; }
+    public List<ListItemDto> List { get; set; } = [];
 
     public int Has_more { get; set; }
 }
@@ -15,9 +13,9 @@ public class LiveSortTag
 {
     public long Id { get; set; }
 
-    public string Name { get; set; }
+    public required string Name { get; set; }
 
-    public string Sort_type { get; set; }
+    public string? Sort_type { get; set; }
 }
 
 public class ListItemDto
@@ -26,7 +24,7 @@ public class ListItemDto
 
     public long Uid { get; set; }
 
-    public string Title { get; set; }
+    public required string Title { get; set; }
 
     public string ShortTitle
     {
@@ -39,22 +37,22 @@ public class ListItemDto
         }
     }
 
-    public string Uname { get; set; }
+    public required string Uname { get; set; }
 
     public long Parent_id { get; set; }
 
-    public string Parent_name { get; set; }
+    public required string Parent_name { get; set; }
 
     public long Area_id { get; set; }
 
-    public string Area_name { get; set; }
+    public string? Area_name { get; set; }
 
     /// <summary>
     ///
     /// </summary>
     /// <sample>1：百人成就</sample>
     /// <sample>2：天选时刻、新星主播</sample>
-    public Dictionary<string, PendantInfo> Pendant_info { get; set; }
+    public Dictionary<string, PendantInfo>? Pendant_info { get; set; }
 }
 
 public class PendantInfo
@@ -71,5 +69,5 @@ public class PendantInfo
     /// 内容
     /// </summary>
     /// <sample>天选时刻</sample>
-    public string Content { get; set; }
+    public string? Content { get; set; }
 }

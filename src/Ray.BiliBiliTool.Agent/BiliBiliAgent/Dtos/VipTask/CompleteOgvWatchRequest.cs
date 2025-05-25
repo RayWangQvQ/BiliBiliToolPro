@@ -12,7 +12,7 @@ public class CompleteOgvWatchRequest : BaseAppRequest
 
     public string token { get; set; }
 
-    public string task_sign { get; set; }
+    public string? task_sign { get; set; }
 
     public long timestamp { get; set; }
 }

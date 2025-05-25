@@ -83,7 +83,7 @@ public class ChargeDomainService(
 
         if (response.Code == 0)
         {
-            if (response.Data.Status == 4)
+            if (response.Data?.Status == 4)
             {
                 logger.LogInformation("【充电结果】成功");
                 logger.LogInformation("【充值个数】 {num}个B币", couponBalance);

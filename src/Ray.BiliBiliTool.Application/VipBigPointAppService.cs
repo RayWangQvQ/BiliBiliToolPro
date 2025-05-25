@@ -82,8 +82,6 @@ public class VipBigPointAppService(
     private async Task<UserInfo> GetUserInfo(BiliCookie ck)
     {
         UserInfo userInfo = await loginDomainService.LoginByCookie(ck);
-        if (userInfo == null)
-            throw new Exception("登录失败，请检查Cookie"); //终止流程
 
         return userInfo;
     }

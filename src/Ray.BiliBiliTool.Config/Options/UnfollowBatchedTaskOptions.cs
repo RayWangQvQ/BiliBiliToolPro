@@ -2,9 +2,11 @@
 
 public class UnfollowBatchedTaskOptions : IHasCron
 {
-    public string? GroupName { get; set; }
+    private const string DefaultGroupName = "天选时刻";
 
-    public int Count { get; set; } = 0;
+    public required string GroupName { get; set; } = DefaultGroupName;
+
+    public int Count { get; set; }
 
     public string? RetainUids { get; set; }
 

@@ -2,7 +2,7 @@
 
 public class CreateTagRequest
 {
-    public string Tag { get; set; }
+    public required string Tag { get; set; }
 
-    public string Csrf { get; set; }
+    public required string Csrf { get; set; }
 }
