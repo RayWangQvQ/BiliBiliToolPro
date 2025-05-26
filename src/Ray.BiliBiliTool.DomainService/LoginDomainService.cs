@@ -32,7 +32,7 @@ public class LoginDomainService(
 {
     public async Task<BiliCookie> LoginByQrCodeAsync(CancellationToken cancellationToken)
     {
-        BiliCookie cookieInfo = null;
+        BiliCookie? cookieInfo = null;
 
         var re = await passportApi.GenerateQrCode();
         if (re.Code != 0)
@@ -200,7 +200,7 @@ public class LoginDomainService(
             return;
         }
 
-        ckInfo.CookieItemDictionary.TryGetValue("DedeUserID", out string userId);
+        ckInfo.CookieItemDictionary.TryGetValue("DedeUserID", out var userId);
         userId ??= ckInfo.CookieStr;
         var indexOfCkConfigEnd = lines.FindIndex(
             indexOfCkConfigKey,
@@ -252,7 +252,7 @@ public class LoginDomainService(
             var list = qlEnvList
                 .Data!.Where(x => x.name.StartsWith("Ray_BiliBiliCookies__"))
                 .ToList();
-            QingLongEnv oldEnv = list.FirstOrDefault(x => x.value.Contains(ckInfo.UserId));
+            var oldEnv = list.FirstOrDefault(x => x.value.Contains(ckInfo.UserId));
 
             if (oldEnv != null)
             {

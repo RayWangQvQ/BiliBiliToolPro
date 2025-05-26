@@ -536,7 +536,7 @@ public class LiveDomainService(
 
                 // Heart Beat 接口
                 var timestamp = Now();
-                BiliApiResponse<HeartBeatResponse> heartBeatResult = null;
+                BiliApiResponse<HeartBeatResponse>? heartBeatResult = null;
                 if (info.HeartBeatCount == 0)
                 {
                     heartBeatResult = await liveTraceApi.EnterRoom(

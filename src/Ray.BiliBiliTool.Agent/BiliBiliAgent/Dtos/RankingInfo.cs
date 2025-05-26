@@ -18,7 +18,7 @@ public class RankingInfo
 
     public long Cid { get; set; }
 
-    public string? Title { get; set; }
+    public required string Title { get; set; }
 
     /// <summary>
     /// 是否转载

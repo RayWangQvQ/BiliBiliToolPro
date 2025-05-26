@@ -98,7 +98,7 @@ public class AccountDomainService(
         logger.LogInformation("【分组名】{group}", _unfollowBatchedTaskOptions.GroupName);
 
         //根据分组名称获取tag
-        TagDto tag = await GetTag(_unfollowBatchedTaskOptions.GroupName, ck);
+        TagDto? tag = await GetTag(_unfollowBatchedTaskOptions.GroupName, ck);
         var tagId = tag?.Tagid;
         int total = tag?.Count ?? 0;
 
@@ -206,7 +206,7 @@ public class AccountDomainService(
     {
         string getTagsReferer = string.Format(RelationApiConstant.GetTagsReferer, ck.UserId);
         List<TagDto> tagList = (await relationApi.GetTags(ck.ToString(), getTagsReferer)).Data!;
-        TagDto tag = tagList.FirstOrDefault(x => x.Name == groupName);
+        var tag = tagList.FirstOrDefault(x => x.Name == groupName);
         return tag;
     }
 

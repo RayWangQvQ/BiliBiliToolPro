@@ -95,7 +95,7 @@ public class DonateCoinDomainService(
         {
             logger.LogDebug("开始尝试第{num}次", i);
 
-            UpVideoInfo video = await TryGetCanDonatedVideo(ck);
+            var video = await TryGetCanDonatedVideo(ck);
             if (video == null)
                 continue;
 
@@ -123,7 +123,7 @@ public class DonateCoinDomainService(
     /// <returns></returns>
     public async Task<UpVideoInfo?> TryGetCanDonatedVideo(BiliCookie ck)
     {
-        UpVideoInfo result;
+        UpVideoInfo? result;
 
         //从配置的up中随机尝试获取1次
         result = await TryGetCanDonateVideoByConfigUps(1, ck);

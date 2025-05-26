@@ -96,7 +96,7 @@ public class VideoDomainService(
 
     public async Task WatchAndShareVideo(DailyTaskInfo dailyTaskStatus, BiliCookie ck)
     {
-        VideoInfoDto targetVideo = null;
+        VideoInfoDto? targetVideo = null;
 
         //至少有一项未完成，获取视频
         if (!dailyTaskStatus.Watch || !dailyTaskStatus.Share)
@@ -239,7 +239,7 @@ public class VideoDomainService(
     private async Task<VideoInfoDto> GetRandomVideoForWatchAndShare(BiliCookie ck)
     {
         //先从配置的或关注的up中取
-        VideoInfoDto video = await GetRandomVideoOfFollowingUps(ck);
+        var video = await GetRandomVideoOfFollowingUps(ck);
         if (video != null)
             return video;
 
@@ -262,7 +262,7 @@ public class VideoDomainService(
         int configUpsCount = _dailyTaskOptions.SupportUpIdList.Count;
         if (configUpsCount > 0)
         {
-            VideoInfoDto video = await GetRandomVideoOfUps(_dailyTaskOptions.SupportUpIdList, ck);
+            var video = await GetRandomVideoOfUps(_dailyTaskOptions.SupportUpIdList, ck);
             if (video != null)
                 return video;
         }
@@ -275,10 +275,7 @@ public class VideoDomainService(
         );
         if (result.Data.Total > 0)
         {
-            VideoInfoDto video = await GetRandomVideoOfUps(
-                result.Data.List.Select(x => x.Mid).ToList(),
-                ck
-            );
+            var video = await GetRandomVideoOfUps(result.Data.List.Select(x => x.Mid).ToList(), ck);
             if (video != null)
                 return video;
         }
@@ -302,7 +299,7 @@ public class VideoDomainService(
 
         if (count > 0)
         {
-            UpVideoInfo video = await GetRandomVideoOfUp(upId, count, ck);
+            var video = await GetRandomVideoOfUp(upId, count, ck);
             if (video == null)
                 return null;
             return new VideoInfoDto
