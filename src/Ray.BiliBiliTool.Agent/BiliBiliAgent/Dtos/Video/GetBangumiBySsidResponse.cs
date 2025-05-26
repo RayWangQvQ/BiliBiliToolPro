@@ -8,7 +8,7 @@ public class GetBangumiBySsidResponse
 
     public string? Message { get; set; }
 
-    public Result? Result { get; set; }
+    public required Result Result { get; set; }
 }
 
 public class Result

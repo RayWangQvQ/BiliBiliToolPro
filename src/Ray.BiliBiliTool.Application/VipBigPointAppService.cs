@@ -232,10 +232,7 @@ public class VipBigPointAppService(
             info = infoResult.Data!;
             bonusTask = GetTarget(info, moduleCode, taskCode);
 
-            logger.LogInformation(
-                "确认：{re}",
-                bonusTask.state == 3 && bonusTask.complete_times >= 1
-            );
+            logger.LogInformation("确认：{re}", bonusTask is { state: 3, complete_times: >= 1 });
         }
     }
 
@@ -281,7 +278,7 @@ public class VipBigPointAppService(
 
             logger.LogInformation(
                 "确认：{re}",
-                privilegeTask.state == 3 && privilegeTask.complete_times >= 1
+                privilegeTask is { state: 3, complete_times: >= 1 }
             );
         }
     }
@@ -328,10 +325,7 @@ public class VipBigPointAppService(
             info = infoResult.Data;
             targetTask = GetTarget(info, moduleCode, taskCode);
 
-            logger.LogInformation(
-                "确认：{re}",
-                targetTask.state == 3 && targetTask.complete_times >= 1
-            );
+            logger.LogInformation("确认：{re}", targetTask is { state: 3, complete_times: >= 1 });
         }
     }
 
@@ -380,10 +374,7 @@ public class VipBigPointAppService(
             info = infoResult.Data;
             targetTask = GetTarget(info, moduleCode, taskCode);
 
-            logger.LogInformation(
-                "确认：{re}",
-                targetTask.state == 3 && targetTask.complete_times >= 1
-            );
+            logger.LogInformation("确认：{re}", targetTask is { state: 3, complete_times: >= 1 });
         }
     }
 
@@ -427,10 +418,7 @@ public class VipBigPointAppService(
             info = infoResult.Data;
             targetTask = GetTarget(info, moduleCode, taskCode);
 
-            logger.LogInformation(
-                "确认：{re}",
-                targetTask.state == 3 && targetTask.complete_times >= 1
-            );
+            logger.LogInformation("确认：{re}", targetTask is { state: 3, complete_times: >= 1 });
         }
     }
 
