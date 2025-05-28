@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Passport;
+﻿namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Passport;
 
 public class GetSsoListResponse
 {

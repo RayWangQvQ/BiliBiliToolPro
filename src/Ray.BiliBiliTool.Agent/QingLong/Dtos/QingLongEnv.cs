@@ -1,5 +1,3 @@
-using System;
-
 namespace Ray.BiliBiliTool.Agent.QingLong.Dtos;
 
 public class QingLongEnv : UpdateQingLongEnv

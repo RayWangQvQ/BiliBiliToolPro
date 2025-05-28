@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Article;
+﻿namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Article;
 
 public class SearchUpArticlesResponse
 {
