@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live;
+﻿namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live;
 
 public class CheckTianXuanDto
 {

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Video;
+﻿namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Video;
 
 public class GetBangumiBySsidResponse
 {

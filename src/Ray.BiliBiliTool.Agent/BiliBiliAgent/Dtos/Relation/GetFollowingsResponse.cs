@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Relation;
+﻿namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Relation;
 
 public class GetFollowingsResponse
 {

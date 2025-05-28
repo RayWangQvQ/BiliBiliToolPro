@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent;
@@ -129,7 +125,7 @@ public class DailyTaskAppService(
     [TaskInterceptor("投币", rethrowWhenException: false)]
     private async Task AddCoins(UserInfo userInfo, BiliCookie ck)
     {
-        if (_dailyTaskOptions.SaveCoinsWhenLv6 && userInfo.Level_info.Current_level >= 6)
+        if (_dailyTaskOptions.SaveCoinsWhenLv6 && userInfo.Level_info?.Current_level >= 6)
         {
             logger.LogInformation("已经为LV6大佬，开始白嫖");
             return;

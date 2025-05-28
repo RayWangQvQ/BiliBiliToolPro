@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Ray.BiliBiliTool.Agent;
+﻿using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 

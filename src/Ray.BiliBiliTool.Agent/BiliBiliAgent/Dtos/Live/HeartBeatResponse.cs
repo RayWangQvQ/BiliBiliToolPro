@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live;
+﻿namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live;
 
 public class HeartBeatResponse
 {
