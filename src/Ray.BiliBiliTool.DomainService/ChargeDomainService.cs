@@ -56,7 +56,7 @@ public class ChargeDomainService(
         }
 
         //B币券余额
-        decimal couponBalance = userInfo.Wallet.Coupon_balance;
+        decimal couponBalance = userInfo.Wallet?.Coupon_balance ?? 0;
         logger.LogInformation("【B币券】{couponBalance}", couponBalance);
         if (couponBalance < 2)
         {

@@ -46,7 +46,7 @@ public class AccountDomainService(
         logger.LogInformation("【会员状态】{0}", useInfo.VipStatus.Description());
         logger.LogInformation("【硬币余额】{0}", useInfo.Money ?? 0);
 
-        if (useInfo.Level_info.Current_level < 6)
+        if (useInfo.Level_info?.Current_level < 6)
         {
             logger.LogInformation(
                 "【距升级Lv{0}】预计{1}天",
@@ -56,7 +56,7 @@ public class AccountDomainService(
         }
         else
         {
-            logger.LogInformation("【当前经验】{0}", useInfo.Level_info.Current_exp);
+            logger.LogInformation("【当前经验】{0}", useInfo.Level_info?.Current_exp);
             logger.LogInformation("您已是 Lv6 的大佬了，无敌是多么寂寞~");
         }
 
@@ -219,7 +219,10 @@ public class AccountDomainService(
     {
         double availableCoins =
             decimal.ToDouble(useInfo.Money ?? 0) - _dailyTaskOptions.NumberOfProtectedCoins;
-        long needExp = useInfo.Level_info.GetNext_expLong() - useInfo.Level_info.Current_exp;
+        long needExp =
+            useInfo.Level_info != null
+                ? useInfo.Level_info.GetNext_expLong() - useInfo.Level_info.Current_exp
+                : 0;
         int needDay;
 
         if (availableCoins < 0)

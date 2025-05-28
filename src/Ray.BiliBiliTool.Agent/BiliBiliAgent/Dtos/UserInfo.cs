@@ -11,7 +11,7 @@ public class UserInfo
     /// <summary>
     /// 用户Id
     /// </summary>
-    public long Mid { get; set; } //todo:这里登陆后可以获取到自己的UserId，后面可以考虑将配置Cookie项去除UserId的配置，改为登陆后获取
+    public long Mid { get; set; }
 
     /// <summary>
     /// 是否登录
@@ -21,13 +21,13 @@ public class UserInfo
     /// <summary>
     /// 等级信息
     /// </summary>
-    public required LevelInfo Level_info { get; set; }
+    public LevelInfo? Level_info { get; set; }
 
     public decimal? Money { get; set; }
 
-    public required string Uname { get; set; }
+    public string? Uname { get; set; }
 
-    public required Wallet Wallet { get; set; }
+    public Wallet? Wallet { get; set; }
 
     /// <summary>
     /// 会员状态
@@ -43,7 +43,12 @@ public class UserInfo
     /// <returns></returns>
     public string GetFuzzyUname()
     {
-        StringBuilder sb = new StringBuilder();
+        if (Uname == null)
+        {
+            return "";
+        }
+
+        var sb = new StringBuilder();
         int s1 = Uname.Length / 2;
         int s2 = (s1 + 1) / 2;
         for (int i = 0; i < Uname.Length; i++)
