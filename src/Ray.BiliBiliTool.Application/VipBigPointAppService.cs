@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Mall;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.ViewMall;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.VipTask;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
@@ -17,6 +18,7 @@ namespace Ray.BiliBiliTool.Application;
 public class VipBigPointAppService(
     ILogger<VipBigPointAppService> logger,
     IVipBigPointApi vipApi,
+    IMallApi mallApi,
     IAccountDomainService loginDomainService,
     IVideoDomainService videoDomainService,
     IAccountDomainService accountDomainService,
@@ -152,24 +154,30 @@ public class VipBigPointAppService(
             return;
         }
 
-        var re = await vipApi.SignAsync(new SignRequest(), ck.ToString());
+        var re = await mallApi.Sign2Async(
+            new Sign2RequestPath(ck.BiliJct),
+            new Sign2Request(),
+            ck.ToString()
+        );
         if (re.Code != 0)
             throw new Exception(re.ToJsonStr());
 
         //确认
-        var infoResult = await vipApi.GetTaskListAsync(ck.ToString());
-        if (infoResult.Code != 0)
-            throw new Exception(infoResult.ToJsonStr());
-        info = infoResult.Data!;
+        // var infoResult = await vipApi.GetTaskListAsync(ck.ToString());
+        // if (infoResult.Code != 0)
+        //     throw new Exception(infoResult.ToJsonStr());
+        // info = infoResult.Data!;
+        //
+        // logger.LogInformation(
+        //     "今日可获得签到积分：{score}",
+        //     info.Task_info.Sing_task_item.TodayHistory?.Score
+        // );
+        // logger.LogInformation(
+        //     info.Task_info.Sing_task_item.IsTodaySigned ? "签到成功" : "签到失败"
+        // );
+        // logger.LogInformation("累计签到{count}天", info.Task_info.Sing_task_item.Count);
 
-        logger.LogInformation(
-            "今日可获得签到积分：{score}",
-            info.Task_info.Sing_task_item.TodayHistory?.Score
-        );
-        logger.LogInformation(
-            info.Task_info.Sing_task_item.IsTodaySigned ? "签到成功" : "签到失败"
-        );
-        logger.LogInformation("累计签到{count}天", info.Task_info.Sing_task_item.Count);
+        logger.LogInformation("签到成功");
     }
 
     [TaskInterceptor("领取任务", TaskLevel.Two, false)]

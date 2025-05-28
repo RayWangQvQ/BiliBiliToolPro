@@ -25,6 +25,7 @@ public interface IVipBigPointApi
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>
+    [Obsolete("Using IMallApi.Sign2Async instead.")]
     [HttpPost("/pgc/activity/score/task/sign")]
     Task<BiliApiResponse> SignAsync(
         [FormContent] SignRequest request,
