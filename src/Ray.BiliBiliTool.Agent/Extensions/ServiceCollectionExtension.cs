@@ -78,6 +78,7 @@ public static class ServiceCollectionExtension
         services.AddBiliBiliClientApi<ILiveApi>(BiliHosts.Live, config);
 
         services.AddBiliBiliClientApi<IVipBigPointApi>(BiliHosts.App, configApp);
+        services.AddBiliBiliClientApi<IMallApi>(BiliHosts.Mall, configApp);
 
         //qinglong
         var qinglongHost = configuration["QL_URL"] ?? "http://localhost:5600";

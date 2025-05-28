@@ -1,0 +1,115 @@
+meta {
+  name: sign2
+  type: http
+  seq: 1
+}
+
+post {
+  url: https://mall.bilibili.com/pgc/activity/score/task/sign2?mobi_app=android&csrf={{csrf}}&platform=android
+  body: json
+  auth: inherit
+}
+
+params:query {
+  mobi_app: android
+  csrf: {{csrf}}
+  platform: android
+}
+
+headers {
+  Host: api.bilibili.com
+  Cookie: {{cookieStr}}
+  accept: application/json, text/plain, */*
+  bili-http-engine: ignet
+  buvid: {{buvid}}
+  content-type: application/json; charset=utf-8
+  guestid: 24675260415603
+  native_api_from: h5
+  referer: https://big.bilibili.com/mobile/index
+  user-agent: {{user-agent}}
+  x-bili-aurora-eid: UlAAQFkMBVkH
+  x-bili-metadata-legal-region: CN
+  x-bili-mid: {{mid}}
+  x-bili-net-bin: DQAAgL8gAQ
+  x-bili-ticket: eyJhbGciOiJIUzI1NiIsImtpZCI6InMwMyIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDg0NzM4MTEsImlhdCI6MTc0ODQ0NDcxMSwiYnV2aWQiOiJYVUE1NjUxQTlFREY3Mzg3MTUzQTk0NUNERTk2Q0FEQ0I2MDAwIn0.IvpforrVemmRAvyQF7svr4fd-RnfP_lEt6g6pWt4AGk
+  x-bili-trace-id: 0d6c319f356dbc6191becbf764683728:91becbf764683728:0:0
+}
+
+body:json {
+  {
+    "t": 1748445354567,
+    "device": "phone",
+    "ts": 1748445354
+  }
+}
+
+docs {
+  Response sample:
+  
+  ```json
+  {
+      "code": 0,
+      "data": {
+          "count": 2,
+          "countdown": 0,
+          "day3WinImg": "https://i0.hdslb.com/bfs/activity-plat/static/4cefecc6742f8995a6bd22402a6d0b8b/day3_win_img.png",
+          "day3WinImgVip": "https://i0.hdslb.com/bfs/activity-plat/static/4cefecc6742f8995a6bd22402a6d0b8b/day3_win_img_vip.png",
+          "duration": 7,
+          "goods": [
+              {
+                  "picture": "https://i0.hdslb.com/bfs/activity-plat/d3df8012062c6996c26f989ed6a4f0752e5d5049.png",
+                  "sale": 128888,
+                  "title": "御坂美琴&食蜂操祈 大霸星祭Ver. 手办"
+              },
+              {
+                  "picture": "https://i0.hdslb.com/bfs/activity-plat/245337f3c305886e4937430335218f2d7bf92362.jpg",
+                  "sale": 39,
+                  "title": "暗黑不朽积分兑换礼包"
+              },
+              {
+                  "picture": "https://i0.hdslb.com/bfs/activity-plat/b782d7228e8a58d2562d26f33448a50519ce4ec5.png",
+                  "sale": 33600,
+                  "title": "BEMOE 初音未来 樱花未来 可爱体UWA系列 毛绒4wa"
+              }
+          ],
+          "hasCoupon": false,
+          "score": 5,
+          "seasons": [
+              {
+                  "badge": "独家",
+                  "badgeType": 1,
+                  "cover": "http://i0.hdslb.com/bfs/bangumi/6a04c87e990ab74cd8d555ef45a863de0993b161.png",
+                  "ratingScore": 9.8,
+                  "seasonId": 5398,
+                  "seasonType": 1,
+                  "subtitle": "不一样的热血动画",
+                  "title": "JOJO的奇妙冒险 不灭钻石"
+              },
+              {
+                  "badge": "大会员",
+                  "badgeType": 0,
+                  "cover": "http://i0.hdslb.com/bfs/bangumi/6d8bd12e0e1ab2d4d5e8567bdba18240e75d7a1b.jpg",
+                  "ratingScore": 9.8,
+                  "seasonId": 6262,
+                  "seasonType": 1,
+                  "subtitle": "不想来笑一下吗？",
+                  "title": "蜡笔小新 第二季（中文）"
+              },
+              {
+                  "badge": "出品",
+                  "badgeType": 1,
+                  "cover": "https://i0.hdslb.com/bfs/bangumi/image/08bf0c1e24e454de51b58d1e26c0a9aecbe9b0c1.png",
+                  "ratingScore": 0.0,
+                  "seasonId": 46585,
+                  "seasonType": 4,
+                  "subtitle": "末世如何才能生存",
+                  "title": "灵笼 第二季"
+              }
+          ],
+          "vipScore": 5,
+          "vipStatus": 1
+      },
+      "message": "success"
+  }
+  ```
+}
