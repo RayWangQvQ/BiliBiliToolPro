@@ -151,13 +151,13 @@ public static class ServiceCollectionExtension
         IConfiguration configuration
     )
     {
-        string proxyAddress = configuration["Security:WebProxy"];
+        var proxyAddress = configuration["Security:WebProxy"];
         if (proxyAddress.IsNotNullOrEmpty())
         {
             WebProxy webProxy = new WebProxy();
 
             //user:password@host:port http proxy only .Tested with tinyproxy-1.11.0-rc1
-            if (proxyAddress.Contains("@"))
+            if (proxyAddress!.Contains("@"))
             {
                 string userPass = proxyAddress.Split("@")[0];
                 string address = proxyAddress.Split("@")[1];
@@ -166,8 +166,8 @@ public static class ServiceCollectionExtension
                 string proxyPass = "";
                 if (userPass.Contains(":"))
                 {
-                    proxyUser = userPass?.Split(":")[0];
-                    proxyPass = userPass?.Split(":")[1];
+                    proxyUser = userPass.Split(":")[0];
+                    proxyPass = userPass.Split(":")[1];
                 }
 
                 webProxy.Address = new Uri("http://" + address);

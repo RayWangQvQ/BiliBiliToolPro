@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
 
 namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Utils;
@@ -41,9 +39,16 @@ public class LiveHeartBeatCrypto
 
     private static string Hash(string text, string key, string algorithmName)
     {
-        var hamc = HMAC.Create(algorithmName);
-        hamc.Key = Encoding.UTF8.GetBytes(key);
-        byte[] inArray = hamc.ComputeHash(Encoding.UTF8.GetBytes(text));
-        return BitConverter.ToString(inArray).Replace("-", "").ToLower();
+        HMAC hamc = algorithmName.ToUpperInvariant() switch
+        {
+            "HMACSHA256" => new HMACSHA256(Encoding.UTF8.GetBytes(key)),
+            "HMACSHA1" => new HMACSHA1(Encoding.UTF8.GetBytes(key)),
+            "HMACMD5" => new HMACMD5(Encoding.UTF8.GetBytes(key)),
+            _ => throw new ArgumentException($"Unsupported algorithm: {algorithmName}"),
+        };
+
+        using HMAC hmac = hamc;
+        byte[] hashBytes = hamc.ComputeHash(Encoding.UTF8.GetBytes(text));
+        return BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
     }
 }

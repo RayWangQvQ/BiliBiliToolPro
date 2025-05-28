@@ -21,13 +21,13 @@ public class UserInfo
     /// <summary>
     /// 等级信息
     /// </summary>
-    public LevelInfo Level_info { get; set; }
+    public required LevelInfo Level_info { get; set; }
 
     public decimal? Money { get; set; }
 
-    public string Uname { get; set; }
+    public required string Uname { get; set; }
 
-    public Wallet Wallet { get; set; }
+    public required Wallet Wallet { get; set; }
 
     /// <summary>
     /// 会员状态
@@ -81,7 +81,7 @@ public class UserInfo
     /// <summary>
     /// 防爬加密用的
     /// </summary>
-    public WbiImg Wbi_img { get; set; }
+    public required WbiImg Wbi_img { get; set; }
 }
 
 /// <summary>
@@ -154,13 +154,13 @@ public class WbiImg
     /// img url
     /// </summary>
     /// <sample>https://i0.hdslb.com/bfs/wbi/9cd4224d4fe74c7e9d6963e2ef891688.png</sample>
-    public string img_url { get; set; }
+    public required string img_url { get; set; }
 
     /// <summary>
     /// sub url
     /// </summary>
     /// <sample>https://i0.hdslb.com/bfs/wbi/263655ae2cad4cce95c9c401981b044a.png</sample>
-    public string sub_url { get; set; }
+    public required string sub_url { get; set; }
 
     public string ImgKey => img_url.Split("wbi/").ToList().Last().Replace(".png", "");
 

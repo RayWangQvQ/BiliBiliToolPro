@@ -114,9 +114,10 @@ public class WbiService(ILogger<WbiService> logger, IUserInfoApi userInfoApi) : 
             return wbiImg;
 
         BiliApiResponse<UserInfo> apiResponse = await userInfoApi.LoginByCookie(ck.ToString());
-        UserInfo useInfo = apiResponse.Data;
-        logger.LogDebug("【img_url】{0}", useInfo.Wbi_img?.img_url);
-        logger.LogDebug("【sub_url】{0}", useInfo.Wbi_img?.sub_url);
+        UserInfo useInfo = apiResponse.Data!;
+        logger.LogDebug("【img_url】{0}", useInfo.Wbi_img.img_url);
+        logger.LogDebug("【sub_url】{0}", useInfo.Wbi_img.sub_url);
+
         wbiImg = useInfo.Wbi_img;
         _cache[ck] = wbiImg;
         return wbiImg;

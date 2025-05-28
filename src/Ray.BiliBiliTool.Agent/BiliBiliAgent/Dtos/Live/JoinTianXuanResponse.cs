@@ -12,5 +12,5 @@ public class JoinTianXuanResponse
 
     public long Goods_id { get; set; }
 
-    public string New_order_id { get; set; }
+    public required string New_order_id { get; set; }
 }

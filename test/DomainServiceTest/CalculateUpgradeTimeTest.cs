@@ -16,7 +16,7 @@ public class CalculateUpgradeTimeTest
         var accountDomainService =
             scope.ServiceProvider.GetRequiredService<IAccountDomainService>();
         int needDay = accountDomainService.CalculateUpgradeTime(
-            new UserInfo()
+            new UserInfo
             {
                 Money = 7,
                 Level_info = new LevelInfo()
@@ -25,6 +25,9 @@ public class CalculateUpgradeTimeTest
                     Current_exp = 100,
                     Next_exp = 200,
                 },
+                Uname = "uname",
+                Wallet = new(),
+                Wbi_img = new() { img_url = "", sub_url = "" },
             }
         );
         int needDay2 = accountDomainService.CalculateUpgradeTime(
@@ -37,6 +40,9 @@ public class CalculateUpgradeTimeTest
                     Current_exp = 1000,
                     Next_exp = 2000,
                 },
+                Uname = "uname",
+                Wallet = new(),
+                Wbi_img = new() { img_url = "", sub_url = "" },
             }
         );
 

@@ -2,7 +2,7 @@
 
 public class QrCodeDto
 {
-    public string Qrcode_key { get; set; }
+    public required string Qrcode_key { get; set; }
 
-    public string Url { get; set; }
+    public required string Url { get; set; }
 }

@@ -62,7 +62,7 @@ public class LiveDomainService(
             logger.LogInformation("【签到结果】成功");
             logger.LogInformation(
                 "【本次获取】{text},{special}",
-                response.Data.Text,
+                response.Data!.Text,
                 response.Data.SpecialText
             );
         }
@@ -117,8 +117,8 @@ public class LiveDomainService(
         if (response.Code == 0)
         {
             result = true;
-            logger.LogInformation("【兑换结果】成功兑换 {coin} 枚硬币", response.Data.Coin);
-            logger.LogInformation("【银瓜子余额】 {silver}", response.Data.Silver);
+            logger.LogInformation("【兑换结果】成功兑换 {coin} 枚硬币", response.Data?.Coin);
+            logger.LogInformation("【银瓜子余额】 {silver}", response.Data?.Silver);
         }
         else
         {
@@ -167,18 +167,15 @@ public class LiveDomainService(
                     wts = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
                 };
                 var reData = (await liveApi.GetList(request, ck.ToString())).Data;
-                if (reData == null)
-                {
-                    continue;
-                }
-                foreach (var item in reData.List ?? new List<ListItemDto>())
+
+                foreach (var item in reData.List)
                 {
                     if (item.Pendant_info == null || item.Pendant_info.Count == 0)
                         continue;
                     var suc = item.Pendant_info.TryGetValue("2", out var pendant);
                     if (!suc)
                         continue;
-                    if (pendant.Pendent_id != 504)
+                    if (pendant?.Pendent_id != 504)
                         continue;
                     count++;
 
@@ -399,7 +396,7 @@ public class LiveDomainService(
         long groupId = 0;
         string referer = string.Format(RelationApiConstant.GetTagsReferer, ck.UserId);
         var groups = await relationApi.GetTags(referer);
-        var tianXuanGroup = groups.Data.FirstOrDefault(x => x.Name == "天选时刻");
+        var tianXuanGroup = groups.Data!.FirstOrDefault(x => x.Name == "天选时刻");
         if (tianXuanGroup == null)
         {
             logger.LogInformation("“天选时刻”分组不存在，尝试创建...");
@@ -539,7 +536,7 @@ public class LiveDomainService(
 
                 // Heart Beat 接口
                 var timestamp = Now();
-                BiliApiResponse<HeartBeatResponse> heartBeatResult = null;
+                BiliApiResponse<HeartBeatResponse>? heartBeatResult = null;
                 if (info.HeartBeatCount == 0)
                 {
                     heartBeatResult = await liveTraceApi.EnterRoom(
@@ -570,7 +567,7 @@ public class LiveDomainService(
                             info.HeartBeatInfo.Timestamp,
                             _securityOptions.UserAgent,
                             info.HeartBeatInfo.Secret_rule,
-                            info.HeartBeatInfo.Secret_key,
+                            info.HeartBeatInfo.Secret_key!,
                             ck.BiliJct,
                             uuid,
                             $"[\"{ck.LiveBuvid}\",\"{uuid}\"]"
@@ -713,7 +710,7 @@ public class LiveDomainService(
                 continue;
             }
 
-            infoList.Add(new FansMedalInfoDto(roomId, medal, liveRoomInfo.Data));
+            infoList.Add(new FansMedalInfoDto(roomId, medal, liveRoomInfo.Data!));
         }
 
         return infoList;
@@ -740,9 +737,9 @@ public class LiveDomainService(
             var liveHomeContent = JsonConvert.DeserializeObject<BiliApiResponse>(
                 await liveHome.Content.ReadAsStringAsync()
             );
-            if (liveHomeContent.Code != 0)
+            if (liveHomeContent?.Code != 0)
             {
-                throw new Exception(liveHomeContent.Message);
+                throw new Exception(liveHomeContent?.Message);
             }
 
             var setHeader = liveHome.Headers.FirstOrDefault(header => header.Key == "Set-Cookie");

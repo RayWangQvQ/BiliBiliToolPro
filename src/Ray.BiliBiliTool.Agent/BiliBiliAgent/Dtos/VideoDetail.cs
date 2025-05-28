@@ -2,7 +2,7 @@
 
 public class VideoDetail
 {
-    public string Bvid { get; set; }
+    public required string Bvid { get; set; }
 
     public long Aid { get; set; }
 
@@ -14,7 +14,7 @@ public class VideoDetail
     /// <summary>
     /// 子分区名称
     /// </summary>
-    public string Tname { get; set; }
+    public string? Tname { get; set; }
 
     /// <summary>
     /// 是否转载
@@ -26,12 +26,12 @@ public class VideoDetail
     /// <summary>
     /// 稿件封面图片url
     /// </summary>
-    public string Pic { get; set; }
+    public string? Pic { get; set; }
 
     /// <summary>
     /// 稿件标题
     /// </summary>
-    public string Title { get; set; }
+    public required string Title { get; set; }
 
     /// <summary>
     /// 稿件发布时间(时间戳)
@@ -46,7 +46,7 @@ public class VideoDetail
     /// <summary>
     /// 	视频简介
     /// </summary>
-    public string Desc { get; set; }
+    public string? Desc { get; set; }
 
     /// <summary>
     /// 视频状态

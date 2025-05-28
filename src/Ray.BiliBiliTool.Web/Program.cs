@@ -45,7 +45,7 @@ try
                 .WriteTo.Console()
                 .WriteTo.File("Logs/log.txt", rollingInterval: RollingInterval.Day)
                 .WriteTo.SQLite(
-                    sqliteDbPath: sqliteConnStr.Split(';')[0].Split('=')[1],
+                    sqliteDbPath: sqliteConnStr?.Split(';')[0].Split('=')[1],
                     tableName: "bili_logs",
                     storeTimestampInUtc: true,
                     batchSize: 7
@@ -66,7 +66,8 @@ try
             storeOptions.UseMicrosoftSQLite(sqlLiteOptions =>
             {
                 sqlLiteOptions.UseDriverDelegate<SQLiteDelegate>();
-                sqlLiteOptions.ConnectionString = sqliteConnStr;
+                sqlLiteOptions.ConnectionString =
+                    sqliteConnStr ?? throw new InvalidOperationException();
                 sqlLiteOptions.TablePrefix = "QRTZ_";
             });
             storeOptions.UseSystemTextJsonSerializer();

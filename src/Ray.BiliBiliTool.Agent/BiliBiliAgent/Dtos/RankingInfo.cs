@@ -4,7 +4,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 
 public class Ranking
 {
-    public List<RankingInfo> List { get; set; }
+    public List<RankingInfo> List { get; set; } = [];
 }
 
 /// <summary>
@@ -14,11 +14,11 @@ public class RankingInfo
 {
     public long Aid { get; set; }
 
-    public string Bvid { get; set; }
+    public required string Bvid { get; set; }
 
     public long Cid { get; set; }
 
-    public string Title { get; set; }
+    public required string Title { get; set; }
 
     /// <summary>
     /// 是否转载

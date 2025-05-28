@@ -1,16 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using QRCoder;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
@@ -39,13 +32,12 @@ public class LoginDomainService(
 {
     public async Task<BiliCookie> LoginByQrCodeAsync(CancellationToken cancellationToken)
     {
-        BiliCookie cookieInfo = null;
+        BiliCookie? cookieInfo = null;
 
         var re = await passportApi.GenerateQrCode();
         if (re.Code != 0)
         {
-            logger.LogWarning("获取二维码失败：{msg}", re.ToJsonStr());
-            return null;
+            throw new Exception($"获取二维码失败：{re.ToJsonStr()}");
         }
 
         var url = re.Data.Url;
@@ -75,7 +67,7 @@ public class LoginDomainService(
 
             var contentStr = await check.Content.ReadAsStringAsync(cancellationToken);
             var content = JsonConvert.DeserializeObject<BiliApiResponse<TokenDto>>(contentStr);
-            if (content.Code != 0)
+            if (content?.Code != 0)
             {
                 logger.LogWarning("调用检测接口异常：{msg}", check.ToJsonStr());
                 break;
@@ -103,6 +95,11 @@ public class LoginDomainService(
             }
 
             logger.LogInformation("{msg}", content.Data.Message + Environment.NewLine);
+        }
+
+        if (cookieInfo == null)
+        {
+            throw new Exception("登录超时");
         }
 
         return cookieInfo;
@@ -167,13 +164,13 @@ public class LoginDomainService(
 
         if (!fileInfo.Exists)
         {
-            await using var stream = File.Create(fileInfo.PhysicalPath);
+            await using var stream = File.Create(fileInfo.PhysicalPath!);
             await using var sw = new StreamWriter(stream);
             await sw.WriteAsync($"{{{Environment.NewLine}}}");
         }
 
         string json;
-        await using (var stream = new FileStream(fileInfo.PhysicalPath, FileMode.Open))
+        await using (var stream = new FileStream(fileInfo.PhysicalPath!, FileMode.Open))
         {
             using var reader = new StreamReader(stream);
             json = await reader.ReadToEndAsync();
@@ -203,7 +200,7 @@ public class LoginDomainService(
             return;
         }
 
-        ckInfo.CookieItemDictionary.TryGetValue("DedeUserID", out string userId);
+        ckInfo.CookieItemDictionary.TryGetValue("DedeUserID", out var userId);
         userId ??= ckInfo.CookieStr;
         var indexOfCkConfigEnd = lines.FindIndex(
             indexOfCkConfigKey,
@@ -253,9 +250,9 @@ public class LoginDomainService(
             logger.LogDebug(ckInfo.ToString());
 
             var list = qlEnvList
-                .Data.Where(x => x.name.StartsWith("Ray_BiliBiliCookies__"))
+                .Data!.Where(x => x.name.StartsWith("Ray_BiliBiliCookies__"))
                 .ToList();
-            QingLongEnv oldEnv = list.FirstOrDefault(x => x.value.Contains(ckInfo.UserId));
+            var oldEnv = list.FirstOrDefault(x => x.value.Contains(ckInfo.UserId));
 
             if (oldEnv != null)
             {
@@ -398,22 +395,11 @@ public class LoginDomainService(
         return $"https://tool.lu/qrcode/basic.html?text={encode}";
     }
 
-    private string GetCookieStr(IEnumerable<string> setCookies)
-    {
-        var ckItemList = new List<string>();
-        foreach (var item in setCookies)
-        {
-            ckItemList.Add(item.Split(';').FirstOrDefault());
-        }
-        var biliCk = string.Join("; ", ckItemList);
-        return biliCk;
-    }
-
     private async Task SaveJson(List<string> lines, IFileInfo fileInfo)
     {
         var newJson = string.Join(Environment.NewLine, lines);
 
-        await using var sw = new StreamWriter(fileInfo.PhysicalPath);
+        await using var sw = new StreamWriter(fileInfo.PhysicalPath!);
         await sw.WriteAsync(newJson);
     }
 
@@ -436,8 +422,8 @@ public class LoginDomainService(
         }
 
         var token = await qingLongApi.GetTokenAsync(
-            qingLongOptions.Value.ClientId,
-            qingLongOptions.Value.ClientSecret
+            qingLongOptions.Value.ClientId!,
+            qingLongOptions.Value.ClientSecret!
         );
 
         return $"{token.Data.token_type} {token.Data.token}";

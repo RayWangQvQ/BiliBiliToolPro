@@ -8,5 +8,5 @@ public class Silver2CoinResponse
 
     public long Silver { get; set; }
 
-    public string Tid { get; set; }
+    public string? Tid { get; set; }
 }

@@ -23,7 +23,7 @@ public class JoinTianXuanRequest
     /// <summary>
     /// bili_jct（取自Cookie）
     /// </summary>
-    public string Csrf { get; set; }
+    public required string Csrf { get; set; }
 
     public string Csrf_token => Csrf;
 

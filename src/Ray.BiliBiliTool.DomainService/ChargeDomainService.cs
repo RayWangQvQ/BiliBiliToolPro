@@ -1,13 +1,10 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Interfaces;
-using Ray.BiliBiliTool.Infrastructure.Cookie;
 
 namespace Ray.BiliBiliTool.DomainService;
 
@@ -18,7 +15,6 @@ public class ChargeDomainService(
     ILogger<ChargeDomainService> logger,
     IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
     IDailyTaskApi dailyTaskApi,
-    CookieStrFactory<BiliCookie> cookieFactory,
     IChargeApi chargeApi
 ) : IChargeDomainService
 {
@@ -87,7 +83,7 @@ public class ChargeDomainService(
 
         if (response.Code == 0)
         {
-            if (response.Data.Status == 4)
+            if (response.Data?.Status == 4)
             {
                 logger.LogInformation("【充电结果】成功");
                 logger.LogInformation("【充值个数】 {num}个B币", couponBalance);

@@ -1,10 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Linq;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Web;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Services;
 using Ray.BiliBiliTool.Infrastructure.Cookie;
@@ -28,7 +22,7 @@ public class WridEncryptionDelegatingHandler(IWbiService wbiService) : Delegatin
             await TrySetWridAync(request, formData, cancellationToken);
 
             var newFormKeyValuePairs = formData
-                .AllKeys.Select(key => new KeyValuePair<string, string>(key, formData[key]))
+                .AllKeys.Select(key => new KeyValuePair<string, string>(key!, formData[key] ?? ""))
                 .ToList();
             request.Content = new FormUrlEncodedContent(newFormKeyValuePairs);
         }
@@ -58,7 +52,7 @@ public class WridEncryptionDelegatingHandler(IWbiService wbiService) : Delegatin
         var paramsToSign = new Dictionary<string, string>();
         foreach (var key in formData.AllKeys)
         {
-            paramsToSign[key] = formData[key];
+            paramsToSign[key!] = formData[key] ?? "";
         }
 
         if (paramsToSign.All(x => x.Key != "w_rid"))
@@ -70,7 +64,7 @@ public class WridEncryptionDelegatingHandler(IWbiService wbiService) : Delegatin
             .Headers.FirstOrDefault(x => x.Key == "Cookie")
             .Value.FirstOrDefault()
             ?.ToString();
-        var ck = CookieStrFactory<BiliCookie>.CreateNew(ckStr);
+        var ck = CookieStrFactory<BiliCookie>.CreateNew(ckStr ?? "");
 
         var wbi = await wbiService.GetWridAsync(paramsToSign, ck);
 
