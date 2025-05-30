@@ -88,13 +88,13 @@ docker compose pull && docker compose up -d
 mkdir bili_tool_web && cd bili_tool_web
 
 # 生成并运行容器
-docker pull ghcr.io/raywangqvq/bilibili_tool_web
+docker pull ghcr.io/raywangqvq/bili_tool_web
 docker run -d --name="bili_tool_web" \
     -p 22330:8080 \
     -e TZ=Asia/Shanghai \
     -v ./Logs:/app/Logs \
     -v ./config:/app/config \
-    ghcr.io/raywangqvq/bilibili_tool_web
+    ghcr.io/raywangqvq/bili_tool_web
 
 # 查看实时日志
 docker logs -f bili_tool_web
