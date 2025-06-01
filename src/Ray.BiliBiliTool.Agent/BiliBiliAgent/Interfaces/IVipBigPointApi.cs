@@ -1,6 +1,7 @@
 ﻿using Ray.BiliBiliTool.Agent.Attributes;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.VipTask;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.VipTask.ThreeDaysSign;
 using WebApiClientCore.Attributes;
 
 namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
@@ -13,6 +14,18 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 [LogFilter]
 public interface IVipBigPointApi
 {
+    /// <summary>
+    /// 获取签到信息
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="ck"></param>
+    /// <returns></returns>
+    [HttpGet("/x/vip/vip_center/sign_in/three_days_sign")]
+    Task<BiliApiResponse<ThreeDaySignResponse>> GetThreeDaySignAsync(
+        [PathQuery] ThreeDaySignRequest request,
+        [Header("Cookie")] string ck
+    );
+
     /// <summary>
     /// 获取任务列表
     /// </summary>

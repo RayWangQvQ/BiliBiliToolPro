@@ -21,7 +21,7 @@ public interface IMallApi
     /// <returns></returns>
     [Header("Referer", "https://big.bilibili.com/mobile/index")]
     [HttpPost("/pgc/activity/score/task/sign2")]
-    Task<BiliApiResponse> Sign2Async(
+    Task<BiliApiResponse<Sign2Response>> Sign2Async(
         [PathQuery] Sign2RequestPath requestPath,
         [JsonContent] Sign2Request request,
         [Header("Cookie")] string ck
