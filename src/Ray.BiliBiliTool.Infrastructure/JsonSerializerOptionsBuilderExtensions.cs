@@ -63,7 +63,9 @@ public static class JsonSerializerOptionsBuilderExtensions
         return option;
     }
 
-    public static JsonSerializerOptions? GetDefaultOptions(this JsonSerializerOptionsBuilder builder)
+    public static JsonSerializerOptions? GetDefaultOptions(
+        this JsonSerializerOptionsBuilder builder
+    )
     {
         return _defaultOptions;
     }

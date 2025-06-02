@@ -1,0 +1,88 @@
+meta {
+  name: three_days_sign
+  type: http
+  seq: 1
+}
+
+get {
+  url: https://api.bilibili.com/x/vip/vip_center/sign_in/three_days_sign?access_key={{access_key}}&appkey={{appKey}}&build=8451100&csrf={{csrf}}&device=phone&disable_rcmd=0&mobi_app=android&platform=android&statistics={"appId":1,"platform":3,"version":"8.45.1","abtest":""}&t=1748747431084&ts=1748747431&web_location=666.146&sign=e95c76f976aed346f84cdc7098f8c35e
+  body: none
+  auth: inherit
+}
+
+params:query {
+  access_key: {{access_key}}
+  appkey: {{appKey}}
+  build: 8451100
+  csrf: {{csrf}}
+  device: phone
+  disable_rcmd: 0
+  mobi_app: android
+  platform: android
+  statistics: {"appId":1,"platform":3,"version":"8.45.1","abtest":""}
+  t: 1748747431084
+  ts: 1748747431
+  web_location: 666.146
+  sign: e95c76f976aed346f84cdc7098f8c35e
+}
+
+headers {
+  Host: api.bilibili.com
+  Cookie: {{cookieStr}}
+  accept: application/json, text/plain, */*
+  bili-http-engine: ignet
+  buvid: {{buvid}}
+  native_api_from: h5
+  referer: https://big.bilibili.com/mobile/index
+  user-agent: {{user-agent}}
+  x-bili-aurora-eid: UlAAQFkMBVkH
+  x-bili-metadata-legal-region: CN
+  x-bili-mid: {{mid}}
+  x-bili-net-bin: DQAAgL8gAQ
+  x-bili-ticket: eyJhbGciOiJIUzI1NiIsImtpZCI6InMwMyIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDg3NzU1OTksImlhdCI6MTc0ODc0NjQ5OSwiYnV2aWQiOiJYVUE1NjUxQTlFREY3Mzg3MTUzQTk0NUNERTk2Q0FEQ0I2MDAwIn0.k0x2o3e2Q3W-6Wzc56IhbLgSjDKTaAuUV9om7K213fI
+  x-bili-trace-id: 25ad3d0de58f794c18d1a884fc683bc4:18d1a884fc683bc4:0:0
+}
+
+docs {
+  Response sample:
+  
+  ```json
+  {
+  	"code": 0,
+  	"message": "0",
+  	"ttl": 1,
+  	"data": {
+  		"big_point": {
+  			"point": 405,
+  			"expire_point": 0,
+  			"expire_time": 0,
+  			"expire_days": 0
+  		},
+  		"three_day_sign": {
+  			"previous_vip_status": 0,
+  			"vip_status": 1,
+  			"day": 5,
+  			"signed": false,
+  			"count": 2,
+  			"has_coupon": false,
+  			"countdown": 0,
+  			"icon": "",
+  			"score": 5,
+  			"vip_score": 5,
+  			"explain": "",
+  			"exp_value": 3,
+  			"received_coupon": false,
+  			"day1_icon": "https://i0.hdslb.com/bfs/activity-plat/static/4cefecc6742f8995a6bd22402a6d0b8b/day1_icon.png",
+  			"day2_icon": "https://i0.hdslb.com/bfs/activity-plat/static/4cefecc6742f8995a6bd22402a6d0b8b/day2_icon.png",
+  			"day3_icon": "https://i0.hdslb.com/bfs/activity-plat/static/4cefecc6742f8995a6bd22402a6d0b8b/day3_icon.png",
+  			"day3_icon_vip": "https://i0.hdslb.com/bfs/activity-plat/static/4cefecc6742f8995a6bd22402a6d0b8b/day3_icon_vip.png",
+  			"day3_win_img": "https://i0.hdslb.com/bfs/activity-plat/static/4cefecc6742f8995a6bd22402a6d0b8b/day3_win_img.png",
+  			"day3_win_img_vip": "https://i0.hdslb.com/bfs/activity-plat/static/4cefecc6742f8995a6bd22402a6d0b8b/day3_win_img_vip.png",
+  			"day3_icon_received": "https://i0.hdslb.com/bfs/activity-plat/static/4cefecc6742f8995a6bd22402a6d0b8b/day3_icon_received.png",
+  			"day3_icon_vip_received": "https://i0.hdslb.com/bfs/activity-plat/static/4cefecc6742f8995a6bd22402a6d0b8b/day3_icon_vip_received.png",
+  			"duration": 7
+  		}
+  	}
+  }
+  ```
+}

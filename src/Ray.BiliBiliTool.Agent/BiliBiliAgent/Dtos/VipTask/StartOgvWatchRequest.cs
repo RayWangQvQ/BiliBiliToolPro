@@ -9,4 +9,9 @@ public class StartOgvWatchRequest : BaseAppRequest
     public string Activity_code { get; } = "";
 
     public string spmid { get; } = "united.player-video-detail.0.0";
+
+    public string c_locale { get; } = "zh_CN";
+    public string channel { get; } = Constants.Channel;
+    public string s_locale { get; } = "zh_CN";
+    public string from_spmid { get; } = "united.player-video-detail.player.continue";
 }

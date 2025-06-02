@@ -1,32 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-
-namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.VipTask;
-
-public class VipTaskInfo
-{
-    public required TaskInfo Task_info { get; set; }
-
-    public void LogInfo(ILogger logger)
-    {
-        logger.LogInformation("------当前任务状态------");
-
-        logger.LogInformation("打卡：{signed}", Task_info.Sing_task_item.IsTodaySigned ? "√" : "X");
-
-        foreach (var moduleItem in Task_info.Modules)
-        {
-            logger.LogInformation("-{title}", moduleItem.module_title);
-            foreach (var commonTaskItem in moduleItem.common_task_item)
-            {
-                logger.LogInformation(
-                    "---{title}：{status}",
-                    commonTaskItem.title,
-                    commonTaskItem.state == 3 ? "√" : "X"
-                );
-            }
-        }
-        logger.LogInformation("------------------------" + Environment.NewLine);
-    }
-}
+namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Mall;
 
 public class TaskInfo
 {
@@ -36,6 +8,9 @@ public class TaskInfo
 
     public List<ModuleItem> Modules { get; set; } = [];
 
+    [Obsolete(
+        "The sign result comes from combine API is not correct, use IVipBigPointApi.GetThreeDaySignAsync instead."
+    )]
     public required SingTaskItem Sing_task_item { get; set; }
 }
 
