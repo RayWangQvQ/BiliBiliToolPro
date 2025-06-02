@@ -209,7 +209,12 @@ public class VipBigPointDomainService(
 
     public async Task<bool> CompleteViewAsync(string taskCode, BiliCookie ck)
     {
-        var channel = "jp_channel";
+        var channel = taskCode switch
+        {
+            "animatetab" => "jp_channel",
+            "filmtab" => "tv_channel",
+            _ => throw new ArgumentOutOfRangeException(),
+        };
 
         logger.LogInformation("开始浏览");
         await Task.Delay(10 * 1000);
