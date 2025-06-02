@@ -1,7 +1,7 @@
 meta {
-  name: complete
+  name: complete-ogv
   type: http
-  seq: 1
+  seq: 2
 }
 
 post {
@@ -42,25 +42,29 @@ body:form-urlencoded {
   ts: 1735744760
   sign: 2292d647d9b3f6dbd2f99b5a90cbddaf
   appkey: {{appKey}}
-  position: tv_channel
-  win_id: bigscore-filmtab
+  task_id: 4320003
+  task_sign: 95cbef871100151e526fa5580534a364
+  timestamp: 1748884714621
+  token: 67ba5888e7
 }
 
 docs {
   终端：APP
   
-  作用：上报完成大会员赚大积分任务-浏览追番频道页、浏览影视频道页（观看剧集内容接口相同，但入参不同，在另一个接口）
+  作用：上报完成大会员赚大积分任务-观看剧集内容
   
   入口：
-    - 我的->会员中心->赚大积分->查看8项任务，点击跳转后，自动触发
+    - 我的->会员中心->赚大积分->查看8项任务，点击“观看剧集内容”，挑选视频，观看10分钟后，自动触发
+  
+  传入剧集的id，会返回task_id和token，用于标识该次观看任务
+  
+  task_sign必传，与sign的生成方式相同。即，先排除掉task_sign和sign，生成签名后赋值给task_sign，然后在签名一次得到sign
+  
+  且只能调用成功一次，第二次及之后会返回400
   
   完整的观看剧集内容任务调用接口如下：
   
   - 领取：app.bilibili.com/pgc/activity/score/task/receive/v2
+  - 开始：app.bilibili.com/pgc/activity/deliver/material/receive
   - 上报完成：app.bilibili.com/pgc/activity/deliver/task/complete
-  
-  入参position:
-  
-  - animatetab: jp_channel
-  - filmtab: tv_channel
 }
