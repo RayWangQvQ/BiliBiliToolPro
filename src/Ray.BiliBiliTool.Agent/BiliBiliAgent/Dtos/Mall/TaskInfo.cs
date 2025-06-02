@@ -8,7 +8,9 @@ public class TaskInfo
 
     public List<ModuleItem> Modules { get; set; } = [];
 
-    [Obsolete]
+    [Obsolete(
+        "The sign result comes from combine API is not correct, use IVipBigPointApi.GetThreeDaySignAsync instead."
+    )]
     public required SingTaskItem Sing_task_item { get; set; }
 }
 
