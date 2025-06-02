@@ -1,6 +1,6 @@
 ﻿namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.VipTask;
 
-public class ViewRequest
+public class ViewRequest : BaseAppRequest
 {
     public ViewRequest(string position)
     {
@@ -13,14 +13,5 @@ public class ViewRequest
 
     public string channel { get; } = Constants.Channel;
 
-    public int disable_rcmd { get; } = 0;
-
-    public string mobi_app { get; } = "android";
-
-    public string platform { get; } = "android";
-
     public string s_locale { get; } = "zh_CN";
-
-    public string statistics { get; } =
-        "{\"appId\":1,\"platform\":3,\"version\":\"6.85.0\",\"abtest\":\"\"}";
 }
