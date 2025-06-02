@@ -138,12 +138,12 @@ public class VipBigPointAppService(
     {
         await DailyDressViewMissionAsync(combine, ck, cancellationToken);
         await DailyVipMallViewMissionAsync(combine, ck, cancellationToken);
-        await DailyVipMallBuyMissionAsync(combine, ck, cancellationToken);
+        await DailyVipMallBuyMissionAsync(cancellationToken);
         await DailyAnimateTabMissionAsync(combine, ck, cancellationToken);
         await DailyFilmTabMissionAsync(combine, ck, cancellationToken);
         await DailyOgvWatchMissionAsync(combine, ck, cancellationToken);
-        await DailyTvOdBuyMissionAsync(combine, ck, cancellationToken);
-        await DailyDressBuyAmountMissionAsync(combine, ck, cancellationToken);
+        await DailyTvOdBuyMissionAsync(cancellationToken);
+        await DailyDressBuyAmountMissionAsync(cancellationToken);
     }
 
     [TaskInterceptor("日常1：浏览装扮商城", TaskLevel.Three, rethrowWhenException: false)]
@@ -180,11 +180,7 @@ public class VipBigPointAppService(
     }
 
     [TaskInterceptor("日常3：购买会员购", TaskLevel.Three, rethrowWhenException: false)]
-    private Task DailyVipMallBuyMissionAsync(
-        VipBigPointCombine combine,
-        BiliCookie ck,
-        CancellationToken cancellationToken = default
-    )
+    private Task DailyVipMallBuyMissionAsync(CancellationToken cancellationToken = default)
     {
         logger.LogInformation("需购买，跳过");
         return Task.CompletedTask;
@@ -239,22 +235,14 @@ public class VipBigPointAppService(
     }
 
     [TaskInterceptor("日常7：购买影片", TaskLevel.Three, rethrowWhenException: false)]
-    private Task DailyTvOdBuyMissionAsync(
-        VipBigPointCombine combine,
-        BiliCookie ck,
-        CancellationToken cancellationToken = default
-    )
+    private Task DailyTvOdBuyMissionAsync(CancellationToken cancellationToken = default)
     {
         logger.LogInformation("需购买，跳过");
         return Task.CompletedTask;
     }
 
     [TaskInterceptor("日常8：购买装扮", TaskLevel.Three, rethrowWhenException: false)]
-    private Task DailyDressBuyAmountMissionAsync(
-        VipBigPointCombine combine,
-        BiliCookie ck,
-        CancellationToken cancellationToken = default
-    )
+    private Task DailyDressBuyAmountMissionAsync(CancellationToken cancellationToken = default)
     {
         logger.LogInformation("需购买，跳过");
         return Task.CompletedTask;
