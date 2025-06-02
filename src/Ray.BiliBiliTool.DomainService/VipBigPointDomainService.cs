@@ -213,7 +213,10 @@ public class VipBigPointDomainService(
         {
             "animatetab" => "jp_channel",
             "filmtab" => "tv_channel",
-            _ => throw new ArgumentOutOfRangeException(),
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(taskCode),
+                $"Invalid taskCode: {taskCode}"
+            ),
         };
 
         logger.LogInformation("开始浏览");
