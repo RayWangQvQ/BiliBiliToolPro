@@ -16,6 +16,10 @@ BiliTool
 [![GitHub Release (latest SemVer)](https://img.shields.io/github/v/release/RayWangQvQ/BiliBiliToolPro?style=flat-square)](https://github.com/RayWangQvQ/BiliBiliToolPro/releases)
 [![GitHub License](https://img.shields.io/github/license/RayWangQvQ/BiliBiliToolPro?style=flat-square)](https://github.com/RayWangQvQ/BiliBiliToolPro/blob/main/LICENSE)
 
+<a href="https://trendshift.io/repositories/3329" target="_blank">
+    <img src="https://trendshift.io/api/badge/repositories/3329" alt="RayWangQvQ%2FBiliBiliToolPro | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/>
+</a>
+
 </div>
 
 **BiliTool 是一个自动执行任务的工具，当我们忘记做某项任务时，它会像一个贴心小助手，按照我们预先吩咐它的命令，在指定频率、时间范围内帮助我们完成计划的任务。**
