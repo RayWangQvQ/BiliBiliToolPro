@@ -5,7 +5,7 @@ public class BaseAppRequest
     // public string access_key { get; set; }
     // public string appkey { get; set; }
 
-    public string build { get; } = "7720200";
+    public string build { get; } = "8451100";
 
     public int disable_rcmd { get; } = 0;
 

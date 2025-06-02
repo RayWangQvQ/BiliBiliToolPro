@@ -5,7 +5,7 @@ meta {
 }
 
 get {
-  url: https://mall.bilibili.com/x/vip_point/task/combine?access_key={{access_key}}&appKey={{appKey}}&bili_local_id=910f57d9d7feaf6928e592860452d06b202505211207597aa9050a2e5c31f431&brand=Samsung&build=8451100&buvid={{buvid}}&channel=bili&containerName=AbstractWebActivity&csrf={{csrf}}&device=phone&deviceId=e3a44e1854764c4c&deviceName=SamsungSM-A5560&devicePlatform=Android12SamsungSM-A5560&device_id={{device_id}}&device_name=SamsungSM-A5560&device_platform=Android12SamsungSM-A5560&disable_rcmd=0&fingerprint=910f57d9d7feaf6928e592860452d06b202505211207597aa9050a2e5c31f431&isPad=false&localFingerprint=910f57d9d7feaf6928e592860452d06b202505211207597aa9050a2e5c31f431&local_id=XUA5651A9EDF7387153A945CDE96CADCB6000&mobi_app=android&modelName=SM-A5560&networkState=2&networkstate=2&osVer=12&platform=android&sessionID=01db4bc0&statistics={"appId":1,"platform":3,"version":"8.45.1","abtest":""}&statusBarHeight=72&ts=1748764069&sign=de7e2667157cccf4af3def524b6796e0
+  url: https://mall.bilibili.com/x/vip_point/task/combine?access_key={{access_key}}&appKey={{appKey}}&bili_local_id=910f57d9d7feaf6928e592860452d06b202505211207597aa9050a2e5c31f431&brand=Samsung&build={{build}}&buvid={{buvid}}&channel=bili&containerName=AbstractWebActivity&csrf={{csrf}}&device=phone&deviceId={{device_id}}&deviceName=SamsungSM-A5560&devicePlatform=Android12SamsungSM-A5560&device_id={{device_id}}&device_name=SamsungSM-A5560&device_platform=Android12SamsungSM-A5560&disable_rcmd=0&fingerprint=910f57d9d7feaf6928e592860452d06b202505211207597aa9050a2e5c31f431&isPad=false&localFingerprint=910f57d9d7feaf6928e592860452d06b202505211207597aa9050a2e5c31f431&local_id=XUA5651A9EDF7387153A945CDE96CADCB6000&mobi_app=android&modelName=SM-A5560&networkState=2&networkstate=2&osVer=12&platform=android&sessionID=01db4bc0&statistics={"appId":1,"platform":3,"version":"8.45.1","abtest":""}&statusBarHeight=72&ts=1748764069&sign=de7e2667157cccf4af3def524b6796e0
   body: none
   auth: inherit
 }
@@ -15,13 +15,13 @@ params:query {
   appKey: {{appKey}}
   bili_local_id: 910f57d9d7feaf6928e592860452d06b202505211207597aa9050a2e5c31f431
   brand: Samsung
-  build: 8451100
+  build: {{build}}
   buvid: {{buvid}}
   channel: bili
   containerName: AbstractWebActivity
   csrf: {{csrf}}
   device: phone
-  deviceId: e3a44e1854764c4c
+  deviceId: {{device_id}}
   deviceName: SamsungSM-A5560
   devicePlatform: Android12SamsungSM-A5560
   device_id: {{device_id}}
@@ -64,6 +64,13 @@ headers {
 }
 
 docs {
+  终端：APP
+  
+  作用：获取大会员赚大积分的任务列表
+  
+  入口：
+    - 我的->会员中心->赚大积分->查看8项任务
+  
   Response sample:
   
   ```json
@@ -302,4 +309,6 @@ docs {
   	}
   }
   ```
+  
+  `build`版本号不同，会返回不同的结果。
 }

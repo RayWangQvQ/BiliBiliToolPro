@@ -19,21 +19,26 @@ public class VipBigPointDomainService(
     IVipBigPointApi vipApi,
     IMallApi mallApi,
     IVipMallApi vipMallApi,
-    IVideoApi videoApi
+    IVideoApi videoApi,
+    IAccountDomainService accountDomainService,
+    IVideoDomainService videoDomainService
 ) : IVipBigPointDomainService
 {
     private readonly VipBigPointOptions _vipBigPointOptions = vipBigPointOptions.CurrentValue;
 
-    public async Task<VipTaskInfo> GetTaskListAsync(BiliCookie ck)
+    public async Task<VipBigPointCombine> GetCombineAsync(BiliCookie ck)
     {
-        var allTasks = await vipApi.GetTaskListAsync(ck.ToString());
+        var allTasks = await mallApi.GetCombineAsync(
+            new GetCombineRequest { csrf = ck.BiliJct, buvid = ck.Buvid },
+            ck.ToString()
+        );
         if (allTasks.Code != 0)
             throw new Exception(allTasks.ToJsonStr());
         return allTasks.Data;
     }
 
     /// <summary>
-    /// 领取大会员专属经验包
+    /// 领取大会员专属等级加速包
     /// </summary>
     public async Task VipExpressAsync(BiliCookie ck)
     {
@@ -48,8 +53,8 @@ public class VipBigPointDomainService(
                     logger.LogInformation("大会员经验观看任务未完成");
                     logger.LogInformation("开始观看视频");
                     // 观看视频，暂时没有好办法解决，先这样使着
-                    // DailyTaskInfo dailyTaskInfo = await accountDomainService.GetDailyTaskStatus(ck);
-                    // await videoDomainService.WatchAndShareVideo(dailyTaskInfo, ck);
+                    DailyTaskInfo dailyTaskInfo = await accountDomainService.GetDailyTaskStatus(ck);
+                    await videoDomainService.WatchAndShareVideo(dailyTaskInfo, ck);
                     // 跳转到未兑换，执行兑换任务
                     goto case 0;
 
@@ -74,6 +79,8 @@ public class VipBigPointDomainService(
                     }
 
                     logger.LogInformation("领取成功，经验+10 √");
+                    var combine = await GetCombineAsync(ck);
+                    combine.LogPointInfo(logger);
                     break;
 
                 default:
@@ -88,7 +95,7 @@ public class VipBigPointDomainService(
     /// </summary>
     /// <param name="ck"></param>
     /// <exception cref="Exception"></exception>
-    public async Task Sign(BiliCookie ck)
+    public async Task SignAsync(BiliCookie ck)
     {
         var signInfo = await vipApi.GetThreeDaySignAsync(
             new ThreeDaySignRequest { csrf = ck.BiliJct },
@@ -111,26 +118,32 @@ public class VipBigPointDomainService(
 
         logger.LogInformation("签到成功");
         logger.LogInformation(re.Data.ToString());
+
+        signInfo = await vipApi.GetThreeDaySignAsync(
+            new ThreeDaySignRequest { csrf = ck.BiliJct },
+            ck.ToString()
+        );
+        signInfo.Data.LogPointInfo(logger);
     }
 
     /// <summary>
     /// 领取任务
     /// </summary>
-    /// <param name="info"></param>
+    /// <param name="combine"></param>
     /// <param name="ck"></param>
-    public async Task ReceiveTasksAsync(VipTaskInfo info, BiliCookie ck)
+    public async Task ReceiveDailyMissionsAsync(VipBigPointCombine combine, BiliCookie ck)
     {
         const string moduleCode = "日常任务";
 
-        var module = info.Task_info.Modules.FirstOrDefault(x => x.module_title == moduleCode);
-        var needReceiveTasks = module?.common_task_item.Where(x => x.state == 0).ToList();
-        if (needReceiveTasks == null || !needReceiveTasks.Any())
+        var module = combine.Task_info.Modules.FirstOrDefault(x => x.module_title == moduleCode);
+        var missionsNeedReceive = module?.common_task_item.Where(x => x.state == 0).ToList();
+        if (missionsNeedReceive == null || missionsNeedReceive.Count == 0)
         {
             logger.LogInformation("均已领取，跳过");
             return;
         }
 
-        foreach (var targetTask in needReceiveTasks)
+        foreach (var targetTask in missionsNeedReceive)
         {
             logger.LogInformation("开始领取任务：{task}", targetTask.title);
             await TryReceive(targetTask.task_code, ck);
@@ -138,7 +151,7 @@ public class VipBigPointDomainService(
     }
 
     public async Task ReceiveAndCompleteAsync(
-        VipTaskInfo info,
+        VipBigPointCombine info,
         string moduleCode,
         string taskCode,
         BiliCookie ck,
@@ -172,11 +185,11 @@ public class VipBigPointDomainService(
         //确认
         if (re)
         {
-            var infoResult = await vipApi.GetTaskListAsync(ck.ToString());
-            if (infoResult.Code != 0)
-                throw new Exception(infoResult.ToJsonStr());
-
-            logger.LogInformation("确认：{re}", bonusTask is { state: 3, complete_times: >= 1 });
+            var combine = await GetCombineAsync(ck);
+            module = combine.Task_info.Modules.FirstOrDefault(x => x.module_title == moduleCode);
+            bonusTask = module?.common_task_item.FirstOrDefault(x => x.task_code == taskCode);
+            var success = bonusTask is { state: 3, complete_times: >= 1 };
+            logger.LogInformation("确认：{re}", success ? "成功，经验 +10" : "失败");
         }
     }
 
@@ -215,7 +228,6 @@ public class VipBigPointDomainService(
 
     public async Task<bool> CompleteViewVipMallAsync(string taskCode, BiliCookie ck)
     {
-        logger.LogInformation("开始完成任务");
         var re = await vipMallApi.ViewVipMallAsync(
             new ViewVipMallRequest { Csrf = ck.BiliJct },
             ck.ToString()

@@ -1,20 +1,21 @@
 using Ray.BiliBiliTool.Agent;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Mall;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.VipTask;
 
 namespace Ray.BiliBiliTool.DomainService.Interfaces;
 
 public interface IVipBigPointDomainService : IDomainService
 {
-    Task<VipTaskInfo> GetTaskListAsync(BiliCookie ck);
+    Task<VipBigPointCombine> GetCombineAsync(BiliCookie ck);
 
     Task VipExpressAsync(BiliCookie ck);
 
-    Task Sign(BiliCookie ck);
+    Task SignAsync(BiliCookie ck);
 
-    Task ReceiveTasksAsync(VipTaskInfo info, BiliCookie ck);
+    Task ReceiveDailyMissionsAsync(VipBigPointCombine combine, BiliCookie ck);
 
     Task ReceiveAndCompleteAsync(
-        VipTaskInfo info,
+        VipBigPointCombine info,
         string moduleCode,
         string taskCode,
         BiliCookie ck,

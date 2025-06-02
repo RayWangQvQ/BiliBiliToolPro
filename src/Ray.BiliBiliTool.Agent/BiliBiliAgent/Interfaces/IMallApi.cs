@@ -26,4 +26,16 @@ public interface IMallApi
         [JsonContent] Sign2Request request,
         [Header("Cookie")] string ck
     );
+
+    /// <summary>
+    /// 获取任务 combine 信息
+    /// </summary>
+    /// <remarks>里面的登录信息是错误的，阿B特色</remarks>
+    /// <returns></returns>
+    [Header("Referer", "https://big.bilibili.com/mobile/bigPoint/task")]
+    [HttpGet("/x/vip_point/task/combine")]
+    Task<BiliApiResponse<VipBigPointCombine>> GetCombineAsync(
+        [PathQuery] GetCombineRequest request,
+        [Header("Cookie")] string ck
+    );
 }

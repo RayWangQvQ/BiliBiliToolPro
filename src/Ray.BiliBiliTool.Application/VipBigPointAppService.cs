@@ -1,11 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
-using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.ViewMall;
-using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.VipTask;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Mall;
 using Ray.BiliBiliTool.Application.Attributes;
 using Ray.BiliBiliTool.Application.Contracts;
-using Ray.BiliBiliTool.DomainService.Dtos;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 using Ray.BiliBiliTool.Infrastructure.Cookie;
 
@@ -24,89 +22,241 @@ public class VipBigPointAppService(
         CancellationToken cancellationToken = default
     )
     {
-        var userInfo = await GetUserInfo(ck);
-        if (userInfo.GetVipType() == VipType.None)
+        bool isVip = await LoginAndCheckVipStatusAsync(ck, cancellationToken);
+        if (!isVip)
         {
-            logger.LogInformation("当前不是大会员，跳过任务");
             return;
         }
 
-        VipTaskInfo info = await vipBigPointDomainService.GetTaskListAsync(ck);
-        info.LogInfo(logger);
+        await ExpressAsync(ck, cancellationToken);
+        await SignAsync(ck, cancellationToken);
+        var combine = await CheckCombineAsync(ck, cancellationToken);
 
-        logger.LogInformation("大会员经验领取任务");
+        // 2 个一次性任务
+        await BonusMissionAsync(combine, ck, cancellationToken);
+        await PrivilegeMissionAsync(combine, ck, cancellationToken);
+
+        // 日常任务
+        await ReceiveMissionsAsync(combine, ck, cancellationToken);
+        await DailyMissionsAsync(combine, ck, cancellationToken);
+
+        await CheckCombineAsync(ck, cancellationToken);
+    }
+
+    [TaskInterceptor("登录并检测会员状态")]
+    private async Task<bool> LoginAndCheckVipStatusAsync(
+        BiliCookie ck,
+        CancellationToken cancellationToken = default
+    )
+    {
+        UserInfo userInfo = await loginDomainService.LoginByCookie(ck);
+        if (userInfo.GetVipType() == VipType.None)
+        {
+            logger.LogInformation("当前不是大会员，跳过任务");
+            return false;
+        }
+
+        return true;
+    }
+
+    [TaskInterceptor("查看大会员大积分状态")]
+    private async Task<VipBigPointCombine> CheckCombineAsync(
+        BiliCookie ck,
+        CancellationToken cancellationToken = default
+    )
+    {
+        VipBigPointCombine combine = await vipBigPointDomainService.GetCombineAsync(ck);
+        combine.LogFullInfo(logger);
+        return combine;
+    }
+
+    /// <summary>
+    /// 领经验（专属等级加速包），观看视频 1 分钟领取 10 经验
+    /// </summary>
+    /// <param name="ck"></param>
+    /// <param name="cancellationToken"></param>
+    [TaskInterceptor("大会员经验观看任务", rethrowWhenException: false)]
+    private async Task ExpressAsync(BiliCookie ck, CancellationToken cancellationToken = default)
+    {
         await vipBigPointDomainService.VipExpressAsync(ck);
+    }
 
-        //签到
-        await vipBigPointDomainService.Sign(ck);
+    [TaskInterceptor("签到任务", rethrowWhenException: false)]
+    private async Task SignAsync(BiliCookie ck, CancellationToken cancellationToken = default)
+    {
+        await vipBigPointDomainService.SignAsync(ck);
+    }
 
-        //领取需要领取的任务
-        await vipBigPointDomainService.ReceiveTasksAsync(info, ck);
+    [TaskInterceptor("领取日常任务", rethrowWhenException: false)]
+    private async Task ReceiveMissionsAsync(
+        VipBigPointCombine combine,
+        BiliCookie ck,
+        CancellationToken cancellationToken = default
+    )
+    {
+        await vipBigPointDomainService.ReceiveDailyMissionsAsync(combine, ck);
+    }
 
-        //福利任务
+    [TaskInterceptor("福利任务", rethrowWhenException: false)]
+    private async Task BonusMissionAsync(
+        VipBigPointCombine combine,
+        BiliCookie ck,
+        CancellationToken cancellationToken = default
+    )
+    {
         await vipBigPointDomainService.ReceiveAndCompleteAsync(
-            info,
+            combine,
             "福利任务",
             "bonus",
             ck,
             async (_, _) => await vipBigPointDomainService.CompleteAsync("bonus", ck)
         );
+    }
 
-        //体验任务
+    [TaskInterceptor("体验任务", rethrowWhenException: false)]
+    private async Task PrivilegeMissionAsync(
+        VipBigPointCombine combine,
+        BiliCookie ck,
+        CancellationToken cancellationToken = default
+    )
+    {
         await vipBigPointDomainService.ReceiveAndCompleteAsync(
-            info,
+            combine,
             "体验任务",
             "privilege",
             ck,
             async (_, _) => await vipBigPointDomainService.CompleteAsync("privilege", ck)
         );
+    }
 
-        //日常任务
-        //浏览追番频道页10秒
+    [TaskInterceptor("日常任务", rethrowWhenException: false)]
+    private async Task DailyMissionsAsync(
+        VipBigPointCombine combine,
+        BiliCookie ck,
+        CancellationToken cancellationToken = default
+    )
+    {
+        await DailyDressViewMissionAsync(combine, ck, cancellationToken);
+        await DailyVipMallViewMissionAsync(combine, ck, cancellationToken);
+        await DailyVipMallBuyMissionAsync(combine, ck, cancellationToken);
+        await DailyAnimateTabMissionAsync(combine, ck, cancellationToken);
+        await DailyFilmTabMissionAsync(combine, ck, cancellationToken);
+        await DailyOgvWatchMissionAsync(combine, ck, cancellationToken);
+        await DailyTvOdBuyMissionAsync(combine, ck, cancellationToken);
+        await DailyDressBuyAmountMissionAsync(combine, ck, cancellationToken);
+    }
+
+    [TaskInterceptor("日常1：浏览装扮商城", TaskLevel.Three, rethrowWhenException: false)]
+    private async Task DailyDressViewMissionAsync(
+        VipBigPointCombine combine,
+        BiliCookie ck,
+        CancellationToken cancellationToken = default
+    )
+    {
         await vipBigPointDomainService.ReceiveAndCompleteAsync(
-            info,
+            combine,
             "日常任务",
-            "animatetab",
+            "dress-view",
             ck,
-            async (_, _) => await vipBigPointDomainService.CompleteViewAsync("animatetab", ck)
+            async (_, _) => await vipBigPointDomainService.CompleteV2Async("dress-view", ck)
         );
+    }
 
-        //浏览会员购页面10秒
+    [TaskInterceptor("日常2：浏览会员购", TaskLevel.Three, rethrowWhenException: false)]
+    private async Task DailyVipMallViewMissionAsync(
+        VipBigPointCombine combine,
+        BiliCookie ck,
+        CancellationToken cancellationToken = default
+    )
+    {
         await vipBigPointDomainService.ReceiveAndCompleteAsync(
-            info,
+            combine,
             "日常任务",
             "vipmallview",
             ck,
             async (_, _) =>
                 await vipBigPointDomainService.CompleteViewVipMallAsync("vipmallview", ck)
         );
+    }
 
-        //浏览装扮商城
+    [TaskInterceptor("日常3：购买会员购", TaskLevel.Three, rethrowWhenException: false)]
+    private Task DailyVipMallBuyMissionAsync(
+        VipBigPointCombine combine,
+        BiliCookie ck,
+        CancellationToken cancellationToken = default
+    )
+    {
+        logger.LogInformation("需购买，跳过");
+        return Task.CompletedTask;
+    }
+
+    [TaskInterceptor("日常4：浏览追番频道", TaskLevel.Three, rethrowWhenException: false)]
+    private async Task DailyAnimateTabMissionAsync(
+        VipBigPointCombine combine,
+        BiliCookie ck,
+        CancellationToken cancellationToken = default
+    )
+    {
         await vipBigPointDomainService.ReceiveAndCompleteAsync(
-            info,
+            combine,
             "日常任务",
-            "dress-view",
+            "animatetab",
             ck,
-            async (_, _) => await vipBigPointDomainService.CompleteV2Async("dress-view", ck)
+            async (_, _) => await vipBigPointDomainService.CompleteViewAsync("animatetab", ck)
         );
+    }
 
-        //观看剧集内容
+    [TaskInterceptor("日常5：浏览影视频道", TaskLevel.Three, rethrowWhenException: false)]
+    private async Task DailyFilmTabMissionAsync(
+        VipBigPointCombine combine,
+        BiliCookie ck,
+        CancellationToken cancellationToken = default
+    )
+    {
         await vipBigPointDomainService.ReceiveAndCompleteAsync(
-            info,
+            combine,
+            "日常任务",
+            "filmtab",
+            ck,
+            async (_, _) => await vipBigPointDomainService.CompleteViewAsync("filmtab", ck)
+        );
+    }
+
+    [TaskInterceptor("日常6：观看剧集", TaskLevel.Three, rethrowWhenException: false)]
+    private async Task DailyOgvWatchMissionAsync(
+        VipBigPointCombine combine,
+        BiliCookie ck,
+        CancellationToken cancellationToken = default
+    )
+    {
+        await vipBigPointDomainService.ReceiveAndCompleteAsync(
+            combine,
             "日常任务",
             "ogvwatchnew",
             ck,
             async (_, _) => await vipBigPointDomainService.CompleteV2Async("ogvwatchnew", ck)
         );
-
-        info.LogInfo(logger);
     }
 
-    [TaskInterceptor("测试Cookie")]
-    private async Task<UserInfo> GetUserInfo(BiliCookie ck)
+    [TaskInterceptor("日常7：购买影片", TaskLevel.Three, rethrowWhenException: false)]
+    private Task DailyTvOdBuyMissionAsync(
+        VipBigPointCombine combine,
+        BiliCookie ck,
+        CancellationToken cancellationToken = default
+    )
     {
-        UserInfo userInfo = await loginDomainService.LoginByCookie(ck);
+        logger.LogInformation("需购买，跳过");
+        return Task.CompletedTask;
+    }
 
-        return userInfo;
+    [TaskInterceptor("日常8：购买装扮", TaskLevel.Three, rethrowWhenException: false)]
+    private Task DailyDressBuyAmountMissionAsync(
+        VipBigPointCombine combine,
+        BiliCookie ck,
+        CancellationToken cancellationToken = default
+    )
+    {
+        logger.LogInformation("需购买，跳过");
+        return Task.CompletedTask;
     }
 }

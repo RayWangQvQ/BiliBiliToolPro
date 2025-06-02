@@ -15,7 +15,7 @@ public class Sign2Response
     public override string ToString()
     {
         var sb = new StringBuilder();
-        sb.AppendLine($"获得经验：{score + vipScore}");
+        sb.AppendLine($"获得经验：{score}");
         sb.AppendLine($"累计签到：{count}/{duration} 天");
 
         return sb.ToString();
