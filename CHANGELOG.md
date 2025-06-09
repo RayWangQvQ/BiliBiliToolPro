@@ -1,3 +1,13 @@
+## 3.2.0
+- Fix: 修复大会员大积分签到任务
+- Fix: 修复大会员大积分的签到和浏览追番频道任务
+- Feature[#901]: 实现大会员大积分的浏览影视频道页任务
+- Feature[#921]: 新增大会员大积分的观看剧集 bruno 信息
+- Feature: 鉴权不再兼容老版本青龙（老版本需要手动添加 bili cookie）
+- Feature: 修复 warnings
+- Feature: 移除无用的using
+- Fix: 修复 VerifyPR CI/CD 流水线
+- Feature: README 添加 Trending 信息
 ## 3.1.0
 - Feature[#842]: 对接青龙新的 OpenAPI，实现青龙版 Bili 登录后自动存储 Cookie
 - Feature[#842]: 兼容老版本青龙的文件鉴权方式

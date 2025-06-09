@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.VipTask;
+﻿namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.VipTask;
 
 public class VouchersInfoResponse
 {

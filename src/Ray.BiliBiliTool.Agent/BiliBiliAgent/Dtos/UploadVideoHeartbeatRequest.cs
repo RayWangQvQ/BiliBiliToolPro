@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
+﻿namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 
 public class UploadVideoHeartbeatRequest
 {
@@ -11,7 +9,7 @@ public class UploadVideoHeartbeatRequest
     /// </summary>
     public long? Cid { get; set; }
 
-    public string Bvid { get; set; }
+    public required string Bvid { get; set; }
 
     public long? Epid { get; set; }
 
@@ -22,7 +20,7 @@ public class UploadVideoHeartbeatRequest
     /// </summary>
     public long Mid { get; set; }
 
-    public string Csrf { get; set; }
+    public required string Csrf { get; set; }
 
     /// <summary>
     /// 视频播放进度（即视频进度条的当前秒数），单位为秒，默认为0

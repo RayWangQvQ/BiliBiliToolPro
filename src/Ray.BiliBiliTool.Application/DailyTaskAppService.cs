@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent;
@@ -91,8 +87,6 @@ public class DailyTaskAppService(
     private async Task<UserInfo> Login(BiliCookie ck)
     {
         UserInfo userInfo = await accountDomainService.LoginByCookie(ck);
-        if (userInfo == null)
-            throw new Exception("登录失败，请检查Cookie"); //终止流程
 
         _expDic.TryGetValue("每日登录", out int exp);
         logger.LogInformation("登录成功，经验+{exp} √", exp);
@@ -131,7 +125,7 @@ public class DailyTaskAppService(
     [TaskInterceptor("投币", rethrowWhenException: false)]
     private async Task AddCoins(UserInfo userInfo, BiliCookie ck)
     {
-        if (_dailyTaskOptions.SaveCoinsWhenLv6 && userInfo.Level_info.Current_level >= 6)
+        if (_dailyTaskOptions.SaveCoinsWhenLv6 && userInfo.Level_info?.Current_level >= 6)
         {
             logger.LogInformation("已经为LV6大佬，开始白嫖");
             return;
@@ -181,7 +175,7 @@ public class DailyTaskAppService(
         {
             try
             {
-                userInfo = await accountDomainService.LoginByCookie(ck);
+                await accountDomainService.LoginByCookie(ck);
             }
             catch (Exception ex)
             {

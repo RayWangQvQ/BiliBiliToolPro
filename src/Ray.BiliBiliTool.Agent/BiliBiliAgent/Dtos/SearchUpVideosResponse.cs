@@ -1,35 +1,33 @@
-﻿using System.Collections.Generic;
-
-namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
+﻿namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 
 public class SearchUpVideosResponse
 {
-    public UpContent List { get; set; }
+    public UpContent? List { get; set; }
 
-    public BiliPageResult Page { get; set; }
+    public required BiliPageResult Page { get; set; }
 }
 
 public class UpContent
 {
-    public List<UpVideoInfo> Vlist { get; set; }
+    public List<UpVideoInfo> Vlist { get; set; } = [];
 }
 
 public class UpVideoInfo
 {
     public long Aid { get; set; }
 
-    public string Author { get; set; }
+    public string? Author { get; set; }
 
-    public string Bvid { get; set; }
+    public required string Bvid { get; set; }
 
-    public string Title { get; set; }
+    public required string Title { get; set; }
 
     /// <summary>
     /// 视频时长
     /// <sample>61:05</sample>
     /// <sample>00:15</sample>
     /// </summary>
-    public string Length { get; set; }
+    public required string Length { get; set; }
 
     /// <summary>
     /// 视频时长的秒数
@@ -47,7 +45,7 @@ public class UpVideoInfo
                 var sec = int.Parse(list[1]);
                 return min * 60 + sec;
             }
-            catch (System.Exception)
+            catch (Exception)
             {
                 //throw;
             }

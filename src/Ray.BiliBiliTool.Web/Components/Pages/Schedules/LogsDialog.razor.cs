@@ -1,11 +1,7 @@
-using System.Collections.ObjectModel;
-using System.Text;
-using BlazingQuartz;
 using BlazingQuartz.Core.Models;
 using BlazingQuartz.Core.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
-using MudBlazor;
 using MudBlazor;
 using Ray.BiliBiliTool.Domain;
 using Ray.BiliBiliTool.Infrastructure.EF;
@@ -41,15 +37,13 @@ public partial class LogsDialog : ComponentBase
     private Timer? _timer;
     private CancellationTokenSource _cancellationTokenSource = new();
     private ElementReference _logContainerReference;
-    private Random _rnd = new Random();
-    private Dictionary<string, DateTime> _processedLogIds = new();
     private string? _fireInstanceId;
 
     protected override async Task OnInitializedAsync()
     {
         await using var context = await DbFactory.CreateDbContextAsync();
         var execution = await context
-            .ExecutionLogs.Where(x => x.JobName == JobKey.Name && x.TriggerName == TriggerKey.Name)
+            .ExecutionLogs.Where(x => x.JobName == JobKey.Name && x.TriggerName == TriggerKey!.Name)
             .OrderByDescending(x => x.FireTimeUtc)
             .FirstOrDefaultAsync();
         _fireInstanceId = execution?.RunInstanceId;

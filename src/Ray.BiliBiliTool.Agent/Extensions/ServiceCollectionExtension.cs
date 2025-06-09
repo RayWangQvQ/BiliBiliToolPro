@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
+﻿using System.Net;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -82,29 +78,12 @@ public static class ServiceCollectionExtension
         services.AddBiliBiliClientApi<ILiveApi>(BiliHosts.Live, config);
 
         services.AddBiliBiliClientApi<IVipBigPointApi>(BiliHosts.App, configApp);
+        services.AddBiliBiliClientApi<IMallApi>(BiliHosts.Mall, configApp);
 
         //qinglong
         var qinglongHost = configuration["QL_URL"] ?? "http://localhost:5600";
         services
             .AddHttpApi<IQingLongApi>(o =>
-            {
-                o.HttpHost = new Uri(qinglongHost);
-                o.UseDefaultUserAgent = false;
-            })
-            .ConfigureHttpClient(
-                (sp, c) =>
-                {
-                    c.DefaultRequestHeaders.Add(
-                        "User-Agent",
-                        sp.GetRequiredService<
-                            IOptionsMonitor<SecurityOptions>
-                        >().CurrentValue.UserAgent
-                    );
-                }
-            )
-            .AddPolicyHandler(GetRetryPolicy());
-        services
-            .AddHttpApi<IQingLongOldApi>(o =>
             {
                 o.HttpHost = new Uri(qinglongHost);
                 o.UseDefaultUserAgent = false;
@@ -169,13 +148,13 @@ public static class ServiceCollectionExtension
         IConfiguration configuration
     )
     {
-        string proxyAddress = configuration["Security:WebProxy"];
+        var proxyAddress = configuration["Security:WebProxy"];
         if (proxyAddress.IsNotNullOrEmpty())
         {
             WebProxy webProxy = new WebProxy();
 
             //user:password@host:port http proxy only .Tested with tinyproxy-1.11.0-rc1
-            if (proxyAddress.Contains("@"))
+            if (proxyAddress!.Contains("@"))
             {
                 string userPass = proxyAddress.Split("@")[0];
                 string address = proxyAddress.Split("@")[1];
@@ -184,8 +163,8 @@ public static class ServiceCollectionExtension
                 string proxyPass = "";
                 if (userPass.Contains(":"))
                 {
-                    proxyUser = userPass?.Split(":")[0];
-                    proxyPass = userPass?.Split(":")[1];
+                    proxyUser = userPass.Split(":")[0];
+                    proxyPass = userPass.Split(":")[1];
                 }
 
                 webProxy.Address = new Uri("http://" + address);

@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Mall;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.VipTask;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Console;
@@ -36,7 +37,7 @@ public class VipBigPointApiTest
     {
         // Arrange
         // Act
-        BiliApiResponse<VipTaskInfo> re = await _api.GetTaskListAsync(null);
+        BiliApiResponse<VipBigPointCombine> re = await _api.GetCombineAsync(null);
 
         // Assert
         re.Code.Should().Be(0);

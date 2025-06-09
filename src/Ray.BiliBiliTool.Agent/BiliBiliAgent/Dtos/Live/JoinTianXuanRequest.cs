@@ -1,5 +1,4 @@
-﻿using System;
-using Ray.BiliBiliTool.Infrastructure.Helpers;
+﻿using Ray.BiliBiliTool.Infrastructure.Helpers;
 
 namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live;
 
@@ -23,7 +22,7 @@ public class JoinTianXuanRequest
     /// <summary>
     /// bili_jct（取自Cookie）
     /// </summary>
-    public string Csrf { get; set; }
+    public required string Csrf { get; set; }
 
     public string Csrf_token => Csrf;
 

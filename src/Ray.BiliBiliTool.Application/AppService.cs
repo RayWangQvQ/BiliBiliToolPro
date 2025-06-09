@@ -1,6 +1,4 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using Ray.BiliBiliTool.Application.Contracts;
+﻿using Ray.BiliBiliTool.Application.Contracts;
 
 namespace Ray.BiliBiliTool.Application;
 

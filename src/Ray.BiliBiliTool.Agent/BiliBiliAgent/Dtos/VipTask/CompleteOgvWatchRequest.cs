@@ -12,7 +12,12 @@ public class CompleteOgvWatchRequest : BaseAppRequest
 
     public string token { get; set; }
 
-    public string task_sign { get; set; }
+    public string? task_sign { get; set; }
 
     public long timestamp { get; set; }
+
+    public string c_locale { get; } = "zh_CN";
+    public string channel { get; } = Constants.Channel;
+    public string s_locale { get; } = "zh_CN";
+    public string from_spmid { get; } = "united.player-video-detail.player.continue";
 }

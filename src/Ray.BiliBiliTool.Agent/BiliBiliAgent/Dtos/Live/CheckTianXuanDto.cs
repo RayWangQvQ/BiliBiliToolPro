@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live;
+﻿namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live;
 
 public class CheckTianXuanDto
 {
@@ -17,7 +14,7 @@ public class CheckTianXuanDto
     /// <summary>
     /// 奖励名称
     /// </summary>
-    public string Award_name { get; set; }
+    public required string Award_name { get; set; }
 
     /// <summary>
     /// 奖励数量
@@ -27,7 +24,7 @@ public class CheckTianXuanDto
     /// <summary>
     /// 弹幕内容
     /// </summary>
-    public string Danmu { get; set; }
+    public string? Danmu { get; set; }
 
     public int Join_type { get; set; }
 
@@ -44,12 +41,12 @@ public class CheckTianXuanDto
     /// <summary>
     /// 要求名称
     /// </summary>
-    public string Require_text { get; set; }
+    public string? Require_text { get; set; }
 
     #region 礼物
     public long Gift_id { get; set; }
 
-    public string Gift_name { get; set; }
+    public string? Gift_name { get; set; }
 
     public int Gift_num { get; set; }
 
@@ -65,23 +62,23 @@ public class CheckTianXuanDto
     public bool AwardNameIsSatisfied(List<string> includeKeys, List<string> excludeKeys)
     {
         //只要包含了排除的关键字，就排除
-        if (excludeKeys != null && excludeKeys.Any())
+        if (excludeKeys.Any())
         {
             foreach (var item in excludeKeys)
             {
-                if (this.Award_name.Contains(item))
+                if (Award_name.Contains(item))
                     return false;
             }
         }
 
         //遍历所有包含关键字，包含其一就确认，否则保持排除
         bool isInclude = true;
-        if (includeKeys != null && includeKeys.Any())
+        if (includeKeys.Any())
         {
             isInclude = false;
             foreach (var item in includeKeys)
             {
-                if (this.Award_name.Contains(item))
+                if (Award_name.Contains(item))
                 {
                     isInclude = true;
                     break;

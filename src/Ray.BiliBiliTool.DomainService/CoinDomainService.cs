@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Ray.BiliBiliTool.Agent;
+﻿using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 
@@ -18,7 +17,7 @@ public class CoinDomainService(IAccountApi accountApi, IDailyTaskApi dailyTaskAp
     public async Task<decimal> GetCoinBalance(BiliCookie ck)
     {
         var response = await accountApi.GetCoinBalanceAsync(ck.ToString());
-        return response.Data.Money ?? 0;
+        return response.Data!.Money ?? 0;
     }
 
     /// <summary>

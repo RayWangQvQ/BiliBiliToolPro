@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Config.Options;
 
 namespace Ray.BiliBiliTool.Agent.HttpClientDelegatingHandlers;
@@ -39,7 +34,7 @@ public class IntervalDelegatingHandler(IOptionsMonitor<SecurityOptions> security
 
         int seconds = 0;
         //需要特殊处理的接口
-        if (_special.TryGetValue(request.RequestUri.AbsolutePath, out int s))
+        if (_special.TryGetValue(request.RequestUri?.AbsolutePath ?? "", out int s))
         {
             seconds = s;
         }

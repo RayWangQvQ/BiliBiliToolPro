@@ -1,0 +1,314 @@
+meta {
+  name: combine
+  type: http
+  seq: 2
+}
+
+get {
+  url: https://mall.bilibili.com/x/vip_point/task/combine?access_key={{access_key}}&appKey={{appKey}}&bili_local_id=910f57d9d7feaf6928e592860452d06b202505211207597aa9050a2e5c31f431&brand=Samsung&build={{build}}&buvid={{buvid}}&channel=bili&containerName=AbstractWebActivity&csrf={{csrf}}&device=phone&deviceId={{device_id}}&deviceName=SamsungSM-A5560&devicePlatform=Android12SamsungSM-A5560&device_id={{device_id}}&device_name=SamsungSM-A5560&device_platform=Android12SamsungSM-A5560&disable_rcmd=0&fingerprint=910f57d9d7feaf6928e592860452d06b202505211207597aa9050a2e5c31f431&isPad=false&localFingerprint=910f57d9d7feaf6928e592860452d06b202505211207597aa9050a2e5c31f431&local_id=XUA5651A9EDF7387153A945CDE96CADCB6000&mobi_app=android&modelName=SM-A5560&networkState=2&networkstate=2&osVer=12&platform=android&sessionID=01db4bc0&statistics={"appId":1,"platform":3,"version":"8.45.1","abtest":""}&statusBarHeight=72&ts=1748764069&sign=de7e2667157cccf4af3def524b6796e0
+  body: none
+  auth: inherit
+}
+
+params:query {
+  access_key: {{access_key}}
+  appKey: {{appKey}}
+  bili_local_id: 910f57d9d7feaf6928e592860452d06b202505211207597aa9050a2e5c31f431
+  brand: Samsung
+  build: {{build}}
+  buvid: {{buvid}}
+  channel: bili
+  containerName: AbstractWebActivity
+  csrf: {{csrf}}
+  device: phone
+  deviceId: {{device_id}}
+  deviceName: SamsungSM-A5560
+  devicePlatform: Android12SamsungSM-A5560
+  device_id: {{device_id}}
+  device_name: SamsungSM-A5560
+  device_platform: Android12SamsungSM-A5560
+  disable_rcmd: 0
+  fingerprint: 910f57d9d7feaf6928e592860452d06b202505211207597aa9050a2e5c31f431
+  isPad: false
+  localFingerprint: 910f57d9d7feaf6928e592860452d06b202505211207597aa9050a2e5c31f431
+  local_id: XUA5651A9EDF7387153A945CDE96CADCB6000
+  mobi_app: android
+  modelName: SM-A5560
+  networkState: 2
+  networkstate: 2
+  osVer: 12
+  platform: android
+  sessionID: 01db4bc0
+  statistics: {"appId":1,"platform":3,"version":"8.45.1","abtest":""}
+  statusBarHeight: 72
+  ts: 1748764069
+  sign: de7e2667157cccf4af3def524b6796e0
+}
+
+headers {
+  Host: api.bilibili.com
+  Cookie: {{cookieStr}}
+  accept: application/json, text/plain, */*
+  bili-http-engine: ignet
+  buvid: {{buvid}}
+  content-type: application/json
+  native_api_from: h5
+  referer: https://big.bilibili.com/mobile/bigPoint/task
+  user-agent: {{user-agent}}
+  x-bili-aurora-eid: UlAAQFkMBVkH
+  x-bili-metadata-legal-region: CN
+  x-bili-mid: 341688380
+  x-bili-net-bin: DQAAgL8gAQ
+  x-bili-ticket: eyJhbGciOiJIUzI1NiIsImtpZCI6InMwMyIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDg3NzU1OTksImlhdCI6MTc0ODc0NjQ5OSwiYnV2aWQiOiJYVUE1NjUxQTlFREY3Mzg3MTUzQTk0NUNERTk2Q0FEQ0I2MDAwIn0.k0x2o3e2Q3W-6Wzc56IhbLgSjDKTaAuUV9om7K213fI
+  x-bili-trace-id: d605d9f1dc3818a42f3a22b5c4683c05:2f3a22b5c4683c05:0:0
+}
+
+docs {
+  终端：APP
+  
+  作用：获取大会员赚大积分的任务列表
+  
+  入口：
+    - 我的->会员中心->赚大积分->查看8项任务
+  
+  Response sample:
+  
+  ```json
+  {
+  	"code": 0,
+  	"message": "0",
+  	"ttl": 1,
+  	"data": {
+  		"vip_info": {
+  			"type": 2,
+  			"status": 1,
+  			"due_date": 1779033600000,
+  			"vip_pay_type": 0,
+  			"label": {
+  				"path": "http://i0.hdslb.com/bfs/vip/label_annual.png",
+  				"text_color": "",
+  				"bg_style": 0,
+  				"bg_color": "",
+  				"border_color": "",
+  				"use_img_label": false,
+  				"img_label_uri_hans": "",
+  				"img_label_uri_hant": "",
+  				"img_label_uri_hans_static": "",
+  				"img_label_uri_hant_static": ""
+  			},
+  			"start_time": 1657418210,
+  			"paid_type": 0,
+  			"mid": 341688380,
+  			"role": 3,
+  			"tv_vip_status": 0,
+  			"tv_vip_pay_type": 0,
+  			"tv_due_date": 0,
+  			"vip_recent_time": 1747398345
+  		},
+  		"point_info": {
+  			"point": 415,
+  			"expire_point": 0,
+  			"expire_time": 0,
+  			"expire_days": 0
+  		},
+  		"task_info": {
+  			"modules": [{
+  				"module_title": "福利任务",
+  				"common_task_item": [{
+  					"task_code": "bonus",
+  					"state": 3,
+  					"title": "大会员福利大积分",
+  					"icon": "https://i0.hdslb.com/bfs/activity-plat/static/20220607/b66bfe4ccfd6bed05bdb54008ff5c7aa/IbtMl6R3yt.png",
+  					"subtitle": "大会员/年度大会员\u003cbr /\u003e\u003cspan class=\"active\"\u003e+100/200大积分",
+  					"explain": "在期大会员可领取100大积分，在期年度大会员可领取200大积分，每人限领1次。如当身份为大会员时已领取过本任务大积分，则后续成为年度大会员也无法补领取差值大积分。",
+  					"vip_limit": 1,
+  					"complete_times": 1,
+  					"max_times": 1,
+  					"recall_num": 0
+  				}]
+  			}, {
+  				"module_title": "体验任务",
+  				"common_task_item": [{
+  					"task_code": "privilege",
+  					"state": 3,
+  					"title": "浏览大会员权益页面",
+  					"icon": "https://i0.hdslb.com/bfs/activity-plat/static/20220607/b66bfe4ccfd6bed05bdb54008ff5c7aa/IbtMl6R3yt.png",
+  					"subtitle": "\u003cspan class=\"active\"\u003e+50大积分\u003c/span\u003e",
+  					"explain": "从本任务入口跳转至大会员权益页，浏览后可得50大积分，每人限完成1次。",
+  					"link": "https://big.bilibili.com/mobile/rights?closable=1\u0026navhide=1",
+  					"vip_limit": 0,
+  					"complete_times": 1,
+  					"max_times": 1,
+  					"recall_num": 0
+  				}]
+  			}, {
+  				"module_title": "日常任务",
+  				"module_sub_title": "截止至06-01 23:59:59",
+  				"common_task_item": [{
+  					"task_code": "dress-view",
+  					"state": 1,
+  					"title": "浏览装扮商城主页",
+  					"icon": "https://i0.hdslb.com/bfs/activity-plat/static/20230316/b66bfe4ccfd6bed05bdb54008ff5c7aa/d8FFfwIwFC.png",
+  					"subtitle": "\u003cspan class=\"active\"\u003e+10大积分\u003c/span\u003e",
+  					"explain": "从本任务入口跳转至装扮商城主页即可完成任务，每人限完成1次。",
+  					"link": "https://www.bilibili.com/h5/mall/home?f_source=vip\u0026navhide=1",
+  					"vip_limit": 1,
+  					"complete_times": 0,
+  					"max_times": 1,
+  					"recall_num": 0
+  				}, {
+  					"task_code": "vipmallview",
+  					"state": 1,
+  					"title": "浏览会员购页面10秒",
+  					"icon": "https://i0.hdslb.com/bfs/activity-plat/static/20220613/b66bfe4ccfd6bed05bdb54008ff5c7aa/RnlARrUdOY.png",
+  					"subtitle": "\u003cspan class=\"active\"\u003e+10大积分\u003c/span\u003e",
+  					"explain": "从本任务入口跳转至会员购页面，并连续浏览页面达10秒可得10大积分，每天可完成1次。如浏览过程中离开会员购页面则中断计时，任务判定失败，需重新从本任务入口再次跳转。",
+  					"link": "bilibili://mall/home?msource=member_integral_browse\u0026action=browse_all\u0026eventId=hevent_oy4b7h3epeb\u0026eventTime=10\u0026showCountDown=2\u0026taskName1=%E6%B5%8F%E8%A7%8810%E7%A7%92\u0026taskName1Placeholder=%E6%B5%8F%E8%A7%88%25ss\u0026taskName2=%E5%BE%97%E7%A7%AF%E5%88%86\u0026taskEndText=%E4%BB%BB%E5%8A%A1%E5%AE%8C%E6%88%90",
+  					"vip_limit": 1,
+  					"complete_times": 0,
+  					"max_times": 1,
+  					"recall_num": 0
+  				}, {
+  					"task_code": "vipmallbuy",
+  					"state": 0,
+  					"title": "购买指定会员购商品",
+  					"icon": "https://i0.hdslb.com/bfs/activity-plat/static/20220613/b66bfe4ccfd6bed05bdb54008ff5c7aa/RnlARrUdOY.png",
+  					"subtitle": "实付1元\u003cspan class=\"active\"\u003e+10大积分\u003c/span\u003e，当前0/2000",
+  					"explain": "领取本任务后，当天内购买会员购商品的首笔订单（除魔力赏/一番赏/票务/先行预定订单外）可获得大积分，每实付1元+10大积分，每天上限2000大积分。本任务不支持先行购买后补领取大积分。如用户通过购买会员购商品获得了本任务大积分，后续将购买的商品退款，则同时会扣除当时获得的任务大积分。如购买商品获得大积分后的当天内产生退款，则大积分扣除后，当天无法再完成此任务。",
+  					"link": "bilibili://mall/home?msource=member_integral_buy",
+  					"vip_limit": 1,
+  					"complete_times": 0,
+  					"max_times": 20000,
+  					"recall_num": 0
+  				}, {
+  					"task_code": "animatetab",
+  					"state": 1,
+  					"title": "浏览追番频道页10秒",
+  					"icon": "https://i0.hdslb.com/bfs/activity-plat/static/20220607/b66bfe4ccfd6bed05bdb54008ff5c7aa/uOwc1tuJwm.png",
+  					"subtitle": "\u003cspan class=\"active\"\u003e+10大积分\u003c/span\u003e",
+  					"explain": "从本任务入口跳转至追番频道页，并连续浏览页面达10秒可得10大积分，每天可完成1次。如浏览过程中离开追番频道页则中断计时，任务判定失败，需重新从本任务入口再次跳转。",
+  					"link": "bilibili://home?bottom_tab_id=home\u0026tab_id=bangumi\u0026vip_task_countdown=10000\u0026win_id=bigscore-animatetab",
+  					"vip_limit": 1,
+  					"complete_times": 0,
+  					"max_times": 1,
+  					"recall_num": 0
+  				}, {
+  					"task_code": "filmtab",
+  					"state": 1,
+  					"title": "浏览影视频道页10秒",
+  					"icon": "https://i0.hdslb.com/bfs/activity-plat/static/20220607/b66bfe4ccfd6bed05bdb54008ff5c7aa/bWPJRBuMh3.png",
+  					"subtitle": "\u003cspan class=\"active\"\u003e+10大积分\u003c/span\u003e",
+  					"explain": "从本任务入口跳转至影视频道页，并连续浏览页面达10秒可得10大积分，每天可完成1次。如浏览过程中离开影视频道页则中断计时，任务判定失败，需重新从本任务入口再次跳转。",
+  					"link": "bilibili://home?bottom_tab_id=home\u0026tab_id=bilibili://pgc/cinema-tab\u0026vip_task_countdown=10000\u0026win_id=bigscore-filmtab",
+  					"vip_limit": 1,
+  					"complete_times": 0,
+  					"max_times": 1,
+  					"recall_num": 0
+  				}, {
+  					"task_code": "ogvwatchnew",
+  					"state": 0,
+  					"title": "观看剧集内容",
+  					"icon": "https://i0.hdslb.com/bfs/activity-plat/static/20220607/b66bfe4ccfd6bed05bdb54008ff5c7aa/6prGo240Md.png",
+  					"subtitle": "观看任一剧集达10分钟\u003cspan class=\"active\"\u003e+40大积分\u003c/span\u003e",
+  					"explain": "领取本任务后，当天内单次观看番剧/国创/电影/电视剧/综艺/纪录片的任一视频的连续时长达到10分钟可得40大积分。单次观看行为需连续达10分钟，切换至其他视频内容会导致观看时长重新计数。仅大陆版手机端APP可领取、可完成任务。",
+  					"link": "https://www.bilibili.com/blackboard/activity-NUbGzdNJpz.html?msource=jifen",
+  					"vip_limit": 1,
+  					"complete_times": 0,
+  					"max_times": 1,
+  					"recall_num": 0
+  				}, {
+  					"task_code": "tvodbuy",
+  					"state": 0,
+  					"title": "购买单点付费影片",
+  					"icon": "https://i0.hdslb.com/bfs/activity-plat/static/20220607/b66bfe4ccfd6bed05bdb54008ff5c7aa/6prGo240Md.png",
+  					"subtitle": "会员特价/独家付费任意影片\u003cbr /\u003e\u003cspan class=\"active\"\u003e+70大积分\u003c/span\u003e",
+  					"explain": "领取本任务后，当天内购买任意1部会员特价/独家付费的影片可得70大积分，每天上限70大积分。",
+  					"link": "https://www.bilibili.com/blackboard/activity-F6sCMq4w92.html?msource=jifen",
+  					"vip_limit": 1,
+  					"complete_times": 0,
+  					"max_times": 1,
+  					"recall_num": 0
+  				}, {
+  					"task_code": "dressbuyamount",
+  					"state": 0,
+  					"title": "购买指定装扮商品",
+  					"icon": "https://i0.hdslb.com/bfs/activity-plat/static/20230316/b66bfe4ccfd6bed05bdb54008ff5c7aa/d8FFfwIwFC.png",
+  					"subtitle": "实付1元\u003cspan class=\"active\"\u003e+10大积分\u003c/span\u003e，当前0/1000",
+  					"explain": "领取本任务后，当天内购买装扮商城商品的订单（除装扮赏/祈愿/数字藏品订单外）可获得大积分，每实付1元+10大积分，每天上限1000大积分。本任务不支持先行购买后补领取大积分。",
+  					"link": "https://www.bilibili.com/h5/mall/home?navhide=1\u0026f_source=vip\u0026from=vipzx.shop",
+  					"vip_limit": 1,
+  					"complete_times": 0,
+  					"max_times": 10000,
+  					"recall_num": 0
+  				}]
+  			}],
+  			"sing_task_item": {
+  				"histories": [{
+  					"day": "2025-05-26",
+  					"signed": false,
+  					"score": 0
+  				}, {
+  					"day": "2025-05-27",
+  					"signed": false,
+  					"score": 0
+  				}, {
+  					"day": "2025-05-28",
+  					"signed": false,
+  					"score": 0
+  				}, {
+  					"day": "2025-05-29",
+  					"signed": false,
+  					"score": 0
+  				}, {
+  					"day": "2025-05-30",
+  					"signed": false,
+  					"score": 0
+  				}, {
+  					"day": "2025-05-31",
+  					"signed": false,
+  					"score": 0
+  				}, {
+  					"day": "2025-06-01",
+  					"signed": false,
+  					"score": 5,
+  					"is_today": true
+  				}, {
+  					"day": "2025-06-02",
+  					"signed": false,
+  					"score": 5
+  				}, {
+  					"day": "2025-06-03",
+  					"signed": false,
+  					"score": 5
+  				}, {
+  					"day": "2025-06-04",
+  					"signed": false,
+  					"score": 5
+  				}, {
+  					"day": "2025-06-05",
+  					"signed": false,
+  					"score": 5
+  				}, {
+  					"day": "2025-06-06",
+  					"signed": false,
+  					"score": 5
+  				}, {
+  					"day": "2025-06-07",
+  					"signed": false,
+  					"score": 10
+  				}],
+  				"count": 0,
+  				"base_score": 5
+  			},
+  			"score_month": 10,
+  			"score_limit": 10000,
+  			"exp_value": 3
+  		},
+  		"current_ts": 1748764070,
+  		"integration_task": false
+  	}
+  }
+  ```
+  
+  `build`版本号不同，会返回不同的结果。
+}

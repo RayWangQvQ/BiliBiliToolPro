@@ -38,7 +38,7 @@
                         <div class="log-entry">
                             <span class="log-timestamp">@log.Timestamp.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")</span>
                             <span class="log-level @GetLogLevelClass(log.Level)">@log.FormattedLogLevel</span>
-                            <span class="log-message">@((MarkupString)log.RenderedMessage.Replace(Environment.NewLine, "<br />"))</span>
+                            <span class="log-message">@((MarkupString)(log.RenderedMessage?.Replace(Environment.NewLine, "<br />")??""))</span>
                             @if (!string.IsNullOrEmpty(log.Exception))
                             {
                                 <span class="log-message">@log.Exception</span>

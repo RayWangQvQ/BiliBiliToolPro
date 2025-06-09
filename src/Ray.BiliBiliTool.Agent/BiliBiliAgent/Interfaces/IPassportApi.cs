@@ -1,6 +1,4 @@
-﻿using System.Net.Http;
-using System.Threading.Tasks;
-using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
+﻿using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Passport;
 using WebApiClientCore.Attributes;
 

@@ -2,34 +2,25 @@
 
 namespace Ray.BiliBiliTool.DomainService.Dtos;
 
-public class HeartBeatIterationInfoDto
+public class HeartBeatIterationInfoDto(
+    long roomId,
+    GetLiveRoomInfoResponse roomInfo,
+    HeartBeatResponse heartBeatInfo,
+    int heartBeatCount,
+    long lastBeatTime
+)
 {
-    public HeartBeatIterationInfoDto(
-        long roomId,
-        GetLiveRoomInfoResponse roomInfo,
-        HeartBeatResponse heartBeatInfo,
-        int heartBeatCount,
-        long lastBeatTime
-    )
-    {
-        RoomId = roomId;
-        RoomInfo = roomInfo;
-        HeartBeatInfo = heartBeatInfo;
-        HeartBeatCount = heartBeatCount;
-        LastBeatTime = lastBeatTime;
-    }
+    public long RoomId { get; set; } = roomId;
 
-    public long RoomId { get; set; } = 0;
+    public GetLiveRoomInfoResponse RoomInfo { get; set; } = roomInfo;
 
-    public GetLiveRoomInfoResponse RoomInfo { get; set; } = new();
-
-    public HeartBeatResponse HeartBeatInfo { get; set; } = new();
+    public HeartBeatResponse HeartBeatInfo { get; set; } = heartBeatInfo;
 
     // 成功发送的心跳包个数
-    public int HeartBeatCount { get; set; } = 0;
+    public int HeartBeatCount { get; set; } = heartBeatCount;
 
-    public long LastBeatTime { get; set; } = 0;
+    public long LastBeatTime { get; set; } = lastBeatTime;
 
     // 连续失败的次数
-    public int FailedTimes { get; set; } = 0;
+    public int FailedTimes { get; set; }
 }

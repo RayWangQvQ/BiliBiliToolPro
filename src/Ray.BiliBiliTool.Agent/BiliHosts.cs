@@ -11,4 +11,5 @@ public static class BiliHosts
     public const string Manga = "https://manga.bilibili.com";
     public const string Account = "https://account.bilibili.com";
     public const string Live = "https://api.live.bilibili.com";
+    public const string Mall = "https://mall.bilibili.com";
 }

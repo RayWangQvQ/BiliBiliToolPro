@@ -92,7 +92,7 @@ public class ArticleDomainService(
 
         logger.LogInformation(
             "【硬币余额】{coin}",
-            (await accountApi.GetCoinBalanceAsync(ck.ToString())).Data.Money ?? 0
+            (await accountApi.GetCoinBalanceAsync(ck.ToString())).Data!.Money ?? 0
         );
 
         return true;
@@ -171,12 +171,12 @@ public class ArticleDomainService(
             throw new Exception(re.Message);
         }
 
-        ArticleInfo articleInfo = re.Data.Articles.FirstOrDefault();
+        var articleInfo = re.Data.Articles.FirstOrDefault();
 
-        logger.LogInformation("获取到的专栏{cvid}({title})", articleInfo.Id, articleInfo.Title);
+        logger.LogInformation("获取到的专栏{cvid}({title})", articleInfo?.Id, articleInfo?.Title);
 
         // 检查是否可投
-        if (!await IsCanDonate(articleInfo.Id))
+        if (articleInfo == null || !await IsCanDonate(articleInfo.Id))
         {
             return 0;
         }

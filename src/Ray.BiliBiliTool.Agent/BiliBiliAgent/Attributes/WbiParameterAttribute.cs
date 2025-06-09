@@ -1,6 +1,3 @@
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Services;
 using Ray.BiliBiliTool.Infrastructure.Cookie;
@@ -21,7 +18,7 @@ public class WbiParameterAttribute : Attribute, IApiParameterAttribute
             var wbiService = context.HttpContext.ServiceProvider.GetRequiredService<IWbiService>();
 
             // 从函数参数中获取Cookie
-            string cookieStr = string.Empty;
+            var cookieStr = string.Empty;
             var allParameters = context.ActionDescriptor.Parameters;
             foreach (var parameter in allParameters)
             {
@@ -31,12 +28,12 @@ public class WbiParameterAttribute : Attribute, IApiParameterAttribute
                 );
                 if (cookieHeader != null)
                 {
-                    cookieStr = context.Arguments[parameter.Index].ToString();
+                    cookieStr = context.Arguments[parameter.Index]?.ToString();
                     break;
                 }
             }
 
-            var cookie = CookieStrFactory<BiliCookie>.CreateNew(cookieStr);
+            var cookie = CookieStrFactory<BiliCookie>.CreateNew(cookieStr ?? "");
 
             // 设置w_rid和wts值
             await wbiService.SetWridAsync(wridRequest, cookie);

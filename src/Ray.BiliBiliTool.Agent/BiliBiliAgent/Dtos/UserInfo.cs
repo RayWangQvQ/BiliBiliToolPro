@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Text;
+﻿using System.Text;
 
 namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 
@@ -11,7 +10,7 @@ public class UserInfo
     /// <summary>
     /// 用户Id
     /// </summary>
-    public long Mid { get; set; } //todo:这里登陆后可以获取到自己的UserId，后面可以考虑将配置Cookie项去除UserId的配置，改为登陆后获取
+    public long Mid { get; set; }
 
     /// <summary>
     /// 是否登录
@@ -21,13 +20,13 @@ public class UserInfo
     /// <summary>
     /// 等级信息
     /// </summary>
-    public LevelInfo Level_info { get; set; }
+    public LevelInfo? Level_info { get; set; }
 
     public decimal? Money { get; set; }
 
-    public string Uname { get; set; }
+    public string? Uname { get; set; }
 
-    public Wallet Wallet { get; set; }
+    public Wallet? Wallet { get; set; }
 
     /// <summary>
     /// 会员状态
@@ -43,7 +42,12 @@ public class UserInfo
     /// <returns></returns>
     public string GetFuzzyUname()
     {
-        StringBuilder sb = new StringBuilder();
+        if (Uname == null)
+        {
+            return "";
+        }
+
+        var sb = new StringBuilder();
         int s1 = Uname.Length / 2;
         int s2 = (s1 + 1) / 2;
         for (int i = 0; i < Uname.Length; i++)
@@ -81,7 +85,7 @@ public class UserInfo
     /// <summary>
     /// 防爬加密用的
     /// </summary>
-    public WbiImg Wbi_img { get; set; }
+    public required WbiImg Wbi_img { get; set; }
 }
 
 /// <summary>
@@ -154,13 +158,13 @@ public class WbiImg
     /// img url
     /// </summary>
     /// <sample>https://i0.hdslb.com/bfs/wbi/9cd4224d4fe74c7e9d6963e2ef891688.png</sample>
-    public string img_url { get; set; }
+    public required string img_url { get; set; }
 
     /// <summary>
     /// sub url
     /// </summary>
     /// <sample>https://i0.hdslb.com/bfs/wbi/263655ae2cad4cce95c9c401981b044a.png</sample>
-    public string sub_url { get; set; }
+    public required string sub_url { get; set; }
 
     public string ImgKey => img_url.Split("wbi/").ToList().Last().Replace(".png", "");
 

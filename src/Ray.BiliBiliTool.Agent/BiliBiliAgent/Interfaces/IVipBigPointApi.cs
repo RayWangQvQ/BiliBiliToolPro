@@ -1,8 +1,8 @@
-﻿using System;
-using System.Threading.Tasks;
-using Ray.BiliBiliTool.Agent.Attributes;
+﻿using Ray.BiliBiliTool.Agent.Attributes;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Mall;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.VipTask;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.VipTask.ThreeDaysSign;
 using WebApiClientCore.Attributes;
 
 namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
@@ -16,17 +16,32 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 public interface IVipBigPointApi
 {
     /// <summary>
+    /// 获取签到信息
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="ck"></param>
+    /// <returns></returns>
+    [HttpGet("/x/vip/vip_center/sign_in/three_days_sign")]
+    Task<BiliApiResponse<ThreeDaySignResponse>> GetThreeDaySignAsync(
+        [PathQuery] ThreeDaySignRequest request,
+        [Header("Cookie")] string ck
+    );
+
+    /// <summary>
     /// 获取任务列表
     /// </summary>
+    /// <remarks>里面的登录信息是错误的，阿B特色</remarks>
     /// <returns></returns>
+    [Obsolete("Using IMallApi.GetCombineAsync instead.")]
     [HttpGet("/x/vip_point/task/combine")]
-    Task<BiliApiResponse<VipTaskInfo>> GetTaskListAsync([Header("Cookie")] string ck);
+    Task<BiliApiResponse<VipBigPointCombine>> GetCombineAsync([Header("Cookie")] string ck);
 
     /// <summary>
     /// 签到任务
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>
+    [Obsolete("Using IMallApi.Sign2Async instead.")]
     [HttpPost("/pgc/activity/score/task/sign")]
     Task<BiliApiResponse> SignAsync(
         [FormContent] SignRequest request,
@@ -82,6 +97,7 @@ public interface IVipBigPointApi
     /// 完成浏览页面任务
     /// </summary>
     /// <param name="request"></param>
+    /// <param name="ck"></param>
     /// <returns></returns>
     [HttpPost("/pgc/activity/deliver/task/complete")]
     Task<BiliApiResponse> ViewComplete(

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
@@ -10,7 +6,6 @@ using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Relation;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Interfaces;
-using Ray.BiliBiliTool.Infrastructure.Cookie;
 
 namespace Ray.BiliBiliTool.DomainService;
 
@@ -23,8 +18,7 @@ public class AccountDomainService(
     IUserInfoApi userInfoApi,
     IRelationApi relationApi,
     IOptionsMonitor<UnfollowBatchedTaskOptions> unfollowBatchedTaskOptions,
-    IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
-    CookieStrFactory<BiliCookie> cookieFactory
+    IOptionsMonitor<DailyTaskOptions> dailyTaskOptions
 ) : IAccountDomainService
 {
     private readonly UnfollowBatchedTaskOptions _unfollowBatchedTaskOptions =
@@ -39,10 +33,10 @@ public class AccountDomainService(
     {
         BiliApiResponse<UserInfo> apiResponse = await userInfoApi.LoginByCookie(cookie.ToString());
 
-        if (apiResponse.Code != 0 || !apiResponse.Data.IsLogin)
+        if (apiResponse.Code != 0 || !apiResponse.Data!.IsLogin)
         {
-            logger.LogWarning("登录异常，请检查Cookie是否错误或过期");
-            return null;
+            throw new Exception("登录失败，请检查Cookie");
+            ;
         }
 
         UserInfo useInfo = apiResponse.Data;
@@ -52,7 +46,7 @@ public class AccountDomainService(
         logger.LogInformation("【会员状态】{0}", useInfo.VipStatus.Description());
         logger.LogInformation("【硬币余额】{0}", useInfo.Money ?? 0);
 
-        if (useInfo.Level_info.Current_level < 6)
+        if (useInfo.Level_info?.Current_level < 6)
         {
             logger.LogInformation(
                 "【距升级Lv{0}】预计{1}天",
@@ -62,7 +56,7 @@ public class AccountDomainService(
         }
         else
         {
-            logger.LogInformation("【当前经验】{0}", useInfo.Level_info.Current_exp);
+            logger.LogInformation("【当前经验】{0}", useInfo.Level_info?.Current_exp);
             logger.LogInformation("您已是 Lv6 的大佬了，无敌是多么寂寞~");
         }
 
@@ -91,7 +85,7 @@ public class AccountDomainService(
             //todo:偶发性请求失败，再请求一次，这么写很丑陋，待用polly再框架层面实现
         }
 
-        return result;
+        return result!;
     }
 
     /// <summary>
@@ -104,7 +98,7 @@ public class AccountDomainService(
         logger.LogInformation("【分组名】{group}", _unfollowBatchedTaskOptions.GroupName);
 
         //根据分组名称获取tag
-        TagDto tag = await GetTag(_unfollowBatchedTaskOptions.GroupName, ck);
+        TagDto? tag = await GetTag(_unfollowBatchedTaskOptions.GroupName, ck);
         var tagId = tag?.Tagid;
         int total = tag?.Count ?? 0;
 
@@ -199,7 +193,7 @@ public class AccountDomainService(
 
         //计算剩余
         tag = await GetTag(_unfollowBatchedTaskOptions.GroupName, ck);
-        logger.LogInformation("【分组下剩余】{count}人", tag?.Count ?? 0);
+        logger.LogInformation("【分组下剩余】{count}人", tag?.Count);
     }
 
     /// <summary>
@@ -208,11 +202,11 @@ public class AccountDomainService(
     /// <param name="groupName"></param>
     /// <param name="ck"></param>
     /// <returns></returns>
-    private async Task<TagDto> GetTag(string groupName, BiliCookie ck)
+    private async Task<TagDto?> GetTag(string groupName, BiliCookie ck)
     {
         string getTagsReferer = string.Format(RelationApiConstant.GetTagsReferer, ck.UserId);
-        List<TagDto> tagList = (await relationApi.GetTags(ck.ToString(), getTagsReferer)).Data;
-        TagDto tag = tagList.FirstOrDefault(x => x.Name == groupName);
+        List<TagDto> tagList = (await relationApi.GetTags(ck.ToString(), getTagsReferer)).Data!;
+        var tag = tagList.FirstOrDefault(x => x.Name == groupName);
         return tag;
     }
 
@@ -225,7 +219,10 @@ public class AccountDomainService(
     {
         double availableCoins =
             decimal.ToDouble(useInfo.Money ?? 0) - _dailyTaskOptions.NumberOfProtectedCoins;
-        long needExp = useInfo.Level_info.GetNext_expLong() - useInfo.Level_info.Current_exp;
+        long needExp =
+            useInfo.Level_info != null
+                ? useInfo.Level_info.GetNext_expLong() - useInfo.Level_info.Current_exp
+                : 0;
         int needDay;
 
         if (availableCoins < 0)

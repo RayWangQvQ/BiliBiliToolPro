@@ -6,7 +6,7 @@ public class GetSpaceInfoResponse
 
     public required string Name { get; set; }
 
-    public SpaceLiveRoomInfoDto? Live_room { get; set; }
+    public required SpaceLiveRoomInfoDto Live_room { get; set; }
 }
 
 public class SpaceLiveRoomInfoDto
