@@ -1,3 +1,6 @@
+## 3.1.8
+- Feature[#921]: 新增大会员大积分的观看剧集 bruno 信息
+- Feature: README 添加 Trending 信息
 ## 3.1.7
 - Feature[#901]: 实现大会员大积分的浏览影视频道页任务
 ## 3.1.6

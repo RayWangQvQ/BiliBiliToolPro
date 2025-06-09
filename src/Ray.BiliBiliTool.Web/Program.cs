@@ -14,7 +14,9 @@ using Ray.BiliBiliTool.Infrastructure.EF.Extensions;
 using Ray.BiliBiliTool.Web.Components;
 using Ray.BiliBiliTool.Web.Extensions;
 using Serilog;
+using Serilog.Core;
 using Serilog.Debugging;
+using Serilog.Events;
 
 SelfLog.Enable(Console.Error);
 Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
@@ -43,7 +45,11 @@ try
                 .ReadFrom.Services(services)
                 .Enrich.FromLogContext()
                 .WriteTo.Console()
-                .WriteTo.File("Logs/log.txt", rollingInterval: RollingInterval.Day)
+                .WriteTo.File(
+                    "Logs/log.txt",
+                    rollingInterval: RollingInterval.Day,
+                    levelSwitch: new LoggingLevelSwitch(LogEventLevel.Verbose)
+                )
                 .WriteTo.SQLite(
                     sqliteDbPath: sqliteConnStr?.Split(';')[0].Split('=')[1],
                     tableName: "bili_logs",
