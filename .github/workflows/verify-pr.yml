@@ -13,7 +13,7 @@ jobs:
         with:
           target: main
           change-to: develop
-          exclude: develop
+          exclude: RayWangQvQ/BiliBiliToolPro:develop
           comment: |
               Your PR was set to `main`, but PRs should be sent to `develop`
               The base branch of this PR has been automatically changed to `develop`, please check that there are no merge conflicts.
