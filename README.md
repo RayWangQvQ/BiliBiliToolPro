@@ -244,4 +244,10 @@ BiliTool 实现自动完成任务的原理，是通过调用一系列开放的ap
     </a>
 </p>
 
+❤️Thanks to [DartNode](https://dartnode.com?aff=FriskyGopher833) for sponsoring the server for testing support:
+
+[![Powered by DartNode](https://dartnode.com/branding/DN-Open-Source-sm.png)](https://dartnode.com "Powered by DartNode - Free VPS for Open Source")
+
+❤️Thank you for your star to this project:
+
 [![Star History Chart](https://api.star-history.com/svg?repos=RayWangQvQ/BiliBiliToolPro&type=Date)](https://www.star-history.com/#RayWangQvQ/BiliBiliToolPro&Date)
