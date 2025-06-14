@@ -1,5 +1,7 @@
 using BlazingQuartz;
 using BlazingQuartz.Core;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor.Services;
 using Quartz;
@@ -11,6 +13,7 @@ using Ray.BiliBiliTool.DomainService.Extensions;
 using Ray.BiliBiliTool.Infrastructure;
 using Ray.BiliBiliTool.Infrastructure.EF;
 using Ray.BiliBiliTool.Infrastructure.EF.Extensions;
+using Ray.BiliBiliTool.Web.Auth;
 using Ray.BiliBiliTool.Web.Components;
 using Ray.BiliBiliTool.Web.Extensions;
 using Serilog;
@@ -31,6 +34,7 @@ try
         .Services.AddRazorComponents()
         .AddInteractiveServerComponents()
         .AddInteractiveWebAssemblyComponents();
+    builder.Services.AddControllers();
 
     var sqliteConnStr = builder.Configuration.GetConnectionString("Sqlite");
 
@@ -89,7 +93,21 @@ try
         .AddBiliBiliConfigs(builder.Configuration)
         .AddBiliBiliClientApi(builder.Configuration);
 
-    builder.Services.AddAppServices();
+    builder.Services.AddAuthenticationCore();
+    builder.Services.AddAuthorizationCore();
+    builder
+        .Services.AddAuthentication(options =>
+        {
+            options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+        })
+        .AddCookie(options =>
+        {
+            options.Cookie.Name = "BiliToolWebAuth";
+            options.LoginPath = "/login";
+            options.ExpireTimeSpan = TimeSpan.FromDays(30);
+        });
+    builder.Services.AddHttpContextAccessor();
+    builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
 
     var app = builder.Build();
 
@@ -116,6 +134,7 @@ try
 
     app.UseSerilogRequestLogging();
 
+    app.MapControllers();
     app.MapRazorComponents<App>()
         .AddInteractiveServerRenderMode()
         .AddInteractiveWebAssemblyRenderMode()
