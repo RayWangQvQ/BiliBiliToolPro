@@ -609,7 +609,7 @@ namespace Ray.BiliBiliTool.Web.Migrations
                     b.HasIndex("Username")
                         .IsUnique();
 
-                    b.ToTable("bili_User");
+                    b.ToTable("bili_user");
                 });
 
             modelBuilder.Entity("AppAny.Quartz.EntityFrameworkCore.Migrations.QuartzBlobTrigger", b =>
