@@ -1,7 +1,9 @@
+## 3.2.3
+- Feature[#935]: Web 新增修改密码功能
 ## 3.2.2
-- Feature: 新增登录功能
+- Feature[#935]: Web 新增登录功能
 ## 3.2.1
-- Feature: 镜像新增linux/386和linux/arm/v7架构
+- Feature: 镜像新增 linux/386 和 linux/arm/v7 架构
 ## 3.2.0
 - Fix: 修复大会员大积分签到任务
 - Fix: 修复大会员大积分的签到和浏览追番频道任务
