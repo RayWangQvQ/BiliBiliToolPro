@@ -1,3 +1,5 @@
+## 3.2.2
+- Feature: 新增登录功能
 ## 3.2.1
 - Feature: 镜像新增linux/386和linux/arm/v7架构
 ## 3.2.0

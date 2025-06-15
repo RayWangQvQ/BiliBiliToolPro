@@ -1,6 +1,5 @@
 using BlazingQuartz;
 using BlazingQuartz.Core;
-using Microsoft.EntityFrameworkCore;
 using MudBlazor.Services;
 using Quartz;
 using Quartz.Impl.AdoJobStore;
@@ -31,6 +30,7 @@ try
         .Services.AddRazorComponents()
         .AddInteractiveServerComponents()
         .AddInteractiveWebAssemblyComponents();
+    builder.Services.AddControllers();
 
     var sqliteConnStr = builder.Configuration.GetConnectionString("Sqlite");
 
@@ -84,20 +84,20 @@ try
     builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 
     builder
-        .Services.AddAppServices()
+        .Services.AddWebServices()
+        .AddAuthServices()
+        .AddAppServices()
         .AddDomainServices()
         .AddBiliBiliConfigs(builder.Configuration)
         .AddBiliBiliClientApi(builder.Configuration);
-
-    builder.Services.AddAppServices();
 
     var app = builder.Build();
 
     Global.ServiceProviderRoot = app.Services;
 
     using var scope = app.Services.CreateScope();
-    var databaseContext = scope.ServiceProvider.GetRequiredService<BiliDbContext>();
-    databaseContext.Database.MigrateAsync().Wait();
+    var dbInitializer = scope.ServiceProvider.GetRequiredService<DbInitializer>();
+    dbInitializer.InitializeAsync().Wait();
 
     if (app.Environment.IsDevelopment())
     {
@@ -116,6 +116,7 @@ try
 
     app.UseSerilogRequestLogging();
 
+    app.MapControllers();
     app.MapRazorComponents<App>()
         .AddInteractiveServerRenderMode()
         .AddInteractiveWebAssemblyRenderMode()

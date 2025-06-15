@@ -1,8 +1,10 @@
 @page "/Schedules"
+@attribute [Authorize]
 @rendermode InteractiveServer
 @attribute [StreamRendering]
 @using BlazingQuartz
 @using BlazingQuartz.Core.Models
+@using Microsoft.AspNetCore.Authorization
 @using Ray.BiliBiliTool.Web.Extensions
 
 <PageTitle>Schedules</PageTitle>

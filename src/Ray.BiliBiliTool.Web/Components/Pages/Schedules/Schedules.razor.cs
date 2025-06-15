@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using Quartz;
 using Ray.BiliBiliTool.Domain;
-using Ray.BiliBiliTool.Web.Client;
 using Ray.BiliBiliTool.Web.Extensions;
 
 namespace Ray.BiliBiliTool.Web.Components.Pages.Schedules;

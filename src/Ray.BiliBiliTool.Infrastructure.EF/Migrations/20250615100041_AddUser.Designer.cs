@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Ray.BiliBiliTool.Infrastructure.EF;
 
@@ -10,9 +11,11 @@ using Ray.BiliBiliTool.Infrastructure.EF;
 namespace Ray.BiliBiliTool.Web.Migrations
 {
     [DbContext(typeof(BiliDbContext))]
-    partial class BiliDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250615100041_AddUser")]
+    partial class AddUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.3");
@@ -609,7 +612,7 @@ namespace Ray.BiliBiliTool.Web.Migrations
                     b.HasIndex("Username")
                         .IsUnique();
 
-                    b.ToTable("bili_user");
+                    b.ToTable("bili_User");
                 });
 
             modelBuilder.Entity("AppAny.Quartz.EntityFrameworkCore.Migrations.QuartzBlobTrigger", b =>

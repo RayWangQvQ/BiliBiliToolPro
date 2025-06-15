@@ -1,4 +1,5 @@
-﻿@inherits LayoutComponentBase
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@inherits LayoutComponentBase
 
 <div class="page">
     <div class="sidebar">
@@ -8,6 +9,11 @@
     <main>
         <div class="top-row px-4">
             <a href="https://github.com/RayWangQvQ/BiliBiliToolPro" target="_blank">About</a>
+            <AuthorizeView>
+                <Authorized>
+                    <a href="/auth/logout" class="nav-link">Log out</a>
+                </Authorized>
+            </AuthorizeView>
         </div>
 
         <article class="content px-4">

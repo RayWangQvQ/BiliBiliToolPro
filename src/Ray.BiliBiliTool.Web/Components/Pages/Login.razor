@@ -1,0 +1,27 @@
+@page "/login"
+@rendermode InteractiveServer
+
+<form action="/auth/login" method="post">
+    <input type="hidden" name="returnUrl" value="@returnUrl" />
+
+    <MudCard Class="mx-auto my-4" Style="max-width: 500px;">
+        <MudCardHeader>
+            <MudText Typo="Typo.h5">Log in</MudText>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudTextField @bind-Value="_username" Name="username" Label="User Name" Required="true" RequiredError="Username cannot be empty" />
+            <MudTextField @bind-Value="_password" Name="password" Label="Password" Required="true" RequiredError="Password cannot be empty"
+                          InputType="@_passwordInput" Adornment="Adornment.End"
+                          AdornmentIcon="@_passwordInputIcon" OnAdornmentClick="TogglePasswordVisibility" />
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary"
+                       Class="ml-auto">Log in</MudButton>
+        </MudCardActions>
+    </MudCard>
+</form>
+
+<MudThemeProvider/>
+<MudPopoverProvider/>
+<MudDialogProvider/>
+<MudSnackbarProvider/>
