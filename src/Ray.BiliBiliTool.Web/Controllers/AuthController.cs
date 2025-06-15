@@ -13,7 +13,7 @@ public class AuthController(IAuthService authService) : Controller
     public async Task<IActionResult> Login(
         [FromForm] string username,
         [FromForm] string password,
-        [FromForm] string returnUrl
+        [FromForm] string? returnUrl
     )
     {
         var claimsIdentity = await authService.LoginAsync(username, password);
@@ -32,6 +32,11 @@ public class AuthController(IAuthService authService) : Controller
                 new ClaimsPrincipal(claimsIdentity),
                 authProperties
             );
+
+            if (!Url.IsLocalUrl(returnUrl))
+            {
+                returnUrl = "/";
+            }
 
             return Redirect(returnUrl ?? "/");
         }
