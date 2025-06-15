@@ -21,9 +21,15 @@ public class PasswordHelper
 
     private static string ComputeHash(string password, string salt)
     {
-        using var sha256 = SHA256.Create();
-        byte[] passwordBytes = Encoding.UTF8.GetBytes(password + salt);
-        byte[] hashBytes = sha256.ComputeHash(passwordBytes);
+        byte[] saltBytes = Convert.FromBase64String(salt);
+        using var pbkdf2 = new Rfc2898DeriveBytes(
+            password,
+            saltBytes,
+            100_000,
+            HashAlgorithmName.SHA256
+        );
+        byte[] hashBytes = pbkdf2.GetBytes(32);
+
         return Convert.ToBase64String(hashBytes);
     }
 }

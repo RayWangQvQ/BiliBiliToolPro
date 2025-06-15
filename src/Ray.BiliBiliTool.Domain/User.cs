@@ -3,11 +3,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ray.BiliBiliTool.Domain;
 
-[Table("bili_User")]
+[Table("bili_user")]
 public class User
 {
     [Key]
-    [Column("id")]
     public long Id { get; set; }
     public required string Username { get; set; }
     public required string PasswordHash { get; set; }

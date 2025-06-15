@@ -11,7 +11,6 @@ public class DbInitializer(BiliDbContext context)
 
     public async Task InitializeAsync()
     {
-        await context.Database.EnsureCreatedAsync();
         await context.Database.MigrateAsync();
 
         await InitUserAsync();
