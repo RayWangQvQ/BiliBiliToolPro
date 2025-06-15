@@ -16,6 +16,7 @@ using Ray.BiliBiliTool.Infrastructure.EF.Extensions;
 using Ray.BiliBiliTool.Web.Auth;
 using Ray.BiliBiliTool.Web.Components;
 using Ray.BiliBiliTool.Web.Extensions;
+using Ray.BiliBiliTool.Web.Services;
 using Serilog;
 using Serilog.Core;
 using Serilog.Debugging;
@@ -108,14 +109,15 @@ try
         });
     builder.Services.AddHttpContextAccessor();
     builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
+    builder.Services.AddScoped<IAuthService, AuthService>();
 
     var app = builder.Build();
 
     Global.ServiceProviderRoot = app.Services;
 
     using var scope = app.Services.CreateScope();
-    var databaseContext = scope.ServiceProvider.GetRequiredService<BiliDbContext>();
-    databaseContext.Database.MigrateAsync().Wait();
+    var dbInitializer = scope.ServiceProvider.GetRequiredService<DbInitializer>();
+    dbInitializer.InitializeAsync().Wait();
 
     if (app.Environment.IsDevelopment())
     {
