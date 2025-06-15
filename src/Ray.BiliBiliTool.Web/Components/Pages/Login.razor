@@ -1,7 +1,5 @@
 @page "/login"
 @rendermode InteractiveServer
-@using Microsoft.AspNetCore.WebUtilities
-@inject NavigationManager NavigationManager
 
 <form action="/auth/login" method="post">
     <input type="hidden" name="returnUrl" value="@returnUrl" />
@@ -11,10 +9,10 @@
             <MudText Typo="Typo.h5">Log in</MudText>
         </MudCardHeader>
         <MudCardContent>
-            <MudTextField @bind-Value="username" Name="username" Label="User Name" Required="true" RequiredError="Username cannot be empty" />
-            <MudTextField @bind-Value="password" Name="password" Label="Password" Required="true" RequiredError="Password cannot be empty"
-                          InputType="@PasswordInput" Adornment="Adornment.End"
-                          AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="TogglePasswordVisibility" />
+            <MudTextField @bind-Value="_username" Name="username" Label="User Name" Required="true" RequiredError="Username cannot be empty" />
+            <MudTextField @bind-Value="_password" Name="password" Label="Password" Required="true" RequiredError="Password cannot be empty"
+                          InputType="@_passwordInput" Adornment="Adornment.End"
+                          AdornmentIcon="@_passwordInputIcon" OnAdornmentClick="TogglePasswordVisibility" />
         </MudCardContent>
         <MudCardActions>
             <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary"
@@ -27,41 +25,3 @@
 <MudPopoverProvider/>
 <MudDialogProvider/>
 <MudSnackbarProvider/>
-
-@code {
-    private string username = "";
-    private string password = "";
-    private bool success;
-    private MudForm form;
-
-    private bool PasswordVisibility;
-    private InputType PasswordInput = InputType.Password;
-    private string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
-
-    private void TogglePasswordVisibility()
-    {
-        if (PasswordVisibility)
-        {
-            PasswordVisibility = false;
-            PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
-            PasswordInput = InputType.Password;
-        }
-        else
-        {
-            PasswordVisibility = true;
-            PasswordInputIcon = Icons.Material.Filled.Visibility;
-            PasswordInput = InputType.Text;
-        }
-    }
-
-    private string? returnUrl;
-
-    protected override void OnInitialized()
-    {
-        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
-        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("returnUrl", out var param))
-        {
-            returnUrl = param.First();
-        }
-    }
-}
