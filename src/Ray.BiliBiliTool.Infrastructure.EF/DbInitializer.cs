@@ -18,7 +18,7 @@ public class DbInitializer(BiliDbContext context)
 
     private async Task InitUserAsync()
     {
-        if (context.Users.Any())
+        if (await context.Users.AnyAsync())
         {
             return;
         }
