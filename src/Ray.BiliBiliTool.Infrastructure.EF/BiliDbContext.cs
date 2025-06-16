@@ -11,6 +11,7 @@ public class BiliDbContext(IConfiguration config) : DbContext
 {
     public DbSet<ExecutionLog> ExecutionLogs { get; set; }
     public DbSet<BiliLogs> BiliLogs { get; set; }
+    public DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -68,6 +69,22 @@ public class BiliDbContext(IConfiguration config) : DbContext
             entity
                 .HasIndex(x => x.FireInstanceIdComputed) // 在计算列上创建索引
                 .HasDatabaseName("IX_Logs_FireInstanceIdComputed");
+        });
+
+        modelBuilder.Entity<User>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Username).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.PasswordHash).IsRequired();
+            entity.Property(e => e.Salt).IsRequired();
+            entity
+                .Property(e => e.Roles)
+                .HasConversion(
+                    v => string.Join(',', v),
+                    v => v.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList()
+                );
+
+            entity.HasIndex(e => e.Username).IsUnique();
         });
     }
 

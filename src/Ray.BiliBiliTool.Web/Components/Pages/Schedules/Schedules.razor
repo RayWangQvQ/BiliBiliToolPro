@@ -1,14 +1,16 @@
 @page "/Schedules"
+@attribute [Authorize]
 @rendermode InteractiveServer
 @attribute [StreamRendering]
 @using BlazingQuartz
 @using BlazingQuartz.Core.Models
+@using Microsoft.AspNetCore.Authorization
 @using Ray.BiliBiliTool.Web.Extensions
 
 <PageTitle>Schedules</PageTitle>
 
 <div>
-    <MudText Typo="Typo.h4">Schedules</MudText>
+    <MudText Typo="Typo.h5">Schedules</MudText>
 
     <MudDataGrid @ref="_scheduleDataGrid" Items="@ScheduledJobs"
                  MultiSelection="true" Filterable="false"

@@ -3,13 +3,14 @@
 
 - [1. 前期工作](#1-前期工作)
     - [1.1. Podman环境](#11-podman环境)
-    - [从Docker迁移](#从docker迁移)
+    - [1.2. 从Docker迁移](#12-从docker迁移)
 - [2. 运行容器](#2-运行容器)
     - [2.1. 极简版](#21-极简版)
     - [2.2. 综合版](#22-综合版)
-- [登录](#登录)
-- [3. 自己构建镜像（非必须）](#3-自己构建镜像非必须)
-- [4. 其他](#4-其他)
+- [3. 登录](#3-登录)
+- [4. 添加 Bili 账号](#4-添加-bili-账号)
+- [5. 自己构建镜像（非必须）](#5-自己构建镜像非必须)
+- [6. 其他](#6-其他)
 
 <!-- /TOC -->
 
@@ -37,7 +38,7 @@ podman machine start
 podman info
 ```
 
-### 从Docker迁移
+### 1.2. 从Docker迁移
 
 Podman可以和Docker共存，命令也基本可以通用。
 
@@ -97,7 +98,14 @@ podman ps -a
 podman exec -it bili bash
 ```
 
-## 登录
+## 3. 登录
+
+- 默认用户：`admin`
+- 默认密码：`BiliTool@2233`
+
+首次登陆后，请到`Admin`页面修改密码。
+
+## 4. 添加 Bili 账号
 
 扫码进行登录。
 
@@ -105,7 +113,7 @@ podman exec -it bili bash
 
 ![login](../docs/imgs/docker-login.png)
 
-## 3. 自己构建镜像（非必须）
+## 5. 自己构建镜像（非必须）
 
 目前我提供和维护的镜像：`[zai7lou/bilibili_tool_web](https://hub.docker.com/repository/docker/zai7lou/bilibili_tool_web)`;
 
@@ -117,6 +125,6 @@ podman exec -it bili bash
 
  `TARGET_NAME`为镜像名称和版本，可以自己起个名字
 
-## 4. 其他
+## 6. 其他
 
 镜像使用的是docker仓库的镜像。

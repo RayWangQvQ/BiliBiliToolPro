@@ -25,4 +25,7 @@
       Version="8.0.4"
     />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Auth\JwtAuthStateProvider.cs" />
+  </ItemGroup>
 </Project>
