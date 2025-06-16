@@ -24,7 +24,7 @@ public class AuthController(IAuthService authService) : Controller
             {
                 IsPersistent = true,
                 ExpiresUtc = DateTimeOffset.UtcNow.AddDays(30),
-                RedirectUri = returnUrl,
+                RedirectUri = Url.IsLocalUrl(returnUrl) ? returnUrl : "/",
             };
 
             await HttpContext.SignInAsync(
@@ -33,12 +33,9 @@ public class AuthController(IAuthService authService) : Controller
                 authProperties
             );
 
-            if (!Url.IsLocalUrl(returnUrl))
-            {
-                returnUrl = "/";
-            }
+            returnUrl = Url.IsLocalUrl(returnUrl) ? returnUrl : "/";
 
-            return Redirect(returnUrl ?? "/");
+            return Redirect(returnUrl);
         }
 
         return Redirect($"/login?error=true&returnUrl={Uri.EscapeDataString(returnUrl ?? "/")}");
