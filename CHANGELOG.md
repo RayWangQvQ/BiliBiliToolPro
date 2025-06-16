@@ -1,7 +1,7 @@
 ## 3.3.0
 - Feature[#935]: Web 新增登录功能
 - Feature[#935]: Web 新增修改密码功能
-- Feature: 镜像新增 linux/386 和 linux/arm/v7 架构
+- Feature: 镜像新增 linux/arm/v7 架构
 - Feature[#935]: 更新文档
 - Feature: 更新开源协议为 GNU GPLv3
 ## 3.2.0
