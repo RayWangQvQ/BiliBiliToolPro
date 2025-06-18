@@ -18,10 +18,8 @@ public class DailyTaskAppService(
     IVideoDomainService videoDomainService,
     IArticleDomainService articleDomainService,
     IDonateCoinDomainService donateCoinDomainService,
-    IMangaDomainService mangaDomainService,
     ILiveDomainService liveDomainService,
     IVipPrivilegeDomainService vipPrivilegeDomainService,
-    IChargeDomainService chargeDomainService,
     IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
     ICoinDomainService coinDomainService,
     ILoginDomainService loginDomainService,
@@ -48,16 +46,9 @@ public class DailyTaskAppService(
 
         await AddCoins(userInfo, ck);
 
-        //签到：
-        await MangaSign(ck);
-        await MangaRead(ck);
         await ExchangeSilver2Coin(ck);
 
-        //领福利：
         await ReceiveVipPrivilege(userInfo, ck);
-        await ReceiveMangaVipReward(userInfo, ck);
-
-        await Charge(userInfo, ck);
     }
 
     [TaskInterceptor("Set Cookie")]
@@ -182,42 +173,6 @@ public class DailyTaskAppService(
                 logger.LogError("领取福利成功，但之后刷新用户信息时异常，信息：{msg}", ex.Message);
             }
         }
-    }
-
-    /// <summary>
-    /// 每月为自己充电
-    /// </summary>
-    [TaskInterceptor("B币券充电", rethrowWhenException: false)]
-    private async Task Charge(UserInfo userInfo, BiliCookie ck)
-    {
-        await chargeDomainService.Charge(userInfo, ck);
-    }
-
-    /// <summary>
-    /// 漫画签到
-    /// </summary>
-    [TaskInterceptor("漫画签到", rethrowWhenException: false)]
-    private async Task MangaSign(BiliCookie ck)
-    {
-        await mangaDomainService.MangaSign(ck);
-    }
-
-    /// <summary>
-    /// 漫画阅读
-    /// </summary>
-    [TaskInterceptor("漫画阅读", rethrowWhenException: false)]
-    private async Task MangaRead(BiliCookie ck)
-    {
-        await mangaDomainService.MangaRead(ck);
-    }
-
-    /// <summary>
-    /// 每月获取大会员漫画权益
-    /// </summary>
-    [TaskInterceptor("领取大会员漫画权益", rethrowWhenException: false)]
-    private async Task ReceiveMangaVipReward(UserInfo userInfo, BiliCookie ck)
-    {
-        await mangaDomainService.ReceiveMangaVipReward(1, userInfo, ck);
     }
 
     private async Task SaveCookieAsync(BiliCookie ckInfo, CancellationToken cancellationToken)
