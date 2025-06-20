@@ -18,10 +18,8 @@ public class DailyTaskAppService(
     IVideoDomainService videoDomainService,
     IArticleDomainService articleDomainService,
     IDonateCoinDomainService donateCoinDomainService,
-    ILiveDomainService liveDomainService,
     IVipPrivilegeDomainService vipPrivilegeDomainService,
     IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
-    ICoinDomainService coinDomainService,
     ILoginDomainService loginDomainService,
     IConfiguration configuration,
     CookieStrFactory<BiliCookie> cookieStrFactory
@@ -45,8 +43,6 @@ public class DailyTaskAppService(
         await WatchAndShareVideo(dailyTaskInfo, ck);
 
         await AddCoins(userInfo, ck);
-
-        await ExchangeSilver2Coin(ck);
 
         await ReceiveVipPrivilege(userInfo, ck);
     }
@@ -136,21 +132,6 @@ public class DailyTaskAppService(
         {
             await donateCoinDomainService.AddCoinsForVideos(ck);
         }
-    }
-
-    /// <summary>
-    /// 直播中心的银瓜子兑换硬币
-    /// </summary>
-    [TaskInterceptor("银瓜子兑换硬币", rethrowWhenException: false)]
-    private async Task ExchangeSilver2Coin(BiliCookie ck)
-    {
-        var success = await liveDomainService.ExchangeSilver2Coin(ck);
-        if (!success)
-            return;
-
-        //如果兑换成功，则打印硬币余额
-        var coinBalance = coinDomainService.GetCoinBalance(ck);
-        logger.LogInformation("【硬币余额】 {coin}", coinBalance);
     }
 
     /// <summary>
