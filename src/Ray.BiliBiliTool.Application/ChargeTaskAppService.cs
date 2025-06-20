@@ -19,7 +19,7 @@ public class ChargeTaskAppService(
     CookieStrFactory<BiliCookie> cookieStrFactory
 ) : BaseMultiAccountsAppService(logger, cookieStrFactory), IChargeTaskAppService
 {
-    [TaskInterceptor("B币券充电", TaskLevel.One)]
+    [TaskInterceptor("免费B币券充电任务", TaskLevel.One)]
     protected override async Task DoTaskAccountAsync(
         BiliCookie ck,
         CancellationToken cancellationToken = default
