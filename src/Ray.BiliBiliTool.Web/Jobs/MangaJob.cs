@@ -3,7 +3,7 @@ using Ray.BiliBiliTool.Application.Contracts;
 
 namespace Ray.BiliBiliTool.Web.Jobs;
 
-public class MangaJob(ILogger<MangaJob> logger, IDailyTaskAppService appService)
+public class MangaJob(ILogger<MangaJob> logger, IMangaTaskAppService appService)
     : BaseJob<MangaJob>(logger)
 {
     private readonly ILogger<MangaJob> _logger = logger;

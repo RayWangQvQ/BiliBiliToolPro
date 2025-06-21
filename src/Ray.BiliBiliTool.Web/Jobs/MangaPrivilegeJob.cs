@@ -3,8 +3,10 @@ using Ray.BiliBiliTool.Application.Contracts;
 
 namespace Ray.BiliBiliTool.Web.Jobs;
 
-public class MangaPrivilegeJob(ILogger<MangaPrivilegeJob> logger, IDailyTaskAppService appService)
-    : BaseJob<MangaPrivilegeJob>(logger)
+public class MangaPrivilegeJob(
+    ILogger<MangaPrivilegeJob> logger,
+    IMangaPrivilegeTaskAppService appService
+) : BaseJob<MangaPrivilegeJob>(logger)
 {
     private readonly ILogger<MangaPrivilegeJob> _logger = logger;
     public static readonly JobKey Key = new(nameof(MangaPrivilegeJob), Constants.BiliJobGroup);

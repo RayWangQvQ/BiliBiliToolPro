@@ -45,12 +45,10 @@ public static class ServiceCollectionQuartzConfiguratorExtensions
         );
 
         // ReceiveVipPrivilege job
-        quartz.AddJob<ReceiveVipPrivilegeJob>(opts =>
-            opts.WithIdentity(ReceiveVipPrivilegeJob.Key)
-        );
+        quartz.AddJob<VipPrivilegeJob>(opts => opts.WithIdentity(VipPrivilegeJob.Key));
         quartz.AddTrigger(opts =>
-            opts.ForJob(ReceiveVipPrivilegeJob.Key)
-                .WithIdentity($"{ReceiveVipPrivilegeJob.Key}.Cron.Trigger", Constants.BiliJobGroup)
+            opts.ForJob(VipPrivilegeJob.Key)
+                .WithIdentity($"{VipPrivilegeJob.Key}.Cron.Trigger", Constants.BiliJobGroup)
                 .WithCronSchedule(
                     configuration["ReceiveVipPrivilegeTaskConfig:Cron"] ?? DefaultCron
                 )

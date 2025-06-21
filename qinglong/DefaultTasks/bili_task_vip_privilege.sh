@@ -4,5 +4,5 @@
 
 . bili_task_base.sh
 
-target_task_code="ReceiveVipPrivilege"
+target_task_code="VipPrivilege"
 run_task "${target_task_code}"

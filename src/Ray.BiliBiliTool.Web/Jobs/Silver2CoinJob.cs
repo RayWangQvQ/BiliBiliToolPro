@@ -3,7 +3,7 @@ using Ray.BiliBiliTool.Application.Contracts;
 
 namespace Ray.BiliBiliTool.Web.Jobs;
 
-public class Silver2CoinJob(ILogger<Silver2CoinJob> logger, IDailyTaskAppService appService)
+public class Silver2CoinJob(ILogger<Silver2CoinJob> logger, ISilver2CoinTaskAppService appService)
     : BaseJob<Silver2CoinJob>(logger)
 {
     private readonly ILogger<Silver2CoinJob> _logger = logger;

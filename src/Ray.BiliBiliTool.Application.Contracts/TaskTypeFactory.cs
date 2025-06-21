@@ -13,7 +13,7 @@ public static class TaskTypeFactory
         typeof(IDailyTaskAppService),
         typeof(IMangaTaskAppService),
         typeof(IMangaPrivilegeTaskAppService),
-        typeof(IReceiveVipPrivilegeTaskAppService),
+        typeof(IVipPrivilegeTaskAppService),
         typeof(ISilver2CoinTaskAppService),
         typeof(IChargeTaskAppService),
         typeof(ILiveFansMedalAppService),

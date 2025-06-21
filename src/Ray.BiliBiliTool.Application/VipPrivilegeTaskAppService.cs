@@ -10,14 +10,14 @@ using Ray.BiliBiliTool.Infrastructure.Enums;
 
 namespace Ray.BiliBiliTool.Application;
 
-public class ReceiveVipPrivilegeTaskAppService(
-    ILogger<ReceiveVipPrivilegeTaskAppService> logger,
+public class VipPrivilegeTaskAppService(
+    ILogger<VipPrivilegeTaskAppService> logger,
     IAccountDomainService accountDomainService,
     IVipPrivilegeDomainService vipPrivilegeDomainService,
     ILoginDomainService loginDomainService,
     IConfiguration configuration,
     CookieStrFactory<BiliCookie> cookieStrFactory
-) : BaseMultiAccountsAppService(logger, cookieStrFactory), IReceiveVipPrivilegeTaskAppService
+) : BaseMultiAccountsAppService(logger, cookieStrFactory), IVipPrivilegeTaskAppService
 {
     [TaskInterceptor("领取大会员福利任务", TaskLevel.One)]
     protected override async Task DoTaskAccountAsync(

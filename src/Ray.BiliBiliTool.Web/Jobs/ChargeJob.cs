@@ -3,7 +3,7 @@ using Ray.BiliBiliTool.Application.Contracts;
 
 namespace Ray.BiliBiliTool.Web.Jobs;
 
-public class ChargeJob(ILogger<ChargeJob> logger, IDailyTaskAppService appService)
+public class ChargeJob(ILogger<ChargeJob> logger, IChargeTaskAppService appService)
     : BaseJob<ChargeJob>(logger)
 {
     private readonly ILogger<ChargeJob> _logger = logger;
