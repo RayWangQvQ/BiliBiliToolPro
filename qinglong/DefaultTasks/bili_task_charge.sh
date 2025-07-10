@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# cron:0 9 * * *
+# cron:0 12 * * *
 # new Env("bili免费B币券充电任务")
 
 . bili_task_base.sh
