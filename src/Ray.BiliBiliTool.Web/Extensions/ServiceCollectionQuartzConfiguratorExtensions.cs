@@ -28,6 +28,48 @@ public static class ServiceCollectionQuartzConfiguratorExtensions
                 .WithCronSchedule(configuration["DailyTaskConfig:Cron"] ?? DefaultCron)
         );
 
+        // Manga job
+        quartz.AddJob<MangaJob>(opts => opts.WithIdentity(MangaJob.Key));
+        quartz.AddTrigger(opts =>
+            opts.ForJob(MangaJob.Key)
+                .WithIdentity($"{MangaJob.Key}.Cron.Trigger", Constants.BiliJobGroup)
+                .WithCronSchedule(configuration["MangaTaskConfig:Cron"] ?? DefaultCron)
+        );
+
+        // MangaPrivilege job
+        quartz.AddJob<MangaPrivilegeJob>(opts => opts.WithIdentity(MangaPrivilegeJob.Key));
+        quartz.AddTrigger(opts =>
+            opts.ForJob(MangaPrivilegeJob.Key)
+                .WithIdentity($"{MangaPrivilegeJob.Key}.Cron.Trigger", Constants.BiliJobGroup)
+                .WithCronSchedule(configuration["MangaPrivilegeTaskConfig:Cron"] ?? DefaultCron)
+        );
+
+        // ReceiveVipPrivilege job
+        quartz.AddJob<VipPrivilegeJob>(opts => opts.WithIdentity(VipPrivilegeJob.Key));
+        quartz.AddTrigger(opts =>
+            opts.ForJob(VipPrivilegeJob.Key)
+                .WithIdentity($"{VipPrivilegeJob.Key}.Cron.Trigger", Constants.BiliJobGroup)
+                .WithCronSchedule(
+                    configuration["VipPrivilegeConfig:Cron"] ?? DefaultCron
+                )
+        );
+
+        // Silver2Coin job
+        quartz.AddJob<Silver2CoinJob>(opts => opts.WithIdentity(Silver2CoinJob.Key));
+        quartz.AddTrigger(opts =>
+            opts.ForJob(Silver2CoinJob.Key)
+                .WithIdentity($"{Silver2CoinJob.Key}.Cron.Trigger", Constants.BiliJobGroup)
+                .WithCronSchedule(configuration["Silver2CoinTaskConfig:Cron"] ?? DefaultCron)
+        );
+
+        // Charge job
+        quartz.AddJob<ChargeJob>(opts => opts.WithIdentity(ChargeJob.Key));
+        quartz.AddTrigger(opts =>
+            opts.ForJob(ChargeJob.Key)
+                .WithIdentity($"{ChargeJob.Key}.Cron.Trigger", Constants.BiliJobGroup)
+                .WithCronSchedule(configuration["ChargeTaskConfig:Cron"] ?? DefaultCron)
+        );
+
         // Vip big point job
         quartz.AddJob<VipBigPointJob>(opts => opts.WithIdentity(VipBigPointJob.Key));
         quartz.AddTrigger(opts =>

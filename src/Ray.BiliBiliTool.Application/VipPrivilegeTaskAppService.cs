@@ -1,48 +1,32 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Application.Attributes;
 using Ray.BiliBiliTool.Application.Contracts;
-using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 using Ray.BiliBiliTool.Infrastructure.Cookie;
 using Ray.BiliBiliTool.Infrastructure.Enums;
 
 namespace Ray.BiliBiliTool.Application;
 
-public class DailyTaskAppService(
-    ILogger<DailyTaskAppService> logger,
+public class VipPrivilegeTaskAppService(
+    ILogger<VipPrivilegeTaskAppService> logger,
     IAccountDomainService accountDomainService,
-    IVideoDomainService videoDomainService,
-    IArticleDomainService articleDomainService,
-    IDonateCoinDomainService donateCoinDomainService,
     IVipPrivilegeDomainService vipPrivilegeDomainService,
-    IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
     ILoginDomainService loginDomainService,
     IConfiguration configuration,
     CookieStrFactory<BiliCookie> cookieStrFactory
-) : BaseMultiAccountsAppService(logger, cookieStrFactory), IDailyTaskAppService
+) : BaseMultiAccountsAppService(logger, cookieStrFactory), IVipPrivilegeTaskAppService
 {
-    private readonly DailyTaskOptions _dailyTaskOptions = dailyTaskOptions.CurrentValue;
-    private readonly Dictionary<string, int> _expDic = Config.Constants.ExpDic;
-
-    [TaskInterceptor("每日任务", TaskLevel.One)]
+    [TaskInterceptor("领取大会员福利任务", TaskLevel.One)]
     protected override async Task DoTaskAccountAsync(
         BiliCookie ck,
         CancellationToken cancellationToken = default
     )
     {
         await SetCookiesAsync(ck, cancellationToken);
-
-        //每日任务赚经验：
         UserInfo userInfo = await Login(ck);
-
-        DailyTaskInfo dailyTaskInfo = await GetDailyTaskStatus(ck);
-        await WatchAndShareVideo(dailyTaskInfo, ck);
-
-        await AddCoins(userInfo, ck);
 
         await ReceiveVipPrivilege(userInfo, ck);
     }
@@ -74,70 +58,13 @@ public class DailyTaskAppService(
     private async Task<UserInfo> Login(BiliCookie ck)
     {
         UserInfo userInfo = await accountDomainService.LoginByCookie(ck);
-
-        _expDic.TryGetValue("每日登录", out int exp);
-        logger.LogInformation("登录成功，经验+{exp} √", exp);
-
         return userInfo;
-    }
-
-    /// <summary>
-    /// 获取任务完成情况
-    /// </summary>
-    /// <returns></returns>
-    [TaskInterceptor(rethrowWhenException: false)]
-    private async Task<DailyTaskInfo> GetDailyTaskStatus(BiliCookie ck)
-    {
-        return await accountDomainService.GetDailyTaskStatus(ck);
-    }
-
-    /// <summary>
-    /// 观看、分享视频
-    /// </summary>
-    [TaskInterceptor("观看、分享视频", rethrowWhenException: false)]
-    private async Task WatchAndShareVideo(DailyTaskInfo dailyTaskInfo, BiliCookie ck)
-    {
-        if (!_dailyTaskOptions.IsWatchVideo && !_dailyTaskOptions.IsShareVideo)
-        {
-            logger.LogInformation("已配置为关闭，跳过任务");
-            return;
-        }
-
-        await videoDomainService.WatchAndShareVideo(dailyTaskInfo, ck);
-    }
-
-    /// <summary>
-    /// 投币任务
-    /// </summary>
-    [TaskInterceptor("投币", rethrowWhenException: false)]
-    private async Task AddCoins(UserInfo userInfo, BiliCookie ck)
-    {
-        if (_dailyTaskOptions.SaveCoinsWhenLv6 && userInfo.Level_info?.Current_level >= 6)
-        {
-            logger.LogInformation("已经为LV6大佬，开始白嫖");
-            return;
-        }
-
-        if (_dailyTaskOptions.IsDonateCoinForArticle)
-        {
-            logger.LogInformation("专栏投币已开启");
-
-            if (!await articleDomainService.AddCoinForArticles(ck))
-            {
-                logger.LogInformation("专栏投币结束，转入视频投币");
-                await donateCoinDomainService.AddCoinsForVideos(ck);
-            }
-        }
-        else
-        {
-            await donateCoinDomainService.AddCoinsForVideos(ck);
-        }
     }
 
     /// <summary>
     /// 每月领取大会员福利
     /// </summary>
-    [TaskInterceptor("领取大会员福利", rethrowWhenException: false)]
+    [TaskInterceptor("领取", rethrowWhenException: false)]
     private async Task ReceiveVipPrivilege(UserInfo userInfo, BiliCookie ck)
     {
         var suc = await vipPrivilegeDomainService.ReceiveVipPrivilege(userInfo, ck);

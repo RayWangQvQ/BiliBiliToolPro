@@ -1,3 +1,5 @@
+## 3.3.1
+- Feature: 拆分原本的 Daily Task
 ## 3.3.0
 - Feature[#935]: Web 新增登录功能
 - Feature[#935]: Web 新增修改密码功能
