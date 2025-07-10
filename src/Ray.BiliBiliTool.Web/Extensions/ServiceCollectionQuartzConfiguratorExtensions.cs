@@ -50,7 +50,7 @@ public static class ServiceCollectionQuartzConfiguratorExtensions
             opts.ForJob(VipPrivilegeJob.Key)
                 .WithIdentity($"{VipPrivilegeJob.Key}.Cron.Trigger", Constants.BiliJobGroup)
                 .WithCronSchedule(
-                    configuration["ReceiveVipPrivilegeTaskConfig:Cron"] ?? DefaultCron
+                    configuration["VipPrivilegeConfig:Cron"] ?? DefaultCron
                 )
         );
 
