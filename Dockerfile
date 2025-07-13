@@ -29,6 +29,7 @@ RUN dotnet publish "Ray.BiliBiliTool.Web.csproj" -c Release -o /app/publish
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-RUN apt-get update \
-    && apt-get clean
-ENTRYPOINT ["dotnet", "Ray.BiliBiliTool.Web.dll"]
+COPY docker/entrypoint.sh /app/entrypoint.sh
+RUN rm -rf /var/lib/apt/lists/* \
+    && chmod +x /app/entrypoint.sh
+ENTRYPOINT ["/app/entrypoint.sh"]
