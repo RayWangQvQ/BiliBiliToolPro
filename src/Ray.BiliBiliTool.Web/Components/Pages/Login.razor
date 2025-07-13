@@ -1,6 +1,13 @@
 @page "/login"
 @rendermode InteractiveServer
 
+@if (_loginError)
+{
+    <MudAlert Severity="Severity.Error" Elevation="0" Class="mx-auto my-4" Style="max-width: 500px;">
+        Incorrect username or password. Please try again.
+    </MudAlert>
+}
+
 <form action="/auth/login" method="post">
     <input type="hidden" name="returnUrl" value="@returnUrl" />
 
