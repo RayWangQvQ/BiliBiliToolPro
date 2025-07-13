@@ -1,3 +1,6 @@
+## 3.3.2
+- Doc: 更新文档
+- Feature: 升级 csharpier
 ## 3.3.1
 - Feature: 拆分原本的 Daily Task
 ## 3.3.0
