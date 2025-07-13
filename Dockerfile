@@ -30,8 +30,6 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 COPY docker/entrypoint.sh /app/entrypoint.sh
-RUN apt-get update \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* \
+RUN rm -rf /var/lib/apt/lists/* \
     && chmod +x /app/entrypoint.sh
 ENTRYPOINT ["/app/entrypoint.sh"]
