@@ -33,13 +33,19 @@ public partial class Login : ComponentBase
     }
 
     private string? returnUrl;
+    private bool _loginError = false;
 
     protected override void OnInitialized()
     {
         var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
-        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("returnUrl", out var param))
+        var query = QueryHelpers.ParseQuery(uri.Query);
+        if (query.TryGetValue("returnUrl", out var param))
         {
             returnUrl = param.First();
+        }
+        if (query.TryGetValue("error", out var errorParam) && bool.TryParse(errorParam.FirstOrDefault(), out var parsed) && parsed)
+        {
+            _loginError = true;
         }
     }
 }
