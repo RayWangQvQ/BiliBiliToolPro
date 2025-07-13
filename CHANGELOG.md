@@ -3,6 +3,10 @@
 - Feature[#935]: Web 新增修改密码功能
 - Feature[#935]: 更新文档
 - Feature: 更新开源协议为 GNU GPLv3
+- Feature: 拆分原本的 Daily 任务
+- Doc: 更新文档
+- Feature: 升级 csharpier
+- Feature: 变更默认数据库文件位置到 /app/config 下
 ## 3.2.0
 - Fix: 修复大会员大积分签到任务
 - Fix: 修复大会员大积分的签到和浏览追番频道任务
