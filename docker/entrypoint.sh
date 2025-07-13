@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+set -o pipefail
 
 echo "Starting BiliTool container..."
 mkdir -p /app/config
