@@ -43,7 +43,7 @@ public partial class Login : ComponentBase
         {
             returnUrl = param.First();
         }
-        if (query.TryGetValue("error", out var errorParam) && errorParam.FirstOrDefault() == "true")
+        if (query.TryGetValue("error", out var errorParam) && bool.TryParse(errorParam.FirstOrDefault(), out var parsed) && parsed)
         {
             _loginError = true;
         }
