@@ -1,3 +1,5 @@
+## 3.3.3
+- Feature: 变更默认数据库文件位置到 /app/config 下
 ## 3.3.2
 - Doc: 更新文档
 - Feature: 升级 csharpier
