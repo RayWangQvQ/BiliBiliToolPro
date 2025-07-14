@@ -355,6 +355,7 @@ MigrationBackup/
 #
 .idea/
 tencentScf/.env
+.obsidian
 
 # vs code
 .vscode
