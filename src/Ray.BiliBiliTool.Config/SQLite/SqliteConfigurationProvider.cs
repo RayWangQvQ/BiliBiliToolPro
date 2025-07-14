@@ -21,7 +21,8 @@ public class SqliteConfigurationProvider(SqliteConfigurationSource source) : Con
         EnsureTableExists(connection);
 
         using var command = connection.CreateCommand();
-        command.CommandText = $"SELECT {_keyColumnName}, {_valueColumnName} FROM {_tableName}";
+        command.CommandText =
+            $"SELECT [{_keyColumnName}], [{_valueColumnName}] FROM [{_tableName}]";
 
         using var reader = command.ExecuteReader();
         while (reader.Read())
