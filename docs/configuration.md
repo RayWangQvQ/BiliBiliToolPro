@@ -41,42 +41,42 @@
         - [3.5.1. 想要批量取关的分组名称](#351-想要批量取关的分组名称)
         - [3.5.2. 批量取关的人数](#352-批量取关的人数)
         - [3.5.3. 取关白名单](#353-取关白名单)
-    - [3.8. 大积分相关](#38-大积分相关)
-        - [3.8.1. 自定义观看番剧](#381-自定义观看番剧)
-    - [3.6. 推送相关](#36-推送相关)
-        - [3.6.1. 是否开启每个账号单独推送消息](#361-是否开启每个账号单独推送消息)
-        - [3.6.2. Telegram机器人](#362-telegram机器人)
-            - [3.6.2.1. botToken](#3621-bottoken)
-            - [3.6.2.2. chatId](#3622-chatid)
-            - [3.6.2.3. proxy](#3623-proxy)
-        - [3.6.3. 企业微信机器人](#363-企业微信机器人)
-            - [3.6.3.1. webHookUrl](#3631-webhookurl)
-        - [3.6.4. 钉钉机器人](#364-钉钉机器人)
-            - [3.6.4.1. webHookUrl](#3641-webhookurl)
-        - [3.6.5. Server酱](#365-server酱)
-            - [3.6.5.1. TurboScKey（Server酱SCKEY）](#3651-turbosckeyserver酱sckey)
-        - [3.6.6. 酷推](#366-酷推)
-            - [3.6.6.1. sKey](#3661-skey)
-        - [3.6.7. 推送到自定义Api](#367-推送到自定义api)
-            - [3.6.7.1. api](#3671-api)
-            - [3.6.7.2. placeholder](#3672-placeholder)
-            - [3.6.7.3. bodyJsonTemplate](#3673-bodyjsontemplate)
-        - [3.6.8. PushPlus[推荐]](#368-pushplus推荐)
-            - [3.6.8.1. PushPlus的Token](#3681-pushplus的token)
-            - [3.6.8.2. PushPlus的Topic](#3682-pushplus的topic)
-            - [3.6.8.3. PushPlus的Channel](#3683-pushplus的channel)
-            - [3.6.8.4. PushPlus的Webhook](#3684-pushplus的webhook)
-        - [3.6.9. Microsoft Teams](#369-microsoft-teams)
-            - [3.6.9.1. Microsoft Teams的Webhook](#3691-microsoft-teams的webhook)
-        - [3.6.10. 企业微信应用推送](#3610-企业微信应用推送)
-            - [3.6.10.1. 企业微信应用推送的corpId](#36101-企业微信应用推送的corpid)
-            - [3.6.10.2. 企业微信应用推送的agentId](#36102-企业微信应用推送的agentid)
-            - [3.6.10.3. 企业微信应用推送的secret](#36103-企业微信应用推送的secret)
-    - [3.7. 日志相关](#37-日志相关)
-        - [3.7.1. 日志输出等级](#371-日志输出等级)
-        - [3.7.2. 日志输出样式](#372-日志输出样式)
-        - [3.7.3. 定时任务相关](#373-定时任务相关)
-        - [3.7.4. 定时任务](#374-定时任务)
+    - [3.6. 大积分相关](#36-大积分相关)
+        - [3.6.1. 自定义观看番剧](#361-自定义观看番剧)
+    - [3.7. 推送相关](#37-推送相关)
+        - [3.7.1. 是否开启每个账号单独推送消息](#371-是否开启每个账号单独推送消息)
+        - [3.7.2. Telegram机器人](#372-telegram机器人)
+            - [3.7.2.1. botToken](#3721-bottoken)
+            - [3.7.2.2. chatId](#3722-chatid)
+            - [3.7.2.3. proxy](#3723-proxy)
+        - [3.7.3. 企业微信机器人](#373-企业微信机器人)
+            - [3.7.3.1. webHookUrl](#3731-webhookurl)
+        - [3.7.4. 钉钉机器人](#374-钉钉机器人)
+            - [3.7.4.1. webHookUrl](#3741-webhookurl)
+        - [3.7.5. Server酱](#375-server酱)
+            - [3.7.5.1. TurboScKey（Server酱SCKEY）](#3751-turbosckeyserver酱sckey)
+        - [3.7.6. 酷推](#376-酷推)
+            - [3.7.6.1. sKey](#3761-skey)
+        - [3.7.7. 推送到自定义Api](#377-推送到自定义api)
+            - [3.7.7.1. api](#3771-api)
+            - [3.7.7.2. placeholder](#3772-placeholder)
+            - [3.7.7.3. bodyJsonTemplate](#3773-bodyjsontemplate)
+        - [3.7.8. PushPlus[推荐]](#378-pushplus推荐)
+            - [3.7.8.1. PushPlus的Token](#3781-pushplus的token)
+            - [3.7.8.2. PushPlus的Topic](#3782-pushplus的topic)
+            - [3.7.8.3. PushPlus的Channel](#3783-pushplus的channel)
+            - [3.7.8.4. PushPlus的Webhook](#3784-pushplus的webhook)
+        - [3.7.9. Microsoft Teams](#379-microsoft-teams)
+            - [3.7.9.1. Microsoft Teams的Webhook](#3791-microsoft-teams的webhook)
+        - [3.7.10. 企业微信应用推送](#3710-企业微信应用推送)
+            - [3.7.10.1. 企业微信应用推送的corpId](#37101-企业微信应用推送的corpid)
+            - [3.7.10.2. 企业微信应用推送的agentId](#37102-企业微信应用推送的agentid)
+            - [3.7.10.3. 企业微信应用推送的secret](#37103-企业微信应用推送的secret)
+    - [3.8. 日志相关](#38-日志相关)
+        - [3.8.1. 日志输出等级](#381-日志输出等级)
+        - [3.8.2. 日志输出样式](#382-日志输出样式)
+        - [3.8.3. 定时任务相关](#383-定时任务相关)
+        - [3.8.4. 定时任务](#384-定时任务)
 
 <!-- /TOC -->
 
@@ -494,11 +494,11 @@ Console项目（青龙）的环境变量需要添加`Ray_`前缀，其他不用�
 | 值域   | 字符串，多个使用英文逗号分隔 |
 | 默认值   | 108569350 |
 
-<a id="markdown-38-大积分相关" name="38-大积分相关"></a>
-### 3.8. 大积分相关
+<a id="markdown-36-大积分相关" name="36-大积分相关"></a>
+### 3.6. 大积分相关
 
-<a id="markdown-381-自定义观看番剧" name="381-自定义观看番剧"></a>
-#### 3.8.1. 自定义观看番剧
+<a id="markdown-361-自定义观看番剧" name="361-自定义观看番剧"></a>
+#### 3.6.1. 自定义观看番剧
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
@@ -506,15 +506,15 @@ Console项目（青龙）的环境变量需要添加`Ray_`前缀，其他不用�
 | 值域   | 番剧的ssid（season_id） |
 | 默认值   | `33378`（名侦探柯南） |
 
-<a id="markdown-36-推送相关" name="36-推送相关"></a>
-### 3.6. 推送相关
+<a id="markdown-37-推送相关" name="37-推送相关"></a>
+### 3.7. 推送相关
 
 v1.0.x仅支持推送到Server酱，v1.1.x之后重新定义了推送地概念，将推送仅看作不同地日志输出端，与Console、File没有本质区别。
 
 配置多个，多个端均会收到日志消息。推荐Telegram、企业微信、Server酱。
 
-<a id="markdown-361-是否开启每个账号单独推送消息" name="361-是否开启每个账号单独推送消息"></a>
-#### 3.6.1. 是否开启每个账号单独推送消息
+<a id="markdown-371-是否开启每个账号单独推送消息" name="371-是否开启每个账号单独推送消息"></a>
+#### 3.7.1. 是否开启每个账号单独推送消息
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
@@ -523,13 +523,13 @@ v1.0.x仅支持推送到Server酱，v1.1.x之后重新定义了推送地概念�
 | 值域   | [true,false] |
 | 默认值   | true |
 
-<a id="markdown-362-telegram机器人" name="362-telegram机器人"></a>
-#### 3.6.2. Telegram机器人
+<a id="markdown-372-telegram机器人" name="372-telegram机器人"></a>
+#### 3.7.2. Telegram机器人
 
 <img src="docs/imgs/push-tg.png" alt="push-tg" width="400" />
 
-<a id="markdown-3621-bottoken" name="3621-bottoken"></a>
-##### 3.6.2.1. botToken
+<a id="markdown-3721-bottoken" name="3721-bottoken"></a>
+##### 3.7.2.1. botToken
 
 点击 https://core.telegram.org/api#bot-api 查看如何创建机器人并获取到机器人的botToken。
 
@@ -540,8 +540,8 @@ v1.0.x仅支持推送到Server酱，v1.1.x之后重新定义了推送地概念�
 | 值域   | 一串字符串 |
 | 默认值   | 空 |
 
-<a id="markdown-3622-chatid" name="3622-chatid"></a>
-##### 3.6.2.2. chatId
+<a id="markdown-3722-chatid" name="3722-chatid"></a>
+##### 3.7.2.2. chatId
 点击 https://api.telegram.org/bot{TOKEN}/getUpdates 获取到与机器人的chatId（需要用上面获取到的Token替换进链接里的{TOKEN}后访问）
 
 P.S.访问链接需要能访问"外网"，有vpn的挂vpn。
@@ -553,8 +553,8 @@ P.S.访问链接需要能访问"外网"，有vpn的挂vpn。
 | 默认值   | 空 |
 | 命令行示范   | 无 |
 
-<a id="markdown-3623-proxy" name="3623-proxy"></a>
-##### 3.6.2.3. proxy
+<a id="markdown-3723-proxy" name="3723-proxy"></a>
+##### 3.7.2.3. proxy
 
 使用代理
 
@@ -565,15 +565,15 @@ P.S.访问链接需要能访问"外网"，有vpn的挂vpn。
 | 默认值   | 空 |
 | 命令行示范   | 无 |
 
-<a id="markdown-363-企业微信机器人" name="363-企业微信机器人"></a>
-#### 3.6.3. 企业微信机器人
+<a id="markdown-373-企业微信机器人" name="373-企业微信机器人"></a>
+#### 3.7.3. 企业微信机器人
 
 在群内添加机器人，获取到机器人的WebHook地址，添加到配置中。
 
 <img src="docs/imgs/push-workweixin.png" alt="push-workweixin" width="400" />
 
-<a id="markdown-3631-webhookurl" name="3631-webhookurl"></a>
-##### 3.6.3.1. webHookUrl
+<a id="markdown-3731-webhookurl" name="3731-webhookurl"></a>
+##### 3.7.3.1. webHookUrl
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
@@ -582,8 +582,8 @@ P.S.访问链接需要能访问"外网"，有vpn的挂vpn。
 | 默认值   | 空 |
 | 命令行示范   | 无 |
 
-<a id="markdown-364-钉钉机器人" name="364-钉钉机器人"></a>
-#### 3.6.4. 钉钉机器人
+<a id="markdown-374-钉钉机器人" name="374-钉钉机器人"></a>
+#### 3.7.4. 钉钉机器人
 
 在群内添加机器人，获取到机器人的WebHook地址，添加到配置中。
 
@@ -591,8 +591,8 @@ P.S.访问链接需要能访问"外网"，有vpn的挂vpn。
 
 <img src="docs/imgs/push-ding.png" alt="push-ding" width="400" />
 
-<a id="markdown-3641-webhookurl" name="3641-webhookurl"></a>
-##### 3.6.4.1. webHookUrl
+<a id="markdown-3741-webhookurl" name="3741-webhookurl"></a>
+##### 3.7.4.1. webHookUrl
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
@@ -600,14 +600,14 @@ P.S.访问链接需要能访问"外网"，有vpn的挂vpn。
 | 值域   | 一串字符串 |
 | 默认值   | 空 |
 
-<a id="markdown-365-server酱" name="365-server酱"></a>
-#### 3.6.5. Server酱
+<a id="markdown-375-server酱" name="375-server酱"></a>
+#### 3.7.5. Server酱
 官网： http://sc.ftqq.com/9.version
 
 <img src="docs/imgs/wechat-push.png" alt="wechat-push" width="400" />
 
-<a id="markdown-3651-turbosckeyserver酱sckey" name="3651-turbosckeyserver酱sckey"></a>
-##### 3.6.5.1. TurboScKey（Server酱SCKEY）
+<a id="markdown-3751-turbosckeyserver酱sckey" name="3751-turbosckeyserver酱sckey"></a>
+##### 3.7.5.1. TurboScKey（Server酱SCKEY）
 获取方式请参考官网。
 
 |   TITLE   | CONTENT   |
@@ -616,11 +616,11 @@ P.S.访问链接需要能访问"外网"，有vpn的挂vpn。
 | 值域   | 一串字符串 |
 | 默认值   | 空 |
 
-<a id="markdown-366-酷推" name="366-酷推"></a>
-#### 3.6.6. 酷推
+<a id="markdown-376-酷推" name="376-酷推"></a>
+#### 3.7.6. 酷推
 https://cp.xuthus.cc/
-<a id="markdown-3661-skey" name="3661-skey"></a>
-##### 3.6.6.1. sKey
+<a id="markdown-3761-skey" name="3761-skey"></a>
+##### 3.7.6.1. sKey
 该平台可能还在完善当中，对接时我发现其接口定义不规范，且机器人容易被封，所以不推荐使用，且不接受提酷推推送相关bug。
 
 |   TITLE   | CONTENT   |
@@ -629,11 +629,11 @@ https://cp.xuthus.cc/
 | 值域   | 一串字符串 |
 | 默认值   | 空 |
 
-<a id="markdown-367-推送到自定义api" name="367-推送到自定义api"></a>
-#### 3.6.7. 推送到自定义Api
+<a id="markdown-377-推送到自定义api" name="377-推送到自定义api"></a>
+#### 3.7.7. 推送到自定义Api
 这是我简单封装了一个通用的推送接口，可以推送到任意的api地址，如果有自己的机器人或自己的用于接受日志的api，可以根据需要自定义配置。
-<a id="markdown-3671-api" name="3671-api"></a>
-##### 3.6.7.1. api
+<a id="markdown-3771-api" name="3771-api"></a>
+##### 3.7.7.1. api
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
@@ -641,8 +641,8 @@ https://cp.xuthus.cc/
 | 值域   | 一串字符串 |
 | 默认值   | 空 |
 
-<a id="markdown-3672-placeholder" name="3672-placeholder"></a>
-##### 3.6.7.2. placeholder
+<a id="markdown-3772-placeholder" name="3772-placeholder"></a>
+##### 3.7.7.2. placeholder
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
@@ -650,8 +650,8 @@ https://cp.xuthus.cc/
 | 值域   | 一串字符串 |
 | 默认值   | 空 |
 
-<a id="markdown-3673-bodyjsontemplate" name="3673-bodyjsontemplate"></a>
-##### 3.6.7.3. bodyJsonTemplate
+<a id="markdown-3773-bodyjsontemplate" name="3773-bodyjsontemplate"></a>
+##### 3.7.7.3. bodyJsonTemplate
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
@@ -659,13 +659,13 @@ https://cp.xuthus.cc/
 | 值域   | 一串字符串 |
 | 默认值   | 空 |
 
-<a id="markdown-368-pushplus推荐" name="368-pushplus推荐"></a>
-#### 3.6.8. PushPlus[推荐]
+<a id="markdown-378-pushplus推荐" name="378-pushplus推荐"></a>
+#### 3.7.8. PushPlus[推荐]
 
 官网： http://www.pushplus.plus/doc/
 
-<a id="markdown-3681-pushplus的token" name="3681-pushplus的token"></a>
-##### 3.6.8.1. PushPlus的Token
+<a id="markdown-3781-pushplus的token" name="3781-pushplus的token"></a>
+##### 3.7.8.1. PushPlus的Token
 
 获取方式请参考官网。
 
@@ -675,8 +675,8 @@ https://cp.xuthus.cc/
 | 值域   | 一串字符串 |
 | 默认值   | 空 |
 
-<a id="markdown-3682-pushplus的topic" name="3682-pushplus的topic"></a>
-##### 3.6.8.2. PushPlus的Topic
+<a id="markdown-3782-pushplus的topic" name="3782-pushplus的topic"></a>
+##### 3.7.8.2. PushPlus的Topic
 
 获取方式请参考官网。
 
@@ -686,8 +686,8 @@ https://cp.xuthus.cc/
 | 值域   | 一串字符串 |
 | 默认值   | 空 |
 
-<a id="markdown-3683-pushplus的channel" name="3683-pushplus的channel"></a>
-##### 3.6.8.3. PushPlus的Channel
+<a id="markdown-3783-pushplus的channel" name="3783-pushplus的channel"></a>
+##### 3.7.8.3. PushPlus的Channel
 
 获取方式请参考官网。
 
@@ -697,8 +697,8 @@ https://cp.xuthus.cc/
 | 值域   | 一串字符串，[wechat,webhook,cp,sms,mail] |
 | 默认值   | 空 |
 
-<a id="markdown-3684-pushplus的webhook" name="3684-pushplus的webhook"></a>
-##### 3.6.8.4. PushPlus的Webhook
+<a id="markdown-3784-pushplus的webhook" name="3784-pushplus的webhook"></a>
+##### 3.7.8.4. PushPlus的Webhook
 
 获取方式请参考官网。
 
@@ -711,13 +711,13 @@ webhook编码(不是地址)，在官网平台设定，仅在channel使用webhook
 | 默认值   | 空 |
 | 命令行示范   |  |
 
-<a id="markdown-369-microsoft-teams" name="369-microsoft-teams"></a>
-#### 3.6.9. Microsoft Teams
+<a id="markdown-379-microsoft-teams" name="379-microsoft-teams"></a>
+#### 3.7.9. Microsoft Teams
 
 官网： https://docs.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook
 
-<a id="markdown-3691-microsoft-teams的webhook" name="3691-microsoft-teams的webhook"></a>
-##### 3.6.9.1. Microsoft Teams的Webhook
+<a id="markdown-3791-microsoft-teams的webhook" name="3791-microsoft-teams的webhook"></a>
+##### 3.7.9.1. Microsoft Teams的Webhook
 
 webhook的完整地址，在Teams的Channel中获取，详细获取方式请参考官网。
 
@@ -728,8 +728,8 @@ webhook的完整地址，在Teams的Channel中获取，详细获取方式请参�
 | 默认值   | 空 |
 | 命令行示范   |  |
 
-<a id="markdown-3610-企业微信应用推送" name="3610-企业微信应用推送"></a>
-#### 3.6.10. 企业微信应用推送
+<a id="markdown-3710-企业微信应用推送" name="3710-企业微信应用推送"></a>
+#### 3.7.10. 企业微信应用推送
 
 官网： https://developer.work.weixin.qq.com/tutorial/application-message
 
@@ -737,8 +737,8 @@ webhook的完整地址，在Teams的Channel中获取，详细获取方式请参�
 
 `toUser`、`toParty`、`toTag`3个配置非必填，但不可同时为空，默认`toUser`为`@all`，向所有用户推送。
 
-<a id="markdown-36101-企业微信应用推送的corpid" name="36101-企业微信应用推送的corpid"></a>
-##### 3.6.10.1. 企业微信应用推送的corpId
+<a id="markdown-37101-企业微信应用推送的corpid" name="37101-企业微信应用推送的corpid"></a>
+##### 3.7.10.1. 企业微信应用推送的corpId
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
@@ -747,8 +747,8 @@ webhook的完整地址，在Teams的Channel中获取，详细获取方式请参�
 | 默认值   | 空 |
 | 命令行示范   |  |
 
-<a id="markdown-36102-企业微信应用推送的agentid" name="36102-企业微信应用推送的agentid"></a>
-##### 3.6.10.2. 企业微信应用推送的agentId
+<a id="markdown-37102-企业微信应用推送的agentid" name="37102-企业微信应用推送的agentid"></a>
+##### 3.7.10.2. 企业微信应用推送的agentId
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
@@ -757,8 +757,8 @@ webhook的完整地址，在Teams的Channel中获取，详细获取方式请参�
 | 默认值   | 空 |
 | 命令行示范   |  |
 
-<a id="markdown-36103-企业微信应用推送的secret" name="36103-企业微信应用推送的secret"></a>
-##### 3.6.10.3. 企业微信应用推送的secret
+<a id="markdown-37103-企业微信应用推送的secret" name="37103-企业微信应用推送的secret"></a>
+##### 3.7.10.3. 企业微信应用推送的secret
 
 | TITLE | CONTENT                          |
 | ----- | -------------------------------- |
@@ -767,11 +767,11 @@ webhook的完整地址，在Teams的Channel中获取，详细获取方式请参�
 | 默认值   | 空                                |
 | 命令行示范 |                                  |
 
-<a id="markdown-37-日志相关" name="37-日志相关"></a>
-### 3.7. 日志相关
+<a id="markdown-38-日志相关" name="38-日志相关"></a>
+### 3.8. 日志相关
 
-<a id="markdown-371-日志输出等级" name="371-日志输出等级"></a>
-#### 3.7.1. 日志输出等级
+<a id="markdown-381-日志输出等级" name="381-日志输出等级"></a>
+#### 3.8.1. 日志输出等级
 
 为了美观， BiliBiliTool 默认只输出最低等级为 Information 的日志，保证只展示最精简的信息。
 
@@ -785,8 +785,8 @@ BiliBiliTool 使用 Serilog 作为日志组件，所以其值域与 Serilog 的�
 | 值域   | [Information,Debug] |
 | 默认值   | 1 |
 
-<a id="markdown-372-日志输出样式" name="372-日志输出样式"></a>
-#### 3.7.2. 日志输出样式
+<a id="markdown-382-日志输出样式" name="382-日志输出样式"></a>
+#### 3.8.2. 日志输出样式
 
 这里的日志样式指的是 Console 的等级，即 GitHub Actions 里和微信推送里看到的日志。
 
@@ -800,13 +800,13 @@ BiliBiliTool 使用 Serilog 作为日志组件，所以可以参考 Serilog 的�
 | 值域   | 字符串 |
 | 默认值   | `[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}` |
 
-<a id="markdown-373-定时任务相关" name="373-定时任务相关"></a>
-#### 3.7.3. 定时任务相关
+<a id="markdown-383-定时任务相关" name="383-定时任务相关"></a>
+#### 3.8.3. 定时任务相关
 
 适用于 [方式四：docker容器化运行（推荐）](../docker/README.md)，用于配置定时任务。
 
-<a id="markdown-374-定时任务" name="374-定时任务"></a>
-#### 3.7.4. 定时任务
+<a id="markdown-384-定时任务" name="384-定时任务"></a>
+#### 3.8.4. 定时任务
 
 以下环境变量的值应为有效的 [cron 表达式](https://docs.oracle.com/cd/E12058_01/doc/doc.1014/e12030/cron_expressions.htm)。
 
