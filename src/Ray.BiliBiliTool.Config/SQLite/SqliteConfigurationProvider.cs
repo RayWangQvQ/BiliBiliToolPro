@@ -21,31 +21,15 @@ public class SqliteConfigurationProvider(SqliteConfigurationSource source) : Con
         EnsureTableExists(connection);
 
         using var command = connection.CreateCommand();
-        command.CommandText = $"SELECT [{_keyColumnName}], [{_valueColumnName}] FROM [{_tableName}]";
+        command.CommandText =
+            $"SELECT [{_keyColumnName}], [{_valueColumnName}] FROM [{_tableName}]";
 
-        try
+        using var reader = command.ExecuteReader();
+        while (reader.Read())
         {
-            using var reader = command.ExecuteReader();
-            while (reader.Read())
-            {
-                string key = reader.GetString(0);
-                string value = reader.GetString(1);
-                Data[key] = value;
-            }
-        }
-        catch (SqliteException)
-        {
-            command.Parameters.Clear();
-            command.CommandText =
-                $"SELECT [{_keyColumnName}], [{_valueColumnName}] FROM [{_tableName}]";
-
-            using var reader = command.ExecuteReader();
-            while (reader.Read())
-            {
-                string key = reader.GetString(0);
-                string value = reader.GetString(1);
-                Data[key] = value;
-            }
+            string key = reader.GetString(0);
+            string value = reader.GetString(1);
+            Data[key] = value;
         }
     }
 
