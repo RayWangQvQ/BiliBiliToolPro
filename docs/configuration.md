@@ -169,7 +169,7 @@ dotnet Ray.BiliBiliTool.Console.dll
 
 值：`abcde`
 
-<img src="docs/imgs/qinglong-env.png" alt="qinglong-env" width="800" />
+<img src="/docs/imgs/qinglong-env.png" alt="qinglong-env" width="800" />
 
 - 配置文件页
 
@@ -180,7 +180,7 @@ export Ray_BiliBiliCookies__1="_uuid=abc..."
 export Ray_Serilog__WriteTo__9__Args__token="abcde"
 ```
 
-<img src="docs/imgs/qinglong-config.png" alt="qinglong-config" width="800" />
+<img src="/docs/imgs/qinglong-config.png" alt="qinglong-config" width="800" />
 
 配置文件页添加、修改配置，需要重启青龙容器使之生效，环境变量页则可以立即生效，所以推荐使用环境变量页配置。
 
@@ -277,7 +277,7 @@ Console项目（青龙）的环境变量需要添加`Ray_`前缀，其他不用�
 
 获取浏览器中自己的UA的方法见下图：
 
-<img src="docs/imgs/get-user-agent.png" alt="get-user-agent" width="800" />
+<img src="/docs/imgs/get-user-agent.png" alt="get-user-agent" width="800" />
 
 <a id="markdown-326-app请求b站接口时头部传递的user-agent" name="326-app请求b站接口时头部传递的user-agent"></a>
 #### 3.2.6. App请求B站接口时头部传递的User-Agent
@@ -290,7 +290,7 @@ Console项目（青龙）的环境变量需要添加`Ray_`前缀，其他不用�
 
 获取浏览器中自己的UA的方法见下图：
 
-<img src="docs/imgs/get-user-agent.png" alt="get-user-agent" width="800" />
+<img src="/docs/imgs/get-user-agent.png" alt="get-user-agent" width="800" />
 
 <a id="markdown-327-webproxy代理" name="327-webproxy代理"></a>
 #### 3.2.7. WebProxy（代理）
@@ -361,7 +361,7 @@ Console项目（青龙）的环境变量需要添加`Ray_`前缀，其他不用�
 
 获取UP主的Id方法：打开bilibili，进入欲要选择的UP主主页，在url中和简介中，都可获得该UP主的Id，如下图所示：
 
-<img src="docs/imgs/get-up-id.png" alt="get-up-id" width="800" />
+<img src="/docs/imgs/get-up-id.png" alt="get-up-id" width="800" />
 
 <a id="markdown-336-每月几号自动充电" name="336-每月几号自动充电"></a>
 #### 3.3.6. 每月几号自动充电
@@ -526,7 +526,7 @@ v1.0.x仅支持推送到Server酱，v1.1.x之后重新定义了推送地概念�
 <a id="markdown-372-telegram机器人" name="372-telegram机器人"></a>
 #### 3.7.2. Telegram机器人
 
-<img src="docs/imgs/push-tg.png" alt="push-tg" width="400" />
+<img src="/docs/imgs/push-tg.png" alt="push-tg" width="400" />
 
 <a id="markdown-3721-bottoken" name="3721-bottoken"></a>
 ##### 3.7.2.1. botToken
@@ -570,7 +570,7 @@ P.S.访问链接需要能访问"外网"，有vpn的挂vpn。
 
 在群内添加机器人，获取到机器人的WebHook地址，添加到配置中。
 
-<img src="docs/imgs/push-workweixin.png" alt="push-workweixin" width="400" />
+<img src="/docs/imgs/push-workweixin.png" alt="push-workweixin" width="400" />
 
 <a id="markdown-3731-webhookurl" name="3731-webhookurl"></a>
 ##### 3.7.3.1. webHookUrl
@@ -589,7 +589,7 @@ P.S.访问链接需要能访问"外网"，有vpn的挂vpn。
 
 机器人的安全策略，当前不支持加签，请使用关键字策略，推荐关键字：`Ray` 或 `BiliBili`
 
-<img src="docs/imgs/push-ding.png" alt="push-ding" width="400" />
+<img src="/docs/imgs/push-ding.png" alt="push-ding" width="400" />
 
 <a id="markdown-3741-webhookurl" name="3741-webhookurl"></a>
 ##### 3.7.4.1. webHookUrl
