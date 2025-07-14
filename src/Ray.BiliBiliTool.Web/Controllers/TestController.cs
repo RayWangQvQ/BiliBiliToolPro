@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Ray.BiliBiliTool.Web.Controllers;
 
+[ApiController]
 [Route("test")]
 public class TestController(IConfiguration config) : Controller
 {
