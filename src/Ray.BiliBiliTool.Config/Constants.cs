@@ -73,5 +73,5 @@ public static class Constants
         { "--proxy", "WebProxy" },
     };
 
-    public static string SqliteTableName = "bili_appsettings";
+    public const string SqliteTableName = "bili_appsettings";
 }
