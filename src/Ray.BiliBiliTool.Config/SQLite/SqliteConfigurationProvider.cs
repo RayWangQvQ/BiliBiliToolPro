@@ -21,15 +21,34 @@ public class SqliteConfigurationProvider(SqliteConfigurationSource source) : Con
         EnsureTableExists(connection);
 
         using var command = connection.CreateCommand();
-        command.CommandText =
-            $"SELECT [{_keyColumnName}], [{_valueColumnName}] FROM [{_tableName}]";
+        command.CommandText = $"SELECT @keyCol, @valueCol FROM @tableName";
+        command.Parameters.AddWithValue("@keyCol", _keyColumnName);
+        command.Parameters.AddWithValue("@valueCol", _valueColumnName);
+        command.Parameters.AddWithValue("@tableName", _tableName);
 
-        using var reader = command.ExecuteReader();
-        while (reader.Read())
+        try
         {
-            string key = reader.GetString(0);
-            string value = reader.GetString(1);
-            Data[key] = value;
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                string key = reader.GetString(0);
+                string value = reader.GetString(1);
+                Data[key] = value;
+            }
+        }
+        catch (SqliteException)
+        {
+            command.Parameters.Clear();
+            command.CommandText =
+                $"SELECT [{_keyColumnName}], [{_valueColumnName}] FROM [{_tableName}]";
+
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                string key = reader.GetString(0);
+                string value = reader.GetString(1);
+                Data[key] = value;
+            }
         }
     }
 
@@ -38,9 +57,9 @@ public class SqliteConfigurationProvider(SqliteConfigurationSource source) : Con
         using var command = connection.CreateCommand();
         command.CommandText =
             $@"
-            CREATE TABLE IF NOT EXISTS {_tableName} (
-                {_keyColumnName} TEXT PRIMARY KEY,
-                {_valueColumnName} TEXT NOT NULL
+            CREATE TABLE IF NOT EXISTS [{_tableName}] (
+                [{_keyColumnName}] TEXT PRIMARY KEY,
+                [{_valueColumnName}] TEXT NOT NULL
             )";
         command.ExecuteNonQuery();
     }
@@ -53,13 +72,13 @@ public class SqliteConfigurationProvider(SqliteConfigurationSource source) : Con
         using var command = connection.CreateCommand();
         command.CommandText =
             $@"
-            INSERT OR REPLACE INTO {_tableName} ({_keyColumnName}, {_valueColumnName})
+            INSERT OR REPLACE INTO [{_tableName}] ([{_keyColumnName}], [{_valueColumnName}])
             VALUES (@key, @value)";
         command.Parameters.AddWithValue("@key", key);
         command.Parameters.AddWithValue("@value", value);
         command.ExecuteNonQuery();
 
         // 更新内存中的数据
-        Load();
+        Data[key] = value;
     }
 }
