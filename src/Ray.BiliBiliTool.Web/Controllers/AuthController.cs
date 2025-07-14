@@ -6,8 +6,9 @@ using Ray.BiliBiliTool.Web.Services;
 
 namespace Ray.BiliBiliTool.Web.Controllers;
 
+[ApiController]
 [Route("auth")]
-public class AuthController(IAuthService authService) : Controller
+public class AuthController(IAuthService authService) : ControllerBase
 {
     [HttpPost("login")]
     public async Task<IActionResult> Login(

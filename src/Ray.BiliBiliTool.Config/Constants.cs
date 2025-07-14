@@ -72,4 +72,6 @@ public static class Constants
         { "--pushScKey", "Serilog:WriteTo:6:Args:scKey" },
         { "--proxy", "WebProxy" },
     };
+
+    public const string SqliteTableName = "bili_appsettings";
 }
