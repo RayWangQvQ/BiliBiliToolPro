@@ -78,7 +78,7 @@ public class SqliteConfigurationProvider(SqliteConfigurationSource source) : Con
         command.Parameters.AddWithValue("@value", value);
         command.ExecuteNonQuery();
 
-        // 更新内存中的数据
+        // Update in-memory data
         Data[key] = value;
     }
 }
