@@ -4,7 +4,7 @@ namespace Ray.BiliBiliTool.Web.Controllers;
 
 [ApiController]
 [Route("test")]
-public class TestController(IConfiguration config) : Controller
+public class TestController(IConfiguration config) : ControllerBase
 {
     [HttpGet("config")]
     public async Task<IActionResult> Config()
