@@ -604,7 +604,7 @@ P.S.访问链接需要能访问"外网"，有vpn的挂vpn。
 #### 3.7.5. Server酱
 官网： http://sc.ftqq.com/9.version
 
-<img src="docs/imgs/wechat-push.png" alt="wechat-push" width="400" />
+<img src="/docs/imgs/wechat-push.png" alt="wechat-push" width="400" />
 
 <a id="markdown-3751-turbosckeyserver酱sckey" name="3751-turbosckeyserver酱sckey"></a>
 ##### 3.7.5.1. TurboScKey（Server酱SCKEY）
