@@ -1,4 +1,6 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@rendermode InteractiveServer
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">
             <img src="/favicon.png" alt="Logo" class="navbar-logo" />
@@ -7,9 +9,9 @@
     </div>
 </div>
 
-<input type="checkbox" title="Navigation menu" class="navbar-toggler"/>
+<input type="checkbox" title="Navigation menu" class="navbar-toggler" id="navToggler"/>
 
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
+<div class="nav-scrollable">
     <nav class="flex-column">
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
@@ -24,9 +26,34 @@
         </div>
 
         <div class="nav-item px-3">
+            <div @onclick="@(() => { _showConfigSubMenu = !_showConfigSubMenu; })"
+                 class="nav-link d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="bi bi-sliders me-1" aria-hidden="true"></span> Configurations
+                </div>
+                <span class="bi @(_showConfigSubMenu ? "bi-chevron-down" : "bi-chevron-right")" aria-hidden="true"></span>
+            </div>
+        </div>
+
+        @if (_showConfigSubMenu)
+        {
+            <div class="submenu-container">
+                <div class="nav-item px-3 ms-4 submenu-item">
+                    <NavLink class="nav-link" href="DailyJobConfig">
+                        <span class="bi bi-coin" aria-hidden="true"></span> Daily Job
+                    </NavLink>
+                </div>
+            </div>
+        }
+
+        <div class="nav-item px-3">
             <NavLink class="nav-link" href="Admin">
                 <span class="bi bi-person-circle" aria-hidden="true"></span> Admin
             </NavLink>
         </div>
     </nav>
 </div>
+
+@code {
+    private bool _showConfigSubMenu;
+}
