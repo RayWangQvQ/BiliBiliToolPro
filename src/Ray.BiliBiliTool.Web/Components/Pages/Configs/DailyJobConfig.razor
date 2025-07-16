@@ -52,9 +52,6 @@
 
                             <MudTextField T="string" @bind-Value="_config.AutoChargeUpId" Label="充电Up主Id" Class="mt-3" />
 
-                            <MudTextField T="string" @bind-Value="_chargeComment" Label="充电后留言" Class="mt-3"
-                                HelperText="不填写则使用默认留言" />
-
                             <MudNumericField T="int" @bind-Value="_config.DayOfReceiveVipPrivilege" Label="每月几号自动领取会员权益 [-1,31]"
                                 Min="-1" Max="31" Class="mt-3"
                                 HelperText="-1表示不指定，默认每月1号；0表示不自动领取" />

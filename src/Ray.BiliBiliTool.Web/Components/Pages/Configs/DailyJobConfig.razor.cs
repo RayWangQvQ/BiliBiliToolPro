@@ -13,11 +13,7 @@ public partial class DailyJobConfig : ComponentBase
     [Inject]
     private IConfiguration Configuration { get; set; } = null!;
 
-    [Inject]
-    private IServiceProvider ServiceProvider { get; set; } = null!;
-
     private DailyTaskOptions _config = new();
-    private string? _chargeComment;
     private bool _isLoading = true;
     private string? _saveMessage;
     private bool _saveSuccess;
@@ -34,42 +30,7 @@ public partial class DailyJobConfig : ComponentBase
 
         try
         {
-            // 从配置中加载当前值
-            _config = new DailyTaskOptions
-            {
-                IsWatchVideo = bool.Parse(GetConfigValue("DailyTaskConfig:IsWatchVideo", "true")),
-                IsShareVideo = bool.Parse(GetConfigValue("DailyTaskConfig:IsShareVideo", "true")),
-                IsDonateCoinForArticle = bool.Parse(
-                    GetConfigValue("DailyTaskConfig:IsDonateCoinForArticle", "false")
-                ),
-                NumberOfCoins = int.Parse(GetConfigValue("DailyTaskConfig:NumberOfCoins", "5")),
-                NumberOfProtectedCoins = int.Parse(
-                    GetConfigValue("DailyTaskConfig:NumberOfProtectedCoins", "0")
-                ),
-                SaveCoinsWhenLv6 = bool.Parse(
-                    GetConfigValue("DailyTaskConfig:SaveCoinsWhenLv6", "false")
-                ),
-                SelectLike = bool.Parse(GetConfigValue("DailyTaskConfig:SelectLike", "false")),
-                SupportUpIds = GetConfigValue("DailyTaskConfig:SupportUpIds", ""),
-                DayOfAutoCharge = int.Parse(
-                    GetConfigValue("DailyTaskConfig:DayOfAutoCharge", "-1")
-                ),
-                AutoChargeUpId = GetConfigValue("DailyTaskConfig:AutoChargeUpId", ""),
-                DayOfReceiveVipPrivilege = int.Parse(
-                    GetConfigValue("DailyTaskConfig:DayOfReceiveVipPrivilege", "-1")
-                ),
-                DayOfExchangeSilver2Coin = int.Parse(
-                    GetConfigValue("DailyTaskConfig:DayOfExchangeSilver2Coin", "-1")
-                ),
-                DevicePlatform = GetConfigValue("DailyTaskConfig:DevicePlatform", "android"),
-                CustomComicId = long.Parse(
-                    GetConfigValue("DailyTaskConfig:CustomComicId", "27355")
-                ),
-                CustomEpId = long.Parse(GetConfigValue("DailyTaskConfig:CustomEpId", "381662")),
-                Cron = GetConfigValue("DailyTaskConfig:Cron", "0 0 6 * * ?"),
-            };
-
-            _chargeComment = GetConfigValue("DailyTaskConfig:ChargeComment", "");
+            _config = DailyTaskOptionsMonitor.CurrentValue;
         }
         catch (Exception ex)
         {
@@ -129,7 +90,6 @@ public partial class DailyJobConfig : ComponentBase
                 _config.DayOfAutoCharge.ToString()
             );
             sqliteProvider.Set("DailyTaskConfig:AutoChargeUpId", _config.AutoChargeUpId ?? "");
-            sqliteProvider.Set("DailyTaskConfig:ChargeComment", _chargeComment ?? "");
             sqliteProvider.Set(
                 "DailyTaskConfig:DayOfReceiveVipPrivilege",
                 _config.DayOfReceiveVipPrivilege.ToString()
