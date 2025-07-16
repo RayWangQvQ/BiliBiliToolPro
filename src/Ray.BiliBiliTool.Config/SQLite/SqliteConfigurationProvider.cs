@@ -59,7 +59,14 @@ public class SqliteConfigurationProvider(SqliteConfigurationSource source) : Con
         command.Parameters.AddWithValue("@value", value);
         command.ExecuteNonQuery();
 
-        // Update in-memory data
         Data[key] = value;
+    }
+
+    public void BatchUpdateConfig(Dictionary<string, string> configValues)
+    {
+        foreach (var kvp in configValues)
+        {
+            Set(kvp.Key, kvp.Value);
+        }
     }
 }

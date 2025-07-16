@@ -135,4 +135,33 @@ public class DailyTaskOptions : IHasCron
     ];
 
     public string? Cron { get; set; }
+
+    public Dictionary<string, string> ToConfigDictionary()
+    {
+        var result = new Dictionary<string, string>
+        {
+            { "DailyTaskConfig:IsWatchVideo", IsWatchVideo.ToString().ToLower() },
+            { "DailyTaskConfig:IsShareVideo", IsShareVideo.ToString().ToLower() },
+            {
+                "DailyTaskConfig:IsDonateCoinForArticle",
+                IsDonateCoinForArticle.ToString().ToLower()
+            },
+            { "DailyTaskConfig:NumberOfCoins", NumberOfCoins.ToString() },
+            { "DailyTaskConfig:NumberOfProtectedCoins", NumberOfProtectedCoins.ToString() },
+            { "DailyTaskConfig:SaveCoinsWhenLv6", SaveCoinsWhenLv6.ToString().ToLower() },
+            { "DailyTaskConfig:SelectLike", SelectLike.ToString().ToLower() },
+            { "DailyTaskConfig:SupportUpIds", SupportUpIds ?? "" },
+            { "DailyTaskConfig:DayOfAutoCharge", DayOfAutoCharge.ToString() },
+            { "DailyTaskConfig:AutoChargeUpId", AutoChargeUpId ?? "" },
+            { "DailyTaskConfig:ChargeComment", _chargeComment ?? "" },
+            { "DailyTaskConfig:DayOfReceiveVipPrivilege", DayOfReceiveVipPrivilege.ToString() },
+            { "DailyTaskConfig:DayOfExchangeSilver2Coin", DayOfExchangeSilver2Coin.ToString() },
+            { "DailyTaskConfig:DevicePlatform", DevicePlatform },
+            { "DailyTaskConfig:CustomComicId", CustomComicId.ToString() },
+            { "DailyTaskConfig:CustomEpId", CustomEpId.ToString() },
+            { "DailyTaskConfig:Cron", Cron ?? "0 0 6 * * ?" },
+        };
+
+        return result;
+    }
 }
