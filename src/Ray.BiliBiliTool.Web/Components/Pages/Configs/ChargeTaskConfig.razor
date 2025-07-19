@@ -1,4 +1,4 @@
-@page "/ChargeTaskConfig"
+@page "/Configurations/ChargeTaskConfig"
 @using Microsoft.AspNetCore.Authorization
 @using Ray.BiliBiliTool.Config.Options;
 @attribute [Authorize]
@@ -30,7 +30,7 @@
                     <MudGrid>
                         <MudItem xs="12" md="6">
                             <MudSwitch T="bool" @bind-Value="_config.IsEnable"
-                                Label="是否启用充电任务" Color="Color.Primary" />
+                                Label="启用任务" Color="Color.Primary" />
                         </MudItem>
                         <MudItem xs="12" md="6">
                             <MudTextField T="string" @bind-Value="_config.Cron" Label="定时任务Cron表达式"
@@ -53,13 +53,27 @@
                     <MudCardContent>
                         <MudGrid>
                             <MudItem xs="12" md="6">
-                                <MudTextField T="string" @bind-Value="_config.AutoChargeUpId" Label="充电Up主Id"
-                                    HelperText="-1表示自己" Class="mt-3" />
+                                <MudTextField T="string" @bind-Value="_config.ChargeComment" Label="充电后留言"
+                                              HelperText="为空时将随机选择一条默认留言" />
                             </MudItem>
 
                             <MudItem xs="12" md="6">
-                                <MudTextField T="string" @bind-Value="_config.ChargeComment" Label="充电后留言"
-                                    HelperText="为空时将随机选择一条默认留言" />
+                                <MudSwitch T="bool" Value="_isSpecifyUpToggled" ValueChanged="OnSpecifyUpToggled"
+                                           Label="指定其他UP" Color="Color.Primary"
+                                           HelperText="开启后可以指定充电给其他UP主" />
+                                @if (_isSpecifyUpToggled)
+                                {
+                                    <div>
+                                        <div style="display: flex; align-items: end; gap: 8px;">
+                                            <MudTextField T="string" @bind-Value="_config.AutoChargeUpId" Label="充电Up主Id"
+                                                          HelperText="阿B最新策略已不允许为自己充电了，可以填自己小号id，或者支持作者的。开源不易，感谢支持~" Class="mt-3" style="flex: 1;"/>
+                                            <MudButton Variant="Variant.Outlined" Color="Color.Success" Size="Size.Small"
+                                                       OnClick="() => SetSupportAuthor()" Class="mt-3" style="white-space: nowrap;">
+                                                支持作者
+                                            </MudButton>
+                                        </div>
+                                    </div>
+                                }
                             </MudItem>
                         </MudGrid>
                     </MudCardContent>

@@ -7,7 +7,7 @@ public class ChargeTaskOptions : BaseConfigOptions
     /// <summary>
     /// 充电Up主Id
     /// </summary>
-    public string? AutoChargeUpId { get; set; } = "-1";
+    public string? AutoChargeUpId { get; set; }
 
     private string? _chargeComment;
 

@@ -92,18 +92,7 @@ public class MangaDomainService(
         }
 
         int day = DateTime.Today.Day;
-
-        if (day != _vipPrivilegeOptions.DayOfReceiveVipPrivilege)
-        {
-            //一个月执行一次就行
-            logger.LogInformation(
-                "【目标日期】{target}号",
-                _vipPrivilegeOptions.DayOfReceiveVipPrivilege
-            );
-            logger.LogInformation("【今天】{day}号", day);
-            logger.LogInformation("跳过");
-            return;
-        }
+        logger.LogInformation("【今天】{day}号", day);
 
         var response = await mangaApi.ReceiveMangaVipReward(reason_id, ck.ToString());
         if (response.Code == 0)
