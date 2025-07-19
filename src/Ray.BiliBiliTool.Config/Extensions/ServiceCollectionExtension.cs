@@ -24,6 +24,12 @@ public static class ServiceCollectionExtension
             .Configure<JsonSerializerOptions>(o => o = JsonSerializerOptionsBuilder.DefaultOptions)
             .Configure<BiliBiliCookieOptions>(configuration.GetSection("BiliBiliCookie"))
             .Configure<DailyTaskOptions>(configuration.GetSection("DailyTaskConfig"))
+            .Configure<MangaTaskOptions>(configuration.GetSection("MangaTaskConfig"))
+            .Configure<MangaPrivilegeTaskOptions>(
+                configuration.GetSection("MangaPrivilegeTaskConfig")
+            )
+            .Configure<Silver2CoinTaskOptions>(configuration.GetSection("Silver2CoinTaskConfig"))
+            .Configure<ChargeTaskOptions>(configuration.GetSection("ChargeTaskConfig"))
             .Configure<LiveLotteryTaskOptions>(configuration.GetSection("LiveLotteryTaskConfig"))
             .Configure<UnfollowBatchedTaskOptions>(
                 configuration.GetSection("UnfollowBatchedTaskConfig")
@@ -32,7 +38,7 @@ public static class ServiceCollectionExtension
             .Configure<SecurityOptions>(configuration.GetSection("Security"))
             .Configure<VipPrivilegeOptions>(configuration.GetSection("VipPrivilegeConfig"))
             .Configure<LiveFansMedalTaskOptions>(
-                configuration.GetSection("LiveFansMedalTaskOptions")
+                configuration.GetSection("LiveFansMedalTaskConfig")
             )
             .Configure<QingLongOptions>(configuration.GetSection("QingLongConfig"));
 
