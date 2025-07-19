@@ -1,8 +1,8 @@
 ﻿namespace Ray.BiliBiliTool.Config.Options;
 
-public class LiveLotteryTaskOptions : IHasCron
+public class LiveLotteryTaskOptions : BaseConfigOptions
 {
-    public const string SectionName = "LiveLotteryTaskConfig";
+    public override string SectionName => "LiveLotteryTaskConfig";
 
     public string? IncludeAwardNames { get; set; }
 
@@ -27,21 +27,19 @@ public class LiveLotteryTaskOptions : IHasCron
             ?.Split(",", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
             .ToList() ?? new List<string>();
 
-    public string? Cron { get; set; }
-
-    public Dictionary<string, string> ToConfigDictionary()
+    public override Dictionary<string, string> ToConfigDictionary()
     {
-        var result = new Dictionary<string, string>
-        {
-            { $"{SectionName}:{nameof(IncludeAwardNames)}", IncludeAwardNames ?? "" },
-            { $"{SectionName}:{nameof(ExcludeAwardNames)}", ExcludeAwardNames ?? "" },
+        return MergeConfigDictionary(
+            new Dictionary<string, string>
             {
-                $"{SectionName}:{nameof(AutoGroupFollowings)}",
-                AutoGroupFollowings.ToString().ToLower()
-            },
-            { $"{SectionName}:{nameof(DenyUids)}", DenyUids ?? "" },
-            { $"{SectionName}:{nameof(Cron)}", Cron ?? "" },
-        };
-        return result;
+                { $"{SectionName}:{nameof(IncludeAwardNames)}", IncludeAwardNames ?? "" },
+                { $"{SectionName}:{nameof(ExcludeAwardNames)}", ExcludeAwardNames ?? "" },
+                {
+                    $"{SectionName}:{nameof(AutoGroupFollowings)}",
+                    AutoGroupFollowings.ToString().ToLower()
+                },
+                { $"{SectionName}:{nameof(DenyUids)}", DenyUids ?? "" },
+            }
+        );
     }
 }

@@ -1,98 +1,25 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Config.Options;
-using Ray.BiliBiliTool.Config.SQLite;
 
 namespace Ray.BiliBiliTool.Web.Components.Pages.Configs;
 
-public partial class UnfollowBatchedTaskConfig : ComponentBase
+public partial class UnfollowBatchedTaskConfig : BaseConfigComponent<UnfollowBatchedTaskOptions>
 {
     [Inject]
     private IOptionsMonitor<UnfollowBatchedTaskOptions> UnfollowBatchedTaskOptionsMonitor { get; set; } =
         null!;
 
-    [Inject]
-    private IConfiguration Configuration { get; set; } = null!;
-
-    private UnfollowBatchedTaskOptions _config = new() { GroupName = "天选时刻" };
-    private bool _isLoading = true;
-    private string? _saveMessage;
-    private bool _saveSuccess;
+    protected override IOptionsMonitor<UnfollowBatchedTaskOptions> OptionsMonitor =>
+        UnfollowBatchedTaskOptionsMonitor;
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadConfigAsync();
-    }
-
-    private Task LoadConfigAsync()
-    {
-        _isLoading = true;
-        _saveMessage = null;
-
-        try
+        // 确保配置对象有默认的GroupName值
+        if (string.IsNullOrEmpty(_config.GroupName))
         {
-            _config = UnfollowBatchedTaskOptionsMonitor.CurrentValue;
+            _config.GroupName = "天选时刻";
         }
-        catch (Exception ex)
-        {
-            _saveMessage = $"Failed to load configuration: {ex.Message}";
-            _saveSuccess = false;
-        }
-        finally
-        {
-            _isLoading = false;
-            StateHasChanged();
-        }
-
-        return Task.CompletedTask;
-    }
-
-    private Task HandleValidSubmitAsync()
-    {
-        _isLoading = true;
-        _saveMessage = null;
-
-        try
-        {
-            var sqliteProvider = GetSqliteConfigurationProvider();
-            if (sqliteProvider == null)
-            {
-                throw new InvalidOperationException("Unable to get SqliteConfigurationProvider");
-            }
-
-            var configValues = _config.ToConfigDictionary();
-
-            sqliteProvider.BatchSet(configValues);
-
-            _saveMessage = "Configuration saved successfully!";
-            _saveSuccess = true;
-        }
-        catch (Exception ex)
-        {
-            _saveMessage = $"Failed to save configuration: {ex.Message}";
-            _saveSuccess = false;
-        }
-        finally
-        {
-            _isLoading = false;
-            StateHasChanged();
-        }
-
-        return Task.CompletedTask;
-    }
-
-    private SqliteConfigurationProvider? GetSqliteConfigurationProvider()
-    {
-        if (Configuration is IConfigurationRoot configRoot)
-        {
-            foreach (var provider in configRoot.Providers)
-            {
-                if (provider is SqliteConfigurationProvider sqliteProvider)
-                {
-                    return sqliteProvider;
-                }
-            }
-        }
-        return null;
+        await base.OnInitializedAsync();
     }
 }

@@ -1,7 +1,9 @@
 @page "/ChargeTaskConfig"
 @using Microsoft.AspNetCore.Authorization
+@using Ray.BiliBiliTool.Config.Options;
 @attribute [Authorize]
 @rendermode InteractiveServer
+@inherits BaseConfigComponent<ChargeTaskOptions>
 
 <PageTitle>充电任务配置</PageTitle>
 
@@ -16,15 +18,31 @@
     {
         <EditForm Model="@_config" OnValidSubmit="HandleValidSubmitAsync">
             <DataAnnotationsValidator />
-            <MudCard>
+
+            <!-- 基础配置卡片 -->
+            <MudCard Class="mb-4">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6">基础配置</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
                 <MudCardContent>
                     <MudGrid>
-                        <MudItem xs="12">
+                        <MudItem xs="12" md="6">
+                            <MudSwitch T="bool" @bind-Value="_config.IsEnable"
+                                Label="是否启用充电任务" Color="Color.Primary" />
+                        </MudItem>
+                        <MudItem xs="12" md="6">
                             <MudTextField T="string" @bind-Value="_config.Cron" Label="定时任务Cron表达式"
-                                HelperText="例如：0 0 12 * * ? (每天中午12点执行)" />
+                                HelperText="例如：0 0 12 * * ? (每天中午12点执行)"
+                                Disabled="!_config.IsEnable" />
                         </MudItem>
                     </MudGrid>
                 </MudCardContent>
+            </MudCard>
+
+            <!-- 操作按钮 -->
+            <MudCard Class="mt-4">
                 <MudCardActions>
                     <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">保存配置</MudButton>
                     <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="LoadConfigAsync" Class="ml-2">重新加载</MudButton>
