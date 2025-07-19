@@ -81,7 +81,7 @@ public class SqliteConfigurationProvider(SqliteConfigurationSource source) : Con
                     VALUES (@key, @value)";
                 command.Parameters.Clear();
                 command.Parameters.AddWithValue("@key", kvp.Key);
-                command.Parameters.AddWithValue("@value", kvp.Value);
+                command.Parameters.AddWithValue("@value", kvp.Value ?? (object)DBNull.Value);
                 command.ExecuteNonQuery();
 
                 Data[kvp.Key] = kvp.Value;
