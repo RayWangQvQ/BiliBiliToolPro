@@ -1,7 +1,6 @@
 ﻿namespace Ray.BiliBiliTool.Config.Options;
 
-public class VipPrivilegeOptions : IHasCron
+public class VipPrivilegeOptions : BaseConfigOptions
 {
-    public string? Cron { get; set; }
-    public bool IsEnable { get; set; } = true;
+    public override string SectionName => "VipPrivilegeConfig";
 }

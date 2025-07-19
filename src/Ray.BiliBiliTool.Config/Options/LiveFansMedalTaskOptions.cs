@@ -3,10 +3,12 @@
 /// <summary>
 /// 粉丝牌等级任务相关配置
 /// </summary>
-public class LiveFansMedalTaskOptions : IHasCron
+public class LiveFansMedalTaskOptions : BaseConfigOptions
 {
+    public override string SectionName => "LiveFansMedalTaskConfig";
+
     /// <summary>
-    /// 自定义发送弹幕内容，如 “打卡” 等来触发直播间内机器人关键词
+    /// 自定义发送弹幕内容，如 "打卡" 等来触发直播间内机器人关键词
     /// </summary>
     public string DanmakuContent { get; set; } = "OvO";
 
@@ -25,8 +27,6 @@ public class LiveFansMedalTaskOptions : IHasCron
     /// </summary>
     public bool IsSkipLevel20Medal { get; set; } = true;
 
-    //public const string UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36";
-
     public const int HeartBeatInterval = 60;
 
     /// <summary>
@@ -44,5 +44,28 @@ public class LiveFansMedalTaskOptions : IHasCron
     /// </summary>
     public int SendDanmakugiveUpThreshold { get; set; } = 3;
 
-    public string? Cron { get; set; }
+    public override Dictionary<string, string> ToConfigDictionary()
+    {
+        return MergeConfigDictionary(
+            new Dictionary<string, string>
+            {
+                { $"{SectionName}:{nameof(DanmakuContent)}", DanmakuContent },
+                { $"{SectionName}:{nameof(HeartBeatNumber)}", HeartBeatNumber.ToString() },
+                {
+                    $"{SectionName}:{nameof(HeartBeatSendGiveUpThreshold)}",
+                    HeartBeatSendGiveUpThreshold.ToString()
+                },
+                {
+                    $"{SectionName}:{nameof(IsSkipLevel20Medal)}",
+                    IsSkipLevel20Medal.ToString().ToLower()
+                },
+                { $"{SectionName}:{nameof(LikeNumber)}", LikeNumber.ToString() },
+                { $"{SectionName}:{nameof(SendDanmakuNumber)}", SendDanmakuNumber.ToString() },
+                {
+                    $"{SectionName}:{nameof(SendDanmakugiveUpThreshold)}",
+                    SendDanmakugiveUpThreshold.ToString()
+                },
+            }
+        );
+    }
 }

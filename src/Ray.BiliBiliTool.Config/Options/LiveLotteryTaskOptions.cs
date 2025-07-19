@@ -1,7 +1,9 @@
 ﻿namespace Ray.BiliBiliTool.Config.Options;
 
-public class LiveLotteryTaskOptions : IHasCron
+public class LiveLotteryTaskOptions : BaseConfigOptions
 {
+    public override string SectionName => "LiveLotteryTaskConfig";
+
     public string? IncludeAwardNames { get; set; }
 
     public string? ExcludeAwardNames { get; set; }
@@ -25,5 +27,19 @@ public class LiveLotteryTaskOptions : IHasCron
             ?.Split(",", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
             .ToList() ?? new List<string>();
 
-    public string? Cron { get; set; }
+    public override Dictionary<string, string> ToConfigDictionary()
+    {
+        return MergeConfigDictionary(
+            new Dictionary<string, string>
+            {
+                { $"{SectionName}:{nameof(IncludeAwardNames)}", IncludeAwardNames ?? "" },
+                { $"{SectionName}:{nameof(ExcludeAwardNames)}", ExcludeAwardNames ?? "" },
+                {
+                    $"{SectionName}:{nameof(AutoGroupFollowings)}",
+                    AutoGroupFollowings.ToString().ToLower()
+                },
+                { $"{SectionName}:{nameof(DenyUids)}", DenyUids ?? "" },
+            }
+        );
+    }
 }
