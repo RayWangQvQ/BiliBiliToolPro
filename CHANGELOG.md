@@ -1,3 +1,5 @@
+## 3.4.3
+- Feature[#924]: 新增 Daily Job 配置页
 ## 3.4.2
 - Feature[#924]: 新增 Sqlite 配置源
 ## 3.4.1
