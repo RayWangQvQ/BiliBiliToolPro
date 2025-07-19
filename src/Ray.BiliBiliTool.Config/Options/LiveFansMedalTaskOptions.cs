@@ -5,8 +5,10 @@
 /// </summary>
 public class LiveFansMedalTaskOptions : IHasCron
 {
+    public const string SectionName = "LiveFansMedalTaskConfig";
+
     /// <summary>
-    /// 自定义发送弹幕内容，如 “打卡” 等来触发直播间内机器人关键词
+    /// 自定义发送弹幕内容，如 "打卡" 等来触发直播间内机器人关键词
     /// </summary>
     public string DanmakuContent { get; set; } = "OvO";
 
@@ -45,4 +47,29 @@ public class LiveFansMedalTaskOptions : IHasCron
     public int SendDanmakugiveUpThreshold { get; set; } = 3;
 
     public string? Cron { get; set; }
+
+    public Dictionary<string, string> ToConfigDictionary()
+    {
+        var result = new Dictionary<string, string>
+        {
+            { $"{SectionName}:{nameof(DanmakuContent)}", DanmakuContent },
+            { $"{SectionName}:{nameof(HeartBeatNumber)}", HeartBeatNumber.ToString() },
+            {
+                $"{SectionName}:{nameof(HeartBeatSendGiveUpThreshold)}",
+                HeartBeatSendGiveUpThreshold.ToString()
+            },
+            {
+                $"{SectionName}:{nameof(IsSkipLevel20Medal)}",
+                IsSkipLevel20Medal.ToString().ToLower()
+            },
+            { $"{SectionName}:{nameof(LikeNumber)}", LikeNumber.ToString() },
+            { $"{SectionName}:{nameof(SendDanmakuNumber)}", SendDanmakuNumber.ToString() },
+            {
+                $"{SectionName}:{nameof(SendDanmakugiveUpThreshold)}",
+                SendDanmakugiveUpThreshold.ToString()
+            },
+            { $"{SectionName}:{nameof(Cron)}", Cron ?? "" },
+        };
+        return result;
+    }
 }

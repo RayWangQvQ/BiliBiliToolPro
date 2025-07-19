@@ -2,6 +2,8 @@
 
 public class LiveLotteryTaskOptions : IHasCron
 {
+    public const string SectionName = "LiveLotteryTaskConfig";
+
     public string? IncludeAwardNames { get; set; }
 
     public string? ExcludeAwardNames { get; set; }
@@ -26,4 +28,20 @@ public class LiveLotteryTaskOptions : IHasCron
             .ToList() ?? new List<string>();
 
     public string? Cron { get; set; }
+
+    public Dictionary<string, string> ToConfigDictionary()
+    {
+        var result = new Dictionary<string, string>
+        {
+            { $"{SectionName}:{nameof(IncludeAwardNames)}", IncludeAwardNames ?? "" },
+            { $"{SectionName}:{nameof(ExcludeAwardNames)}", ExcludeAwardNames ?? "" },
+            {
+                $"{SectionName}:{nameof(AutoGroupFollowings)}",
+                AutoGroupFollowings.ToString().ToLower()
+            },
+            { $"{SectionName}:{nameof(DenyUids)}", DenyUids ?? "" },
+            { $"{SectionName}:{nameof(Cron)}", Cron ?? "" },
+        };
+        return result;
+    }
 }

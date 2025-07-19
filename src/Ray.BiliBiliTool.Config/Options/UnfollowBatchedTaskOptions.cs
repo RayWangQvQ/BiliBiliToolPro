@@ -2,9 +2,10 @@
 
 public class UnfollowBatchedTaskOptions : IHasCron
 {
+    public const string SectionName = "UnfollowBatchedTaskConfig";
     private const string DefaultGroupName = "天选时刻";
 
-    public required string GroupName { get; set; } = DefaultGroupName;
+    public string GroupName { get; set; } = DefaultGroupName;
 
     public int Count { get; set; }
 
@@ -16,4 +17,16 @@ public class UnfollowBatchedTaskOptions : IHasCron
             .ToList() ?? new List<string>();
 
     public string? Cron { get; set; }
+
+    public Dictionary<string, string> ToConfigDictionary()
+    {
+        var result = new Dictionary<string, string>
+        {
+            { $"{SectionName}:{nameof(GroupName)}", GroupName },
+            { $"{SectionName}:{nameof(Count)}", Count.ToString() },
+            { $"{SectionName}:{nameof(RetainUids)}", RetainUids ?? "" },
+            { $"{SectionName}:{nameof(Cron)}", Cron ?? "" },
+        };
+        return result;
+    }
 }

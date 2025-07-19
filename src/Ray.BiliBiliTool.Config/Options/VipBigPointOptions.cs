@@ -2,6 +2,8 @@
 
 public class VipBigPointOptions : IHasCron
 {
+    public const string SectionName = "VipBigPointConfig";
+
     public string? ViewBangumis { get; set; }
 
     public List<long> ViewBangumiList
@@ -25,4 +27,14 @@ public class VipBigPointOptions : IHasCron
     }
 
     public string? Cron { get; set; }
+
+    public Dictionary<string, string> ToConfigDictionary()
+    {
+        var result = new Dictionary<string, string>
+        {
+            { $"{SectionName}:{nameof(ViewBangumis)}", ViewBangumis ?? "" },
+            { $"{SectionName}:{nameof(Cron)}", Cron ?? "" },
+        };
+        return result;
+    }
 }
