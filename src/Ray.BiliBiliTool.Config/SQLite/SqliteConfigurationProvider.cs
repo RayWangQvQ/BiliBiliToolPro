@@ -45,7 +45,7 @@ public class SqliteConfigurationProvider(SqliteConfigurationSource source) : Con
         command.ExecuteNonQuery();
     }
 
-    public void UpdateConfig(string key, string value)
+    public override void Set(string key, string? value)
     {
         using var connection = new SqliteConnection(_connectionString);
         connection.Open();
@@ -62,7 +62,7 @@ public class SqliteConfigurationProvider(SqliteConfigurationSource source) : Con
         Data[key] = value;
     }
 
-    public void BatchUpdateConfig(Dictionary<string, string> configValues)
+    public void BatchSet(Dictionary<string, string> configValues)
     {
         using var connection = new SqliteConnection(_connectionString);
         connection.Open();

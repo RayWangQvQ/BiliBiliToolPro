@@ -61,7 +61,7 @@ public partial class DailyJobConfig : ComponentBase
 
             var configValues = _config.ToConfigDictionary();
 
-            sqliteProvider.BatchUpdateConfig(configValues);
+            sqliteProvider.BatchSet(configValues);
 
             _saveMessage = "Configuration saved successfully!";
             _saveSuccess = true;
