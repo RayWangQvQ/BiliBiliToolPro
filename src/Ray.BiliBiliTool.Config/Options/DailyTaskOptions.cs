@@ -6,6 +6,11 @@
 public class DailyTaskOptions : IHasCron
 {
     /// <summary>
+    /// 配置节名称
+    /// </summary>
+    public const string SectionName = "DailyTaskConfig";
+
+    /// <summary>
     /// 是否观看视频
     /// </summary>
     public bool IsWatchVideo { get; set; }
@@ -135,4 +140,42 @@ public class DailyTaskOptions : IHasCron
     ];
 
     public string? Cron { get; set; }
+
+    public Dictionary<string, string> ToConfigDictionary()
+    {
+        var result = new Dictionary<string, string>
+        {
+            { $"{SectionName}:{nameof(IsWatchVideo)}", IsWatchVideo.ToString().ToLower() },
+            { $"{SectionName}:{nameof(IsShareVideo)}", IsShareVideo.ToString().ToLower() },
+            {
+                $"{SectionName}:{nameof(IsDonateCoinForArticle)}",
+                IsDonateCoinForArticle.ToString().ToLower()
+            },
+            { $"{SectionName}:{nameof(NumberOfCoins)}", NumberOfCoins.ToString() },
+            {
+                $"{SectionName}:{nameof(NumberOfProtectedCoins)}",
+                NumberOfProtectedCoins.ToString()
+            },
+            { $"{SectionName}:{nameof(SaveCoinsWhenLv6)}", SaveCoinsWhenLv6.ToString().ToLower() },
+            { $"{SectionName}:{nameof(SelectLike)}", SelectLike.ToString().ToLower() },
+            { $"{SectionName}:{nameof(SupportUpIds)}", SupportUpIds ?? "" },
+            { $"{SectionName}:{nameof(DayOfAutoCharge)}", DayOfAutoCharge.ToString() },
+            { $"{SectionName}:{nameof(AutoChargeUpId)}", AutoChargeUpId ?? "" },
+            { $"{SectionName}:{nameof(ChargeComment)}", _chargeComment ?? "" },
+            {
+                $"{SectionName}:{nameof(DayOfReceiveVipPrivilege)}",
+                DayOfReceiveVipPrivilege.ToString()
+            },
+            {
+                $"{SectionName}:{nameof(DayOfExchangeSilver2Coin)}",
+                DayOfExchangeSilver2Coin.ToString()
+            },
+            { $"{SectionName}:{nameof(DevicePlatform)}", DevicePlatform },
+            { $"{SectionName}:{nameof(CustomComicId)}", CustomComicId.ToString() },
+            { $"{SectionName}:{nameof(CustomEpId)}", CustomEpId.ToString() },
+            { $"{SectionName}:{nameof(Cron)}", Cron ?? "0 0 6 * * ?" },
+        };
+
+        return result;
+    }
 }

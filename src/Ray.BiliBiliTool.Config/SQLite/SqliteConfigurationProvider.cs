@@ -45,7 +45,7 @@ public class SqliteConfigurationProvider(SqliteConfigurationSource source) : Con
         command.ExecuteNonQuery();
     }
 
-    public void Set(string key, string value)
+    public override void Set(string key, string? value)
     {
         using var connection = new SqliteConnection(_connectionString);
         connection.Open();
@@ -59,7 +59,40 @@ public class SqliteConfigurationProvider(SqliteConfigurationSource source) : Con
         command.Parameters.AddWithValue("@value", value);
         command.ExecuteNonQuery();
 
-        // Update in-memory data
         Data[key] = value;
+    }
+
+    public void BatchSet(Dictionary<string, string> configValues)
+    {
+        using var connection = new SqliteConnection(_connectionString);
+        connection.Open();
+
+        using var transaction = connection.BeginTransaction();
+        using var command = connection.CreateCommand();
+        command.Transaction = transaction;
+
+        try
+        {
+            foreach (var kvp in configValues)
+            {
+                command.CommandText =
+                    $@"
+                    INSERT OR REPLACE INTO [{_tableName}] ([{_keyColumnName}], [{_valueColumnName}])
+                    VALUES (@key, @value)";
+                command.Parameters.Clear();
+                command.Parameters.AddWithValue("@key", kvp.Key);
+                command.Parameters.AddWithValue("@value", kvp.Value ?? (object)DBNull.Value);
+                command.ExecuteNonQuery();
+
+                Data[kvp.Key] = kvp.Value;
+            }
+
+            transaction.Commit();
+        }
+        catch
+        {
+            transaction.Rollback();
+            throw;
+        }
     }
 }
