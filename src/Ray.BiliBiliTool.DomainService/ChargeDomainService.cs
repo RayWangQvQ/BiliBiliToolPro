@@ -14,11 +14,13 @@ namespace Ray.BiliBiliTool.DomainService;
 public class ChargeDomainService(
     ILogger<ChargeDomainService> logger,
     IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
+    IOptionsMonitor<ChargeTaskOptions> chargeTaskOptions,
     IDailyTaskApi dailyTaskApi,
     IChargeApi chargeApi
 ) : IChargeDomainService
 {
     private readonly DailyTaskOptions _dailyTaskOptions = dailyTaskOptions.CurrentValue;
+    private readonly ChargeTaskOptions _chargeTaskOptions = chargeTaskOptions.CurrentValue;
     private readonly IDailyTaskApi _dailyTaskApi = dailyTaskApi;
 
     /// <summary>
@@ -27,12 +29,6 @@ public class ChargeDomainService(
     /// </summary>
     public async Task Charge(UserInfo userInfo, BiliCookie ck)
     {
-        if (_dailyTaskOptions.DayOfAutoCharge == 0)
-        {
-            logger.LogInformation("已配置为关闭，跳过");
-            return;
-        }
-
         //大会员类型
         VipType vipType = userInfo.GetVipType();
         if (vipType != VipType.Annual)
@@ -41,19 +37,7 @@ public class ChargeDomainService(
             return;
         }
 
-        int targetDay =
-            _dailyTaskOptions.DayOfAutoCharge == -1
-                ? DateTime.Today.LastDayOfMonth().Day
-                : _dailyTaskOptions.DayOfAutoCharge;
-
-        logger.LogInformation("【目标日期】{targetDay}号", targetDay);
         logger.LogInformation("【今天】{today}号", DateTime.Today.Day);
-
-        if (DateTime.Today.Day != targetDay)
-        {
-            logger.LogInformation("跳过");
-            return;
-        }
 
         //B币券余额
         decimal couponBalance = userInfo.Wallet?.Coupon_balance ?? 0;
@@ -66,10 +50,10 @@ public class ChargeDomainService(
 
         //如果没有配置或配了-1，则使用fallback值（B站最新策略已不允许为自己充电）
         string targetUpId =
-            _dailyTaskOptions.AutoChargeUpId.IsNullOrWhiteSpace()
-            || _dailyTaskOptions.AutoChargeUpId == "-1"
+            _chargeTaskOptions.AutoChargeUpId.IsNullOrWhiteSpace()
+            || _chargeTaskOptions.AutoChargeUpId == "-1"
                 ? Config.Constants.FallbackAutoChargeUpId
-                : _dailyTaskOptions.AutoChargeUpId!;
+                : _chargeTaskOptions.AutoChargeUpId!;
 
         logger.LogDebug("【目标Up】{up}", targetUpId);
 
@@ -112,7 +96,7 @@ public class ChargeDomainService(
     /// <param name="token"></param>
     public async Task ChargeComments(string orderNum, BiliCookie ck)
     {
-        var comment = _dailyTaskOptions.ChargeComment ?? "";
+        var comment = _chargeTaskOptions.ChargeComment ?? "";
         var request = new ChargeCommentRequest(orderNum, comment, ck.BiliJct);
         await chargeApi.ChargeCommentAsync(request, ck.ToString());
 

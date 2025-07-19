@@ -11,4 +11,27 @@ public partial class ChargeTaskConfig : BaseConfigComponent<ChargeTaskOptions>
 
     protected override IOptionsMonitor<ChargeTaskOptions> OptionsMonitor =>
         ChargeTaskOptionsMonitor;
+
+    private bool _isSpecifyUpToggled;
+
+    protected override Task OnInitializedAsync()
+    {
+        if (!OptionsMonitor.CurrentValue.AutoChargeUpId.IsNullOrWhiteSpace())
+        {
+            _isSpecifyUpToggled = true;
+        }
+        return base.OnInitializedAsync();
+    }
+
+    private void OnSpecifyUpToggled(bool isSpecified)
+    {
+        _isSpecifyUpToggled = !_isSpecifyUpToggled;
+        StateHasChanged();
+    }
+
+    private Task SetSupportAuthor()
+    {
+        _config.AutoChargeUpId = "-1";
+        return Task.CompletedTask;
+    }
 }

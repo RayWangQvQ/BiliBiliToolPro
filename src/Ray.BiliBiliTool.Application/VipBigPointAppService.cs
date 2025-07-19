@@ -1,9 +1,11 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Mall;
 using Ray.BiliBiliTool.Application.Attributes;
 using Ray.BiliBiliTool.Application.Contracts;
+using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 using Ray.BiliBiliTool.Infrastructure.Cookie;
 
@@ -11,6 +13,7 @@ namespace Ray.BiliBiliTool.Application;
 
 public class VipBigPointAppService(
     ILogger<VipBigPointAppService> logger,
+    IOptionsMonitor<VipBigPointOptions> vipBigPointOptions,
     IAccountDomainService loginDomainService,
     IVipBigPointDomainService vipBigPointDomainService,
     CookieStrFactory<BiliCookie> cookieFactory
@@ -22,6 +25,12 @@ public class VipBigPointAppService(
         CancellationToken cancellationToken = default
     )
     {
+        if (!vipBigPointOptions.CurrentValue.IsEnable)
+        {
+            logger.LogInformation("已配置为关闭，跳过");
+            return;
+        }
+
         bool isVip = await LoginAndCheckVipStatusAsync(ck, cancellationToken);
         if (!isVip)
         {
