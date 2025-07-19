@@ -14,7 +14,7 @@
     }
     else
     {
-        <EditForm Model="@_config" OnValidSubmit="HandleValidSubmit">
+        <EditForm Model="@_config" OnValidSubmit="HandleValidSubmitAsync">
             <DataAnnotationsValidator />
             <MudCard>
                 <MudCardContent>
@@ -72,7 +72,7 @@
                 </MudCardContent>
                 <MudCardActions>
                     <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">保存配置</MudButton>
-                    <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="LoadConfig" Class="ml-2">重新加载</MudButton>
+                    <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="LoadConfigAsync" Class="ml-2">重新加载</MudButton>
                 </MudCardActions>
             </MudCard>
         </EditForm>

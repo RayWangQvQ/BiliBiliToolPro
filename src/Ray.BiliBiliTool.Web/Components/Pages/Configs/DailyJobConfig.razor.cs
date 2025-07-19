@@ -20,10 +20,10 @@ public partial class DailyJobConfig : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadConfig();
+        await LoadConfigAsync();
     }
 
-    private async Task LoadConfig()
+    private Task LoadConfigAsync()
     {
         _isLoading = true;
         _saveMessage = null;
@@ -34,7 +34,7 @@ public partial class DailyJobConfig : ComponentBase
         }
         catch (Exception ex)
         {
-            _saveMessage = $"加载配置失败: {ex.Message}";
+            _saveMessage = $"Failed to load configuration: {ex.Message}";
             _saveSuccess = false;
         }
         finally
@@ -42,9 +42,11 @@ public partial class DailyJobConfig : ComponentBase
             _isLoading = false;
             StateHasChanged();
         }
+
+        return Task.CompletedTask;
     }
 
-    private async Task HandleValidSubmit()
+    private Task HandleValidSubmitAsync()
     {
         _isLoading = true;
         _saveMessage = null;
@@ -54,19 +56,19 @@ public partial class DailyJobConfig : ComponentBase
             var sqliteProvider = GetSqliteConfigurationProvider();
             if (sqliteProvider == null)
             {
-                throw new InvalidOperationException("无法获取 SqliteConfigurationProvider");
+                throw new InvalidOperationException("Unable to get SqliteConfigurationProvider");
             }
 
             var configValues = _config.ToConfigDictionary();
 
             sqliteProvider.BatchUpdateConfig(configValues);
 
-            _saveMessage = "配置保存成功！";
+            _saveMessage = "Configuration saved successfully!";
             _saveSuccess = true;
         }
         catch (Exception ex)
         {
-            _saveMessage = $"保存配置失败: {ex.Message}";
+            _saveMessage = $"Failed to save configuration: {ex.Message}";
             _saveSuccess = false;
         }
         finally
@@ -74,6 +76,8 @@ public partial class DailyJobConfig : ComponentBase
             _isLoading = false;
             StateHasChanged();
         }
+
+        return Task.CompletedTask;
     }
 
     private SqliteConfigurationProvider? GetSqliteConfigurationProvider()
