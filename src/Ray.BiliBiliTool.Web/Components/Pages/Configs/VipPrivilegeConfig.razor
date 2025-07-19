@@ -41,6 +41,27 @@
                 </MudCardContent>
             </MudCard>
 
+            <!-- 详细配置卡片 -->
+            @if (_config.IsEnable)
+            {
+                <MudCard>
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h6">详细配置</MudText>
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <MudGrid>
+                            <MudItem xs="12">
+                                <MudNumericField T="int" @bind-Value="_config.DayOfReceiveVipPrivilege" Label="每月几号自动领取会员权益 [-1,31]"
+                                    Min="-1" Max="31"
+                                    HelperText="-1表示不指定，默认每月1号；0表示不自动领取" />
+                            </MudItem>
+                        </MudGrid>
+                    </MudCardContent>
+                </MudCard>
+            }
+
             <!-- 操作按钮 -->
             <MudCard Class="mt-4">
                 <MudCardActions>

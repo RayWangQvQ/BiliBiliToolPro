@@ -1,9 +1,11 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Application.Attributes;
 using Ray.BiliBiliTool.Application.Contracts;
+using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 using Ray.BiliBiliTool.Infrastructure.Cookie;
 using Ray.BiliBiliTool.Infrastructure.Enums;
@@ -12,6 +14,7 @@ namespace Ray.BiliBiliTool.Application;
 
 public class VipPrivilegeTaskAppService(
     ILogger<VipPrivilegeTaskAppService> logger,
+    IOptionsMonitor<VipPrivilegeOptions> vipPrivilegeOptions,
     IAccountDomainService accountDomainService,
     IVipPrivilegeDomainService vipPrivilegeDomainService,
     ILoginDomainService loginDomainService,
@@ -25,6 +28,12 @@ public class VipPrivilegeTaskAppService(
         CancellationToken cancellationToken = default
     )
     {
+        if (!vipPrivilegeOptions.CurrentValue.IsEnable)
+        {
+            logger.LogInformation("已配置为关闭，跳过");
+            return;
+        }
+
         await SetCookiesAsync(ck, cancellationToken);
         UserInfo userInfo = await Login(ck);
 

@@ -9,6 +9,7 @@ using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 using Ray.BiliBiliTool.Infrastructure.Cookie;
 using Ray.BiliBiliTool.Infrastructure.Enums;
+using SQLitePCL;
 
 namespace Ray.BiliBiliTool.Application;
 
@@ -34,6 +35,12 @@ public class DailyTaskAppService(
         CancellationToken cancellationToken = default
     )
     {
+        if (!_dailyTaskOptions.IsEnable)
+        {
+            logger.LogInformation("已配置为关闭，跳过");
+            return;
+        }
+
         await SetCookiesAsync(ck, cancellationToken);
 
         //每日任务赚经验：

@@ -41,6 +41,31 @@
                 </MudCardContent>
             </MudCard>
 
+            <!-- 详细配置卡片 -->
+            @if (_config.IsEnable)
+            {
+                <MudCard>
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h6">详细配置</MudText>
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <MudGrid>
+                            <MudItem xs="12" md="6">
+                                <MudTextField T="string" @bind-Value="_config.AutoChargeUpId" Label="充电Up主Id"
+                                    HelperText="-1表示自己" Class="mt-3" />
+                            </MudItem>
+
+                            <MudItem xs="12" md="6">
+                                <MudTextField T="string" @bind-Value="_config.ChargeComment" Label="充电后留言"
+                                    HelperText="为空时将随机选择一条默认留言" />
+                            </MudItem>
+                        </MudGrid>
+                    </MudCardContent>
+                </MudCard>
+            }
+
             <!-- 操作按钮 -->
             <MudCard Class="mt-4">
                 <MudCardActions>

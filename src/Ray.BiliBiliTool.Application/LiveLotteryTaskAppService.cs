@@ -26,6 +26,12 @@ public class LiveLotteryTaskAppService(
         CancellationToken cancellationToken = default
     )
     {
+        if (!liveLotteryTaskOptions.CurrentValue.IsEnable)
+        {
+            logger.LogInformation("已配置为关闭，跳过");
+            return;
+        }
+
         await LogUserInfo(ck);
         await LotteryTianXuan(ck);
         await AutoGroupFollowings(ck);

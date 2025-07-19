@@ -28,7 +28,7 @@ namespace ConfigTest
             var options = scope.ServiceProvider.GetRequiredService<
                 IOptionsMonitor<DailyTaskOptions>
             >();
-            var re = options.CurrentValue.ChargeComment;
+            var re = options.CurrentValue.NumberOfCoins;
             Debug.WriteLine(re);
         }
     }

@@ -48,53 +48,9 @@ public class DailyTaskOptions : BaseConfigOptions
     public string? SupportUpIds { get; set; }
 
     /// <summary>
-    /// 每月几号自动充电[-1,31]，-1表示不指定，默认月底最后一天；0表示不充电
-    /// </summary>
-    public int DayOfAutoCharge { get; set; } = -1;
-
-    /// <summary>
-    /// 充电Up主Id
-    /// </summary>
-    public string? AutoChargeUpId { get; set; }
-
-    private string? _chargeComment;
-
-    /// <summary>
-    /// 充电后留言
-    /// </summary>
-    public string ChargeComment
-    {
-        get =>
-            string.IsNullOrWhiteSpace(_chargeComment)
-                ? DefaultComments[new Random().Next(0, DefaultComments.Count)]
-                : _chargeComment;
-        set => _chargeComment = value;
-    }
-
-    /// <summary>
-    /// 每月几号自动领取会员权益的[-1,31]，-1表示不指定，默认每月1号；0表示不自动领取
-    /// </summary>
-    public int DayOfReceiveVipPrivilege { get; set; } = -1;
-
-    /// <summary>
-    /// 每月几号执行银瓜子兑换硬币[-1,31]，-1表示不指定，默认每月1号；-2表示每天；0表示不进行兑换
-    /// </summary>
-    public int DayOfExchangeSilver2Coin { get; set; } = -1;
-
-    /// <summary>
     /// 执行客户端操作时的平台 [ios,android]
     /// </summary>
     public string DevicePlatform { get; set; } = "android";
-
-    /// <summary>
-    /// 自定义漫画阅读 comic_id
-    /// </summary>
-    public long CustomComicId { get; set; } = 27355;
-
-    /// <summary>
-    /// 自定义漫画阅读 ep_id
-    /// </summary>
-    public long CustomEpId { get; set; } = 381662;
 
     public List<long> SupportUpIdList
     {
@@ -158,20 +114,7 @@ public class DailyTaskOptions : BaseConfigOptions
                 },
                 { $"{SectionName}:{nameof(SelectLike)}", SelectLike.ToString().ToLower() },
                 { $"{SectionName}:{nameof(SupportUpIds)}", SupportUpIds ?? "" },
-                { $"{SectionName}:{nameof(DayOfAutoCharge)}", DayOfAutoCharge.ToString() },
-                { $"{SectionName}:{nameof(AutoChargeUpId)}", AutoChargeUpId ?? "" },
-                { $"{SectionName}:{nameof(ChargeComment)}", _chargeComment ?? "" },
-                {
-                    $"{SectionName}:{nameof(DayOfReceiveVipPrivilege)}",
-                    DayOfReceiveVipPrivilege.ToString()
-                },
-                {
-                    $"{SectionName}:{nameof(DayOfExchangeSilver2Coin)}",
-                    DayOfExchangeSilver2Coin.ToString()
-                },
                 { $"{SectionName}:{nameof(DevicePlatform)}", DevicePlatform },
-                { $"{SectionName}:{nameof(CustomComicId)}", CustomComicId.ToString() },
-                { $"{SectionName}:{nameof(CustomEpId)}", CustomEpId.ToString() },
             }
         );
     }
