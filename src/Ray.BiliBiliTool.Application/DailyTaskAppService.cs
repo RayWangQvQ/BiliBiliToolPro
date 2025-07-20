@@ -9,7 +9,6 @@ using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 using Ray.BiliBiliTool.Infrastructure.Cookie;
 using Ray.BiliBiliTool.Infrastructure.Enums;
-using SQLitePCL;
 
 namespace Ray.BiliBiliTool.Application;
 
