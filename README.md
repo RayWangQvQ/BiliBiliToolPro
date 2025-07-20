@@ -23,6 +23,7 @@ BiliTool
 </div>
 
 **BiliTool 是一个自动执行任务的工具，当我们忘记做某项任务时，它会像一个贴心小助手，按照我们预先吩咐它的命令，在指定频率、时间范围内帮助我们完成计划的任务。**
+
 **BiliTool is an automated task execution tool that acts as a helpful assistant, following pre-configured commands to complete planned tasks within specified frequencies and timeframes when we forget to do them.**
 
 主要功能如下：
@@ -81,6 +82,9 @@ BiliTool
     <img src="docs/imgs/web-schedules.png" alt="运行图示" width="800" />
     <br/>
     <img src="docs/imgs/web-schedules-log.png" alt="运行日志" width="800" />
+    <br/>
+    <img src="docs/imgs/web-configs.png" alt="运行日志" width="800" />
+    <br/>
 </p>
 
 ## 1. 如何使用
