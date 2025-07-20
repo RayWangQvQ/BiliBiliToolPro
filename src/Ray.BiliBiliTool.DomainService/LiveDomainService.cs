@@ -25,6 +25,7 @@ public class LiveDomainService(
     IOptionsMonitor<LiveLotteryTaskOptions> liveLotteryTaskOptions,
     IOptionsMonitor<LiveFansMedalTaskOptions> liveFansMedalTaskOptions,
     IOptionsMonitor<SecurityOptions> securityOptions,
+    IOptionsMonitor<Silver2CoinTaskOptions> silver2CoinTaskOptions,
     IUpInfoApi upInfoApi
 ) : ILiveDomainService
 {
@@ -34,6 +35,8 @@ public class LiveDomainService(
         liveFansMedalTaskOptions.CurrentValue;
     private readonly DailyTaskOptions _dailyTaskOptions = dailyTaskOptions.CurrentValue;
     private readonly SecurityOptions _securityOptions = securityOptions.CurrentValue;
+    private readonly Silver2CoinTaskOptions _silver2CoinTaskOptions =
+        silver2CoinTaskOptions.CurrentValue;
 
     /// <summary>
     /// 本次通过天选关注的主播
@@ -76,25 +79,13 @@ public class LiveDomainService(
     {
         var result = false;
 
-        if (_dailyTaskOptions.DayOfExchangeSilver2Coin == 0)
+        if (!_silver2CoinTaskOptions.IsEnable)
         {
             logger.LogInformation("已配置为关闭，跳过");
             return false;
         }
 
-        int targetDay =
-            _dailyTaskOptions.DayOfExchangeSilver2Coin == -2 ? DateTime.Today.Day
-            : _dailyTaskOptions.DayOfExchangeSilver2Coin == -1 ? DateTime.Today.LastDayOfMonth().Day
-            : _dailyTaskOptions.DayOfExchangeSilver2Coin;
-
-        logger.LogInformation("【目标兑换日期】{targetDay}号", targetDay);
         logger.LogInformation("【今天】{day}号", DateTime.Today.Day);
-
-        if (DateTime.Today.Day != targetDay)
-        {
-            logger.LogInformation("跳过");
-            return false;
-        }
 
         BiliApiResponse<LiveWalletStatusResponse> queryStatus = await liveApi.GetLiveWalletStatus(
             ck.ToString()

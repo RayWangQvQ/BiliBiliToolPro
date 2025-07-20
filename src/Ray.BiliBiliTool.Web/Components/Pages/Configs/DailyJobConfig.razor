@@ -1,4 +1,4 @@
-@page "/DailyJobConfig"
+@page "/Configurations/DailyJobConfig"
 @using Microsoft.AspNetCore.Authorization
 @using Ray.BiliBiliTool.Config.Options;
 @attribute [Authorize]
@@ -30,7 +30,7 @@
                     <MudGrid>
                         <MudItem xs="12" md="6">
                             <MudSwitch T="bool" @bind-Value="_config.IsEnable"
-                                Label="是否启用每日任务" Color="Color.Primary" />
+                                Label="启用任务" Color="Color.Primary" />
                         </MudItem>
                         <MudItem xs="12" md="6">
                             <MudTextField T="string" @bind-Value="_config.Cron" Label="定时任务Cron表达式"
@@ -60,38 +60,24 @@
                                     Label="是否分享视频" Color="Color.Primary" Class="mt-3" />
 
                                 <MudSwitch T="bool" @bind-Value="_config.IsDonateCoinForArticle"
-                                    Label="是否开启专栏投币模式" Color="Color.Primary" Class="mt-3" />
+                                    Label="是否开启专栏投币" Color="Color.Primary" Class="mt-3" />
 
-                                <MudNumericField T="int" @bind-Value="_config.NumberOfCoins" Label="每日设定的投币数 [0-5]"
+                                <MudNumericField T="int" @bind-Value="_config.NumberOfCoins" Label="每日投币数 [0-5]"
                                     Min="0" Max="5" Class="mt-3" />
 
                                 <MudNumericField T="int" @bind-Value="_config.NumberOfProtectedCoins" Label="要保留的硬币数量"
                                     Min="0" Class="mt-3" />
-
-                                <MudSwitch T="bool" @bind-Value="_config.SaveCoinsWhenLv6"
-                                    Label="达到六级后是否开始白嫖" Color="Color.Primary" Class="mt-3" />
-
-                                <MudSwitch T="bool" @bind-Value="_config.SelectLike"
-                                    Label="投币时是否点赞" Color="Color.Primary" Class="mt-3" />
                             </MudItem>
 
                             <MudItem xs="12" md="6">
+                                <MudSwitch T="bool" @bind-Value="_config.SaveCoinsWhenLv6"
+                                    Label="达到六级后开始白嫖" Color="Color.Primary" />
+
+                                <MudSwitch T="bool" @bind-Value="_config.SelectLike"
+                                    Label="投币时点赞" Color="Color.Primary" Class="mt-3" />
+
                                 <MudTextField T="string" @bind-Value="_config.SupportUpIds" Label="支持的up主Id集合（用逗号分隔）"
-                                    HelperText="配置后会优先从指定的up主下挑选视频进行观看、分享和投币" />
-
-                                <MudNumericField T="int" @bind-Value="_config.DayOfAutoCharge" Label="每月几号自动充电 [-1,31]"
-                                    Min="-1" Max="31" Class="mt-3"
-                                    HelperText="-1表示不指定，默认月底最后一天；0表示不充电" />
-
-                                <MudTextField T="string" @bind-Value="_config.AutoChargeUpId" Label="充电Up主Id" Class="mt-3" />
-
-                                <MudNumericField T="int" @bind-Value="_config.DayOfReceiveVipPrivilege" Label="每月几号自动领取会员权益 [-1,31]"
-                                    Min="-1" Max="31" Class="mt-3"
-                                    HelperText="-1表示不指定，默认每月1号；0表示不自动领取" />
-
-                                <MudNumericField T="int" @bind-Value="_config.DayOfExchangeSilver2Coin" Label="每月几号执行银瓜子兑换硬币 [-1,31]"
-                                    Min="-2" Max="31" Class="mt-3"
-                                    HelperText="-1表示不指定，默认每月1号；-2表示每天；0表示不进行兑换" />
+                                    HelperText="配置后会优先从指定的up主下挑选视频进行观看、分享和投币" Class="mt-3" />
 
                                 <MudSelect T="string" @bind-Value="_config.DevicePlatform" Label="执行客户端操作时的平台" Class="mt-3">
                                     <MudSelectItem Value="@("android")">Android</MudSelectItem>
@@ -112,7 +98,7 @@
             </MudCard>
         </EditForm>
 
-        @if (!string.IsNullOrEmpty(_saveMessage))
+        @if (_saveMessage.HasValue)
         {
             <MudAlert Severity="@(_saveSuccess ? Severity.Success : Severity.Error)" Class="mt-3">
                 @_saveMessage

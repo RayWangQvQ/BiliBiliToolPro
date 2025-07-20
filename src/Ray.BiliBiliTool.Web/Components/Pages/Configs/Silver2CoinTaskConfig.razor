@@ -1,4 +1,4 @@
-@page "/Silver2CoinTaskConfig"
+@page "/Configurations/Silver2CoinTaskConfig"
 @using Microsoft.AspNetCore.Authorization
 @using Ray.BiliBiliTool.Config.Options;
 @attribute [Authorize]
@@ -30,7 +30,7 @@
                     <MudGrid>
                         <MudItem xs="12" md="6">
                             <MudSwitch T="bool" @bind-Value="_config.IsEnable"
-                                Label="是否启用银瓜子兑换硬币任务" Color="Color.Primary" />
+                                Label="启用任务" Color="Color.Primary" />
                         </MudItem>
                         <MudItem xs="12" md="6">
                             <MudTextField T="string" @bind-Value="_config.Cron" Label="定时任务Cron表达式"
@@ -50,7 +50,7 @@
             </MudCard>
         </EditForm>
 
-        @if (!string.IsNullOrEmpty(_saveMessage))
+        @if (_saveMessage.HasValue)
         {
             <MudAlert Severity="@(_saveSuccess ? Severity.Success : Severity.Error)" Class="mt-3">
                 @_saveMessage

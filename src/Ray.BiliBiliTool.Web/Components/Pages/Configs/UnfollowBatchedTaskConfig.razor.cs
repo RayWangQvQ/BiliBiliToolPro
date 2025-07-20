@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Options;
+using Quartz;
 using Ray.BiliBiliTool.Config.Options;
+using Ray.BiliBiliTool.Web.Jobs;
 
 namespace Ray.BiliBiliTool.Web.Components.Pages.Configs;
 
@@ -12,6 +14,8 @@ public partial class UnfollowBatchedTaskConfig : BaseConfigComponent<UnfollowBat
 
     protected override IOptionsMonitor<UnfollowBatchedTaskOptions> OptionsMonitor =>
         UnfollowBatchedTaskOptionsMonitor;
+
+    protected override JobKey GetJobKey() => UnfollowBatchedJob.Key;
 
     protected override async Task OnInitializedAsync()
     {

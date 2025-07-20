@@ -1,4 +1,4 @@
-@page "/MangaTaskConfig"
+@page "/Configurations/MangaTaskConfig"
 @using Microsoft.AspNetCore.Authorization
 @using Ray.BiliBiliTool.Config.Options;
 @attribute [Authorize]
@@ -30,7 +30,7 @@
                     <MudGrid>
                         <MudItem xs="12" md="6">
                             <MudSwitch T="bool" @bind-Value="_config.IsEnable"
-                                Label="是否启用漫画任务" Color="Color.Primary" />
+                                Label="启用任务" Color="Color.Primary" />
                         </MudItem>
                         <MudItem xs="12" md="6">
                             <MudTextField T="string" @bind-Value="_config.Cron" Label="定时任务Cron表达式"
@@ -41,6 +41,30 @@
                 </MudCardContent>
             </MudCard>
 
+            <!-- 详细配置卡片 -->
+            @if (_config.IsEnable)
+            {
+                <MudCard>
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h6">详细配置</MudText>
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <MudGrid>
+                            <MudItem xs="12" md="6">
+                                <MudNumericField T="long" @bind-Value="_config.CustomComicId" Label="自定义漫画阅读 comic_id"
+                                    HelperText="若不清楚含义请勿修改" />
+                            </MudItem>
+                            <MudItem xs="12" md="6">
+                                <MudNumericField T="long" @bind-Value="_config.CustomEpId" Label="自定义漫画阅读 ep_id"
+                                    HelperText="若不清楚含义请勿修改" />
+                            </MudItem>
+                        </MudGrid>
+                    </MudCardContent>
+                </MudCard>
+            }
+
             <!-- 操作按钮 -->
             <MudCard Class="mt-4">
                 <MudCardActions>
@@ -50,7 +74,7 @@
             </MudCard>
         </EditForm>
 
-        @if (!string.IsNullOrEmpty(_saveMessage))
+        @if (_saveMessage.HasValue)
         {
             <MudAlert Severity="@(_saveSuccess ? Severity.Success : Severity.Error)" Class="mt-3">
                 @_saveMessage
