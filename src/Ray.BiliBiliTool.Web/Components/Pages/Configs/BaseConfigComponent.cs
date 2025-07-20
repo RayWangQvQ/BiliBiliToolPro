@@ -152,7 +152,7 @@ public abstract class BaseConfigComponent<T> : ComponentBase
         }
         catch (Exception ex)
         {
-            Logger.LogError($"Failed to update cron expression for job {jobKey}: {ex.Message}");
+            Logger.LogError(ex, "Failed to update cron expression for job {JobKey}", jobKey);
         }
     }
 
