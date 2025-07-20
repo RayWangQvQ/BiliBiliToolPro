@@ -1,3 +1,11 @@
+## 3.5.0
+- Feature[#924]: 新增 Sqlite 配置源
+- Feature[#924]: 新增在线配置页
+- Feature[#924]: 根据任务拆分配置
+- Feature[#924]: 实现开启、关闭任务功能
+- Feature[#924]: 实现修改 Cron 定时时间功能
+- Feature: 定时任务页改为默认50条
+- Feature: 更新配置文档
 ## 3.4.0
 - Feature: 优化登录失败时的提示信息
 - Feature: 更新推送的文档说明

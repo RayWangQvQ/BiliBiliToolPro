@@ -78,8 +78,9 @@ BiliTool
 运行图示：
 
 <p align="center">
-    <img src="docs/imgs/web-schedules.png" alt="运行图示" width="800">
-    <img src="docs/imgs/web-schedules-log.png" alt="运行日志" width="800">
+    <img src="docs/imgs/web-schedules.png" alt="运行图示" width="800" />
+    <br/>
+    <img src="docs/imgs/web-schedules-log.png" alt="运行日志" width="800" />
 </p>
 
 ## 1. 如何使用

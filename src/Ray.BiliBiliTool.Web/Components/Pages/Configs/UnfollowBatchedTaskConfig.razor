@@ -1,0 +1,93 @@
+@page "/Configurations/UnfollowBatchedTaskConfig"
+@using Microsoft.AspNetCore.Authorization
+@using Ray.BiliBiliTool.Config.Options;
+@attribute [Authorize]
+@rendermode InteractiveServer
+@inherits BaseConfigComponent<UnfollowBatchedTaskOptions>
+
+<PageTitle>批量取关任务配置</PageTitle>
+
+<MudContainer>
+    <MudText Typo="Typo.h4" Class="mb-4">批量取关任务配置</MudText>
+
+    @if (_isLoading)
+    {
+        <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+    }
+    else
+    {
+        <EditForm Model="@_config" OnValidSubmit="HandleValidSubmitAsync">
+            <DataAnnotationsValidator />
+
+            <!-- 基础配置卡片 -->
+            <MudCard Class="mb-4">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6">基础配置</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudGrid>
+                        <MudItem xs="12" md="6">
+                            <MudSwitch T="bool" @bind-Value="_config.IsEnable"
+                                Label="启用任务" Color="Color.Primary" />
+                        </MudItem>
+                        <MudItem xs="12" md="6">
+                            <MudTextField T="string" @bind-Value="_config.Cron" Label="定时任务Cron表达式"
+                                HelperText="例如：0 0 6 1 * ? (每月1号早上6点执行)"
+                                Disabled="!_config.IsEnable" />
+                        </MudItem>
+                    </MudGrid>
+                </MudCardContent>
+            </MudCard>
+
+            <!-- 详细配置卡片 -->
+            @if (_config.IsEnable)
+            {
+                <MudCard>
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h6">详细配置</MudText>
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <MudGrid>
+                            <MudItem xs="12" md="6">
+                                <MudTextField T="string" @bind-Value="_config.GroupName" Label="取关的分组名称"
+                                    HelperText="默认为'天选时刻'" />
+
+                                <MudNumericField T="int" @bind-Value="_config.Count" Label="本次取关个数"
+                                    Min="0" HelperText="倒序，从后往前取关" Class="mt-3" />
+                            </MudItem>
+
+                            <MudItem xs="12" md="6">
+                                <MudTextField T="string" @bind-Value="_config.RetainUids" Label="白名单（保留的UpId）"
+                                    HelperText="多个用英文逗号分隔，配置后，批量取关时不会取关配置的Up" />
+                            </MudItem>
+                        </MudGrid>
+                    </MudCardContent>
+                </MudCard>
+            }
+
+            <!-- 操作按钮 -->
+            <MudCard Class="mt-4">
+                <MudCardActions>
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">保存配置</MudButton>
+                    <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="LoadConfigAsync" Class="ml-2">重新加载</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </EditForm>
+
+        @if (_saveMessage.HasValue)
+        {
+            <MudAlert Severity="@(_saveSuccess ? Severity.Success : Severity.Error)" Class="mt-3">
+                @_saveMessage
+            </MudAlert>
+        }
+    }
+</MudContainer>
+
+<MudThemeProvider/>
+<MudPopoverProvider/>
+<MudDialogProvider/>
+<MudSnackbarProvider/>

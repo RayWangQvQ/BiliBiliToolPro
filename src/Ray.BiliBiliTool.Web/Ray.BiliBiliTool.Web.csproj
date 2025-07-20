@@ -16,6 +16,7 @@
     <PackageReference Include="Quartz.Serialization.SystemTextJson" Version="3.14.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
     <PackageReference Include="Serilog.Sinks.SQLite.Microsoft" Version="1.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <ProjectReference Include="..\BlazingQuartz.Core\BlazingQuartz.Core.csproj" />
     <ProjectReference Include="..\Ray.BiliBiliTool.Application\Ray.BiliBiliTool.Application.csproj" />
     <ProjectReference Include="..\Ray.BiliBiliTool.Infrastructure.EF\Ray.BiliBiliTool.Infrastructure.EF.csproj" />

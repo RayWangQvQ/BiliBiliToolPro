@@ -1,11 +1,13 @@
 using BlazingQuartz;
 using BlazingQuartz.Core;
+using Microsoft.OpenApi.Models;
 using MudBlazor.Services;
 using Quartz;
 using Quartz.Impl.AdoJobStore;
 using Ray.BiliBiliTool.Agent.Extensions;
 using Ray.BiliBiliTool.Application.Extensions;
 using Ray.BiliBiliTool.Config.Extensions;
+using Ray.BiliBiliTool.Config.SQLite;
 using Ray.BiliBiliTool.DomainService.Extensions;
 using Ray.BiliBiliTool.Infrastructure;
 using Ray.BiliBiliTool.Infrastructure.EF;
@@ -25,6 +27,16 @@ try
     var builder = WebApplication.CreateBuilder(args);
 
     builder.Configuration.AddJsonFile("config/cookies.json", optional: true, reloadOnChange: true);
+    var sqliteConnStr = builder.Configuration.GetConnectionString("Sqlite");
+    if (!string.IsNullOrEmpty(sqliteConnStr))
+    {
+        builder.Configuration.AddSqlite(
+            connectionString: sqliteConnStr,
+            tableName: Ray.BiliBiliTool.Config.Constants.SqliteTableName,
+            keyColumnName: "Key",
+            valueColumnName: "Value"
+        );
+    }
 
     builder
         .Services.AddRazorComponents()
@@ -32,7 +44,24 @@ try
         .AddInteractiveWebAssemblyComponents();
     builder.Services.AddControllers();
 
-    var sqliteConnStr = builder.Configuration.GetConnectionString("Sqlite");
+    builder.Services.AddEndpointsApiExplorer();
+    builder.Services.AddSwaggerGen(c =>
+    {
+        c.SwaggerDoc(
+            "v1",
+            new OpenApiInfo
+            {
+                Title = "BiliBiliToolPro API",
+                Version = "v1",
+                Description = "BiliBiliToolPro的API接口文档",
+                Contact = new OpenApiContact
+                {
+                    Name = "BiliBiliToolPro",
+                    Url = new Uri("https://github.com/RayWangQvQ/BiliBiliToolPro"),
+                },
+            }
+        );
+    });
 
     builder.Services.AddMudServices();
 
@@ -121,6 +150,13 @@ try
         .AddInteractiveServerRenderMode()
         .AddInteractiveWebAssemblyRenderMode()
         .AddAdditionalAssemblies(typeof(Ray.BiliBiliTool.Web.Client._Imports).Assembly);
+
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "BiliBiliToolPro API V1");
+        c.RoutePrefix = "swagger";
+    });
 
     app.Run();
 }

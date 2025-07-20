@@ -1,0 +1,104 @@
+@page "/Configurations/ChargeTaskConfig"
+@using Microsoft.AspNetCore.Authorization
+@using Ray.BiliBiliTool.Config.Options;
+@attribute [Authorize]
+@rendermode InteractiveServer
+@inherits BaseConfigComponent<ChargeTaskOptions>
+
+<PageTitle>免费B币券充电任务配置</PageTitle>
+
+<MudContainer>
+    <MudText Typo="Typo.h4" Class="mb-4">免费B币券充电任务配置</MudText>
+
+    @if (_isLoading)
+    {
+        <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+    }
+    else
+    {
+        <EditForm Model="@_config" OnValidSubmit="HandleValidSubmitAsync">
+            <DataAnnotationsValidator />
+
+            <!-- 基础配置卡片 -->
+            <MudCard Class="mb-4">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6">基础配置</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudGrid>
+                        <MudItem xs="12" md="6">
+                            <MudSwitch T="bool" @bind-Value="_config.IsEnable"
+                                Label="启用任务" Color="Color.Primary" />
+                        </MudItem>
+                        <MudItem xs="12" md="6">
+                            <MudTextField T="string" @bind-Value="_config.Cron" Label="定时任务Cron表达式"
+                                HelperText="例如：0 0 12 * * ? (每天中午12点执行)"
+                                Disabled="!_config.IsEnable" />
+                        </MudItem>
+                    </MudGrid>
+                </MudCardContent>
+            </MudCard>
+
+            <!-- 详细配置卡片 -->
+            @if (_config.IsEnable)
+            {
+                <MudCard>
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h6">详细配置</MudText>
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <MudGrid>
+                            <MudItem xs="12" md="6">
+                                <MudTextField T="string" @bind-Value="_config.ChargeComment" Label="充电后留言"
+                                              HelperText="为空时将随机选择一条默认留言" />
+                            </MudItem>
+
+                            <MudItem xs="12" md="6">
+                                <MudSwitch T="bool" Value="_isSpecifyUpToggled" ValueChanged="OnSpecifyUpToggled"
+                                           Label="指定其他UP" Color="Color.Primary"
+                                           HelperText="开启后可以指定充电给其他UP主" />
+                                @if (_isSpecifyUpToggled)
+                                {
+                                    <div>
+                                        <div style="display: flex; align-items: end; gap: 8px;">
+                                            <MudTextField T="string" @bind-Value="_config.AutoChargeUpId" Label="充电Up主Id"
+                                                          HelperText="阿B最新策略已不允许为自己充电了，可以填自己小号id，或者支持作者的。开源不易，感谢支持~" Class="mt-3" style="flex: 1;"/>
+                                            <MudButton Variant="Variant.Outlined" Color="Color.Success" Size="Size.Small"
+                                                       OnClick="() => SetSupportAuthor()" Class="mt-3" style="white-space: nowrap;">
+                                                支持作者
+                                            </MudButton>
+                                        </div>
+                                    </div>
+                                }
+                            </MudItem>
+                        </MudGrid>
+                    </MudCardContent>
+                </MudCard>
+            }
+
+            <!-- 操作按钮 -->
+            <MudCard Class="mt-4">
+                <MudCardActions>
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">保存配置</MudButton>
+                    <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="LoadConfigAsync" Class="ml-2">重新加载</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </EditForm>
+
+        @if (_saveMessage.HasValue)
+        {
+            <MudAlert Severity="@(_saveSuccess ? Severity.Success : Severity.Error)" Class="mt-3">
+                @_saveMessage
+            </MudAlert>
+        }
+    }
+</MudContainer>
+
+<MudThemeProvider/>
+<MudPopoverProvider/>
+<MudDialogProvider/>
+<MudSnackbarProvider/>

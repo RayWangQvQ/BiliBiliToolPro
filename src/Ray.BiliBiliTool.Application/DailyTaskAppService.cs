@@ -34,6 +34,12 @@ public class DailyTaskAppService(
         CancellationToken cancellationToken = default
     )
     {
+        if (!_dailyTaskOptions.IsEnable)
+        {
+            logger.LogInformation("已配置为关闭，跳过");
+            return;
+        }
+
         await SetCookiesAsync(ck, cancellationToken);
 
         //每日任务赚经验：

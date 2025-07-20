@@ -14,10 +14,14 @@ namespace Ray.BiliBiliTool.DomainService;
 public class MangaDomainService(
     ILogger<MangaDomainService> logger,
     IMangaApi mangaApi,
-    IOptionsMonitor<DailyTaskOptions> dailyTaskOptions
+    IOptionsMonitor<MangaTaskOptions> mangaTaskOptions,
+    IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
+    IOptionsMonitor<VipPrivilegeOptions> vipPrivilegeOptions
 ) : IMangaDomainService
 {
+    private readonly MangaTaskOptions _mangaTaskOptions = mangaTaskOptions.CurrentValue;
     private readonly DailyTaskOptions _dailyTaskOptions = dailyTaskOptions.CurrentValue;
+    private readonly VipPrivilegeOptions _vipPrivilegeOptions = vipPrivilegeOptions.CurrentValue;
 
     /// <summary>
     /// 漫画签到
@@ -54,12 +58,12 @@ public class MangaDomainService(
     /// </summary>
     public async Task MangaRead(BiliCookie ck)
     {
-        if (_dailyTaskOptions.CustomComicId <= 0)
+        if (_mangaTaskOptions.CustomComicId <= 0)
             return;
         BiliApiResponse response = await mangaApi.ReadManga(
             _dailyTaskOptions.DevicePlatform,
-            _dailyTaskOptions.CustomComicId,
-            _dailyTaskOptions.CustomEpId,
+            _mangaTaskOptions.CustomComicId,
+            _mangaTaskOptions.CustomEpId,
             ck.ToString()
         );
 
@@ -88,18 +92,7 @@ public class MangaDomainService(
         }
 
         int day = DateTime.Today.Day;
-
-        if (day != _dailyTaskOptions.DayOfReceiveVipPrivilege)
-        {
-            //一个月执行一次就行
-            logger.LogInformation(
-                "【目标日期】{target}号",
-                _dailyTaskOptions.DayOfReceiveVipPrivilege
-            );
-            logger.LogInformation("【今天】{day}号", day);
-            logger.LogInformation("跳过");
-            return;
-        }
+        logger.LogInformation("【今天】{day}号", day);
 
         var response = await mangaApi.ReceiveMangaVipReward(reason_id, ck.ToString());
         if (response.Code == 0)

@@ -1,4 +1,6 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@rendermode InteractiveServer
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">
             <img src="/favicon.png" alt="Logo" class="navbar-logo" />
@@ -7,9 +9,9 @@
     </div>
 </div>
 
-<input type="checkbox" title="Navigation menu" class="navbar-toggler"/>
+<input type="checkbox" title="Navigation menu" class="navbar-toggler" id="navToggler"/>
 
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
+<div class="nav-scrollable">
     <nav class="flex-column">
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
@@ -24,9 +26,88 @@
         </div>
 
         <div class="nav-item px-3">
+            <div @onclick="@(() => { _showConfigSubMenu = !_showConfigSubMenu; })"
+                 class="nav-link d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="bi bi-sliders me-1" aria-hidden="true"></span> Configurations
+                </div>
+                <span class="bi @(_showConfigSubMenu ? "bi-chevron-down" : "bi-chevron-right")" aria-hidden="true"></span>
+            </div>
+        </div>
+
+        @if (_showConfigSubMenu)
+        {
+            <div class="submenu-container">
+                <div class="nav-item px-3 ms-4 submenu-item">
+                    <NavLink class="nav-link" href="Configurations/DailyJobConfig">
+                        <span class="bi bi-coin" aria-hidden="true"></span> Daily Job
+                    </NavLink>
+                </div>
+
+                <div class="nav-item px-3 ms-4 submenu-item">
+                    <NavLink class="nav-link" href="Configurations/MangaTaskConfig">
+                        <span class="bi bi-book" aria-hidden="true"></span> Manga Task
+                    </NavLink>
+                </div>
+
+                <div class="nav-item px-3 ms-4 submenu-item">
+                    <NavLink class="nav-link" href="Configurations/MangaPrivilegeTaskConfig">
+                        <span class="bi bi-book-half" aria-hidden="true"></span> Manga Privilege
+                    </NavLink>
+                </div>
+
+                <div class="nav-item px-3 ms-4 submenu-item">
+                    <NavLink class="nav-link" href="Configurations/Silver2CoinTaskConfig">
+                        <span class="bi bi-currency-exchange" aria-hidden="true"></span> Silver2Coin
+                    </NavLink>
+                </div>
+
+                <div class="nav-item px-3 ms-4 submenu-item">
+                    <NavLink class="nav-link" href="Configurations/ChargeTaskConfig">
+                        <span class="bi bi-lightning-charge" aria-hidden="true"></span> Charge Task
+                    </NavLink>
+                </div>
+
+                <div class="nav-item px-3 ms-4 submenu-item">
+                    <NavLink class="nav-link" href="Configurations/VipPrivilegeConfig">
+                        <span class="bi bi-star" aria-hidden="true"></span> VIP Privilege
+                    </NavLink>
+                </div>
+
+                <div class="nav-item px-3 ms-4 submenu-item">
+                    <NavLink class="nav-link" href="Configurations/VipBigPointConfig">
+                        <span class="bi bi-award" aria-hidden="true"></span> VIP Big Point
+                    </NavLink>
+                </div>
+
+                <div class="nav-item px-3 ms-4 submenu-item">
+                    <NavLink class="nav-link" href="Configurations/LiveLotteryTaskConfig">
+                        <span class="bi bi-gift" aria-hidden="true"></span> Live Lottery
+                    </NavLink>
+                </div>
+
+                <div class="nav-item px-3 ms-4 submenu-item">
+                    <NavLink class="nav-link" href="Configurations/LiveFansMedalTaskConfig">
+                        <span class="bi bi-badge-cc" aria-hidden="true"></span> Fans Medal
+                    </NavLink>
+                </div>
+
+                <div class="nav-item px-3 ms-4 submenu-item">
+                    <NavLink class="nav-link" href="Configurations/UnfollowBatchedTaskConfig">
+                        <span class="bi bi-person-dash" aria-hidden="true"></span> Unfollow Batch
+                    </NavLink>
+                </div>
+            </div>
+        }
+
+        <div class="nav-item px-3">
             <NavLink class="nav-link" href="Admin">
                 <span class="bi bi-person-circle" aria-hidden="true"></span> Admin
             </NavLink>
         </div>
     </nav>
 </div>
+
+@code {
+    private bool _showConfigSubMenu;
+}

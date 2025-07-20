@@ -1,7 +1,9 @@
 ﻿namespace Ray.BiliBiliTool.Config.Options;
 
-public class VipBigPointOptions : IHasCron
+public class VipBigPointOptions : BaseConfigOptions
 {
+    public override string SectionName => "VipBigPointConfig";
+
     public string? ViewBangumis { get; set; }
 
     public List<long> ViewBangumiList
@@ -24,5 +26,13 @@ public class VipBigPointOptions : IHasCron
         }
     }
 
-    public string? Cron { get; set; }
+    public override Dictionary<string, string> ToConfigDictionary()
+    {
+        return MergeConfigDictionary(
+            new Dictionary<string, string>
+            {
+                { $"{SectionName}:{nameof(ViewBangumis)}", ViewBangumis ?? "" },
+            }
+        );
+    }
 }
