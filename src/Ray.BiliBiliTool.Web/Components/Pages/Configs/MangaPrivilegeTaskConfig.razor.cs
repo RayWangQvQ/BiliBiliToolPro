@@ -16,6 +16,4 @@ public partial class MangaPrivilegeTaskConfig : BaseConfigComponent<MangaPrivile
         MangaPrivilegeTaskOptionsMonitor;
 
     protected override JobKey? GetJobKey() => MangaPrivilegeJob.Key;
-
-    protected override string GetJobDisplayName() => "Manga privilege job";
 }

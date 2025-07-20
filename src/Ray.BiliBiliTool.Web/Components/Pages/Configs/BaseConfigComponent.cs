@@ -19,9 +19,12 @@ public abstract class BaseConfigComponent<T> : ComponentBase
     [Inject]
     protected ISchedulerFactory? SchedulerFactory { get; set; }
 
+    [Inject]
+    protected ILogger<BaseConfigComponent<T>> Logger { get; set; } = null!;
+
     protected T _config = new();
     protected bool _isLoading = true;
-    protected string? _saveMessage;
+    protected MarkupString? _saveMessage;
     protected bool _saveSuccess;
 
     protected abstract IOptionsMonitor<T> OptionsMonitor { get; }
@@ -32,9 +35,9 @@ public abstract class BaseConfigComponent<T> : ComponentBase
     protected virtual JobKey? GetJobKey() => null;
 
     /// <summary>
-    /// 获取任务的显示名称，用于消息提示
+    /// 获取触发器名称
     /// </summary>
-    protected virtual string GetJobDisplayName() => "Job";
+    protected virtual string GetTriggerName(JobKey jobKey) => $"{jobKey}.Cron.Trigger";
 
     protected override async Task OnInitializedAsync()
     {
@@ -52,7 +55,7 @@ public abstract class BaseConfigComponent<T> : ComponentBase
         }
         catch (Exception ex)
         {
-            _saveMessage = $"Failed to load configuration: {ex.Message}";
+            _saveMessage = new MarkupString($"Failed to load configuration: {ex.Message}");
             _saveSuccess = false;
         }
         finally
@@ -86,10 +89,10 @@ public abstract class BaseConfigComponent<T> : ComponentBase
             if (jobKey != null && SchedulerService != null)
             {
                 // 更新 Cron 表达式
-                await UpdateJobCronExpression(jobKey, _config.Cron);
+                await UpdateJobCronAsync(jobKey, _config.Cron);
 
                 // 控制任务启停
-                await ControlScheduledJob(jobKey, _config.IsEnable);
+                await ControlScheduledJobAsyc(jobKey, _config.IsEnable);
             }
 
             _saveMessage = GetSaveSuccessMessage();
@@ -97,7 +100,7 @@ public abstract class BaseConfigComponent<T> : ComponentBase
         }
         catch (Exception ex)
         {
-            _saveMessage = $"Failed to save configuration: {ex.Message}";
+            _saveMessage = new MarkupString($"Failed to save configuration: {ex.Message}");
             _saveSuccess = false;
         }
         finally
@@ -107,9 +110,9 @@ public abstract class BaseConfigComponent<T> : ComponentBase
         }
     }
 
-    private async Task ControlScheduledJob(JobKey jobKey, bool isEnable)
+    private async Task ControlScheduledJobAsyc(JobKey jobKey, bool isEnable)
     {
-        var triggerName = $"{jobKey}.Cron.Trigger";
+        var triggerName = GetTriggerName(jobKey);
         var triggerGroup = Constants.BiliJobGroup;
 
         if (isEnable)
@@ -124,12 +127,12 @@ public abstract class BaseConfigComponent<T> : ComponentBase
         }
     }
 
-    private async Task UpdateJobCronExpression(JobKey jobKey, string? cronExpression)
+    private async Task UpdateJobCronAsync(JobKey jobKey, string? cronExpression)
     {
         if (string.IsNullOrWhiteSpace(cronExpression) || SchedulerFactory == null)
             return;
 
-        var triggerName = $"{jobKey}.Cron.Trigger";
+        var triggerName = GetTriggerName(jobKey);
         var triggerKey = new TriggerKey(triggerName, Constants.BiliJobGroup);
 
         try
@@ -149,22 +152,22 @@ public abstract class BaseConfigComponent<T> : ComponentBase
         }
         catch (Exception ex)
         {
-            // 记录错误但不影响配置保存
-            Console.WriteLine($"Failed to update cron expression for job {jobKey}: {ex.Message}");
+            Logger.LogError($"Failed to update cron expression for job {jobKey}: {ex.Message}");
         }
     }
 
-    private string GetSaveSuccessMessage()
+    private MarkupString GetSaveSuccessMessage()
     {
         var jobKey = GetJobKey();
         if (jobKey == null)
         {
-            return "Configuration saved successfully!";
+            return new MarkupString("Configuration saved successfully!");
         }
 
-        var jobDisplayName = GetJobDisplayName();
         var status = _config.IsEnable ? "enabled" : "disabled";
-        return $"Configuration saved successfully! {jobDisplayName} has been {status}.";
+        return new MarkupString(
+            $"Configuration saved successfully!<br/>{jobKey} has been {status}."
+        );
     }
 
     private SqliteConfigurationProvider? GetSqliteConfigurationProvider()

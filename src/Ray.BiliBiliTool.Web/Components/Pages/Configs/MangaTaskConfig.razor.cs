@@ -13,7 +13,5 @@ public partial class MangaTaskConfig : BaseConfigComponent<MangaTaskOptions>
 
     protected override IOptionsMonitor<MangaTaskOptions> OptionsMonitor => MangaTaskOptionsMonitor;
 
-    protected override JobKey? GetJobKey() => MangaJob.Key;
-
-    protected override string GetJobDisplayName() => "Manga job";
+    protected override JobKey GetJobKey() => MangaJob.Key;
 }

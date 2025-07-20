@@ -98,7 +98,7 @@
             </MudCard>
         </EditForm>
 
-        @if (!string.IsNullOrEmpty(_saveMessage))
+        @if (_saveMessage.HasValue)
         {
             <MudAlert Severity="@(_saveSuccess ? Severity.Success : Severity.Error)" Class="mt-3">
                 @_saveMessage

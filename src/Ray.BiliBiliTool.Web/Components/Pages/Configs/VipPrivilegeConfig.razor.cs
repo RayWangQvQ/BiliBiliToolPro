@@ -14,7 +14,5 @@ public partial class VipPrivilegeConfig : BaseConfigComponent<VipPrivilegeOption
     protected override IOptionsMonitor<VipPrivilegeOptions> OptionsMonitor =>
         VipPrivilegeOptionsMonitor;
 
-    protected override JobKey? GetJobKey() => VipPrivilegeJob.Key;
-
-    protected override string GetJobDisplayName() => "VIP privilege job";
+    protected override JobKey GetJobKey() => VipPrivilegeJob.Key;
 }

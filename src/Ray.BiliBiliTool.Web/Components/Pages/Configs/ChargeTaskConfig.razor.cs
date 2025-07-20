@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Options;
+using Quartz;
 using Ray.BiliBiliTool.Config.Options;
+using Ray.BiliBiliTool.Web.Jobs;
 
 namespace Ray.BiliBiliTool.Web.Components.Pages.Configs;
 
@@ -34,4 +36,6 @@ public partial class ChargeTaskConfig : BaseConfigComponent<ChargeTaskOptions>
         _config.AutoChargeUpId = "-1";
         return Task.CompletedTask;
     }
+
+    protected override JobKey GetJobKey() => ChargeJob.Key;
 }

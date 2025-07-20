@@ -14,6 +14,4 @@ public partial class DailyJobConfig : BaseConfigComponent<DailyTaskOptions>
     protected override IOptionsMonitor<DailyTaskOptions> OptionsMonitor => DailyTaskOptionsMonitor;
 
     protected override JobKey GetJobKey() => DailyJob.Key;
-
-    protected override string GetJobDisplayName() => "Daily job";
 }
