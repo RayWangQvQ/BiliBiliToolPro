@@ -8,19 +8,19 @@
 
 左上角可以选择一个区域，然后点击 **App Store**。
 
-![claw-app-store.png](claw-app-store.png)
+![claw-app-store.png](/docs/imgs/claw-app-store.png)
 
 搜索`BiliTool`并点击如下搜索结果。
 
-![claw-search.png](claw-search.png)
+![claw-search.png](/docs/imgs/claw-search.png)
 
 点击`Deploy App`按钮一键部署。
 
-![[claw-deploy.png]]
+![claw-deploy.png](/docs/imgs/claw-deploy.png)
 
 等待半分钟左右，进入容器 Detail 页面，点击如下链接即可访问站点：
 
-![[claw-addr.png]]
+![claw-addr.png](/docs/imgs/claw-addr.png)
 
 ## 费用
 
