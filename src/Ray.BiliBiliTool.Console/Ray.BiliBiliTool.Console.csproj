@@ -46,16 +46,16 @@
     <PackageReference Include="Serilog.Sinks.Debug" Version="3.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
     <PackageReference Include="System.Collections" Version="4.3.0" />
-    <PackageReference Include="Ray.Serilog.Sinks.CoolPushBatched" Version="0.0.11-preview.20250726184312" />
-    <PackageReference Include="Ray.Serilog.Sinks.DingTalkBatched" Version="0.0.11-preview.20250726184312" />
-    <PackageReference Include="Ray.Serilog.Sinks.GotifyBatched" Version="0.0.11-preview.20250726184312" />
-    <PackageReference Include="Ray.Serilog.Sinks.MicrosoftTeamsBatched" Version="0.0.11-preview.20250726184312" />
-    <PackageReference Include="Ray.Serilog.Sinks.OtherApiBatched" Version="0.0.11-preview.20250726184312" />
-    <PackageReference Include="Ray.Serilog.Sinks.PushPlusBatched" Version="0.0.11-preview.20250726184312" />
-    <PackageReference Include="Ray.Serilog.Sinks.ServerChanBatched" Version="0.0.11-preview.20250726184312" />
-    <PackageReference Include="Ray.Serilog.Sinks.TelegramBatched" Version="0.0.11-preview.20250726184312" />
-    <PackageReference Include="Ray.Serilog.Sinks.WorkWeiXinAppBatched" Version="0.0.11-preview.20250726184312" />
-    <PackageReference Include="Ray.Serilog.Sinks.WorkWeiXinBatched" Version="0.0.11-preview.20250726184312" />
+    <PackageReference Include="Ray.Serilog.Sinks.CoolPushBatched" Version="0.0.11" />
+    <PackageReference Include="Ray.Serilog.Sinks.DingTalkBatched" Version="0.0.11" />
+    <PackageReference Include="Ray.Serilog.Sinks.GotifyBatched" Version="0.0.11" />
+    <PackageReference Include="Ray.Serilog.Sinks.MicrosoftTeamsBatched" Version="0.0.11" />
+    <PackageReference Include="Ray.Serilog.Sinks.OtherApiBatched" Version="0.0.11" />
+    <PackageReference Include="Ray.Serilog.Sinks.PushPlusBatched" Version="0.0.11" />
+    <PackageReference Include="Ray.Serilog.Sinks.ServerChanBatched" Version="0.0.11" />
+    <PackageReference Include="Ray.Serilog.Sinks.TelegramBatched" Version="0.0.11" />
+    <PackageReference Include="Ray.Serilog.Sinks.WorkWeiXinAppBatched" Version="0.0.11" />
+    <PackageReference Include="Ray.Serilog.Sinks.WorkWeiXinBatched" Version="0.0.11" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Ray.BiliBiliTool.Agent\Ray.BiliBiliTool.Agent.csproj" />
