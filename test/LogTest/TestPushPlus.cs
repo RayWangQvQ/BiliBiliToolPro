@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Ray.BiliBiliTool.Console;
 using Ray.BiliBiliTool.Infrastructure;
-using Ray.Serilog.Sinks.CoolPushBatched;
 using Ray.Serilog.Sinks.PushPlusBatched;
-using Ray.Serilog.Sinks.ServerChanBatched;
 using Xunit;
 
 namespace LogTest
@@ -21,7 +19,7 @@ namespace LogTest
         public TestPushPlus()
         {
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
-            Program.CreateHost(new string[] { });
+            Program.CreateHost(new string[] { "ENVIRONMENT=Development" });
 
             _token = Global.ConfigurationRoot["Serilog:WriteTo:9:Args:token"];
             _channel = Global.ConfigurationRoot["Serilog:WriteTo:9:Args:channel"];
@@ -29,13 +27,13 @@ namespace LogTest
         }
 
         [Fact]
-        public void Test2()
+        public async Task Test2()
         {
             var client = new PushPlusApiClient(_token, channel: _channel, webhook: _webhook);
 
             var msg = LogConstants.Msg2;
 
-            var result = client.PushMessage(msg);
+            var result = await client.PushMessageAsync(msg);
             Debug.WriteLine(result.Content.ReadAsStringAsync().Result);
         }
     }

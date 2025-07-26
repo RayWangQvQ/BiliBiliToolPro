@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Ray.BiliBiliTool.Console;
 using Ray.BiliBiliTool.Infrastructure;
-using Ray.Serilog.Sinks.CoolPushBatched;
 using Ray.Serilog.Sinks.MicrosoftTeamsBatched;
-using Ray.Serilog.Sinks.PushPlusBatched;
-using Ray.Serilog.Sinks.ServerChanBatched;
 using Xunit;
 
 namespace LogTest
@@ -26,13 +23,13 @@ namespace LogTest
         }
 
         [Fact]
-        public void Test()
+        public async Task Test()
         {
             var client = new MicrosoftTeamsApiClient(webhook: _webhook);
 
             var msg = LogConstants.Msg2;
 
-            var result = client.PushMessage(msg);
+            var result = await client.PushMessageAsync(msg);
             Debug.WriteLine(result.Content.ReadAsStringAsync().Result);
 
             Assert.True(result.StatusCode == System.Net.HttpStatusCode.OK);

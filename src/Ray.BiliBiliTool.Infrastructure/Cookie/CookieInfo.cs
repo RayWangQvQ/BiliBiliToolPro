@@ -74,7 +74,7 @@ public class CookieInfo(Dictionary<string, string> cookieDic)
     {
         return setCookieList
             .Select(item => item.Split(';').FirstOrDefault()?.Trim() ?? "")
-            .Where(x => !x.IsNullOrWhiteSpace())
+            .Where(x => !string.IsNullOrWhiteSpace(x))
             .ToList();
     }
 

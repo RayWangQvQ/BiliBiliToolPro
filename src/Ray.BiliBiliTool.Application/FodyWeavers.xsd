@@ -4,7 +4,72 @@
   <xs:element name="Weavers">
     <xs:complexType>
       <xs:all>
-        <xs:element name="Rougamo" minOccurs="0" maxOccurs="1" type="xs:anyType" />
+        <xs:element name="Rougamo" minOccurs="0" maxOccurs="1">
+          <xs:complexType>
+            <xs:all>
+              <xs:element name="Mos" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="Mo" minOccurs="0" maxOccurs="unbounded">
+                      <xs:complexType>
+                        <xs:attribute name="assembly" type="xs:string">
+                          <xs:annotation>
+                            <xs:documentation>The assembly name of the aspect type, which does not contain the '.dll' suffix.</xs:documentation>
+                          </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="type" type="xs:string">
+                          <xs:annotation>
+                            <xs:documentation>The aspect type full name.</xs:documentation>
+                          </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="pattern" type="xs:string">
+                          <xs:annotation>
+                            <xs:documentation>An AspectN pattern. Apply the aspect type to methods matched by the pattern. This pattern will override the pointcut settings of the aspect type.</xs:documentation>
+                          </xs:annotation>
+                        </xs:attribute>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:all>
+            <xs:attribute name="enabled" type="xs:boolean">
+              <xs:annotation>
+                <xs:documentation>Set to false to disable Rougamo. The default is true.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="composite-accessibility" type="xs:boolean">
+              <xs:annotation>
+                <xs:documentation>Set to true to use the type and method composite accessibility. The default is false. Etc, an internal type has a public method, public for default(false) and internal for true.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="skip-ref-struct" type="xs:boolean">
+              <xs:annotation>
+                <xs:documentation>Set to true to skip saving ref struct parameters and return value into MethodContext. The default is false.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="pure-stacktrace" type="xs:boolean">
+              <xs:annotation>
+                <xs:documentation>Set to false to prevent generating the StackTraceHiddenAttribute for the proxy method. The default is true.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="iterator-returns" type="xs:boolean">
+              <xs:annotation>
+                <xs:documentation>Set to true to save the items that the iterator returns. This will take up additional memory space. The default is false.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="reverse-call-nonentry" type="xs:boolean">
+              <xs:annotation>
+                <xs:documentation>Set to false to make the execution order of the OnSuccess, OnException, and OnExit methods the same as OnEntry. The default is true.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="except-type-patterns" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>Regex expressions for the type's full name, separated by ',' or ';'. All types matching any of these regex expressions will be ignored by Rougamo.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+          </xs:complexType>
+        </xs:element>
       </xs:all>
       <xs:attribute name="VerifyAssembly" type="xs:boolean">
         <xs:annotation>

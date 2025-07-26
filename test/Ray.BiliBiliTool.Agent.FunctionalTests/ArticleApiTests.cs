@@ -78,7 +78,7 @@ public class ArticleApiTests
 
         // Assert
         re.Code.Should().Be(-404);
-        re.Data.Should().IsNull();
+        re.Data.Should().BeNull();
         re.Message.Should().BeEquivalentTo("啥都木有");
     }
 
