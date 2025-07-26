@@ -9,9 +9,9 @@
       Include="Microsoft.Extensions.DependencyInjection.Abstractions"
       Version="8.0.2"
     />
-    <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.2" />
-    <PackageReference Include="Scrutor" Version="4.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="8.0.18" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.3" />
+    <PackageReference Include="Scrutor" Version="6.1.0" />
     <PackageReference Include="WebApiClientCore" Version="2.1.5" />
   </ItemGroup>
   <ItemGroup>

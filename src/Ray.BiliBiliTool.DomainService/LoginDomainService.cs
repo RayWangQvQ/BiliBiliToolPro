@@ -235,7 +235,7 @@ public class LoginDomainService(
         try
         {
             var token = await GetQingLongAuthTokenAsync();
-            if (token.IsNullOrEmpty())
+            if (string.IsNullOrEmpty(token))
             {
                 throw new Exception("获取青龙token失败");
             }
@@ -263,7 +263,7 @@ public class LoginDomainService(
                     id = oldEnv.id,
                     name = oldEnv.name,
                     value = ckInfo.CookieStr,
-                    remarks = oldEnv.remarks.IsNullOrEmpty()
+                    remarks = string.IsNullOrEmpty(oldEnv.remarks)
                         ? $"bili-{ckInfo.UserId}"
                         : oldEnv.remarks,
                 };
@@ -409,8 +409,8 @@ public class LoginDomainService(
     {
         logger.LogWarning("使用OpenAPI鉴权");
         if (
-            qingLongOptions.Value.ClientId.IsNullOrWhiteSpace()
-            || qingLongOptions.Value.ClientSecret.IsNullOrWhiteSpace()
+            string.IsNullOrWhiteSpace(qingLongOptions.Value.ClientId)
+            || string.IsNullOrWhiteSpace(qingLongOptions.Value.ClientSecret)
         )
         {
             logger.LogWarning("未配置青龙的ClientId和ClientSecret，无法自动获取token");

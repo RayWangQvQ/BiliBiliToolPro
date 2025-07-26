@@ -149,7 +149,7 @@ public static class ServiceCollectionExtension
     )
     {
         var proxyAddress = configuration["Security:WebProxy"];
-        if (proxyAddress.IsNotNullOrEmpty())
+        if (!string.IsNullOrWhiteSpace(proxyAddress))
         {
             WebProxy webProxy = new WebProxy();
 

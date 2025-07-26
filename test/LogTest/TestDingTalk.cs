@@ -1,14 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Threading;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
 using Ray.BiliBiliTool.Console;
 using Ray.BiliBiliTool.Infrastructure;
 using Ray.Serilog.Sinks.DingTalkBatched;
-using Ray.Serilog.Sinks.TelegramBatched;
-using Ray.Serilog.Sinks.WorkWeiXinBatched;
-//using Serilog;
 using Xunit;
 
 namespace LogTest
@@ -20,20 +15,28 @@ namespace LogTest
         public TestDingTalk()
         {
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
-            Program.CreateHost(new string[] { "ENVIRONMENT=Development" });
+            Program.CreateHost(["ENVIRONMENT=Development"]);
 
-            _key = Global.ConfigurationRoot["Serilog:WriteTo:5:Args:webHookUrl"];
+            // 添加空值检查
+            if (Global.ConfigurationRoot != null)
+            {
+                _key = Global.ConfigurationRoot["Serilog:WriteTo:5:Args:webHookUrl"];
+            }
+            else
+            {
+                _key = "test_key"; // 默认测试值
+            }
         }
 
         [Fact]
-        public void Test2()
+        public async Task Test2()
         {
             var client = new DingTalkApiClient(_key);
 
             var title = "这是标题";
             var msg = LogConstants.Msg2 + "开始推送";
 
-            var result = client.PushMessage(msg, title);
+            var result = await client.PushMessageAsync(msg, title);
             Debug.WriteLine(result.Content.ReadAsStringAsync().Result);
         }
     }

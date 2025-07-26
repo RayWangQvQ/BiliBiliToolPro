@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Threading;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
 using Ray.BiliBiliTool.Console;
 using Ray.BiliBiliTool.Infrastructure;
 using Ray.Serilog.Sinks.TelegramBatched;
-//using Serilog;
 using Xunit;
 
 namespace LogTest
@@ -18,21 +15,21 @@ namespace LogTest
 
         public TestTelegram()
         {
-            Environment.SetEnvironmentVariable("DOTNET_ENVIRONMENT", "Development");
-            Program.CreateHost(new string[] { "ENVIRONMENT=Development" });
+            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
+            Program.CreateHost(["ENVIRONMENT=Development"]);
 
             _botToken = Global.ConfigurationRoot["Serilog:WriteTo:3:Args:botToken"];
             _chatId = Global.ConfigurationRoot["Serilog:WriteTo:3:Args:chatId"];
         }
 
         [Fact]
-        public void Test2()
+        public async Task Test2()
         {
-            TelegramApiClient client = new TelegramApiClient(_botToken, _chatId);
+            var client = new TelegramApiClient(_botToken, _chatId);
 
             string msg = LogConstants.Msg2;
 
-            var result = client.PushMessage(msg, "标题");
+            var result = await client.PushMessageAsync(msg, "标题");
             Debug.WriteLine(result.Content.ReadAsStringAsync().Result);
 
             /*
