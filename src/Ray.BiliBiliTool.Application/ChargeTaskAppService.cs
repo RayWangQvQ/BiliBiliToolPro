@@ -43,7 +43,7 @@ public class ChargeTaskAppService(
     private async Task SetCookiesAsync(BiliCookie biliCookie, CancellationToken cancellationToken)
     {
         //判断cookie是否完整
-        if (biliCookie.Buvid.IsNotNullOrEmpty())
+        if (!string.IsNullOrWhiteSpace(biliCookie.Buvid))
         {
             logger.LogInformation("Cookie完整，不需要Set Cookie");
             return;

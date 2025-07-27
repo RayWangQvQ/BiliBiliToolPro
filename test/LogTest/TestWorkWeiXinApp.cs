@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using Ray.BiliBiliTool.Console;
 using Ray.BiliBiliTool.Infrastructure;
 using Ray.Serilog.Sinks.WorkWeiXinAppBatched;
@@ -17,7 +18,7 @@ namespace LogTest
         public TestWorkWeiXinApp()
         {
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
-            Program.CreateHost(new string[] { });
+            Program.CreateHost(new string[] { "ENVIRONMENT=Development" });
 
             _agentId = Global.ConfigurationRoot["Serilog:WriteTo:11:Args:agentId"];
             _secret = Global.ConfigurationRoot["Serilog:WriteTo:11:Args:secret"];
@@ -27,13 +28,13 @@ namespace LogTest
         }
 
         [Fact]
-        public void Test()
+        public async Task Test()
         {
             var client = new WorkWeiXinAppApiClient(_corpId, _agentId, _secret, _toUser);
 
             var msg = LogConstants.Msg2;
 
-            var result = client.PushMessage(msg);
+            var result = await client.PushMessageAsync(msg);
             Debug.WriteLine(result.Content.ReadAsStringAsync().Result);
 
             Assert.True(result.StatusCode == System.Net.HttpStatusCode.OK);

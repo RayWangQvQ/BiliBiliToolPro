@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Application.Contracts;
 using Ray.BiliBiliTool.Config.Options;
+using Ray.Serilog.Sinks.Batched;
 using Constants = Ray.BiliBiliTool.Config.Constants;
 
 namespace Ray.BiliBiliTool.Console;
@@ -45,11 +46,7 @@ public class BiliBiliToolHostedService(
         finally
         {
             LogAppInfo();
-            logger.LogInformation(
-                "·开始推送·{task}·{user}",
-                $"{configuration["RunTasks"]}任务",
-                ""
-            );
+
             //环境
             logger.LogInformation("运行环境：{env}", environment.EnvironmentName);
             logger.LogInformation(

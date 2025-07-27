@@ -11,22 +11,11 @@ public static class JsonSerializerOptionsBuilderExtensions
         Action<JsonSerializerOptions> action
     )
     {
-        builder.CheckNullWithException(nameof(builder));
-        action.CheckNullWithException(nameof(action));
         builder.BuildActionList.Add(action);
         return builder;
     }
 
     #region 设置区
-
-    public static JsonSerializerOptionsBuilder SetEncoder(
-        this JsonSerializerOptionsBuilder builder,
-        JavaScriptEncoder encoder
-    )
-    {
-        encoder.CheckNullWithException(nameof(encoder));
-        return SetActionBase(builder, t => t.Encoder = encoder);
-    }
 
     public static JsonSerializerOptionsBuilder SetCamelCase(
         this JsonSerializerOptionsBuilder builder
@@ -63,18 +52,11 @@ public static class JsonSerializerOptionsBuilderExtensions
         return option;
     }
 
-    public static JsonSerializerOptions? GetDefaultOptions(
-        this JsonSerializerOptionsBuilder builder
-    )
-    {
-        return _defaultOptions;
-    }
-
     public static JsonSerializerOptions GetOrBuildDefaultOptions(
         this JsonSerializerOptionsBuilder builder
     )
     {
-        return _defaultOptions.IsNull()
+        return _defaultOptions == null
             ? builder.SetCamelCase().SetEncoderToUnicodeRangeAll().BuildAndSaveToDefault()
             : _defaultOptions!;
     }

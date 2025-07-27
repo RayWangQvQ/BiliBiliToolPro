@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Ray.BiliBiliTool.Console;
@@ -18,20 +18,20 @@ namespace LogTest
         public TestServerChan()
         {
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
-            Program.CreateHost(new string[] { });
+            Program.CreateHost(new string[] { "ENVIRONMENT=Development" });
 
             _scKey = Global.ConfigurationRoot["Serilog:WriteTo:6:Args:scKey"];
             _turboScKey = Global.ConfigurationRoot["Serilog:WriteTo:6:Args:turboScKey"];
         }
 
         [Fact]
-        public void Test()
+        public async Task Test()
         {
             var client = new ServerChanApiClient(_scKey);
 
             string msg = LogConstants.Msg2;
 
-            var result = client.PushMessage(msg);
+            var result = await client.PushMessageAsync(msg);
             Debug.WriteLine(result.Content.ReadAsStringAsync().Result);
 
             /*
@@ -40,13 +40,13 @@ namespace LogTest
         }
 
         [Fact]
-        public void TestTurbo()
+        public async Task TestTurbo()
         {
             var client = new ServerChanTurboApiClient(_turboScKey);
 
             string msg = LogConstants.Msg2;
 
-            var result = client.PushMessage(msg, "测试");
+            var result = await client.PushMessageAsync(msg, "测试");
             Debug.WriteLine(result.Content.ReadAsStringAsync().Result);
 
             /*

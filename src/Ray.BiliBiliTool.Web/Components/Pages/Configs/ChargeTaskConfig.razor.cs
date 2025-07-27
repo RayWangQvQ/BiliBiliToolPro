@@ -18,7 +18,7 @@ public partial class ChargeTaskConfig : BaseConfigComponent<ChargeTaskOptions>
 
     protected override Task OnInitializedAsync()
     {
-        if (!OptionsMonitor.CurrentValue.AutoChargeUpId.IsNullOrWhiteSpace())
+        if (!string.IsNullOrWhiteSpace(OptionsMonitor.CurrentValue.AutoChargeUpId))
         {
             _isSpecifyUpToggled = true;
         }
