@@ -18,6 +18,16 @@
     <PackageReference Include="Quartz.Serialization.SystemTextJson" />
     <PackageReference Include="Serilog.AspNetCore" />
     <PackageReference Include="Serilog.Sinks.SQLite.Microsoft" />
+    <PackageReference Include="Ray.Serilog.Sinks.CoolPushBatched" />
+    <PackageReference Include="Ray.Serilog.Sinks.DingTalkBatched" />
+    <PackageReference Include="Ray.Serilog.Sinks.GotifyBatched" />
+    <PackageReference Include="Ray.Serilog.Sinks.MicrosoftTeamsBatched" />
+    <PackageReference Include="Ray.Serilog.Sinks.OtherApiBatched" />
+    <PackageReference Include="Ray.Serilog.Sinks.PushPlusBatched" />
+    <PackageReference Include="Ray.Serilog.Sinks.ServerChanBatched" />
+    <PackageReference Include="Ray.Serilog.Sinks.TelegramBatched" />
+    <PackageReference Include="Ray.Serilog.Sinks.WorkWeiXinAppBatched" />
+    <PackageReference Include="Ray.Serilog.Sinks.WorkWeiXinBatched" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BlazingQuartz.Core\BlazingQuartz.Core.csproj" />
@@ -27,5 +37,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Auth\JwtAuthStateProvider.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Logs\" />
   </ItemGroup>
 </Project>

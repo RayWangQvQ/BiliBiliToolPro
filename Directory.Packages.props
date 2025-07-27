@@ -2,7 +2,6 @@
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
-
   <ItemGroup>
     <!-- Microsoft Extensions -->
     <PackageVersion Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
@@ -22,7 +21,6 @@
     <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="8.0.1" />
     <PackageVersion Include="Microsoft.Extensions.Options" Version="8.0.2" />
     <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
-
     <!-- Entity Framework -->
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="8.0.18" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Abstractions" Version="8.0.18" />
@@ -33,11 +31,9 @@
     <PackageVersion Include="Microsoft.Data.Sqlite" Version="8.0.18" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.2" />
     <PackageVersion Include="EFCore.NamingConventions" Version="8.0.3" />
-
     <!-- ASP.NET Core -->
     <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.18" />
     <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.18" />
-
     <!-- Serilog -->
     <PackageVersion Include="Serilog" Version="4.3.0" />
     <PackageVersion Include="Serilog.AspNetCore" Version="8.0.3" />
@@ -48,26 +44,23 @@
     <PackageVersion Include="Serilog.Sinks.Debug" Version="3.0.0" />
     <PackageVersion Include="Serilog.Sinks.File" Version="6.0.0" />
     <PackageVersion Include="Serilog.Sinks.SQLite.Microsoft" Version="1.0.0" />
-
     <!-- Ray Serilog Sinks -->
-    <PackageVersion Include="Ray.Serilog.Sinks.CoolPushBatched" Version="0.0.11" />
-    <PackageVersion Include="Ray.Serilog.Sinks.DingTalkBatched" Version="0.0.11" />
-    <PackageVersion Include="Ray.Serilog.Sinks.GotifyBatched" Version="0.0.11" />
-    <PackageVersion Include="Ray.Serilog.Sinks.MicrosoftTeamsBatched" Version="0.0.11" />
-    <PackageVersion Include="Ray.Serilog.Sinks.OtherApiBatched" Version="0.0.11" />
-    <PackageVersion Include="Ray.Serilog.Sinks.PushPlusBatched" Version="0.0.11" />
-    <PackageVersion Include="Ray.Serilog.Sinks.ServerChanBatched" Version="0.0.11" />
-    <PackageVersion Include="Ray.Serilog.Sinks.TelegramBatched" Version="0.0.11" />
-    <PackageVersion Include="Ray.Serilog.Sinks.WorkWeiXinAppBatched" Version="0.0.11" />
-    <PackageVersion Include="Ray.Serilog.Sinks.WorkWeiXinBatched" Version="0.0.11" />
-
+    <PackageVersion Include="Ray.Serilog.Sinks.CoolPushBatched" Version="0.1.0" />
+    <PackageVersion Include="Ray.Serilog.Sinks.DingTalkBatched" Version="0.1.0" />
+    <PackageVersion Include="Ray.Serilog.Sinks.GotifyBatched" Version="0.1.0" />
+    <PackageVersion Include="Ray.Serilog.Sinks.MicrosoftTeamsBatched" Version="0.1.0" />
+    <PackageVersion Include="Ray.Serilog.Sinks.OtherApiBatched" Version="0.1.0" />
+    <PackageVersion Include="Ray.Serilog.Sinks.PushPlusBatched" Version="0.1.0" />
+    <PackageVersion Include="Ray.Serilog.Sinks.ServerChanBatched" Version="0.1.0" />
+    <PackageVersion Include="Ray.Serilog.Sinks.TelegramBatched" Version="0.1.0" />
+    <PackageVersion Include="Ray.Serilog.Sinks.WorkWeiXinAppBatched" Version="0.1.0" />
+    <PackageVersion Include="Ray.Serilog.Sinks.WorkWeiXinBatched" Version="0.1.0" />
     <!-- Quartz -->
     <PackageVersion Include="Quartz" Version="3.14.0" />
     <PackageVersion Include="Quartz.AspNetCore" Version="3.14.0" />
     <PackageVersion Include="Quartz.Serialization.SystemTextJson" Version="3.14.0" />
     <PackageVersion Include="AppAny.Quartz.EntityFrameworkCore.Migrations.SQLite" Version="0.5.1" />
     <PackageVersion Include="CronExpressionDescriptor" Version="2.44.0" />
-
     <!-- Other packages - 修复版本兼容性问题 -->
     <PackageVersion Include="Ray.Infrastructure" Version="0.0.26" />
     <PackageVersion Include="Scrutor" Version="6.1.0" />
@@ -77,7 +70,6 @@
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="8.1.4" />
     <PackageVersion Include="Rougamo.Fody" Version="5.0.1" />
     <PackageVersion Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
-
     <!-- Test packages -->
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
     <PackageVersion Include="xunit" Version="2.9.3" />
