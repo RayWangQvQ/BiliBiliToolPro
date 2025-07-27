@@ -6,22 +6,24 @@
     <UserSecretsId>1970628b-9d9e-45d1-b337-32d4d1e64e95</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.18">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="MudBlazor" Version="8.6.0" />
-    <PackageReference Include="Quartz" Version="3.14.0" />
-    <PackageReference Include="Quartz.AspNetCore" Version="3.14.0" />
-    <PackageReference Include="Quartz.Serialization.SystemTextJson" Version="3.14.0" />
-    <PackageReference Include="Serilog.AspNetCore" Version="8.0.3" />
-    <PackageReference Include="Serilog.Sinks.SQLite.Microsoft" Version="1.0.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.4" />
+    <PackageReference Include="MudBlazor" />
+    <PackageReference Include="Swashbuckle.AspNetCore" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" />
+    <PackageReference Include="Quartz" />
+    <PackageReference Include="Quartz.AspNetCore" />
+    <PackageReference Include="Quartz.Serialization.SystemTextJson" />
+    <PackageReference Include="Serilog.AspNetCore" />
+    <PackageReference Include="Serilog.Sinks.SQLite.Microsoft" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\BlazingQuartz.Core\BlazingQuartz.Core.csproj" />
     <ProjectReference Include="..\Ray.BiliBiliTool.Application\Ray.BiliBiliTool.Application.csproj" />
     <ProjectReference Include="..\Ray.BiliBiliTool.Infrastructure.EF\Ray.BiliBiliTool.Infrastructure.EF.csproj" />
     <ProjectReference Include="..\Ray.BiliBiliTool.Web.Client\Ray.BiliBiliTool.Web.Client.csproj" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.18" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Auth\JwtAuthStateProvider.cs" />
