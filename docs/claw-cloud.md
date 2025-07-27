@@ -22,6 +22,14 @@
 
 ![claw-addr.png](/docs/imgs/claw-addr.png)
 
+## 消息推送
+
+建议使用环境变量配置：
+
+![claw-notification.png](/docs/imgs/claw-notification.png)
+
+配置值见：[confifuration](/docs/configuration.md)
+
 ## 费用
 
 官方模板默认配置为 `0.5C 1G`，每天 $0.14，一个月 `30 * 0.14 = $4.2`，每月赠送是 $5，会剩余 $0.8。
@@ -42,3 +50,7 @@
 不同区域速度可能有差异，可自己切换尝试。
 
 如果速度慢可能会导致页面短时无响应，可稍作等待，或手动刷新。
+
+### 更新
+
+右上角`Update`进行版本更新，如果更新后启动异常，请尝试`Pause`然后再`Restart`。
