@@ -44,7 +44,6 @@
     <PackageVersion Include="Serilog.Sinks.Debug" Version="3.0.0" />
     <PackageVersion Include="Serilog.Sinks.File" Version="6.0.0" />
     <PackageVersion Include="Serilog.Sinks.SQLite.Microsoft" Version="1.0.0" />
-    <PackageVersion Include="Serilog.Formatting.Compact" Version="3.0.0" />
     <!-- Ray Serilog Sinks -->
     <PackageVersion Include="Ray.Serilog.Sinks.CoolPushBatched" Version="0.1.0" />
     <PackageVersion Include="Ray.Serilog.Sinks.DingTalkBatched" Version="0.1.0" />
