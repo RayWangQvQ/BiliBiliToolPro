@@ -26,36 +26,27 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="8.0.1" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.3" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.1" />
-    <PackageReference
-      Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets"
-      Version="1.21.0"
-    />
-    <PackageReference Include="Serilog" Version="4.3.0" />
-    <PackageReference Include="Serilog.Extensions.Hosting" Version="8.0.0" />
-    <PackageReference Include="Serilog.Extensions.Logging" Version="8.0.0" />
-    <PackageReference Include="Serilog.Settings.Configuration" Version="8.0.4" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
-    <PackageReference Include="Serilog.Sinks.Debug" Version="3.0.0" />
-    <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
-    <PackageReference Include="System.Collections" Version="4.3.0" />
-    <PackageReference Include="Ray.Serilog.Sinks.CoolPushBatched" Version="0.0.11" />
-    <PackageReference Include="Ray.Serilog.Sinks.DingTalkBatched" Version="0.0.11" />
-    <PackageReference Include="Ray.Serilog.Sinks.GotifyBatched" Version="0.0.11" />
-    <PackageReference Include="Ray.Serilog.Sinks.MicrosoftTeamsBatched" Version="0.0.11" />
-    <PackageReference Include="Ray.Serilog.Sinks.OtherApiBatched" Version="0.0.11" />
-    <PackageReference Include="Ray.Serilog.Sinks.PushPlusBatched" Version="0.0.11" />
-    <PackageReference Include="Ray.Serilog.Sinks.ServerChanBatched" Version="0.0.11" />
-    <PackageReference Include="Ray.Serilog.Sinks.TelegramBatched" Version="0.0.11" />
-    <PackageReference Include="Ray.Serilog.Sinks.WorkWeiXinAppBatched" Version="0.0.11" />
-    <PackageReference Include="Ray.Serilog.Sinks.WorkWeiXinBatched" Version="0.0.11" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" />
+    <PackageReference Include="Microsoft.Extensions.Http" />
+    <PackageReference Include="Serilog" />
+    <PackageReference Include="Serilog.Extensions.Hosting" />
+    <PackageReference Include="Serilog.Settings.Configuration" />
+    <PackageReference Include="Serilog.Sinks.Console" />
+    <PackageReference Include="Serilog.Sinks.Debug" />
+    <PackageReference Include="Serilog.Sinks.File" />
+    <PackageReference Include="Ray.Serilog.Sinks.CoolPushBatched" />
+    <PackageReference Include="Ray.Serilog.Sinks.DingTalkBatched" />
+    <PackageReference Include="Ray.Serilog.Sinks.GotifyBatched" />
+    <PackageReference Include="Ray.Serilog.Sinks.MicrosoftTeamsBatched" />
+    <PackageReference Include="Ray.Serilog.Sinks.OtherApiBatched" />
+    <PackageReference Include="Ray.Serilog.Sinks.PushPlusBatched" />
+    <PackageReference Include="Ray.Serilog.Sinks.ServerChanBatched" />
+    <PackageReference Include="Ray.Serilog.Sinks.TelegramBatched" />
+    <PackageReference Include="Ray.Serilog.Sinks.WorkWeiXinAppBatched" />
+    <PackageReference Include="Ray.Serilog.Sinks.WorkWeiXinBatched" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Ray.BiliBiliTool.Agent\Ray.BiliBiliTool.Agent.csproj" />

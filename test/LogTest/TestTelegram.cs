@@ -18,8 +18,8 @@ namespace LogTest
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
             Program.CreateHost(["ENVIRONMENT=Development"]);
 
-            _botToken = Global.ConfigurationRoot["Serilog:WriteTo:3:Args:botToken"];
-            _chatId = Global.ConfigurationRoot["Serilog:WriteTo:3:Args:chatId"];
+            _botToken = Global.ConfigurationRoot?["Serilog:WriteTo:3:Args:botToken"];
+            _chatId = Global.ConfigurationRoot?["Serilog:WriteTo:3:Args:chatId"];
         }
 
         [Fact]

@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Ray.BiliBiliTool.Domain;
 using Ray.BiliBiliTool.Infrastructure.EF;

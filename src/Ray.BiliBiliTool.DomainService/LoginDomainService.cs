@@ -250,7 +250,7 @@ public class LoginDomainService(
             logger.LogDebug(ckInfo.ToString());
 
             var list = qlEnvList
-                .Data!.Where(x => x.name.StartsWith("Ray_BiliBiliCookies__"))
+                .Data.Where(x => x.name.StartsWith("Ray_BiliBiliCookies__"))
                 .ToList();
             var oldEnv = list.FirstOrDefault(x => x.value.Contains(ckInfo.UserId));
 
@@ -391,7 +391,6 @@ public class LoginDomainService(
     private string GetOnlinePic(string str)
     {
         var encode = System.Web.HttpUtility.UrlEncode(str);
-        ;
         return $"https://tool.lu/qrcode/basic.html?text={encode}";
     }
 

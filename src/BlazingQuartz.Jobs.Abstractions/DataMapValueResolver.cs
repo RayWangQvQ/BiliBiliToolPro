@@ -1,5 +1,4 @@
-﻿using System;
-using BlazingQuartz.Jobs.Abstractions.Processors;
+﻿using BlazingQuartz.Jobs.Abstractions.Processors;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
