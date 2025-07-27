@@ -50,7 +50,7 @@ public class ChargeDomainService(
 
         //如果没有配置或配了-1，则使用fallback值（B站最新策略已不允许为自己充电）
         string targetUpId =
-            _chargeTaskOptions.AutoChargeUpId.IsNullOrWhiteSpace()
+            string.IsNullOrWhiteSpace(_chargeTaskOptions.AutoChargeUpId)
             || _chargeTaskOptions.AutoChargeUpId == "-1"
                 ? Config.Constants.FallbackAutoChargeUpId
                 : _chargeTaskOptions.AutoChargeUpId!;

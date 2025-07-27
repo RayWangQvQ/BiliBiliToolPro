@@ -1,4 +1,5 @@
 using Quartz;
+using Ray.Serilog.Sinks.Batched;
 using Serilog.Context;
 
 namespace Ray.BiliBiliTool.Web.Jobs;
@@ -9,7 +10,14 @@ public abstract class BaseJob<TJob>(ILogger<TJob> logger) : IJob
     public async Task Execute(IJobExecutionContext context)
     {
         var fireInstanceId = context.FireInstanceId;
+
         using (LogContext.PushProperty("FireInstanceId", fireInstanceId))
+        using (
+            LogContext.PushProperty(
+                Ray.Serilog.Sinks.Batched.Constants.GroupPropertyKey,
+                fireInstanceId
+            )
+        )
         {
             try
             {
@@ -19,6 +27,15 @@ public abstract class BaseJob<TJob>(ILogger<TJob> logger) : IJob
             {
                 logger.LogError(e, e.Message);
             }
+        }
+
+        try
+        {
+            await BatchSinkManager.FlushAsync(fireInstanceId);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Fail to push logs");
         }
     }
 

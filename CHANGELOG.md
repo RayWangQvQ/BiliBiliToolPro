@@ -1,3 +1,7 @@
+## 3.6.0
+- Feature[#961]: Web 项目新增推送功能
+- Feature[#961]: 升级 Serilog Pkg
+- Feature: 使用中心化包管理
 ## 3.5.0
 - Feature[#924]: 新增 Sqlite 配置源
 - Feature[#924]: 新增在线配置页
