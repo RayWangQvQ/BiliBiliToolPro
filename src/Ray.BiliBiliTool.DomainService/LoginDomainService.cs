@@ -324,6 +324,33 @@ public class LoginDomainService(
         PrintSmall(qrCodeData);
     }
 
+    private void Print(QRCodeData qrCodeData)
+    {
+        Console.BackgroundColor = ConsoleColor.White;
+        for (int i = 0; i < qrCodeData.ModuleMatrix.Count + 2; i++)
+            Console.Write("　"); //中文全角的空格符
+        Console.WriteLine();
+        for (int j = 0; j < qrCodeData.ModuleMatrix.Count; j++)
+        {
+            for (int i = 0; i < qrCodeData.ModuleMatrix.Count; i++)
+            {
+                //char charToPoint = qrCode.Matrix[i, j] ? '█' : '　';
+                Console.Write(i == 0 ? "　" : ""); //中文全角的空格符
+                Console.BackgroundColor = qrCodeData.ModuleMatrix[i][j]
+                    ? ConsoleColor.Black
+                    : ConsoleColor.White;
+                Console.Write('　'); //中文全角的空格符
+                Console.BackgroundColor = ConsoleColor.White;
+                Console.Write(i == qrCodeData.ModuleMatrix.Count - 1 ? "　" : ""); //中文全角的空格符
+            }
+            Console.WriteLine();
+        }
+        for (int i = 0; i < qrCodeData.ModuleMatrix.Count + 2; i++)
+            Console.Write("　"); //中文全角的空格符
+
+        Console.WriteLine();
+    }
+
     private void PrintSmall(QRCodeData qrCodeData)
     {
         //黑黑（" "）
