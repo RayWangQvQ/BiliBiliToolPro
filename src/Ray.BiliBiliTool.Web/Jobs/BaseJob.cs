@@ -1,3 +1,4 @@
+using System.Reflection;
 using Quartz;
 using Ray.Serilog.Sinks.Batched;
 using Serilog.Context;
@@ -31,6 +32,13 @@ public abstract class BaseJob<TJob>(ILogger<TJob> logger) : IJob
 
         try
         {
+            logger.LogInformation(
+                "v{version} 开源 by {url}",
+                typeof(Program)
+                    .Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+                    ?.InformationalVersion,
+                Config.Constants.SourceCodeUrl + Environment.NewLine
+            );
             await BatchSinkManager.FlushAsync(fireInstanceId);
         }
         catch (Exception ex)
