@@ -28,17 +28,21 @@ public abstract class BaseJob<TJob>(ILogger<TJob> logger) : IJob
             {
                 logger.LogError(e, e.Message);
             }
+            finally
+            {
+                logger.LogInformation("---");
+                logger.LogInformation(
+                    "v{version} 开源 by {url}",
+                    typeof(Program)
+                        .Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+                        ?.InformationalVersion,
+                    Config.Constants.SourceCodeUrl + Environment.NewLine
+                );
+            }
         }
 
         try
         {
-            logger.LogInformation(
-                "v{version} 开源 by {url}",
-                typeof(Program)
-                    .Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-                    ?.InformationalVersion,
-                Config.Constants.SourceCodeUrl + Environment.NewLine
-            );
             await BatchSinkManager.FlushAsync(fireInstanceId);
         }
         catch (Exception ex)
