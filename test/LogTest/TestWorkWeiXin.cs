@@ -25,7 +25,7 @@ namespace LogTest
         [Fact]
         public async Task Test2()
         {
-            var client = new WorkWeiXinApiClient(_key);
+            var client = new WorkWeiXinApiClient(_key, WorkWeiXinMsgType.text);
 
             //string msg = LogConstants.Msg;
             string msg = LogConstants.Msg2;
