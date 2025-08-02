@@ -145,9 +145,7 @@ public class BiliBiliToolHostedService(
         logger.LogInformation(Environment.NewLine + "========================");
         logger.LogInformation(
             "v{version} 开源 by {url}",
-            typeof(Program)
-                .Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-                ?.InformationalVersion,
+            typeof(Program).Assembly.GetName().Version?.ToString(),
             Constants.SourceCodeUrl + Environment.NewLine
         );
         //_logger.LogInformation("【当前IP】{ip} ", IpHelper.GetIp());
