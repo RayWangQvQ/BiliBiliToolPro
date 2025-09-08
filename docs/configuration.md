@@ -765,12 +765,12 @@ webhook的完整地址，在Teams的Channel中获取，详细获取方式请参�
 
 <a id="markdown-38-日志相关" name="38-日志相关"></a>
 
-<a id="markdown-3710-email" name="3710-email"></a>
-#### 3.7.10. Email
+<a id="markdown-3711-email" name="3711-推送到邮箱"></a>
+#### 3.7.11. 推送到邮箱
 官网：https://github.com/gutenye/email-notification/blob/main/src/templates/BiliBiliToolPro.md
 
-<a id="markdown-37101-api" name="37101-api"></a>
-##### 3.7.10.1. api
+<a id="markdown-37111-api" name="37111-api"></a>
+##### 3.7.11.1. api
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
@@ -780,8 +780,8 @@ webhook的完整地址，在Teams的Channel中获取，详细获取方式请参�
 | 例子 | https://HOST/API_KEY }
 
 
-<a id="markdown-37102-bodyjsontemplate" name="37102-bodyjsontemplate"></a>
-##### 3.7.10.2. bodyJsonTemplate
+<a id="markdown-37112-bodyjsontemplate" name="37112-bodyjsontemplate"></a>
+##### 3.7.11.2. bodyJsonTemplate
 
 |   TITLE   | CONTENT   |
 | ---------- | -------------- |
