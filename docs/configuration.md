@@ -763,8 +763,6 @@ webhook的完整地址，在Teams的Channel中获取，详细获取方式请参�
 | 默认值   | 空                                |
 | 命令行示范 |                                  |
 
-<a id="markdown-38-日志相关" name="38-日志相关"></a>
-
 <a id="markdown-3711-email" name="3711-推送到邮箱"></a>
 #### 3.7.11. 推送到邮箱
 官网：https://github.com/gutenye/email-notification/blob/main/src/templates/BiliBiliToolPro.md
@@ -790,7 +788,7 @@ webhook的完整地址，在Teams的Channel中获取，详细获取方式请参�
 | 默认值   | 空 |
 | 例子 ｜ BiliBiliToolPro\n#msg# ｜
 
-<a id="markdown-378-pushplus推荐" name="378-pushplus推荐"></a>
+<a id="markdown-38-日志相关" name="38-日志相关"></a>
 ### 3.8. 日志相关
 
 <a id="markdown-381-日志输出等级" name="381-日志输出等级"></a>
