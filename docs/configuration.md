@@ -72,6 +72,9 @@
             - [3.7.10.1. 企业微信应用推送的corpId](#37101-企业微信应用推送的corpid)
             - [3.7.10.2. 企业微信应用推送的agentId](#37102-企业微信应用推送的agentid)
             - [3.7.10.3. 企业微信应用推送的secret](#37103-企业微信应用推送的secret)
+        - [3.7.11. 推送到邮箱](#3711-推送到邮箱)
+            - [3.7.11.1. api](#37111-api)
+            - [3.7.11.2. bodyJsonTemplate](#37112-bodyjsontemplate)
     - [3.8. 日志相关](#38-日志相关)
         - [3.8.1. 日志输出等级](#381-日志输出等级)
         - [3.8.2. 日志输出样式](#382-日志输出样式)
@@ -759,6 +762,31 @@ webhook的完整地址，在Teams的Channel中获取，详细获取方式请参�
 | 值域    | 一串字符串                            |
 | 默认值   | 空                                |
 | 命令行示范 |                                  |
+
+<a id="markdown-3711-email" name="3711-推送到邮箱"></a>
+#### 3.7.11. 推送到邮箱
+官网：https://github.com/gutenye/email-notification/blob/main/src/templates/BiliBiliToolPro.md
+
+<a id="markdown-37111-api" name="37111-api"></a>
+##### 3.7.11.1. api
+
+|   TITLE   | CONTENT   |
+| ---------- | -------------- |
+| 配置Key | `Serilog__WriteTo__8__Args__api` |
+| 值域   | 一串字符串 |
+| 默认值   | 空 |
+| 例子 | https://HOST/API_KEY }
+
+
+<a id="markdown-37112-bodyjsontemplate" name="37112-bodyjsontemplate"></a>
+##### 3.7.11.2. bodyJsonTemplate
+
+|   TITLE   | CONTENT   |
+| ---------- | -------------- |
+| 配置Key | `Serilog__WriteTo__8__Args__bodyJsonTemplate` |
+| 值域   | 一串字符串 |
+| 默认值   | 空 |
+| 例子 ｜ BiliBiliToolPro\n#msg# ｜
 
 <a id="markdown-38-日志相关" name="38-日志相关"></a>
 ### 3.8. 日志相关
