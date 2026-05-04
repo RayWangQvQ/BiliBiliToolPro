@@ -8,7 +8,11 @@ public class GetLiveRoomInfoResponse
 
     public long Parent_area_id { get; set; }
 
+    public string Parent_area_name { get; set; }
+
     public int Live_Status { get; set; }
 
     public long Uid { get; set; }
+
+    public string Title { get; set; }
 }

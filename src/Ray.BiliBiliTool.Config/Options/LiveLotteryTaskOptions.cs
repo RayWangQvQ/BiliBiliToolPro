@@ -11,12 +11,14 @@ public class LiveLotteryTaskOptions : BaseConfigOptions
     public List<string> IncludeAwardNameList =>
         IncludeAwardNames
             ?.Split("|", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
-            .ToList() ?? new List<string>();
+            .ToList()
+        ?? new List<string>();
 
     public List<string> ExcludeAwardNameList =>
         ExcludeAwardNames
             ?.Split("|", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
-            .ToList() ?? new List<string>();
+            .ToList()
+        ?? new List<string>();
 
     public bool AutoGroupFollowings { get; set; } = true;
 
@@ -25,7 +27,21 @@ public class LiveLotteryTaskOptions : BaseConfigOptions
     public List<string> DenyUidList =>
         DenyUids
             ?.Split(",", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
-            .ToList() ?? new List<string>();
+            .ToList()
+        ?? new List<string>();
+
+    /// <summary>
+    /// 天选模式 default\FansMedal\WhiteList
+    /// </summary>
+    public string? TianXuanMode { get; set; }
+
+    public string? RoomWhiteList { get; set; }
+
+    public List<string> RoomWhiteListList =>
+        RoomWhiteList
+            ?.Split(",", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+            .ToList()
+        ?? new List<string>();
 
     public override Dictionary<string, string> ToConfigDictionary()
     {
@@ -39,6 +55,8 @@ public class LiveLotteryTaskOptions : BaseConfigOptions
                     AutoGroupFollowings.ToString().ToLower()
                 },
                 { $"{SectionName}:{nameof(DenyUids)}", DenyUids ?? "" },
+                { $"{SectionName}:{nameof(TianXuanMode)}", TianXuanMode ?? "" },
+                { $"{SectionName}:{nameof(RoomWhiteList)}", RoomWhiteList ?? "" },
             }
         );
     }

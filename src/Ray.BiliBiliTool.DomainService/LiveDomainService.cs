@@ -125,6 +125,40 @@ public class LiveDomainService(
     {
         _tianXuanFollowed = new List<ListItemDto>();
 
+        int count = await doTianXuanLogic(ck);
+
+        if (count == 0)
+        {
+            logger.LogInformation("未搜索到直播间");
+            return;
+        }
+    }
+
+    private async Task<int> doTianXuanLogic(BiliCookie ck)
+    {
+        if (!string.IsNullOrEmpty(_liveLotteryTaskOptions.TianXuanMode))
+        {
+            string tianXuanMode = _liveLotteryTaskOptions.TianXuanMode;
+            if ("FansMedal".Equals(tianXuanMode, StringComparison.CurrentCultureIgnoreCase))
+            {
+                return await FansMedalTianXuanLogic(ck);
+            }
+            else if ("WhiteList".Equals(tianXuanMode, StringComparison.CurrentCultureIgnoreCase))
+            {
+                return await WhiteListTianXuanLogic(ck);
+            }
+        }
+        return await defaultTianXuanLogic(ck);
+    }
+
+    /// <summary>
+    /// 默认天选抽奖逻辑
+    /// </summary>
+    /// <param name="ck"></param>
+    /// <returns></returns>
+    private async Task<int> defaultTianXuanLogic(BiliCookie ck)
+    {
+        logger.LogInformation("【天选抽奖】默认模式");
         if (_liveLotteryTaskOptions.AutoGroupFollowings)
         {
             //获取此时最后一个关注的up，此后再新增的关注，与参与成功的抽奖，取交集，就是本地新增的天选关注
@@ -177,11 +211,81 @@ public class LiveDomainService(
             defaultSort = "";
         }
 
-        if (count == 0)
+        return count;
+    }
+
+    /// <summary>
+    /// 粉丝牌天选抽奖
+    /// </summary>
+    /// <param name="ck"></param>
+    /// <returns></returns>
+    private async Task<int> FansMedalTianXuanLogic(BiliCookie ck)
+    {
+        logger.LogInformation("【天选抽奖】粉丝灯牌模式");
+        int count = 0;
+        List<ListItemDto> infoList = new List<ListItemDto>();
+        (await GetFansMedalInfoList(ck, false))
+            .FindAll(info => info.LiveRoomInfo.Live_Status != 0)
+            .ForEach(medal =>
+            {
+                infoList.Add(
+                    new ListItemDto()
+                    {
+                        Roomid = medal.RoomId,
+                        Uid = medal.LiveRoomInfo.Uid,
+                        Title = medal.LiveRoomInfo.Title,
+                        Parent_name = medal.LiveRoomInfo.Parent_area_name,
+                        Uname = medal.MedalInfo.Target_name,
+                    }
+                );
+            });
+        foreach (var item in infoList)
         {
-            logger.LogInformation("未搜索到直播间");
-            return;
+            count++;
+            await TryJoinTianXuan(item, ck);
         }
+        return count;
+    }
+
+    private async Task<int> WhiteListTianXuanLogic(BiliCookie ck)
+    {
+        logger.LogInformation("【天选抽奖】白名单模式");
+        int count = 0;
+        if (_liveLotteryTaskOptions.RoomWhiteListList.Count == 0)
+        {
+            logger.LogInformation("【天选抽奖】白名单未设置，跳过");
+            return count;
+        }
+        foreach (var roomId in _liveLotteryTaskOptions.RoomWhiteListList)
+        {
+            if (long.TryParse(roomId, out long roomIdLong))
+            {
+                var liveRoomInfo = await liveApi.GetLiveRoomInfo(roomIdLong);
+                if (liveRoomInfo.Code != 0)
+                {
+                    logger.LogError("【获取直播间信息】失败");
+                    logger.LogError("【原因】{message}", liveRoomInfo.Message);
+                    continue;
+                }
+                var liveRoomInfoData = liveRoomInfo.Data;
+                if (liveRoomInfoData != null)
+                {
+                    count++;
+                    await TryJoinTianXuan(
+                        new ListItemDto()
+                        {
+                            Roomid = liveRoomInfoData.Room_id,
+                            Uid = liveRoomInfoData.Uid,
+                            Title = liveRoomInfoData.Title,
+                            Parent_name = liveRoomInfoData.Parent_area_name,
+                            Uname = roomId,
+                        },
+                        ck
+                    );
+                }
+            }
+        }
+        return count;
     }
 
     public async Task TryJoinTianXuan(ListItemDto target, BiliCookie ck)
@@ -642,7 +746,10 @@ public class LiveDomainService(
         }
     }
 
-    private async Task<List<FansMedalInfoDto>> GetFansMedalInfoList(BiliCookie ck)
+    private async Task<List<FansMedalInfoDto>> GetFansMedalInfoList(
+        BiliCookie ck,
+        bool checkLevel20Medal = true
+    )
     {
         logger.LogInformation("【获取直播列表】获取拥有粉丝牌的直播列表");
         var medalWallInfo = await liveApi.GetMedalWall(ck.UserId, ck.ToString());
@@ -658,7 +765,11 @@ public class LiveDomainService(
         foreach (var medal in medalWallInfo.Data.List)
         {
             logger.LogInformation("【主播】{name} ", medal.Target_name);
-            if (_liveFansMedalTaskOptions.IsSkipLevel20Medal && medal.Medal_info.Level >= 20)
+            if (
+                checkLevel20Medal
+                && _liveFansMedalTaskOptions.IsSkipLevel20Medal
+                && medal.Medal_info.Level >= 20
+            )
             {
                 logger.LogInformation(
                     "粉丝牌等级为 {level}，观看将不再增长亲密度，跳过",
