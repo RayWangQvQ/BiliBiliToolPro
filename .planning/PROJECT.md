@@ -10,7 +10,18 @@ The product being preserved is an automated Bilibili task execution system with 
 
 Make the existing codebase safe to change: clear boundaries, lower coupling, and testable critical flows.
 
-## Current Milestone: v4.0.0.7 Bili Account Management (SHIPPED 2026-05-07)
+## Current Milestone: v4.0.0.8 Notification Boundary
+
+**Goal:** Extract the notification concern behind an explicit `INotificationService` port/adapter boundary, replacing the current direct Serilog-sink-only approach, and prove the boundary works by adding a native Telegram HTTP adapter alongside the existing 13 channels.
+
+**Target features:**
+- `INotificationService` port — Application-layer interface for "send task results/summaries to the user", separated from diagnostic logging
+- Serilog adapter — Default adapter that routes notification calls through the existing 13 Serilog sinks (zero breaking change)
+- Telegram HTTP adapter — New native HTTP-based Telegram channel behind the port, proving extensibility without Serilog dependency
+- Migration — Task completion, error summaries, and other "notification-worthy" signals routed through the new port; regular debug logging stays on `ILogger`
+- Configuration — All existing Serilog sink config in `appsettings.json` continues to work; new Telegram adapter has its own config section
+
+## Shipped: v4.0.0.7 Bili Account Management (SHIPPED 2026-05-07)
 
 **Goal:** Add a Web-based "Bili Account" page for viewing, adding, editing, and deleting Bili accounts (cookies), backed by SQLite as the sole configuration source for Web, replacing `cookies.json`.
 
@@ -41,7 +52,7 @@ Make the existing codebase safe to change: clear boundaries, lower coupling, and
 - ✓ ARCH-01: Maintainer can enforce explicit dependency direction between all 5 layers — v4.0.0.1
 - ✓ ARCH-02: Web and Console hosts stay thin; startup code no longer owns business orchestration — v4.0.0.1
 - ✓ ARCH-03: Core modules compose through module-level registration entry points — v4.0.0.1
-- ⚠ ARCH-04 (partial): EF + HTTP Agent boundaries established; notification boundary deferred — v4.0.0.1
+- ⚠ ARCH-04 (partial): EF + HTTP Agent boundaries established; notification boundary → v4.0.0.8 — v4.0.0.1
 - ✓ TEST-01: Login and DailyTask observable behavior frozen with characterization tests — v4.0.0.1
 - ✓ TEST-02: Startup, config, EF, HTTP, and scheduling validated via host integration tests — v4.0.0.1
 - ✓ TEST-03: Cross-layer dependency violations detected through ArchUnitNET architecture tests — v4.0.0.1
@@ -87,7 +98,7 @@ Make the existing codebase safe to change: clear boundaries, lower coupling, and
 
 ### Active
 
-No active requirements — next milestone not yet defined.
+No active requirements — defining requirements for v4.0.0.8 Notification Boundary.
 
 ### Deferred (future milestones)
 
@@ -118,7 +129,7 @@ No active requirements — next milestone not yet defined.
 - BiliException hierarchy (Business/Integration/Validation) established in `src\Ray.BiliBiliTool.Domain\Exceptions`
 - IExecutionLogRepository and IUserRepository adapters decouple Web from direct EF factory injection
 - `BaseMultiAccountsAppService` now owns `SetCookiesAsync` + `SaveCookieAsync` as `protected virtual` — all 11 in-scope services inherit; `LoginTaskAppService` retains its own (out of scope by design)
-- Notification boundary not yet established — still direct Serilog sink dependency (deferred to future milestone)
+- Notification boundary not yet established — 13 Serilog sink channels active (Console, File, Telegram, WorkWeChat×2, DingTalk, ServerChan, CoolPush, OtherApi, PushPlus, Teams, Gotify); no `INotificationService` abstraction; `BatchSinkManager.FlushAsync()` triggers at job end — target of v4.0.0.8
 
 ## Constraints
 
@@ -142,6 +153,7 @@ No active requirements — next milestone not yet defined.
 | Extract shared AppService cookie handling into base class | 6 AppServices copy identical SetCookie/SaveCookie private methods — DRY violation targets a single base class | v4.0.0.2 Phase 7 |
 | Keep cookies.json as fallback (not remove) in Web host | Existing Console-host users who haven't migrated to SQLite would break; fallback loaded before AddSqlite so SQLite wins for overlapping keys | v4.0.0.7 Phase 17 |
 | QR login generates base64 PNG in domain service layer | Web browser displays PNG via img tag; terminal QR rendering doesn't apply; PngByteQRCode already referenced in DomainService.csproj | v4.0.0.7 Phase 19 |
+| INotificationService port for notification boundary | All 13 current channels are Serilog sinks with no application-level abstraction; port enables future non-Serilog adapters (Telegram HTTP, webhook, etc.) without touching callers | v4.0.0.8 (active) |
 
 ## Evolution
 
@@ -161,4 +173,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-07 — v4.0.0.7 milestone completed (Bili Account Management)*
+*Last updated: 2026-05-07 — v4.0.0.8 milestone started (Notification Boundary)*

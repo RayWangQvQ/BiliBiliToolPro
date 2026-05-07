@@ -5,29 +5,32 @@
 See: .planning/PROJECT.md (updated 2026-05-07)
 
 **Core value:** Make the existing codebase safe to change: clear boundaries, lower coupling, and testable critical flows.
-**Current focus:** No active milestone — ready for `/gsd-new-milestone`
+**Current focus:** v4.0.0.8 Notification Boundary — roadmap created, ready for Phase 20 planning
 
 ## Current Position
 
-Milestone: v4.0.0.7 Bili Account Management — SHIPPED
-Phase: — (milestone complete)
-Status: Milestone shipped — all 3 phases (17–19) verified and tagged
-Last activity: 2026-05-07 — v4.0.0.7 milestone completed and archived
+Milestone: v4.0.0.8 Notification Boundary
+Phase: Phase 20 — Port Definition & Contracts (not started)
+Plan: —
+Status: Roadmap created, awaiting `/gsd-plan-phase 20`
+Last activity: 2026-05-07 — Roadmap created (4 phases: 20–23)
 
-Progress: [██████████] 100% — v4.0.0.7 shipped (7/7 ACCT requirements satisfied)
+Progress: [░░░░░░░░░░] 0% — v4.0.0.8 roadmap created (17 requirements across 4 phases)
 
 ## Current Snapshot
 
 - Shipped milestones: v4.0.0.1 through v4.0.0.7
-- v4.0.0.7 delivered: Web-based Bili Account CRUD with QR login, SQLite-backed cookie storage with cookies.json fallback
-- 7 requirements defined and validated (ACCT-01 through ACCT-07)
-- 3 phases completed: Phase 17 (Storage Foundation), Phase 18 (CRUD Operations), Phase 19 (QR Login)
-- Next: `/gsd-new-milestone` to start v4.0.0.8
+- v4.0.0.8 roadmap: 4 phases (20–23), 17 requirements
+- Phase 20: Port Definition & Contracts (NOTIF-01..04)
+- Phase 21: Serilog Notification Adapter (SERILOG-01..04)
+- Phase 22: Telegram HTTP Adapter (TELEGRAM-01..04)
+- Phase 23: DI Wiring & AppService Migration (WIRING-01..05)
+- ARCH-04 (notification boundary) being addressed in this milestone
+- Next: `/gsd-plan-phase 20`
 
 ## Pending Todos
 
 - Investigate pre-existing test failure: `Daily_task_multi_account_wrapper_continues_after_account_failure` (deferred)
-- Revisit deferred notification adapter or port boundary when milestone scope permits
 
 ## Blockers/Concerns
 
@@ -37,12 +40,11 @@ Progress: [██████████] 100% — v4.0.0.7 shipped (7/7 ACCT r
 
 | Category | Item | Status | Deferred At |
 |----------|------|--------|-------------|
-| ARCH-04 | Notification adapter/port boundary | Open | Phase 6 |
 | Quality | Pre-existing characterization test failure | Open | Phase 5 |
-| Future milestone | TEST-05 / FLOW-05 / QUAL-03 / QUAL-04 candidates | Open | v4.0.0.6 planning |
+| Future milestone | TEST-04 / TEST-05 / FLOW-05 / QUAL-03 / QUAL-04 candidates | Open | v4.0.0.6 planning |
 
 ## Session Continuity
 
-Last session: 2026-05-07 — v4.0.0.7 milestone completed, archived, and tagged
-Stopped at: Ready for `/gsd-new-milestone`
-Resume action: define requirements, then create roadmap
+Last session: 2026-05-07 — v4.0.0.8 roadmap created
+Stopped at: Roadmap created, ready for Phase 20 planning
+Resume action: `/gsd-plan-phase 20`
