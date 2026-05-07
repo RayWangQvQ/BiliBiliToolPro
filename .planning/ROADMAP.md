@@ -96,7 +96,10 @@
   3. `SummaryLine` value object carries Label, Value, and StatusIcon for structured task-result summaries
   4. The port interface is async-only (all methods return `Task`) and does not reference Serilog, ILogger, or any Infrastructure type
   5. An ArchUnitNET test enforces that Application-layer code may reference `INotificationService` from `Application.Contracts` but may not directly reference any `Infrastructure.Notifications` adapter class
-**Plans**: TBD
+**Plans**: 1 plan
+
+Plans:
+- [ ] 20-01-PLAN.md — Port definition, DTOs, and ArchUnit guardrail
 
 ### Phase 21: Serilog Notification Adapter
 **Goal**: A `SerilogNotificationAdapter` implements `INotificationService` by routing notification content through the existing Serilog pipeline, so all 13 sink channels keep working identically with zero breaking changes
@@ -136,7 +139,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 20. Port Definition & Contracts | 0/1 | Not started | — |
+| 20. Port Definition & Contracts | 0/1 | Planned | — |
 | 21. Serilog Notification Adapter | 0/1 | Not started | — |
 | 22. Telegram HTTP Adapter | 0/1 | Not started | — |
 | 23. DI Wiring & AppService Migration | 0/1 | Not started | — |
