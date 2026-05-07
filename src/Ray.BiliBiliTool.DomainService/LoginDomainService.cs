@@ -516,12 +516,15 @@ public class LoginDomainService(
 
     private Task PrintIfSaveCookieFailAsync(BiliCookie ckInfo, CancellationToken cancellationToken)
     {
-        logger.LogError("持久化失败，青龙版本高于2.18，请手动添加环境变量到青龙");
+        logger.LogError("持久化Cookie到青龙失败");
+        logger.LogError("可能原因：无法连接到青龙OpenAPI（默认地址: http://localhost:5700）");
+        logger.LogError("请检查：");
+        logger.LogError("1. 在青龙面板 系统设置->应用设置 中创建应用，获取 ClientId 和 ClientSecret");
+        logger.LogError("2. 添加环境变量 Ray_QingLongConfig__ClientId 和 Ray_QingLongConfig__ClientSecret");
+        logger.LogError("3. 如地址不对，请添加环境变量 QL_URL 指定正确地址（如 http://localhost:5600）");
         logger.LogWarning("变量Key：{key}", "Ray_BiliBiliCookies__0");
         logger.LogWarning("变量值：{value}", ckInfo.CookieStr);
-        logger.LogWarning(
-            "如果Key已存在，请自行+1，如Ray_BiliBiliCookies__1，Ray_BiliBiliCookies__2..."
-        );
+        logger.LogWarning("如果Key已存在，请自行+1，如Ray_BiliBiliCookies__1，Ray_BiliBiliCookies__2...");
         return Task.CompletedTask;
     }
 

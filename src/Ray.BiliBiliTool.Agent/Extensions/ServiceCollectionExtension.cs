@@ -83,7 +83,9 @@ public static class ServiceCollectionExtension
         );
 
         //qinglong
-        var qinglongHost = configuration["QL_URL"] ?? "http://localhost:5600";
+        var qinglongHost = configuration["QL_URL"]
+            ?? configuration["Ray_QL_URL"]
+            ?? "http://localhost:5700";
         services
             .AddRefitClient<IQingLongApi>()
             .ConfigureHttpClient(
