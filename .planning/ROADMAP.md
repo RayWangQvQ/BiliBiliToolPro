@@ -110,7 +110,10 @@ Plans:
   2. All 13 existing Serilog sink channels (Console, Debug, File, Telegram, WorkWeChat×2, DingTalk, ServerChan, CoolPush, OtherApi, PushPlus, Teams, Gotify) continue working identically after the adapter is registered
   3. The adapter preserves `BatchSinkManager.FlushAsync(fireInstanceId)` batch-at-end timing by tagging log entries with `GroupPropertyKey` so sinks batch and flush at job end
   4. The adapter uses `Log.ForContext("NotificationOrigin", "adapter")` so adapter error logs do not re-enter the notification sink pipeline (prevents circular dependency)
-**Plans**: TBD
+**Plans**: 1 plan
+
+Plans:
+- [ ] 21-01-PLAN.md — Serilog adapter implementation and tests
 
 ### Phase 22: Telegram HTTP Adapter
 **Goal**: A native `TelegramHttpAdapter` implements `INotificationService` by sending notifications as HTTP POST requests to the Telegram Bot API, proving the port/adapter boundary enables non-Serilog extensibility
@@ -140,7 +143,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 20. Port Definition & Contracts | 1/1 | ✓ Complete | 2026-05-08 |
-| 21. Serilog Notification Adapter | 0/1 | Not started | — |
+| 21. Serilog Notification Adapter | 0/1 | Planned | — |
 | 22. Telegram HTTP Adapter | 0/1 | Not started | — |
 | 23. DI Wiring & AppService Migration | 0/1 | Not started | — |
 
