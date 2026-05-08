@@ -16,7 +16,7 @@
 <details open>
 <summary>🔲 v4.0.0.8 Notification Boundary (Phases 20–23) — IN PROGRESS</summary>
 
-- [ ] **Phase 20: Port Definition & Contracts** — NOTIF-01..04 — interface shape is the foundation
+- [x] **Phase 20: Port Definition & Contracts** — NOTIF-01..04 — 1/1 plan complete — 2026-05-08
 - [ ] **Phase 21: Serilog Notification Adapter** — SERILOG-01..04 — zero-breakage bridge to existing 13 channels
 - [ ] **Phase 22: Telegram HTTP Adapter** — TELEGRAM-01..04 — proves extensibility
 - [ ] **Phase 23: DI Wiring & AppService Migration** — WIRING-01..05 — wire everything together
@@ -99,7 +99,7 @@
 **Plans**: 1 plan
 
 Plans:
-- [ ] 20-01-PLAN.md — Port definition, DTOs, and ArchUnit guardrail
+- [x] 20-01-PLAN.md — Port definition, DTOs, and ArchUnit guardrail — complete ✓
 
 ### Phase 21: Serilog Notification Adapter
 **Goal**: A `SerilogNotificationAdapter` implements `INotificationService` by routing notification content through the existing Serilog pipeline, so all 13 sink channels keep working identically with zero breaking changes
@@ -139,7 +139,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 20. Port Definition & Contracts | 0/1 | Planned | — |
+| 20. Port Definition & Contracts | 1/1 | ✓ Complete | 2026-05-08 |
 | 21. Serilog Notification Adapter | 0/1 | Not started | — |
 | 22. Telegram HTTP Adapter | 0/1 | Not started | — |
 | 23. DI Wiring & AppService Migration | 0/1 | Not started | — |

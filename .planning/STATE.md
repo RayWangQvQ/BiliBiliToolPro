@@ -10,12 +10,12 @@ See: .planning/PROJECT.md (updated 2026-05-07)
 ## Current Position
 
 Milestone: v4.0.0.8 Notification Boundary
-Phase: Phase 20 — Port Definition & Contracts (context gathered)
-Plan: —
-Status: Context gathered, awaiting `/gsd-plan-phase 20`
-Last activity: 2026-05-07 — Phase 20 context gathered (3 decisions locked)
+Phase: Phase 20 — Port Definition & Contracts (complete)
+Plan: 20-01 — complete
+Status: Phase 20 complete, ready for Phase 21
+Last activity: 2026-05-08 — Phase 20 executed (1/1 plans complete)
 
-Progress: [█░░░░░░░░░] 5% — Phase 20 context gathered (dual methods, explicit GroupKey, separate DTOs)
+Progress: [██░░░░░░░░] 25% — Phase 20 complete (INotificationService port, DTOs, ArchUnit guardrail)
 
 ## Current Snapshot
 

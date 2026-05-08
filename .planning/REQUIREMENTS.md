@@ -14,10 +14,10 @@ Extract the notification concern behind an explicit `INotificationService` port/
 
 ### Category: Port & Contracts (NOTIF)
 
-- [ ] **NOTIF-01**: Maintainer can depend on a single `INotificationService` interface in `Application.Contracts` with `SendAsync(NotificationMessage)` and `SendSummaryAsync(IEnumerable<SummaryLine>, string title)` methods
-- [ ] **NOTIF-02**: A `NotificationMessage` value object carries `Title`, `Body`, `NotificationLevel` (Info/Warning/Error), and an optional `GroupKey` for batch-at-end correlation
-- [ ] **NOTIF-03**: A `SummaryLine` value object carries `Label`, `Value`, and `StatusIcon` for structured task-result summaries
-- [ ] **NOTIF-04**: The port interface is async-only (all methods return `Task`) and does not reference Serilog, `ILogger`, or any Infrastructure type
+- [x] **NOTIF-01**: Maintainer can depend on a single `INotificationService` interface in `Application.Contracts` with `SendAsync(NotificationMessage)` and `SendSummaryAsync(IEnumerable<SummaryLine>, string title)` methods
+- [x] **NOTIF-02**: A `NotificationMessage` value object carries `Title`, `Body`, `NotificationLevel` (Info/Warning/Error), and an optional `GroupKey` for batch-at-end correlation
+- [x] **NOTIF-03**: A `SummaryLine` value object carries `Label`, `Value`, and `StatusIcon` for structured task-result summaries
+- [x] **NOTIF-04**: The port interface is async-only (all methods return `Task`) and does not reference Serilog, `ILogger`, or any Infrastructure type
 
 ### Category: Serilog Adapter (SERILOG)
 
@@ -72,10 +72,10 @@ _Roadmap created 2026-05-07. Phases 20–23._
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| NOTIF-01 | Phase 20 | Pending |
-| NOTIF-02 | Phase 20 | Pending |
-| NOTIF-03 | Phase 20 | Pending |
-| NOTIF-04 | Phase 20 | Pending |
+| NOTIF-01 | Phase 20 | ✓ Complete |
+| NOTIF-02 | Phase 20 | ✓ Complete |
+| NOTIF-03 | Phase 20 | ✓ Complete |
+| NOTIF-04 | Phase 20 | ✓ Complete |
 | SERILOG-01 | Phase 21 | Pending |
 | SERILOG-02 | Phase 21 | Pending |
 | SERILOG-03 | Phase 21 | Pending |
