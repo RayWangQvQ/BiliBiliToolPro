@@ -23,8 +23,37 @@ github_proxy=""
 github_branch="main"
 remote_compose_url="${github_proxy}https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/refs/heads/${github_branch}/docker/sample/docker-compose.yml"
 remote_ckJson_url="${github_proxy}https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/refs/heads/${github_branch}/docker/sample/config/cookies.json"
-docker_img_name="ghcr.io/raywangqvq/bili_tool_web"
 container_name="bili_tool_web"
+
+# 选择地区
+selectRegion() {
+    eval $invocation
+    
+    echo ""
+    echo "请选择您安装源 / Please select your sources:"
+    echo "1) 镜像源 (Proxy Source)"
+    echo "2) 官方源 (Official Source)"
+    echo ""
+    
+    while true; do
+        read -p "请输入选择 (1 或 2) / Please enter your choice (1 or 2): " region_choice
+        case $region_choice in
+            1)
+                docker_img_name="ghcr.nju.edu.cn/raywangqvq/bili_tool_web"
+                say_info "已选择中国大陆镜像源: $docker_img_name"
+                break
+                ;;
+            2)
+                docker_img_name="ghcr.io/raywangqvq/bili_tool_web"
+                say_info "Selected non-Mainland China image source: $docker_img_name"
+                break
+                ;;
+            *)
+                say_warning "无效选择，请重新输入 / Invalid choice, please try again"
+                ;;
+        esac
+    done
+}
 
 ### infra
 verbose=false
@@ -327,6 +356,7 @@ checkResult() {
 }
 
 main() {
+    selectRegion
     installDocker
     createBaseDir
     downloadResources
