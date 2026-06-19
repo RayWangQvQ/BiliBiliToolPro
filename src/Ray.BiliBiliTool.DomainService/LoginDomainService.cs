@@ -13,6 +13,8 @@ using Ray.BiliBiliTool.Agent.QingLong;
 using Ray.BiliBiliTool.Agent.QingLong.Dtos;
 using Ray.BiliBiliTool.Agent.Baihu;
 using Ray.BiliBiliTool.Agent.Baihu.Dtos;
+using Ray.BiliBiliTool.Agent.DaiDai;
+using Ray.BiliBiliTool.Agent.DaiDai.Dtos;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.Domain.Exceptions;
 using Ray.BiliBiliTool.DomainService.Dtos;
@@ -30,10 +32,12 @@ public class LoginDomainService(
     IHostEnvironment hostingEnvironment,
     IQingLongApi qingLongApi,
     IBaihuApi baihuApi,
+    IDaiDaiApi daiDaiApi,
     IHomeApi homeApi,
     IConfiguration configuration,
     IOptions<QingLongOptions> qingLongOptions,
-    IOptions<BaihuOptions> baihuOptions
+    IOptions<BaihuOptions> baihuOptions,
+    IOptions<DaiDaiOptions> daiDaiOptions
 ) : ILoginDomainService
 {
     public async Task<BiliCookie> LoginByQrCodeAsync(CancellationToken cancellationToken)
@@ -477,6 +481,81 @@ public class LoginDomainService(
         }
     }
 
+    public async Task<bool> SaveCookieToDaiDaiAsync(
+        BiliCookie ckInfo,
+        CancellationToken cancellationToken
+    )
+    {
+        try
+        {
+            // 先用 AppKey/AppSecret 换取 access_token
+            var token = await GetDaiDaiAuthTokenAsync();
+            if (string.IsNullOrEmpty(token))
+            {
+                throw new Exception("获取呆呆面板token失败");
+            }
+
+            // all=1 返回全部匹配项，避免分页漏掉
+            var envListRe = await daiDaiApi.GetEnvsAsync("Ray_BiliBiliCookies__", "1", token);
+
+            var list = (envListRe.Data ?? [])
+                .Where(x => x.Name != null && x.Name.StartsWith("Ray_BiliBiliCookies__"))
+                .ToList();
+            var oldEnv = list.FirstOrDefault(x =>
+                x.Value != null && x.Value.Contains(ckInfo.UserId)
+            );
+
+            if (oldEnv != null)
+            {
+                logger.LogInformation("用户已存在，更新呆呆面板环境变量");
+                logger.LogInformation("Key：{key}", oldEnv.Name);
+
+                oldEnv.Value = ckInfo.CookieStr;
+                oldEnv.Remarks = string.IsNullOrEmpty(oldEnv.Remarks)
+                    ? $"bili-{ckInfo.UserId}"
+                    : oldEnv.Remarks;
+
+                var updateRe = await daiDaiApi.UpdateEnvAsync(oldEnv.Id, oldEnv, token);
+                logger.LogInformation("更新成功！{msg}", updateRe.Message);
+
+                return true;
+            }
+
+            logger.LogInformation("用户不存在，新增呆呆面板环境变量");
+            var maxNum = -1;
+            if (list.Any())
+            {
+                maxNum = list.Select(x =>
+                    {
+                        var num = (x.Name ?? "").Replace("Ray_BiliBiliCookies__", "");
+                        var parseSuc = int.TryParse(num, out int envNum);
+                        return parseSuc ? envNum : 0;
+                    })
+                    .Max();
+            }
+
+            var name = $"Ray_BiliBiliCookies__{maxNum + 1}";
+            logger.LogInformation("Key：{key}", name);
+
+            var add = new DaiDaiEnv
+            {
+                Name = name,
+                Value = ckInfo.CookieStr,
+                Remarks = $"bili-{ckInfo.UserId}",
+                Enabled = true,
+            };
+            var addRe = await daiDaiApi.AddEnvAsync(add, token);
+            logger.LogInformation("新增成功！{msg}", addRe.Message);
+            return true;
+        }
+        catch (Exception e)
+        {
+            logger.LogError("保存到呆呆面板失败：{msg}", e.Message);
+            await PrintIfSaveCookieFailAsync(ckInfo, cancellationToken);
+            return false;
+        }
+    }
+
     #region private
 
     private void GenerateQrCode(string str)
@@ -598,15 +677,56 @@ public class LoginDomainService(
         return $"{token.Data.token_type} {token.Data.token}";
     }
 
+    private async Task<string> GetDaiDaiAuthTokenAsync()
+    {
+        logger.LogWarning("使用呆呆面板OpenAPI鉴权");
+        if (
+            string.IsNullOrWhiteSpace(daiDaiOptions.Value.AppKey)
+            || string.IsNullOrWhiteSpace(daiDaiOptions.Value.AppSecret)
+        )
+        {
+            logger.LogWarning("未配置呆呆面板的AppKey和AppSecret，无法自动获取token");
+            logger.LogWarning(
+                "教程：{daidaiDoc}",
+                "https://github.com/RayWangQvQ/BiliBiliToolPro/blob/develop/daidai/README.md"
+            );
+            return "";
+        }
+
+        var re = await daiDaiApi.GetTokenAsync(
+            new DaiDaiTokenRequest
+            {
+                AppKey = daiDaiOptions.Value.AppKey,
+                AppSecret = daiDaiOptions.Value.AppSecret,
+            }
+        );
+
+        if (re.Data == null || string.IsNullOrEmpty(re.Data.AccessToken))
+        {
+            return "";
+        }
+
+        return $"{re.Data.TokenType} {re.Data.AccessToken}";
+    }
+
     private Task PrintIfSaveCookieFailAsync(BiliCookie ckInfo, CancellationToken cancellationToken)
     {
         var platform = configuration["Ray_PlatformType"] ?? "";
-        var platformName = platform.Equals("Baihu", StringComparison.OrdinalIgnoreCase) ? "白虎" : "青龙";
+        var platformName = platform.Equals("Baihu", StringComparison.OrdinalIgnoreCase)
+            ? "白虎"
+            : platform.Equals("DaiDai", StringComparison.OrdinalIgnoreCase)
+                ? "呆呆"
+                : "青龙";
 
         if (platformName == "白虎")
         {
             logger.LogError("持久化失败，请手动添加环境变量到白虎面板");
             logger.LogInformation("提示：配置环境变量 BaihuConfig__Token 后，在baihu面板系统设置->openapi获取，程序可尝试自动保存。");
+        }
+        else if (platformName == "呆呆")
+        {
+            logger.LogError("持久化失败，请手动添加环境变量到呆呆面板");
+            logger.LogInformation("提示：在呆呆面板「系统设置->Open API」新建应用（授权范围含 envs），配置环境变量 DaiDaiConfig__AppKey / DaiDaiConfig__AppSecret 后，程序可尝试自动保存。");
         }
         else
         {

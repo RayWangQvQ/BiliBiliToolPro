@@ -8,4 +8,5 @@ public enum PlatformType
     QingLong,
     Web,
     Baihu,
+    DaiDai,
 }
