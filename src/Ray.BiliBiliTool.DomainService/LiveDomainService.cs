@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Ray.BiliBiliTool.Agent;
@@ -42,6 +43,7 @@ public class LiveDomainService(
     /// 本次通过天选关注的主播
     /// </summary>
     private List<ListItemDto> _tianXuanFollowed = new();
+    private int _tianXuanJoined = 0;
 
     /// <summary>
     /// 开始抽奖前最后一个关注的up
@@ -123,6 +125,7 @@ public class LiveDomainService(
     public async Task TianXuan(BiliCookie ck)
     {
         _tianXuanFollowed = new List<ListItemDto>();
+        _tianXuanJoined = 0;
 
         if (_liveLotteryTaskOptions.AutoGroupFollowings)
         {
@@ -134,53 +137,71 @@ public class LiveDomainService(
         List<AreaDto> areaList = (await liveApi.GetAreaList(ck.ToString())).Data.Data;
 
         //遍历分区
-        int count = 0;
         foreach (var area in areaList)
         {
             logger.LogInformation("【扫描分区】{area}..." + Environment.NewLine, area.Name);
 
-            string defaultSort = "";
-            //每个分区下搜索5页
-            for (int i = 1; i < 6; i++)
+            //每个分区下搜索若干页（v3 接口不受风控，逐房间校验天选状态）
+            for (int i = 1; i < 4; i++)
             {
-                var request = new GetListRequest
+                var request = new GetRoomListV3Request
                 {
                     platform = "web",
                     parent_area_id = area.Id,
                     area_id = 0,
-                    sort_type = defaultSort,
+                    sort_type = "online",
                     page = i,
-                    wts = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+                    page_size = 99,
                 };
-                var reData = (await liveApi.GetList(request, ck.ToString())).Data;
+                var reListResp = await liveApi.GetRoomListV3(request, ck.ToString());
+                if (reListResp.Data == null)
+                {
+                    logger.LogWarning(
+                        "【天选时刻】获取分区 {area} 第 {page} 页直播间列表失败，B站返回 Code={code}，跳过该分区。",
+                        area.Name, i, reListResp.Code);
+                    break;
+                }
+                var reData = reListResp.Data;
 
                 foreach (var item in reData.List)
                 {
-                    if (item.Pendant_info == null || item.Pendant_info.Count == 0)
+                    // v3 接口下天选标记：pendant_info["2"].pendent_id == 1432（"天选之旅"）
+                    // pendant_info 形状偶发异常（[]/标量/null），改用 JsonElement 容忍解析，避免整轮反序列化崩溃
+                    if (item.Pendant_info == null
+                        || item.Pendant_info.Value.ValueKind != JsonValueKind.Object
+                        || !item.Pendant_info.Value.TryGetProperty("2", out var pendant)
+                        || pendant.ValueKind != JsonValueKind.Object
+                        || !pendant.TryGetProperty("pendent_id", out var pid)
+                        || !pid.TryGetInt64(out var pidVal)
+                        || pidVal != 1432)
                         continue;
-                    var suc = item.Pendant_info.TryGetValue("2", out var pendant);
-                    if (!suc)
-                        continue;
-                    if (pendant?.Pendent_id != 504)
-                        continue;
-                    count++;
 
-                    await TryJoinTianXuan(item, ck);
+                    try
+                    {
+                        logger.LogInformation(
+                            "【天选时刻】发现天选房间：{room}",
+                            item.Roomid);
+                        await TryJoinTianXuan(item, ck);
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.LogWarning(
+                            "【天选时刻】检查房间 {room} 出错：{msg}",
+                            item.Roomid, ex.Message);
+                    }
                 }
 
-                if (reData.Has_more != 1)
+                if (reData.List.Count < 99)
                     break;
-                defaultSort = reData.New_tags.FirstOrDefault()?.Sort_type ?? "";
             }
-
-            defaultSort = "";
         }
 
-        if (count == 0)
+        if (_tianXuanJoined == 0)
         {
-            logger.LogInformation("未搜索到直播间");
+            logger.LogInformation("本轮未参与天选（未扫描到符合条件的进行中天选）");
             return;
         }
+        logger.LogInformation("本轮共尝试参与 {n} 个天选抽奖", _tianXuanJoined);
     }
 
     public async Task TryJoinTianXuan(ListItemDto target, BiliCookie ck)
@@ -260,6 +281,7 @@ public class LiveDomainService(
                 logger.LogInformation("【抽奖】成功 √" + Environment.NewLine);
                 if (check.Require_type == RequireType.Follow)
                     _tianXuanFollowed.AddIfNotExist(target, x => x.Uid == target.Uid);
+                _tianXuanJoined++;
                 return;
             }
 
@@ -736,6 +758,11 @@ public class LiveDomainService(
         }
         catch (Exception exception)
         {
+            if (!string.IsNullOrWhiteSpace(ck.SessData))
+            {
+                logger.LogWarning("直播 Cookie(LIVE_BUVID)自动配置失败，将使用主 Cookie 继续：{message}", exception.Message);
+                return true;
+            }
             logger.LogError("【配置直播Cookie】失败，放弃执行后续任务...");
             logger.LogError("【原因】{message}", exception.Message);
             return false;

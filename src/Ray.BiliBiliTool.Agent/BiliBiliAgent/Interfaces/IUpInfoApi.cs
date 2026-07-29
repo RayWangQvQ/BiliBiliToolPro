@@ -1,4 +1,5 @@
 ﻿using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Attributes;
 using WebApiClientCore.Attributes;
 
 namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
@@ -18,6 +19,7 @@ public interface IUpInfoApi : IBiliBiliApi
     /// <returns></returns>
     [HttpGet("/x/space/wbi/acc/info")]
     Task<BiliApiResponse<GetSpaceInfoResponse>> GetSpaceInfo(
+                [WbiParameter]
         [PathQuery] GetSpaceInfoDto request,
         [Header("Cookie")] string ck
     );

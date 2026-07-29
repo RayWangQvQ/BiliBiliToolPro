@@ -1,4 +1,6 @@
-﻿namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live;
+using System.Text.Json;
+
+namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live;
 
 public class GetListResponse
 {
@@ -52,7 +54,7 @@ public class ListItemDto
     /// </summary>
     /// <sample>1：百人成就</sample>
     /// <sample>2：天选时刻、新星主播</sample>
-    public Dictionary<string, PendantInfo>? Pendant_info { get; set; }
+    public JsonElement? Pendant_info { get; set; }
 }
 
 public class PendantInfo

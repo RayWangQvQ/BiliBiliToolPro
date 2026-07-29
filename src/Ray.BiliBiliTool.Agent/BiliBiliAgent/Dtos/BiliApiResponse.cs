@@ -9,5 +9,5 @@ public class BiliApiResponse
 
 public class BiliApiResponse<TData> : BiliApiResponse
 {
-    public required TData Data { get; set; }
+    public TData Data { get; set; } = default!;
 }

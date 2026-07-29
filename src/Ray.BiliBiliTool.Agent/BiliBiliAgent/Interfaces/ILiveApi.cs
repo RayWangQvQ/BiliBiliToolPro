@@ -1,5 +1,6 @@
 ﻿using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Attributes;
 using WebApiClientCore.Attributes;
 
 namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
@@ -80,7 +81,19 @@ public interface ILiveApi : IBiliBiliApi
     [Header("Origin", "https://live.bilibili.com")]
     [HttpGet("/xlive/web-interface/v1/second/getList")]
     Task<BiliApiResponse<GetListResponse>> GetList(
+                [WbiParameter]
         [PathQuery] GetListRequest request,
+        [Header("Cookie")] string ck
+    );
+
+    /// <summary>
+    /// 获取直播列表（v3，无需 WBI，规避 second/getList 风控 -352）
+    /// </summary>
+    [Header("Referer", "https://live.bilibili.com/")]
+    [Header("Origin", "https://live.bilibili.com")]
+    [HttpGet("/room/v3/area/getRoomList")]
+    Task<BiliApiResponse<GetListResponse>> GetRoomListV3(
+        [PathQuery] GetRoomListV3Request request,
         [Header("Cookie")] string ck
     );
 
