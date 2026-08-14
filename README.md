@@ -253,6 +253,10 @@ BiliTool 实现自动完成任务的原理，是通过调用一系列开放的ap
 
 - [JunzhouLiu/BILIBILI-HELPER](https://github.com/JunzhouLiu/BILIBILI-HELPER)
 
+**相关项目（第三方部署套件）：**
+
+- [Taylon114/bilibili-auto-checkin](https://github.com/Taylon114/bilibili-auto-checkin)：BiliBiliToolPro 的 Windows 一键部署套件——每天 08:30 自动签到（错过后补跑）、开机自启、每日状态查看（Lv6 倒计时）、运行结果通知，开箱即用。
+
 ❤️Thanks to `JetBrains` for the free certificate support:
 
 <p align="center">
