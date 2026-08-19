@@ -17,22 +17,32 @@ public class MangaTaskOptions : BaseConfigOptions
     public long CustomEpId { get; set; } = 381662;
 
     /// <summary>
-    /// 自定义漫画阅读列表（多本时使用）。
-    /// 为空时回退到 CustomComicId/CustomEpId 单本配置；不为空时按顺序循环调用 ReadManga。
-    /// 每次成功调用 ReadManga 对应 B 站"今日推荐 1 本"的阅读任务进度（1→+5, 2→+10, 3→+20, 4→+20, 5→+30，共 +85 经验）。
-    ///
-    /// 注意：
-    ///   1. B 站要求每本"再读 5 分钟"才计入；本工具仅触发 AddHistory 信号，不会真停 5 分钟刷阅读时长。
-    ///      建议至少在本机上配合 App 手动停留其中一本 5 分钟以满足 B 站风控。
-    ///   2. 添加配置示例（appsettings.json）：
-    ///      "MangaTaskConfig": {
-    ///        "CustomComics": [
-    ///          { "ComicId": 27355, "EpId": 381662 },
-    ///          { "ComicId": 11111, "EpId": 22222 }
-    ///        ]
-    ///      }
+    /// 自定义漫画阅读列表（多本时使用，优先级最高）。
+    /// 不为空时按顺序循环调用 ReadManga，不再自动抓取今日推荐。
+    /// 添加配置示例（appsettings.json）：
+    ///   "MangaTaskConfig": {
+    ///     "CustomComics": [
+    ///       { "ComicId": 27355, "EpId": 381662 },
+    ///       { "ComicId": 11111, "EpId": 22222 }
+    ///     ]
+    ///   }
     /// </summary>
     public List<ComicReadTarget> CustomComics { get; set; } = new();
+
+    /// <summary>
+    /// 未配置 CustomComics 时，自动抓取"漫画首页推荐"（B 站每日指定的推荐漫画），
+    /// 并读取其中前 N 本（每本取其 jump_value 中的 cid 作为 ep_id）。
+    /// 默认 5 本——对应 B 站每日阅读任务 1→+5, 2→+10, 3→+20, 4→+20, 5→+30，共 +85 经验。
+    /// 设为 0 表示不自动抓取（仅当显式配置了 CustomComics 时才读）。
+    /// </summary>
+    public int MangaReadCount { get; set; } = 5;
+
+    /// <summary>
+    /// 是否启用"自动抓取漫画首页推荐"作为每日阅读来源。
+    /// 关闭后，仅有 CustomComics / CustomComicId 配置时才读，否则跳过。
+    /// 默认开启（修复 issue #1098：每日阅读必须读 B 站当天指定的书，而非任意 5 本）。
+    /// </summary>
+    public bool UseHomeRecommend { get; set; } = true;
 
     public override Dictionary<string, string> ToConfigDictionary()
     {
@@ -53,6 +63,9 @@ public class MangaTaskOptions : BaseConfigOptions
                 c.EpId.ToString();
             i++;
         }
+
+        dict[$"{SectionName}:{nameof(MangaReadCount)}"] = MangaReadCount.ToString();
+        dict[$"{SectionName}:{nameof(UseHomeRecommend)}"] = UseHomeRecommend.ToString();
 
         return MergeConfigDictionary(dict);
     }

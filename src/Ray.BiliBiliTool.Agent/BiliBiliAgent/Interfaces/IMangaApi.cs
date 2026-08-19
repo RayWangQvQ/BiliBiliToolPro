@@ -43,4 +43,15 @@ public interface IMangaApi
         int reason_id,
         [Header("Cookie")] string ck
     );
+
+    /// <summary>
+    /// 获取漫画首页推荐（B 站每日指定的推荐漫画，用于每日阅读任务）。
+    /// 实测仅需网页 Cookie 鉴权（platform=web），无需 app 签名 / WBI。
+    /// 请求体需带 pageNum（缺省报 invalid_argument）。
+    /// </summary>
+    [Post("/twirp/comic.v1.Comic/HomeRecommend?device=pc&platform=web&nov=25")]
+    Task<BiliApiResponse<HomeRecommendResponse>> HomeRecommend(
+        [Body] HomeRecommendRequest request,
+        [Header("Cookie")] string ck
+    );
 }
