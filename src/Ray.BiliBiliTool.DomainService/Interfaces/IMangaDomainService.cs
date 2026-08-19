@@ -15,6 +15,11 @@ public interface IMangaDomainService : IDomainService
     Task MangaSign(BiliCookie ck);
 
     /// <summary>
+    /// 分享（每日 +5 积分，SeasonV2 per_task.push_point）
+    /// </summary>
+    Task MangaShare(BiliCookie ck);
+
+    /// <summary>
     /// 阅读
     /// </summary>
     Task MangaRead(BiliCookie ck);

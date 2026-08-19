@@ -60,6 +60,41 @@ public class MangaDomainService(
     }
 
     /// <summary>
+    /// 漫画分享（每日 +5 积分，SeasonV2 per_task.push_point）。
+    /// 实测仅需网页 Cookie，返回 data.point 为本次获得的积分；重复分享返回 msg"今日已分享"。
+    /// </summary>
+    public async Task MangaShare(BiliCookie ck)
+    {
+        try
+        {
+            var response = await mangaApi.ShareComic(
+                _dailyTaskOptions.DevicePlatform,
+                ck.ToString()
+            );
+            if (response.Code == 0)
+            {
+                int point = response.Data?.Point ?? 0;
+                logger.LogInformation(
+                    "【分享结果】成功{PointSuffix}",
+                    point > 0 ? $"（+{point}积分）" : ""
+                );
+            }
+            else
+            {
+                logger.LogInformation(
+                    "【分享结果】已分享过或失败（code={Code} msg={Msg}）",
+                    response.Code,
+                    response.Message ?? "(null)"
+                );
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "【分享结果】异常");
+        }
+    }
+
+    /// <summary>
     /// 漫画阅读
     /// </summary>
     /// <remarks>
