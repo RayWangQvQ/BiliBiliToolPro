@@ -97,12 +97,15 @@ public class MangaDomainService(
         else if (_mangaTaskOptions.UseHomeRecommend)
         {
             var fetched = await FetchHomeRecommendList(ck);
-            int take =
+            int target =
                 _mangaTaskOptions.MangaReadCount > 0
                     ? _mangaTaskOptions.MangaReadCount
                     : fetched.Count;
-            foreach (var item in fetched.Take(take))
+            // 遍历推荐列表，跳过无法解析 ep_id 的项，直到凑够 target 本有效漫画
+            foreach (var item in fetched)
             {
+                if (list.Count >= target)
+                    break;
                 long epId = ParseEpId(item);
                 if (item.ComicId > 0 && epId > 0)
                 {
