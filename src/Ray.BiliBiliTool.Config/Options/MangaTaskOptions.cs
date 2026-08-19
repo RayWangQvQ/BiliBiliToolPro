@@ -7,14 +7,15 @@ public class MangaTaskOptions : BaseConfigOptions
     public override string SectionName => "MangaTaskConfig";
 
     /// <summary>
-    /// 自定义漫画阅读 comic_id（单本兼容字段，CustomComics 为空时使用；默认指向 PR #562 示例值）
+    /// 自定义漫画阅读 comic_id（单本兼容字段，CustomComics 为空且 CustomComicId > 0 时使用）。
+    /// 默认 0 表示未配置——此时若 UseHomeRecommend 开启，自动读取 B 站当日指定推荐漫画（默认 5 本）。
     /// </summary>
-    public long CustomComicId { get; set; } = 27355;
+    public long CustomComicId { get; set; } = 0;
 
     /// <summary>
-    /// 自定义漫画阅读 ep_id（单本兼容字段，CustomComics 为空时使用）
+    /// 自定义漫画阅读 ep_id（单本兼容字段，与 CustomComicId 配对使用）
     /// </summary>
-    public long CustomEpId { get; set; } = 381662;
+    public long CustomEpId { get; set; } = 0;
 
     /// <summary>
     /// 自定义漫画阅读列表（多本时使用，优先级最高）。

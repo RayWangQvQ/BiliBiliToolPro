@@ -30,6 +30,11 @@ public class MangaDomainService(
     /// <summary>
     /// 漫画签到
     /// </summary>
+    /// <remarks>
+    /// 修复：重复签到返回非 0 code 或抛 400 异常，不应误报"失败"
+    /// （B 站 ClockIn 对已签到账号返回 invalid_argument，msg 字段与 DTO 的
+    /// Message 长度不同无法反序列化，故原日志显示"原因 null"）
+    /// </remarks>
     public async Task MangaSign(BiliCookie ck)
     {
         BiliApiResponse response;
@@ -41,8 +46,7 @@ public class MangaDomainService(
         {
             //ignore
             //重复签到会报400异常,这里忽略掉
-            logger.LogInformation("【签到结果】失败");
-            logger.LogInformation("【原因】今日已签到过，无法重复签到");
+            logger.LogInformation("【签到结果】已签到过（重复签到触发异常，忽略）");
             return;
         }
 
@@ -52,8 +56,7 @@ public class MangaDomainService(
         }
         else
         {
-            logger.LogInformation("【签到结果】失败");
-            logger.LogInformation("【原因】{msg}", response.Message);
+            logger.LogInformation("【签到结果】已签到过或失败（code={Code}）", response.Code);
         }
     }
 
