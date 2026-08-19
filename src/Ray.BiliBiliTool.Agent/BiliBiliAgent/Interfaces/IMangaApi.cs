@@ -22,10 +22,7 @@ public interface IMangaApi
     /// 漫画分享（每日分享 +5 积分，实测仅需网页 Cookie 即可调用，返回 data.point）
     /// </summary>
     [Post("/twirp/activity.v1.Activity/ShareComic?platform={platform}")]
-    Task<BiliApiResponse<ShareComicResponse>> ShareComic(
-        string platform,
-        [Header("Cookie")] string ck
-    );
+    Task<BiliApiResponse> ShareComic(string platform, [Header("Cookie")] string ck);
 
     /// <summary>
     /// 漫画阅读

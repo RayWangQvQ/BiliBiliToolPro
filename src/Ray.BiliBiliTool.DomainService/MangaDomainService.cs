@@ -61,7 +61,8 @@ public class MangaDomainService(
 
     /// <summary>
     /// 漫画分享（每日 +5 积分，SeasonV2 per_task.push_point）。
-    /// 实测仅需网页 Cookie，返回 data.point 为本次获得的积分；重复分享返回 msg"今日已分享"。
+    /// 实测仅需网页 Cookie；首次返回 data.point=5，重复分享返回 msg"今日已分享"（无 data，
+    /// 用非泛型响应避免反序列化异常）。
     /// </summary>
     public async Task MangaShare(BiliCookie ck)
     {
@@ -73,16 +74,16 @@ public class MangaDomainService(
             );
             if (response.Code == 0)
             {
-                int point = response.Data?.Point ?? 0;
+                bool alreadyShared = response.Message?.Contains("已分享") == true;
                 logger.LogInformation(
-                    "【分享结果】成功{PointSuffix}",
-                    point > 0 ? $"（+{point}积分）" : ""
+                    "【分享结果】{Result}",
+                    alreadyShared ? "今日已分享过" : "成功（+5积分）"
                 );
             }
             else
             {
                 logger.LogInformation(
-                    "【分享结果】已分享过或失败（code={Code} msg={Msg}）",
+                    "【分享结果】失败（code={Code} msg={Msg}）",
                     response.Code,
                     response.Message ?? "(null)"
                 );
