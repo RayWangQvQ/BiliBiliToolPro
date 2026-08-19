@@ -45,13 +45,23 @@ public interface IMangaApi
     );
 
     /// <summary>
-    /// 获取漫画首页推荐（B 站每日指定的推荐漫画，用于每日阅读任务）。
-    /// 实测仅需网页 Cookie 鉴权（platform=web），无需 app 签名 / WBI。
-    /// 请求体需带 pageNum（缺省报 invalid_argument）。
+    /// 获取赛季活动信息（含每日阅读任务书单）。
+    /// 实测：POST user.v1.SeasonV2/GetSeasonInfo，body {"type":1}，
+    /// 仅需网页 Cookie 鉴权（无签名），每天 0 点更新的"今日推荐"5 本书就在
+    /// data.day_task.book_task 里（每本含 comic_id id / read_min / user_read_min / point）。
+    /// 这是"每日阅读 +5/+10/+20/+20/+30 经验"任务的官方书单来源。
     /// </summary>
-    [Post("/twirp/comic.v1.Comic/HomeRecommend?device=pc&platform=web&nov=25")]
-    Task<BiliApiResponse<HomeRecommendResponse>> HomeRecommend(
-        [Body] HomeRecommendRequest request,
+    [Post("/twirp/user.v1.SeasonV2/GetSeasonInfo")]
+    Task<BiliApiResponse<SeasonInfoResponse>> GetSeasonInfo(
+        [Body] SeasonRequest request,
         [Header("Cookie")] string ck
     );
+
+    /// <summary>
+    /// 上报漫画阅读时长（App 端"读满 5 分钟"的心跳上报）。
+    /// 实测 path 因版本而异（旧版 activity.v1.Activity/CompleteReadTask，
+    /// 新版路径可能变化），若 404 需从抓包确认；不影响 SeasonV2 书单+AddHistory 主流程。
+    /// </summary>
+    [Post("/twirp/activity.v1.Activity/CompleteReadTask")]
+    Task<BiliApiResponse> CompleteReadTask([Query] int read_minute, [Header("Cookie")] string ck);
 }

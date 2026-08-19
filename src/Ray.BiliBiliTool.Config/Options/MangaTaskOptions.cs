@@ -8,7 +8,7 @@ public class MangaTaskOptions : BaseConfigOptions
 
     /// <summary>
     /// 自定义漫画阅读 comic_id（单本兼容字段，CustomComics 为空且 CustomComicId > 0 时使用）。
-    /// 默认 0 表示未配置——此时若 UseHomeRecommend 开启，自动读取 B 站当日指定推荐漫画（默认 5 本）。
+    /// 默认 0 表示未配置——此时若 UseSeasonBookList 开启，自动读取 B 站当日指定推荐漫画（默认 5 本）。
     /// </summary>
     public long CustomComicId { get; set; } = 0;
 
@@ -31,19 +31,19 @@ public class MangaTaskOptions : BaseConfigOptions
     public List<ComicReadTarget> CustomComics { get; set; } = new();
 
     /// <summary>
-    /// 未配置 CustomComics 时，自动抓取"漫画首页推荐"（B 站每日指定的推荐漫画），
-    /// 并读取其中前 N 本（每本取其 jump_value 中的 cid 作为 ep_id）。
-    /// 默认 5 本——对应 B 站每日阅读任务 1→+5, 2→+10, 3→+20, 4→+20, 5→+30，共 +85 经验。
-    /// 设为 0 表示不自动抓取（仅当显式配置了 CustomComics 时才读）。
+    /// 未配置 CustomComics 时，自动获取"今日推荐（0点更新）"每日阅读书单
+    /// （user.v1.SeasonV2/GetSeasonInfo 的 data.day_task.book_task，B 站官方书单，仅需网页 Cookie），
+    /// 并读取其中前 N 本。默认 5 本——对应 B 站每日阅读任务 1→+5, 2→+10, 3→+20, 4→+20, 5→+30，共 +85 经验。
+    /// 设为 0 表示不自动获取（仅当显式配置了 CustomComics 时才读）。
     /// </summary>
     public int MangaReadCount { get; set; } = 5;
 
     /// <summary>
-    /// 是否启用"自动抓取漫画首页推荐"作为每日阅读来源。
+    /// 是否启用"自动获取今日书单（SeasonV2/GetSeasonInfo）"作为每日阅读来源。
     /// 关闭后，仅有 CustomComics / CustomComicId 配置时才读，否则跳过。
     /// 默认开启（修复 issue #1098：每日阅读必须读 B 站当天指定的书，而非任意 5 本）。
     /// </summary>
-    public bool UseHomeRecommend { get; set; } = true;
+    public bool UseSeasonBookList { get; set; } = true;
 
     public override Dictionary<string, string> ToConfigDictionary()
     {
@@ -66,7 +66,7 @@ public class MangaTaskOptions : BaseConfigOptions
         }
 
         dict[$"{SectionName}:{nameof(MangaReadCount)}"] = MangaReadCount.ToString();
-        dict[$"{SectionName}:{nameof(UseHomeRecommend)}"] = UseHomeRecommend.ToString();
+        dict[$"{SectionName}:{nameof(UseSeasonBookList)}"] = UseSeasonBookList.ToString();
 
         return MergeConfigDictionary(dict);
     }

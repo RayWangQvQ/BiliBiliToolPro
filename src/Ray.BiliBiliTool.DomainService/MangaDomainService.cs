@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent;
@@ -69,13 +68,15 @@ public class MangaDomainService(
     ///   2. 若 <see cref="MangaTaskOptions.CustomComics"/> 为空，回退使用
     ///      <see cref="MangaTaskOptions.CustomComicId"/> + <see cref="MangaTaskOptions.CustomEpId"/> 单本配置
     ///      （向后兼容 PR #562 的旧配置）；
-    ///   3. 两者都未配置且 <see cref="MangaTaskOptions.UseHomeRecommend"/> 开启时，自动抓取
-    ///      "漫画首页推荐"（comic.v1.Comic/HomeRecommend，B 站每日指定的推荐漫画），取前
-    ///      <see cref="MangaTaskOptions.MangaReadCount"/> 本，解析每本的 (comic_id, ep_id) 后循环 ReadManga；
+    ///   3. 两者都未配置且 <see cref="MangaTaskOptions.UseSeasonBookList"/> 开启时，自动调
+    ///      user.v1.SeasonV2/GetSeasonInfo 获取"今日推荐（0点更新）"书单
+    ///      （data.day_task.book_task，B 站官方每日阅读任务书单，仅需网页 Cookie 即可），
+    ///      取前 <see cref="MangaTaskOptions.MangaReadCount"/> 本循环 ReadManga；
     ///   4. 以上都没有 → 打"跳过"日志并 return。
     ///
-    /// 注意：AddHistory 仅上报阅读记录，B 站奖励仍要求用户在 App 端真实停留 5 分钟/本，
-    /// 这部分风控不在工具能力范围。
+    /// 注意：AddHistory 仅上报阅读记录（实测 ep_id 不校验，任意值即可）；
+    /// B 站奖励仍要求用户累计阅读时长（read_min 分钟/本），这部分依赖 App 端计时上报，
+    /// 工具尽力上报 CompleteReadTask（部分版本路径 404，属已知限制）。
     /// </remarks>
     public async Task MangaRead(BiliCookie ck)
     {
@@ -94,31 +95,28 @@ public class MangaDomainService(
         {
             list.Add((_mangaTaskOptions.CustomComicId, _mangaTaskOptions.CustomEpId));
         }
-        else if (_mangaTaskOptions.UseHomeRecommend)
+        else if (_mangaTaskOptions.UseSeasonBookList)
         {
-            var fetched = await FetchHomeRecommendList(ck);
+            var fetched = await FetchSeasonBookList(ck);
             int target =
                 _mangaTaskOptions.MangaReadCount > 0
                     ? _mangaTaskOptions.MangaReadCount
                     : fetched.Count;
-            // 遍历推荐列表，跳过无法解析 ep_id 的项，直到凑够 target 本有效漫画
+            // 遍历书单，直到凑够 target 本
             foreach (var item in fetched)
             {
                 if (list.Count >= target)
                     break;
-                long epId = ParseEpId(item);
-                if (item.ComicId > 0 && epId > 0)
-                {
-                    list.Add((item.ComicId, epId));
-                }
-                else
-                {
-                    logger.LogInformation(
-                        "【漫画阅读】跳过推荐项（无法解析 ep_id）：comic_id={ComicId} title={Title}",
-                        item.ComicId,
-                        item.Title ?? "(null)"
-                    );
-                }
+                // 实测 bookshelf.v1.Bookshelf/AddHistory 不校验 ep_id，
+                // 书单只下发 comic_id（ep_id 需 App 签名接口才能查），这里用 1 占位即可上报
+                list.Add((item.ComicId, 1));
+                logger.LogInformation(
+                    "【漫画阅读】今日书单 {Idx}：comic_id={ComicId} {Title}（需读满 {ReadMin} 分钟）",
+                    list.Count,
+                    item.ComicId,
+                    item.Title ?? "(null)",
+                    item.ReadMin
+                );
             }
         }
 
@@ -126,7 +124,7 @@ public class MangaDomainService(
         if (list.Count == 0)
         {
             logger.LogInformation(
-                "【漫画阅读】跳过：未配置 CustomComicId / CustomComics，且未启用 HomeRecommend（详见 issue #1098）"
+                "【漫画阅读】跳过：未配置 CustomComicId / CustomComics，且未启用 SeasonBookList（详见 issue #1098）"
             );
             return;
         }
@@ -194,59 +192,41 @@ public class MangaDomainService(
     }
 
     /// <summary>
-    /// 抓取漫画首页推荐，返回当日指定推荐漫画列表
+    /// 获取"今日推荐（0点更新）"每日阅读书单
+    /// （user.v1.SeasonV2/GetSeasonInfo，B 站官方每日阅读任务书单，仅需网页 Cookie）
     /// </summary>
-    private async Task<List<ComicRecommendItem>> FetchHomeRecommendList(BiliCookie ck)
+    private async Task<List<BookTaskItem>> FetchSeasonBookList(BiliCookie ck)
     {
-        var result = new List<ComicRecommendItem>();
+        var result = new List<BookTaskItem>();
         try
         {
-            var resp = await mangaApi.HomeRecommend(
-                new HomeRecommendRequest { PageNum = 1 },
-                ck.ToString()
-            );
-            if (resp.Code != 0 || resp.Data?.List == null)
+            var resp = await mangaApi.GetSeasonInfo(new SeasonRequest { Type = 1 }, ck.ToString());
+            if (resp.Code != 0 || resp.Data?.DayTask?.BookTask == null)
             {
                 logger.LogInformation(
-                    "【漫画阅读】获取首页推荐失败：code={Code} msg={Msg}",
+                    "【漫画阅读】获取今日书单失败：code={Code} msg={Msg}",
                     resp.Code,
                     resp.Message ?? "(null)"
                 );
                 return result;
             }
 
-            result = resp.Data.List;
-            logger.LogInformation("【漫画阅读】获取到首页推荐 {Count} 本", result.Count);
+            result = resp.Data.DayTask.BookTask;
+            logger.LogInformation("【漫画阅读】获取到今日书单 {Count} 本", result.Count);
+            if (resp.Data.DayTask.RewardProgress > 0)
+            {
+                logger.LogInformation(
+                    "【漫画阅读】今日已读完 {Progress} 本（奖励进度）",
+                    resp.Data.DayTask.RewardProgress
+                );
+            }
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "【漫画阅读】获取首页推荐异常");
+            logger.LogError(ex, "【漫画阅读】获取今日书单异常");
         }
 
         return result;
-    }
-
-    /// <summary>
-    /// 从推荐项解析 ep_id：优先 jump_value 中的 cid=，回退 pv_info.cid（字符串）
-    /// </summary>
-    private long ParseEpId(ComicRecommendItem item)
-    {
-        if (!string.IsNullOrEmpty(item.JumpValue))
-        {
-            var m = Regex.Match(item.JumpValue, @"cid=(\d+)");
-            if (m.Success && long.TryParse(m.Groups[1].Value, out var cid) && cid > 0)
-                return cid;
-        }
-
-        if (
-            item.PvInfo != null
-            && !string.IsNullOrEmpty(item.PvInfo.Cid)
-            && long.TryParse(item.PvInfo.Cid, out var cid2)
-            && cid2 > 0
-        )
-            return cid2;
-
-        return 0;
     }
 
     /// <summary>
