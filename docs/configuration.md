@@ -496,7 +496,7 @@ Console项目（青龙）的环境变量需要添加`Ray_`前缀，其他不用�
 
 | TITLE | CONTENT                           |
 | ----- | --------------------------------- |
-| 配置Key | `DailyTaskConfig__AutoChargeUpId` |
+| 配置Key | `ChargeTaskConfig__AutoChargeUpId` |
 | 值域    | up的Id字符串                          |
 | 默认值   | 无                                 |
 
