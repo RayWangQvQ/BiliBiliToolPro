@@ -95,6 +95,11 @@ public class DependencyGuardrailTests
         .ResideInNamespace("Ray.BiliBiliTool.Infrastructure")
         .As("infrastructure layers");
 
+    private static readonly IObjectProvider<IType> NotificationAdapters = Types()
+        .That()
+        .ResideInNamespace("Ray.BiliBiliTool.Infrastructure.Notifications")
+        .As("notification adapter layer");
+
     [Fact]
     public void Quartz_jobs_should_not_reach_directly_into_lower_layers()
     {
@@ -179,6 +184,21 @@ public class DependencyGuardrailTests
             .NotDependOnAny(InfrastructureLayers)
             .Because(
                 "Web component code-behind classes must route Domain and Infrastructure access through Web-layer workflow seams (Phases 13-15)"
+            );
+
+        rule.Check(Architecture);
+    }
+
+    [Fact]
+    public void Application_should_not_depend_on_notification_adapters()
+    {
+        IArchRule rule = Types()
+            .That()
+            .Are(ApplicationLayer)
+            .Should()
+            .NotDependOnAny(NotificationAdapters)
+            .Because(
+                "Application-layer code must use INotificationService from Application.Contracts, not Infrastructure notification adapters directly (Phase 20)"
             );
 
         rule.Check(Architecture);
