@@ -1,0 +1,247 @@
+info:
+  name: wbi-acc-info
+  type: http
+  seq: 1
+
+http:
+  method: GET
+  url: '{{host}}/x/space/wbi/acc/info?mid={{mid}}&token=&platform=web&web_location=1550101&dm_img_list=[]&dm_img_str=V2ViR0wgMS4wIChPcGVuR0wgRVMgMi4wIENocm9taXVtKQ&dm_cover_img_str=QU5HTEUgKEFNRCwgQU1EIFJhZGVvbihUTSkgR3JhcGhpY3MgKDB4MDAwMDE2MzgpIERpcmVjdDNEMTEgdnNfNV8wIHBzXzVfMCwgRDNEMTEpR29vZ2xlIEluYy4gKEFNRC&dm_img_inter={"ds":[],"wh":[5563,4171,107],"of":[66,132,66]}&w_webid=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzcG1faWQiOiIzMzMuMTM4NyIsImJ1dmlkIjoiQ0VGODNDQjAtMzY2NC0zNDU4LTI5RTctRTJFOENCQjY0NzlCNjU2MjFpbmZvYyIsInVzZXJfYWdlbnQiOiJNb3ppbGxhLzUuMCAoV2luZG93cyBOVCAxMC4wOyBXaW42NDsgeDY0KSBBcHBsZVdlYktpdC81MzcuMzYgKEtIVE1MLCBsaWtlIEdlY2tvKSBDaHJvbWUvMTM3LjAuMC4wIFNhZmFyaS81MzcuMzYgRWRnLzEzNy4wLjAuMCIsImJ1dmlkX2ZwIjoiMDNjNGYyNWQyZTlmMDZkNjU4NzJlMmVhNTdiMjJmMzkiLCJiaWxpX3RpY2tldCI6ImV5SmhiR2NpT2lKSVV6STFOaUlzSW10cFpDSTZJbk13TXlJc0luUjVjQ0k2SWtwWFZDSjkuZXlKbGVIQWlPakUzTkRjM01qYzVORGdzSW1saGRDSTZNVGMwTnpRMk9EWTRPQ3dpY0d4MElqb3RNWDAuQmVkeFFPX3VZMllldFVFb0FvWE5hellBNzFTTkdhc0JtSkNnaFFsVy1iTSIsImNyZWF0ZWRfYXQiOjE3NDc0Njg4NDEsInR0bCI6ODY0MDAsInVybCI6Ii8yMzk0NzI4NyIsInJlc3VsdCI6MCwiaXNzIjoiZ2FpYSIsImlhdCI6MTc0NzQ2ODg0MX0.IhLw1v9Auwys4SFZ7PFaTXgkVqodmz67ZdVPORbnmcw3rxirilDqngVFpr3AYjUQ8hx-gmGTrMgeus12QE4zn9ql-wjTRKzbi9G2WEzDKEwHMNBKVIepaSZqHYIbKBwWsjqdEL9paDeRDpPiZ37YJ4YMKNsFfEP2yC_4ke2_KS2cgfSaaOhaXtXfEZortr_KvKWhY3gtJKC77HqEerZEID5hda8oqCTxZbb7gV7DDuncJ803K9H5ezWn-8a-y3eSdpbBB8Td5-u8At9mhHVgrKcODM7gi-Lhbnb86m7p4yyBoPs_iucDQJSGvs9Lijio57bL60Qm6_mIz0p49rzFWA&w_rid={{w_rid}}&wts={{wts}}'
+  headers:
+    - name: dnt
+      value: "1"
+    - name: origin
+      value: https://space.bilibili.com
+    - name: priority
+      value: u=1, i
+    - name: referer
+      value: https://space.bilibili.com/23947287
+    - name: sec-ch-ua
+      value: '"Microsoft Edge";v="137", "Chromium";v="137", "Not/A)Brand";v="24"'
+    - name: sec-ch-ua-mobile
+      value: ?0
+    - name: sec-ch-ua-platform
+      value: '"Windows"'
+    - name: sec-fetch-dest
+      value: empty
+    - name: sec-fetch-mode
+      value: cors
+    - name: sec-fetch-site
+      value: same-site
+    - name: user-agent
+      value: "{{user-agent-web}}"
+    - name: Cookie
+      value: "{{cookieStr}}"
+  params:
+    - name: mid
+      value: "{{mid}}"
+      type: query
+    - name: token
+      value: ""
+      type: query
+    - name: platform
+      value: web
+      type: query
+    - name: web_location
+      value: "1550101"
+      type: query
+    - name: dm_img_list
+      value: "[]"
+      type: query
+    - name: dm_img_str
+      value: V2ViR0wgMS4wIChPcGVuR0wgRVMgMi4wIENocm9taXVtKQ
+      type: query
+    - name: dm_cover_img_str
+      value: QU5HTEUgKEFNRCwgQU1EIFJhZGVvbihUTSkgR3JhcGhpY3MgKDB4MDAwMDE2MzgpIERpcmVjdDNEMTEgdnNfNV8wIHBzXzVfMCwgRDNEMTEpR29vZ2xlIEluYy4gKEFNRC
+      type: query
+    - name: dm_img_inter
+      value: '{"ds":[],"wh":[5563,4171,107],"of":[66,132,66]}'
+      type: query
+    - name: w_webid
+      value: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzcG1faWQiOiIzMzMuMTM4NyIsImJ1dmlkIjoiQ0VGODNDQjAtMzY2NC0zNDU4LTI5RTctRTJFOENCQjY0NzlCNjU2MjFpbmZvYyIsInVzZXJfYWdlbnQiOiJNb3ppbGxhLzUuMCAoV2luZG93cyBOVCAxMC4wOyBXaW42NDsgeDY0KSBBcHBsZVdlYktpdC81MzcuMzYgKEtIVE1MLCBsaWtlIEdlY2tvKSBDaHJvbWUvMTM3LjAuMC4wIFNhZmFyaS81MzcuMzYgRWRnLzEzNy4wLjAuMCIsImJ1dmlkX2ZwIjoiMDNjNGYyNWQyZTlmMDZkNjU4NzJlMmVhNTdiMjJmMzkiLCJiaWxpX3RpY2tldCI6ImV5SmhiR2NpT2lKSVV6STFOaUlzSW10cFpDSTZJbk13TXlJc0luUjVjQ0k2SWtwWFZDSjkuZXlKbGVIQWlPakUzTkRjM01qYzVORGdzSW1saGRDSTZNVGMwTnpRMk9EWTRPQ3dpY0d4MElqb3RNWDAuQmVkeFFPX3VZMllldFVFb0FvWE5hellBNzFTTkdhc0JtSkNnaFFsVy1iTSIsImNyZWF0ZWRfYXQiOjE3NDc0Njg4NDEsInR0bCI6ODY0MDAsInVybCI6Ii8yMzk0NzI4NyIsInJlc3VsdCI6MCwiaXNzIjoiZ2FpYSIsImlhdCI6MTc0NzQ2ODg0MX0.IhLw1v9Auwys4SFZ7PFaTXgkVqodmz67ZdVPORbnmcw3rxirilDqngVFpr3AYjUQ8hx-gmGTrMgeus12QE4zn9ql-wjTRKzbi9G2WEzDKEwHMNBKVIepaSZqHYIbKBwWsjqdEL9paDeRDpPiZ37YJ4YMKNsFfEP2yC_4ke2_KS2cgfSaaOhaXtXfEZortr_KvKWhY3gtJKC77HqEerZEID5hda8oqCTxZbb7gV7DDuncJ803K9H5ezWn-8a-y3eSdpbBB8Td5-u8At9mhHVgrKcODM7gi-Lhbnb86m7p4yyBoPs_iucDQJSGvs9Lijio57bL60Qm6_mIz0p49rzFWA
+      type: query
+    - name: w_rid
+      value: "{{w_rid}}"
+      type: query
+    - name: wts
+      value: "{{wts}}"
+      type: query
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+docs: |
+  ## Response Sample
+
+  ```json
+  {
+    "code": 0,
+    "message": "OK",
+    "ttl": 1,
+    "data": {
+      "mid": 123456,
+      "name": "Abc",
+      "sex": "保密",
+      "face": "https://i2.hdslb.com/bfs/face/0fed8598ff2ae289bbb7efe62fba30914f906da9.jpg",
+      "face_nft": 0,
+      "face_nft_type": 0,
+      "sign": "",
+      "rank": 10000,
+      "level": 6,
+      "jointime": 0,
+      "moral": 0,
+      "silence": 0,
+      "control": 0,
+      "coins": 123.9,
+      "fans_badge": false,
+      "fans_medal": {
+        "show": true,
+        "wear": false,
+        "medal": null,
+        "detail": null
+      },
+      "official": {
+        "role": 0,
+        "title": "",
+        "desc": "",
+        "type": -1
+      },
+      "vip": {
+        "type": 2,
+        "status": 1,
+        "due_date": 1810656000000,
+        "vip_pay_type": 0,
+        "theme_type": 0,
+        "label": {
+          "path": "http://i0.hdslb.com/bfs/vip/label_annual.png",
+          "text": "年度大会员",
+          "label_theme": "annual_vip",
+          "text_color": "#FFFFFF",
+          "bg_style": 1,
+          "bg_color": "#FB7299",
+          "border_color": "",
+          "use_img_label": true,
+          "img_label_uri_hans": "",
+          "img_label_uri_hant": "",
+          "img_label_uri_hans_static": "https://i0.hdslb.com/bfs/vip/8d4f8bfc713826a5412a0a27eaaac4d6b9ede1d9.png",
+          "img_label_uri_hant_static": "https://i0.hdslb.com/bfs/activity-plat/static/20220614/e369244d0b14644f5e1a06431e22a4d5/VEW8fCC0hg.png",
+          "label_id": -22,
+          "label_goto": {
+            "mobile": "https://big.bilibili.com/mobile/index?navhide=1&from_spmid=vipicon",
+            "pc_web": "https://account.bilibili.com/big?from_spmid=vipicon"
+          }
+        },
+        "avatar_subscript": 1,
+        "nickname_color": "#FB7299",
+        "role": 3,
+        "avatar_subscript_url": "",
+        "tv_vip_status": 0,
+        "tv_vip_pay_type": 0,
+        "tv_due_date": 0,
+        "avatar_icon": {
+          "icon_type": 1,
+          "icon_resource": {}
+        },
+        "ott_info": {
+          "vip_type": 0,
+          "pay_type": 0,
+          "pay_channel_id": "",
+          "status": 0,
+          "overdue_time": 0
+        },
+        "super_vip": {
+          "is_super_vip": false
+        }
+      },
+      "pendant": {
+        "pid": 0,
+        "name": "",
+        "image": "",
+        "expire": 0,
+        "image_enhance": "",
+        "image_enhance_frame": "",
+        "n_pid": 0
+      },
+      "nameplate": {
+        "nid": 0,
+        "name": "",
+        "image": "",
+        "image_small": "",
+        "level": "",
+        "condition": ""
+      },
+      "user_honour_info": {
+        "mid": 0,
+        "colour": null,
+        "tags": [],
+        "is_latest_100honour": 0
+      },
+      "is_followed": false,
+      "top_photo": "bfs/space/cb1c3ef50e22b6096fde67febe863494caefebad.png",
+      "sys_notice": {},
+      "live_room": null,
+      "birthday": "01-01",
+      "school": {
+        "name": ""
+      },
+      "profession": {
+        "name": "",
+        "department": "",
+        "title": "",
+        "is_show": 0
+      },
+      "tags": null,
+      "series": {
+        "user_upgrade_status": 3,
+        "show_upgrade_window": false
+      },
+      "is_senior_member": 0,
+      "mcn_info": null,
+      "gaia_res_type": 0,
+      "gaia_data": null,
+      "is_risk": false,
+      "elec": {
+        "show_info": {
+          "show": false,
+          "state": -1,
+          "title": "",
+          "icon": "",
+          "jump_url": "?oid=341688380",
+          "total": 0,
+          "list": null,
+          "upower_count_show": true,
+          "long_title": "",
+          "jump_url_web": ""
+        }
+      },
+      "contract": {
+        "is_display": false,
+        "is_follow_display": false
+      },
+      "certificate_show": false,
+      "name_render": null,
+      "top_photo_v2": {
+        "sid": 1,
+        "l_img": "https://i1.hdslb.com/bfs/space/cb1c3ef50e22b6096fde67febe863494caefebad.png",
+        "l_200h_img": "https://i1.hdslb.com/bfs/activity-plat/static/0977767b2e79d8ad0a36a731068a83d7/1sz3p8w2Sk.png"
+      },
+      "theme": null,
+      "attestation": {
+        "type": 0,
+        "common_info": {
+          "title": "",
+          "prefix": "",
+          "prefix_title": ""
+        },
+        "splice_info": {
+          "title": ""
+        },
+        "icon": "",
+        "desc": ""
+      }
+    }
+  }
+  ```

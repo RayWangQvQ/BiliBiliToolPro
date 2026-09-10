@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
-using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.ViewMall;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.ShowApi;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Console;
 
@@ -10,7 +10,7 @@ namespace Ray.BiliBiliTool.Agent.FunctionalTests;
 
 public class VipMallApiTests
 {
-    private readonly IVipMallApi _api;
+    private readonly IShowApi _api;
 
     private readonly BiliCookie _ck;
 
@@ -24,7 +24,7 @@ public class VipMallApiTests
         };
         IHost host = Program.CreateHost(envs.ToArray());
         _ck = host.Services.GetRequiredService<BiliCookie>();
-        _api = host.Services.GetRequiredService<IVipMallApi>();
+        _api = host.Services.GetRequiredService<IShowApi>();
     }
 
     [Fact]

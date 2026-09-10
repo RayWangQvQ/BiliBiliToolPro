@@ -1,10 +1,10 @@
 using System.Collections.ObjectModel;
 using System.Text;
 using BlazingQuartz.Core.Models;
-using BlazingQuartz.Core.Services;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using Ray.BiliBiliTool.Domain;
+using Ray.BiliBiliTool.Web.Services.Pages.Schedules;
 
 namespace Ray.BiliBiliTool.Web.Components.Pages.Schedules;
 
@@ -17,7 +17,7 @@ public partial class HistoryDialog : ComponentBase
     private IDialogService DialogSvc { get; set; } = null!;
 
     [Inject]
-    IExecutionLogService LogSvc { get; set; } = null!;
+    private IHistoryDialogWorkflow HistoryWorkflow { get; set; } = null!;
 
     [EditorRequired]
     [Parameter]
@@ -52,7 +52,7 @@ public partial class HistoryDialog : ComponentBase
             pageMeta = _lastPageMeta with { Page = _lastPageMeta.Page + 1 };
         }
 
-        var result = await LogSvc.GetLatestExecutionLog(
+        var result = await HistoryWorkflow.GetHistoryPageAsync(
             JobKey.Name,
             JobKey.Group ?? BlazingQuartz.Constants.DEFAULT_GROUP,
             TriggerKey?.Name,

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using Ray.BiliBiliTool.Web.Services;
+using Ray.BiliBiliTool.Web.Services.Pages.Admin;
 
 namespace Ray.BiliBiliTool.Web.Components.Pages;
 
@@ -12,12 +13,16 @@ public partial class Admin : ComponentBase
     [Inject]
     private IAuthService AuthService { get; set; } = null!;
 
+    [Inject]
+    private IAdminPageWorkflow AdminPageWorkflow { get; set; } = null!;
+
     private string _username = "";
     private string _currentPassword = "";
     private string _newPassword = "";
     private string _confirmPassword = "";
     private string _errorMessage = "";
     private string _successMessage = "";
+    private bool _showLogoutButton;
 
     private bool _passwordVisibility;
     private InputType _passwordInput = InputType.Password;
@@ -68,32 +73,29 @@ public partial class Admin : ComponentBase
     {
         _errorMessage = "";
         _successMessage = "";
+        _showLogoutButton = false;
 
-        if (_newPassword != _confirmPassword)
-        {
-            _errorMessage = "The new password and the confirm password do not match";
-            return;
-        }
+        var request = new AdminPasswordChangeRequest(
+            _username,
+            _currentPassword,
+            _newPassword,
+            _confirmPassword
+        );
+        var result = await AdminPageWorkflow.ChangePasswordAsync(request);
 
-        if (string.IsNullOrWhiteSpace(_newPassword))
+        if (result.IsSuccess)
         {
-            _errorMessage = "Password cannot be empty";
-            return;
+            _successMessage = result.SuccessMessage ?? "Password updated successfully.";
+            _showLogoutButton = true;
         }
+        else
+        {
+            _errorMessage = result.ErrorMessage ?? "";
+        }
+    }
 
-        try
-        {
-            await AuthService.ChangePasswordAsync(_username, _currentPassword, _newPassword);
-            _successMessage = "Update Successful, you will be logged out in 2 seconds";
-            await Task.Delay(2000);
-            _currentPassword = "";
-            _newPassword = "";
-            _confirmPassword = "";
-            NavigationManager.NavigateTo("/auth/logout", true);
-        }
-        catch (Exception e)
-        {
-            _errorMessage = e.Message;
-        }
+    private void Logout()
+    {
+        NavigationManager.NavigateTo("/auth/logout", true);
     }
 }

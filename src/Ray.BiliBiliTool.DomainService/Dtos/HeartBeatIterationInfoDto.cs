@@ -1,4 +1,5 @@
-﻿using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live;
+﻿using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.LiveApi;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.LiveTraceApi;
 
 namespace Ray.BiliBiliTool.DomainService.Dtos;
 

@@ -1,0 +1,127 @@
+info:
+  name: vipmallbuy
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{host}}/pgc/activity/score/task/receive/v2"
+  headers:
+    - name: Cookie
+      value: "{{cookieStr}}"
+    - name: native_api_from
+      value: h5
+    - name: buvid
+      value: "{{buvid}}"
+    - name: referer
+      value: https://big.bilibili.com/mobile/bigPoint/task
+    - name: user-agent
+      value: "{{user-agent}}"
+    - name: x-bili-trace-id
+      value: 9e3ed57f35a83d4edb8160805867752f:db8160805867752f:0:0
+    - name: x-bili-aurora-eid
+      value: UlAAQFkMBVkH
+    - name: x-bili-mid
+      value: "{{mid}}"
+    - name: x-bili-aurora-zone
+      value: ""
+    - name: x-bili-gaia-vtoken
+      value: ""
+    - name: x-bili-ticket
+      value: eyJhbGciOiJIUzI1NiIsImtpZCI6InMwMyIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzU3NjE2NjQsImlhdCI6MTczNTczMjU2NCwiYnV2aWQiOiJYVzcyNEQxNzI0Njg3MTlDQzI1NjA1REIyNDI0NzhEMkUxMjE5In0.YVtwH53dLJ1l6n6aFcvwNZ4MBkgnBPtxE8UfD7u9J4I
+    - name: bili-http-engine
+      value: cronet
+  body:
+    type: form-urlencoded
+    data:
+      - name: access_key
+        value: "{{access_key}}"
+      - name: appKey
+        value: "{{appKey}}"
+      - name: appkey
+        value: "{{appKey}}"
+      - name: bili_local_id
+        value: "{{device_id}}"
+      - name: build
+        value: "{{build}}"
+      - name: buvid
+        value: "{{buvid}}"
+      - name: channel
+        value: yingyongbao
+      - name: containerName
+        value: AbstractWebActivity
+      - name: csrf
+        value: "{{csrf}}"
+      - name: device
+        value: phone
+      - name: deviceId
+        value: f9abaee74692f9e9
+      - name: deviceName
+        value: samsungNexus
+      - name: devicePlatform
+        value: Android10samsungNexus
+      - name: device_id
+        value: "{{device_id}}"
+      - name: device_name
+        value: samsungNexus
+      - name: device_platform
+        value: Android10samsungNexus
+      - name: disable_rcmd
+        value: "0"
+      - name: fingerprint
+        value: "{{device_id}}"
+      - name: isPad
+        value: "false"
+      - name: localFingerprint
+        value: "{{device_id}}"
+      - name: local_id
+        value: "{{buvid}}"
+      - name: mobi_app
+        value: android
+      - name: modelName
+        value: Nexus
+      - name: networkState
+        value: "2"
+      - name: networkstate
+        value: "2"
+      - name: osVer
+        value: "10"
+      - name: platform
+        value: android
+      - name: sessionID
+        value: 120548f6
+      - name: statistics
+        value: "{{statistics}}"
+      - name: statusBarHeight
+        value: "77"
+      - name: taskCode
+        value: vipmallbuy
+      - name: ts
+        value: "{{ts}}"
+      - name: sign
+        value: "{{sign}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+docs: |
+  终端：APP
+
+  作用：领取大会员赚大积分任务-购买指定会员购商品
+
+  入口：
+    - 我的->会员中心->赚大积分->查看8项任务->领取任务
+    
+    
+  ## Response Sample
+
+  ```json
+  {
+    "code": 0,
+    "data": {},
+    "message": "success"
+  }
+  ```

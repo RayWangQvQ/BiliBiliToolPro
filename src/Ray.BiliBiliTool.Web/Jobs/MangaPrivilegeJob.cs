@@ -8,12 +8,8 @@ public class MangaPrivilegeJob(
     IMangaPrivilegeTaskAppService appService
 ) : BaseJob<MangaPrivilegeJob>(logger)
 {
-    private readonly ILogger<MangaPrivilegeJob> _logger = logger;
     public static readonly JobKey Key = new(nameof(MangaPrivilegeJob), Constants.BiliJobGroup);
 
-    protected override async Task DoExecuteAsync(IJobExecutionContext context)
-    {
-        _logger.LogInformation($"{nameof(MangaPrivilegeJob)} started.");
+    protected override async Task DoExecuteAsync(IJobExecutionContext context) =>
         await appService.DoTaskAsync();
-    }
 }

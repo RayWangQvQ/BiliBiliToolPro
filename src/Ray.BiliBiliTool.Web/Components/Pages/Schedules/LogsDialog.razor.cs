@@ -1,10 +1,8 @@
 using BlazingQuartz.Core.Models;
-using BlazingQuartz.Core.Services;
 using Microsoft.AspNetCore.Components;
-using Microsoft.EntityFrameworkCore;
 using MudBlazor;
 using Ray.BiliBiliTool.Domain;
-using Ray.BiliBiliTool.Infrastructure.EF;
+using Ray.BiliBiliTool.Web.Services.Pages.Schedules;
 
 namespace Ray.BiliBiliTool.Web.Components.Pages.Schedules;
 
@@ -17,10 +15,7 @@ public partial class LogsDialog : ComponentBase
     private IDialogService DialogSvc { get; set; } = null!;
 
     [Inject]
-    IExecutionLogService LogSvc { get; set; } = null!;
-
-    [Inject]
-    private IDbContextFactory<BiliDbContext> DbFactory { get; set; } = null!;
+    private ILogsDialogWorkflow LogsWorkflow { get; set; } = null!;
 
     [EditorRequired]
     [Parameter]
@@ -41,12 +36,10 @@ public partial class LogsDialog : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        await using var context = await DbFactory.CreateDbContextAsync();
-        var execution = await context
-            .ExecutionLogs.Where(x => x.JobName == JobKey.Name && x.TriggerName == TriggerKey!.Name)
-            .OrderByDescending(x => x.FireTimeUtc)
-            .FirstOrDefaultAsync();
-        _fireInstanceId = execution?.RunInstanceId;
+        _fireInstanceId = await LogsWorkflow.GetLatestRunInstanceIdAsync(
+            JobKey.Name,
+            TriggerKey!.Name
+        );
 
         if (_fireInstanceId == null)
         {
@@ -77,12 +70,11 @@ public partial class LogsDialog : ComponentBase
 
         try
         {
-            await using var context = await DbFactory.CreateDbContextAsync();
-            _logs = await context
-                .BiliLogs.Where(x => x.FireInstanceIdComputed == _fireInstanceId)
-                .OrderBy(l => l.Timestamp)
-                .Take(300) // 限制记录数量，避免加载过多数据
-                .ToListAsync(_cancellationTokenSource.Token);
+            _logs = await LogsWorkflow.GetLogsForRunAsync(
+                _fireInstanceId!,
+                300,
+                _cancellationTokenSource.Token
+            );
         }
         catch (Exception ex)
         {

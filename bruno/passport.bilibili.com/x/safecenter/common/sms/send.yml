@@ -1,0 +1,69 @@
+info:
+  name: send
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: "{{host}}/x/safecenter/common/sms/send"
+  headers:
+    - name: Cookie
+      value: Buvid=XUA5651A9EDF7387153A945CDE96CADCB6000
+    - name: bili-http-engine
+      value: ignet
+    - name: native_api_from
+      value: h5
+    - name: referer
+      value: https://passport.bilibili.com/h5-app/passport/risk/verify?tmp_token=2ecff8d85344943d1eda8e8a08f41141&request_id=899a2807c62748c5a6b7d28f3570424e&source=risk
+    - name: x-bili-net-bin
+      value: DQAAgL8gAQ
+    - name: x-bili-ticket
+      value: eyJhbGciOiJIUzI1NiIsImtpZCI6InMwMyIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzY2MjU5OTIsImlhdCI6MTc3NjU5Njg5MiwiYnV2aWQiOiJYVUE1NjUxQTlFREY3Mzg3MTUzQTk0NUNERTk2Q0FEQ0I2MDAwIn0.GNwbcwJMRU29LO8E1287V1TtdNqFvED18f-1RXZxb_k
+    - name: x-bili-trace-id
+      value: 24e2dbed930abffd6d749d55d469e4e9:6d749d55d469e4e9:0:0
+  body:
+    type: form-urlencoded
+    data:
+      - name: appkey
+        value: "{{appKeyGuest}}"
+      - name: disable_rcmd
+        value: "0"
+      - name: gee_challenge
+        value: 445b6546da3cdbf94755fd36115844b4
+      - name: gee_seccode
+        value: 78d12ae74c656424d1c566e628820a40%7Cjordan
+      - name: gee_validate
+        value: 78d12ae74c656424d1c566e628820a40
+      - name: recaptcha_token
+        value: fc1a1c798d1e4c6fad4f4cef7af0654c
+      - name: sms_type
+        value: loginTelCheck
+      - name: statistics
+        value: "{{statistics}}"
+      - name: tmp_code
+        value: 2ecff8d85344943d1eda8e8a08f41141
+      - name: ts
+        value: "{{ts}}"
+      - name: sign
+        value: "{{sign}}"
+  auth: inherit
+
+settings:
+  encodeUrl: false
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+docs: |
+  ## Response Sample
+
+  ```json
+  {
+  	"code": 0,
+  	"message": "OK",
+  	"ttl": 1,
+  	"data": {
+  		"captcha_key": "c09eddb62a485d265c479f1b6575bd11"
+  	}
+  }
+  ```

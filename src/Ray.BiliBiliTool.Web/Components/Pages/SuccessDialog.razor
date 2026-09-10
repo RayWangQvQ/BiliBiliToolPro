@@ -1,0 +1,29 @@
+@using MudBlazor
+
+<MudDialogContent>
+    <div class="d-flex flex-column align-center gap-3 py-4">
+        <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" Style="font-size:4rem;" />
+        <MudText Typo="Typo.h6" Align="Align.Center">@Message</MudText>
+        <MudText Typo="Typo.body2" Color="Color.Secondary" Align="Align.Center">
+            You need to log back in with the new password.
+        </MudText>
+    </div>
+</MudDialogContent>
+<MudDialogActions>
+    <MudButton FullWidth="true"
+               Variant="Variant.Filled"
+               Color="Color.Primary"
+               Size="Size.Large"
+               StartIcon="@Icons.Material.Filled.Logout"
+               OnClick="Confirm">Re-Login Now</MudButton>
+</MudDialogActions>
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = null!;
+
+    [Parameter]
+    public string Message { get; set; } = "";
+
+    private void Confirm() => MudDialog.Close(DialogResult.Ok(true));
+}

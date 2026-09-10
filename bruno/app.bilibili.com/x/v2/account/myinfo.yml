@@ -1,0 +1,155 @@
+info:
+  name: myinfo
+  type: http
+  seq: 1
+
+http:
+  method: GET
+  url: "{{host}}/x/v2/account/myinfo?access_key={{access_key}}&appkey={{appKeyGuest}}&build={{build}}&buvid={{buvid}}&c_locale=zh_CN&channel=yingyongbao&disable_rcmd=0&local_id={{buvid}}&mobi_app=android&platform=android&s_locale=zh_CN&statistics={{statistics}}&ts={{ts}}&sign={{sign}}"
+  headers:
+    - name: x-bili-aurora-eid
+      value: UlAAQFkMBVkH
+    - name: x-bili-mid
+      value: "{{mid}}"
+    - name: x-bili-aurora-zone
+      value: ""
+    - name: x-bili-gaia-vtoken
+      value: ""
+    - name: bili-http-engine
+      value: cronet
+    - name: Cookie
+      value: "{{cookieStr}}"
+  params:
+    - name: access_key
+      value: "{{access_key}}"
+      type: query
+    - name: appkey
+      value: "{{appKeyGuest}}"
+      type: query
+    - name: build
+      value: "{{build}}"
+      type: query
+    - name: buvid
+      value: "{{buvid}}"
+      type: query
+    - name: c_locale
+      value: zh_CN
+      type: query
+    - name: channel
+      value: yingyongbao
+      type: query
+    - name: disable_rcmd
+      value: "0"
+      type: query
+    - name: local_id
+      value: "{{buvid}}"
+      type: query
+    - name: mobi_app
+      value: android
+      type: query
+    - name: platform
+      value: android
+      type: query
+    - name: s_locale
+      value: zh_CN
+      type: query
+    - name: statistics
+      value: "{{statistics}}"
+      type: query
+    - name: ts
+      value: "{{ts}}"
+      type: query
+    - name: sign
+      value: "{{sign}}"
+      type: query
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+docs: |
+  ## Response Sample
+
+  ```json
+  {
+    "code": 0,
+    "message": "OK",
+    "ttl": 1,
+    "data": {
+      "mid": 123456789,
+      "name": "ABCD",
+      "sign": "",
+      "coins": 123.9,
+      "birthday": "1970-01-01",
+      "face": "https://i2.hdslb.com/bfs/face/0fed8598ff2ae289bbb7efe62fba30914f906da9.jpg",
+      "face_nft_new": 0,
+      "sex": 0,
+      "level": 6,
+      "rank": 10000,
+      "silence": 0,
+      "vip": {
+        "type": 2,
+        "status": 1,
+        "due_date": 1810656000000,
+        "vip_pay_type": 0,
+        "theme_type": 0,
+        "label": {
+          "path": "http://i0.hdslb.com/bfs/vip/label_annual.png",
+          "text": "年度大会员",
+          "label_theme": "annual_vip",
+          "text_color": "#FFFFFF",
+          "bg_style": 1,
+          "bg_color": "#FB7299",
+          "border_color": "",
+          "use_img_label": true,
+          "img_label_uri_hans": "",
+          "img_label_uri_hant": "",
+          "img_label_uri_hans_static": "https://i0.hdslb.com/bfs/vip/8d4f8bfc713826a5412a0a27eaaac4d6b9ede1d9.png",
+          "img_label_uri_hant_static": "https://i0.hdslb.com/bfs/activity-plat/static/20220614/e369244d0b14644f5e1a06431e22a4d5/VEW8fCC0hg.png",
+          "label_id": 0,
+          "label_goto": null
+        },
+        "avatar_subscript": 1,
+        "nickname_color": "#FB7299",
+        "role": 3,
+        "avatar_subscript_url": "",
+        "tv_vip_status": 0,
+        "tv_vip_pay_type": 0,
+        "tv_due_date": 0,
+        "avatar_icon": {
+          "icon_resource": {}
+        },
+        "ott_info": {
+          "vip_type": 0,
+          "pay_type": 0,
+          "pay_channel_id": "",
+          "status": 0,
+          "overdue_time": 0
+        },
+        "super_vip": {
+          "is_super_vip": false
+        }
+      },
+      "email_status": 1,
+      "tel_status": 1,
+      "official": {
+        "role": 0,
+        "title": "",
+        "desc": "",
+        "type": -1
+      },
+      "identification": 1,
+      "invite": {
+        "invite_remind": 2,
+        "display": true
+      },
+      "is_tourist": 0,
+      "pin_prompting": 0,
+      "in_reg_audit": 0,
+      "has_face_nft": false,
+      "set_birthday": false
+    }
+  }
+  ```

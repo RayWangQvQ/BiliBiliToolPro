@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.WebUtilities;
 using MudBlazor;
+using Ray.BiliBiliTool.Web.Services.Pages.Login;
 
 namespace Ray.BiliBiliTool.Web.Components.Pages;
 
@@ -8,6 +8,9 @@ public partial class Login : ComponentBase
 {
     [Inject]
     private NavigationManager NavigationManager { get; set; } = null!;
+
+    [Inject]
+    private ILoginPageStateFactory LoginPageStateFactory { get; set; } = null!;
 
     private string _username = "";
     private string _password = "";
@@ -38,14 +41,8 @@ public partial class Login : ComponentBase
     protected override void OnInitialized()
     {
         var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
-        var query = QueryHelpers.ParseQuery(uri.Query);
-        if (query.TryGetValue("returnUrl", out var param))
-        {
-            returnUrl = param.First();
-        }
-        if (query.TryGetValue("error", out var errorParam) && bool.TryParse(errorParam.FirstOrDefault(), out var parsed) && parsed)
-        {
-            _loginError = true;
-        }
+        var state = LoginPageStateFactory.Create(uri);
+        returnUrl = state.ReturnUrl;
+        _loginError = state.HasLoginError;
     }
 }

@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -7,11 +7,15 @@ using Newtonsoft.Json;
 using QRCoder;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
-using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Passport;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.PassportApi;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Agent.QingLong;
 using Ray.BiliBiliTool.Agent.QingLong.Dtos;
+using Ray.BiliBiliTool.Agent.Baihu;
+using Ray.BiliBiliTool.Agent.Baihu.Dtos;
 using Ray.BiliBiliTool.Config.Options;
+using Ray.BiliBiliTool.Domain.Exceptions;
+using Ray.BiliBiliTool.DomainService.Dtos;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 using Ray.BiliBiliTool.Infrastructure.Cookie;
 
@@ -25,9 +29,11 @@ public class LoginDomainService(
     IPassportApi passportApi,
     IHostEnvironment hostingEnvironment,
     IQingLongApi qingLongApi,
+    IBaihuApi baihuApi,
     IHomeApi homeApi,
     IConfiguration configuration,
-    IOptions<QingLongOptions> qingLongOptions
+    IOptions<QingLongOptions> qingLongOptions,
+    IOptions<BaihuOptions> baihuOptions
 ) : ILoginDomainService
 {
     public async Task<BiliCookie> LoginByQrCodeAsync(CancellationToken cancellationToken)
@@ -37,7 +43,7 @@ public class LoginDomainService(
         var re = await passportApi.GenerateQrCode();
         if (re.Code != 0)
         {
-            throw new Exception($"获取二维码失败：{re.ToJsonStr()}");
+            throw new BiliBusinessException($"获取二维码失败：{re.ToJsonStr()}");
         }
 
         var url = re.Data.Url;
@@ -99,7 +105,7 @@ public class LoginDomainService(
 
         if (cookieInfo == null)
         {
-            throw new Exception("登录超时");
+            throw new BiliIntegrationException("登录超时");
         }
 
         return cookieInfo;
@@ -237,13 +243,13 @@ public class LoginDomainService(
             var token = await GetQingLongAuthTokenAsync();
             if (string.IsNullOrEmpty(token))
             {
-                throw new Exception("获取青龙token失败");
+                throw new BiliIntegrationException("获取青龙token失败");
             }
 
             var qlEnvList = await qingLongApi.GetEnvsAsync("Ray_BiliBiliCookies__", token);
             if (qlEnvList.Code != 200)
             {
-                throw new Exception($"查询环境变量失败：{qlEnvList.ToJsonStr()}");
+                throw new BiliIntegrationException($"查询环境变量失败：{qlEnvList.ToJsonStr()}");
             }
 
             logger.LogDebug(qlEnvList.Data.ToJsonStr());
@@ -302,6 +308,170 @@ public class LoginDomainService(
         }
         catch
         {
+            await PrintIfSaveCookieFailAsync(ckInfo, cancellationToken);
+            return false;
+        }
+    }
+
+    public async Task<QrLoginGenerateResult> GenerateQrCodeWebAsync(
+        CancellationToken cancellationToken
+    )
+    {
+        var re = await passportApi.GenerateQrCode();
+        if (re.Code != 0)
+        {
+            throw new BiliBusinessException($"获取二维码失败：{re.ToJsonStr()}");
+        }
+
+        var url = re.Data.Url;
+
+        // Generate PNG QR code (no console output, per D-01)
+        var qrGenerator = new QRCodeGenerator();
+        var qrCodeData = qrGenerator.CreateQrCode(url, QRCodeGenerator.ECCLevel.L);
+        var pngQrCode = new PngByteQRCode(qrCodeData);
+        var pngBytes = pngQrCode.GetGraphic(20);
+        var base64 = Convert.ToBase64String(pngBytes);
+
+        var onlineUrl = GetOnlinePic(url);
+
+        return new QrLoginGenerateResult
+        {
+            QrImageBase64 = base64,
+            QrcodeKey = re.Data.Qrcode_key,
+            OnlineUrl = onlineUrl,
+        };
+    }
+
+    public async Task<QrLoginCheckResult> CheckQrLoginAsync(
+        string qrcodeKey,
+        CancellationToken cancellationToken
+    )
+    {
+        var check = await passportApi.CheckQrCodeHasScaned(qrcodeKey);
+        if (!check.IsSuccessStatusCode)
+        {
+            return new QrLoginCheckResult
+            {
+                Status = QrLoginStatus.Error,
+                Message = "检测接口异常",
+            };
+        }
+
+        var contentStr = await check.Content.ReadAsStringAsync(cancellationToken);
+        var content = JsonConvert.DeserializeObject<BiliApiResponse<TokenDto>>(contentStr);
+        if (content?.Code != 0)
+        {
+            return new QrLoginCheckResult
+            {
+                Status = QrLoginStatus.Error,
+                Message = $"检测接口异常：{check.ToJsonStr()}",
+            };
+        }
+
+        if (content.Data.Code == 86038) // 已失效
+        {
+            return new QrLoginCheckResult
+            {
+                Status = QrLoginStatus.Expired,
+                Message = content.Data.Message,
+            };
+        }
+
+        if (content.Data.Code == 0) // 扫描成功
+        {
+            IEnumerable<string> cookies = check
+                .Headers.SingleOrDefault(header => header.Key == "Set-Cookie")
+                .Value;
+
+            var cookieStr = CookieInfo.ConvertSetCkHeadersToCkStr(cookies);
+            var cookieInfo = CookieStrFactory<BiliCookie>.CreateNew(cookieStr);
+            cookieInfo.Check();
+
+            return new QrLoginCheckResult { Status = QrLoginStatus.Success, Cookie = cookieInfo };
+        }
+
+        return new QrLoginCheckResult
+        {
+            Status = QrLoginStatus.Waiting,
+            Message = content.Data.Message,
+        };
+    }
+
+    public async Task<bool> SaveCookieToBaihuAsync(
+        BiliCookie ckInfo,
+        CancellationToken cancellationToken
+    )
+    {
+        try
+        {
+            var token = baihuOptions.Value.Token;
+            if (string.IsNullOrEmpty(token))
+            {
+                throw new Exception("未配置白虎API Token");
+            }
+
+            if (!token.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+            {
+                token = $"Bearer {token}";
+            }
+
+            var envListRe = await baihuApi.GetEnvsAsync(token);
+            if (envListRe.Code != 200)
+            {
+                throw new Exception($"查询白虎环境变量失败：{envListRe.Msg}");
+            }
+
+            var list = envListRe
+                .Data.Where(x => x.Name.StartsWith("Ray_BiliBiliCookies__"))
+                .ToList();
+            var oldEnv = list.FirstOrDefault(x => x.Value.Contains(ckInfo.UserId));
+
+            if (oldEnv != null)
+            {
+                logger.LogInformation("用户已存在，更新白虎环境变量");
+                logger.LogInformation("Key：{key}", oldEnv.Name);
+
+                oldEnv.Value = ckInfo.CookieStr;
+                oldEnv.Remark = string.IsNullOrEmpty(oldEnv.Remark)
+                    ? $"bili-{ckInfo.UserId}"
+                    : oldEnv.Remark;
+
+                var updateRe = await baihuApi.UpdateEnvAsync(oldEnv.Id, oldEnv, token);
+                logger.LogInformation(updateRe.Code == 200 ? "更新成功！" : updateRe.Msg);
+
+                return true;
+            }
+
+            logger.LogInformation("用户不存在，新增白虎环境变量");
+            var maxNum = -1;
+            if (list.Any())
+            {
+                maxNum = list.Select(x =>
+                    {
+                        var num = x.Name.Replace("Ray_BiliBiliCookies__", "");
+                        var parseSuc = int.TryParse(num, out int envNum);
+                        return parseSuc ? envNum : 0;
+                    })
+                    .Max();
+            }
+
+            var name = $"Ray_BiliBiliCookies__{maxNum + 1}";
+            logger.LogInformation("Key：{key}", name);
+
+            var add = new BaihuEnv
+            {
+                Name = name,
+                Value = ckInfo.CookieStr,
+                Remark = $"bili-{ckInfo.UserId}",
+                Enabled = true,
+            };
+            var addRe = await baihuApi.AddEnvAsync(add, token);
+            logger.LogInformation(addRe.Code == 200 ? "新增成功！" : addRe.Msg);
+            return true;
+        }
+        catch (Exception e)
+        {
+            logger.LogError("保存到白虎失败：{msg}", e.Message);
             await PrintIfSaveCookieFailAsync(ckInfo, cancellationToken);
             return false;
         }
@@ -430,7 +600,19 @@ public class LoginDomainService(
 
     private Task PrintIfSaveCookieFailAsync(BiliCookie ckInfo, CancellationToken cancellationToken)
     {
-        logger.LogError("持久化失败，青龙版本高于2.18，请手动添加环境变量到青龙");
+        var platform = configuration["Ray_PlatformType"] ?? "";
+        var platformName = platform.Equals("Baihu", StringComparison.OrdinalIgnoreCase) ? "白虎" : "青龙";
+
+        if (platformName == "白虎")
+        {
+            logger.LogError("持久化失败，请手动添加环境变量到白虎面板");
+            logger.LogInformation("提示：配置环境变量 BaihuConfig__Token 后，在baihu面板系统设置->openapi获取，程序可尝试自动保存。");
+        }
+        else
+        {
+            logger.LogError("持久化失败，青龙版本高于2.18，请手动添加环境变量到青龙");
+        }
+
         logger.LogWarning("变量Key：{key}", "Ray_BiliBiliCookies__0");
         logger.LogWarning("变量值：{value}", ckInfo.CookieStr);
         logger.LogWarning(

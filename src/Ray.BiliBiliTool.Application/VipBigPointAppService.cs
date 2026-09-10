@@ -1,10 +1,13 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
-using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Mall;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.ApiApi.VipBigPoint;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.NavApi;
 using Ray.BiliBiliTool.Application.Attributes;
 using Ray.BiliBiliTool.Application.Contracts;
+using Ray.BiliBiliTool.Application.Diagnostics;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 using Ray.BiliBiliTool.Infrastructure.Cookie;
@@ -14,10 +17,14 @@ namespace Ray.BiliBiliTool.Application;
 public class VipBigPointAppService(
     ILogger<VipBigPointAppService> logger,
     IOptionsMonitor<VipBigPointOptions> vipBigPointOptions,
-    IAccountDomainService loginDomainService,
+    IAccountDomainService accountDomainService,
     IVipBigPointDomainService vipBigPointDomainService,
+    ILoginDomainService loginDomainService,
+    IConfiguration configuration,
     CookieStrFactory<BiliCookie> cookieFactory
-) : BaseMultiAccountsAppService(logger, cookieFactory), IVipBigPointAppService
+)
+    : BaseMultiAccountsAppService(logger, cookieFactory, loginDomainService, configuration),
+        IVipBigPointAppService
 {
     [TaskInterceptor("大会员大积分", TaskLevel.One)]
     protected override async Task DoTaskAccountAsync(
@@ -25,31 +32,39 @@ public class VipBigPointAppService(
         CancellationToken cancellationToken = default
     )
     {
-        if (!vipBigPointOptions.CurrentValue.IsEnable)
-        {
-            logger.LogInformation("已配置为关闭，跳过");
-            return;
-        }
+        await TaskFlowDiagnosticScope.ExecuteAsync(
+            logger,
+            "大会员大积分",
+            async () =>
+            {
+                if (!vipBigPointOptions.CurrentValue.IsEnable)
+                {
+                    logger.LogInformation("已配置为关闭，跳过");
+                    return;
+                }
 
-        bool isVip = await LoginAndCheckVipStatusAsync(ck, cancellationToken);
-        if (!isVip)
-        {
-            return;
-        }
+                await SetCookiesAsync(ck, cancellationToken);
+                bool isVip = await LoginAndCheckVipStatusAsync(ck, cancellationToken);
+                if (!isVip)
+                {
+                    return;
+                }
 
-        await ExpressAsync(ck, cancellationToken);
-        await SignAsync(ck, cancellationToken);
-        var combine = await CheckCombineAsync(ck, cancellationToken);
+                await ExpressAsync(ck, cancellationToken);
+                await SignAsync(ck, cancellationToken);
+                var combine = await CheckCombineAsync(ck, cancellationToken);
 
-        // 2 个一次性任务
-        await BonusMissionAsync(combine, ck, cancellationToken);
-        await PrivilegeMissionAsync(combine, ck, cancellationToken);
+                // 2 个一次性任务
+                await BonusMissionAsync(combine, ck, cancellationToken);
+                await PrivilegeMissionAsync(combine, ck, cancellationToken);
 
-        // 日常任务
-        await ReceiveMissionsAsync(combine, ck, cancellationToken);
-        await DailyMissionsAsync(combine, ck, cancellationToken);
+                // 日常任务
+                await ReceiveMissionsAsync(combine, ck, cancellationToken);
+                await DailyMissionsAsync(combine, ck, cancellationToken);
 
-        await CheckCombineAsync(ck, cancellationToken);
+                await CheckCombineAsync(ck, cancellationToken);
+            }
+        );
     }
 
     [TaskInterceptor("登录并检测会员状态")]
@@ -58,7 +73,7 @@ public class VipBigPointAppService(
         CancellationToken cancellationToken = default
     )
     {
-        UserInfo userInfo = await loginDomainService.LoginByCookie(ck);
+        UserInfo userInfo = await accountDomainService.LoginByCookie(ck);
         if (userInfo.GetVipType() == VipType.None)
         {
             logger.LogInformation("当前不是大会员，跳过任务");

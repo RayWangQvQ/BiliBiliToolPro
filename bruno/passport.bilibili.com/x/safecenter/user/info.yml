@@ -1,0 +1,53 @@
+info:
+  name: info
+  type: http
+  seq: 2
+
+http:
+  method: get
+  url: "{{host}}/x/safecenter/user/info?appkey={{appKeyGuest}}&disable_rcmd=0&statistics={{statistics}}&tmp_code=2ecff8d85344943d1eda8e8a08f41141&ts={{ts}}&sign={{sign}}"
+  headers:
+    - name: Cookie
+      value: Buvid=XUA5651A9EDF7387153A945CDE96CADCB6000
+    - name: bili-http-engine
+      value: ignet
+    - name: buvid
+      value: "{{buvid}}"
+    - name: native_api_from
+      value: h5
+    - name: referer
+      value: https://passport.bilibili.com/h5-app/passport/risk/verify?tmp_token=2ecff8d85344943d1eda8e8a08f41141&request_id=899a2807c62748c5a6b7d28f3570424e&source=risk
+    - name: user-agent
+      value: "{{user-agent}}"
+    - name: x-bili-net-bin
+      value: DQAAgL8gAQ
+    - name: x-bili-ticket
+      value: eyJhbGciOiJIUzI1NiIsImtpZCI6InMwMyIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzY2MjU5OTIsImlhdCI6MTc3NjU5Njg5MiwiYnV2aWQiOiJYVUE1NjUxQTlFREY3Mzg3MTUzQTk0NUNERTk2Q0FEQ0I2MDAwIn0.GNwbcwJMRU29LO8E1287V1TtdNqFvED18f-1RXZxb_k
+    - name: x-bili-trace-id
+      value: 477775180f6edae4bbf7c27e0769e4e8:bbf7c27e0769e4e8:0:0
+  params:
+    - name: appkey
+      value: "{{appKeyGuest}}"
+      type: query
+    - name: disable_rcmd
+      value: "0"
+      type: query
+    - name: statistics
+      value: "{{statistics}}"
+      type: query
+    - name: tmp_code
+      value: 2ecff8d85344943d1eda8e8a08f41141
+      type: query
+    - name: ts
+      value: "{{ts}}"
+      type: query
+    - name: sign
+      value: "{{sign}}"
+      type: query
+  auth: inherit
+
+settings:
+  encodeUrl: false
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

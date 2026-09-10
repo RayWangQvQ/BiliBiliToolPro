@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="coverlet.collector">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="TngTech.ArchUnitNET.xUnit" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Ray.BiliBiliTool.Agent\Ray.BiliBiliTool.Agent.csproj" />
+    <ProjectReference Include="..\..\src\Ray.BiliBiliTool.Application\Ray.BiliBiliTool.Application.csproj" />
+    <ProjectReference Include="..\..\src\Ray.BiliBiliTool.Console\Ray.BiliBiliTool.Console.csproj" />
+    <ProjectReference Include="..\..\src\Ray.BiliBiliTool.Domain\Ray.BiliBiliTool.Domain.csproj" />
+    <ProjectReference Include="..\..\src\Ray.BiliBiliTool.DomainService\Ray.BiliBiliTool.DomainService.csproj" />
+    <ProjectReference Include="..\..\src\Ray.BiliBiliTool.Infrastructure\Ray.BiliBiliTool.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Ray.BiliBiliTool.Infrastructure.EF\Ray.BiliBiliTool.Infrastructure.EF.csproj" />
+    <ProjectReference Include="..\..\src\Ray.BiliBiliTool.Web\Ray.BiliBiliTool.Web.csproj" />
+  </ItemGroup>
+</Project>

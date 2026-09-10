@@ -1,0 +1,143 @@
+info:
+  name: access_token
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{host}}/x/passport-login/oauth2/access_token"
+  headers:
+    - name: bili-http-engine
+      value: ignet
+    - name: fp_local
+      value: 910f57d9d7feaf6928e592860452d06b202505211207597aa9050a2e5c31f431
+    - name: fp_remote
+      value: 910f57d9d7feaf6928e592860452d06b202505211207597aa9050a2e5c31f431
+    - name: guestid
+      value: "24675260415603"
+    - name: session_id
+      value: 45dd1740
+    - name: x-bili-locale-bin
+      value: CggKAnpoGgJDThIICgJ6aBoCQ04iDUFzaWEvU2hhbmdoYWkqBiswODowMA
+    - name: x-bili-net-bin
+      value: DQAAgL8gAQ
+    - name: x-bili-ticket
+      value: eyJhbGciOiJIUzI1NiIsImtpZCI6InMwMyIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzY2MjU5OTIsImlhdCI6MTc3NjU5Njg5MiwiYnV2aWQiOiJYVUE1NjUxQTlFREY3Mzg3MTUzQTk0NUNERTk2Q0FEQ0I2MDAwIn0.GNwbcwJMRU29LO8E1287V1TtdNqFvED18f-1RXZxb_k
+    - name: x-bili-trace-id
+      value: d3299244273def80e58813d13069e4e9:e58813d13069e4e9:0:0
+  body:
+    type: form-urlencoded
+    data:
+      - name: appkey
+        value: "{{appKeyGuest}}"
+      - name: bili_local_id
+        value: 910f57d9d7feaf6928e592860452d06b202505211207597aa9050a2e5c31f431
+      - name: build
+        value: "{{build}}"
+      - name: buvid
+        value: "{{buvid}}"
+      - name: c_locale
+        value: zh_CN
+      - name: channel
+        value: bili
+      - name: code
+        value: ef330ca16724a3d6f832732d22f86841
+      - name: device
+        value: phone
+      - name: device_id
+        value: 910f57d9d7feaf6928e592860452d06b202505211207597aa9050a2e5c31f431
+      - name: device_name
+        value: SamsungSM-S9210
+      - name: device_platform
+        value: Android12SamsungSM-S9210
+      - name: disable_rcmd
+        value: "0"
+      - name: grant_type
+        value: authorization_code
+      - name: local_id
+        value: XUA5651A9EDF7387153A945CDE96CADCB6000
+      - name: mobi_app
+        value: android
+      - name: platform
+        value: android
+      - name: s_locale
+        value: zh_CN
+      - name: statistics
+        value: "{{statistics}}"
+      - name: ts
+        value: "{{ts}}"
+      - name: sign
+        value: "{{sign}}"
+  auth: inherit
+
+settings:
+  encodeUrl: false
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+docs: |
+  ## Response Sample
+
+  ```json
+  {
+  	"code": 0,
+  	"message": "OK",
+  	"ttl": 1,
+  	"data": {
+  		"status": 0,
+  		"message": "",
+  		"url": "",
+  		"token_info": {
+  			"mid": 123456,
+  			"access_token": "abcdef",
+  			"refresh_token": "123456",
+  			"expires_in": 15552000,
+  			"region": "CN",
+  			"store_region": "CN"
+  		},
+  		"cookie_info": {
+  			"cookies": [{
+  				"name": "SESSDATA",
+  				"value": "abc",
+  				"http_only": 1,
+  				"expires": 1784385693,
+  				"secure": 1,
+  				"same_site": 0
+  			}, {
+  				"name": "bili_jct",
+  				"value": "abc",
+  				"http_only": 0,
+  				"expires": 1784385693,
+  				"secure": 0,
+  				"same_site": 0
+  			}, {
+  				"name": "DedeUserID",
+  				"value": "123456",
+  				"http_only": 0,
+  				"expires": 1784385693,
+  				"secure": 0,
+  				"same_site": 0
+  			}, {
+  				"name": "DedeUserID__ckMd5",
+  				"value": "abc",
+  				"http_only": 0,
+  				"expires": 1784385693,
+  				"secure": 0,
+  				"same_site": 0
+  			}, {
+  				"name": "sid",
+  				"value": "abc",
+  				"http_only": 0,
+  				"expires": 1784385693,
+  				"secure": 0,
+  				"same_site": 0
+  			}],
+  			"domains": [".bilibili.com", ".biligame.com", ".bilibili.cn", ".huasheng.cn"]
+  		},
+  		"sso": ["https://passport.bilibili.com/api/v2/sso", "https://passport.biligame.com/api/v2/sso", "https://passport.bilibili.cn/api/v2/sso"],
+  		"is_new": false,
+  		"is_tourist": false
+  	}
+  }
+  ```

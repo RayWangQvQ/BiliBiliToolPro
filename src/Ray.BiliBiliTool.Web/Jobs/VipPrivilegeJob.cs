@@ -8,12 +8,8 @@ public class VipPrivilegeJob(
     IVipPrivilegeTaskAppService appService
 ) : BaseJob<VipPrivilegeJob>(logger)
 {
-    private readonly ILogger<VipPrivilegeJob> _logger = logger;
     public static readonly JobKey Key = new(nameof(VipPrivilegeJob), Constants.BiliJobGroup);
 
-    protected override async Task DoExecuteAsync(IJobExecutionContext context)
-    {
-        _logger.LogInformation($"{nameof(VipPrivilegeJob)} started.");
+    protected override async Task DoExecuteAsync(IJobExecutionContext context) =>
         await appService.DoTaskAsync();
-    }
 }

@@ -1,0 +1,69 @@
+info:
+  name: verify
+  type: http
+  seq: 4
+
+http:
+  method: POST
+  url: "{{host}}/x/safecenter/login/tel/verify"
+  headers:
+    - name: Cookie
+      value: Buvid=XUA5651A9EDF7387153A945CDE96CADCB6000
+    - name: bili-http-engine
+      value: ignet
+    - name: native_api_from
+      value: h5
+    - name: referer
+      value: https://passport.bilibili.com/h5-app/passport/risk/verify?tmp_token=2ecff8d85344943d1eda8e8a08f41141&request_id=899a2807c62748c5a6b7d28f3570424e&source=risk
+    - name: x-bili-net-bin
+      value: DQAAgL8gAQ
+    - name: x-bili-ticket
+      value: eyJhbGciOiJIUzI1NiIsImtpZCI6InMwMyIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzY2MjU5OTIsImlhdCI6MTc3NjU5Njg5MiwiYnV2aWQiOiJYVUE1NjUxQTlFREY3Mzg3MTUzQTk0NUNERTk2Q0FEQ0I2MDAwIn0.GNwbcwJMRU29LO8E1287V1TtdNqFvED18f-1RXZxb_k
+    - name: x-bili-trace-id
+      value: 71e35673d649f72ce095c631c869e4e9:e095c631c869e4e9:0:0
+  body:
+    type: form-urlencoded
+    data:
+      - name: appkey
+        value: "{{appKeyGuest}}"
+      - name: captcha_key
+        value: c09eddb62a485d265c479f1b6575bd11
+      - name: code
+        value: "871494"
+      - name: disable_rcmd
+        value: "0"
+      - name: request_id
+        value: 899a2807c62748c5a6b7d28f3570424e
+      - name: source
+        value: risk
+      - name: statistics
+        value: "{{statistics}}"
+      - name: tmp_code
+        value: 2ecff8d85344943d1eda8e8a08f41141
+      - name: ts
+        value: "{{ts}}"
+      - name: type
+        value: loginTelCheck
+      - name: sign
+        value: "{{sign}}"
+  auth: inherit
+
+settings:
+  encodeUrl: false
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+docs: |
+  ## Response Sample
+
+  ```json
+  {
+  	"code": 0,
+  	"message": "OK",
+  	"ttl": 1,
+  	"data": {
+  		"code": "ef330ca16724a3d6f832732d22f86841"
+  	}
+  }
+  ```

@@ -1,0 +1,54 @@
+info:
+  name: key
+  type: http
+  seq: 1
+
+http:
+  method: GET
+  url: "{{host}}/x/passport-login/web/key"
+  headers:
+    - name: x-bili-aurora-eid
+      value: ""
+    - name: x-bili-mid
+      value: ""
+    - name: x-bili-aurora-zone
+      value: ""
+    - name: x-bili-gaia-vtoken
+      value: ""
+    - name: bili-http-engine
+      value: cronet
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        const body = res.getBody();
+        if (body && body.code === 0 && body.data) {
+          bru.setVar("rsa_hash", body.data.hash);
+          bru.setVar("rsa_key", body.data.key);
+          console.log("✅ Saved rsa_hash:", body.data.hash);
+          console.log("✅ Saved rsa_key (first 40 chars):", body.data.key.substring(0, 40));
+        } else {
+          console.log("❌ Failed to get RSA key, response:", JSON.stringify(body));
+        }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+docs: |
+  ## Response Sample
+
+  ```json
+  {
+    "code": 0,
+    "message": "OK",
+    "ttl": 1,
+    "data": {
+      "hash": "8e54ba6e9c94e344",
+      "key": "-----BEGIN PUBLIC KEY-----\nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDjb4V7EidX/ym28t2ybo0U6t0n\n6p4ej8VjqKHg100va6jkNbNTrLQqMCQCAYtXMXXp2Fwkk6WR+12N9zknLjf+C9sx\n/+l48mjUU8RqahiFD1XT/u2e0m2EN029OhCgkHx3Fc/KlFSIbak93EH/XlYis0w+\nXl69GV6klzgxW6d2xQIDAQAB\n-----END PUBLIC KEY-----\n"
+    }
+  }
+  ```

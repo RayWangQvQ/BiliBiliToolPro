@@ -29,8 +29,16 @@
                       AdornmentIcon="@_passwordInputIcon" OnAdornmentClick="TogglePasswordVisibility" />
     </MudCardContent>
     <MudCardActions>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ChangePasswordAsync"
-                   Class="ml-auto">Submit</MudButton>
+        @if (_showLogoutButton)
+        {
+            <MudButton Variant="Variant.Filled" Color="Color.Warning" OnClick="Logout"
+                       Class="ml-auto">Logout</MudButton>
+        }
+        else
+        {
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ChangePasswordAsync"
+                       Class="ml-auto">Submit</MudButton>
+        }
     </MudCardActions>
 </MudCard>
 

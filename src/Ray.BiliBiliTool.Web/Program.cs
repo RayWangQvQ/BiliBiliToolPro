@@ -2,13 +2,7 @@ using BlazingQuartz;
 using BlazingQuartz.Core;
 using Microsoft.OpenApi.Models;
 using MudBlazor.Services;
-using Quartz;
-using Quartz.Impl.AdoJobStore;
-using Ray.BiliBiliTool.Agent.Extensions;
-using Ray.BiliBiliTool.Application.Extensions;
-using Ray.BiliBiliTool.Config.Extensions;
 using Ray.BiliBiliTool.Config.SQLite;
-using Ray.BiliBiliTool.DomainService.Extensions;
 using Ray.BiliBiliTool.Infrastructure;
 using Ray.BiliBiliTool.Infrastructure.EF;
 using Ray.BiliBiliTool.Infrastructure.EF.Extensions;
@@ -24,7 +18,10 @@ try
 {
     var builder = WebApplication.CreateBuilder(args);
 
+    // cookies.json as fallback source — loaded before SQLite so that
+    // SQLite keys take precedence when both exist.
     builder.Configuration.AddJsonFile("config/cookies.json", optional: true, reloadOnChange: true);
+
     var sqliteConnStr = builder.Configuration.GetConnectionString("Sqlite");
     if (!string.IsNullOrEmpty(sqliteConnStr))
     {
@@ -84,41 +81,17 @@ try
         builder.Configuration.GetSection("BlazingQuartz")
     );
     builder.Services.AddBlazingQuartz();
-    builder.Services.AddMudServices();
-
-    builder.Services.AddQuartz(q =>
-    {
-        q.UsePersistentStore(storeOptions =>
-        {
-            storeOptions.UseMicrosoftSQLite(sqlLiteOptions =>
-            {
-                sqlLiteOptions.UseDriverDelegate<SQLiteDelegate>();
-                sqlLiteOptions.ConnectionString =
-                    sqliteConnStr ?? throw new InvalidOperationException();
-                sqlLiteOptions.TablePrefix = "QRTZ_";
-            });
-            storeOptions.UseSystemTextJsonSerializer();
-        });
-
-        q.AddBiliJobs(builder.Configuration);
-    });
-    builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
+    builder.Services.AddBiliScheduler(builder.Configuration);
 
     builder
         .Services.AddWebServices()
         .AddAuthServices()
-        .AddAppServices()
-        .AddDomainServices()
-        .AddBiliBiliConfigs(builder.Configuration)
-        .AddBiliBiliClientApi(builder.Configuration);
+        .AddCoreModuleServices(builder.Configuration);
 
     var app = builder.Build();
 
     Global.ServiceProviderRoot = app.Services;
-
-    using var scope = app.Services.CreateScope();
-    var dbInitializer = scope.ServiceProvider.GetRequiredService<DbInitializer>();
-    dbInitializer.InitializeAsync().Wait();
+    await app.InitializeBiliToolAsync();
 
     if (app.Environment.IsDevelopment())
     {
@@ -160,3 +133,5 @@ finally
 {
     Log.CloseAndFlush();
 }
+
+public partial class Program;

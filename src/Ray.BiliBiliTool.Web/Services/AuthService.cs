@@ -1,7 +1,6 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.EntityFrameworkCore;
-using Ray.BiliBiliTool.Infrastructure.EF;
+using Ray.BiliBiliTool.Domain;
 using Ray.BiliBiliTool.Infrastructure.Helpers;
 
 namespace Ray.BiliBiliTool.Web.Services;
@@ -13,12 +12,11 @@ public interface IAuthService
     Task<string> GetAdminUserNameAsync();
 }
 
-public class AuthService(IDbContextFactory<BiliDbContext> dbFactory) : IAuthService
+public class AuthService(IUserRepository userRepository) : IAuthService
 {
     public async Task<ClaimsIdentity> LoginAsync(string username, string password)
     {
-        await using var context = await dbFactory.CreateDbContextAsync();
-        var user = await context.Users.FirstOrDefaultAsync(u => u.Username == username);
+        var user = await userRepository.FindByUsernameAsync(username);
 
         if (user != null && PasswordHelper.VerifyPassword(password, user.Salt, user.PasswordHash))
         {
@@ -42,8 +40,7 @@ public class AuthService(IDbContextFactory<BiliDbContext> dbFactory) : IAuthServ
         string newPassword
     )
     {
-        await using var context = await dbFactory.CreateDbContextAsync();
-        var user = await context.Users.FirstAsync(u => u.Id == 1);
+        var user = await userRepository.GetAdminAsync();
 
         if (!PasswordHelper.VerifyPassword(currentPassword, user.Salt, user.PasswordHash))
         {
@@ -56,13 +53,12 @@ public class AuthService(IDbContextFactory<BiliDbContext> dbFactory) : IAuthServ
         user.PasswordHash = hash;
         user.Username = username;
 
-        await context.SaveChangesAsync();
+        await userRepository.UpdateAsync(user);
     }
 
     public async Task<string> GetAdminUserNameAsync()
     {
-        await using var context = await dbFactory.CreateDbContextAsync();
-        var user = await context.Users.FirstAsync(u => u.Id == 1);
+        var user = await userRepository.GetAdminAsync();
         return user.Username;
     }
 }

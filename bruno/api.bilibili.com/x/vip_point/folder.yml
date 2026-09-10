@@ -1,0 +1,7 @@
+info:
+  name: vip_point
+  type: folder
+  seq: 5
+
+request:
+  auth: inherit

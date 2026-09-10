@@ -1,0 +1,173 @@
+info:
+  name: end
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{host}}/x/report/heartbeat/mobile"
+  headers:
+    - name: buvid
+      value: "{{buvid}}"
+    - name: fp_local
+      value: "{{device_id}}"
+    - name: fp_remote
+      value: "{{device_id}}"
+    - name: session_id
+      value: e04d2e05
+    - name: env
+      value: prod
+    - name: app-key
+      value: android64
+    - name: user-agent
+      value: "{{user-agent}}"
+    - name: x-bili-trace-id
+      value: 2c64470432d0c5346a475a449467755d:6a475a449467755d:0:0
+    - name: x-bili-aurora-eid
+      value: UlAAQFkMBVkH
+    - name: x-bili-mid
+      value: "{{mid}}"
+    - name: x-bili-aurora-zone
+      value: ""
+    - name: x-bili-gaia-vtoken
+      value: ""
+    - name: x-bili-ticket
+      value: eyJhbGciOiJIUzI1NiIsImtpZCI6InMwMyIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzU3NzI2NDcsImlhdCI6MTczNTc0MzU0NywiYnV2aWQiOiJYVzcyNEQxNzI0Njg3MTlDQzI1NjA1REIyNDI0NzhEMkUxMjE5In0.eafhpooLoe2q6cA45_Xrgq1VO-y490pxP5gwJ4qm_ik
+    - name: bili-http-engine
+      value: cronet
+    - name: Cookie
+      value: "{{cookieStr}}"
+      disabled: true
+  body:
+    type: form-urlencoded
+    data:
+      - name: access_key
+        value: "{{access_key}}"
+        disabled: true
+      - name: appkey
+        value: "{{appKey}}"
+      - name: actual_played_time
+        value: "548"
+      - name: aid
+        value: "726710400"
+      - name: auto_play
+        value: "99"
+      - name: build
+        value: "7720200"
+      - name: c_locale
+        value: zh_CN
+      - name: channel
+        value: yingyongbao
+      - name: cid
+        value: "785731972"
+      - name: disable_rcmd
+        value: "0"
+      - name: epid
+        value: "511578"
+      - name: epid_status
+        value: "13"
+      - name: extra
+        value: '{"from_outer_spmid":"activity.h5.0.0"}'
+      - name: from
+        value: "12"
+      - name: from_spmid
+        value: united.player-video-detail.player.continue
+      - name: last_play_progress_time
+        value: "638"
+      - name: list_play_time
+        value: "0"
+      - name: max_play_progress_time
+        value: "638"
+      - name: mid
+        value: "{{mid}}"
+      - name: miniplayer_play_time
+        value: "0"
+      - name: mobi_app
+        value: android
+      - name: network_type
+        value: "1"
+      - name: paused_time
+        value: "0"
+      - name: platform
+        value: android
+      - name: play_mode
+        value: "1"
+      - name: play_status
+        value: "1"
+      - name: play_type
+        value: ""
+      - name: played_time
+        value: "548"
+      - name: quality
+        value: "64"
+      - name: report_flow_data
+        value: ""
+      - name: s_locale
+        value: zh_CN
+      - name: session
+        value: 2edcb8dc8ff0b6f13dd685a23aff692b72bf2869
+      - name: sid
+        value: "41410"
+      - name: spmid
+        value: united.player-video-detail.0.0
+      - name: start_ts
+        value: "1735744223"
+      - name: statistics
+        value: "{{statistics}}"
+      - name: sub_type
+        value: "1"
+      - name: total_time
+        value: "548"
+      - name: track_id
+        value: ""
+      - name: type
+        value: "4"
+      - name: user_status
+        value: "1"
+      - name: video_duration
+        value: "1450"
+      - name: ts
+        value: "{{ts}}"
+      - name: sign
+        value: "{{sign}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+docs: |
+  ## Auth
+
+  - NA
+
+  ## Signature Verification
+
+  - sign
+
+  ## Response Sample
+
+  ```json
+  {
+    "code": 0,
+    "message": "0",
+    "ttl": 1,
+    "data": {
+      "ts": 1776604931
+    }
+  }
+  ```
+
+  ## Response Sample
+
+  ```json
+  {
+    "code": 0,
+    "message": "0",
+    "ttl": 1,
+    "data": {
+      "ts": 1735744223
+    }
+  }
+  ```

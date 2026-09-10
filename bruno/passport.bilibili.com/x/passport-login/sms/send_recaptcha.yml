@@ -1,0 +1,97 @@
+info:
+  name: send_recaptcha
+  type: http
+  seq: 4
+
+http:
+  method: POST
+  url: "{{host}}/x/passport-login/sms/send"
+  headers:
+    - name: bili-http-engine
+      value: ignet
+    - name: fp_local
+      value: 910f57d9d7feaf6928e592860452d06b202505211207597aa9050a2e5c31f431
+    - name: fp_remote
+      value: 910f57d9d7feaf6928e592860452d06b202505211207597aa9050a2e5c31f431
+    - name: guestid
+      value: "24675260415603"
+    - name: session_id
+      value: 45dd1740
+    - name: x-bili-locale-bin
+      value: CggKAnpoGgJDThIICgJ6aBoCQ04iDUFzaWEvU2hhbmdoYWkqBiswODowMA
+    - name: x-bili-metadata-ip-region
+      value: CN
+    - name: x-bili-net-bin
+      value: DcdEej8gAQ
+  body:
+    type: form-urlencoded
+    data:
+      - name: appkey
+        value: "{{appKeyGuest}}"
+      - name: build
+        value: "{{build}}"
+      - name: buvid
+        value: "{{buvid}}"
+      - name: c_locale
+        value: zh_CN
+      - name: channel
+        value: bili
+      - name: cid
+        value: "86"
+      - name: device_tourist_id
+        value: "24675260415603"
+      - name: disable_rcmd
+        value: "0"
+      - name: extend
+        value: ""
+      - name: gee_challenge
+        value: "{{risk_gee_challenge}}"
+      - name: gee_seccode
+        value: 2df4cd1ccaefbd5511ebec809e13c09f|jordan
+      - name: gee_validate
+        value: 2df4cd1ccaefbd5511ebec809e13c09f
+      - name: local_id
+        value: "{{buvid}}"
+      - name: login_session_id
+        value: fddb6c114c723b3612822a75f04eeeb4
+      - name: mobi_app
+        value: android
+      - name: platform
+        value: android
+      - name: recaptcha_token
+        value: "{{risk_recaptcha_token}}"
+      - name: s_locale
+        value: zh_CN
+      - name: spm_id
+        value: main.homepage.bottombar.myinfo
+      - name: statistics
+        value: "{{statistics}}"
+      - name: tel
+        value: "{{phone}}"
+      - name: ts
+        value: "{{ts}}"
+      - name: sign
+        value: "{{sign}}"
+  auth: inherit
+
+settings:
+  encodeUrl: false
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+docs: |-
+  ## Response Sample
+
+  ```json
+  {
+  	"code": 0,
+  	"message": "OK",
+  	"ttl": 1,
+  	"data": {
+  		"is_new": false,
+  		"captcha_key": "32e3f801780d9b71fc45a14987fe3ca1",
+  		"recaptcha_url": ""
+  	}
+  }
+  ```

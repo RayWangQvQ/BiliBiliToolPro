@@ -8,6 +8,8 @@ namespace Ray.BiliBiliTool.Web.Jobs;
 public abstract class BaseJob<TJob>(ILogger<TJob> logger) : IJob
     where TJob : BaseJob<TJob>
 {
+    protected ILogger<TJob> Logger { get; } = logger;
+
     public async Task Execute(IJobExecutionContext context)
     {
         var fireInstanceId = context.FireInstanceId;
@@ -22,6 +24,7 @@ public abstract class BaseJob<TJob>(ILogger<TJob> logger) : IJob
         {
             try
             {
+                logger.LogInformation($"{typeof(TJob).Name} started.");
                 await DoExecuteAsync(context);
             }
             catch (Exception e)

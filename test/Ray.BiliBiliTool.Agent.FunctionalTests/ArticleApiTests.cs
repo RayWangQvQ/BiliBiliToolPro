@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
-using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Article;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.ApiApi.Article;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Services;
 using Ray.BiliBiliTool.Console;
@@ -11,7 +11,7 @@ namespace Ray.BiliBiliTool.Agent.FunctionalTests;
 
 public class ArticleApiTests
 {
-    private readonly IArticleApi _api;
+    private readonly IApiApi _api;
 
     private readonly BiliCookie _ck;
     private readonly IWbiService _wbiService;
@@ -27,7 +27,7 @@ public class ArticleApiTests
         IHost host = Program.CreateHost(envs.ToArray());
         _ck = host.Services.GetRequiredService<BiliCookie>();
         _wbiService = host.Services.GetRequiredService<IWbiService>();
-        _api = host.Services.GetRequiredService<IArticleApi>();
+        _api = host.Services.GetRequiredService<IApiApi>();
     }
 
     #region SearchUpArticlesByUpIdAsync

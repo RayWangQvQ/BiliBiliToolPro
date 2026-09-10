@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.NavApi;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Interfaces;
@@ -13,7 +14,7 @@ namespace Ray.BiliBiliTool.DomainService;
 /// </summary>
 public class VipPrivilegeDomainService(
     ILogger<VipPrivilegeDomainService> logger,
-    IDailyTaskApi dailyTaskApi,
+    IApiApi apiApi,
     IOptionsMonitor<VipPrivilegeOptions> receiveVipPrivilegeOptions
 ) : IVipPrivilegeDomainService
 {
@@ -74,11 +75,7 @@ public class VipPrivilegeDomainService(
     /// <param name="ck"></param>
     private async Task<bool> ReceiveVipPrivilege(VipPrivilegeType type, BiliCookie ck)
     {
-        var response = await dailyTaskApi.ReceiveVipPrivilegeAsync(
-            (int)type,
-            ck.BiliJct,
-            ck.ToString()
-        );
+        var response = await apiApi.ReceiveVipPrivilegeAsync((int)type, ck.BiliJct, ck.ToString());
 
         var name = GetPrivilegeName(type);
         logger.LogInformation("【领取】{name}", name);

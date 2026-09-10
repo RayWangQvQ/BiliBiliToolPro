@@ -1,6 +1,8 @@
 ﻿using System.Threading.Tasks;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.ApiApi.Daily;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.ApiApi.Video;
 using Ray.BiliBiliTool.DomainService.Dtos;
 
 namespace Ray.BiliBiliTool.DomainService.Interfaces;

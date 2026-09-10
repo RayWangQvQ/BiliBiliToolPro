@@ -1,0 +1,139 @@
+@page "/BiliAccount"
+@using Microsoft.AspNetCore.Authorization
+@using Ray.BiliBiliTool.Web.Services.Pages.BiliAccount
+@using Ray.BiliBiliTool.Web.Components.Pages.BiliAccount
+@rendermode InteractiveServer
+@attribute [Authorize]
+
+@inject IBiliAccountPageWorkflow Workflow
+@inject IDialogService DialogService
+
+<PageTitle>Bili Account</PageTitle>
+
+<MudText Typo="Typo.h5">Bili Account</MudText>
+
+<MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add"
+           Class="mt-2 mb-2" OnClick="OpenAddDialog">Add Account</MudButton>
+
+<MudButton Variant="Variant.Outlined" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.QrCodeScanner"
+           Class="mt-2 mb-2 ml-2" OnClick="OpenQrLoginDialog">Login with QR</MudButton>
+
+@if (_loading)
+{
+    <MudProgressCircular Indeterminate="true" Class="mt-4" />
+}
+else if (_accounts.Count == 0)
+{
+    <MudText Typo="Typo.body1" Class="mt-4">No accounts configured.</MudText>
+}
+else
+{
+    <MudTable Items="_accounts" Hover="true" Striped="true" Class="mt-4">
+        <HeaderContent>
+            <MudTh>#</MudTh>
+            <MudTh>UserId</MudTh>
+            <MudTh>Cookie</MudTh>
+            <MudTh>Actions</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="#">@context.Index</MudTd>
+            <MudTd DataLabel="UserId">@context.UserId</MudTd>
+            <MudTd DataLabel="Cookie">
+                <MudTooltip Text="@context.CookieStr">
+                    @(context.CookieStr.Length > 80 ? context.CookieStr[..80] + "..." : context.CookieStr)
+                </MudTooltip>
+            </MudTd>
+            <MudTd DataLabel="Actions">
+                <MudIconButton Icon="@Icons.Material.Filled.KeyboardArrowUp" Size="Size.Small"
+                               Disabled="@(context.Index == 0)"
+                               OnClick="@(() => MoveUp(context))" />
+                <MudIconButton Icon="@Icons.Material.Filled.KeyboardArrowDown" Size="Size.Small"
+                               Disabled="@(context.Index == _accounts.Count - 1)"
+                               OnClick="@(() => MoveDown(context))" />
+                <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small"
+                               OnClick="@(() => OpenEditDialog(context))" />
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error"
+                               OnClick="@(() => OpenDeleteDialog(context))" />
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+}
+
+<MudThemeProvider/>
+<MudDialogProvider/>
+<MudSnackbarProvider/>
+<MudPopoverProvider />
+
+@code {
+    private bool _loading = true;
+    private List<BiliAccountDto> _accounts = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAccounts();
+    }
+
+    private async Task LoadAccounts()
+    {
+        _loading = true;
+        _accounts = await Workflow.GetAllAccountsAsync();
+        _loading = false;
+    }
+
+    private async Task OpenAddDialog()
+    {
+        var dialog = await DialogService.ShowAsync<AddAccountDialog>("Add Account");
+        var result = await dialog.Result;
+        if (!result.Canceled && result.Data is string cookieStr)
+        {
+            await Workflow.AddAsync(cookieStr);
+            await LoadAccounts();
+        }
+    }
+
+    private async Task OpenQrLoginDialog()
+    {
+        var dialog = await DialogService.ShowAsync<QrLoginDialog>("QR Code Login");
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await LoadAccounts();
+        }
+    }
+
+    private async Task OpenEditDialog(BiliAccountDto account)
+    {
+        var parameters = new DialogParameters { ["CookieStr"] = account.CookieStr };
+        var dialog = await DialogService.ShowAsync<EditAccountDialog>("Edit Account", parameters);
+        var result = await dialog.Result;
+        if (!result.Canceled && result.Data is string newCookieStr)
+        {
+            await Workflow.UpdateAsync(account.Index, newCookieStr);
+            await LoadAccounts();
+        }
+    }
+
+    private async Task OpenDeleteDialog(BiliAccountDto account)
+    {
+        var parameters = new DialogParameters { ["UserId"] = account.UserId };
+        var dialog = await DialogService.ShowAsync<DeleteAccountDialog>("Delete Account", parameters);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await Workflow.DeleteAsync(account.Index);
+            await LoadAccounts();
+        }
+    }
+
+    private async Task MoveUp(BiliAccountDto account)
+    {
+        await Workflow.ReorderAsync(account.Index, account.Index - 1);
+        await LoadAccounts();
+    }
+
+    private async Task MoveDown(BiliAccountDto account)
+    {
+        await Workflow.ReorderAsync(account.Index, account.Index + 1);
+        await LoadAccounts();
+    }
+}

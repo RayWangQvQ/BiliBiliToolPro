@@ -2,10 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Ray.BiliBiliTool.Agent.Extensions;
-using Ray.BiliBiliTool.Application.Extensions;
-using Ray.BiliBiliTool.Config.Extensions;
-using Ray.BiliBiliTool.DomainService.Extensions;
+using Ray.BiliBiliTool.Console.Extensions;
 using Ray.BiliBiliTool.Infrastructure;
 using Serilog;
 using Serilog.Debugging;
@@ -117,11 +114,7 @@ public class Program
             (hostContext, services) =>
             {
                 services.AddHostedService<BiliBiliToolHostedService>();
-
-                services.AddBiliBiliConfigs(hostContext.Configuration);
-                services.AddBiliBiliClientApi(hostContext.Configuration);
-                services.AddDomainServices();
-                services.AddAppServices();
+                services.AddConsoleCoreServices(hostContext.Configuration);
             }
         );
 

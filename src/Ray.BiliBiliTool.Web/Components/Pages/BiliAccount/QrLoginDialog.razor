@@ -1,0 +1,190 @@
+@using MudBlazor
+@using Ray.BiliBiliTool.DomainService.Dtos
+@using Ray.BiliBiliTool.Web.Services.Pages.BiliAccount
+@inject IBiliAccountPageWorkflow Workflow
+
+<MudDialog>
+    <DialogContent>
+        @switch (_state)
+        {
+            case QrLoginDialogState.Generating:
+                <div class="d-flex flex-column align-center pa-4">
+                    <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+                    <MudText Typo="Typo.body2" Class="mt-2">正在生成二维码...</MudText>
+                </div>
+                break;
+
+            case QrLoginDialogState.Scanning:
+                <div class="d-flex flex-column align-center pa-4">
+                    <MudText Typo="Typo.body2" Class="mb-2">请使用Bilibili App扫描二维码</MudText>
+                    <img src="data:image/png;base64,@_qrImageBase64" alt="QR Code"
+                         style="width:200px;height:200px;border:1px solid #e0e0e0;border-radius:4px;" />
+                    @if (!string.IsNullOrEmpty(_onlineUrl))
+                    {
+                        <MudText Typo="Typo.caption" Class="mt-1">
+                            <MudLink Href="@_onlineUrl" Target="_blank">扫码失败？查看高清二维码</MudLink>
+                        </MudText>
+                    }
+                    <MudText Typo="Typo.caption" Class="mt-2">@($"等待扫描... {_pollCount}/10")</MudText>
+                    <MudProgressLinear Value="@(_pollCount * 10)" Color="Color.Primary" Class="mt-1" Style="width:200px;" />
+                </div>
+                break;
+
+            case QrLoginDialogState.Success:
+                <div class="d-flex flex-column align-center pa-4">
+                    <MudProgressCircular Indeterminate="true" Color="Color.Success" />
+                    <MudText Typo="Typo.body2" Color="Color.Success" Class="mt-2">登录成功！正在保存...</MudText>
+                </div>
+                break;
+
+            case QrLoginDialogState.Expired:
+            case QrLoginDialogState.Failed:
+                <div class="d-flex flex-column align-center pa-4">
+                    <MudIcon Icon="@Icons.Material.Filled.ErrorOutline" Color="Color.Error" Size="Size.Large" />
+                    <MudText Typo="Typo.body2" Color="Color.Error" Class="mt-2">@_errorMessage</MudText>
+                </div>
+                break;
+        }
+    </DialogContent>
+    <DialogActions>
+        @if (_state == QrLoginDialogState.Failed || _state == QrLoginDialogState.Expired)
+        {
+            <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="Retry">重试</MudButton>
+        }
+        <MudButton OnClick="Cancel">取消</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = null!;
+
+    private enum QrLoginDialogState { Generating, Scanning, Success, Failed, Expired }
+
+    private QrLoginDialogState _state = QrLoginDialogState.Generating;
+    private string? _qrImageBase64;
+    private string? _qrcodeKey;
+    private string? _onlineUrl;
+    private int _pollCount;
+    private string? _errorMessage;
+    private CancellationTokenSource? _pollingCts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await StartQrLoginAsync();
+    }
+
+    private async Task StartQrLoginAsync()
+    {
+        _pollingCts?.Cancel();
+        _pollingCts = new CancellationTokenSource();
+        var ct = _pollingCts.Token;
+
+        try
+        {
+            // Phase 1: Generate QR code
+            _state = QrLoginDialogState.Generating;
+            StateHasChanged();
+
+            QrLoginGenerateResult generateResult;
+            try
+            {
+                generateResult = await Workflow.QrLoginGenerateAsync();
+            }
+            catch (Exception ex)
+            {
+                _state = QrLoginDialogState.Failed;
+                _errorMessage = $"生成二维码失败：{ex.Message}";
+                StateHasChanged();
+                return;
+            }
+
+            _qrImageBase64 = generateResult.QrImageBase64;
+            _qrcodeKey = generateResult.QrcodeKey;
+            _onlineUrl = generateResult.OnlineUrl;
+
+            // Phase 2: Poll for scan result
+            _state = QrLoginDialogState.Scanning;
+            _pollCount = 0;
+            StateHasChanged();
+
+            var maxAttempts = 10;
+            for (int i = 0; i < maxAttempts; i++)
+            {
+                if (ct.IsCancellationRequested)
+                    return;
+
+                await Task.Delay(5000, ct);
+                _pollCount = i + 1;
+                StateHasChanged();
+
+                QrLoginCheckResult checkResult;
+                try
+                {
+                    checkResult = await Workflow.QrLoginPollAsync(_qrcodeKey);
+                }
+                catch (Exception)
+                {
+                    // Network error on poll — continue trying
+                    continue;
+                }
+
+                switch (checkResult.Status)
+                {
+                    case QrLoginStatus.Success:
+                        _state = QrLoginDialogState.Success;
+                        StateHasChanged();
+                        // Complete: enrich cookie and save to SQLite (per D-02)
+                        await Workflow.QrLoginCompleteAsync(checkResult.Cookie!);
+                        MudDialog.Close(DialogResult.Ok(true));
+                        return;
+
+                    case QrLoginStatus.Expired:
+                        _state = QrLoginDialogState.Expired;
+                        _errorMessage = "二维码已过期";
+                        StateHasChanged();
+                        return;
+
+                    case QrLoginStatus.Error:
+                        _state = QrLoginDialogState.Failed;
+                        _errorMessage = checkResult.Message ?? "登录失败";
+                        StateHasChanged();
+                        return;
+
+                    case QrLoginStatus.Waiting:
+                    default:
+                        // Still waiting — continue polling
+                        break;
+                }
+            }
+
+            // Timeout after all attempts (per D-04)
+            _state = QrLoginDialogState.Failed;
+            _errorMessage = "登录超时，请重试";
+            StateHasChanged();
+        }
+        catch (OperationCanceledException)
+        {
+            // Dialog was closed or retried — expected
+        }
+    }
+
+    private async Task Retry()
+    {
+        _pollCount = 0;
+        _errorMessage = null;
+        await StartQrLoginAsync();
+    }
+
+    private void Cancel()
+    {
+        _pollingCts?.Cancel();
+        MudDialog.Cancel();
+    }
+
+    public void Dispose()
+    {
+        _pollingCts?.Cancel();
+        _pollingCts?.Dispose();
+    }
+}

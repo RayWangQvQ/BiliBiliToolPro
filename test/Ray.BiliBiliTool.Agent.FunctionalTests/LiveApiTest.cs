@@ -5,7 +5,8 @@ using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
-using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Live;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.ApiApi.UpInfo;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.LiveApi;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Services;
 using Ray.BiliBiliTool.Console;
@@ -133,7 +134,7 @@ namespace BiliAgentTest
             using var scope = Global.ServiceProviderRoot.CreateScope();
 
             var ck = scope.ServiceProvider.GetRequiredService<CookieStrFactory<BiliCookie>>();
-            var api = scope.ServiceProvider.GetRequiredService<IUpInfoApi>();
+            var api = scope.ServiceProvider.GetRequiredService<IApiApi>();
 
             var wbiService = scope.ServiceProvider.GetRequiredService<IWbiService>();
 

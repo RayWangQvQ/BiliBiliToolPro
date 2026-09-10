@@ -1,19 +1,19 @@
 ﻿using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
-using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Passport;
-using WebApiClientCore.Attributes;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.PassportApi;
+using Refit;
 
 namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 
-[Header("Host", "passport.bilibili.com")]
-public interface IPassportApi : IBiliBiliApi
+[Headers("Host: passport.bilibili.com")]
+public interface IPassportApi
 {
-    [HttpGet("/x/passport-login/web/qrcode/generate")]
+    [Get("/x/passport-login/web/qrcode/generate")]
     Task<BiliApiResponse<QrCodeDto>> GenerateQrCode();
 
-    [HttpGet("/x/passport-login/web/qrcode/poll?qrcode_key={qrcode_key}&source=main_mini")]
+    [Get("/x/passport-login/web/qrcode/poll?qrcode_key={qrcode_key}&source=main_mini")]
     //Task<BiliApiResponse<TokenDto>> CheckQrCodeHasScaned(string qrcode_key);
     Task<HttpResponseMessage> CheckQrCodeHasScaned(string qrcode_key);
 
-    [HttpGet("/x/passport-login/web/sso/list?biliCSRF={csrf}")]
+    [Get("/x/passport-login/web/sso/list?biliCSRF={csrf}")]
     Task<BiliApiResponse<GetSsoListResponse>> GetSsoListAsync(string csrf);
 }

@@ -1,16 +1,17 @@
 ﻿using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
-using WebApiClientCore.Attributes;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.AccountApi;
+using Refit;
 
 namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 
-[Header("Host", "account.bilibili.com")]
-public interface IAccountApi : IBiliBiliApi
+[Headers("Host: account.bilibili.com")]
+public interface IAccountApi
 {
     /// <summary>
     /// 获取硬币余额
     /// </summary>
     /// <returns></returns>
-    [Header("Referer", "https://account.bilibili.com/account/coin")]
-    [HttpGet("/site/getCoin")]
+    [Headers("Referer: https://account.bilibili.com/account/coin")]
+    [Get("/site/getCoin")]
     Task<BiliApiResponse<CoinBalance>> GetCoinBalanceAsync([Header("Cookie")] string ck);
 }

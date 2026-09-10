@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.ApiApi.Daily;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Console;
 
@@ -9,7 +10,7 @@ namespace Ray.BiliBiliTool.Agent.FunctionalTests;
 
 public class DailyTaskApiTests
 {
-    private readonly IDailyTaskApi _api;
+    private readonly IApiApi _api;
 
     private readonly BiliCookie _ck;
 
@@ -23,7 +24,7 @@ public class DailyTaskApiTests
         };
         IHost host = Program.CreateHost(envs.ToArray());
         _ck = host.Services.GetRequiredService<BiliCookie>();
-        _api = host.Services.GetRequiredService<IDailyTaskApi>();
+        _api = host.Services.GetRequiredService<IApiApi>();
     }
 
     [Fact]

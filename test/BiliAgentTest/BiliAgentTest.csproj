@@ -19,5 +19,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Ray.BiliBiliTool.Console\Ray.BiliBiliTool.Console.csproj" />
+    <ProjectReference Include="..\..\src\Ray.BiliBiliTool.Domain\Ray.BiliBiliTool.Domain.csproj" />
   </ItemGroup>
 </Project>

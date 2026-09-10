@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Ray.BiliBiliTool.Config.Options;
@@ -40,7 +40,8 @@ public static class ServiceCollectionExtension
             .Configure<LiveFansMedalTaskOptions>(
                 configuration.GetSection("LiveFansMedalTaskConfig")
             )
-            .Configure<QingLongOptions>(configuration.GetSection("QingLongConfig"));
+            .Configure<QingLongOptions>(configuration.GetSection("QingLongConfig"))
+            .Configure<BaihuOptions>(configuration.GetSection("BaihuConfig"));
 
         return services;
     }

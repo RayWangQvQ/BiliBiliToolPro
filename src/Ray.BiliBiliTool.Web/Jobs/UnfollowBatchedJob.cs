@@ -8,12 +8,8 @@ public class UnfollowBatchedJob(
     IUnfollowBatchedTaskAppService appService
 ) : BaseJob<UnfollowBatchedJob>(logger)
 {
-    private readonly ILogger<UnfollowBatchedJob> _logger = logger;
     public static readonly JobKey Key = new(nameof(UnfollowBatchedJob), Constants.BiliJobGroup);
 
-    protected override async Task DoExecuteAsync(IJobExecutionContext context)
-    {
-        _logger.LogInformation($"{nameof(UnfollowBatchedJob)} started.");
+    protected override async Task DoExecuteAsync(IJobExecutionContext context) =>
         await appService.DoTaskAsync();
-    }
 }

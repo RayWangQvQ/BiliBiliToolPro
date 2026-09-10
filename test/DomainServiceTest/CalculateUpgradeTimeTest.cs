@@ -1,4 +1,5 @@
 ﻿using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.NavApi;
 
 namespace DomainServiceTest;
 

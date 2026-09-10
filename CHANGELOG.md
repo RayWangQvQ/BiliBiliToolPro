@@ -1,3 +1,14 @@
+## 4.0.1
+- 新增Bili账号管理页面
+- 重构Web
+- 整合Agent Dtos
+- 整合Agent interfaces
+- WebApiClientCore迁移为Refit
+- 重构AppService
+- 升级bruno到v3
+- bruno实现APP的sign签名算法和Web的WBI签名算法
+- Refactor by GSD
+- PR[#1078]：适配白虎面板
 ## 3.8.2
 - Fix[#1026]: 更新文档
 ## 3.8.1

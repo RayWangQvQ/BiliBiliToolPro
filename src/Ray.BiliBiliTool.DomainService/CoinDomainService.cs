@@ -7,8 +7,7 @@ namespace Ray.BiliBiliTool.DomainService;
 /// <summary>
 /// 硬币
 /// </summary>
-public class CoinDomainService(IAccountApi accountApi, IDailyTaskApi dailyTaskApi)
-    : ICoinDomainService
+public class CoinDomainService(IAccountApi accountApi, IApiApi apiApi) : ICoinDomainService
 {
     /// <summary>
     /// 获取账户硬币余额
@@ -36,7 +35,7 @@ public class CoinDomainService(IAccountApi accountApi, IDailyTaskApi dailyTaskAp
     /// <returns></returns>
     private async Task<int> GetDonateCoinExp(BiliCookie ck)
     {
-        return (await dailyTaskApi.GetDonateCoinExpAsync(ck.ToString())).Data;
+        return (await apiApi.GetDonateCoinExpAsync(ck.ToString())).Data;
     }
     #endregion
 }

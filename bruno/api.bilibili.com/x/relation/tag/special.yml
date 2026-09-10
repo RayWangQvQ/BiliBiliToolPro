@@ -1,0 +1,134 @@
+info:
+  name: special
+  type: http
+  seq: 1
+
+http:
+  method: GET
+  url: "{{host}}/x/relation/tag/special?access_key={{access_key}}&_device=android&_hwid=e0N3QnRBJEV0QiEXaxdrXG8LPgw1UDECYFU0AWJTZQ&build={{build}}&c_locale=zh_CN&channel=yingyongbao&disable_rcmd=0&mobi_app=android&platform=android&s_locale=zh_CN&src=yingyongbao&statistics={{statistics}}&trace_id=20250101120700047&version=7.72.0.7720200"
+  headers:
+    - name: buvid
+      value: "{{buvid}}"
+    - name: fp_local
+      value: "{{device_id}}"
+    - name: fp_remote
+      value: "{{device_id}}"
+    - name: session_id
+      value: "3160e892"
+    - name: env
+      value: prod
+    - name: app-key
+      value: android64
+    - name: user-agent
+      value: Mozilla/5.0 BiliDroid/7.72.0 (bbcallen@gmail.com) os/android model/Nexus mobi_app/android build/7720200 channel/yingyongbao innerVer/7720210 osVer/10 network/2
+    - name: x-bili-trace-id
+      value: f8209f943aca4379b5b407142a6774bf:b5b407142a6774bf:0:0
+    - name: x-bili-aurora-eid
+      value: UlAAQFkMBVkH
+    - name: x-bili-mid
+      value: "{{mid}}"
+    - name: x-bili-aurora-zone
+      value: ""
+    - name: x-bili-gaia-vtoken
+      value: ""
+    - name: x-bili-ticket
+      value: eyJhbGciOiJIUzI1NiIsImtpZCI6InMwMyIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzU3MzI4OTIsImlhdCI6MTczNTcwMzc5MiwiYnV2aWQiOiJYVzcyNEQxNzI0Njg3MTlDQzI1NjA1REIyNDI0NzhEMkUxMjE5In0.hEDtIHZoN5Wyoja2hNuPcfy-laa1r05ObiEhJ5gPSt4
+    - name: bili-http-engine
+      value: cronet
+    - name: Cookie
+      value: "{{cookieStr}}"
+  params:
+    - name: access_key
+      value: "{{access_key}}"
+      type: query
+    - name: appkey
+      value: "{{appKey}}"
+      type: query
+      disabled: true
+    - name: _device
+      value: android
+      type: query
+    - name: _hwid
+      value: e0N3QnRBJEV0QiEXaxdrXG8LPgw1UDECYFU0AWJTZQ
+      type: query
+    - name: build
+      value: "{{build}}"
+      type: query
+    - name: c_locale
+      value: zh_CN
+      type: query
+    - name: channel
+      value: yingyongbao
+      type: query
+    - name: disable_rcmd
+      value: "0"
+      type: query
+    - name: mobi_app
+      value: android
+      type: query
+    - name: platform
+      value: android
+      type: query
+    - name: s_locale
+      value: zh_CN
+      type: query
+    - name: src
+      value: yingyongbao
+      type: query
+    - name: statistics
+      value: "{{statistics}}"
+      type: query
+    - name: trace_id
+      value: "20250101120700047"
+      type: query
+    - name: version
+      value: 7.72.0.7720200
+      type: query
+    - name: ts
+      value: "{{ts}}"
+      type: query
+      disabled: true
+    - name: sign
+      value: "{{sign}}"
+      type: query
+      disabled: true
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+docs: |
+  ## Auth
+
+  - access_key
+  - Cookie
+
+  ## Signature Verification
+
+  - NA
+
+  ## Response Sample
+
+  ```json
+  {
+    "code": 0,
+    "message": "0",
+    "ttl": 1,
+    "data": [
+      432969969,
+      385670211,
+      515078764,
+      39627524,
+      493570956,
+      1241806378,
+      942755,
+      199676483,
+      79061224,
+      7584632,
+      473673050,
+      169952592
+    ]
+  }
+  ```

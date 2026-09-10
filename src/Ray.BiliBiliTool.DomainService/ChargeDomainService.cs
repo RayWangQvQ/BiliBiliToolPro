@@ -2,6 +2,8 @@
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.ApiApi.Charge;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.NavApi;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Interfaces;
@@ -15,13 +17,11 @@ public class ChargeDomainService(
     ILogger<ChargeDomainService> logger,
     IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
     IOptionsMonitor<ChargeTaskOptions> chargeTaskOptions,
-    IDailyTaskApi dailyTaskApi,
-    IChargeApi chargeApi
+    IApiApi apiApi
 ) : IChargeDomainService
 {
     private readonly DailyTaskOptions _dailyTaskOptions = dailyTaskOptions.CurrentValue;
     private readonly ChargeTaskOptions _chargeTaskOptions = chargeTaskOptions.CurrentValue;
-    private readonly IDailyTaskApi _dailyTaskApi = dailyTaskApi;
 
     /// <summary>
     /// 月底自动己充电
@@ -60,7 +60,7 @@ public class ChargeDomainService(
         var request = new ChargeRequest(couponBalance, long.Parse(targetUpId), ck.BiliJct);
 
         //BiliApiResponse<ChargeResponse> response = await _chargeApi.Charge(decimal.ToInt32(couponBalance * 10), _dailyTaskOptions.AutoChargeUpId, _cookieOptions.UserId, _cookieOptions.BiliJct);
-        BiliApiResponse<ChargeV2Response> response = await chargeApi.ChargeV2Async(
+        BiliApiResponse<ChargeV2Response> response = await apiApi.ChargeV2Async(
             request,
             ck.ToString()
         );
@@ -98,7 +98,7 @@ public class ChargeDomainService(
     {
         var comment = _chargeTaskOptions.ChargeComment ?? "";
         var request = new ChargeCommentRequest(orderNum, comment, ck.BiliJct);
-        await chargeApi.ChargeCommentAsync(request, ck.ToString());
+        await apiApi.ChargeCommentAsync(request, ck.ToString());
 
         logger.LogInformation("【留言】{comment}", comment);
     }

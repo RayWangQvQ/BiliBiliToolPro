@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.NavApi;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Infrastructure.Helpers;
 
@@ -11,7 +12,7 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Services;
 /// <summary>
 /// 防爬
 /// </summary>
-public class WbiService(ILogger<WbiService> logger, IUserInfoApi userInfoApi) : IWbiService
+public class WbiService(ILogger<WbiService> logger, INavApi navApi) : IWbiService
 {
     private Dictionary<BiliCookie, WbiImg> _cache = new();
 
@@ -108,7 +109,7 @@ public class WbiService(ILogger<WbiService> logger, IUserInfoApi userInfoApi) : 
         if (wbiImg != null)
             return wbiImg;
 
-        BiliApiResponse<UserInfo> apiResponse = await userInfoApi.LoginByCookie(ck.ToString());
+        BiliApiResponse<UserInfo> apiResponse = await navApi.GetNavAsync(ck.ToString());
         UserInfo useInfo = apiResponse.Data!;
         logger.LogDebug("【img_url】{0}", useInfo.Wbi_img.img_url);
         logger.LogDebug("【sub_url】{0}", useInfo.Wbi_img.sub_url);

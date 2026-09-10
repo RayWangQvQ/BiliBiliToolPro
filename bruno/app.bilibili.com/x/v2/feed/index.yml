@@ -1,0 +1,1736 @@
+info:
+  name: index
+  type: http
+  seq: 1
+
+http:
+  method: GET
+  url: "{{host}}/x/v2/feed/index"
+  headers:
+    - name: fp_local
+      value: "{{device_id}}"
+    - name: fp_remote
+      value: "{{device_id}}"
+    - name: session_id
+      value: "3160e892"
+    - name: x-bili-aurora-eid
+      value: UlAAQFkMBVkH
+    - name: x-bili-mid
+      value: "{{mid}}"
+    - name: x-bili-aurora-zone
+      value: ""
+    - name: x-bili-gaia-vtoken
+      value: ""
+    - name: bili-http-engine
+      value: cronet
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+docs: |
+  ## Response Sample
+
+  ```json
+  {
+    "code": 0,
+    "message": "OK",
+    "ttl": 1,
+    "data": {
+      "config": {
+        "column": 2,
+        "autoplay_card": 2,
+        "feed_clean_abtest": 0,
+        "home_transfer_test": 0,
+        "auto_refresh_time": 1200,
+        "show_inline_danmaku": 1,
+        "toast": {},
+        "is_back_to_homepage": true,
+        "enable_rcmd_guide": true,
+        "inline_sound": 2,
+        "auto_refresh_time_by_appear": 1200,
+        "auto_refresh_time_by_active": 1200,
+        "visible_area": 80,
+        "card_density_exp": 1,
+        "small_cover_wh_ratio": 1.33,
+        "space_enlarge_exp": 1,
+        "story_mode_v2_guide_exp": 6,
+        "pegasus_code": -1200,
+        "rcmd_label_mng_entrance": 0
+      },
+      "interest_choose": null,
+      "items": [
+        {
+          "card_type": "small_cover_v2",
+          "card_goto": "av",
+          "goto": "av",
+          "param": "116415977750571",
+          "cover": "http://i0.hdslb.com/bfs/archive/1f528323407a17fff111e1c72e5205371a1008ba.jpg",
+          "title": "⚡ 在 5:20 睡 觉 13:14 准 时 起 ！！⚡",
+          "uri": "bilibili://video/116415977750571?cid=37564649211&player_height=2160&player_preload=%7B%22cid%22%3A37564649211%2C%22expire_time%22%3A1776611587%2C%22file_info%22%3A%7B%2216%22%3A%5B%7B%22timelength%22%3A143810%2C%22filesize%22%3A9327116%7D%5D%7D%2C%22support_quality%22%3Anull%2C%22support_formats%22%3Anull%2C%22support_description%22%3Anull%2C%22quality%22%3A16%2C%22url%22%3A%22http%3A%2F%2Fcn-zjjh-ct-04-06.bilivideo.com%2Fupgcxcode%2F11%2F92%2F37564649211%2F37564649211-1-16.mp4%3Fe%3Dig8euxZM2rNcNbRVhwdVhwdlhWdVhwdVhoNvNC8BqJIzNbfqXBvEuENvNC8aNEVEtEvE9IMvXBvE2ENvNCImNEVEIj0Y2J_aug859r1qXg8gNEVE5XREto8z5JZC2X2gkX5L5F1eTX1jkXlsTXHeux_f2o859IB_%5Cu0026platform%3D%5Cu0026deadline%3D1776615187%5Cu0026uipk%3D5%5Cu0026trid%3D000077aaf87789294fe1b50ea9673379106U%5Cu0026gen%3Dplayurlv3%5Cu0026os%3Dbcache%5Cu0026og%3Dhw%5Cu0026nbs%3D1%5Cu0026mid%3D0%5Cu0026oi%3D0x240e03a20fe16670b49abffffebde4a3%5Cu0026upsig%3Df6b0cf31cfa89332f7c440e20e475858%5Cu0026uparams%3De%2Cplatform%2Cdeadline%2Cuipk%2Ctrid%2Cgen%2Cos%2Cog%2Cnbs%2Cmid%2Coi%5Cu0026cdnid%3D6591%5Cu0026bvc%3Dvod%5Cu0026nettype%3D0%5Cu0026bw%3D521796%5Cu0026lrs%3D64%5Cu0026dl%3D0%5Cu0026f%3DU_0_0%5Cu0026agrr%3D0%5Cu0026buvid%3D%5Cu0026build%3D0%5Cu0026orderid%3D0%2C3%22%2C%22video_codecid%22%3A7%2C%22video_project%22%3Atrue%2C%22fnver%22%3A0%2C%22fnval%22%3A0%7D&player_rotate=0&player_width=3840&report_flow_data=%7B%22flow_card_type%22%3A%22av%22%7D",
+          "three_point": {
+            "dislike_reasons": [
+              {
+                "id": 4,
+                "name": "UP主:学姐圆",
+                "toast": "将减少相似内容推荐"
+              },
+              {
+                "id": 3,
+                "name": "频道:安和昂",
+                "toast": "将减少相似内容推荐"
+              },
+              {
+                "id": 12,
+                "name": "此类内容过多",
+                "toast": "将减少相似内容推荐"
+              },
+              {
+                "id": 13,
+                "name": "推荐过",
+                "toast": "将减少相似内容推荐"
+              },
+              {
+                "id": 1,
+                "name": "这个内容",
+                "toast": "将减少相似内容推荐"
+              }
+            ],
+            "feedbacks": [
+              {
+                "id": 1,
+                "name": "恐怖血腥",
+                "toast": "将优化首页此类内容"
+              },
+              {
+                "id": 2,
+                "name": "色情低俗",
+                "toast": "将优化首页此类内容"
+              },
+              {
+                "id": 3,
+                "name": "封面恶心",
+                "toast": "将优化首页此类内容"
+              },
+              {
+                "id": 4,
+                "name": "标题党/封面党",
+                "toast": "将优化首页此类内容"
+              }
+            ],
+            "watch_later": 1
+          },
+          "args": {
+            "up_id": 30502823,
+            "up_name": "学姐圆",
+            "tid": 43213851,
+            "tname": "安和昂",
+            "aid": 116415977750571
+          },
+          "player_args": {
+            "aid": 116415977750571,
+            "cid": 37564649211,
+            "type": "av",
+            "duration": 144
+          },
+          "idx": 1776607997,
+          "three_point_v2": [
+            {
+              "title": "添加至稍后再看",
+              "type": "watch_later",
+              "icon": "https://i0.hdslb.com/bfs/activity-plat/static/ce06d65bc0a8d8aa2a463747ce2a4752/NyPAqcn0QF.png"
+            },
+            {
+              "title": "反馈",
+              "subtitle": "(选择后将优化首页此类内容)",
+              "reasons": [
+                {
+                  "id": 1,
+                  "name": "恐怖血腥",
+                  "toast": "将优化首页此类内容"
+                },
+                {
+                  "id": 2,
+                  "name": "色情低俗",
+                  "toast": "将优化首页此类内容"
+                },
+                {
+                  "id": 3,
+                  "name": "封面恶心",
+                  "toast": "将优化首页此类内容"
+                },
+                {
+                  "id": 4,
+                  "name": "标题党/封面党",
+                  "toast": "将优化首页此类内容"
+                }
+              ],
+              "type": "feedback"
+            },
+            {
+              "title": "不感兴趣",
+              "subtitle": "(选择后将减少相似内容推荐)",
+              "reasons": [
+                {
+                  "id": 4,
+                  "name": "UP主:学姐圆",
+                  "toast": "将减少相似内容推荐"
+                },
+                {
+                  "id": 3,
+                  "name": "频道:安和昂",
+                  "toast": "将减少相似内容推荐"
+                },
+                {
+                  "id": 12,
+                  "name": "此类内容过多",
+                  "toast": "将减少相似内容推荐"
+                },
+                {
+                  "id": 13,
+                  "name": "推荐过",
+                  "toast": "将减少相似内容推荐"
+                },
+                {
+                  "id": 1,
+                  "name": "这个内容",
+                  "toast": "将减少相似内容推荐"
+                }
+              ],
+              "type": "dislike"
+            }
+          ],
+          "talk_back": "视频,⚡ 在 5:20 睡 觉 13:14 准 时 起 ！！⚡,42.9万观看,753弹幕,时长2分钟24秒,UP主学姐圆,",
+          "report_flow_data": "{\"flow_card_type\":\"av\"}",
+          "three_point_v": "v2",
+          "cover_left_text_1": "42.9万",
+          "cover_left_icon_1": 1,
+          "cover_left_1_content_description": "42.9万观看",
+          "cover_left_text_2": "753",
+          "cover_left_icon_2": 3,
+          "cover_left_2_content_description": "753弹幕",
+          "cover_right_text": "2:24",
+          "cover_right_content_description": "2分钟24秒",
+          "desc_button": {
+            "text": "学姐圆",
+            "uri": "bilibili://space/30502823",
+            "event": "nickname",
+            "type": 1
+          },
+          "official_icon": 16,
+          "can_play": 1,
+          "goto_icon": {
+            "icon_url": "https://i0.hdslb.com/bfs/activity-plat/static/20230227/0977767b2e79d8ad0a36a731068a83d7/077GOeHOfO.png",
+            "icon_night_url": "https://i0.hdslb.com/bfs/activity-plat/static/20230227/0977767b2e79d8ad0a36a731068a83d7/ldbCXtkoK2.png",
+            "icon_width": 16,
+            "icon_height": 16
+          },
+          "cover_info_priority": 123
+        },
+        {
+          "card_type": "small_cover_v2",
+          "card_goto": "av",
+          "goto": "av",
+          "param": "116421682007020",
+          "cover": "http://i1.hdslb.com/bfs/archive/bd8c77522b08ddafcf61008b3588b87508f10064.jpg",
+          "title": "广西乡村寻狗之人在囧途！",
+          "uri": "bilibili://video/116421682007020?cid=37593547222&player_height=1920&player_preload=%7B%22cid%22%3A37593547222%2C%22expire_time%22%3A1776611587%2C%22file_info%22%3A%7B%2216%22%3A%5B%7B%22timelength%22%3A461869%2C%22filesize%22%3A53562055%7D%5D%7D%2C%22support_quality%22%3Anull%2C%22support_formats%22%3Anull%2C%22support_description%22%3Anull%2C%22quality%22%3A16%2C%22url%22%3A%22http%3A%2F%2Fcn-zjjh-ct-04-05.bilivideo.com%2Fupgcxcode%2F22%2F72%2F37593547222%2F37593547222-1-16.mp4%3Fe%3Dig8euxZM2rNcNbR17WdVhwdlhWRBhwdVhoNvNC8BqJIzNbfqXBvEuENvNC8aNEVEtEvE9IMvXBvE2ENvNCImNEVEIj0Y2J_aug859r1qXg8gNEVE5XREto8z5JZC2X2gkX5L5F1eTX1jkXlsTXHeux_f2o859IB_%5Cu0026gen%3Dplayurlv3%5Cu0026os%3Dbcache%5Cu0026og%3Dcos%5Cu0026mid%3D0%5Cu0026oi%3D0x240e03a20fe16670b49abffffebde4a3%5Cu0026nbs%3D1%5Cu0026platform%3D%5Cu0026deadline%3D1776615187%5Cu0026uipk%3D5%5Cu0026trid%3D000077aaf87789294fe1b50ea9673379106U%5Cu0026upsig%3D4ffe97555b47a52cefba57874c91b169%5Cu0026uparams%3De%2Cgen%2Cos%2Cog%2Cmid%2Coi%2Cnbs%2Cplatform%2Cdeadline%2Cuipk%2Ctrid%5Cu0026cdnid%3D6590%5Cu0026bvc%3Dvod%5Cu0026nettype%3D0%5Cu0026bw%3D929493%5Cu0026lrs%3D82%5Cu0026build%3D0%5Cu0026dl%3D0%5Cu0026f%3DU_0_0%5Cu0026agrr%3D0%5Cu0026buvid%3D%5Cu0026orderid%3D0%2C3%22%2C%22video_codecid%22%3A7%2C%22video_project%22%3Atrue%2C%22fnver%22%3A0%2C%22fnval%22%3A0%7D&player_rotate=0&player_width=1080&report_flow_data=%7B%22flow_card_type%22%3A%22av%22%7D",
+          "three_point": {
+            "dislike_reasons": [
+              {
+                "id": 4,
+                "name": "UP主:大虎-寻狗日记",
+                "toast": "将减少相似内容推荐"
+              },
+              {
+                "id": 3,
+                "name": "频道:土松",
+                "toast": "将减少相似内容推荐"
+              },
+              {
+                "id": 12,
+                "name": "此类内容过多",
+                "toast": "将减少相似内容推荐"
+              },
+              {
+                "id": 13,
+                "name": "推荐过",
+                "toast": "将减少相似内容推荐"
+              },
+              {
+                "id": 1,
+                "name": "这个内容",
+                "toast": "将减少相似内容推荐"
+              }
+            ],
+            "feedbacks": [
+              {
+                "id": 1,
+                "name": "恐怖血腥",
+                "toast": "将优化首页此类内容"
+              },
+              {
+                "id": 2,
+                "name": "色情低俗",
+                "toast": "将优化首页此类内容"
+              },
+              {
+                "id": 3,
+                "name": "封面恶心",
+                "toast": "将优化首页此类内容"
+              },
+              {
+                "id": 4,
+                "name": "标题党/封面党",
+                "toast": "将优化首页此类内容"
+              }
+            ],
+            "watch_later": 1
+          },
+          "args": {
+            "up_id": 3706959855356803,
+            "up_name": "大虎-寻狗日记",
+            "tid": 6269310,
+            "tname": "土松",
+            "aid": 116421682007020
+          },
+          "player_args": {
+            "aid": 116421682007020,
+            "cid": 37593547222,
+            "type": "av",
+            "duration": 462
+          },
+          "idx": 1776607996,
+          "three_point_v2": [
+            {
+              "title": "添加至稍后再看",
+              "type": "watch_later",
+              "icon": "https://i0.hdslb.com/bfs/activity-plat/static/ce06d65bc0a8d8aa2a463747ce2a4752/NyPAqcn0QF.png"
+            },
+            {
+              "title": "反馈",
+              "subtitle": "(选择后将优化首页此类内容)",
+              "reasons": [
+                {
+                  "id": 1,
+                  "name": "恐怖血腥",
+                  "toast": "将优化首页此类内容"
+                },
+                {
+                  "id": 2,
+                  "name": "色情低俗",
+                  "toast": "将优化首页此类内容"
+                },
+                {
+                  "id": 3,
+                  "name": "封面恶心",
+                  "toast": "将优化首页此类内容"
+                },
+                {
+                  "id": 4,
+                  "name": "标题党/封面党",
+                  "toast": "将优化首页此类内容"
+                }
+              ],
+              "type": "feedback"
+            },
+            {
+              "title": "不感兴趣",
+              "subtitle": "(选择后将减少相似内容推荐)",
+              "reasons": [
+                {
+                  "id": 4,
+                  "name": "UP主:大虎-寻狗日记",
+                  "toast": "将减少相似内容推荐"
+                },
+                {
+                  "id": 3,
+                  "name": "频道:土松",
+                  "toast": "将减少相似内容推荐"
+                },
+                {
+                  "id": 12,
+                  "name": "此类内容过多",
+                  "toast": "将减少相似内容推荐"
+                },
+                {
+                  "id": 13,
+                  "name": "推荐过",
+                  "toast": "将减少相似内容推荐"
+                },
+                {
+                  "id": 1,
+                  "name": "这个内容",
+                  "toast": "将减少相似内容推荐"
+                }
+              ],
+              "type": "dislike"
+            }
+          ],
+          "talk_back": "视频,广西乡村寻狗之人在囧途！,33.7万观看,779弹幕,时长7分钟42秒,UP主大虎-寻狗日记,",
+          "report_flow_data": "{\"flow_card_type\":\"av\"}",
+          "three_point_v": "v2",
+          "cover_left_text_1": "33.7万",
+          "cover_left_icon_1": 1,
+          "cover_left_1_content_description": "33.7万观看",
+          "cover_left_text_2": "779",
+          "cover_left_icon_2": 3,
+          "cover_left_2_content_description": "779弹幕",
+          "cover_right_text": "7:42",
+          "cover_right_content_description": "7分钟42秒",
+          "desc_button": {
+            "text": "大虎-寻狗日记",
+            "uri": "bilibili://space/3706959855356803",
+            "event": "nickname",
+            "type": 1
+          },
+          "can_play": 1,
+          "goto_icon": {
+            "icon_url": "https://i0.hdslb.com/bfs/activity-plat/static/20230227/0977767b2e79d8ad0a36a731068a83d7/077GOeHOfO.png",
+            "icon_night_url": "https://i0.hdslb.com/bfs/activity-plat/static/20230227/0977767b2e79d8ad0a36a731068a83d7/ldbCXtkoK2.png",
+            "icon_width": 16,
+            "icon_height": 16
+          },
+          "cover_info_priority": 123
+        },
+        {
+          "card_type": "small_cover_v2",
+          "card_goto": "av",
+          "goto": "av",
+          "param": "116414518204270",
+          "cover": "http://i0.hdslb.com/bfs/archive/51e0d58fa0b6febd86dc9a84ee4096ddeb4232c9.jpg",
+          "title": "35载再回首丨那年，我们这样拍三国",
+          "uri": "bilibili://video/116414518204270?cid=37557438550&player_height=1080&player_preload=%7B%22cid%22%3A37557438550%2C%22expire_time%22%3A1776611587%2C%22file_info%22%3A%7B%2216%22%3A%5B%7B%22timelength%22%3A1722366%2C%22filesize%22%3A100011552%7D%5D%7D%2C%22support_quality%22%3Anull%2C%22support_formats%22%3Anull%2C%22support_description%22%3Anull%2C%22quality%22%3A16%2C%22url%22%3A%22http%3A%2F%2Fupos-sz-estgcos.bilivideo.com%2Fupgcxcode%2F50%2F85%2F37557438550%2F37557438550-1-16.mp4%3Fe%3Dig8euxZM2rNcNbRVhwdVhwdlhWdVhwdVhoNvNC8BqJIzNbfqXBvEuENvNC8aNEVEtEvE9IMvXBvE2ENvNCImNEVEIj0Y2J_aug859r1qXg8gNEVE5XREto8z5JZC2X2gkX5L5F1eTX1jkXlsTXHeux_f2o859IB_%5Cu0026deadline%3D1776615187%5Cu0026oi%3D0x240e03a20fe16670b49abffffebde4a3%5Cu0026os%3Destgcos%5Cu0026og%3Dcos%5Cu0026uipk%3D5%5Cu0026trid%3D77aaf87789294fe1b50ea9673379106U%5Cu0026mid%3D0%5Cu0026gen%3Dplayurlv3%5Cu0026nbs%3D1%5Cu0026platform%3D%5Cu0026upsig%3Db7bfcc60ab19c77cb0876d33a2312a50%5Cu0026uparams%3De%2Cdeadline%2Coi%2Cos%2Cog%2Cuipk%2Ctrid%2Cmid%2Cgen%2Cnbs%2Cplatform%5Cu0026bvc%3Dvod%5Cu0026nettype%3D0%5Cu0026bw%3D464629%5Cu0026build%3D0%5Cu0026dl%3D0%5Cu0026f%3DU_0_0%5Cu0026agrr%3D0%5Cu0026buvid%3D%5Cu0026orderid%3D0%2C3%22%2C%22video_codecid%22%3A7%2C%22video_project%22%3Atrue%2C%22fnver%22%3A0%2C%22fnval%22%3A0%7D&player_rotate=0&player_width=1920&report_flow_data=%7B%22flow_card_type%22%3A%22av%22%7D",
+          "three_point": {
+            "dislike_reasons": [
+              {
+                "id": 4,
+                "name": "UP主:荣观",
+                "toast": "将减少相似内容推荐"
+              },
+              {
+                "id": 3,
+                "name": "频道:王扶林",
+                "toast": "将减少相似内容推荐"
+              },
+              {
+                "id": 12,
+                "name": "此类内容过多",
+                "toast": "将减少相似内容推荐"
+              },
+              {
+                "id": 13,
+                "name": "推荐过",
+                "toast": "将减少相似内容推荐"
+              },
+              {
+                "id": 1,
+                "name": "这个内容",
+                "toast": "将减少相似内容推荐"
+              }
+            ],
+            "feedbacks": [
+              {
+                "id": 1,
+                "name": "恐怖血腥",
+                "toast": "将优化首页此类内容"
+              },
+              {
+                "id": 2,
+                "name": "色情低俗",
+                "toast": "将优化首页此类内容"
+              },
+              {
+                "id": 3,
+                "name": "封面恶心",
+                "toast": "将优化首页此类内容"
+              },
+              {
+                "id": 4,
+                "name": "标题党/封面党",
+                "toast": "将优化首页此类内容"
+              }
+            ],
+            "watch_later": 1
+          },
+          "args": {
+            "up_id": 9663969,
+            "up_name": "荣观",
+            "tid": 1068271,
+            "tname": "王扶林",
+            "aid": 116414518204270
+          },
+          "player_args": {
+            "aid": 116414518204270,
+            "cid": 37557438550,
+            "type": "av",
+            "duration": 1723
+          },
+          "idx": 1776607995,
+          "three_point_v2": [
+            {
+              "title": "添加至稍后再看",
+              "type": "watch_later",
+              "icon": "https://i0.hdslb.com/bfs/activity-plat/static/ce06d65bc0a8d8aa2a463747ce2a4752/NyPAqcn0QF.png"
+            },
+            {
+              "title": "反馈",
+              "subtitle": "(选择后将优化首页此类内容)",
+              "reasons": [
+                {
+                  "id": 1,
+                  "name": "恐怖血腥",
+                  "toast": "将优化首页此类内容"
+                },
+                {
+                  "id": 2,
+                  "name": "色情低俗",
+                  "toast": "将优化首页此类内容"
+                },
+                {
+                  "id": 3,
+                  "name": "封面恶心",
+                  "toast": "将优化首页此类内容"
+                },
+                {
+                  "id": 4,
+                  "name": "标题党/封面党",
+                  "toast": "将优化首页此类内容"
+                }
+              ],
+              "type": "feedback"
+            },
+            {
+              "title": "不感兴趣",
+              "subtitle": "(选择后将减少相似内容推荐)",
+              "reasons": [
+                {
+                  "id": 4,
+                  "name": "UP主:荣观",
+                  "toast": "将减少相似内容推荐"
+                },
+                {
+                  "id": 3,
+                  "name": "频道:王扶林",
+                  "toast": "将减少相似内容推荐"
+                },
+                {
+                  "id": 12,
+                  "name": "此类内容过多",
+                  "toast": "将减少相似内容推荐"
+                },
+                {
+                  "id": 13,
+                  "name": "推荐过",
+                  "toast": "将减少相似内容推荐"
+                },
+                {
+                  "id": 1,
+                  "name": "这个内容",
+                  "toast": "将减少相似内容推荐"
+                }
+              ],
+              "type": "dislike"
+            }
+          ],
+          "talk_back": "视频,35载再回首丨那年，我们这样拍三国,11.7万观看,1825弹幕,时长28分钟43秒,UP主荣观,",
+          "report_flow_data": "{\"flow_card_type\":\"av\"}",
+          "three_point_v": "v2",
+          "cover_left_text_1": "11.7万",
+          "cover_left_icon_1": 1,
+          "cover_left_1_content_description": "11.7万观看",
+          "cover_left_text_2": "1825",
+          "cover_left_icon_2": 3,
+          "cover_left_2_content_description": "1825弹幕",
+          "cover_right_text": "28:43",
+          "cover_right_content_description": "28分钟43秒",
+          "desc_button": {
+            "text": "荣观",
+            "uri": "bilibili://space/9663969",
+            "event": "nickname",
+            "type": 1
+          },
+          "can_play": 1,
+          "goto_icon": {
+            "icon_url": "https://i0.hdslb.com/bfs/activity-plat/static/20230227/0977767b2e79d8ad0a36a731068a83d7/077GOeHOfO.png",
+            "icon_night_url": "https://i0.hdslb.com/bfs/activity-plat/static/20230227/0977767b2e79d8ad0a36a731068a83d7/ldbCXtkoK2.png",
+            "icon_width": 16,
+            "icon_height": 16
+          },
+          "cover_info_priority": 123
+        },
+        {
+          "card_type": "small_cover_v2",
+          "card_goto": "av",
+          "goto": "av",
+          "param": "116419534520840",
+          "cover": "http://i2.hdslb.com/bfs/archive/3c537a06d89abe364504d665e1055e39f3e7e3af.jpg",
+          "title": "献给广西三月三 | 洛天依原创曲《唱山》【国乐季·天琴篇】",
+          "uri": "bilibili://video/116419534520840?cid=37581359644&player_height=2160&player_preload=%7B%22cid%22%3A37581359644%2C%22expire_time%22%3A1776611587%2C%22file_info%22%3A%7B%2216%22%3A%5B%7B%22timelength%22%3A260283%2C%22filesize%22%3A20004466%7D%5D%7D%2C%22support_quality%22%3Anull%2C%22support_formats%22%3Anull%2C%22support_description%22%3Anull%2C%22quality%22%3A16%2C%22url%22%3A%22http%3A%2F%2Fcn-hbyc-ct-01-02.bilivideo.com%2Fupgcxcode%2F44%2F96%2F37581359644%2F37581359644-1-16.mp4%3Fe%3Dig8euxZM2rNcNbRVhwdVhwdlhWdVhwdVhoNvNC8BqJIzNbfqXBvEuENvNC8aNEVEtEvE9IMvXBvE2ENvNCImNEVEIj0Y2J_aug859r1qXg8gNEVE5XREto8z5JZC2X2gkX5L5F1eTX1jkXlsTXHeux_f2o859IB_%5Cu0026nbs%3D1%5Cu0026platform%3D%5Cu0026gen%3Dplayurlv3%5Cu0026os%3Dbcache%5Cu0026trid%3D000077aaf87789294fe1b50ea9673379106U%5Cu0026mid%3D0%5Cu0026oi%3D0x240e03a20fe16670b49abffffebde4a3%5Cu0026deadline%3D1776615187%5Cu0026uipk%3D5%5Cu0026og%3Dcos%5Cu0026upsig%3D927516e3a45d3d1899a6d63617d432ee%5Cu0026uparams%3De%2Cnbs%2Cplatform%2Cgen%2Cos%2Ctrid%2Cmid%2Coi%2Cdeadline%2Cuipk%2Cog%5Cu0026cdnid%3D88802%5Cu0026bvc%3Dvod%5Cu0026nettype%3D0%5Cu0026bw%3D615522%5Cu0026lrs%3D83%5Cu0026build%3D0%5Cu0026dl%3D0%5Cu0026f%3DU_0_0%5Cu0026agrr%3D0%5Cu0026buvid%3D%5Cu0026orderid%3D0%2C3%22%2C%22video_codecid%22%3A7%2C%22video_project%22%3Atrue%2C%22fnver%22%3A0%2C%22fnval%22%3A0%7D&player_rotate=0&player_width=3840&report_flow_data=%7B%22flow_card_type%22%3A%22av%22%7D",
+          "three_point": {
+            "dislike_reasons": [
+              {
+                "id": 4,
+                "name": "UP主:洛天依",
+                "toast": "将减少相似内容推荐"
+              },
+              {
+                "id": 3,
+                "name": "频道:原创歌曲",
+                "toast": "将减少相似内容推荐"
+              },
+              {
+                "id": 12,
+                "name": "此类内容过多",
+                "toast": "将减少相似内容推荐"
+              },
+              {
+                "id": 13,
+                "name": "推荐过",
+                "toast": "将减少相似内容推荐"
+              },
+              {
+                "id": 1,
+                "name": "这个内容",
+                "toast": "将减少相似内容推荐"
+              }
+            ],
+            "feedbacks": [
+              {
+                "id": 1,
+                "name": "恐怖血腥",
+                "toast": "将优化首页此类内容"
+              },
+              {
+                "id": 2,
+                "name": "色情低俗",
+                "toast": "将优化首页此类内容"
+              },
+              {
+                "id": 3,
+                "name": "封面恶心",
+                "toast": "将优化首页此类内容"
+              },
+              {
+                "id": 4,
+                "name": "标题党/封面党",
+                "toast": "将优化首页此类内容"
+              }
+            ],
+            "watch_later": 1
+          },
+          "args": {
+            "up_id": 36081646,
+            "up_name": "洛天依",
+            "tid": 72138,
+            "tname": "原创歌曲",
+            "aid": 116419534520840
+          },
+          "player_args": {
+            "aid": 116419534520840,
+            "cid": 37581359644,
+            "type": "av",
+            "duration": 261
+          },
+          "idx": 1776607994,
+          "three_point_v2": [
+            {
+              "title": "添加至稍后再看",
+              "type": "watch_later",
+              "icon": "https://i0.hdslb.com/bfs/activity-plat/static/ce06d65bc0a8d8aa2a463747ce2a4752/NyPAqcn0QF.png"
+            },
+            {
+              "title": "反馈",
+              "subtitle": "(选择后将优化首页此类内容)",
+              "reasons": [
+                {
+                  "id": 1,
+                  "name": "恐怖血腥",
+                  "toast": "将优化首页此类内容"
+                },
+                {
+                  "id": 2,
+                  "name": "色情低俗",
+                  "toast": "将优化首页此类内容"
+                },
+                {
+                  "id": 3,
+                  "name": "封面恶心",
+                  "toast": "将优化首页此类内容"
+                },
+                {
+                  "id": 4,
+                  "name": "标题党/封面党",
+                  "toast": "将优化首页此类内容"
+                }
+              ],
+              "type": "feedback"
+            },
+            {
+              "title": "不感兴趣",
+              "subtitle": "(选择后将减少相似内容推荐)",
+              "reasons": [
+                {
+                  "id": 4,
+                  "name": "UP主:洛天依",
+                  "toast": "将减少相似内容推荐"
+                },
+                {
+                  "id": 3,
+                  "name": "频道:原创歌曲",
+                  "toast": "将减少相似内容推荐"
+                },
+                {
+                  "id": 12,
+                  "name": "此类内容过多",
+                  "toast": "将减少相似内容推荐"
+                },
+                {
+                  "id": 13,
+                  "name": "推荐过",
+                  "toast": "将减少相似内容推荐"
+                },
+                {
+                  "id": 1,
+                  "name": "这个内容",
+                  "toast": "将减少相似内容推荐"
+                }
+              ],
+              "type": "dislike"
+            }
+          ],
+          "talk_back": "视频,献给广西三月三 | 洛天依原创曲《唱山》【国乐季·天琴篇】,38万观看,1318弹幕,时长4分钟21秒,UP主洛天依,",
+          "report_flow_data": "{\"flow_card_type\":\"av\"}",
+          "three_point_v": "v2",
+          "cover_left_text_1": "38万",
+          "cover_left_icon_1": 1,
+          "cover_left_1_content_description": "38万观看",
+          "cover_left_text_2": "1318",
+          "cover_left_icon_2": 3,
+          "cover_left_2_content_description": "1318弹幕",
+          "cover_right_text": "4:21",
+          "cover_right_content_description": "4分钟21秒",
+          "desc_button": {
+            "text": "洛天依",
+            "uri": "bilibili://space/36081646",
+            "event": "nickname",
+            "type": 1
+          },
+          "official_icon": 16,
+          "can_play": 1,
+          "goto_icon": {
+            "icon_url": "https://i0.hdslb.com/bfs/activity-plat/static/20230227/0977767b2e79d8ad0a36a731068a83d7/077GOeHOfO.png",
+            "icon_night_url": "https://i0.hdslb.com/bfs/activity-plat/static/20230227/0977767b2e79d8ad0a36a731068a83d7/ldbCXtkoK2.png",
+            "icon_width": 16,
+            "icon_height": 16
+          },
+          "cover_info_priority": 123
+        },
+        {
+          "card_type": "small_cover_v2",
+          "card_goto": "av",
+          "goto": "av",
+          "param": "116407287224178",
+          "cover": "http://i1.hdslb.com/bfs/archive/df6d3ad8180a9131a1fd26739112a0862913c59c.jpg",
+          "title": "桃子是五千年来的顶奢？",
+          "uri": "bilibili://video/116407287224178?cid=37520998472&player_height=1080&player_preload=%7B%22cid%22%3A37520998472%2C%22expire_time%22%3A1776611587%2C%22file_info%22%3A%7B%2216%22%3A%5B%7B%22timelength%22%3A377788%2C%22filesize%22%3A21232439%7D%5D%7D%2C%22support_quality%22%3Anull%2C%22support_formats%22%3Anull%2C%22support_description%22%3Anull%2C%22quality%22%3A16%2C%22url%22%3A%22http%3A%2F%2Fcn-zjjh-ct-04-06.bilivideo.com%2Fupgcxcode%2F72%2F84%2F37520998472%2F37520998472-1-16.mp4%3Fe%3Dig8euxZM2rNcNbRVhwdVhwdlhWdVhwdVhoNvNC8BqJIzNbfqXBvEuENvNC8aNEVEtEvE9IMvXBvE2ENvNCImNEVEIj0Y2J_aug859r1qXg8gNEVE5XREto8z5JZC2X2gkX5L5F1eTX1jkXlsTXHeux_f2o859IB_%5Cu0026gen%3Dplayurlv3%5Cu0026og%3Dcos%5Cu0026uipk%3D5%5Cu0026mid%3D0%5Cu0026os%3Dbcache%5Cu0026deadline%3D1776615187%5Cu0026trid%3D000077aaf87789294fe1b50ea9673379106U%5Cu0026oi%3D0x240e03a20fe16670b49abffffebde4a3%5Cu0026nbs%3D1%5Cu0026platform%3D%5Cu0026upsig%3D48d2d2dcc82747311af3f42bd45a38fe%5Cu0026uparams%3De%2Cgen%2Cog%2Cuipk%2Cmid%2Cos%2Cdeadline%2Ctrid%2Coi%2Cnbs%2Cplatform%5Cu0026cdnid%3D6591%5Cu0026bvc%3Dvod%5Cu0026nettype%3D0%5Cu0026bw%3D450555%5Cu0026lrs%3D75%5Cu0026dl%3D0%5Cu0026f%3DU_0_0%5Cu0026agrr%3D0%5Cu0026buvid%3D%5Cu0026build%3D0%5Cu0026orderid%3D0%2C3%22%2C%22video_codecid%22%3A7%2C%22video_project%22%3Atrue%2C%22fnver%22%3A0%2C%22fnval%22%3A0%7D&player_rotate=0&player_width=1920&report_flow_data=%7B%22flow_card_type%22%3A%22av%22%7D",
+          "three_point": {
+            "dislike_reasons": [
+              {
+                "id": 4,
+                "name": "UP主:小时好食禄",
+                "toast": "将减少相似内容推荐"
+              },
+              {
+                "id": 3,
+                "name": "频道:财经",
+                "toast": "将减少相似内容推荐"
+              },
+              {
+                "id": 12,
+                "name": "此类内容过多",
+                "toast": "将减少相似内容推荐"
+              },
+              {
+                "id": 13,
+                "name": "推荐过",
+                "toast": "将减少相似内容推荐"
+              },
+              {
+                "id": 1,
+                "name": "这个内容",
+                "toast": "将减少相似内容推荐"
+              }
+            ],
+            "feedbacks": [
+              {
+                "id": 1,
+                "name": "恐怖血腥",
+                "toast": "将优化首页此类内容"
+              },
+              {
+                "id": 2,
+                "name": "色情低俗",
+                "toast": "将优化首页此类内容"
+              },
+              {
+                "id": 3,
+                "name": "封面恶心",
+                "toast": "将优化首页此类内容"
+              },
+              {
+                "id": 4,
+                "name": "标题党/封面党",
+                "toast": "将优化首页此类内容"
+              }
+            ],
+            "watch_later": 1
+          },
+          "args": {
+            "up_id": 49923662,
+            "up_name": "小时好食禄",
+            "tid": 66849,
+            "tname": "财经",
+            "aid": 116407287224178
+          },
+          "player_args": {
+            "aid": 116407287224178,
+            "cid": 37520998472,
+            "type": "av",
+            "duration": 378
+          },
+          "idx": 1776607993,
+          "three_point_v2": [
+            {
+              "title": "添加至稍后再看",
+              "type": "watch_later",
+              "icon": "https://i0.hdslb.com/bfs/activity-plat/static/ce06d65bc0a8d8aa2a463747ce2a4752/NyPAqcn0QF.png"
+            },
+            {
+              "title": "反馈",
+              "subtitle": "(选择后将优化首页此类内容)",
+              "reasons": [
+                {
+                  "id": 1,
+                  "name": "恐怖血腥",
+                  "toast": "将优化首页此类内容"
+                },
+                {
+                  "id": 2,
+                  "name": "色情低俗",
+                  "toast": "将优化首页此类内容"
+                },
+                {
+                  "id": 3,
+                  "name": "封面恶心",
+                  "toast": "将优化首页此类内容"
+                },
+                {
+                  "id": 4,
+                  "name": "标题党/封面党",
+                  "toast": "将优化首页此类内容"
+                }
+              ],
+              "type": "feedback"
+            },
+            {
+              "title": "不感兴趣",
+              "subtitle": "(选择后将减少相似内容推荐)",
+              "reasons": [
+                {
+                  "id": 4,
+                  "name": "UP主:小时好食禄",
+                  "toast": "将减少相似内容推荐"
+                },
+                {
+                  "id": 3,
+                  "name": "频道:财经",
+                  "toast": "将减少相似内容推荐"
+                },
+                {
+                  "id": 12,
+                  "name": "此类内容过多",
+                  "toast": "将减少相似内容推荐"
+                },
+                {
+                  "id": 13,
+                  "name": "推荐过",
+                  "toast": "将减少相似内容推荐"
+                },
+                {
+                  "id": 1,
+                  "name": "这个内容",
+                  "toast": "将减少相似内容推荐"
+                }
+              ],
+              "type": "dislike"
+            }
+          ],
+          "talk_back": "视频,桃子是五千年来的顶奢？,133.2万观看,1316弹幕,时长6分钟18秒,UP主小时好食禄,",
+          "report_flow_data": "{\"flow_card_type\":\"av\"}",
+          "three_point_v": "v2",
+          "cover_left_text_1": "133.2万",
+          "cover_left_icon_1": 1,
+          "cover_left_1_content_description": "133.2万观看",
+          "cover_left_text_2": "1316",
+          "cover_left_icon_2": 3,
+          "cover_left_2_content_description": "1316弹幕",
+          "cover_right_text": "6:18",
+          "cover_right_content_description": "6分钟18秒",
+          "desc_button": {
+            "text": "小时好食禄",
+            "uri": "bilibili://space/49923662",
+            "event": "nickname",
+            "type": 1
+          },
+          "official_icon": 16,
+          "can_play": 1,
+          "goto_icon": {
+            "icon_url": "https://i0.hdslb.com/bfs/activity-plat/static/20230227/0977767b2e79d8ad0a36a731068a83d7/077GOeHOfO.png",
+            "icon_night_url": "https://i0.hdslb.com/bfs/activity-plat/static/20230227/0977767b2e79d8ad0a36a731068a83d7/ldbCXtkoK2.png",
+            "icon_width": 16,
+            "icon_height": 16
+          },
+          "cover_info_priority": 123
+        },
+        {
+          "card_type": "small_cover_v2",
+          "card_goto": "av",
+          "goto": "av",
+          "param": "116427386257618",
+          "cover": "http://i0.hdslb.com/bfs/archive/26529fe63d9f7be69db3204872a3a8ec36e66be0.jpg",
+          "title": "【异环入坑指南】第二期：都市玩法展示：全房产演示+全车辆演示+各个玩法介绍！赛博买房买车！",
+          "uri": "bilibili://video/116427386257618?cid=37622252741&player_height=1080&player_preload=%7B%22cid%22%3A37622252741%2C%22expire_time%22%3A1776611587%2C%22file_info%22%3A%7B%2216%22%3A%5B%7B%22timelength%22%3A278570%2C%22filesize%22%3A9871770%7D%5D%7D%2C%22support_quality%22%3Anull%2C%22support_formats%22%3Anull%2C%22support_description%22%3Anull%2C%22quality%22%3A16%2C%22url%22%3A%22http%3A%2F%2Fcn-zjjh-ct-04-03.bilivideo.com%2Fupgcxcode%2F41%2F27%2F37622252741%2F37622252741_qe1-1-16.mp4%3Fe%3Dig8euxZM2rNcNbRVhwdVhwdlhWdVhwdVhoNvNC8BqJIzNbfqXBvEuENvNC8aNEVEtEvE9IMvXBvE2ENvNCImNEVEIj0Y2J_aug859r1qXg8gNEVE5XREto8z5JZC2X2gkX5L5F1eTX1jkXlsTXHeux_f2o859IB_%5Cu0026og%3Dhw%5Cu0026deadline%3D1776615187%5Cu0026uipk%3D5%5Cu0026mid%3D0%5Cu0026oi%3D0x240e03a20fe16670b49abffffebde4a3%5Cu0026nbs%3D1%5Cu0026platform%3D%5Cu0026gen%3Dplayurlv3%5Cu0026os%3Dbcache%5Cu0026trid%3D000077aaf87789294fe1b50ea9673379106U%5Cu0026upsig%3D0625d08b9f39c25bf255d110bcf3f1aa%5Cu0026uparams%3De%2Cog%2Cdeadline%2Cuipk%2Cmid%2Coi%2Cnbs%2Cplatform%2Cgen%2Cos%2Ctrid%5Cu0026cdnid%3D6588%5Cu0026bvc%3Dvod%5Cu0026nettype%3D0%5Cu0026bw%3D284079%5Cu0026lrs%3D78%5Cu0026dl%3D0%5Cu0026f%3DU_0_0%5Cu0026agrr%3D0%5Cu0026buvid%3D%5Cu0026build%3D0%5Cu0026orderid%3D0%2C3%22%2C%22video_codecid%22%3A7%2C%22video_project%22%3Atrue%2C%22fnver%22%3A0%2C%22fnval%22%3A0%7D&player_rotate=0&player_width=1920&report_flow_data=%7B%22flow_card_type%22%3A%22av%22%7D",
+          "three_point": {
+            "dislike_reasons": [
+              {
+                "id": 4,
+                "name": "UP主:卡特亚",
+                "toast": "将减少相似内容推荐"
+              },
+              {
+                "id": 3,
+                "name": "频道:异环",
+                "toast": "将减少相似内容推荐"
+              },
+              {
+                "id": 12,
+                "name": "此类内容过多",
+                "toast": "将减少相似内容推荐"
+              },
+              {
+                "id": 13,
+                "name": "推荐过",
+                "toast": "将减少相似内容推荐"
+              },
+              {
+                "id": 1,
+                "name": "这个内容",
+                "toast": "将减少相似内容推荐"
+              }
+            ],
+            "feedbacks": [
+              {
+                "id": 1,
+                "name": "恐怖血腥",
+                "toast": "将优化首页此类内容"
+              },
+              {
+                "id": 2,
+                "name": "色情低俗",
+                "toast": "将优化首页此类内容"
+              },
+              {
+                "id": 3,
+                "name": "封面恶心",
+                "toast": "将优化首页此类内容"
+              },
+              {
+                "id": 4,
+                "name": "标题党/封面党",
+                "toast": "将优化首页此类内容"
+              }
+            ],
+            "watch_later": 1
+          },
+          "args": {
+            "up_id": 43222001,
+            "up_name": "卡特亚",
+            "tid": 39095616,
+            "tname": "异环",
+            "aid": 116427386257618
+          },
+          "player_args": {
+            "aid": 116427386257618,
+            "cid": 37622252741,
+            "type": "av",
+            "duration": 3728
+          },
+          "idx": 1776607992,
+          "three_point_v2": [
+            {
+              "title": "添加至稍后再看",
+              "type": "watch_later",
+              "icon": "https://i0.hdslb.com/bfs/activity-plat/static/ce06d65bc0a8d8aa2a463747ce2a4752/NyPAqcn0QF.png"
+            },
+            {
+              "title": "反馈",
+              "subtitle": "(选择后将优化首页此类内容)",
+              "reasons": [
+                {
+                  "id": 1,
+                  "name": "恐怖血腥",
+                  "toast": "将优化首页此类内容"
+                },
+                {
+                  "id": 2,
+                  "name": "色情低俗",
+                  "toast": "将优化首页此类内容"
+                },
+                {
+                  "id": 3,
+                  "name": "封面恶心",
+                  "toast": "将优化首页此类内容"
+                },
+                {
+                  "id": 4,
+                  "name": "标题党/封面党",
+                  "toast": "将优化首页此类内容"
+                }
+              ],
+              "type": "feedback"
+            },
+            {
+              "title": "不感兴趣",
+              "subtitle": "(选择后将减少相似内容推荐)",
+              "reasons": [
+                {
+                  "id": 4,
+                  "name": "UP主:卡特亚",
+                  "toast": "将减少相似内容推荐"
+                },
+                {
+                  "id": 3,
+                  "name": "频道:异环",
+                  "toast": "将减少相似内容推荐"
+                },
+                {
+                  "id": 12,
+                  "name": "此类内容过多",
+                  "toast": "将减少相似内容推荐"
+                },
+                {
+                  "id": 13,
+                  "name": "推荐过",
+                  "toast": "将减少相似内容推荐"
+                },
+                {
+                  "id": 1,
+                  "name": "这个内容",
+                  "toast": "将减少相似内容推荐"
+                }
+              ],
+              "type": "dislike"
+            }
+          ],
+          "talk_back": "视频,【异环入坑指南】第二期：都市玩法展示：全房产演示+全车辆演示+各个玩法介绍！赛博买房买车！,16.5万观看,1673弹幕,时长1小时02分钟08秒,UP主卡特亚,",
+          "report_flow_data": "{\"flow_card_type\":\"av\"}",
+          "three_point_v": "v2",
+          "cover_left_text_1": "16.5万",
+          "cover_left_icon_1": 1,
+          "cover_left_1_content_description": "16.5万观看",
+          "cover_left_text_2": "1673",
+          "cover_left_icon_2": 3,
+          "cover_left_2_content_description": "1673弹幕",
+          "cover_right_text": "1:02:08",
+          "cover_right_content_description": "1小时02分钟08秒",
+          "desc_button": {
+            "text": "卡特亚",
+            "uri": "bilibili://space/43222001",
+            "event": "nickname",
+            "type": 1
+          },
+          "official_icon": 16,
+          "can_play": 1,
+          "goto_icon": {
+            "icon_url": "https://i0.hdslb.com/bfs/activity-plat/static/20230227/0977767b2e79d8ad0a36a731068a83d7/077GOeHOfO.png",
+            "icon_night_url": "https://i0.hdslb.com/bfs/activity-plat/static/20230227/0977767b2e79d8ad0a36a731068a83d7/ldbCXtkoK2.png",
+            "icon_width": 16,
+            "icon_height": 16
+          },
+          "cover_info_priority": 123
+        },
+        {
+          "card_type": "small_cover_v2",
+          "card_goto": "av",
+          "goto": "av",
+          "param": "116420339831133",
+          "cover": "http://i0.hdslb.com/bfs/archive/0923b093be33a4a47db2893f3d98419f134ef333.jpg",
+          "title": "【TF_ING】周末小游戏：春日丰容计划",
+          "uri": "bilibili://video/116420339831133?cid=37586404809&player_height=1080&player_preload=%7B%22cid%22%3A37586404809%2C%22expire_time%22%3A1776611587%2C%22file_info%22%3A%7B%2216%22%3A%5B%7B%22timelength%22%3A1885568%2C%22filesize%22%3A90412481%7D%5D%7D%2C%22support_quality%22%3Anull%2C%22support_formats%22%3Anull%2C%22support_description%22%3Anull%2C%22quality%22%3A16%2C%22url%22%3A%22http%3A%2F%2Fcn-hbyc-ct-01-05.bilivideo.com%2Fupgcxcode%2F09%2F48%2F37586404809%2F37586404809-1-16.mp4%3Fe%3Dig8euxZM2rNcNbRVhwdVhwdlhWdVhwdVhoNvNC8BqJIzNbfqXBvEuENvNC8aNEVEtEvE9IMvXBvE2ENvNCImNEVEIj0Y2J_aug859r1qXg8gNEVE5XREto8z5JZC2X2gkX5L5F1eTX1jkXlsTXHeux_f2o859IB_%5Cu0026uipk%3D5%5Cu0026mid%3D0%5Cu0026oi%3D0x240e03a20fe16670b49abffffebde4a3%5Cu0026platform%3D%5Cu0026deadline%3D1776615187%5Cu0026gen%3Dplayurlv3%5Cu0026trid%3D000077aaf87789294fe1b50ea9673379106U%5Cu0026nbs%3D1%5Cu0026os%3Dbcache%5Cu0026og%3Dhw%5Cu0026upsig%3Dea2f142854a55e8395fe86ed26fa37a7%5Cu0026uparams%3De%2Cuipk%2Cmid%2Coi%2Cplatform%2Cdeadline%2Cgen%2Ctrid%2Cnbs%2Cos%2Cog%5Cu0026cdnid%3D88805%5Cu0026bvc%3Dvod%5Cu0026nettype%3D0%5Cu0026bw%3D383713%5Cu0026lrs%3D65%5Cu0026f%3DU_0_0%5Cu0026agrr%3D0%5Cu0026buvid%3D%5Cu0026build%3D0%5Cu0026dl%3D0%5Cu0026orderid%3D0%2C3%22%2C%22video_codecid%22%3A7%2C%22video_project%22%3Atrue%2C%22fnver%22%3A0%2C%22fnval%22%3A0%7D&player_rotate=0&player_width=1920&report_flow_data=%7B%22flow_card_type%22%3A%22av%22%7D",
+          "three_point": {
+            "dislike_reasons": [
+              {
+                "id": 4,
+                "name": "UP主:TF_ING",
+                "toast": "将减少相似内容推荐"
+              },
+              {
+                "id": 3,
+                "name": "频道:黄朔",
+                "toast": "将减少相似内容推荐"
+              },
+              {
+                "id": 12,
+                "name": "此类内容过多",
+                "toast": "将减少相似内容推荐"
+              },
+              {
+                "id": 13,
+                "name": "推荐过",
+                "toast": "将减少相似内容推荐"
+              },
+              {
+                "id": 1,
+                "name": "这个内容",
+                "toast": "将减少相似内容推荐"
+              }
+            ],
+            "feedbacks": [
+              {
+                "id": 1,
+                "name": "恐怖血腥",
+                "toast": "将优化首页此类内容"
+              },
+              {
+                "id": 2,
+                "name": "色情低俗",
+                "toast": "将优化首页此类内容"
+              },
+              {
+                "id": 3,
+                "name": "封面恶心",
+                "toast": "将优化首页此类内容"
+              },
+              {
+                "id": 4,
+                "name": "标题党/封面党",
+                "toast": "将优化首页此类内容"
+              }
+            ],
+            "watch_later": 1
+          },
+          "args": {
+            "up_id": 1438644295,
+            "up_name": "TF_ING",
+            "tid": 24405681,
+            "tname": "黄朔",
+            "aid": 116420339831133
+          },
+          "player_args": {
+            "aid": 116420339831133,
+            "cid": 37586404809,
+            "type": "av",
+            "duration": 1886
+          },
+          "idx": 1776607991,
+          "three_point_v2": [
+            {
+              "title": "添加至稍后再看",
+              "type": "watch_later",
+              "icon": "https://i0.hdslb.com/bfs/activity-plat/static/ce06d65bc0a8d8aa2a463747ce2a4752/NyPAqcn0QF.png"
+            },
+            {
+              "title": "反馈",
+              "subtitle": "(选择后将优化首页此类内容)",
+              "reasons": [
+                {
+                  "id": 1,
+                  "name": "恐怖血腥",
+                  "toast": "将优化首页此类内容"
+                },
+                {
+                  "id": 2,
+                  "name": "色情低俗",
+                  "toast": "将优化首页此类内容"
+                },
+                {
+                  "id": 3,
+                  "name": "封面恶心",
+                  "toast": "将优化首页此类内容"
+                },
+                {
+                  "id": 4,
+                  "name": "标题党/封面党",
+                  "toast": "将优化首页此类内容"
+                }
+              ],
+              "type": "feedback"
+            },
+            {
+              "title": "不感兴趣",
+              "subtitle": "(选择后将减少相似内容推荐)",
+              "reasons": [
+                {
+                  "id": 4,
+                  "name": "UP主:TF_ING",
+                  "toast": "将减少相似内容推荐"
+                },
+                {
+                  "id": 3,
+                  "name": "频道:黄朔",
+                  "toast": "将减少相似内容推荐"
+                },
+                {
+                  "id": 12,
+                  "name": "此类内容过多",
+                  "toast": "将减少相似内容推荐"
+                },
+                {
+                  "id": 13,
+                  "name": "推荐过",
+                  "toast": "将减少相似内容推荐"
+                },
+                {
+                  "id": 1,
+                  "name": "这个内容",
+                  "toast": "将减少相似内容推荐"
+                }
+              ],
+              "type": "dislike"
+            }
+          ],
+          "talk_back": "视频,【TF_ING】周末小游戏：春日丰容计划,19.5万观看,2.3万弹幕,时长31分钟26秒,UP主TF_ING,",
+          "report_flow_data": "{\"flow_card_type\":\"av\"}",
+          "three_point_v": "v2",
+          "cover_left_text_1": "19.5万",
+          "cover_left_icon_1": 1,
+          "cover_left_1_content_description": "19.5万观看",
+          "cover_left_text_2": "2.3万",
+          "cover_left_icon_2": 3,
+          "cover_left_2_content_description": "2.3万弹幕",
+          "cover_right_text": "31:26",
+          "cover_right_content_description": "31分钟26秒",
+          "desc_button": {
+            "text": "TF_ING",
+            "uri": "bilibili://space/1438644295",
+            "event": "nickname",
+            "type": 1
+          },
+          "official_icon": 16,
+          "can_play": 1,
+          "goto_icon": {
+            "icon_url": "https://i0.hdslb.com/bfs/activity-plat/static/20230227/0977767b2e79d8ad0a36a731068a83d7/077GOeHOfO.png",
+            "icon_night_url": "https://i0.hdslb.com/bfs/activity-plat/static/20230227/0977767b2e79d8ad0a36a731068a83d7/ldbCXtkoK2.png",
+            "icon_width": 16,
+            "icon_height": 16
+          },
+          "cover_info_priority": 123
+        },
+        {
+          "card_type": "small_cover_v2",
+          "card_goto": "av",
+          "goto": "av",
+          "param": "116423946995495",
+          "cover": "http://i2.hdslb.com/bfs/archive/f9b33f1530ebba2a4e9ba2d0124e74c5b4672870.jpg",
+          "title": "伏兔穴，蕾缪安，浅扎一下，她站起来了！！！",
+          "uri": "bilibili://video/116423946995495?cid=37601808087&player_height=1080&player_preload=%7B%22cid%22%3A37601808087%2C%22expire_time%22%3A1776611587%2C%22file_info%22%3A%7B%2216%22%3A%5B%7B%22timelength%22%3A180906%2C%22filesize%22%3A7229344%7D%5D%7D%2C%22support_quality%22%3Anull%2C%22support_formats%22%3Anull%2C%22support_description%22%3Anull%2C%22quality%22%3A16%2C%22url%22%3A%22http%3A%2F%2Fcn-zjjh-ct-04-03.bilivideo.com%2Fupgcxcode%2F87%2F80%2F37601808087%2F37601808087-1-16.mp4%3Fe%3Dig8euxZM2rNcNbRVhwdVhwdlhWdVhwdVhoNvNC8BqJIzNbfqXBvEuENvNC8aNEVEtEvE9IMvXBvE2ENvNCImNEVEIj0Y2J_aug859r1qXg8gNEVE5XREto8z5JZC2X2gkX5L5F1eTX1jkXlsTXHeux_f2o859IB_%5Cu0026mid%3D0%5Cu0026oi%3D0x240e03a20fe16670b49abffffebde4a3%5Cu0026platform%3D%5Cu0026deadline%3D1776615187%5Cu0026uipk%3D5%5Cu0026trid%3D000077aaf87789294fe1b50ea9673379106U%5Cu0026nbs%3D1%5Cu0026gen%3Dplayurlv3%5Cu0026os%3Dbcache%5Cu0026og%3Dhw%5Cu0026upsig%3D2d48ddf4f2f1a51d95728a915986dd2b%5Cu0026uparams%3De%2Cmid%2Coi%2Cplatform%2Cdeadline%2Cuipk%2Ctrid%2Cnbs%2Cgen%2Cos%2Cog%5Cu0026cdnid%3D6588%5Cu0026bvc%3Dvod%5Cu0026nettype%3D0%5Cu0026bw%3D321304%5Cu0026lrs%3D71%5Cu0026build%3D0%5Cu0026dl%3D0%5Cu0026f%3DU_0_0%5Cu0026agrr%3D0%5Cu0026buvid%3D%5Cu0026orderid%3D0%2C3%22%2C%22video_codecid%22%3A7%2C%22video_project%22%3Atrue%2C%22fnver%22%3A0%2C%22fnval%22%3A0%7D&player_rotate=0&player_width=1920&report_flow_data=%7B%22flow_card_type%22%3A%22av%22%7D",
+          "three_point": {
+            "dislike_reasons": [
+              {
+                "id": 4,
+                "name": "UP主:医者正心",
+                "toast": "将减少相似内容推荐"
+              },
+              {
+                "id": 3,
+                "name": "频道:二次元",
+                "toast": "将减少相似内容推荐"
+              },
+              {
+                "id": 12,
+                "name": "此类内容过多",
+                "toast": "将减少相似内容推荐"
+              },
+              {
+                "id": 13,
+                "name": "推荐过",
+                "toast": "将减少相似内容推荐"
+              },
+              {
+                "id": 1,
+                "name": "这个内容",
+                "toast": "将减少相似内容推荐"
+              }
+            ],
+            "feedbacks": [
+              {
+                "id": 1,
+                "name": "恐怖血腥",
+                "toast": "将优化首页此类内容"
+              },
+              {
+                "id": 2,
+                "name": "色情低俗",
+                "toast": "将优化首页此类内容"
+              },
+              {
+                "id": 3,
+                "name": "封面恶心",
+                "toast": "将优化首页此类内容"
+              },
+              {
+                "id": 4,
+                "name": "标题党/封面党",
+                "toast": "将优化首页此类内容"
+              }
+            ],
+            "watch_later": 1
+          },
+          "args": {
+            "up_id": 2142394537,
+            "up_name": "医者正心",
+            "tid": 1907,
+            "tname": "二次元",
+            "aid": 116423946995495
+          },
+          "player_args": {
+            "aid": 116423946995495,
+            "cid": 37601808087,
+            "type": "av",
+            "duration": 181
+          },
+          "idx": 1776607990,
+          "three_point_v2": [
+            {
+              "title": "添加至稍后再看",
+              "type": "watch_later",
+              "icon": "https://i0.hdslb.com/bfs/activity-plat/static/ce06d65bc0a8d8aa2a463747ce2a4752/NyPAqcn0QF.png"
+            },
+            {
+              "title": "反馈",
+              "subtitle": "(选择后将优化首页此类内容)",
+              "reasons": [
+                {
+                  "id": 1,
+                  "name": "恐怖血腥",
+                  "toast": "将优化首页此类内容"
+                },
+                {
+                  "id": 2,
+                  "name": "色情低俗",
+                  "toast": "将优化首页此类内容"
+                },
+                {
+                  "id": 3,
+                  "name": "封面恶心",
+                  "toast": "将优化首页此类内容"
+                },
+                {
+                  "id": 4,
+                  "name": "标题党/封面党",
+                  "toast": "将优化首页此类内容"
+                }
+              ],
+              "type": "feedback"
+            },
+            {
+              "title": "不感兴趣",
+              "subtitle": "(选择后将减少相似内容推荐)",
+              "reasons": [
+                {
+                  "id": 4,
+                  "name": "UP主:医者正心",
+                  "toast": "将减少相似内容推荐"
+                },
+                {
+                  "id": 3,
+                  "name": "频道:二次元",
+                  "toast": "将减少相似内容推荐"
+                },
+                {
+                  "id": 12,
+                  "name": "此类内容过多",
+                  "toast": "将减少相似内容推荐"
+                },
+                {
+                  "id": 13,
+                  "name": "推荐过",
+                  "toast": "将减少相似内容推荐"
+                },
+                {
+                  "id": 1,
+                  "name": "这个内容",
+                  "toast": "将减少相似内容推荐"
+                }
+              ],
+              "type": "dislike"
+            }
+          ],
+          "talk_back": "视频,伏兔穴，蕾缪安，浅扎一下，她站起来了！！！,62万观看,436弹幕,时长3分钟01秒,UP主医者正心,",
+          "report_flow_data": "{\"flow_card_type\":\"av\"}",
+          "three_point_v": "v2",
+          "cover_left_text_1": "62万",
+          "cover_left_icon_1": 1,
+          "cover_left_1_content_description": "62万观看",
+          "cover_left_text_2": "436",
+          "cover_left_icon_2": 3,
+          "cover_left_2_content_description": "436弹幕",
+          "cover_right_text": "3:01",
+          "cover_right_content_description": "3分钟01秒",
+          "desc_button": {
+            "text": "医者正心",
+            "uri": "bilibili://space/2142394537",
+            "event": "nickname",
+            "type": 1
+          },
+          "official_icon": 16,
+          "can_play": 1,
+          "goto_icon": {
+            "icon_url": "https://i0.hdslb.com/bfs/activity-plat/static/20230227/0977767b2e79d8ad0a36a731068a83d7/077GOeHOfO.png",
+            "icon_night_url": "https://i0.hdslb.com/bfs/activity-plat/static/20230227/0977767b2e79d8ad0a36a731068a83d7/ldbCXtkoK2.png",
+            "icon_width": 16,
+            "icon_height": 16
+          },
+          "cover_info_priority": 123
+        },
+        {
+          "card_type": "small_cover_v2",
+          "card_goto": "av",
+          "goto": "av",
+          "param": "116410239947853",
+          "cover": "http://i0.hdslb.com/bfs/archive/92fe95ab8f0bd945ff5c22b5fc90cf4651e374af.jpg",
+          "title": "\"有人不知悔改 迷雾里混淆黑白\"",
+          "uri": "bilibili://video/116410239947853?cid=37537449756&player_height=1440&player_preload=%7B%22cid%22%3A37537449756%2C%22expire_time%22%3A1776611587%2C%22file_info%22%3A%7B%2216%22%3A%5B%7B%22timelength%22%3A185922%2C%22filesize%22%3A4869114%7D%5D%7D%2C%22support_quality%22%3Anull%2C%22support_formats%22%3Anull%2C%22support_description%22%3Anull%2C%22quality%22%3A16%2C%22url%22%3A%22http%3A%2F%2Fcn-hbyc-ct-01-02.bilivideo.com%2Fupgcxcode%2F56%2F97%2F37537449756%2F37537449756-1-16.mp4%3Fe%3Dig8euxZM2rNcNbRVhwdVhwdlhWdVhwdVhoNvNC8BqJIzNbfqXBvEuENvNC8aNEVEtEvE9IMvXBvE2ENvNCImNEVEIj0Y2J_aug859r1qXg8gNEVE5XREto8z5JZC2X2gkX5L5F1eTX1jkXlsTXHeux_f2o859IB_%5Cu0026platform%3D%5Cu0026gen%3Dplayurlv3%5Cu0026os%3Dbcache%5Cu0026uipk%3D5%5Cu0026trid%3D000077aaf87789294fe1b50ea9673379106U%5Cu0026nbs%3D1%5Cu0026og%3Dcos%5Cu0026deadline%3D1776615187%5Cu0026mid%3D0%5Cu0026oi%3D0x240e03a20fe16670b49abffffebde4a3%5Cu0026upsig%3Dc7a806eb30103955c20778ac8a986209%5Cu0026uparams%3De%2Cplatform%2Cgen%2Cos%2Cuipk%2Ctrid%2Cnbs%2Cog%2Cdeadline%2Cmid%2Coi%5Cu0026cdnid%3D88802%5Cu0026bvc%3Dvod%5Cu0026nettype%3D0%5Cu0026bw%3D210556%5Cu0026lrs%3D66%5Cu0026build%3D0%5Cu0026dl%3D0%5Cu0026f%3DU_0_0%5Cu0026agrr%3D0%5Cu0026buvid%3D%5Cu0026orderid%3D0%2C3%22%2C%22video_codecid%22%3A7%2C%22video_project%22%3Atrue%2C%22fnver%22%3A0%2C%22fnval%22%3A0%7D&player_rotate=0&player_width=2560&report_flow_data=%7B%22flow_card_type%22%3A%22av%22%7D",
+          "three_point": {
+            "dislike_reasons": [
+              {
+                "id": 4,
+                "name": "UP主:我爱吃派大星",
+                "toast": "将减少相似内容推荐"
+              },
+              {
+                "id": 3,
+                "name": "频道:dj",
+                "toast": "将减少相似内容推荐"
+              },
+              {
+                "id": 12,
+                "name": "此类内容过多",
+                "toast": "将减少相似内容推荐"
+              },
+              {
+                "id": 13,
+                "name": "推荐过",
+                "toast": "将减少相似内容推荐"
+              },
+              {
+                "id": 1,
+                "name": "这个内容",
+                "toast": "将减少相似内容推荐"
+              }
+            ],
+            "feedbacks": [
+              {
+                "id": 1,
+                "name": "恐怖血腥",
+                "toast": "将优化首页此类内容"
+              },
+              {
+                "id": 2,
+                "name": "色情低俗",
+                "toast": "将优化首页此类内容"
+              },
+              {
+                "id": 3,
+                "name": "封面恶心",
+                "toast": "将优化首页此类内容"
+              },
+              {
+                "id": 4,
+                "name": "标题党/封面党",
+                "toast": "将优化首页此类内容"
+              }
+            ],
+            "watch_later": 1
+          },
+          "args": {
+            "up_id": 296465852,
+            "up_name": "我爱吃派大星",
+            "tid": 2515556,
+            "tname": "dj",
+            "aid": 116410239947853
+          },
+          "player_args": {
+            "aid": 116410239947853,
+            "cid": 37537449756,
+            "type": "av",
+            "duration": 186
+          },
+          "idx": 1776607989,
+          "three_point_v2": [
+            {
+              "title": "添加至稍后再看",
+              "type": "watch_later",
+              "icon": "https://i0.hdslb.com/bfs/activity-plat/static/ce06d65bc0a8d8aa2a463747ce2a4752/NyPAqcn0QF.png"
+            },
+            {
+              "title": "反馈",
+              "subtitle": "(选择后将优化首页此类内容)",
+              "reasons": [
+                {
+                  "id": 1,
+                  "name": "恐怖血腥",
+                  "toast": "将优化首页此类内容"
+                },
+                {
+                  "id": 2,
+                  "name": "色情低俗",
+                  "toast": "将优化首页此类内容"
+                },
+                {
+                  "id": 3,
+                  "name": "封面恶心",
+                  "toast": "将优化首页此类内容"
+                },
+                {
+                  "id": 4,
+                  "name": "标题党/封面党",
+                  "toast": "将优化首页此类内容"
+                }
+              ],
+              "type": "feedback"
+            },
+            {
+              "title": "不感兴趣",
+              "subtitle": "(选择后将减少相似内容推荐)",
+              "reasons": [
+                {
+                  "id": 4,
+                  "name": "UP主:我爱吃派大星",
+                  "toast": "将减少相似内容推荐"
+                },
+                {
+                  "id": 3,
+                  "name": "频道:dj",
+                  "toast": "将减少相似内容推荐"
+                },
+                {
+                  "id": 12,
+                  "name": "此类内容过多",
+                  "toast": "将减少相似内容推荐"
+                },
+                {
+                  "id": 13,
+                  "name": "推荐过",
+                  "toast": "将减少相似内容推荐"
+                },
+                {
+                  "id": 1,
+                  "name": "这个内容",
+                  "toast": "将减少相似内容推荐"
+                }
+              ],
+              "type": "dislike"
+            }
+          ],
+          "talk_back": "视频,\"有人不知悔改 迷雾里混淆黑白\",206万观看,26弹幕,时长3分钟06秒,UP主我爱吃派大星,",
+          "report_flow_data": "{\"flow_card_type\":\"av\"}",
+          "three_point_v": "v2",
+          "cover_left_text_1": "206万",
+          "cover_left_icon_1": 1,
+          "cover_left_1_content_description": "206万观看",
+          "cover_left_text_2": "26",
+          "cover_left_icon_2": 3,
+          "cover_left_2_content_description": "26弹幕",
+          "cover_right_text": "3:06",
+          "cover_right_content_description": "3分钟06秒",
+          "desc_button": {
+            "text": "我爱吃派大星",
+            "uri": "bilibili://space/296465852",
+            "event": "nickname",
+            "type": 1
+          },
+          "official_icon": 16,
+          "can_play": 1,
+          "goto_icon": {
+            "icon_url": "https://i0.hdslb.com/bfs/activity-plat/static/20230227/0977767b2e79d8ad0a36a731068a83d7/077GOeHOfO.png",
+            "icon_night_url": "https://i0.hdslb.com/bfs/activity-plat/static/20230227/0977767b2e79d8ad0a36a731068a83d7/ldbCXtkoK2.png",
+            "icon_width": 16,
+            "icon_height": 16
+          },
+          "cover_info_priority": 123
+        },
+        {
+          "card_type": "small_cover_v2",
+          "card_goto": "av",
+          "goto": "av",
+          "param": "116407857649477",
+          "cover": "http://i2.hdslb.com/bfs/archive/1f94d07cc4f5ca872b03e9de2bafdb5c9f0b5a4a.jpg",
+          "title": "蛋仔派对：麻辣毛蛋万人号12天，20个648花完都能获得什么？",
+          "uri": "bilibili://video/116407857649477?cid=37524606736&player_height=1080&player_preload=%7B%22cid%22%3A37524606736%2C%22expire_time%22%3A1776611587%2C%22file_info%22%3A%7B%2216%22%3A%5B%7B%22timelength%22%3A113894%2C%22filesize%22%3A7328326%7D%5D%7D%2C%22support_quality%22%3Anull%2C%22support_formats%22%3Anull%2C%22support_description%22%3Anull%2C%22quality%22%3A16%2C%22url%22%3A%22http%3A%2F%2Fupos-sz-estgoss.bilivideo.com%2Fupgcxcode%2F36%2F67%2F37524606736%2F37524606736_qe1-1-16.mp4%3Fe%3Dig8euxZM2rNcNbRVhwdVhwdlhWdVhwdVhoNvNC8BqJIzNbfqXBvEuENvNC8aNEVEtEvE9IMvXBvE2ENvNCImNEVEIj0Y2J_aug859r1qXg8gNEVE5XREto8z5JZC2X2gkX5L5F1eTX1jkXlsTXHeux_f2o859IB_%5Cu0026uipk%3D5%5Cu0026mid%3D0%5Cu0026gen%3Dplayurlv3%5Cu0026os%3Destgoss%5Cu0026oi%3D0x240e03a20fe16670b49abffffebde4a3%5Cu0026nbs%3D1%5Cu0026platform%3D%5Cu0026trid%3D77aaf87789294fe1b50ea9673379106U%5Cu0026og%3Dali%5Cu0026deadline%3D1776615187%5Cu0026upsig%3Dfc9efb4d0f3ce3021786f8db00540106%5Cu0026uparams%3De%2Cuipk%2Cmid%2Cgen%2Cos%2Coi%2Cnbs%2Cplatform%2Ctrid%2Cog%2Cdeadline%5Cu0026bvc%3Dvod%5Cu0026nettype%3D0%5Cu0026bw%3D518819%5Cu0026build%3D0%5Cu0026dl%3D0%5Cu0026f%3DU_0_0%5Cu0026agrr%3D0%5Cu0026buvid%3D%5Cu0026orderid%3D0%2C3%22%2C%22video_codecid%22%3A7%2C%22video_project%22%3Atrue%2C%22fnver%22%3A0%2C%22fnval%22%3A0%7D&player_rotate=0&player_width=1920&report_flow_data=%7B%22flow_card_type%22%3A%22av%22%7D",
+          "three_point": {
+            "dislike_reasons": [
+              {
+                "id": 4,
+                "name": "UP主:一克麻辣毛蛋儿",
+                "toast": "将减少相似内容推荐"
+              },
+              {
+                "id": 3,
+                "name": "频道:搞笑视频",
+                "toast": "将减少相似内容推荐"
+              },
+              {
+                "id": 12,
+                "name": "此类内容过多",
+                "toast": "将减少相似内容推荐"
+              },
+              {
+                "id": 13,
+                "name": "推荐过",
+                "toast": "将减少相似内容推荐"
+              },
+              {
+                "id": 1,
+                "name": "这个内容",
+                "toast": "将减少相似内容推荐"
+              }
+            ],
+            "feedbacks": [
+              {
+                "id": 1,
+                "name": "恐怖血腥",
+                "toast": "将优化首页此类内容"
+              },
+              {
+                "id": 2,
+                "name": "色情低俗",
+                "toast": "将优化首页此类内容"
+              },
+              {
+                "id": 3,
+                "name": "封面恶心",
+                "toast": "将优化首页此类内容"
+              },
+              {
+                "id": 4,
+                "name": "标题党/封面党",
+                "toast": "将优化首页此类内容"
+              }
+            ],
+            "watch_later": 1
+          },
+          "args": {
+            "up_id": 1912249087,
+            "up_name": "一克麻辣毛蛋儿",
+            "tid": 69347,
+            "tname": "搞笑视频",
+            "aid": 116407857649477
+          },
+          "player_args": {
+            "aid": 116407857649477,
+            "cid": 37524606736,
+            "type": "av",
+            "duration": 114
+          },
+          "idx": 1776607988,
+          "three_point_v2": [
+            {
+              "title": "添加至稍后再看",
+              "type": "watch_later",
+              "icon": "https://i0.hdslb.com/bfs/activity-plat/static/ce06d65bc0a8d8aa2a463747ce2a4752/NyPAqcn0QF.png"
+            },
+            {
+              "title": "反馈",
+              "subtitle": "(选择后将优化首页此类内容)",
+              "reasons": [
+                {
+                  "id": 1,
+                  "name": "恐怖血腥",
+                  "toast": "将优化首页此类内容"
+                },
+                {
+                  "id": 2,
+                  "name": "色情低俗",
+                  "toast": "将优化首页此类内容"
+                },
+                {
+                  "id": 3,
+                  "name": "封面恶心",
+                  "toast": "将优化首页此类内容"
+                },
+                {
+                  "id": 4,
+                  "name": "标题党/封面党",
+                  "toast": "将优化首页此类内容"
+                }
+              ],
+              "type": "feedback"
+            },
+            {
+              "title": "不感兴趣",
+              "subtitle": "(选择后将减少相似内容推荐)",
+              "reasons": [
+                {
+                  "id": 4,
+                  "name": "UP主:一克麻辣毛蛋儿",
+                  "toast": "将减少相似内容推荐"
+                },
+                {
+                  "id": 3,
+                  "name": "频道:搞笑视频",
+                  "toast": "将减少相似内容推荐"
+                },
+                {
+                  "id": 12,
+                  "name": "此类内容过多",
+                  "toast": "将减少相似内容推荐"
+                },
+                {
+                  "id": 13,
+                  "name": "推荐过",
+                  "toast": "将减少相似内容推荐"
+                },
+                {
+                  "id": 1,
+                  "name": "这个内容",
+                  "toast": "将减少相似内容推荐"
+                }
+              ],
+              "type": "dislike"
+            }
+          ],
+          "talk_back": "视频,蛋仔派对：麻辣毛蛋万人号12天，20个648花完都能获得什么？,282.7万观看,134弹幕,时长1分钟54秒,UP主一克麻辣毛蛋儿,",
+          "report_flow_data": "{\"flow_card_type\":\"av\"}",
+          "three_point_v": "v2",
+          "cover_left_text_1": "282.7万",
+          "cover_left_icon_1": 1,
+          "cover_left_1_content_description": "282.7万观看",
+          "cover_left_text_2": "134",
+          "cover_left_icon_2": 3,
+          "cover_left_2_content_description": "134弹幕",
+          "cover_right_text": "1:54",
+          "cover_right_content_description": "1分钟54秒",
+          "desc_button": {
+            "text": "一克麻辣毛蛋儿",
+            "uri": "bilibili://space/1912249087",
+            "event": "nickname",
+            "type": 1
+          },
+          "official_icon": 16,
+          "can_play": 1,
+          "goto_icon": {
+            "icon_url": "https://i0.hdslb.com/bfs/activity-plat/static/20230227/0977767b2e79d8ad0a36a731068a83d7/077GOeHOfO.png",
+            "icon_night_url": "https://i0.hdslb.com/bfs/activity-plat/static/20230227/0977767b2e79d8ad0a36a731068a83d7/ldbCXtkoK2.png",
+            "icon_width": 16,
+            "icon_height": 16
+          },
+          "cover_info_priority": 123
+        }
+      ]
+    }
+  }
+  ```

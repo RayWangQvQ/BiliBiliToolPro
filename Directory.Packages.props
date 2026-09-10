@@ -1,4 +1,4 @@
-<Project>
+﻿<Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
@@ -34,6 +34,7 @@
     <!-- ASP.NET Core -->
     <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.18" />
     <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.18" />
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.18" />
     <!-- Serilog -->
     <PackageVersion Include="Serilog" Version="4.3.0" />
     <PackageVersion Include="Serilog.AspNetCore" Version="8.0.3" />
@@ -63,8 +64,9 @@
     <PackageVersion Include="CronExpressionDescriptor" Version="2.44.0" />
     <!-- Other packages - 修复版本兼容性问题 -->
     <PackageVersion Include="Ray.Infrastructure" Version="0.0.26" />
+    <PackageVersion Include="Refit" Version="8.0.0" />
+    <PackageVersion Include="Refit.HttpClientFactory" Version="8.0.0" />
     <PackageVersion Include="Scrutor" Version="6.1.0" />
-    <PackageVersion Include="WebApiClientCore" Version="2.1.5" />
     <PackageVersion Include="QRCoder" Version="1.6.0" />
     <PackageVersion Include="MudBlazor" Version="8.6.0" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="8.1.4" />
@@ -76,5 +78,8 @@
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.0.1" />
     <PackageVersion Include="coverlet.collector" Version="6.0.4" />
     <PackageVersion Include="FluentAssertions" Version="8.5.0" />
+    <PackageVersion Include="TngTech.ArchUnitNET" Version="0.13.3" />
+    <PackageVersion Include="TngTech.ArchUnitNET.xUnit" Version="0.13.3" />
+    <PackageVersion Include="bunit" Version="1.34.0" />
   </ItemGroup>
 </Project>

@@ -1,8 +1,10 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Application.Attributes;
 using Ray.BiliBiliTool.Application.Contracts;
+using Ray.BiliBiliTool.Application.Diagnostics;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 using Ray.BiliBiliTool.Infrastructure.Cookie;
@@ -13,8 +15,12 @@ public class LiveFansMedalAppService(
     ILogger<LiveFansMedalAppService> logger,
     IOptionsMonitor<LiveFansMedalTaskOptions> liveFansMedalTaskOptions,
     ILiveDomainService liveDomainService,
+    ILoginDomainService loginDomainService,
+    IConfiguration configuration,
     CookieStrFactory<BiliCookie> cookieStrFactory
-) : BaseMultiAccountsAppService(logger, cookieStrFactory), ILiveFansMedalAppService
+)
+    : BaseMultiAccountsAppService(logger, cookieStrFactory, loginDomainService, configuration),
+        ILiveFansMedalAppService
 {
     [TaskInterceptor("直播间互动", TaskLevel.One)]
     protected override async Task DoTaskAccountAsync(
@@ -22,15 +28,23 @@ public class LiveFansMedalAppService(
         CancellationToken cancellationToken = default
     )
     {
-        if (!liveFansMedalTaskOptions.CurrentValue.IsEnable)
-        {
-            logger.LogInformation("已配置为关闭，跳过");
-            return;
-        }
+        await TaskFlowDiagnosticScope.ExecuteAsync(
+            logger,
+            "直播间互动",
+            async () =>
+            {
+                if (!liveFansMedalTaskOptions.CurrentValue.IsEnable)
+                {
+                    logger.LogInformation("已配置为关闭，跳过");
+                    return;
+                }
 
-        await SendDanmaku(ck);
-        await Like(ck);
-        await HeartBeat(ck);
+                await SetCookiesAsync(ck, cancellationToken);
+                await SendDanmaku(ck);
+                await Like(ck);
+                await HeartBeat(ck);
+            }
+        );
     }
 
     [TaskInterceptor("发送弹幕", TaskLevel.Two, false)]

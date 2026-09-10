@@ -1,0 +1,30 @@
+info:
+  name: app.bilibili.com
+  type: folder
+  seq: 2
+
+request:
+  headers:
+    - name: buvid
+      value: "{{buvid}}"
+    - name: env
+      value: prod
+    - name: app-key
+      value: android64
+    - name: user-agent
+      value: "{{user-agent}}"
+    - name: x-bili-trace-id
+      value: 43e1a54f60cfbf0bb9788d4d9e6774bf:b9788d4d9e6774bf:0:0
+      disabled: true
+    - name: x-bili-ticket
+      value: eyJhbGciOiJIUzI1NiIsImtpZCI6InMwMyIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzU3MzI4OTIsImlhdCI6MTczNTcwMzc5MiwiYnV2aWQiOiJYVzcyNEQxNzI0Njg3MTlDQzI1NjA1REIyNDI0NzhEMkUxMjE5In0.hEDtIHZoN5Wyoja2hNuPcfy-laa1r05ObiEhJ5gPSt4
+      disabled: true
+  variables:
+    - name: host
+      value: https://app.bilibili.com
+  scripts:
+    - type: before-request
+      code: |-
+        // Shared sign utility — see lib/sign.js
+        const { signRequest } = require('./lib/sign');
+        signRequest(req, bru);

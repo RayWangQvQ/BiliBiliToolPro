@@ -1,0 +1,127 @@
+info:
+  name: send
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{host}}/x/passport-login/sms/send"
+  headers:
+    - name: bili-http-engine
+      value: ignet
+    - name: fp_local
+      value: 910f57d9d7feaf6928e592860452d06b202505211207597aa9050a2e5c31f431
+    - name: fp_remote
+      value: 910f57d9d7feaf6928e592860452d06b202505211207597aa9050a2e5c31f431
+    - name: guestid
+      value: "24675260415603"
+    - name: session_id
+      value: 45dd1740
+    - name: x-bili-locale-bin
+      value: CggKAnpoGgJDThIICgJ6aBoCQ04iDUFzaWEvU2hhbmdoYWkqBiswODowMA
+    - name: x-bili-metadata-ip-region
+      value: CN
+    - name: x-bili-net-bin
+      value: DcdEej8gAQ
+  body:
+    type: form-urlencoded
+    data:
+      - name: appkey
+        value: "{{appKeyGuest}}"
+      - name: build
+        value: "{{build}}"
+      - name: buvid
+        value: "{{buvid}}"
+      - name: c_locale
+        value: zh_CN
+      - name: channel
+        value: bili
+      - name: cid
+        value: "86"
+      - name: device_tourist_id
+        value: "24675260415603"
+      - name: disable_rcmd
+        value: "0"
+      - name: extend
+        value: ""
+      - name: local_id
+        value: "{{buvid}}"
+      - name: login_session_id
+        value: fddb6c114c723b3612822a75f04eeeb4
+      - name: mobi_app
+        value: android
+      - name: platform
+        value: android
+      - name: s_locale
+        value: zh_CN
+      - name: spm_id
+        value: main.homepage.bottombar.myinfo
+      - name: statistics
+        value: "{{statistics}}"
+      - name: tel
+        value: "{{phone}}"
+      - name: ts
+        value: "{{ts}}"
+      - name: sign
+        value: "{{sign}}"
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        // Extract geetest params from recaptcha_url for next send_recaptcha request.
+        function parseQuery(url) {
+          const idx = url.indexOf('?');
+          if (idx < 0) return {};
+          const q = url.slice(idx + 1);
+          const obj = {};
+          q.split('&').forEach(pair => {
+            if (!pair) return;
+            const parts = pair.split('=');
+            const k = decodeURIComponent(parts[0] || '');
+            const v = decodeURIComponent(parts.slice(1).join('=') || '');
+            if (k) obj[k] = v;
+          });
+          return obj;
+        }
+
+        try {
+          const body = res.getBody();
+          const url = body && body.data ? body.data.recaptcha_url || '' : '';
+          if (url) {
+            const q = parseQuery(url);
+            bru.setVar('risk_recaptcha_url', url);
+            bru.setVar('risk_recaptcha_token', q.recaptcha_token || '');
+            bru.setVar('risk_gee_gt', q.gee_gt || '');
+            bru.setVar('risk_gee_challenge', q.gee_challenge || '');
+            bru.setVar('risk_hash', q.hash || '');
+            console.log('risk vars saved from sms recaptcha_url');
+          } else {
+            console.log('sms send: no recaptcha_url in response');
+          }
+        } catch (e) {
+          console.log('sms send after-response parse failed:', e.message);
+        }
+
+settings:
+  encodeUrl: false
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+docs: |-
+  ## Response Sample
+
+  ```json
+  {
+    "code": 0,
+    "message": "OK",
+    "ttl": 1,
+    "data": {
+      "is_new": false,
+      "captcha_key": "",
+      "recaptcha_url": "https://www.bilibili.com/h5/project-msg-auth/verify?ct=geetest&recaptcha_token=e895c2cae40f4476a90034a2c75fe795&gee_gt=1c0ea7c7d47d8126dda19ee3431a5f38&gee_challenge=a88fc95608e371e769f0670cdf0ff809&hash=4c3dc6210c927bbc0ba18088ae09def7"
+    }
+  }
+  ```

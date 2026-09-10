@@ -1,0 +1,17 @@
+﻿namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.ApiApi.Charge;
+
+public class ChargeCommentRequest
+{
+    public ChargeCommentRequest(string order_id, string message, string csrf)
+    {
+        Order_id = order_id;
+        Message = message;
+        Csrf = csrf;
+    }
+
+    public string Order_id { get; set; }
+
+    public string Message { get; set; }
+
+    public string Csrf { get; set; }
+}

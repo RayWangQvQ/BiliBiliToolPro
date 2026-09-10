@@ -1,0 +1,128 @@
+info:
+  name: passport.bilibili.com
+  type: folder
+  seq: 1
+
+request:
+  headers:
+    - name: buvid
+      value: "{{buvid}}"
+    - name: env
+      value: prod
+    - name: app-key
+      value: android64
+    - name: user-agent
+      value: "{{user-agent}}"
+    - name: x-bili-trace-id
+      value: 43e1a54f60cfbf0bb9788d4d9e6774bf:b9788d4d9e6774bf:0:0
+      disabled: true
+    - name: x-bili-ticket
+      value: eyJhbGciOiJIUzI1NiIsImtpZCI6InMwMyIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzU3MzI4OTIsImlhdCI6MTczNTcwMzc5MiwiYnV2aWQiOiJYVzcyNEQxNzI0Njg3MTlDQzI1NjA1REIyNDI0NzhEMkUxMjE5In0.hEDtIHZoN5Wyoja2hNuPcfy-laa1r05ObiEhJ5gPSt4
+      disabled: true
+  variables:
+    - name: host
+      value: https://passport.bilibili.com
+  scripts:
+    - type: before-request
+      code: |-
+        // Shared sign utility — see lib/sign.js
+        const { signRequest } = require('./lib/sign');
+        signRequest(req, bru);
+
+docs:
+  content: |-
+    # passport-login 登录流程说明
+
+    本目录支持两种登录方式：
+    1. 账号 + 密码登录（RSA）
+    2. 短信验证码登录（SMS）
+
+    ## 一、账号 + 密码登录（RSA）
+
+    请求链路：
+    1. 先执行 `x/passport-login/web/key`，拿公钥
+    2. 再执行 `x/passport-login/oauth2/login`，密码使用公钥加密
+    3. 如果报风险，访问返回的链接，进行短信验证
+      3.1. 通过`x/safecenter/user/info`拿用户脱敏信息（如手机号），用于展示
+      3.2. 请求`x/safecenter/captcha/pre`拿图形验证
+      3.3. 请求`x/safecenter/common/sms/send`，发送短信验证码
+      3.4. 请求`x/safecenter/login/tel/verify`验证短信码，获取code
+      3.5. 请求`x/passport-login/oauth2/access_token`，通过code获取`access_key`
+
+    关键步骤：
+    1. `web/key` 的 after-response 脚本写入 runtime 变量：
+      - `rsa_hash`
+      - `rsa_key`
+    2. `oauth2/login` 的 before-request：
+      - 读取 `rsa_hash` + `rsa_key`
+      - 使用 `node-forge` 将 `(rsa_hash + 明文密码)` 做 `RSAES-PKCS1-V1_5` 加密
+      - 写入 `encryptedPwd`
+      - 再调用共享签名逻辑计算 `ts/sign`
+
+    ## 二、短信验证码登录（SMS）
+
+    请求链路（常见）：
+    1. 先执行 `x/passport-login/sms/send` 生成验证码
+    2. 调用 `x/passport-login/sms/send_recaptcha` 发送验证码
+    2. 再执行对应的短信登录接口（提交手机号 + 验证码）
+
+    说明：
+    1. SMS 登录不需要 RSA 公钥加密密码
+    2. 但通常仍需要 `appkey/appsec` 签名
+    3. 因此依然复用同一套 `signRequest(req, bru)` 签名逻辑
+
+    ## 三、签名策略（共享、去重）
+
+    签名逻辑统一在：
+    - `lib/sign.js`
+
+    对外入口：
+    - `signRequest(req, bru)`
+
+    规则：
+    1. 自动收集 body/query 参数
+    2. 自动替换 `{{变量}}`（优先 runtime，再 env）
+    3. 若仍存在未解析占位符（如 `{{encryptedPwd}}`），跳过签名，交由后续脚本处理
+    4. 按 `appkey` 自动选择 `appSec` 或 `appSecGuest`
+    5. 计算：`md5(sortedQuery + appsec)`
+    6. 回写 `ts/sign` 到 runtime 变量
+
+    这套策略既支持普通请求，也支持“先补参数（如 RSA）再签名”的场景。
+
+    ## 四、依赖与运行要求
+
+    1. Bruno 需开启 Developer Mode（允许 `require` 外部包）
+    2. `bruno` 目录已安装依赖：
+      - `node-forge`（RSA）
+      - `crypto-js`（MD5）
+
+    ## 五、关键变量约定
+
+    环境变量（示例）：
+    - `phone`
+    - `pwd`
+    - `appKey/appSec`
+    - `appKeyGuest/appSecGuest`
+    - 设备相关字段（`buvid`、`device_id`、`build`、`statistics` 等）
+
+    运行时变量：
+    - `rsa_hash`
+    - `rsa_key`
+    - `encryptedPwd`
+    - `ts`
+    - `sign`
+
+    ## 六、常见错误排查
+
+    1. `code: -3, API校验密匙错误`
+      - 说明 `sign` 与最终请求参数不一致
+      - 检查是否在参数最终确定后重新签名
+      - 密码登录时检查是否在 RSA 之后调用了 `signRequest`
+
+    2. `rsa_hash` 或 `rsa_key` 缺失
+      - 说明未先执行 `web/key`，或其 after-response 未成功写变量
+
+    3. `Cannot find module`
+      - 检查是否开启 Developer Mode
+      - 检查依赖是否安装在 `bruno` 根目录
+  type: text/markdown

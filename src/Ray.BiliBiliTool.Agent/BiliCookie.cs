@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using Ray.BiliBiliTool.Domain.Exceptions;
 using Ray.BiliBiliTool.Infrastructure.Cookie;
 using Ray.BiliBiliTool.Infrastructure.Extensions;
 
@@ -68,21 +69,23 @@ public class BiliCookie(Dictionary<string, string> cookieDic) : CookieInfo(cooki
         base.Check();
 
         if (CookieItemDictionary.Count == 0)
-            throw new Exception("Cookie字符串格式异常，内部无等号");
+            throw new BiliValidationException("Cookie字符串格式异常，内部无等号");
 
         bool result = true;
-        string msg = "Cookie字符串异常，无[{1}]项";
+        string msg = "Cookie字符串异常，无[{0}]项";
 
         //UserId为空，抛异常
         if (string.IsNullOrWhiteSpace(UserId))
         {
-            throw new Exception(string.Format(msg, GetPropertyDescription(nameof(UserId))));
+            throw new BiliValidationException(
+                string.Format(msg, GetPropertyDescription(nameof(UserId)))
+            );
         }
         else if (!long.TryParse(UserId, out long uid)) //不为空，但不能转换为long，警告
         {
-            throw new Exception(
+            throw new BiliValidationException(
                 string.Format(
-                    "[{uidKey}]={uid} 不能转换为long型，请确认配置的是正确的Cookie值",
+                    "[{0}]={1} 不能转换为long型，请确认配置的是正确的Cookie值",
                     GetPropertyDescription(nameof(UserId)),
                     UserId
                 )
@@ -92,17 +95,21 @@ public class BiliCookie(Dictionary<string, string> cookieDic) : CookieInfo(cooki
         //SessData为空，抛异常
         if (string.IsNullOrWhiteSpace(SessData))
         {
-            throw new Exception(string.Format(msg, GetPropertyDescription(nameof(SessData))));
+            throw new BiliValidationException(
+                string.Format(msg, GetPropertyDescription(nameof(SessData)))
+            );
         }
 
         //BiliJct为空，抛异常
         if (string.IsNullOrWhiteSpace(BiliJct))
         {
-            throw new Exception(string.Format(msg, GetPropertyDescription(nameof(BiliJct))));
+            throw new BiliValidationException(
+                string.Format(msg, GetPropertyDescription(nameof(BiliJct)))
+            );
         }
 
         if (!result)
-            throw new Exception(
+            throw new BiliValidationException(
                 $"请正确配置Cookie后再运行，配置方式见 {Config.Constants.SourceCodeUrl}"
             );
     }

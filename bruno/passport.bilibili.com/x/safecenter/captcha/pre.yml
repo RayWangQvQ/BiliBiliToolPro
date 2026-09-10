@@ -1,0 +1,62 @@
+info:
+  name: pre
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{host}}/x/safecenter/captcha/pre"
+  headers:
+    - name: Cookie
+      value: Buvid=XUA5651A9EDF7387153A945CDE96CADCB6000
+    - name: bili-http-engine
+      value: ignet
+    - name: buvid
+      value: "{{buvid}}"
+    - name: native_api_from
+      value: h5
+    - name: referer
+      value: https://passport.bilibili.com/h5-app/passport/risk/verify?tmp_token=2ecff8d85344943d1eda8e8a08f41141&request_id=899a2807c62748c5a6b7d28f3570424e&source=risk
+    - name: x-bili-net-bin
+      value: DQAAgL8gAQ
+    - name: x-bili-ticket
+      value: eyJhbGciOiJIUzI1NiIsImtpZCI6InMwMyIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzY2MjU5OTIsImlhdCI6MTc3NjU5Njg5MiwiYnV2aWQiOiJYVUE1NjUxQTlFREY3Mzg3MTUzQTk0NUNERTk2Q0FEQ0I2MDAwIn0.GNwbcwJMRU29LO8E1287V1TtdNqFvED18f-1RXZxb_k
+    - name: x-bili-trace-id
+      value: c0448091c2c29a3fa41293bb9169e4e9:a41293bb9169e4e9:0:0
+  body:
+    type: form-urlencoded
+    data:
+      - name: appkey
+        value: "{{appKeyGuest}}"
+      - name: disable_rcmd
+        value: "0"
+      - name: statistics
+        value: "{{statistics}}"
+      - name: ts
+        value: "{{ts}}"
+      - name: sign
+        value: "{{sign}}"
+  auth: inherit
+
+settings:
+  encodeUrl: false
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+docs: |
+  ## Response Sample
+
+  ```json
+  {
+    "code": 0,
+    "message": "OK",
+    "ttl": 1,
+    "data": {
+      "recaptcha_type": "geetest",
+      "recaptcha_token": "a96f82409a3b4a0a954497f8561858bb",
+      "gee_challenge": "f35ad9bc02bd67c811daef8e0847b024",
+      "gee_gt": "ac597a4506fee079629df5d8b66dd4fe"
+    }
+  }
+  ```

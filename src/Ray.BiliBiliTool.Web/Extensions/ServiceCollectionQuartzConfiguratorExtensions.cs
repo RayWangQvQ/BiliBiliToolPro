@@ -1,11 +1,41 @@
 using Quartz;
+using Quartz.Impl.AdoJobStore;
 using Ray.BiliBiliTool.Web.Jobs;
 
 namespace Ray.BiliBiliTool.Web.Extensions;
 
 public static class ServiceCollectionQuartzConfiguratorExtensions
 {
+    // Fires Jan 1 at midnight — disabled by default.
     private const string DefaultCron = "0 0 0 1 1 ?";
+
+    public static IServiceCollection AddBiliScheduler(
+        this IServiceCollection services,
+        IConfiguration configuration
+    )
+    {
+        var sqliteConnStr =
+            configuration.GetConnectionString("Sqlite") ?? throw new InvalidOperationException();
+
+        services.AddQuartz(q =>
+        {
+            q.UsePersistentStore(storeOptions =>
+            {
+                storeOptions.UseMicrosoftSQLite(sqlLiteOptions =>
+                {
+                    sqlLiteOptions.UseDriverDelegate<SQLiteDelegate>();
+                    sqlLiteOptions.ConnectionString = sqliteConnStr;
+                    sqlLiteOptions.TablePrefix = "QRTZ_";
+                });
+                storeOptions.UseSystemTextJsonSerializer();
+            });
+
+            q.AddBiliJobs(configuration);
+        });
+        services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
+
+        return services;
+    }
 
     public static IServiceCollectionQuartzConfigurator AddBiliJobs(
         this IServiceCollectionQuartzConfigurator quartz,
@@ -13,103 +43,96 @@ public static class ServiceCollectionQuartzConfiguratorExtensions
     )
     {
         // Login job
-        quartz.AddJob<LoginJob>(opts => opts.WithIdentity(LoginJob.Key));
-        quartz.AddTrigger(opts =>
-            opts.ForJob(LoginJob.Key)
-                .WithIdentity($"{LoginJob.Key}.Cron.Trigger", Constants.BiliJobGroup)
-                .WithCronSchedule(DefaultCron)
-        );
+        AddBiliJob<LoginJob>(quartz, LoginJob.Key, null, configuration);
 
         // Daily job
-        quartz.AddJob<DailyJob>(opts => opts.WithIdentity(DailyJob.Key));
-        quartz.AddTrigger(opts =>
-            opts.ForJob(DailyJob.Key)
-                .WithIdentity($"{DailyJob.Key}.Cron.Trigger", Constants.BiliJobGroup)
-                .WithCronSchedule(configuration["DailyTaskConfig:Cron"] ?? DefaultCron)
-        );
+        AddBiliJob<DailyJob>(quartz, DailyJob.Key, "DailyTaskConfig:Cron", configuration);
 
         // Manga job
-        quartz.AddJob<MangaJob>(opts => opts.WithIdentity(MangaJob.Key));
-        quartz.AddTrigger(opts =>
-            opts.ForJob(MangaJob.Key)
-                .WithIdentity($"{MangaJob.Key}.Cron.Trigger", Constants.BiliJobGroup)
-                .WithCronSchedule(configuration["MangaTaskConfig:Cron"] ?? DefaultCron)
-        );
+        AddBiliJob<MangaJob>(quartz, MangaJob.Key, "MangaTaskConfig:Cron", configuration);
 
         // MangaPrivilege job
-        quartz.AddJob<MangaPrivilegeJob>(opts => opts.WithIdentity(MangaPrivilegeJob.Key));
-        quartz.AddTrigger(opts =>
-            opts.ForJob(MangaPrivilegeJob.Key)
-                .WithIdentity($"{MangaPrivilegeJob.Key}.Cron.Trigger", Constants.BiliJobGroup)
-                .WithCronSchedule(configuration["MangaPrivilegeTaskConfig:Cron"] ?? DefaultCron)
+        AddBiliJob<MangaPrivilegeJob>(
+            quartz,
+            MangaPrivilegeJob.Key,
+            "MangaPrivilegeTaskConfig:Cron",
+            configuration
         );
 
         // ReceiveVipPrivilege job
-        quartz.AddJob<VipPrivilegeJob>(opts => opts.WithIdentity(VipPrivilegeJob.Key));
-        quartz.AddTrigger(opts =>
-            opts.ForJob(VipPrivilegeJob.Key)
-                .WithIdentity($"{VipPrivilegeJob.Key}.Cron.Trigger", Constants.BiliJobGroup)
-                .WithCronSchedule(
-                    configuration["VipPrivilegeConfig:Cron"] ?? DefaultCron
-                )
+        AddBiliJob<VipPrivilegeJob>(
+            quartz,
+            VipPrivilegeJob.Key,
+            "VipPrivilegeConfig:Cron",
+            configuration
         );
 
         // Silver2Coin job
-        quartz.AddJob<Silver2CoinJob>(opts => opts.WithIdentity(Silver2CoinJob.Key));
-        quartz.AddTrigger(opts =>
-            opts.ForJob(Silver2CoinJob.Key)
-                .WithIdentity($"{Silver2CoinJob.Key}.Cron.Trigger", Constants.BiliJobGroup)
-                .WithCronSchedule(configuration["Silver2CoinTaskConfig:Cron"] ?? DefaultCron)
+        AddBiliJob<Silver2CoinJob>(
+            quartz,
+            Silver2CoinJob.Key,
+            "Silver2CoinTaskConfig:Cron",
+            configuration
         );
 
         // Charge job
-        quartz.AddJob<ChargeJob>(opts => opts.WithIdentity(ChargeJob.Key));
-        quartz.AddTrigger(opts =>
-            opts.ForJob(ChargeJob.Key)
-                .WithIdentity($"{ChargeJob.Key}.Cron.Trigger", Constants.BiliJobGroup)
-                .WithCronSchedule(configuration["ChargeTaskConfig:Cron"] ?? DefaultCron)
-        );
+        AddBiliJob<ChargeJob>(quartz, ChargeJob.Key, "ChargeTaskConfig:Cron", configuration);
 
         // Vip big point job
-        quartz.AddJob<VipBigPointJob>(opts => opts.WithIdentity(VipBigPointJob.Key));
-        quartz.AddTrigger(opts =>
-            opts.ForJob(VipBigPointJob.Key)
-                .WithIdentity($"{VipBigPointJob.Key}.Cron.Trigger", Constants.BiliJobGroup)
-                .WithCronSchedule(configuration["VipBigPointConfig:Cron"] ?? DefaultCron)
+        AddBiliJob<VipBigPointJob>(
+            quartz,
+            VipBigPointJob.Key,
+            "VipBigPointConfig:Cron",
+            configuration
         );
 
         // Live lottery job
-        quartz.AddJob<LiveLotteryJob>(opts => opts.WithIdentity(LiveLotteryJob.Key));
-        quartz.AddTrigger(opts =>
-            opts.ForJob(LiveLotteryJob.Key)
-                .WithIdentity($"{LiveLotteryJob.Key}.Cron.Trigger", Constants.BiliJobGroup)
-                .WithCronSchedule(configuration["LiveLotteryTaskConfig:Cron"] ?? DefaultCron)
+        AddBiliJob<LiveLotteryJob>(
+            quartz,
+            LiveLotteryJob.Key,
+            "LiveLotteryTaskConfig:Cron",
+            configuration
         );
 
         // Live fans medal job
-        quartz.AddJob<LiveFansMedalJob>(opts => opts.WithIdentity(LiveFansMedalJob.Key));
-        quartz.AddTrigger(opts =>
-            opts.ForJob(LiveFansMedalJob.Key)
-                .WithIdentity($"{LiveFansMedalJob.Key}.Cron.Trigger", Constants.BiliJobGroup)
-                .WithCronSchedule(configuration["LiveFansMedalTaskConfig:Cron"] ?? DefaultCron)
+        AddBiliJob<LiveFansMedalJob>(
+            quartz,
+            LiveFansMedalJob.Key,
+            "LiveFansMedalTaskConfig:Cron",
+            configuration
         );
 
         // Unfollow batched job
-        quartz.AddJob<UnfollowBatchedJob>(opts => opts.WithIdentity(UnfollowBatchedJob.Key));
-        quartz.AddTrigger(opts =>
-            opts.ForJob(UnfollowBatchedJob.Key)
-                .WithIdentity($"{UnfollowBatchedJob.Key}.Cron.Trigger", Constants.BiliJobGroup)
-                .WithCronSchedule(configuration["UnfollowBatchedTaskConfig:Cron"] ?? DefaultCron)
+        AddBiliJob<UnfollowBatchedJob>(
+            quartz,
+            UnfollowBatchedJob.Key,
+            "UnfollowBatchedTaskConfig:Cron",
+            configuration
         );
 
         // Test bili job
-        quartz.AddJob<TestBiliJob>(opts => opts.WithIdentity(TestBiliJob.Key));
-        quartz.AddTrigger(opts =>
-            opts.ForJob(TestBiliJob.Key)
-                .WithIdentity($"{TestBiliJob.Key}.Cron.Trigger", Constants.BiliJobGroup)
-                .WithCronSchedule(DefaultCron)
-        );
+        AddBiliJob<TestBiliJob>(quartz, TestBiliJob.Key, null, configuration);
 
         return quartz;
+    }
+
+    private static void AddBiliJob<TJob>(
+        IServiceCollectionQuartzConfigurator quartz,
+        JobKey key,
+        string? configCronKey,
+        IConfiguration configuration
+    )
+        where TJob : IJob
+    {
+        quartz.AddJob<TJob>(opts => opts.WithIdentity(key));
+        quartz.AddTrigger(opts =>
+            opts.ForJob(key)
+                .WithIdentity($"{key}.Cron.Trigger", Constants.BiliJobGroup)
+                .WithCronSchedule(
+                    configCronKey != null
+                        ? (configuration[configCronKey] ?? DefaultCron)
+                        : DefaultCron
+                )
+        );
     }
 }

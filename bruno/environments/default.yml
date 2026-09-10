@@ -1,0 +1,34 @@
+name: default
+variables:
+  - name: phone
+    value: "{{process.env.phone}}"
+  - name: pwd
+    value: "{{process.env.pwd}}"
+  - name: mid
+    value: "{{process.env.mid}}"
+  - name: buvid
+    value: "{{process.env.buvid}}"
+  - name: csrf
+    value: "{{process.env.csrf}}"
+  - name: appKey
+    value: 1d8b6e7d45233436
+  - name: appSec
+    value: 560c52ccd288fed045859ed18bffd973
+  - name: appKeyGuest
+    value: 783bbb7264451d82
+  - name: appSecGuest
+    value: 2653583c8873dea268ab9386918b1d65
+  - name: access_key
+    value: "{{process.env.access_key}}"
+  - name: cookieStr
+    value: "{{process.env.cookieStr}}"
+  - name: user-agent
+    value: Mozilla/5.0 BiliDroid/8.45.1 (bbcallen@gmail.com) os/android model/SM-S9210 mobi_app/android build/8451100 channel/bili innerVer/8451110 osVer/12 network/2
+  - name: user-agent-web
+    value: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36 Edg/148.0.0.0
+  - name: device_id
+    value: "{{process.env.device_id}}"
+  - name: build
+    value: "8451100"
+  - name: statistics
+    value: '{"appId":1,"platform":3,"version":"8.45.1","abtest":""}'

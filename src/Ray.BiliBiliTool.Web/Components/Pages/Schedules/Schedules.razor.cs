@@ -7,8 +7,8 @@ using BlazingQuartz.Jobs.Abstractions;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using Quartz;
-using Ray.BiliBiliTool.Domain;
 using Ray.BiliBiliTool.Web.Extensions;
+using Ray.BiliBiliTool.Web.Services.Pages.Schedules;
 
 namespace Ray.BiliBiliTool.Web.Components.Pages.Schedules;
 
@@ -22,13 +22,10 @@ public partial class Schedules : ComponentBase, IDisposable
     private ILogger<Schedules> Logger { get; set; } = null!;
 
     [Inject]
-    private ISchedulerService SchedulerSvc { get; set; } = null!;
+    private ISchedulerPageWorkflow SchedulerWorkflow { get; set; } = null!;
 
     [Inject]
     private ISchedulerListenerService SchedulerListenerSvc { get; set; } = null!;
-
-    [Inject]
-    private IExecutionLogService ExecutionLogSvc { get; set; } = null!;
 
     [Inject]
     private IDialogService DialogSvc { get; set; } = null!;
@@ -87,7 +84,7 @@ public partial class Schedules : ComponentBase, IDisposable
     {
         ScheduledJobs.Clear();
 
-        IAsyncEnumerable<ScheduleModel> jobs = SchedulerSvc.GetAllJobsAsync(_filter);
+        IAsyncEnumerable<ScheduleModel> jobs = SchedulerWorkflow.GetAllJobsAsync(_filter);
         await foreach (ScheduleModel job in jobs)
         {
             ScheduledJobs.Add(job);
@@ -96,7 +93,7 @@ public partial class Schedules : ComponentBase, IDisposable
         if (ScheduledJobs.Any())
             await _scheduleDataGrid.ExpandAllGroupsAsync();
 
-        await UpdateScheduleModelsLastExecution();
+        await SchedulerWorkflow.EnrichWithLastExecutionAsync(ScheduledJobs);
     }
 
     private void UnRegisterEventListeners()
@@ -210,7 +207,7 @@ public partial class Schedules : ComponentBase, IDisposable
                 }
                 else
                 {
-                    JobDetailModel? jobDetail = await SchedulerSvc.GetJobDetail(
+                    JobDetailModel? jobDetail = await SchedulerWorkflow.GetJobDetailAsync(
                         model.JobName,
                         model.JobGroup
                     );
@@ -285,7 +282,7 @@ public partial class Schedules : ComponentBase, IDisposable
 
         await InvokeAsync(async () =>
         {
-            ScheduleModel model = await SchedulerSvc.GetScheduleModelAsync(e.Args);
+            ScheduleModel model = await SchedulerWorkflow.GetScheduleModelAsync(e.Args);
             ScheduledJobs.Add(model);
         });
     }
@@ -326,65 +323,18 @@ public partial class Schedules : ComponentBase, IDisposable
             )
         );
 
-    private async Task UpdateScheduleModelsLastExecution()
-    {
-        var latestResult = new PageMetadata(0, 1);
-        var scheduleJobType = new HashSet<LogType> { LogType.ScheduleJob };
-
-        foreach (ScheduleModel schModel in ScheduledJobs)
-        {
-            if (string.IsNullOrEmpty(schModel.JobName))
-                continue;
-
-            PagedList<ExecutionLog> latestLogList = await ExecutionLogSvc.GetLatestExecutionLog(
-                schModel.JobName,
-                schModel.JobGroup,
-                schModel.TriggerName,
-                schModel.TriggerGroup,
-                latestResult,
-                logTypes: scheduleJobType
-            );
-
-            if (latestLogList != null && latestLogList.Any())
-            {
-                ExecutionLog latestLog = latestLogList.First();
-                if (!schModel.PreviousTriggerTime.HasValue)
-                {
-                    schModel.PreviousTriggerTime = latestLog.FireTimeUtc;
-                }
-
-                if (latestLog.IsSuccess.HasValue && !latestLog.IsSuccess.Value)
-                {
-                    schModel.ExceptionMessage = latestLog.GetShortResultMessage();
-                }
-                else if (latestLog.IsException ?? false)
-                {
-                    schModel.ExceptionMessage = latestLog.GetShortExceptionMessage();
-                }
-            }
-        }
-    }
-
     private async Task OnResumeScheduleJob(ScheduleModel model)
     {
-        if (model.TriggerName == null)
-        {
-            Snackbar.Add("Cannot resume schedule. Trigger name is null.", Severity.Error);
-            return;
-        }
-
-        await SchedulerSvc.ResumeTrigger(model.TriggerName, model.TriggerGroup);
+        var result = await SchedulerWorkflow.ResumeJobAsync(model);
+        if (!result.IsSuccess)
+            Snackbar.Add(result.ErrorMessage!, Severity.Error);
     }
 
     private async Task OnPauseScheduleJob(ScheduleModel model)
     {
-        if (model.TriggerName == null)
-        {
-            Snackbar.Add("Cannot pause schedule. Trigger name is null.", Severity.Error);
-            return;
-        }
-
-        await SchedulerSvc.PauseTrigger(model.TriggerName, model.TriggerGroup);
+        var result = await SchedulerWorkflow.PauseJobAsync(model);
+        if (!result.IsSuccess)
+            Snackbar.Add(result.ErrorMessage!, Severity.Error);
     }
 
     private void OnJobHistory(ScheduleModel model)
@@ -446,24 +396,18 @@ public partial class Schedules : ComponentBase, IDisposable
 
     private async Task OnTriggerNow(ScheduleModel model)
     {
-        if (model.JobName == null)
-        {
-            Snackbar.Add("Cannot add trigger. Check if job still exists.", Severity.Error);
-            return;
-        }
-
-        bool? result = await DialogSvc.ShowMessageBox(
+        bool? confirmed = await DialogSvc.ShowMessageBox(
             title: "Confirm",
             markupMessage: (MarkupString)"Do you want to trigger this job now?",
             yesText: "Trigger",
             cancelText: "Cancel"
         );
 
-        if (result != true)
-        {
+        if (confirmed != true)
             return;
-        }
 
-        await SchedulerSvc.TriggerJob(model.JobName, model.JobGroup);
+        var result = await SchedulerWorkflow.TriggerJobNowAsync(model);
+        if (!result.IsSuccess)
+            Snackbar.Add(result.ErrorMessage!, Severity.Error);
     }
 }

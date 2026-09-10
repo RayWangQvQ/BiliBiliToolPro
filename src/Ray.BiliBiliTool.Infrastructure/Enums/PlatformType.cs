@@ -1,4 +1,4 @@
-﻿namespace Ray.BiliBiliTool.Infrastructure.Enums;
+namespace Ray.BiliBiliTool.Infrastructure.Enums;
 
 public enum PlatformType
 {
@@ -7,4 +7,5 @@ public enum PlatformType
     Docker,
     QingLong,
     Web,
+    Baihu,
 }

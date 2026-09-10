@@ -1,0 +1,60 @@
+info:
+  name: sign
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{host}}/pgc/activity/score/task/sign"
+  headers:
+    - name: Cookie
+      value: "{{cookieStr}}"
+    - name: native_api_from
+      value: h5
+    - name: buvid
+      value: "{{buvid}}"
+    - name: referer
+      value: https://big.bilibili.com/mobile/index?exp_symbol=release_version&oflAb=1
+    - name: user-agent
+      value: "{{user-agent}}"
+    - name: x-bili-trace-id
+      value: 9c642fae280ce80077653eef826774e3:77653eef826774e3:0:0
+    - name: x-bili-aurora-eid
+      value: UlAAQFkMBVkH
+    - name: x-bili-mid
+      value: "{{mid}}"
+    - name: x-bili-aurora-zone
+      value: ""
+    - name: x-bili-gaia-vtoken
+      value: ""
+    - name: x-bili-ticket
+      value: eyJhbGciOiJIUzI1NiIsImtpZCI6InMwMyIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzU3MzgxMTEsImlhdCI6MTczNTcwOTAxMSwiYnV2aWQiOiJYVzcyNEQxNzI0Njg3MTlDQzI1NjA1REIyNDI0NzhEMkUxMjE5In0.J28IlxZ6SjllQEQkq_OvFUiRYAEL2VhQG_WWBcmNppE
+    - name: bili-http-engine
+      value: cronet
+  body:
+    type: form-urlencoded
+    data:
+      - name: access_key
+        value: "{{access_key}}"
+      - name: appkey
+        value: "{{appKey}}"
+      - name: csrf
+        value: "{{csrf}}"
+      - name: disable_rcmd
+        value: "0"
+      - name: mobi_app
+        value: android
+      - name: platform
+        value: android
+      - name: statistics
+        value: "{{statistics}}"
+      - name: ts
+        value: "{{ts}}"
+      - name: sign
+        value: "{{sign}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

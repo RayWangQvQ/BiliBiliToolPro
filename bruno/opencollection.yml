@@ -1,0 +1,109 @@
+opencollection: 1.0.0
+
+info:
+  name: Bili
+config:
+  proxy:
+    inherit: true
+    config:
+      protocol: http
+      hostname: ""
+      port: ""
+      auth:
+        username: ""
+        password: ""
+      bypassProxy: ""
+
+docs:
+  content: |-
+    This is document.
+
+    ## First Run (Install Dependencies)
+
+    本 collection 的脚本使用了外部 npm 包（如 `node-forge`）。
+    第一次使用前，请先在 `bruno` 目录安装依赖：
+
+    ```powershell
+    cd bruno
+    npm install
+    ```
+
+    同时请确保 Bruno 已开启 Developer Mode（允许 `require` 外部包）。
+
+    ## Host
+
+    Host以Header里的Host(:authority)为准。
+
+    抓包经常会出现Url里Host是`https://passport.bilibili.com`，但Header里Host是`api.bilibili.com`的情况，此时该接口Url的Host完全可以换成后者，但反过来则不行。
+
+    该情况，只会将API维护到后者Host内。
+
+    ## Auth
+
+    ### Access Key
+
+    APP 使用，请求参数里传入，
+
+    ### Cookie
+
+    ## Signature Verification
+
+    Bilibili API 常见有两套签名机制：
+
+    - APP 侧签名：Sign（`appkey + ts + sign`）
+    - Web 侧签名：WBI（`wts + w_rid`）
+
+    ### 1) Sign 签名（`ts + sign`）
+
+    适用于大量 app 风格接口，基于 `appkey + appsec` 校验。
+
+    #### 算法
+
+    1. 将请求参数按 key 字母排序，拼接为 query string
+    2. 在末尾拼接 appsec：`md5(sorted_query_string + appsec)`
+    3. 结果即 `sign`，同时带上当前时间戳 `ts`
+
+    #### AppKey / AppSec 配对
+
+    | 变量 | 值 | 用途 |
+    |------|-----|------|
+    | appKey / appSec | `1d8b6e7d45233436` / `560c52ccd288fed045859ed18bffd973` | 已登录用户接口 |
+    | appKeyGuest / appSecGuest | `783bbb7264451d82` / `2653583c8873dea268ab9386918b1d65` | 游客/登录前接口 |
+
+    > 注意：appkey 和 appsec 必须配对使用，不可混用，否则会返回 `{"code":-3,"message":"API校验密匙错误"}`。
+
+    #### 脚本自动签名
+
+    各 folder 的 before-request 脚本会自动：
+    - 检测请求中是否包含 `sign` 参数（body 或 query params）
+    - 根据请求中的 `appkey` 自动匹配对应的 `appsec`
+    - 更新 `ts` 为当前时间戳
+    - 计算并设置 `sign`
+    - 通过 `bru.setVar` 写入运行时变量，供 `{{ts}}` 和 `{{sign}}` 占位符自动替换
+
+    ### 2) WBI 签名（`wts + w_rid`）
+
+    `WBI` 是 B 站 Web 端使用的签名机制（风控/防爬），不是通用标准协议。
+
+    核心参数：
+
+    - `wts`：当前 Unix 时间戳（秒）
+    - `w_rid`：签名值
+
+    #### WBI 签名步骤（简化）
+
+    1. 调用 `x/web-interface/nav` 获取 `wbi_img.img_url` 和 `wbi_img.sub_url`
+    2. 提取 `img_key`、`sub_key`
+    3. 按固定下标表打乱 `img_key + sub_key`，取前 32 位得到 `mixin_key`
+    4. 组装待签名参数（加入 `wts`，去掉旧 `wts/w_rid`）
+    5. 对参数值做字符过滤与 URL 编码，按 key 排序后拼接为 query
+    6. 计算 `md5(query + mixin_key)` 得到 `w_rid`
+
+    当前 collection 中，`wbi-acc-info` 请求通过 before-request 脚本自动完成上述流程。
+  type: text/markdown
+bundled: false
+extensions:
+  bruno:
+    ignore:
+      - node_modules
+      - .git

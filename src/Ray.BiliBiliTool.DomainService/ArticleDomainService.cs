@@ -2,15 +2,16 @@
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
-using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.Article;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.ApiApi.Article;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Config.Options;
+using Ray.BiliBiliTool.Domain.Exceptions;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 
 namespace Ray.BiliBiliTool.DomainService;
 
 public class ArticleDomainService(
-    IArticleApi articleApi,
+    IApiApi apiApi,
     ILogger<ArticleDomainService> logger,
     IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
     ICoinDomainService coinDomainService,
@@ -31,7 +32,7 @@ public class ArticleDomainService(
 
     public async Task LikeArticle(long cvid, BiliCookie ck)
     {
-        await articleApi.LikeAsync(cvid, ck.BiliJct, ck.ToString());
+        await apiApi.LikeAsync(cvid, ck.BiliJct, ck.ToString());
     }
 
     /// <summary>
@@ -111,7 +112,7 @@ public class ArticleDomainService(
         {
             var refer =
                 $"https://www.bilibili.com/read/cv{cvid}/?from=search&spm_id_from=333.337.0.0";
-            result = await articleApi.AddCoinForArticleAsync(
+            result = await apiApi.AddCoinForArticleAsync(
                 new AddCoinForArticleRequest(cvid, mid, ck.BiliJct),
                 ck.ToString(),
                 refer
@@ -162,13 +163,13 @@ public class ArticleDomainService(
             pn = new Random().Next(1, articleCount + 1),
         };
 
-        BiliApiResponse<SearchUpArticlesResponse> re = await articleApi.SearchUpArticlesByUpIdAsync(
+        BiliApiResponse<SearchUpArticlesResponse> re = await apiApi.SearchUpArticlesByUpIdAsync(
             req
         );
 
         if (re.Code != 0)
         {
-            throw new Exception(re.Message);
+            throw new BiliBusinessException(re.Message);
         }
 
         var articleInfo = re.Data.Articles.FirstOrDefault();
@@ -235,13 +236,13 @@ public class ArticleDomainService(
     {
         var req = new SearchArticlesByUpIdDto() { mid = mid };
 
-        BiliApiResponse<SearchUpArticlesResponse> re = await articleApi.SearchUpArticlesByUpIdAsync(
+        BiliApiResponse<SearchUpArticlesResponse> re = await apiApi.SearchUpArticlesByUpIdAsync(
             req
         );
 
         if (re.Code != 0)
         {
-            throw new Exception(re.Message);
+            throw new BiliBusinessException(re.Message);
         }
 
         return re.Data.Count;
@@ -346,7 +347,7 @@ public class ArticleDomainService(
 
             if (!_alreadyDonatedCoinCountCatch.TryGetValue(cvid.ToString(), out int multiply))
             {
-                multiply = (await articleApi.SearchArticleInfoAsync(cvid)).Data.Coin;
+                multiply = (await apiApi.SearchArticleInfoAsync(cvid)).Data.Coin;
                 _alreadyDonatedCoinCountCatch.TryAdd(cvid.ToString(), multiply);
             }
 

@@ -1,4 +1,6 @@
-﻿namespace Ray.BiliBiliTool.Infrastructure.Cookie;
+﻿using Ray.BiliBiliTool.Domain.Exceptions;
+
+namespace Ray.BiliBiliTool.Infrastructure.Cookie;
 
 public class CookieInfo(Dictionary<string, string> cookieDic)
 {
@@ -15,7 +17,7 @@ public class CookieInfo(Dictionary<string, string> cookieDic)
     public virtual void Check()
     {
         if (CookieItemDictionary == null || CookieItemDictionary.Count == 0)
-            throw new Exception("Cookie字符串为空");
+            throw new BiliValidationException("Cookie字符串为空");
     }
 
     protected virtual string CkNameBuild(string name)
