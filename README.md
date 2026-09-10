@@ -103,10 +103,6 @@ BiliTool 实现自动完成任务的原理，是通过调用一系列开放的ap
 
 有很多平台会提供一定免费额度的在线容器，基于官方镜像，部署 BiliTool 很容易。
 
-以下以 ClawCloud 为例，其他平台操作类似：
-
-[>>ClawCloud 部署教程](docs/claw-cloud.md)
-
 #### 1.1.2. 方式二：青龙
 
 [>>青龙部署教程](qinglong/README.md)
