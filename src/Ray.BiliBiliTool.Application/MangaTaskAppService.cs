@@ -44,6 +44,7 @@ public class MangaTaskAppService(
                 await Login(ck);
 
                 await MangaSign(ck);
+                await MangaShare(ck);
                 await MangaRead(ck);
             }
         );
@@ -66,6 +67,15 @@ public class MangaTaskAppService(
     private async Task MangaSign(BiliCookie ck)
     {
         await mangaDomainService.MangaSign(ck);
+    }
+
+    /// <summary>
+    /// 漫画分享
+    /// </summary>
+    [TaskInterceptor("漫画分享", rethrowWhenException: false)]
+    private async Task MangaShare(BiliCookie ck)
+    {
+        await mangaDomainService.MangaShare(ck);
     }
 
     /// <summary>
