@@ -12,13 +12,13 @@
 
 ```
 名称：拉取Bili库(不屏蔽dev)
-命令：baihu reposync --source-type git --source-url https://github.com/RayWangQvQ/BiliBiliToolPro.git --pre-command "bash baihu/copyshfile.sh"  --blacklist qinglong/DefaultTasks|.git --task-timeout 30 --task-langs '[{"name":"dotnet","version":"8.0"}]'
+命令：baihu reposync --source-type git --source-url https://github.com/RayWangQvQ/BiliBiliToolPro.git --pre-command "bash baihu/copyshfile.sh"  --blacklist qinglong/DefaultTasks|.git --task-timeout 30 --task-langs '[{"name":"dotnet","version":"10.0"}]'
 定时规则：2 3 28 * *
 ```
 
 ```
 名称：拉取Bili库(屏蔽dev)
-命令：baihu reposync --source-type git --source-url https://github.com/RayWangQvQ/BiliBiliToolPro.git --pre-command "bash baihu/copyshfile.sh"  --blacklist qinglong/DefaultTasks|.git|baihu/DefaultTasks/dev --task-timeout 30 --task-langs '[{"name":"dotnet","version":"8.0"}]'
+命令：baihu reposync --source-type git --source-url https://github.com/RayWangQvQ/BiliBiliToolPro.git --pre-command "bash baihu/copyshfile.sh"  --blacklist qinglong/DefaultTasks|.git|baihu/DefaultTasks/dev --task-timeout 30 --task-langs '[{"name":"dotnet","version":"10.0"}]'
 定时规则：2 3 28 * *
 ```
 
@@ -30,7 +30,7 @@
 
 ### 1.3. 运行环境配置 (自动处理)
 
-白虎面板中，你可以直接运行任务。脚本会自动检测白虎自带的 `mise` 环境管理器，并自动为你极速安装配置所需的 `.NET 8` 环境。一切全自动完成，无需像青龙那样再去手动处理繁琐的依赖问题或下载备用的二进制包。
+白虎面板中，你可以直接运行任务。脚本会自动检测白虎自带的 `mise` 环境管理器，并自动为你极速安装配置所需的 `.NET 10` 环境。一切全自动完成，无需像青龙那样再去手动处理繁琐的依赖问题或下载备用的二进制包。
 
 ### 1.4. Bili登录 (支持自动写入)
 
@@ -65,7 +65,7 @@ https://gh-proxy.com/https://github.com/RayWangQvQ/BiliBiliToolPro.git
 ## 3. 常见问题
 
 ### 3.1. 安装dotnet失败怎么办
-如果 `mise` 自动安装失败，通常是网络原因，建议检查主机的网络连通性。如果仍然不行，你可以登录白虎面板，在“编程语言”管理页面中，手动添加并安装 `dotnet@8`。
+如果 `mise` 自动安装失败，通常是网络原因，建议检查主机的网络连通性。如果仍然不行，你可以登录白虎面板，在“编程语言”管理页面中，手动添加并安装 `dotnet@10`。
 
 ### 3.2. Couldn't find a valid ICU package installed on the system
 如果你使用的是精简版容器遇到类似问题，请在面板环境变量添加如下环境变量：
