@@ -262,15 +262,28 @@ check_unzip() {
 check_dotnet() {
     eval $invocation
 
-    dotnetVersion=$(dotnet --version)
+    dotnetVersion=$(dotnet --version 2>/dev/null || true)
+    dotnetMajor=$(echo "$dotnetVersion" | grep -oE '^[0-9]+' || true)
     say "当前dotnet版本：$dotnetVersion"
-    if [[ $(echo "$dotnetVersion" | grep -oE '^[0-9]+') -ge 8 ]]; then
+    if [[ "$dotnetMajor" =~ ^[0-9]+$ && "$dotnetMajor" -ge 10 ]]; then
         say "已安装，且版本满足"
         say "which dotnet: $(which dotnet)"
         return 0
     else
         say "未安装"
         return 1
+    fi
+}
+
+remove_legacy_dotnet_entry() {
+    local legacyDotnet="/usr/local/bin/dotnet"
+    if [[ -e "$legacyDotnet" || -L "$legacyDotnet" ]]; then
+        local legacyDotnetMajor
+        legacyDotnetMajor=$("$legacyDotnet" --version 2>/dev/null | grep -oE '^[0-9]+' || true)
+        if ! [[ "$legacyDotnetMajor" =~ ^[0-9]+$ && "$legacyDotnetMajor" -ge 10 ]]; then
+            rm -f "$legacyDotnet"
+            hash -r
+        fi
     fi
 }
 
@@ -323,14 +336,14 @@ install_dotnet_by_script() {
     eval $invocation
 
     say "再尝试使用官方脚本安装"
-    curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 8.0 --verbose
+    curl -fsSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 10.0 --verbose
 
     say "添加到PATH"
     local exportFile="/root/.bashrc"
     touch $exportFile
     echo '' >>$exportFile
     echo 'export DOTNET_ROOT=$HOME/.dotnet' >>$exportFile
-    echo 'export PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools' >>$exportFile
+    echo 'export PATH=$DOTNET_ROOT:$DOTNET_ROOT/tools:$PATH' >>$exportFile
     . $exportFile
 }
 
@@ -355,12 +368,21 @@ install_dotnet() {
             curl -o packages-microsoft-prod.deb https://packages.microsoft.com/config/debian/$VERSION_ID/packages-microsoft-prod.deb
             dpkg -i packages-microsoft-prod.deb
             rm packages-microsoft-prod.deb
-            apt-get update && apt-get install -y dotnet-sdk-8.0
+            apt-get update && apt-get install -y dotnet-sdk-10.0
+            unset DOTNET_ROOT
+            export PATH="/usr/bin:$PATH"
+            hash -r
         } || {
             install_dotnet_by_script
         }
     else
         say "使用apk安装"
+        . /etc/os-release
+        if [[ "${VERSION_ID:-}" != 3.23* ]]; then
+            say_err "Alpine ${VERSION_ID:-unknown} 不支持通过包管理器安装 .NET 10"
+            say_err "请升级到 Alpine 3.23 或设置 BILI_MODE=bilitool"
+            return 1
+        fi
         if ! (curl -s -m 5 www.google.com >/dev/nul); then
             say "机器位于墙内，切换为包源为国内镜像源"
             cp /etc/apk/repositories /etc/apk/repositories.bak
@@ -368,14 +390,22 @@ install_dotnet() {
             sed -i 's/http:\/\/dl-cdn.alpinelinux.org/https:\/\/mirrors.ustc.edu.cn/g' /etc/apk/repositories
             apk update
         fi
-        {
-            apk add dotnet8-sdk # https://pkgs.alpinelinux.org/packages
-        } || {
-            install_dotnet_by_script
-        }
+        if ! apk add --no-cache dotnet10-sdk; then
+            say_err "无法从 Alpine 包源安装 .NET 10 SDK，请确认 community 仓库已启用"
+            return 1
+        fi
+        unset DOTNET_ROOT
+        export PATH="/usr/bin:$PATH"
+        hash -r
     fi
-    dotnet --version && say "which dotnet: $(which dotnet)" && say "安装成功"
-    return $?
+
+    if check_dotnet; then
+        remove_legacy_dotnet_entry
+        say "安装成功"
+        return 0
+    fi
+
+    return 1
 }
 
 # 从github获取bilitool下载地址
@@ -429,6 +459,9 @@ install() {
     eval $invocation
 
     if check_installed; then
+        if [ "$prefer_mode" == "dotnet" ]; then
+            remove_legacy_dotnet_entry
+        fi
         say "环境正常，本次无需安装"
     else
         say "开始安装环境"
@@ -437,6 +470,7 @@ install() {
                 say_err "安装失败"
                 say_err "请根据文档自行在青龙容器中安装dotnet：https://learn.microsoft.com/zh-cn/dotnet/core/install/linux-$current_linux_os"
                 say_err "或者尝试切换运行模式为bilitool，它不需要安装dotnet：https://github.com/RayWangQvQ/BiliBiliToolPro/blob/develop/qinglong/README.md"
+                return 1
             }
         fi
 

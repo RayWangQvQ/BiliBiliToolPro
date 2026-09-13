@@ -164,8 +164,8 @@ docker run --rm \
 
 ## 8. 其他
 
-代码编译和发布环境: mcr.microsoft.com/dotnet/sdk:8.0
+代码编译和发布环境: mcr.microsoft.com/dotnet/sdk:10.0
 
-代码运行环境: mcr.microsoft.com/dotnet/aspnet:8.0
+代码运行环境: mcr.microsoft.com/dotnet/aspnet:10.0
 
 如果下载`github`资源有问题，可以尝试添加加速器。
