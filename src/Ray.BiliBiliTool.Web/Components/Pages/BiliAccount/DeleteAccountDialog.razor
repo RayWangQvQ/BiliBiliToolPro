@@ -2,12 +2,12 @@
 
 <MudDialog>
     <DialogContent>
-        <MudText>Are you sure you want to delete account <strong>@UserId</strong>?</MudText>
-        <MudText Typo="Typo.body2" Class="mt-2">This action cannot be undone. Higher-indexed accounts will be re-numbered.</MudText>
+        <MudText>确定要删除账号 <strong>@UserId</strong> 吗？</MudText>
+        <MudText Typo="Typo.body2" Class="mt-2">此操作不可撤销，后面的账号序号会自动前移。</MudText>
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="Cancel">Cancel</MudButton>
-        <MudButton Color="Color.Error" Variant="Variant.Filled" OnClick="Submit">Delete</MudButton>
+        <MudButton OnClick="Cancel">取消</MudButton>
+        <MudButton Color="Color.Error" Variant="Variant.Filled" OnClick="Submit">删除</MudButton>
     </DialogActions>
 </MudDialog>
 

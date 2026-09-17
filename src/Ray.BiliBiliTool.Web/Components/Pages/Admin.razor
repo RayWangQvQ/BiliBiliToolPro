@@ -3,9 +3,9 @@
 @rendermode InteractiveServer
 @attribute [Authorize]
 
-<PageTitle>Change Password</PageTitle>
+<PageTitle>修改密码</PageTitle>
 
-<MudText Typo="Typo.h5">Change Password</MudText>
+<MudText Typo="Typo.h5">修改密码</MudText>
 
 <MudCard Class="mx-auto my-4" Style="max-width: 500px;">
     <MudCardContent>
@@ -17,14 +17,14 @@
         {
             <MudAlert Severity="Severity.Success" Class="mb-3">@_successMessage</MudAlert>
         }
-        <MudTextField @bind-Value="_username" Label="New User Name" Required="true" RequiredError="Username cannot be empty" />
-        <MudTextField @bind-Value="_currentPassword" Label="Current Password" Required="true" RequiredError="Password cannot be empty"
+        <MudTextField @bind-Value="_username" Label="新用户名" Required="true" RequiredError="Username cannot be empty" />
+        <MudTextField @bind-Value="_currentPassword" Label="当前密码" Required="true" RequiredError="Password cannot be empty"
                       InputType="@_currentPasswordInput" Adornment="Adornment.End"
                       AdornmentIcon="@_currentPasswordInputIcon" OnAdornmentClick="ToggleCurrentPasswordVisibility" />
-        <MudTextField @bind-Value="_newPassword" Label="New Password" Required="true" RequiredError="Password cannot be empty"
+        <MudTextField @bind-Value="_newPassword" Label="新密码" Required="true" RequiredError="Password cannot be empty"
                       InputType="@_passwordInput" Adornment="Adornment.End"
                       AdornmentIcon="@_passwordInputIcon" OnAdornmentClick="TogglePasswordVisibility" />
-        <MudTextField @bind-Value="_confirmPassword" Label="Confirm Password" Required="true" RequiredError="Password cannot be empty"
+        <MudTextField @bind-Value="_confirmPassword" Label="确认新密码" Required="true" RequiredError="Password cannot be empty"
                       InputType="@_passwordInput" Adornment="Adornment.End"
                       AdornmentIcon="@_passwordInputIcon" OnAdornmentClick="TogglePasswordVisibility" />
     </MudCardContent>
@@ -32,12 +32,12 @@
         @if (_showLogoutButton)
         {
             <MudButton Variant="Variant.Filled" Color="Color.Warning" OnClick="Logout"
-                       Class="ml-auto">Logout</MudButton>
+                       Class="ml-auto">退出登录</MudButton>
         }
         else
         {
             <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ChangePasswordAsync"
-                       Class="ml-auto">Submit</MudButton>
+                       Class="ml-auto">提交</MudButton>
         }
     </MudCardActions>
 </MudCard>

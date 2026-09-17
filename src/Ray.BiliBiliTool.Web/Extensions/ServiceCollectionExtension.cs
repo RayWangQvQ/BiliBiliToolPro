@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Components.Authorization;
 using Ray.BiliBiliTool.Agent.Extensions;
+using Ray.BiliBiliTool.Application.Contracts;
 using Ray.BiliBiliTool.Application.Extensions;
 using Ray.BiliBiliTool.Config.Extensions;
 using Ray.BiliBiliTool.DomainService.Extensions;
@@ -24,6 +25,12 @@ public static class ServiceCollectionExtension
         services.AddScoped<ILogsDialogWorkflow, LogsDialogWorkflow>();
         services.AddScoped<IHistoryDialogWorkflow, HistoryDialogWorkflow>();
         services.AddScoped<IBiliAccountPageWorkflow, BiliAccountPageWorkflow>();
+
+        // 「今日任务」相关
+        services.AddSingleton<ITaskRecordWriter, TaskRecordWriter>();
+        services.AddSingleton<IBiliAccountProbe, BiliAccountProbe>();
+        services.AddScoped<TaskRecoveryExecutor>();
+        services.AddScoped<ITodayTaskService, TodayTaskService>();
 
         return services;
     }

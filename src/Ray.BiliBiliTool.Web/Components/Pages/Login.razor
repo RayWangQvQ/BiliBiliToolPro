@@ -13,17 +13,17 @@
 
     <MudCard Class="mx-auto my-4" Style="max-width: 500px;">
         <MudCardHeader>
-            <MudText Typo="Typo.h5">Log in</MudText>
+            <MudText Typo="Typo.h5">登录</MudText>
         </MudCardHeader>
         <MudCardContent>
-            <MudTextField @bind-Value="_username" Name="username" Label="User Name" Required="true" RequiredError="Username cannot be empty" />
-            <MudTextField @bind-Value="_password" Name="password" Label="Password" Required="true" RequiredError="Password cannot be empty"
+            <MudTextField @bind-Value="_username" Name="username" Label="用户名" Required="true" RequiredError="Username cannot be empty" />
+            <MudTextField @bind-Value="_password" Name="password" Label="密码" Required="true" RequiredError="Password cannot be empty"
                           InputType="@_passwordInput" Adornment="Adornment.End"
                           AdornmentIcon="@_passwordInputIcon" OnAdornmentClick="TogglePasswordVisibility" />
         </MudCardContent>
         <MudCardActions>
             <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary"
-                       Class="ml-auto">Log in</MudButton>
+                       Class="ml-auto">登录</MudButton>
         </MudCardActions>
     </MudCard>
 </form>

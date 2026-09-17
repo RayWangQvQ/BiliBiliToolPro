@@ -12,6 +12,7 @@ public class BiliDbContext(IConfiguration config) : DbContext
     public DbSet<ExecutionLog> ExecutionLogs { get; set; }
     public DbSet<BiliLogs> BiliLogs { get; set; }
     public DbSet<User> Users { get; set; }
+    public DbSet<TaskRecord> TaskRecords { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -85,6 +86,18 @@ public class BiliDbContext(IConfiguration config) : DbContext
                 );
 
             entity.HasIndex(e => e.Username).IsUnique();
+        });
+
+        modelBuilder.Entity<TaskRecord>(entity =>
+        {
+            entity.Property(e => e.Status).HasConversion<string>();
+            entity.Property(e => e.Trigger).HasConversion<string>();
+            entity.HasIndex(e => new
+            {
+                e.UserId,
+                e.TaskKey,
+                e.RecordDate,
+            });
         });
     }
 

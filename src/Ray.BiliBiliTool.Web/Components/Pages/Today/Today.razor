@@ -1,0 +1,144 @@
+@page "/Today"
+@using Microsoft.AspNetCore.Authorization
+@using Ray.BiliBiliTool.Web.Services
+@attribute [Authorize]
+@rendermode InteractiveServer
+
+<PageTitle>今日任务</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="my-4">
+    <MudText Typo="Typo.h5">今日任务</MudText>
+    <MudText Typo="Typo.body2" Class="mud-text-secondary mb-3">
+        显示每个账号今天的任务完成情况。漏做的会自动补做（每项每天最多自动补 3 次），也可以自己点「补做」。
+    </MudText>
+
+    <MudPaper Class="pa-3 mb-4" Elevation="1">
+        <div class="d-flex flex-wrap align-center gap-3">
+            <MudText Typo="Typo.body2">日期：@DateTime.Now.ToString("yyyy-MM-dd")</MudText>
+            @if (_lastRefresh.HasValue)
+            {
+                <MudText Typo="Typo.body2">最后检查：@_lastRefresh.Value.ToString("HH:mm:ss")</MudText>
+            }
+            <MudButton Variant="Variant.Filled" Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Refresh"
+                       Disabled="_busy" OnClick="ManualRefreshAsync">立即刷新</MudButton>
+            <MudButton Variant="Variant.Outlined" Color="Color.Secondary"
+                       Disabled="_busy" OnClick="RedoAllAsync">一键补做全部漏做项</MudButton>
+        </div>
+
+        <MudDivider Class="my-3" />
+
+        <div class="d-flex flex-wrap align-center gap-3">
+            <MudSwitch @bind-Value="_autoEnable" Color="Color.Primary" Label="自动补做" />
+            <MudNumericField @bind-Value="_intervalHours" Label="每几小时检查一次"
+                             Min="1" Max="24" Style="max-width:190px" />
+            <MudNumericField @bind-Value="_retentionDays" Label="记录保留天数"
+                             Min="1" Max="90" Style="max-width:170px" />
+            <MudButton Variant="Variant.Filled" Color="Color.Primary"
+                       Disabled="_busy" OnClick="SaveSettingsAsync">保存设置</MudButton>
+        </div>
+    </MudPaper>
+
+    @if (_loadingLocal)
+    {
+        <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+    }
+    else if (_accounts.Count == 0)
+    {
+        <MudAlert Severity="Severity.Info">还没有添加 B 站账号，请先到「账号管理」添加或扫码登录。</MudAlert>
+    }
+    else
+    {
+        @foreach (var account in _accounts)
+        {
+            <MudCard Class="mb-3">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6">👤 账号@(account.Index + 1) · @account.UserName</MudText>
+                        <MudText Typo="Typo.caption" Class="mud-text-secondary">UID @account.UserId</MudText>
+                    </CardHeaderContent>
+                    <CardHeaderActions>
+                        <MudButton Size="Size.Small" Variant="Variant.Outlined"
+                                   Disabled="_busy"
+                                   OnClick="@(() => RedoAccountAsync(account))">整卡补做</MudButton>
+                    </CardHeaderActions>
+                </MudCardHeader>
+                <MudCardContent Class="pt-0">
+                    @if (_biliChecked && !account.IsCookieValid)
+                    {
+                        <MudAlert Severity="Severity.Warning" Dense="true" Class="mb-2">
+                            该账号 Cookie 可能已失效，请到「账号管理」重新检测或扫码登录。
+                        </MudAlert>
+                    }
+
+                    @foreach (var group in account.Groups)
+                    {
+                        foreach (var item in group.Items)
+                        {
+                            <div class="d-flex align-center justify-space-between py-1 task-row">
+                                <div class="d-flex align-center gap-2">
+                                    <span class="state-icon">@StateIcon(item)</span>
+                                    <MudText Typo="Typo.body2">@item.DisplayName</MudText>
+                                </div>
+                                <div class="d-flex align-center gap-3">
+                                    <MudText Typo="Typo.body2" Class="@StateClass(item)">
+                                        @item.StateText@(item.Message is null ? "" : $"（{item.Message}）")
+                                    </MudText>
+                                    @if (item.CompletedAt.HasValue)
+                                    {
+                                        <MudText Typo="Typo.caption" Class="mud-text-secondary">
+                                            @item.CompletedAt.Value.ToLocalTime().ToString("MM-dd HH:mm")
+                                        </MudText>
+                                    }
+                                    @if (item.CanRedo)
+                                    {
+                                        <MudButton Size="Size.Small" Variant="Variant.Text"
+                                                   Color="Color.Primary" Disabled="_busy"
+                                                   OnClick="@(() => RedoItemAsync(account, group.TaskKey, item))">补做</MudButton>
+                                    }
+                                    @if (item.CanDisableShare)
+                                    {
+                                        <MudButton Size="Size.Small" Variant="Variant.Text"
+                                                   Color="Color.Warning" Disabled="_busy"
+                                                   OnClick="DisableShareAsync">不再尝试</MudButton>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    }
+                </MudCardContent>
+            </MudCard>
+        }
+    }
+</MudContainer>
+
+<style>
+    .task-row {
+        border-bottom: 1px solid var(--mud-palette-lines-default);
+    }
+
+    .task-row:last-child {
+        border-bottom: none;
+    }
+
+    .state-icon {
+        width: 1.2rem;
+        text-align: center;
+    }
+
+    .state-ok {
+        color: var(--mud-palette-success);
+    }
+
+    .state-warn {
+        color: var(--mud-palette-warning);
+    }
+
+    .state-bad {
+        color: var(--mud-palette-error);
+    }
+
+    .state-muted {
+        color: var(--mud-palette-text-secondary);
+    }
+</style>

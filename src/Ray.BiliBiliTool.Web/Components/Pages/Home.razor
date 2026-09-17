@@ -1,7 +1,55 @@
-﻿@page "/"
+@page "/"
 
-<PageTitle>Home</PageTitle>
+<PageTitle>首页</PageTitle>
 
-<h1>Hello, world!</h1>
+<MudContainer>
+    <div class="text-center mt-5 mb-4">
+        <h1 class="display-6">欢迎使用 BiliBiliToolPro</h1>
+        <p class="mud-text-secondary mt-2">
+            B 站自动任务管理面板：每日任务、投币充电、漫画签到、直播抽奖、粉丝勋章等自动化任务，全部在浏览器中配置与管理。
+        </p>
+    </div>
 
-Welcome to your new app.
+    <div class="row g-3">
+        <div class="col-md-3">
+            <MudCard>
+                <MudCardContent>
+                    <MudText Typo="Typo.h6"><MudIcon Icon="@Icons.Material.Filled.CheckCircle" Class="mr-1" />今日任务</MudText>
+                    <MudText Typo="Typo.body2" Class="mud-text-secondary">查看每个账号今天完成了哪些任务，漏做的可一键补做。</MudText>
+                    <MudButton Variant="Variant.Text" Color="Color.Primary" Href="/Today" Class="pa-0">前往今日任务</MudButton>
+                </MudCardContent>
+            </MudCard>
+        </div>
+        <div class="col-md-3">
+            <MudCard>
+                <MudCardContent>
+                    <MudText Typo="Typo.h6"><MudIcon Icon="@Icons.Material.Filled.People" Class="mr-1" />账号管理</MudText>
+                    <MudText Typo="Typo.body2" Class="mud-text-secondary">添加或删除 B 站账号，支持扫码登录、多账号管理。</MudText>
+                    <MudButton Variant="Variant.Text" Color="Color.Primary" Href="/BiliAccount" Class="pa-0">前往账号管理</MudButton>
+                </MudCardContent>
+            </MudCard>
+        </div>
+        <div class="col-md-3">
+            <MudCard>
+                <MudCardContent>
+                    <MudText Typo="Typo.h6"><MudIcon Icon="@Icons.Material.Filled.CalendarMonth" Class="mr-1" />计划任务</MudText>
+                    <MudText Typo="Typo.body2" Class="mud-text-secondary">查看所有定时任务的状态、执行历史与实时日志。</MudText>
+                    <MudButton Variant="Variant.Text" Color="Color.Primary" Href="/Schedules" Class="pa-0">前往计划任务</MudButton>
+                </MudCardContent>
+            </MudCard>
+        </div>
+        <div class="col-md-3">
+            <MudCard>
+                <MudCardContent>
+                    <MudText Typo="Typo.h6"><MudIcon Icon="@Icons.Material.Filled.Tune" Class="mr-1" />任务配置</MudText>
+                    <MudText Typo="Typo.body2" Class="mud-text-secondary">配置每个任务的开关键、执行时间（Cron）与详细参数。</MudText>
+                    <MudButton Variant="Variant.Text" Color="Color.Primary" Href="/Configurations/DailyJobConfig" Class="pa-0">前往每日任务配置</MudButton>
+                </MudCardContent>
+            </MudCard>
+        </div>
+    </div>
+
+    <MudAlert Severity="Severity.Info" Class="mt-4">
+        <b>首次使用指引：</b>先在「账号管理」中用手机 B 站 App 扫码添加账号（可添加多个），然后在「任务配置」中确认需要开启的任务与执行时间，之后在「今日任务」里就能看到每个账号当天的完成情况。
+    </MudAlert>
+</MudContainer>

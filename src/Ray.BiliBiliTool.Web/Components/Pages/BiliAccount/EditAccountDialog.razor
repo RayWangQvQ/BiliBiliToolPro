@@ -2,11 +2,11 @@
 
 <MudDialog>
     <DialogContent>
-        <MudTextField @bind-Value="_cookieStr" Label="Cookie String" Lines="5" Variant="Variant.Outlined" />
+        <MudTextField @bind-Value="_cookieStr" Label="Cookie 字符串" Lines="5" Variant="Variant.Outlined" />
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="Cancel">Cancel</MudButton>
-        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="Submit" Disabled="@string.IsNullOrWhiteSpace(_cookieStr)">Save</MudButton>
+        <MudButton OnClick="Cancel">取消</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="Submit" Disabled="@string.IsNullOrWhiteSpace(_cookieStr)">保存</MudButton>
     </DialogActions>
 </MudDialog>
 

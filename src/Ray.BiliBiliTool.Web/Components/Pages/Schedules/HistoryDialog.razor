@@ -6,7 +6,7 @@
 <MudDialog>
     <TitleContent>
         <div class="d-flex">
-            <MudText Typo="Typo.h5">Execution History</MudText>
+            <MudText Typo="Typo.h5">执行历史</MudText>
             <MudIconButton Icon="@Icons.Material.Filled.Refresh"
                            OnClick="OnRefreshHistory" />
         </div>
@@ -52,7 +52,7 @@
                                             Class="pa-0 ma-0"
                                             Style="text-transform:none;"
                                             OnClick="@(() => OnMoreDetails(log, "Error Details"))"
-                                            Color="Color.Primary">Error Details</MudButton>
+                                            Color="Color.Primary">错误详情</MudButton>
                                 </ItemContent>
                             </MudTimelineItem>
                         }
@@ -78,7 +78,7 @@
                                             Class="pa-0 ma-0"
                                             Style="text-transform:none;"
                                             OnClick="@(() => OnMoreDetails(log, "Execution Details"))"
-                                            Color="Color.Primary">Execution Details</MudButton>
+                                            Color="Color.Primary">执行详情</MudButton>
                                 }
                             </MudTimelineItem>
                         }
@@ -91,13 +91,13 @@
                         <MudButton Variant="Variant.Text"
                                    Style="text-transform:none;"
                                    OnClick="GetMoreLogs"
-                                   Color="Color.Primary">Load More</MudButton>
+                                   Color="Color.Primary">加载更多</MudButton>
                     </MudTimelineItem>
                 }
             </MudTimeline>
         </MudContainer>
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="Close">Close</MudButton>
+        <MudButton OnClick="Close">关闭</MudButton>
     </DialogActions>
 </MudDialog>
