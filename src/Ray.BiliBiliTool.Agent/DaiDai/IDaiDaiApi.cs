@@ -21,10 +21,7 @@ public interface IDaiDaiApi
     );
 
     [Post("/api/envs")]
-    Task<DaiDaiEnvResponse> AddEnvAsync(
-        [Body] DaiDaiEnv env,
-        [Header("Authorization")] string token
-    );
+    Task<DaiDaiEnvResponse> AddEnvAsync([Body] DaiDaiEnv env, [Header("Authorization")] string token);
 
     [Put("/api/envs/{id}")]
     Task<DaiDaiEnvResponse> UpdateEnvAsync(

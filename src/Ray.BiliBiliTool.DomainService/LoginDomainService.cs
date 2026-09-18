@@ -6,15 +6,15 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using QRCoder;
 using Ray.BiliBiliTool.Agent;
-using Ray.BiliBiliTool.Agent.Baihu;
-using Ray.BiliBiliTool.Agent.Baihu.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.PassportApi;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
-using Ray.BiliBiliTool.Agent.DaiDai;
-using Ray.BiliBiliTool.Agent.DaiDai.Dtos;
 using Ray.BiliBiliTool.Agent.QingLong;
 using Ray.BiliBiliTool.Agent.QingLong.Dtos;
+using Ray.BiliBiliTool.Agent.Baihu;
+using Ray.BiliBiliTool.Agent.Baihu.Dtos;
+using Ray.BiliBiliTool.Agent.DaiDai;
+using Ray.BiliBiliTool.Agent.DaiDai.Dtos;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.Domain.Exceptions;
 using Ray.BiliBiliTool.DomainService.Dtos;
@@ -712,24 +712,21 @@ public class LoginDomainService(
     private Task PrintIfSaveCookieFailAsync(BiliCookie ckInfo, CancellationToken cancellationToken)
     {
         var platform = configuration["Ray_PlatformType"] ?? "";
-        var platformName =
-            platform.Equals("Baihu", StringComparison.OrdinalIgnoreCase) ? "白虎"
-            : platform.Equals("DaiDai", StringComparison.OrdinalIgnoreCase) ? "呆呆"
-            : "青龙";
+        var platformName = platform.Equals("Baihu", StringComparison.OrdinalIgnoreCase)
+            ? "白虎"
+            : platform.Equals("DaiDai", StringComparison.OrdinalIgnoreCase)
+                ? "呆呆"
+                : "青龙";
 
         if (platformName == "白虎")
         {
             logger.LogError("持久化失败，请手动添加环境变量到白虎面板");
-            logger.LogInformation(
-                "提示：配置环境变量 BaihuConfig__Token 后，在baihu面板系统设置->openapi获取，程序可尝试自动保存。"
-            );
+            logger.LogInformation("提示：配置环境变量 BaihuConfig__Token 后，在baihu面板系统设置->openapi获取，程序可尝试自动保存。");
         }
         else if (platformName == "呆呆")
         {
             logger.LogError("持久化失败，请手动添加环境变量到呆呆面板");
-            logger.LogInformation(
-                "提示：在呆呆面板「系统设置->Open API」新建应用（授权范围含 envs），配置环境变量 DaiDaiConfig__AppKey / DaiDaiConfig__AppSecret 后，程序可尝试自动保存。"
-            );
+            logger.LogInformation("提示：在呆呆面板「系统设置->Open API」新建应用（授权范围含 envs），配置环境变量 DaiDaiConfig__AppKey / DaiDaiConfig__AppSecret 后，程序可尝试自动保存。");
         }
         else
         {
