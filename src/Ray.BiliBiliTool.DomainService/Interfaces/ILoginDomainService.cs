@@ -1,7 +1,6 @@
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.DomainService.Dtos;
 
-
 namespace Ray.BiliBiliTool.DomainService.Interfaces;
 
 /// <summary>
@@ -56,4 +55,12 @@ public interface ILoginDomainService : IDomainService
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     Task<bool> SaveCookieToBaihuAsync(BiliCookie ckInfo, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// 持久化Cookie到呆呆面板环境变量（通过其原生 Open API）
+    /// </summary>
+    /// <param name="ckInfo"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<bool> SaveCookieToDaiDaiAsync(BiliCookie ckInfo, CancellationToken cancellationToken);
 }

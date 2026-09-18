@@ -381,6 +381,14 @@ public class DailyTaskCharacterizationTests
             throw new NotSupportedException();
         }
 
+        public Task<bool> SaveCookieToDaiDaiAsync(
+            BiliCookie ckInfo,
+            CancellationToken cancellationToken
+        )
+        {
+            throw new NotSupportedException();
+        }
+
         public Task<QrLoginGenerateResult> GenerateQrCodeWebAsync(
             CancellationToken cancellationToken
         )

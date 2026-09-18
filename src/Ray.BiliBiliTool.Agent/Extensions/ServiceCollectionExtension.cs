@@ -4,12 +4,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Polly;
 using Polly.Extensions.Http;
+using Ray.BiliBiliTool.Agent.Baihu;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Services;
+using Ray.BiliBiliTool.Agent.DaiDai;
 using Ray.BiliBiliTool.Agent.HttpClientDelegatingHandlers;
 using Ray.BiliBiliTool.Agent.QingLong;
-using Ray.BiliBiliTool.Agent.Baihu;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.Infrastructure.Cookie;
 using Refit;
@@ -110,6 +111,24 @@ public static class ServiceCollectionExtension
                 (sp, c) =>
                 {
                     c.BaseAddress = new Uri(baihuHost);
+                    c.DefaultRequestHeaders.Add(
+                        "User-Agent",
+                        sp.GetRequiredService<
+                            IOptionsMonitor<SecurityOptions>
+                        >().CurrentValue.UserAgent
+                    );
+                }
+            )
+            .AddPolicyHandler(BiliResiliencePolicies.ReadOnlyPolicy());
+
+        //daidai（呆呆面板原生 Open API）
+        var daidaiHost = configuration["DaiDai_URL"] ?? "http://127.0.0.1:5700";
+        services
+            .AddRefitClient<IDaiDaiApi>()
+            .ConfigureHttpClient(
+                (sp, c) =>
+                {
+                    c.BaseAddress = new Uri(daidaiHost);
                     c.DefaultRequestHeaders.Add(
                         "User-Agent",
                         sp.GetRequiredService<
