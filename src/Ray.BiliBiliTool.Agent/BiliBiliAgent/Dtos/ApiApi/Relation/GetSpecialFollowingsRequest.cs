@@ -4,28 +4,28 @@ public class GetSpecialFollowingsRequest
 {
     public GetSpecialFollowingsRequest(long userId)
     {
-        Mid = userId;
+        mid = userId;
     }
 
     public GetSpecialFollowingsRequest(long userId, long tagId)
     {
-        Mid = userId;
-        Tagid = tagId;
+        mid = userId;
+        tagid = tagId;
     }
 
-    public long Mid { get; set; }
+    public long mid { get; set; }
 
     /// <summary>
     /// TagId
     /// </summary>
     /// <sample>-10:特别关注</sample>
-    public long Tagid { get; set; } = -10;
+    public long tagid { get; set; } = -10;
 
-    public int Pn { get; set; } = 1;
+    public int pn { get; set; } = 1;
 
-    public int Ps { get; set; } = 20;
+    public int ps { get; set; } = 20;
 
-    public string Jsonp { get; set; } = "jsonp";
+    public string jsonp { get; set; } = "jsonp";
 
-    //public string Callback { get; set; }
+    //public string callback { get; set; }
 }

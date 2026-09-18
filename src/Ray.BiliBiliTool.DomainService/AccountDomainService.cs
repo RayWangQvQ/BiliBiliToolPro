@@ -129,7 +129,7 @@ public class AccountDomainService(
         //从最后一页开始获取
         var req = new GetSpecialFollowingsRequest(long.Parse(ck.UserId), tagId.Value)
         {
-            Pn = totalPage,
+            pn = totalPage,
         };
         List<UpInfoDto> followings = (await apiApi.GetFollowingsByTag(req, ck.ToString())).Data;
         followings.Reverse();
@@ -151,7 +151,7 @@ public class AccountDomainService(
                 pn -= 1;
                 if (pn <= 0)
                     break;
-                req.Pn = pn;
+                req.pn = pn;
                 followings = (await apiApi.GetFollowingsByTag(req, ck.ToString())).Data;
                 followings.Reverse();
             }

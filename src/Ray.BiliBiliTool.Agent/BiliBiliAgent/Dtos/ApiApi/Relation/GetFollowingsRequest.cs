@@ -9,21 +9,21 @@ public class GetFollowingsRequest
         FollowingsOrderType followingsOrder = FollowingsOrderType.AttentionDesc
     )
     {
-        Vmid = userId;
-        Order_type = followingsOrder.DefaultValue();
+        vmid = userId;
+        order_type = followingsOrder.DefaultValue();
     }
 
-    public long Vmid { get; set; }
+    public long vmid { get; set; }
 
-    public string Order_type { get; set; }
+    public string order_type { get; set; }
 
-    public int Pn { get; set; } = 1;
+    public int pn { get; set; } = 1;
 
-    public int Ps { get; set; } = 20;
+    public int ps { get; set; } = 20;
 
-    public string Order { get; set; } = "desc";
+    public string order { get; set; } = "desc";
 
-    public string Jsonp { get; set; } = "jsonp";
+    public string jsonp { get; set; } = "jsonp";
 
-    //public string Callback { get; set; }
+    //public string callback { get; set; }
 }

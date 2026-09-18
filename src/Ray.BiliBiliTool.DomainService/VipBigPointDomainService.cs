@@ -305,23 +305,23 @@ public class VipBigPointDomainService(
         // 观看该视频
         var request = new UploadVideoHeartbeatRequest()
         {
-            Aid = long.Parse(videoInfo.Aid),
-            Bvid = videoInfo.Bvid,
-            Cid = videoInfo.Cid,
-            Mid = long.Parse(ck.UserId),
-            Sid = randomSsid,
-            Epid = res.Value.Item2,
-            Csrf = ck.BiliJct,
-            Type = 4,
-            Sub_type = 1,
-            Start_ts = DateTime.Now.ToTimeStamp() - playedTime,
-            Played_time = playedTime,
-            Realtime = playedTime,
-            Real_played_time = playedTime,
+            aid = long.Parse(videoInfo.Aid),
+            bvid = videoInfo.Bvid,
+            cid = videoInfo.Cid,
+            mid = long.Parse(ck.UserId),
+            sid = randomSsid,
+            epid = res.Value.Item2,
+            csrf = ck.BiliJct,
+            type = 4,
+            sub_type = 1,
+            start_ts = DateTime.Now.ToTimeStamp() - playedTime,
+            played_time = playedTime,
+            realtime = playedTime,
+            real_played_time = playedTime,
         };
         BiliApiResponse apiResponse = await apiApi.UploadVideoHeartbeat(
-            request.Aid,
-            request.Played_time,
+            request.aid,
+            request.played_time,
             request,
             ck.ToString()
         );

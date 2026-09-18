@@ -4,25 +4,25 @@ public class AddCoinRequest
 {
     public AddCoinRequest(long aid, string csrf)
     {
-        Aid = aid;
-        Csrf = csrf;
+        this.aid = aid;
+        this.csrf = csrf;
     }
 
-    public long Aid { get; set; }
+    public long aid { get; set; }
 
-    public int Multiply { get; set; } = 1;
+    public int multiply { get; set; } = 1;
 
-    public int Select_like { get; set; } = 1;
+    public int select_like { get; set; } = 1;
 
-    public string Cross_domain { get; set; } = "true";
+    public string cross_domain { get; set; } = "true";
 
-    public string Csrf { get; set; }
+    public string csrf { get; set; }
 
-    public string Eab_x { get; set; } = "2";
+    public string eab_x { get; set; } = "2";
 
-    public string Ramval { get; set; } = "3";
+    public string ramval { get; set; } = "3";
 
-    public string Source { get; set; } = "web_normal";
+    public string source { get; set; } = "web_normal";
 
-    public string Ga { get; set; } = "1";
+    public string ga { get; set; } = "1";
 }

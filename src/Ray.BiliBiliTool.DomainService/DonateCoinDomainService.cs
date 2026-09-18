@@ -164,7 +164,7 @@ public class DonateCoinDomainService(
         {
             var request = new AddCoinRequest(video.Aid, ck.BiliJct)
             {
-                Select_like = select_like ? 1 : 0,
+                select_like = select_like ? 1 : 0,
             };
             var referer =
                 $"https://www.bilibili.com/video/{video.Bvid}/?spm_id_from=333.1007.tianma.1-1-1.click&vd_source=80c1601a7003934e7a90709c18dfcffd";

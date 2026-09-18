@@ -152,19 +152,19 @@ public class VideoDomainService(
 
         var request = new UploadVideoHeartbeatRequest
         {
-            Aid = long.Parse(videoInfo.Aid),
-            Bvid = videoInfo.Bvid,
-            Cid = videoInfo.Cid,
-            Mid = long.Parse(ck.UserId),
-            Csrf = ck.BiliJct,
+            aid = long.Parse(videoInfo.Aid),
+            bvid = videoInfo.Bvid,
+            cid = videoInfo.Cid,
+            mid = long.Parse(ck.UserId),
+            csrf = ck.BiliJct,
 
-            Played_time = playedTime,
-            Realtime = playedTime,
-            Real_played_time = playedTime,
+            played_time = playedTime,
+            realtime = playedTime,
+            real_played_time = playedTime,
         };
         BiliApiResponse apiResponse = await apiApi.UploadVideoHeartbeat(
-            request.Aid,
-            request.Played_time,
+            request.aid,
+            request.played_time,
             request,
             ck.ToString()
         );
@@ -213,18 +213,18 @@ public class VideoDomainService(
     {
         var request = new UploadVideoHeartbeatRequest
         {
-            Aid = long.Parse(videoInfo.Aid),
-            Bvid = videoInfo.Bvid,
-            Cid = videoInfo.Cid,
+            aid = long.Parse(videoInfo.Aid),
+            bvid = videoInfo.Bvid,
+            cid = videoInfo.Cid,
 
-            Mid = long.Parse(ck.UserId),
-            Csrf = ck.BiliJct,
+            mid = long.Parse(ck.UserId),
+            csrf = ck.BiliJct,
         };
 
         //开始上报一次
         BiliApiResponse apiResponse = await apiApi.UploadVideoHeartbeat(
-            request.Aid,
-            request.Played_time,
+            request.aid,
+            request.played_time,
             request,
             ck.ToString()
         );

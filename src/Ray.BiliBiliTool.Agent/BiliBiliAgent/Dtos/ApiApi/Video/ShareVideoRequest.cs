@@ -4,19 +4,19 @@ public class ShareVideoRequest
 {
     public ShareVideoRequest(long aid, string csrf)
     {
-        Aid = aid;
-        Csrf = csrf;
+        this.aid = aid;
+        this.csrf = csrf;
     }
 
-    public long Aid { get; set; }
+    public long aid { get; set; }
 
-    public string Csrf { get; set; }
+    public string csrf { get; set; }
 
-    public string Eab_x { get; set; } = "1";
+    public string eab_x { get; set; } = "1";
 
-    public string Ramval { get; set; } = $"{new Random().Next(3, 20)}";
+    public string ramval { get; set; } = $"{new Random().Next(3, 20)}";
 
-    public string Source { get; set; } = "web_normal";
+    public string source { get; set; } = "web_normal";
 
-    public string Ga { get; set; } = "1";
+    public string ga { get; set; } = "1";
 }
