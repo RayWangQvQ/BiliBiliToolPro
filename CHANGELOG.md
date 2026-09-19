@@ -1,3 +1,7 @@
+## 4.0.1.2
+- Fix[#1107]: 修复 dotnet10 升级后模型快照未同步导致 Web 启动崩溃的问题
+- Feature: Serilog Pkg 升级到最新稳定版
+- Feature: 移除 lock 文件机制
 ## 4.0.1.1
 - 升级到dotnet10
 ## 4.0.1
