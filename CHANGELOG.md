@@ -1,3 +1,8 @@
+## 4.0.1.4
+- Fix: Bili Account 页面的增/改/删/排序写配置时误用了环境变量式键名（`BiliBiliCookies__N`），而 SqliteConfigurationProvider 不做 `__`→`:` 归一化，这些键对 `IConfiguration` 完全不可见，导致填写后保存看似无效；已改为层级键名 `BiliBiliCookies:N`
+- Fix: Bili Account 页面的保存不再静默失败，成功/失败均给出 Snackbar 提示
+- Notice: 4.0.1~4.0.1.3 期间通过该页面添加的账号存为 `BiliBiliCookies__N` 死键，升级后依然读不到，需在页面重新添加（或执行 `DELETE FROM bili_appsettings WHERE Key LIKE 'BiliBiliCookies__%'` 清理）
+- 已知限制：删除账号会在列表末尾留下一条空记录（SQLite 无法遮蔽 config/cookies.json 提供的同名键），后续单独处理
 ## 4.0.1.3
 - Fix: 补回 `app.MapStaticAssets()`，修复 dotnet10 升级后 `_framework/blazor.web.js` 返回 404 导致 Web 页面无任何交互（Configurations 子菜单点击无响应）的问题
 ## 4.0.1.2
