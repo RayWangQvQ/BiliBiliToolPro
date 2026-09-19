@@ -1,6 +1,6 @@
 # 在青龙中运行
 
-原理是，利用青龙的拉库命令，拉取本仓库源码，自动添加cron定时任务，然后在青龙容器中安装`dotnet`环境或`bilitool`的二进制包，定时运行相应的Task。
+原理是，利用青龙的拉库命令，拉取本仓库源码，自动添加cron定时任务，然后在青龙容器中安装 .NET 10 SDK 或 `bilitool` 的二进制包，定时运行相应的Task。
 
 开始前，请先确保你的青龙面板是运行正常的。
 
@@ -142,16 +142,16 @@ https://gh-proxy.com/https://github.com/RayWangQvQ/BiliBiliToolPro.git
 
 ### 4.1. 安装dotnet失败怎么办法
 
+`dotnet` 运行模式需要 .NET 10 SDK。脚本会自动检查版本，并在低于 .NET 10 时安装或升级。
+
 首先，青龙有两个版本的镜像：
 
 - alpine：whyour/qinglong:latest
 - debian：whyour/qinglong:debian
 
-安装dotnet失败的情况，几乎全发生在alpine版上。。。
+Alpine `3.23` 可通过包管理器安装 `dotnet10-sdk`，脚本会自动使用此方式。较旧的 Alpine 镜像没有可用的 .NET 10 包；使用 `dotnet` 模式时脚本会停止并提示升级镜像或切换运行模式。
 
-所以，如果你“执迷不悟”，就是一定要用alpine版，那请先通过日志自行排查，不行就根据微软官方文档，进入qinglong容器后，手动安装。
-
-如果还不行，那么可以切换到基于`bilitool`的二进制包运行方式，该方式不需要安装`dotnet`，方式：
+若使用较旧 Alpine，或 .NET 安装仍失败，可以切换到基于`bilitool`的二进制包运行方式，该方式不需要安装`dotnet`，方式：
 
 编辑青龙面板的`配置文件`，新增如下两行：
 
@@ -163,8 +163,6 @@ export BILI_GITHUB_PROXY="https://github.moeyy.xyz/" # 下载二进制包时使�
 ![qinglong-login.png](../docs/imgs/qinglong-run-as-bilitool.png)
 
 bilitool没有先行版的概念，因为只有main分支才会打包，更新会稍慢一点。
-
-另外，alpine版的问题，我不建议来提交issue，因为已经大大超出本项目的scope了，建议可以去给alpine官方或微软的dotnet官方提交issue。
 
 ### 4.2. Couldn't find a valid ICU package installed on the system
 

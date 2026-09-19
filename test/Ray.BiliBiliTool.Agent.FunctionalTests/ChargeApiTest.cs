@@ -8,6 +8,7 @@ using Ray.BiliBiliTool.Console;
 
 namespace Ray.BiliBiliTool.Agent.FunctionalTests;
 
+[Trait("Category", "External")]
 public class ChargeApiTest
 {
     private readonly IApiApi _target;

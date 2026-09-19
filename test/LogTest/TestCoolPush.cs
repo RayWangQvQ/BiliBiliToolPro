@@ -10,6 +10,7 @@ using Xunit;
 
 namespace LogTest
 {
+    [Trait("Category", "External")]
     public class TestCoolPush
     {
         private string _key;

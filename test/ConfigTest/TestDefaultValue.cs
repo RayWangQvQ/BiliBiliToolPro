@@ -13,6 +13,7 @@ using Xunit;
 
 namespace ConfigTest
 {
+    [Trait("Category", "External")]
     public class TestDefaultValue
     {
         public TestDefaultValue()

@@ -8,6 +8,7 @@ using Ray.BiliBiliTool.Console;
 
 namespace Ray.BiliBiliTool.Agent.FunctionalTests;
 
+[Trait("Category", "External")]
 public class VipMallApiTests
 {
     private readonly IShowApi _api;

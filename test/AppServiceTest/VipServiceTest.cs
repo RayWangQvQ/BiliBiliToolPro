@@ -7,6 +7,7 @@ using Ray.BiliBiliTool.Infrastructure;
 
 namespace AppServiceTest;
 
+[Trait("Category", "External")]
 public class VipServiceTest
 {
     public VipServiceTest()
