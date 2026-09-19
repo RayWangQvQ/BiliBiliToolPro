@@ -1,3 +1,7 @@
+## 4.0.1.5
+- Fix: WebApiClientCore 迁移到 Refit 后，query 与 form 的参数名按 CLR 属性名原样发出（`?Vmid=1&Order_type=...`、`Aid=1&Csrf=...`），而 B 站的参数名区分大小写，导致大批接口返回 `{"code":-400,"message":"请求错误"}`；现已还原为首字母小写（`BiliUrlParameterKeyFormatter` 处理 query，`FormUrlEncodedKeyNormalizingDelegatingHandler` 处理 form，且注册在 `WridEncryptionDelegatingHandler` 之前以保证签名覆盖实际发出的 key），并补充报文回归测试
+- Fix: `BiliApiResponse<TData>.Data` 被声明为 `required`，而 B 站的错误信封不含 data 字段，System.Text.Json 在解析阶段就抛异常，真实业务错误码被 Refit 统一压成 `An error occured deserializing the response.`；已改为可空并在各调用点补充判空
+- Feature: 响应解析失败时输出可定位的诊断日志（Warning：方法、完整 URL、HTTP 状态、真实异常原因、响应体；Debug：实际发出的完整请求报文），Cookie、csrf、SESSDATA、access_key 等凭据一律掩码，避免进入日志与推送
 ## 4.0.1.4
 - Fix: Bili Account 页面的增/改/删/排序写配置时误用了环境变量式键名（`BiliBiliCookies__N`），而 SqliteConfigurationProvider 不做 `__`→`:` 归一化，这些键对 `IConfiguration` 完全不可见，导致填写后保存看似无效；已改为层级键名 `BiliBiliCookies:N`
 - Fix: Bili Account 页面的保存不再静默失败，成功/失败均给出 Snackbar 提示

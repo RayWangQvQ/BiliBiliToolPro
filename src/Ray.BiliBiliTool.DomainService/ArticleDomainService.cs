@@ -167,9 +167,9 @@ public class ArticleDomainService(
             req
         );
 
-        if (re.Code != 0)
+        if (re.Code != 0 || re.Data is null)
         {
-            throw new BiliBusinessException(re.Message);
+            throw new BiliBusinessException(re.Message ?? "响应中缺少 data 字段");
         }
 
         var articleInfo = re.Data.Articles.FirstOrDefault();
@@ -240,9 +240,9 @@ public class ArticleDomainService(
             req
         );
 
-        if (re.Code != 0)
+        if (re.Code != 0 || re.Data is null)
         {
-            throw new BiliBusinessException(re.Message);
+            throw new BiliBusinessException(re.Message ?? "响应中缺少 data 字段");
         }
 
         return re.Data.Count;
@@ -347,7 +347,16 @@ public class ArticleDomainService(
 
             if (!_alreadyDonatedCoinCountCatch.TryGetValue(cvid.ToString(), out int multiply))
             {
-                multiply = (await apiApi.SearchArticleInfoAsync(cvid)).Data.Coin;
+                BiliApiResponse<SearchArticleInfoResponse> re = await apiApi.SearchArticleInfoAsync(
+                    cvid
+                );
+                if (re.Code != 0 || re.Data is null)
+                {
+                    logger.LogWarning("获取专栏信息失败：{message}({code})", re.Message, re.Code);
+                    return false;
+                }
+
+                multiply = re.Data.Coin;
                 _alreadyDonatedCoinCountCatch.TryAdd(cvid.ToString(), multiply);
             }
 

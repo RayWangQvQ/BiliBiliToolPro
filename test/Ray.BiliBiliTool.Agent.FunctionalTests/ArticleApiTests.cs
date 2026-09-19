@@ -46,7 +46,7 @@ public class ArticleApiTests
 
         // Assert
         re.Code.Should().Be(0);
-        re.Data.Count.Should().BeGreaterThan(0);
+        re.Data!.Count.Should().BeGreaterThan(0);
     }
 
     #endregion
@@ -64,7 +64,7 @@ public class ArticleApiTests
 
         // Assert
         re.Code.Should().Be(0);
-        re.Data.Mid.Should().BeGreaterThan(0);
+        re.Data!.Mid.Should().BeGreaterThan(0);
         re.Data.Like.Should().BeGreaterThanOrEqualTo(1);
     }
 

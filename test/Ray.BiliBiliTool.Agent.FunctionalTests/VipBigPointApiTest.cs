@@ -72,7 +72,7 @@ public class VipBigPointApiTest
 
         // Assert
         re.Code.Should().Be(0);
-        re.Data.List.Should().Contain(x => x.Type == 9);
+        re.Data!.List.Should().Contain(x => x.Type == 9);
     }
 
     [Fact]
