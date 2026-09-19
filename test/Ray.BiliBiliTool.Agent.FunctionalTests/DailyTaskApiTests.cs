@@ -8,6 +8,7 @@ using Ray.BiliBiliTool.Console;
 
 namespace Ray.BiliBiliTool.Agent.FunctionalTests;
 
+[Trait("Category", "External")]
 public class DailyTaskApiTests
 {
     private readonly IApiApi _api;

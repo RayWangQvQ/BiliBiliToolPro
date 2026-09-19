@@ -16,6 +16,7 @@ using Ray.BiliBiliTool.Infrastructure.Cookie;
 
 namespace Ray.BiliBiliTool.CharacterizationTests;
 
+[Collection("Characterization")]
 public class DailyTaskCharacterizationTests
 {
     [Fact]

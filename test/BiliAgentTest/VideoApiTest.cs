@@ -11,6 +11,7 @@ using Xunit;
 
 namespace BiliAgentTest;
 
+[Trait("Category", "External")]
 public class VideoApiTest
 {
     public VideoApiTest()

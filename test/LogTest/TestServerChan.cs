@@ -10,6 +10,7 @@ using Xunit;
 
 namespace LogTest
 {
+    [Trait("Category", "External")]
     public class TestServerChan
     {
         private string _scKey;

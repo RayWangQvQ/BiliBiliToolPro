@@ -3,6 +3,7 @@ using Ray.Infrastructure.Helpers;
 
 namespace DomainServiceTest
 {
+    [Trait("Category", "External")]
     public class VideoDomainServiceTest
     {
         public VideoDomainServiceTest()

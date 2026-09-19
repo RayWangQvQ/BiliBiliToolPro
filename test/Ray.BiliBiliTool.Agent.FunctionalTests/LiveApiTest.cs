@@ -16,6 +16,7 @@ using Xunit;
 
 namespace BiliAgentTest
 {
+    [Trait("Category", "External")]
     public class LiveApiTest
     {
         public LiveApiTest()
