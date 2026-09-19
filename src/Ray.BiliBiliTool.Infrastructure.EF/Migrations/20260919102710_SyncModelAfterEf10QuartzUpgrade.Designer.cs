@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Ray.BiliBiliTool.Infrastructure.EF;
 
@@ -10,9 +11,11 @@ using Ray.BiliBiliTool.Infrastructure.EF;
 namespace Ray.BiliBiliTool.Web.Migrations
 {
     [DbContext(typeof(BiliDbContext))]
-    partial class BiliDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260919102710_SyncModelAfterEf10QuartzUpgrade")]
+    partial class SyncModelAfterEf10QuartzUpgrade
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.12");
@@ -503,7 +506,7 @@ namespace Ray.BiliBiliTool.Web.Migrations
                     b.HasIndex("FireInstanceIdComputed")
                         .HasDatabaseName("IX_Logs_FireInstanceIdComputed");
 
-                    b.ToTable("bili_logs", (string)null);
+                    b.ToTable("bili_logs");
                 });
 
             modelBuilder.Entity("Ray.BiliBiliTool.Domain.ExecutionLog", b =>
@@ -581,7 +584,7 @@ namespace Ray.BiliBiliTool.Web.Migrations
 
                     b.HasIndex("TriggerName", "TriggerGroup", "JobName", "JobGroup", "DateAddedUtc");
 
-                    b.ToTable("bili_execution_logs", (string)null);
+                    b.ToTable("bili_execution_logs");
                 });
 
             modelBuilder.Entity("Ray.BiliBiliTool.Domain.User", b =>
@@ -612,7 +615,7 @@ namespace Ray.BiliBiliTool.Web.Migrations
                     b.HasIndex("Username")
                         .IsUnique();
 
-                    b.ToTable("bili_user", (string)null);
+                    b.ToTable("bili_user");
                 });
 
             modelBuilder.Entity("AppAny.Quartz.EntityFrameworkCore.Migrations.QuartzBlobTrigger", b =>
