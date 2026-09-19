@@ -1,3 +1,5 @@
+## 4.0.1.3
+- Fix: 补回 `app.MapStaticAssets()`，修复 dotnet10 升级后 `_framework/blazor.web.js` 返回 404 导致 Web 页面无任何交互（Configurations 子菜单点击无响应）的问题
 ## 4.0.1.2
 - Fix[#1107]: 修复 dotnet10 升级后模型快照未同步导致 Web 启动崩溃的问题
 - Feature: Serilog Pkg 升级到最新稳定版
