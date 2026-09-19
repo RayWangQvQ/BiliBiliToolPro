@@ -129,7 +129,7 @@
 
 | 模式 | 说明 | Cookie 自动写回 |
 | --- | --- | --- |
-| `dotnet`（默认） | 在面板容器里安装 .NET 8 SDK，直接用 `dotnet run` **从本仓库源码编译运行** | ✅ 立即可用（源码里已包含呆呆面板适配） |
+| `dotnet`（默认） | 在面板容器里安装 .NET 10 SDK，直接用 `dotnet run` **从本仓库源码编译运行** | ✅ 立即可用（源码里已包含呆呆面板适配） |
 | `bilitool` | 不装 dotnet，直接下载 GitHub 上预编译好的 `bilitool` 二进制运行，更轻量 | ⚠️ 需要等官方发布**包含呆呆面板适配的新版本**后才支持；旧版本二进制不认识 `DaiDai` 平台，登录只会把 Cookie 打印到日志，需手动添加 |
 
 建议：
@@ -165,10 +165,12 @@ https://gh-proxy.com/https://github.com/RayWangQvQ/BiliBiliToolPro.git
 
 ### 6.2. dotnet 安装失败
 
-`dotnet` 模式首次运行会自动装 .NET 8 SDK。如果失败，可：
+`dotnet` 模式首次运行会自动装 .NET 10 SDK。如果失败，可：
 
 1. 进面板容器手动按微软官方文档安装 dotnet；或
 2. 切换到 `bilitool` 模式（`BILI_MODE=bilitool`，不需要 dotnet）。
+
+Alpine 容器仅 Alpine `3.23` 支持通过包管理器安装 `dotnet10-sdk`。较旧版本请升级 Alpine，或切换到 `BILI_MODE=bilitool`。
 
 ### 6.3. Couldn't find a valid ICU package
 

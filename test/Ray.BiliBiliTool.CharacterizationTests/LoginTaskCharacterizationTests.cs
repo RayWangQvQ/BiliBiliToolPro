@@ -9,6 +9,7 @@ using Ray.BiliBiliTool.Infrastructure;
 
 namespace Ray.BiliBiliTool.CharacterizationTests;
 
+[Collection("Characterization")]
 public class LoginTaskCharacterizationTests
 {
     [Fact]

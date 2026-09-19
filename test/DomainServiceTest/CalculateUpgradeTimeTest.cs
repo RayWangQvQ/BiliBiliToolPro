@@ -3,6 +3,7 @@ using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.NavApi;
 
 namespace DomainServiceTest;
 
+[Trait("Category", "External")]
 public class CalculateUpgradeTimeTest
 {
     public CalculateUpgradeTimeTest()
