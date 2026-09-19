@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
 using Ray.BiliBiliTool.Config.SQLite;
 using Xunit;
@@ -22,6 +23,8 @@ public class SqliteConfigurationProviderTests
         }
         finally
         {
+            // 连接池会在 Dispose 后继续持有文件句柄，需清空后才能删除临时目录
+            SqliteConnection.ClearAllPools();
             if (Directory.Exists(rootDirectory))
             {
                 Directory.Delete(rootDirectory, recursive: true);
