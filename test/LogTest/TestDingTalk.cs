@@ -8,6 +8,7 @@ using Xunit;
 
 namespace LogTest
 {
+    [Trait("Category", "External")]
     public class TestDingTalk
     {
         private string _key;

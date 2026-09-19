@@ -15,6 +15,7 @@ using Xunit;
 
 namespace ConfigTest
 {
+    [Trait("Category", "External")]
     public class UnitTest1
     {
         [Fact]

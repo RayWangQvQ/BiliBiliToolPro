@@ -40,7 +40,7 @@ public class BiliAccountPageWorkflow(
 
         var currentCount =
             _configurationRoot.GetSection("BiliBiliCookies").Get<List<string>>()?.Count ?? 0;
-        provider.Set($"BiliBiliCookies__{currentCount}", cookieStr);
+        provider.Set($"BiliBiliCookies:{currentCount}", cookieStr);
         ReloadConfiguration();
         return Task.CompletedTask;
     }
@@ -51,7 +51,7 @@ public class BiliAccountPageWorkflow(
             GetSqliteProvider()
             ?? throw new InvalidOperationException("SqliteConfigurationProvider not found");
 
-        provider.Set($"BiliBiliCookies__{index}", cookieStr);
+        provider.Set($"BiliBiliCookies:{index}", cookieStr);
         ReloadConfiguration();
         return Task.CompletedTask;
     }
@@ -69,14 +69,14 @@ public class BiliAccountPageWorkflow(
         var rekeyDict = new Dictionary<string, string>();
         for (int i = index + 1; i < cookieList.Count; i++)
         {
-            rekeyDict[$"BiliBiliCookies__{i - 1}"] = cookieList[i];
+            rekeyDict[$"BiliBiliCookies:{i - 1}"] = cookieList[i];
         }
 
         if (rekeyDict.Count > 0)
             provider.BatchSet(rekeyDict);
 
-        // Delete the old last key
-        provider.Set($"BiliBiliCookies__{newCount}", string.Empty);
+        // Blank, not drop: an absent row would let cookies.json resurrect the deleted cookie
+        provider.Set($"BiliBiliCookies:{newCount}", string.Empty);
         ReloadConfiguration();
         return Task.CompletedTask;
     }
@@ -99,8 +99,8 @@ public class BiliAccountPageWorkflow(
         // Swap the two keys atomically via BatchSet
         var swapDict = new Dictionary<string, string>
         {
-            [$"BiliBiliCookies__{fromIndex}"] = cookieList[toIndex],
-            [$"BiliBiliCookies__{toIndex}"] = cookieList[fromIndex],
+            [$"BiliBiliCookies:{fromIndex}"] = cookieList[toIndex],
+            [$"BiliBiliCookies:{toIndex}"] = cookieList[fromIndex],
         };
 
         provider.BatchSet(swapDict);

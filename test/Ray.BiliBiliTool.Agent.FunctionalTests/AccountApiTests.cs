@@ -8,6 +8,7 @@ using Ray.BiliBiliTool.Console;
 
 namespace Ray.BiliBiliTool.Agent.FunctionalTests;
 
+[Trait("Category", "External")]
 public class AccountApiTests
 {
     private readonly IAccountApi _api;
@@ -34,6 +35,6 @@ public class AccountApiTests
 
         // Assert
         re.Code.Should().Be(0);
-        re.Data.Money.Should().NotBeNull();
+        re.Data!.Money.Should().NotBeNull();
     }
 }

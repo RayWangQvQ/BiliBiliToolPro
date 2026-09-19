@@ -16,6 +16,7 @@ using Ray.BiliBiliTool.Infrastructure.Cookie;
 
 namespace Ray.BiliBiliTool.CharacterizationTests;
 
+[Collection("Characterization")]
 public class DailyTaskCharacterizationTests
 {
     [Fact]
@@ -364,6 +365,14 @@ public class DailyTaskCharacterizationTests
         }
 
         public Task<bool> SaveCookieToBaihuAsync(
+            BiliCookie ckInfo,
+            CancellationToken cancellationToken
+        )
+        {
+            throw new NotSupportedException();
+        }
+
+        public Task<bool> SaveCookieToDaiDaiAsync(
             BiliCookie ckInfo,
             CancellationToken cancellationToken
         )

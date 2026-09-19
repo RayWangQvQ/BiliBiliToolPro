@@ -1,3 +1,10 @@
+## 4.0.2
+- 升级到dotnet10
+- Fix[#1104]: WebApiClientCore 迁移到 Refit 后，参数首字母变为大写导致调用失败，现统一还原，并补充回归测试
+- Feature: 响应解析失败时输出可定位的诊断日志，Cookie 等凭据一律掩码，避免进入日志与推送
+- Feature[#1087]：适配呆呆面板（Daidai Panel）
+- Fix: Bili Account 页面的增/改/删/排序写配置时，修正之前误用的环境变量式键名（`BiliBiliCookies__N`）
+- Fix: Bili Account 页面的保存不再静默失败，成功/失败均给出 Snackbar 提示
 ## 4.0.1
 - 新增Bili账号管理页面
 - 重构Web

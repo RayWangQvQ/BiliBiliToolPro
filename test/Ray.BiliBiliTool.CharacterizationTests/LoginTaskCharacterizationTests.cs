@@ -9,6 +9,7 @@ using Ray.BiliBiliTool.Infrastructure;
 
 namespace Ray.BiliBiliTool.CharacterizationTests;
 
+[Collection("Characterization")]
 public class LoginTaskCharacterizationTests
 {
     [Fact]
@@ -103,6 +104,14 @@ public class LoginTaskCharacterizationTests
         }
 
         public Task<bool> SaveCookieToBaihuAsync(
+            BiliCookie ckInfo,
+            CancellationToken cancellationToken
+        )
+        {
+            throw new NotSupportedException();
+        }
+
+        public Task<bool> SaveCookieToDaiDaiAsync(
             BiliCookie ckInfo,
             CancellationToken cancellationToken
         )

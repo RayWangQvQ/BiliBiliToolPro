@@ -9,6 +9,7 @@ using Ray.BiliBiliTool.Console;
 
 namespace Ray.BiliBiliTool.Agent.FunctionalTests;
 
+[Trait("Category", "External")]
 public class ArticleApiTests
 {
     private readonly IApiApi _api;
@@ -45,7 +46,7 @@ public class ArticleApiTests
 
         // Assert
         re.Code.Should().Be(0);
-        re.Data.Count.Should().BeGreaterThan(0);
+        re.Data!.Count.Should().BeGreaterThan(0);
     }
 
     #endregion
@@ -63,7 +64,7 @@ public class ArticleApiTests
 
         // Assert
         re.Code.Should().Be(0);
-        re.Data.Mid.Should().BeGreaterThan(0);
+        re.Data!.Mid.Should().BeGreaterThan(0);
         re.Data.Like.Should().BeGreaterThanOrEqualTo(1);
     }
 

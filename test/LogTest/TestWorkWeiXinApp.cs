@@ -8,6 +8,7 @@ using Xunit;
 
 namespace LogTest
 {
+    [Trait("Category", "External")]
     public class TestWorkWeiXinApp
     {
         private string _agentId;

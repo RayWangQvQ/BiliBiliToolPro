@@ -22,13 +22,26 @@ find . -type d -name "obj" -exec rm -rf {} +
 echo -e "清理完成\n"
 
 echo "检测dotnet..."
-dotnetVersion=$(dotnet --version)
+requiredDotnetMajor=10
+dotnetVersion=$(dotnet --version 2>/dev/null || true)
+dotnetMajor=$(echo "$dotnetVersion" | grep -oE '^[0-9]+' || true)
 echo "当前dotnet版本：$dotnetVersion"
-if [[ $(echo "$dotnetVersion" | grep -oE '^[0-9]+') -ge 8 ]]; then
+if [[ "$dotnetMajor" =~ ^[0-9]+$ && "$dotnetMajor" -ge "$requiredDotnetMajor" ]]; then
     echo "已安装，且版本满足"
 else
     echo "which dotnet: $(which dotnet)"
     echo "Path: $PATH"
-    rm -f /usr/local/bin/dotnet
+    if ! bash "$qinglong_bili_repo_dir/qinglong/ray-dotnet-install.sh"; then
+        echo "安装 .NET $requiredDotnetMajor SDK 失败"
+        exit 1
+    fi
+    . /root/.bashrc
+    dotnetVersion=$(dotnet --version 2>/dev/null || true)
+    dotnetMajor=$(echo "$dotnetVersion" | grep -oE '^[0-9]+' || true)
+    if ! [[ "$dotnetMajor" =~ ^[0-9]+$ && "$dotnetMajor" -ge "$requiredDotnetMajor" ]]; then
+        echo ".NET $requiredDotnetMajor SDK 安装后不可用"
+        exit 1
+    fi
+    echo "当前dotnet版本：$dotnetVersion"
 fi
 echo "检测dotnet结束"

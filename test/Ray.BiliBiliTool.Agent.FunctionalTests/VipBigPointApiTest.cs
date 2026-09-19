@@ -9,6 +9,7 @@ using Xunit.Abstractions;
 
 namespace Ray.BiliBiliTool.Agent.FunctionalTests;
 
+[Trait("Category", "External")]
 public class VipBigPointApiTest
 {
     private readonly IApiApi _api;
@@ -71,7 +72,7 @@ public class VipBigPointApiTest
 
         // Assert
         re.Code.Should().Be(0);
-        re.Data.List.Should().Contain(x => x.Type == 9);
+        re.Data!.List.Should().Contain(x => x.Type == 9);
     }
 
     [Fact]

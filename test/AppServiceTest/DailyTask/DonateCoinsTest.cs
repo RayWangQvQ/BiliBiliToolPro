@@ -5,6 +5,7 @@ using Ray.BiliBiliTool.Infrastructure;
 
 namespace AppServiceTest.DailyTask
 {
+    [Trait("Category", "External")]
     public class DonateCoinsTest
     {
         public DonateCoinsTest()

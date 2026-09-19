@@ -8,6 +8,7 @@ using Ray.BiliBiliTool.Console;
 
 namespace Ray.BiliBiliTool.Agent.FunctionalTests;
 
+[Trait("Category", "External")]
 public class ChargeApiTest
 {
     private readonly IApiApi _target;
@@ -41,7 +42,7 @@ public class ChargeApiTest
 
         // Assert
         re.Code.Should().Be(0);
-        re.Data.Status.Should()
+        re.Data!.Status.Should()
             .BeOneOf(
                 -4, //bp.to.battery http failed, invalid args, errNo=800409904: B ������
                 4

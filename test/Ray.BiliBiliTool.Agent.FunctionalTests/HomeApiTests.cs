@@ -6,6 +6,7 @@ using Ray.BiliBiliTool.Console;
 
 namespace Ray.BiliBiliTool.Agent.FunctionalTests;
 
+[Trait("Category", "External")]
 public class HomeApiTests
 {
     private readonly IHomeApi _api;

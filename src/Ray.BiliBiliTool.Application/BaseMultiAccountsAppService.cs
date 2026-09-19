@@ -80,6 +80,13 @@ public abstract class BaseMultiAccountsAppService(
             return;
         }
 
+        //更新cookie到呆呆面板env
+        if (platformType == PlatformType.DaiDai)
+        {
+            await loginDomainService.SaveCookieToDaiDaiAsync(ckInfo, cancellationToken);
+            return;
+        }
+
         await loginDomainService.SaveCookieToJsonFileAsync(ckInfo, cancellationToken);
     }
 }

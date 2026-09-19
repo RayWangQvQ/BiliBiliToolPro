@@ -15,7 +15,7 @@ namespace Ray.BiliBiliTool.Web.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "8.0.3");
+            modelBuilder.HasAnnotation("ProductVersion", "10.0.12");
 
             modelBuilder.Entity("AppAny.Quartz.EntityFrameworkCore.Migrations.QuartzBlobTrigger", b =>
                 {
@@ -418,6 +418,10 @@ namespace Ray.BiliBiliTool.Web.Migrations
                         .HasColumnType("smallint")
                         .HasColumnName("MISFIRE_INSTR");
 
+                    b.Property<long?>("MisfireOriginalFireTime")
+                        .HasColumnType("bigint")
+                        .HasColumnName("MISFIRE_ORIG_FIRE_TIME");
+
                     b.Property<long?>("NextFireTime")
                         .HasColumnType("bigint")
                         .HasColumnName("NEXT_FIRE_TIME");
@@ -499,7 +503,7 @@ namespace Ray.BiliBiliTool.Web.Migrations
                     b.HasIndex("FireInstanceIdComputed")
                         .HasDatabaseName("IX_Logs_FireInstanceIdComputed");
 
-                    b.ToTable("bili_logs");
+                    b.ToTable("bili_logs", (string)null);
                 });
 
             modelBuilder.Entity("Ray.BiliBiliTool.Domain.ExecutionLog", b =>
@@ -577,15 +581,14 @@ namespace Ray.BiliBiliTool.Web.Migrations
 
                     b.HasIndex("TriggerName", "TriggerGroup", "JobName", "JobGroup", "DateAddedUtc");
 
-                    b.ToTable("bili_execution_logs");
+                    b.ToTable("bili_execution_logs", (string)null);
                 });
 
             modelBuilder.Entity("Ray.BiliBiliTool.Domain.User", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
-                        .HasColumnName("id");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
@@ -609,7 +612,7 @@ namespace Ray.BiliBiliTool.Web.Migrations
                     b.HasIndex("Username")
                         .IsUnique();
 
-                    b.ToTable("bili_user");
+                    b.ToTable("bili_user", (string)null);
                 });
 
             modelBuilder.Entity("AppAny.Quartz.EntityFrameworkCore.Migrations.QuartzBlobTrigger", b =>
