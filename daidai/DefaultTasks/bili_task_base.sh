@@ -185,14 +185,15 @@ check_unzip() {
 
 check_dotnet() {
     eval $invocation
-    dotnetVersion=$(dotnet --version)
+    dotnetVersion=$(dotnet --version 2>/dev/null || true)
+    dotnetMajor=$(echo "$dotnetVersion" | grep -oE '^[0-9]+' || true)
     say "当前dotnet版本：$dotnetVersion"
-    if [[ $(echo "$dotnetVersion" | grep -oE '^[0-9]+') -ge 8 ]]; then
+    if [[ "$dotnetMajor" =~ ^[0-9]+$ && "$dotnetMajor" -ge 10 ]]; then
         say "已安装，且版本满足"
         say "which dotnet: $(which dotnet)"
         return 0
     else
-        say "未安装"
+        say "未安装 .NET 10 SDK"
         return 1
     fi
 }
@@ -233,14 +234,17 @@ check_installed() {
 install_dotnet_by_script() {
     eval $invocation
     say "再尝试使用官方脚本安装"
-    curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 8.0 --verbose
+    if ! curl -fsSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 10.0 --verbose; then
+        say_err "官方脚本安装 .NET 10 SDK 失败"
+        return 1
+    fi
 
     say "添加到PATH"
     local exportFile="/root/.bashrc"
     touch $exportFile
     echo '' >>$exportFile
     echo 'export DOTNET_ROOT=$HOME/.dotnet' >>$exportFile
-    echo 'export PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools' >>$exportFile
+    echo 'export PATH=$DOTNET_ROOT:$DOTNET_ROOT/tools:$PATH' >>$exportFile
     . $exportFile
 }
 
@@ -262,12 +266,21 @@ install_dotnet() {
             curl -o packages-microsoft-prod.deb https://packages.microsoft.com/config/debian/$VERSION_ID/packages-microsoft-prod.deb
             dpkg -i packages-microsoft-prod.deb
             rm packages-microsoft-prod.deb
-            apt-get update && apt-get install -y dotnet-sdk-8.0
+            apt-get update && apt-get install -y dotnet-sdk-10.0
+            unset DOTNET_ROOT
+            export PATH="/usr/bin:$PATH"
+            hash -r
         } || {
             install_dotnet_by_script
         }
     else
         say "使用apk安装"
+        . /etc/os-release
+        if [[ "${VERSION_ID:-}" != 3.23* ]]; then
+            say_err "Alpine ${VERSION_ID:-unknown} 不支持通过包管理器安装 .NET 10"
+            say_err "请升级到 Alpine 3.23 或设置 BILI_MODE=bilitool"
+            return 1
+        fi
         if ! (curl -s -m 5 www.google.com >/dev/null); then
             say "机器位于墙内，切换为国内镜像源"
             cp /etc/apk/repositories /etc/apk/repositories.bak 2>/dev/null || true
@@ -275,14 +288,21 @@ install_dotnet() {
             sed -i 's/http:\/\/dl-cdn.alpinelinux.org/https:\/\/mirrors.ustc.edu.cn/g' /etc/apk/repositories 2>/dev/null || true
             apk update
         fi
-        {
-            apk add dotnet8-sdk
-        } || {
-            install_dotnet_by_script
-        }
+        if ! apk add --no-cache dotnet10-sdk; then
+            say_err "无法从 Alpine 包源安装 .NET 10 SDK，请确认 community 仓库已启用"
+            return 1
+        fi
+        unset DOTNET_ROOT
+        export PATH="/usr/bin:$PATH"
+        hash -r
     fi
-    dotnet --version && say "which dotnet: $(which dotnet)" && say "安装成功"
-    return $?
+
+    if check_dotnet; then
+        say "安装成功"
+        return 0
+    fi
+
+    return 1
 }
 
 get_download_url() {
@@ -326,6 +346,7 @@ install() {
             install_dotnet || {
                 say_err "安装失败，请根据文档自行在面板容器中安装dotnet，或切换为 bilitool 模式"
                 say_err "文档：https://github.com/RayWangQvQ/BiliBiliToolPro/blob/develop/daidai/README.md"
+                return 1
             }
         fi
         if [ "$prefer_mode" == "bilitool" ]; then

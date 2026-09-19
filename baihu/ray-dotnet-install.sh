@@ -12,22 +12,22 @@ install_dependency() {
 }
 
 install_by_mise() {
-    echo "使用 mise 安装 dotnet@8..."
+    echo "使用 mise 安装 dotnet@10..."
     if command -v mise >/dev/null 2>&1; then
-        mise install dotnet@8
+        mise install dotnet@10
     else
         echo "未检测到 mise，请确认当前环境支持 mise"
-        exit 1
+        return 1
     fi
 }
 
 dotnet() {
-    mise exec dotnet@8 -- dotnet "$@"
+    mise exec dotnet@10 -- dotnet "$@"
 }
 
 install_dependency
 
-install_by_mise
+install_by_mise || exit 1
 
 dotnet --info
 

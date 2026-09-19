@@ -74,7 +74,7 @@ touch /root/.bashrc && . /root/.bashrc
 
 # 包装 dotnet 命令，统一使用 mise 调度
 dotnet() {
-    mise exec dotnet@8 -- dotnet "$@"
+    mise exec dotnet@10 -- dotnet "$@"
 }
 
 # 目录
@@ -265,11 +265,11 @@ check_dotnet() {
 
     dotnetVersion=$(dotnet --version 2>/dev/null || true)
     say "当前dotnet版本：$dotnetVersion"
-    if [[ $(echo "$dotnetVersion" | grep -oE '^[0-9]+') -ge 8 ]]; then
+    if [[ $(echo "$dotnetVersion" | grep -oE '^[0-9]+') -ge 10 ]]; then
         say "已安装，且版本满足"
         return 0
     else
-        say "未安装 dotnet@8"
+        say "未安装 dotnet@10"
         return 1
     fi
 }
@@ -322,7 +322,7 @@ check_installed() {
 install_dotnet() {
     eval $invocation
 
-    say "开始使用 mise 安装 dotnet@8"
+    say "开始使用 mise 安装 dotnet@10"
     if ! machine_has mise; then
         say_err "未检测到 mise，请确认当前环境支持 mise"
         return 1
@@ -333,14 +333,14 @@ install_dotnet() {
         apt-get update && apt-get install -y bash libicu-dev libkrb5-dev libssl-dev zlib1g-dev || true
     fi
 
-    mise install dotnet@8
+    mise install dotnet@10
     local install_status=$?
     
     if [ $install_status -eq 0 ]; then
-        say "mise dotnet@8 安装成功"
+        say "mise dotnet@10 安装成功"
         return 0
     else
-        say_err "mise dotnet@8 安装失败"
+        say_err "mise dotnet@10 安装失败"
         return 1
     fi
 }
@@ -404,6 +404,7 @@ install() {
                 say_err "安装失败"
                 say_err "请根据文档自行在白虎面板环境中安装dotnet（进入“编程语言”页面安装）"
                 say_err "或者尝试切换运行模式为bilitool，它不需要安装dotnet：https://github.com/RayWangQvQ/BiliBiliToolPro/blob/develop/baihu/README.md"
+                return 1
             }
         fi
 
