@@ -1,7 +1,8 @@
 <Project>
   <PropertyGroup>
     <Authors>Ray</Authors>
-    <Version>4.0.2</Version>
+    <!-- 版本真相来源：只写前缀。develop 上由 CI 注入 -alpha.N 后缀，main 上无后缀即正式版。 -->
+    <VersionPrefix>4.0.3</VersionPrefix>
     <NoWarn>$(NoWarn);CS1591;CS0436</NoWarn>
   </PropertyGroup>
 </Project>

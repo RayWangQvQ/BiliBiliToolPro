@@ -3,6 +3,11 @@ on:
   pull_request_target:
     types: [opened, edited]
 
+# 只改 PR 的 base 分支，不 checkout PR 代码
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   checkTargetBranch:
     runs-on: ubuntu-latest
@@ -13,6 +18,7 @@ jobs:
         with:
           target: main
           change-to: develop
+          # 唯一被允许打进 main 的来源分支：阶段性发版 PR
           exclude: RayWangQvQ/BiliBiliToolPro:develop
           comment: |
               Your PR was set to `main`, but PRs should be sent to `develop`

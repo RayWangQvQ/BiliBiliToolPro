@@ -1,0 +1,84 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main, develop]
+    # 注意：这两个 job 会被设成 required check，所以绝对不能加 paths 过滤。
+    # 只改文档的 PR 一旦被过滤掉，检查会永远停在 Expected，PR 无法合并。
+
+permissions:
+  contents: read
+
+concurrency:
+  # 同一个 PR 的新提交取消旧运行；不能把 run_id 放进来，否则每组只会有一个运行
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # 版本号一致性 + 构建 + 离线单元测试。依赖真实 B 站接口/凭据的测试带
+  # [Trait("Category", "External")]，被过滤掉，只在本地或按需手动执行。
+  Verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      pull-requests: write # 只为把算出来的版本号播报成 PR 评论
+    steps:
+      # fetch-depth: 0 是为了拿到全部 tag —— 预览版的 -alpha.N 由已有 tag 推算，
+      # 浅克隆看不到 tag，N 就永远算成 1，会和已推过的预览镜像撞号。
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+          cache: true
+
+      - name: Version matches CHANGELOG
+        run: bash ./scripts/version.sh check-consistency
+
+      - name: Report planned version
+        # 版本号不落进文件，所以在 PR 上贴一条评论告诉我合并后会出哪个号。
+        # 派生仓库（fork）的 PR 拿不到写权限的 token，直接跳过；
+        # 播报失败也绝不挡合并门（continue-on-error）。
+        if: github.event.pull_request.head.repo.full_name == github.repository
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          BASE_REF: ${{ github.base_ref }}
+        run: bash ./scripts/report-version.sh post "$BASE_REF"
+
+      - name: Build
+        run: dotnet build Ray.BiliBiliTool.sln --configuration Release --nologo
+
+      - name: Test (offline)
+        # 把出网指向一个不存在的端口：任何偷偷联网的测试都会立刻失败，
+        # 而不是在 CI 上偶发变红。依赖真实凭据的测试请标 [Trait("Category", "External")]。
+        env:
+          HTTP_PROXY: http://127.0.0.1:9
+          HTTPS_PROXY: http://127.0.0.1:9
+          ALL_PROXY: http://127.0.0.1:9
+        run: >
+          dotnet test Ray.BiliBiliTool.sln --configuration Release --no-build
+          --filter "Category!=External" --nologo
+
+  # 只构建不推送，用来保证合并到 develop/main 之后镜像不会当场碎掉
+  ImageSmoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          platforms: linux/amd64
+          tags: bili-tool-web:smoke
+          cache-from: type=gha,scope=smoke
+          cache-to: type=gha,scope=smoke,mode=max
