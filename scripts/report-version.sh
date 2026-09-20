@@ -8,7 +8,18 @@
 set -euo pipefail
 
 repo_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
-version_sh="$repo_dir/scripts/version.sh"
+
+die() {
+    echo "$1" >&2
+    exit 1
+}
+
+# version.sh 一律用 bash 显式调用，不依赖可执行位：仓库里的 .sh 提交为 mode 100644，
+# 而 core.fileMode=false 会让本机的 chmod 根本进不了 git，直接执行在 Linux runner 上
+# 就是 Permission denied —— 表现出来是拿到空版本号，却看不到任何报错。
+vsh() {
+    bash "$repo_dir/scripts/version.sh" "$@"
+}
 
 # 用来定位自己发过的那条评论，避免每次 push 都叠一条新的
 marker='<!-- ci-planned-version -->'
@@ -20,13 +31,14 @@ body() {
     local branch p latest planned
     branch=${1:-}
     [ -n "$branch" ] || branch=$(git -C "$repo_dir" rev-parse --abbrev-ref HEAD)
-    p=$("$version_sh" prefix)
+    p=$(vsh prefix)
 
     case "$branch" in
     develop)
-        planned=$("$version_sh" preview-tag 2>/dev/null)
+        planned=$(vsh preview-tag)
+        [ -n "$planned" ] || die "version.sh preview-tag 没有算出版本号，拒绝播报空值"
         if [ "$planned" = "SKIP" ]; then
-            latest=$("$version_sh" latest-release)
+            latest=$(vsh latest-release)
             cat <<EOF
 $marker
 ### 计划版本
@@ -49,7 +61,8 @@ EOF
         fi
         ;;
     main)
-        planned=$("$version_sh" release-tag 2>/dev/null)
+        planned=$(vsh release-tag)
+        [ -n "$planned" ] || die "version.sh release-tag 没有算出版本号，拒绝播报空值"
         if [ "$planned" = "SKIP" ]; then
             cat <<EOF
 $marker

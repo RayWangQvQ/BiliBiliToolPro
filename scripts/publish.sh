@@ -45,8 +45,9 @@ read_var_from_user() {
 }
 
 get_version() {
-    # CI 通过 RELEASE_VERSION 传入；本地直接运行时回落到 common.props 的前缀
-    [ -n "$version" ] || version=$($repoDir/scripts/version.sh prefix)
+    # CI 通过 RELEASE_VERSION 传入；本地直接运行时回落到 common.props 的前缀。
+    # 用 bash 显式调用：.sh 提交为 mode 100644，直接执行在 Linux 上是 Permission denied
+    [ -n "$version" ] || version=$(bash "$repoDir/scripts/version.sh" prefix)
     echo -e "current version: $version \n\n"
 
     mkdir -p $publishDir
@@ -56,7 +57,7 @@ extract_release_notes() {
     echo "Extracting release notes from CHANGELOG.md..."
     mkdir -p $publishDir
 
-    $repoDir/scripts/version.sh release-notes > "$publishDir/release_notes.md"
+    bash "$repoDir/scripts/version.sh" release-notes > "$publishDir/release_notes.md"
 
     echo "Release notes saved to $publishDir/release_notes.md"
 }
