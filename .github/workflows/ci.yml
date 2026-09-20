@@ -34,7 +34,9 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "10.0.x"
-          cache: true
+          # 不要开 cache：setup-dotnet 的缓存只认 packages.lock.json，
+          # 本仓库启用了集中式版本管理（Directory.Packages.props）且没有 lock 文件，
+          # 开了会直接 "Dependencies lock file is not found" 报错。
 
       - name: Version matches CHANGELOG
         run: bash ./scripts/version.sh check-consistency
