@@ -3,6 +3,7 @@
 - 版本号只留在 `common.props` 的 `<VersionPrefix>`，`-alpha.N` 由 CI 依据已有 git tag 推导、不再写回文件；PR 上由 CI 评论播报合并后将生成的版本号
 - 依赖真实 B 站接口/凭据的测试标记 `[Trait("Category", "External")]`，一律不在 CI 中运行
 - Fix: 启动日志与定时任务推送里的版本号改用 InformationalVersion，预览镜像不再被显示成 `v4.0.3.0`，与镜像 tag、Release 版本保持一致
+- CI 增加代码格式门禁：`dotnet csharpier check`（版本由 `.config/dotnet-tools.json` 钉死），并把此前只被 pre-commit hook 覆盖到的范围补齐到 csproj / props / NuGet.Config，存量 11 处不合规一并格式化
 - 新增 Dependabot（github-actions + nuget，目标分支 develop）
 ## 4.0.2
 - 升级到dotnet10

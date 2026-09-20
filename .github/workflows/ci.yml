@@ -38,6 +38,18 @@ jobs:
           # 本仓库启用了集中式版本管理（Directory.Packages.props）且没有 lock 文件，
           # 开了会直接 "Dependencies lock file is not found" 报错。
 
+      - name: Format (csharpier)
+        # 版本由 .config/dotnet-tools.json 钉死（当前 1.3.0）。绝不要改成
+        # dotnet tool install：装到最新版会让规则漂移，CI 和每个人本地互相判对方红。
+        # 这里只判不改：fork PR 的 token 没有写权限，CI 也 push 不回作者的分支。
+        run: |
+          dotnet tool restore
+          if ! dotnet csharpier check .; then
+            echo "::error::代码格式不符合 csharpier，上面列出了具体文件。本地执行下面这条再提交："
+            echo "::error::    dotnet tool restore && dotnet csharpier format ."
+            exit 1
+          fi
+
       - name: Version matches CHANGELOG
         run: bash ./scripts/version.sh check-consistency
 
