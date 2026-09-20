@@ -1,0 +1,37 @@
+version: 2
+
+updates:
+  - package-ecosystem: github-actions
+    directory: "/"
+    target-branch: develop
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: Asia/Shanghai
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: nuget
+    directory: "/"
+    target-branch: develop
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: Asia/Shanghai
+    open-pull-requests-limit: 5
+    groups:
+      # 大版本升级（.NET / EF Core 这种）单独出 PR，不和小改动混在一起
+      dotnet-major:
+        patterns:
+          - "Microsoft.NET*"
+          - "Microsoft.EntityFrameworkCore*"
+          - "Serilog*"
+        update-types:
+          - major
+      minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch

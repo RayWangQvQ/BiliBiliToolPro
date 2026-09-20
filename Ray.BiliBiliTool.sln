@@ -53,13 +53,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{73DD
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{61613EF4-3644-42D4-A620-70547291FB38}"
 	ProjectSection(SolutionItems) = preProject
-		.github\workflows\auto-close-pr.yml = .github\workflows\auto-close-pr.yml
 		.github\workflows\auto-deploy-tencent-scf.yml = .github\workflows\auto-deploy-tencent-scf.yml
+		.github\workflows\ci.yml = .github\workflows\ci.yml
 		.github\workflows\codeql-analysis.yml = .github\workflows\codeql-analysis.yml
-		.github\workflows\publish-image.yml = .github\workflows\publish-image.yml
-		.github\workflows\publish-release.yml = .github\workflows\publish-release.yml
+		.github\workflows\preview-image.yml = .github\workflows\preview-image.yml
+		.github\workflows\release.yml = .github\workflows\release.yml
 		.github\workflows\repo-sync.yml = .github\workflows\repo-sync.yml
-		.github\workflows\tag.yml = .github\workflows\tag.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker", "docker", "{A93210FD-27B6-40E4-B08D-391F96CA2754}"
@@ -146,7 +145,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{2B5F
 		scripts\publish.bat = scripts\publish.bat
 		scripts\publish.ps1 = scripts\publish.ps1
 		scripts\publish.sh = scripts\publish.sh
+		scripts\report-version.sh = scripts\report-version.sh
 		scripts\ut.ps1 = scripts\ut.ps1
+		scripts\version.sh = scripts\version.sh
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ray.BiliBiliTool.Web.Client", "src\Ray.BiliBiliTool.Web.Client\Ray.BiliBiliTool.Web.Client.csproj", "{5772E00F-271F-4B25-8B10-A3C24D8D3E10}"

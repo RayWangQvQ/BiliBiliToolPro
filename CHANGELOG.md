@@ -1,3 +1,10 @@
+## 4.0.3
+- 重构 GitHub Actions：新增 `ci.yml`（PR 必跑版本一致性校验、构建、离线单测、镜像试构建）、`preview-image.yml`（合并 develop 后推送 `x.x.x-alpha.N` 预览镜像与 `:develop`）、`release.yml`（合并 main 后正式发版：打 tag、建 Release 附 zip 包、推镜像与 `:latest`），删除 `tag.yml`、`publish-image.yml`、`publish-release.yml`
+- 版本号只留在 `common.props` 的 `<VersionPrefix>`，`-alpha.N` 由 CI 依据已有 git tag 推导、不再写回文件；PR 上由 CI 评论播报合并后将生成的版本号
+- 依赖真实 B 站接口/凭据的测试标记 `[Trait("Category", "External")]`，一律不在 CI 中运行
+- Fix: 启动日志与定时任务推送里的版本号改用 InformationalVersion，预览镜像不再被显示成 `v4.0.3.0`，与镜像 tag、Release 版本保持一致
+- CI 增加代码格式门禁：`dotnet csharpier check`（版本由 `.config/dotnet-tools.json` 钉死），并把此前只被 pre-commit hook 覆盖到的范围补齐到 csproj / props / NuGet.Config，存量 11 处不合规一并格式化
+- 新增 Dependabot（github-actions + nuget，目标分支 develop）
 ## 4.0.2
 - 升级到dotnet10
 - Fix[#1104]: WebApiClientCore 迁移到 Refit 后，参数首字母变为大写导致调用失败，现统一还原，并补充回归测试
