@@ -43,6 +43,13 @@ public class VideoDomainService(
     public async Task<RankingInfo> GetRandomVideoOfRanking()
     {
         var apiResponse = await apiApi.GetRegionRankingVideosV2();
+        if (apiResponse.Code != 0 || apiResponse.Data is null)
+        {
+            throw new BiliBusinessException(
+                $"获取排行榜失败：{apiResponse.Message}({apiResponse.Code})"
+            );
+        }
+
         logger.LogDebug("获取排行榜成功");
         var data = apiResponse.Data.List[new Random().Next(apiResponse.Data.List.Count)];
         return data;
@@ -152,19 +159,19 @@ public class VideoDomainService(
 
         var request = new UploadVideoHeartbeatRequest
         {
-            aid = long.Parse(videoInfo.Aid),
-            bvid = videoInfo.Bvid,
-            cid = videoInfo.Cid,
-            mid = long.Parse(ck.UserId),
-            csrf = ck.BiliJct,
+            Aid = long.Parse(videoInfo.Aid),
+            Bvid = videoInfo.Bvid,
+            Cid = videoInfo.Cid,
+            Mid = long.Parse(ck.UserId),
+            Csrf = ck.BiliJct,
 
-            played_time = playedTime,
-            realtime = playedTime,
-            real_played_time = playedTime,
+            Played_time = playedTime,
+            Realtime = playedTime,
+            Real_played_time = playedTime,
         };
         BiliApiResponse apiResponse = await apiApi.UploadVideoHeartbeat(
-            request.aid,
-            request.played_time,
+            request.Aid,
+            request.Played_time,
             request,
             ck.ToString()
         );
@@ -213,18 +220,18 @@ public class VideoDomainService(
     {
         var request = new UploadVideoHeartbeatRequest
         {
-            aid = long.Parse(videoInfo.Aid),
-            bvid = videoInfo.Bvid,
-            cid = videoInfo.Cid,
+            Aid = long.Parse(videoInfo.Aid),
+            Bvid = videoInfo.Bvid,
+            Cid = videoInfo.Cid,
 
-            mid = long.Parse(ck.UserId),
-            csrf = ck.BiliJct,
+            Mid = long.Parse(ck.UserId),
+            Csrf = ck.BiliJct,
         };
 
         //开始上报一次
         BiliApiResponse apiResponse = await apiApi.UploadVideoHeartbeat(
-            request.aid,
-            request.played_time,
+            request.Aid,
+            request.Played_time,
             request,
             ck.ToString()
         );
@@ -283,7 +290,7 @@ public class VideoDomainService(
             request,
             ck.ToString()
         );
-        if (result.Data.Total > 0)
+        if (result.Code == 0 && result.Data is not null && result.Data.Total > 0)
         {
             var video = await GetRandomVideoOfUps(result.Data.List.Select(x => x.Mid).ToList(), ck);
             if (video != null)

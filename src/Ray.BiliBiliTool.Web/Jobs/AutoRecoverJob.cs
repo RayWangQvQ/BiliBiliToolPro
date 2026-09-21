@@ -1,24 +1,22 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Quartz;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.Domain;
-using Ray.BiliBiliTool.Infrastructure;
-using Ray.BiliBiliTool.Infrastructure.EF;
 using Ray.BiliBiliTool.Web.Services;
 
 namespace Ray.BiliBiliTool.Web.Jobs;
 
 /// <summary>
 /// 自动补做：每隔 N 小时检查一次，把今天到点但没做（或做了失败但没到重试上限）的项补上。
-/// 判定规则见规格 §5。
+/// 「哪些项允许自动补做」见 <see cref="TaskStatusEvaluator.CanAutoRedo"/>。
+///
+/// 注意：Web.Jobs 不允许直接依赖 Infrastructure / Infrastructure.EF（见 DependencyGuardrailTests），
+/// 所以清理过期记录走 ITodayTaskService，不在本类里碰 DbContext。
 /// </summary>
 public class AutoRecoverJob(
     ILogger<AutoRecoverJob> logger,
     IOptionsMonitor<AutoRecoverOptions> options,
-    ITodayTaskService todayTaskService,
-    IDbContextFactory<BiliDbContext> dbContextFactory
+    ITodayTaskService todayTaskService
 ) : BaseJob<AutoRecoverJob>(logger)
 {
     public static readonly JobKey Key = new(nameof(AutoRecoverJob), Constants.BiliJobGroup);
@@ -31,7 +29,10 @@ public class AutoRecoverJob(
     {
         var config = options.CurrentValue;
 
-        await CleanupAsync(config.RecordRetentionDays, context.CancellationToken);
+        await todayTaskService.CleanupExpiredRecordsAsync(
+            config.RecordRetentionDays,
+            context.CancellationToken
+        );
 
         if (!config.IsEnable)
         {
@@ -81,57 +82,5 @@ public class AutoRecoverJob(
                 }
             }
         }
-    }
-
-    /// <summary>清理超过保留天数的执行记录</summary>
-    private async Task CleanupAsync(int retentionDays, CancellationToken cancellationToken)
-    {
-        try
-        {
-            var cutoff = DateTimeOffset.UtcNow.AddDays(-Math.Clamp(retentionDays, 1, 90));
-            await using var db = await dbContextFactory.CreateDbContextAsync(cancellationToken);
-            await db
-                .TaskRecords.Where(r => r.CreatedAtUtc < cutoff)
-                .ExecuteDeleteAsync(cancellationToken);
-        }
-        catch (Exception ex)
-        {
-            logger.LogWarning(ex, "清理过期的任务执行记录失败");
-        }
-    }
-
-    /// <summary>
-    /// 按当前配置重建触发器（间隔小时数变了要重新调度）。
-    /// </summary>
-    public static async Task RescheduleAsync(ISchedulerFactory schedulerFactory)
-    {
-        try
-        {
-            var scheduler = await schedulerFactory.GetScheduler();
-            if (!await scheduler.CheckExists(TriggerKeyValue))
-            {
-                return;
-            }
-
-            var newTrigger = TriggerBuilder
-                .Create()
-                .WithIdentity(TriggerKeyValue)
-                .ForJob(Key)
-                .StartAt(DateTimeOffset.UtcNow.AddMinutes(1))
-                .WithSimpleSchedule(x => x.WithIntervalInHours(ReadIntervalHours()).RepeatForever())
-                .Build();
-
-            await scheduler.RescheduleJob(TriggerKeyValue, newTrigger);
-        }
-        catch
-        {
-            // 重新调度失败不影响已保存的配置；下次重启会按新值启动
-        }
-    }
-
-    private static int ReadIntervalHours()
-    {
-        var config = Global.ServiceProviderRoot?.GetService<IConfiguration>();
-        return Math.Clamp(config?.GetValue("AutoRecoverConfig:IntervalHours", 2) ?? 2, 1, 24);
     }
 }

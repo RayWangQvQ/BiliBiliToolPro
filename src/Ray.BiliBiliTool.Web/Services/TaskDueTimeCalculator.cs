@@ -22,7 +22,20 @@ public static class TaskDueTimeCalculator
             return result;
         }
 
-        var expression = new CronExpression(cron);
+        // cron 必须按「传入时刻所属的时区」求值，不能用默认的 TimeZoneInfo.Local：
+        // 下方算「当天」窗口用的是 day.Offset，两者一旦不是同一个时区就会算错
+        // （例如机器在 UTC 而传入的是 +08:00 的时刻，当天的触发点会被判成落在窗口之外）。
+        // 运行时的 now 来自 DateTimeOffset.Now，其 Offset 就是宿主机本地时区，
+        // 也就是 Quartz 触发器默认使用的时区，因此这里与调度实际行为一致。
+        var expression = new CronExpression(cron)
+        {
+            TimeZone = TimeZoneInfo.CreateCustomTimeZone(
+                $"BiliCronUtc{(day.Offset < TimeSpan.Zero ? "-" : "+")}{day.Offset.Duration():hh\\:mm}",
+                day.Offset,
+                "BiliCron",
+                "BiliCron"
+            ),
+        };
         var midnight = new DateTimeOffset(day.Year, day.Month, day.Day, 0, 0, 0, day.Offset);
 
         // 起点回退 1 秒：Quartz 的 GetNextValidTimeAfter 返回「严格晚于」的时间，

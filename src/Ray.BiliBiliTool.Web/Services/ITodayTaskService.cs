@@ -95,4 +95,13 @@ public interface ITodayTaskService
         int retentionDays,
         CancellationToken cancellationToken = default
     );
+
+    /// <summary>
+    /// 清理超过保留天数的任务执行记录。由 AutoRecoverJob 调用 ——
+    /// Web.Jobs 不允许直接依赖 Infrastructure.EF，所以清理放在这一层。
+    /// </summary>
+    Task CleanupExpiredRecordsAsync(
+        int retentionDays,
+        CancellationToken cancellationToken = default
+    );
 }

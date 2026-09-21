@@ -79,12 +79,12 @@ public class AccountDomainService(
         if (apiResponse.Code == 0)
         {
             logger.LogDebug("请求本日任务完成状态成功");
-            result = apiResponse.Data;
+            result = apiResponse.Data ?? result;
         }
         else
         {
             logger.LogWarning("获取今日任务完成状态失败：{result}", apiResponse.ToJsonStr());
-            result = (await apiApi.GetDailyTaskRewardInfoAsync(ck.ToString())).Data;
+            result = (await apiApi.GetDailyTaskRewardInfoAsync(ck.ToString())).Data ?? result;
             //todo:偶发性请求失败，再请求一次，这么写很丑陋，待用polly再框架层面实现
         }
 
@@ -129,9 +129,23 @@ public class AccountDomainService(
         //从最后一页开始获取
         var req = new GetSpecialFollowingsRequest(long.Parse(ck.UserId), tagId.Value)
         {
-            pn = totalPage,
+            Pn = totalPage,
         };
-        List<UpInfoDto> followings = (await apiApi.GetFollowingsByTag(req, ck.ToString())).Data;
+        BiliApiResponse<List<UpInfoDto>> followingsResponse = await apiApi.GetFollowingsByTag(
+            req,
+            ck.ToString()
+        );
+        if (followingsResponse.Code != 0 || followingsResponse.Data is null)
+        {
+            logger.LogWarning(
+                "获取分组下的up失败：{message}({code})",
+                followingsResponse.Message,
+                followingsResponse.Code
+            );
+            return;
+        }
+
+        List<UpInfoDto> followings = followingsResponse.Data;
         followings.Reverse();
 
         var targetList = new List<UpInfoDto>();
@@ -151,8 +165,8 @@ public class AccountDomainService(
                 pn -= 1;
                 if (pn <= 0)
                     break;
-                req.pn = pn;
-                followings = (await apiApi.GetFollowingsByTag(req, ck.ToString())).Data;
+                req.Pn = pn;
+                followings = (await apiApi.GetFollowingsByTag(req, ck.ToString())).Data ?? [];
                 followings.Reverse();
             }
         }

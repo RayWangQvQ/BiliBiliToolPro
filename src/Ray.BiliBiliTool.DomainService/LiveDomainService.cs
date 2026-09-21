@@ -93,6 +93,16 @@ public class LiveDomainService(
         BiliApiResponse<LiveWalletStatusResponse> queryStatus = await liveApi.GetLiveWalletStatus(
             ck.ToString()
         );
+        if (queryStatus.Code != 0 || queryStatus.Data is null)
+        {
+            logger.LogWarning(
+                "获取直播钱包信息失败：{message}({code})",
+                queryStatus.Message,
+                queryStatus.Code
+            );
+            return false;
+        }
+
         logger.LogInformation("【银瓜子余额】 {silver}", queryStatus.Data.Silver);
         logger.LogInformation("【硬币余额】 {coin}", queryStatus.Data.Coin);
         logger.LogInformation("【今日剩余兑换次数】 {left}", queryStatus.Data.Silver_2_coin_left);
@@ -134,7 +144,20 @@ public class LiveDomainService(
         }
 
         //获取直播的分区
-        List<AreaDto> areaList = (await liveApi.GetAreaList(ck.ToString())).Data.Data;
+        BiliApiResponse<GetArteaListResponse> areaResponse = await liveApi.GetAreaList(
+            ck.ToString()
+        );
+        if (areaResponse.Code != 0 || areaResponse.Data?.Data is null)
+        {
+            logger.LogWarning(
+                "获取直播分区失败：{message}({code})",
+                areaResponse.Message,
+                areaResponse.Code
+            );
+            return;
+        }
+
+        List<AreaDto> areaList = areaResponse.Data.Data;
 
         //遍历分区
         int count = 0;
@@ -155,7 +178,21 @@ public class LiveDomainService(
                     page = i,
                     wts = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
                 };
-                var reData = (await liveApi.GetList(request, ck.ToString())).Data;
+                BiliApiResponse<GetListResponse> listResponse = await liveApi.GetList(
+                    request,
+                    ck.ToString()
+                );
+                if (listResponse.Code != 0 || listResponse.Data is null)
+                {
+                    logger.LogWarning(
+                        "获取分区直播间列表失败：{message}({code})",
+                        listResponse.Message,
+                        listResponse.Code
+                    );
+                    return;
+                }
+
+                var reData = listResponse.Data;
 
                 foreach (var item in reData.List)
                 {
@@ -198,7 +235,7 @@ public class LiveDomainService(
                 return;
             }
 
-            CheckTianXuanDto check = (
+            CheckTianXuanDto? check = (
                 await liveApi.CheckTianXuan(target.Roomid, ck.ToString())
             ).Data;
 
@@ -337,7 +374,7 @@ public class LiveDomainService(
             new GetFollowingsRequest(long.Parse(ck.UserId), FollowingsOrderType.TimeDesc),
             ck.ToString()
         );
-        return followings.Data.List.FirstOrDefault()?.Mid ?? 0;
+        return followings.Data?.List.FirstOrDefault()?.Mid ?? 0;
     }
 
     /// <summary>
@@ -354,7 +391,7 @@ public class LiveDomainService(
             ck.ToString()
         );
 
-        foreach (UpInfoDto item in followings.Data.List)
+        foreach (UpInfoDto item in followings.Data?.List ?? [])
         {
             if (item.Mid == _lastFollowUpId)
             {
@@ -385,7 +422,7 @@ public class LiveDomainService(
         long groupId = 0;
         string referer = string.Format(RelationApiConstant.GetTagsReferer, ck.UserId);
         var groups = await apiApi.GetTags(ck.ToString(), referer);
-        var tianXuanGroup = groups.Data!.FirstOrDefault(x => x.Name == "天选时刻");
+        var tianXuanGroup = groups.Data?.FirstOrDefault(x => x.Name == "天选时刻");
         if (tianXuanGroup == null)
         {
             logger.LogInformation("“天选时刻”分组不存在，尝试创建...");
@@ -394,6 +431,16 @@ public class LiveDomainService(
                 new CreateTagRequest { Tag = "天选时刻", Csrf = ck.BiliJct },
                 ck.ToString()
             );
+            if (createRe.Code != 0 || createRe.Data is null)
+            {
+                logger.LogWarning(
+                    "创建“天选时刻”分组失败：{message}({code})",
+                    createRe.Message,
+                    createRe.Code
+                );
+                return 0;
+            }
+
             groupId = createRe.Data.Tagid;
             logger.LogInformation("创建成功");
         }
@@ -428,7 +475,7 @@ public class LiveDomainService(
             var req = new GetSpaceInfoDto() { mid = liveHostUserId };
 
             var spaceInfo = await apiApi.GetSpaceInfo(req, ck.ToString());
-            if (spaceInfo.Code != 0)
+            if (spaceInfo.Code != 0 || spaceInfo.Data is null)
             {
                 logger.LogError("【获取直播间信息】失败");
                 logger.LogError("【原因】{message}", spaceInfo.Message);
@@ -649,7 +696,7 @@ public class LiveDomainService(
         logger.LogInformation("【获取直播列表】获取拥有粉丝牌的直播列表");
         var medalWallInfo = await liveApi.GetMedalWall(ck.UserId, ck.ToString());
 
-        if (medalWallInfo.Code != 0)
+        if (medalWallInfo.Code != 0 || medalWallInfo.Data is null)
         {
             logger.LogError("【获取直播列表】失败");
             logger.LogError("【原因】{message}", medalWallInfo.Message);
@@ -674,7 +721,7 @@ public class LiveDomainService(
             var req = new GetSpaceInfoDto() { mid = liveHostUserId };
 
             var spaceInfo = await apiApi.GetSpaceInfo(req, ck.ToString());
-            if (spaceInfo.Code != 0)
+            if (spaceInfo.Code != 0 || spaceInfo.Data is null)
             {
                 logger.LogError("【获取空间信息】失败");
                 logger.LogError("【原因】{message}", spaceInfo.Message);

@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
-
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
@@ -25,5 +24,4 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Ray.BiliBiliTool.Web\Ray.BiliBiliTool.Web.csproj" />
   </ItemGroup>
-
 </Project>

@@ -32,7 +32,7 @@ public class VipBigPointDomainService(
             new GetCombineRequest { csrf = ck.BiliJct, buvid = ck.Buvid },
             ck.ToString()
         );
-        if (allTasks.Code != 0)
+        if (allTasks.Code != 0 || allTasks.Data is null)
             throw new BiliBusinessException(allTasks.ToJsonStr());
         return allTasks.Data;
     }
@@ -43,7 +43,7 @@ public class VipBigPointDomainService(
     public async Task VipExpressAsync(BiliCookie ck)
     {
         var re = await apiApi.GetVouchersInfoAsync(ck.ToString());
-        if (re.Code == 0)
+        if (re.Code == 0 && re.Data is not null)
         {
             var state = re.Data.List.Find(x => x.Type == 9)?.State;
 
@@ -101,7 +101,7 @@ public class VipBigPointDomainService(
             new ThreeDaySignRequest { csrf = ck.BiliJct },
             ck.ToString()
         );
-        if (signInfo.Data.three_day_sign.signed)
+        if (signInfo.Data?.three_day_sign.signed == true)
         {
             logger.LogInformation("已完成，跳过");
             logger.LogInformation(signInfo.Data.ToString());
@@ -113,7 +113,7 @@ public class VipBigPointDomainService(
             new Sign2Request(),
             ck.ToString()
         );
-        if (re.Code != 0)
+        if (re.Code != 0 || re.Data is null)
             throw new BiliBusinessException(re.ToJsonStr());
 
         logger.LogInformation("签到成功");
@@ -123,7 +123,7 @@ public class VipBigPointDomainService(
             new ThreeDaySignRequest { csrf = ck.BiliJct },
             ck.ToString()
         );
-        signInfo.Data.LogPointInfo(logger);
+        signInfo.Data?.LogPointInfo(logger);
     }
 
     /// <summary>
@@ -305,23 +305,23 @@ public class VipBigPointDomainService(
         // 观看该视频
         var request = new UploadVideoHeartbeatRequest()
         {
-            aid = long.Parse(videoInfo.Aid),
-            bvid = videoInfo.Bvid,
-            cid = videoInfo.Cid,
-            mid = long.Parse(ck.UserId),
-            sid = randomSsid,
-            epid = res.Value.Item2,
-            csrf = ck.BiliJct,
-            type = 4,
-            sub_type = 1,
-            start_ts = DateTime.Now.ToTimeStamp() - playedTime,
-            played_time = playedTime,
-            realtime = playedTime,
-            real_played_time = playedTime,
+            Aid = long.Parse(videoInfo.Aid),
+            Bvid = videoInfo.Bvid,
+            Cid = videoInfo.Cid,
+            Mid = long.Parse(ck.UserId),
+            Sid = randomSsid,
+            Epid = res.Value.Item2,
+            Csrf = ck.BiliJct,
+            Type = 4,
+            Sub_type = 1,
+            Start_ts = DateTime.Now.ToTimeStamp() - playedTime,
+            Played_time = playedTime,
+            Realtime = playedTime,
+            Real_played_time = playedTime,
         };
         BiliApiResponse apiResponse = await apiApi.UploadVideoHeartbeat(
-            request.aid,
-            request.played_time,
+            request.Aid,
+            request.Played_time,
             request,
             ck.ToString()
         );

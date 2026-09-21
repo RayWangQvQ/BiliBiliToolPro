@@ -206,8 +206,7 @@ else
         var result = await dialog.Result;
         if (!result.Canceled && result.Data is string cookieStr)
         {
-            await Workflow.AddAsync(cookieStr);
-            await LoadAccounts();
+            await SaveAsync("Account added", () => Workflow.AddAsync(cookieStr));
         }
     }
 
@@ -228,8 +227,7 @@ else
         var result = await dialog.Result;
         if (!result.Canceled && result.Data is string newCookieStr)
         {
-            await Workflow.UpdateAsync(account.Index, newCookieStr);
-            await LoadAccounts();
+            await SaveAsync("Account updated", () => Workflow.UpdateAsync(account.Index, newCookieStr));
         }
     }
 
@@ -240,20 +238,32 @@ else
         var result = await dialog.Result;
         if (!result.Canceled)
         {
-            await Workflow.DeleteAsync(account.Index);
-            await LoadAccounts();
+            await SaveAsync("Account deleted", () => Workflow.DeleteAsync(account.Index));
         }
     }
 
     private async Task MoveUp(BiliAccountDto account)
     {
-        await Workflow.ReorderAsync(account.Index, account.Index - 1);
-        await LoadAccounts();
+        await SaveAsync("Account moved up", () => Workflow.ReorderAsync(account.Index, account.Index - 1));
     }
 
     private async Task MoveDown(BiliAccountDto account)
     {
-        await Workflow.ReorderAsync(account.Index, account.Index + 1);
+        await SaveAsync("Account moved down", () => Workflow.ReorderAsync(account.Index, account.Index + 1));
+    }
+
+    private async Task SaveAsync(string successMessage, Func<Task> action)
+    {
+        try
+        {
+            await action();
+            Snackbar.Add(successMessage, Severity.Success);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+
         await LoadAccounts();
     }
 }

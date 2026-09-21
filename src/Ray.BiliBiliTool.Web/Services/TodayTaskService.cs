@@ -14,10 +14,12 @@ using Ray.BiliBiliTool.Web.Services.Pages.BiliAccount;
 namespace Ray.BiliBiliTool.Web.Services;
 
 /// <summary>
-/// 「今日任务」页面的查询与补做编排。判定规则见 docs/superpowers/specs 下的设计规格。
+/// 「今日任务」页面的查询与补做编排。
 ///
 /// 性能约定：账号列表、执行记录、到点判定全部来自本地（配置 / 数据库 / Quartz），
 /// 不发任何网络请求；B 站状态只在 <c>includeBili: true</c> 时并发补查，并有缓存与超时。
+///
+/// 状态判定规则见 <see cref="TaskStatusEvaluator"/>，到点计算见 <see cref="TaskDueTimeCalculator"/>。
 /// </summary>
 public class TodayTaskService(
     CookieStrFactory<BiliCookie> cookieStrFactory,
@@ -443,7 +445,63 @@ public class TodayTaskService(
         root.Reload();
 
         // 间隔小时数变了要重建 Quartz 触发器
-        await AutoRecoverJob.RescheduleAsync(schedulerFactory);
+        await RescheduleAutoRecoverAsync();
+    }
+
+    /// <summary>
+    /// 按当前配置重建自动补做的触发器（间隔小时数变了要重新调度）。
+    /// </summary>
+    private async Task RescheduleAutoRecoverAsync()
+    {
+        try
+        {
+            var intervalHours = Math.Clamp(
+                configuration.GetValue("AutoRecoverConfig:IntervalHours", 2),
+                1,
+                24
+            );
+            var scheduler = await schedulerFactory.GetScheduler();
+            var triggerKey = AutoRecoverJob.TriggerKeyValue;
+            if (!await scheduler.CheckExists(triggerKey))
+            {
+                return;
+            }
+
+            var newTrigger = TriggerBuilder
+                .Create()
+                .WithIdentity(triggerKey)
+                .ForJob(AutoRecoverJob.Key)
+                .StartAt(DateTimeOffset.UtcNow.AddMinutes(1))
+                .WithSimpleSchedule(x => x.WithIntervalInHours(intervalHours).RepeatForever())
+                .Build();
+
+            await scheduler.RescheduleJob(triggerKey, newTrigger);
+        }
+        catch (Exception ex)
+        {
+            // 重新调度失败不影响已保存的配置；下次重启会按新值启动
+            logger.LogWarning(ex, "重建自动补做触发器失败");
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task CleanupExpiredRecordsAsync(
+        int retentionDays,
+        CancellationToken cancellationToken = default
+    )
+    {
+        try
+        {
+            var cutoff = DateTimeOffset.UtcNow.AddDays(-Math.Clamp(retentionDays, 1, 90));
+            await using var db = await dbContextFactory.CreateDbContextAsync(cancellationToken);
+            await db
+                .TaskRecords.Where(r => r.CreatedAtUtc < cutoff)
+                .ExecuteDeleteAsync(cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "清理过期的任务执行记录失败");
+        }
     }
 
     private static string Describe(TodayTaskItemState state) =>

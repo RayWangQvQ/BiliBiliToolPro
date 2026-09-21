@@ -1,0 +1,81 @@
+name: Publish preview image
+
+on:
+  push:
+    branches: [develop]
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+
+permissions:
+  contents: read
+  packages: write
+
+# 必须串行：alpha 序号由已有 tag 推导，两个并发 run 会算出同一个号
+concurrency:
+  group: preview-image-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  DOCKER_IMG_NAME: zai7lou/bili_tool_web
+  GHCR_IMG_NAME: ghcr.io/raywangqvq/bili_tool_web
+
+jobs:
+  decide:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      suffix: ${{ steps.version.outputs.suffix }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - id: version
+        run: |
+          version=$(bash ./scripts/version.sh preview-tag)
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "suffix=${version#*-}" >> "$GITHUB_OUTPUT"
+          echo "预览版本：$version"
+
+  preview:
+    needs: decide
+    # 同 release.yml：自定义 if 顶掉隐式 success()，需显式判 needs 结果
+    if: needs.decide.result == 'success' && needs.decide.outputs.version != 'SKIP'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/setup-qemu-action@v3
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          platforms: linux/amd64,linux/arm64
+          build-args: |
+            VERSION_SUFFIX=${{ needs.decide.outputs.suffix }}
+          tags: |
+            ${{ env.DOCKER_IMG_NAME }}:${{ needs.decide.outputs.version }}
+            ${{ env.DOCKER_IMG_NAME }}:develop
+            ${{ env.GHCR_IMG_NAME }}:${{ needs.decide.outputs.version }}
+            ${{ env.GHCR_IMG_NAME }}:develop
+          cache-from: type=gha,scope=preview
+          cache-to: type=gha,scope=preview,mode=max

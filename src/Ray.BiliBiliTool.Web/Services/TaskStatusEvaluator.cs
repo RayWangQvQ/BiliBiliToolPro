@@ -4,7 +4,7 @@ namespace Ray.BiliBiliTool.Web.Services;
 
 /// <summary>
 /// 单个检查项的状态判定。纯逻辑、无 IO。
-/// 判定优先级见规格 §5.2：
+/// 判定优先级（自上而下，先命中先返回）：
 /// 已关闭 → 本日无需执行 → 等待执行 → 状态未知 → 已完成 → 分享特例 → 已达重试上限 → 失败 → 未执行
 /// </summary>
 public static class TaskStatusEvaluator
@@ -93,7 +93,7 @@ public static class TaskStatusEvaluator
     /// <summary>
     /// 是否允许「自动补做」。
     /// 除了状态本身要是未执行/失败之外，分享必须排除：B 站对该接口恒返回 -403（已实测连续 13 天
-    /// 100% 失败），自动重试纯属浪费，规格 §5.4 规定它只允许手动补做。
+    /// 100% 失败），自动重试纯属浪费，因此只允许手动补做。
     /// </summary>
     public static bool CanAutoRedo(TodayTaskItemContext ctx, TodayTaskItemResult result) =>
         result.State is TodayTaskItemState.NotDone or TodayTaskItemState.Failed

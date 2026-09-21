@@ -6,9 +6,7 @@ namespace Ray.BiliBiliTool.Agent.Baihu;
 public interface IBaihuApi
 {
     [Get("/open2api/v1/env/all")]
-    Task<BaihuGenericResponse<List<BaihuEnv>>> GetEnvsAsync(
-        [Header("Authorization")] string token
-    );
+    Task<BaihuGenericResponse<List<BaihuEnv>>> GetEnvsAsync([Header("Authorization")] string token);
 
     [Post("/open2api/v1/env")]
     Task<BaihuGenericResponse<BaihuEnv>> AddEnvAsync(

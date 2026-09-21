@@ -164,7 +164,7 @@ public class DonateCoinDomainService(
         {
             var request = new AddCoinRequest(video.Aid, ck.BiliJct)
             {
-                select_like = select_like ? 1 : 0,
+                Select_like = select_like ? 1 : 0,
             };
             var referer =
                 $"https://www.bilibili.com/video/{video.Bvid}/?spm_id_from=333.1007.tianma.1-1-1.click&vd_source=80c1601a7003934e7a90709c18dfcffd";
@@ -285,6 +285,12 @@ public class DonateCoinDomainService(
             request,
             ck.ToString()
         );
+        if (result.Code != 0 || result.Data is null)
+        {
+            logger.LogWarning("获取关注列表失败：{message}({code})", result.Message, result.Code);
+            return null;
+        }
+
         if (result.Data.Total == 0)
             return null;
 
@@ -402,14 +408,22 @@ public class DonateCoinDomainService(
             //获取已投币数量
             if (!_alreadyDonatedCoinCountCatch.TryGetValue(aid, out int multiply))
             {
-                multiply = (
+                BiliApiResponse<DonatedCoinsForVideo> donatedRe =
                     await apiApi.GetDonatedCoinsForVideo(
                         new GetAlreadyDonatedCoinsRequest(long.Parse(aid)),
                         ck.ToString()
-                    )
-                )
-                    .Data
-                    .Multiply;
+                    );
+                if (donatedRe.Code != 0 || donatedRe.Data is null)
+                {
+                    logger.LogWarning(
+                        "获取视频已投币数失败：{message}({code})",
+                        donatedRe.Message,
+                        donatedRe.Code
+                    );
+                    return false;
+                }
+
+                multiply = donatedRe.Data.Multiply;
                 _alreadyDonatedCoinCountCatch.TryAdd(aid, multiply);
             }
 

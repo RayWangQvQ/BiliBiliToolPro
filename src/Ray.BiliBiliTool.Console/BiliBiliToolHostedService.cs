@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Application.Contracts;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.Serilog.Sinks.Batched;
+using AppVersion = Ray.BiliBiliTool.Config.AppVersion;
 using Constants = Ray.BiliBiliTool.Config.Constants;
 
 namespace Ray.BiliBiliTool.Console;
@@ -145,7 +146,7 @@ public class BiliBiliToolHostedService(
         logger.LogInformation(Environment.NewLine + "========================");
         logger.LogInformation(
             "v{version} 开源 by {url}",
-            typeof(Program).Assembly.GetName().Version?.ToString(),
+            AppVersion.InformationalOf(typeof(Program).Assembly),
             Constants.SourceCodeUrl + Environment.NewLine
         );
         //_logger.LogInformation("【当前IP】{ip} ", IpHelper.GetIp());

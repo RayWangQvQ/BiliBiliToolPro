@@ -35,6 +35,6 @@ public class AccountApiTests
 
         // Assert
         re.Code.Should().Be(0);
-        re.Data.Money.Should().NotBeNull();
+        re.Data!.Money.Should().NotBeNull();
     }
 }

@@ -32,7 +32,7 @@ namespace BiliAgentTest
 
             Assert.Equal(0, re.Code);
             Assert.Equal("0", re.Message);
-            Assert.Equal(60, re.Data.Next_interval);
+            Assert.Equal(60, re.Data!.Next_interval);
         }
     }
 }

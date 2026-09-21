@@ -14,7 +14,8 @@ public class UnfollowBatchedTaskOptions : BaseConfigOptions
     public List<string> RetainUidList =>
         RetainUids
             ?.Split(",", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
-            .ToList() ?? new List<string>();
+            .ToList()
+        ?? new List<string>();
 
     public override Dictionary<string, string> ToConfigDictionary()
     {
