@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Close Stale Issues
-        uses: actions/stale@v5
+        uses: actions/stale@v11
         with:
           days-before-stale: 3 # 3 天不活跃后标记Stale
           days-before-close: 3 # 标记Stale后3天不活跃则关闭问题
