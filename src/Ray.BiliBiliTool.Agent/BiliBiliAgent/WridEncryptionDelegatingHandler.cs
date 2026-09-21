@@ -55,7 +55,11 @@ public class WridEncryptionDelegatingHandler(IWbiService wbiService) : Delegatin
             paramsToSign[key!] = formData[key] ?? "";
         }
 
-        if (paramsToSign.All(x => x.Key != "w_rid"))
+        // 用 wts 判断是否需要签名，不能用 w_rid：
+        // w_rid 是可空引用类型，值为 null 时 Refit 会直接把它从查询串里丢掉，
+        // 于是这里永远判断为「不需要签名」，请求就变成未签名，B站一律回 -403。
+        // wts 是 long（非空值类型），一定会出现在查询串里，可稳定作为 IWrid 的标记。
+        if (paramsToSign.All(x => x.Key != "wts"))
         {
             return;
         }

@@ -812,3 +812,45 @@ BiliBiliTool 使用 Serilog 作为日志组件，所以可以参考 Serilog 的�
 | `LiveLotteryTaskConfig__Cron`     | 天选时刻抽奖 |
 | `UnfollowBatchedTaskConfig__Cron` | 批量取关   |
 | `VipBigPointConfig__Cron`         | 大会员大积分 |
+
+<a id="markdown-310-自动补做相关" name="310-自动补做相关"></a>
+### 3.10. 自动补做相关
+
+适用于 `Ray.BiliBiliTool.Web`（网页版，即 [方式四：docker容器化运行（推荐）](../docker/README.md)）。
+
+网页版的「今日任务」页面会记录每个任务每天的执行结果。当某个任务已经到点、但当天漏做了（或者做了但失败、且还没到自动重试上限）时，自动补做会把它补跑一次，不用人工去页面上点。
+
+补做按固定间隔触发，不是 cron 表达式，所以没有 `AutoRecoverConfig__Cron`。
+
+<a id="markdown-3101-是否开启自动补做" name="3101-是否开启自动补做"></a>
+#### 3.10.1. 是否开启自动补做
+
+关闭后仍然会记录任务执行结果，只是不再自动补跑。
+
+| TITLE | CONTENT |
+| ------ | ------ |
+| 配置Key | `AutoRecoverConfig__IsEnable` |
+| 值域   | [true,false] |
+| 默认值   | true |
+
+<a id="markdown-3102-检查间隔小时数" name="3102-检查间隔小时数"></a>
+#### 3.10.2. 检查间隔小时数
+
+每隔几小时检查一次是否有需要补做的任务。
+
+| TITLE | CONTENT |
+| ------ | ------ |
+| 配置Key | `AutoRecoverConfig__IntervalHours` |
+| 值域   | [1,24] |
+| 默认值   | 2 |
+
+<a id="markdown-3103-执行记录保留天数" name="3103-执行记录保留天数"></a>
+#### 3.10.3. 执行记录保留天数
+
+任务执行记录（「今日任务」页面展示的数据）保留多少天，超期的记录会被自动清理。
+
+| TITLE | CONTENT |
+| ------ | ------ |
+| 配置Key | `AutoRecoverConfig__RecordRetentionDays` |
+| 值域   | [1,90] |
+| 默认值   | 3 |

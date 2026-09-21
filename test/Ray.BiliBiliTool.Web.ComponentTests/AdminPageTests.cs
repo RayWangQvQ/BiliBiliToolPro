@@ -62,7 +62,7 @@ public class AdminPageTests : TestContext
 
         await cut.Find("button.mud-button-filled").ClickAsync(new());
 
-        cut.Markup.Should().Contain("Logout");
+        cut.Markup.Should().Contain("退出登录");
         cut.Markup.Should().Contain("Password updated successfully.");
     }
 

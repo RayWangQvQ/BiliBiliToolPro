@@ -54,4 +54,14 @@ public interface IVideoDomainService : IDomainService
     /// <param name="aid"></param>
     /// <param name="dailyTaskStatus"></param>
     Task ShareVideo(VideoInfoDto videoInfo, BiliCookie ck);
+
+    /// <summary>
+    /// 取一个用于观看/分享的随机视频（「今日任务」页面补做单项时使用）
+    /// </summary>
+    Task<VideoInfoDto> GetRandomVideoForWatchAndShare(BiliCookie ck);
+
+    /// <summary>
+    /// 打开视频（上报一次播放进度，补做分享前使用）
+    /// </summary>
+    Task<bool> OpenVideo(VideoInfoDto videoInfo, BiliCookie ck);
 }

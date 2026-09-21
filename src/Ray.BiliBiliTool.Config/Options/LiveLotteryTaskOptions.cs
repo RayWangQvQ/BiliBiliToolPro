@@ -11,12 +11,14 @@ public class LiveLotteryTaskOptions : BaseConfigOptions
     public List<string> IncludeAwardNameList =>
         IncludeAwardNames
             ?.Split("|", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
-            .ToList() ?? new List<string>();
+            .ToList()
+        ?? new List<string>();
 
     public List<string> ExcludeAwardNameList =>
         ExcludeAwardNames
             ?.Split("|", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
-            .ToList() ?? new List<string>();
+            .ToList()
+        ?? new List<string>();
 
     public bool AutoGroupFollowings { get; set; } = true;
 
@@ -25,7 +27,8 @@ public class LiveLotteryTaskOptions : BaseConfigOptions
     public List<string> DenyUidList =>
         DenyUids
             ?.Split(",", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
-            .ToList() ?? new List<string>();
+            .ToList()
+        ?? new List<string>();
 
     public override Dictionary<string, string> ToConfigDictionary()
     {

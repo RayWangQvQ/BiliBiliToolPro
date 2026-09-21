@@ -1,0 +1,107 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+# main 的一次合并 = 一次正式发布。串行，避免并发算出同一个版本号。
+concurrency:
+  group: release-main
+  cancel-in-progress: false
+
+permissions:
+  contents: write # 建 tag 和 GitHub Release
+  packages: write # 推 GHCR
+
+env:
+  DOCKER_IMG_NAME: zai7lou/bili_tool_web
+  GHCR_IMG_NAME: ghcr.io/raywangqvq/bili_tool_web
+
+jobs:
+  decide:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - id: version
+        run: |
+          bash ./scripts/version.sh check-consistency
+          version=$(bash ./scripts/version.sh release-tag)
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "发布版本：$version"
+
+  publish:
+    needs: decide
+    # 自定义 if 会顶掉隐式的 success()，所以必须显式判 needs 的结果，
+    # 否则 decide 失败时 version 为空串，!= 'SKIP' 反而为真
+    if: needs.decide.result == 'success' && needs.decide.outputs.version != 'SKIP'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Publish all runtimes
+        env:
+          RELEASE_VERSION: ${{ needs.decide.outputs.version }}
+        run: bash ./scripts/publish.sh --runtime all
+
+      - name: Collect release notes
+        run: bash ./scripts/version.sh release-notes > release_notes.md
+
+      # 已存在则更新，不报错：重跑失败的发版不会撞车
+      - name: Create GitHub Release and tag
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.decide.outputs.version }}
+          name: BiliBiliToolPro-V${{ needs.decide.outputs.version }}
+          body_path: release_notes.md
+          files: ./src/Ray.BiliBiliTool.Console/bin/Publish/*.zip
+          discussion_category_name: Announcements
+          make_latest: "true"
+          fail_on_unmatched_files: true
+
+  image:
+    needs: [decide, publish]
+    if: needs.publish.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/setup-qemu-action@v3
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: |
+            ${{ env.DOCKER_IMG_NAME }}:${{ needs.decide.outputs.version }}
+            ${{ env.DOCKER_IMG_NAME }}:latest
+            ${{ env.GHCR_IMG_NAME }}:${{ needs.decide.outputs.version }}
+            ${{ env.GHCR_IMG_NAME }}:latest
+          cache-from: type=gha,scope=release
+          cache-to: type=gha,scope=release,mode=max

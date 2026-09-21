@@ -11,5 +11,9 @@ README.md
 
 Dockerfile
 
-[b|B]in
-[O|o]bj
+# .claude 存放 AI 会话工作树（内含完整仓库副本与编译产物），不能复制进镜像
+.claude
+
+# 注意：.dockerignore 的普通模式只匹配构建上下文根目录，只有加 **/ 才能递归匹配子目录
+**/[bB]in
+**/[oO]bj

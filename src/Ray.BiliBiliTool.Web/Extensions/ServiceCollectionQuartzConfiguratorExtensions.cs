@@ -110,6 +110,21 @@ public static class ServiceCollectionQuartzConfiguratorExtensions
             configuration
         );
 
+        // 自动补做 job：固定间隔触发（不是 Cron），用于补跑今天漏做的任务
+        var autoRecoverInterval = Math.Clamp(
+            configuration.GetValue("AutoRecoverConfig:IntervalHours", 2),
+            1,
+            24
+        );
+
+        quartz.AddJob<AutoRecoverJob>(opts => opts.WithIdentity(AutoRecoverJob.Key));
+        quartz.AddTrigger(opts =>
+            opts.ForJob(AutoRecoverJob.Key)
+                .WithIdentity(AutoRecoverJob.TriggerKeyValue)
+                .StartAt(DateTimeOffset.UtcNow.AddMinutes(1))
+                .WithSimpleSchedule(x => x.WithIntervalInHours(autoRecoverInterval).RepeatForever())
+        );
+
         // Test bili job
         AddBiliJob<TestBiliJob>(quartz, TestBiliJob.Key, null, configuration);
 

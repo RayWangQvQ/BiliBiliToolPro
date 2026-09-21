@@ -11,10 +11,10 @@ echo ' |____/|_|_|_| |_|\___/ \___/|_| '
 echo ''
 
 # ------------vars-----------
-repoDir=$(dirname $PWD)
+repoDir=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 consoleDir=$repoDir/src/Ray.BiliBiliTool.Console
 publishDir=$consoleDir/bin/Publish
-version=""
+version="${RELEASE_VERSION:-}"
 runTime=""
 # --------------------------
 
@@ -45,23 +45,19 @@ read_var_from_user() {
 }
 
 get_version() {
-    version=$(grep -oP '(?<=<Version>).*?(?=<\/Version>)' $repoDir/common.props)
+    # CI 通过 RELEASE_VERSION 传入；本地直接运行时回落到 common.props 的前缀。
+    # 用 bash 显式调用：.sh 提交为 mode 100644，直接执行在 Linux 上是 Permission denied
+    [ -n "$version" ] || version=$(bash "$repoDir/scripts/version.sh" prefix)
     echo -e "current version: $version \n\n"
 
     mkdir -p $publishDir
-
-    # 将版本号保存到文件
-    echo "$version" > "$publishDir/version.txt"
-
-    echo "Version saved to $publishDir/version.txt"
 }
 
 extract_release_notes() {
     echo "Extracting release notes from CHANGELOG.md..."
     mkdir -p $publishDir
 
-    # 提取最新的 changelog (从第一个 ## 标题到下一个 ## 标题之间的所有内容)
-    sed -n '/^## /{p;:a;n;/^## /q;p;ba}' "$repoDir/CHANGELOG.md" > "$publishDir/release_notes.md"
+    bash "$repoDir/scripts/version.sh" release-notes > "$publishDir/release_notes.md"
 
     echo "Release notes saved to $publishDir/release_notes.md"
 }
