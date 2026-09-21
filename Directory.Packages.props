@@ -61,7 +61,7 @@
     <PackageVersion Include="Ray.Serilog.Sinks.WorkWeiXinAppBatched" Version="0.1.5" />
     <PackageVersion Include="Ray.Serilog.Sinks.WorkWeiXinBatched" Version="0.1.5" />
     <!-- Quartz -->
-    <PackageVersion Include="Quartz" Version="3.14.0" />
+    <PackageVersion Include="Quartz" Version="4.1.1" />
     <PackageVersion Include="Quartz.AspNetCore" Version="3.14.0" />
     <PackageVersion Include="Quartz.Serialization.SystemTextJson" Version="3.14.0" />
     <PackageVersion Include="AppAny.Quartz.EntityFrameworkCore.Migrations.SQLite" Version="0.6.0" />
