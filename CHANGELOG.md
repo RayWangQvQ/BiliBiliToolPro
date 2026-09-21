@@ -1,3 +1,5 @@
+## 4.0.4
+- 升级 GitHub Actions
 ## 4.0.3
 - Feature[#1106]: Web 新增「今日任务」页面：逐账号列出每个任务今天该不该做、做了没有，并提供单项/整账号/全部补做
 - Feature[#1106]: 漏做的任务可自动补做，间隔与记录保留天数由 `AutoRecoverConfig` 配置（默认每 2 小时检查一次，文档见 `docs/configuration.md`）
