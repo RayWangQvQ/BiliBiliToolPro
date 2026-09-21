@@ -12,6 +12,7 @@ concurrency:
 permissions:
   contents: write # 建 tag 和 GitHub Release
   packages: write # 推 GHCR
+  discussions: write # 发版时自动开 Discussion
 
 env:
   DOCKER_IMG_NAME: zai7lou/bili_tool_web
