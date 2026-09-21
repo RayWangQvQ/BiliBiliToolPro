@@ -1,10 +1,4 @@
 ## 4.0.3
-- 重构 GitHub Actions：新增 `ci.yml`（PR 必跑版本一致性校验、构建、离线单测、镜像试构建）、`preview-image.yml`（合并 develop 后推送 `x.x.x-alpha.N` 预览镜像与 `:develop`）、`release.yml`（合并 main 后正式发版：打 tag、建 Release 附 zip 包、推镜像与 `:latest`），删除 `tag.yml`、`publish-image.yml`、`publish-release.yml`
-- 版本号只留在 `common.props` 的 `<VersionPrefix>`，`-alpha.N` 由 CI 依据已有 git tag 推导、不再写回文件；PR 上由 CI 评论播报合并后将生成的版本号
-- 依赖真实 B 站接口/凭据的测试标记 `[Trait("Category", "External")]`，一律不在 CI 中运行
-- Fix: 启动日志与定时任务推送里的版本号改用 InformationalVersion，预览镜像不再被显示成 `v4.0.3.0`，与镜像 tag、Release 版本保持一致
-- CI 增加代码格式门禁：`dotnet csharpier check`（版本由 `.config/dotnet-tools.json` 钉死），并把此前只被 pre-commit hook 覆盖到的范围补齐到 csproj / props / NuGet.Config，存量 11 处不合规一并格式化
-- 新增 Dependabot（github-actions + nuget，目标分支 develop）
 - Feature[#1106]: Web 新增「今日任务」页面：逐账号列出每个任务今天该不该做、做了没有，并提供单项/整账号/全部补做
 - Feature[#1106]: 漏做的任务可自动补做，间隔与记录保留天数由 `AutoRecoverConfig` 配置（默认每 2 小时检查一次，文档见 `docs/configuration.md`）
 - Feature[#1106]: Web 界面汉化（导航、首页、账号页、计划任务、日志/历史对话框、登录、修改密码、错误页）
@@ -12,6 +6,8 @@
 - Fix[#1106]: 账号页 Cookie 只显示截断值，不再把完整 Cookie 写进页面 DOM
 - Fix[#1106]: WBI 签名判定误用 `w_rid`（该字段为空时被 Refit 从查询串丢弃，导致签名从未生效），改用必然存在的 `wts` 判定
 - Fix[#1106]: 今日任务的到点计算改为按传入时刻的时区求值，不再依赖宿主机时区（原先在 UTC 机器上判为「本日无需执行」）
+- 重构 GitHub Actions
+- 新增 Dependabot（github-actions + nuget，目标分支 develop）
 ## 4.0.2
 - 升级到dotnet10
 - Fix[#1104]: WebApiClientCore 迁移到 Refit 后，参数首字母变为大写导致调用失败，现统一还原，并补充回归测试
