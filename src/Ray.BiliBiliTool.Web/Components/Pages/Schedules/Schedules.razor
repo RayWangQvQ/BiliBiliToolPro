@@ -7,10 +7,10 @@
 @using Microsoft.AspNetCore.Authorization
 @using Ray.BiliBiliTool.Web.Extensions
 
-<PageTitle>Schedules</PageTitle>
+<PageTitle>计划任务</PageTitle>
 
 <div>
-    <MudText Typo="Typo.h5">Schedules</MudText>
+    <MudText Typo="Typo.h5">计划任务</MudText>
 
     <MudDataGrid @ref="_scheduleDataGrid" Items="@ScheduledJobs"
                  MultiSelection="true" Filterable="false"
@@ -33,7 +33,7 @@
         <Columns>
             <SelectColumn T="ScheduleModel" ShowInFooter="false"/>
 
-            <PropertyColumn Title="Job Group" Property="x => x.JobGroup"
+            <PropertyColumn Title="任务分组" Property="x => x.JobGroup"
                             Grouping="true" Hidden="true" ShowColumnOptions="false" GroupBy="@_groupDefinition">
                 <GroupTemplate>
                     <span style="font-weight:bold">
@@ -43,7 +43,7 @@
                 </GroupTemplate>
             </PropertyColumn>
 
-            <TemplateColumn Title="Status" Filterable="false" Groupable="false"
+            <TemplateColumn Title="状态" Filterable="false" Groupable="false"
                             HeaderStyle="text-align: center;padding: 0px"
                             CellStyle="text-align: center;padding: 0px"
                             Sortable="false"
@@ -60,19 +60,19 @@
                         case JobStatus.Idle:
                             <MudIcon Icon="@Icons.Material.Filled.Circle" Class="green-text"
                                      Style="vertical-align: middle;"
-                                     Title="Idle"
+                                     Title="空闲"
                                      Size="Size.Medium"/>
                             break;
                         case JobStatus.Paused:
                             <MudIcon Icon="@Icons.Material.Filled.Circle" Class="grey-text"
                                      Style="vertical-align: middle;"
-                                     Title="Paused"
+                                     Title="已暂停"
                                      Size="Size.Medium"/>
                             break;
                         case JobStatus.NoSchedule:
                             <MudIcon Icon="@Icons.Material.Filled.AutoDelete" Class="grey-text"
                                      Style="vertical-align: middle;"
-                                     Title="Schedule completed and job got deleted"
+                                     Title="计划已完成，任务已被删除"
                                      Size="Size.Small"/>
                             break;
                         case JobStatus.Error:
@@ -100,20 +100,20 @@
                         case JobStatus.NoTrigger:
                             <MudIcon Icon="@Icons.Material.Filled.AlarmOff" Class="grey-text"
                                      Style="vertical-align: middle;"
-                                     Title="No trigger"
+                                     Title="无触发器"
                                      Size="Size.Small"/>
                             break;
                     }
                 </CellTemplate>
             </TemplateColumn>
-            <PropertyColumn Title="Job Name" Property="x => x.JobName" ShowColumnOptions="false">
+            <PropertyColumn Title="任务名" Property="x => x.JobName" ShowColumnOptions="false">
                 <CellTemplate>
                     <MudTooltip Duration="1000" Text="@context.Item.JobDescription">
                         @context.Item.JobName
                     </MudTooltip>
                 </CellTemplate>
             </PropertyColumn>
-            <PropertyColumn Title="Trigger" Property="x => x.TriggerName"
+            <PropertyColumn Title="触发器" Property="x => x.TriggerName"
                             ShowColumnOptions="false">
                 <CellTemplate>
                     @if (context.Item.JobStatus == JobStatus.NoTrigger)
@@ -128,7 +128,7 @@
                     }
                 </CellTemplate>
             </PropertyColumn>
-            <PropertyColumn Title="Schedule" Property="x => x.TriggerType">
+            <PropertyColumn Title="执行计划" Property="x => x.TriggerType">
                 <CellTemplate>
                     @if (context.Item.JobStatus == JobStatus.NoTrigger)
                     {
@@ -165,14 +165,14 @@
                     }
                 </CellTemplate>
             </PropertyColumn>
-            <PropertyColumn Title="Job Type" Property="x => x.JobType">
+            <PropertyColumn Title="任务类型" Property="x => x.JobType">
                 <CellTemplate>
                     <MudTooltip Duration="1000" Text="@context.Item.JobType">
                         @context.Item.GetJobTypeShortName()
                     </MudTooltip>
                 </CellTemplate>
             </PropertyColumn>
-            <TemplateColumn Title="Next Run" Groupable="false" Filterable="false"
+            <TemplateColumn Title="下次执行" Groupable="false" Filterable="false"
                             ShowColumnOptions="false">
                 <CellTemplate>
                     @if (context.Item.JobStatus == JobStatus.NoTrigger)
@@ -185,7 +185,7 @@
                     }
                 </CellTemplate>
             </TemplateColumn>
-            <TemplateColumn Title="Last Run" Groupable="false" Filterable="false"
+            <TemplateColumn Title="上次执行" Groupable="false" Filterable="false"
                             ShowColumnOptions="false">
                 <CellTemplate>
                     <div class="d-flex gap-1">
@@ -217,7 +217,7 @@
                     </div>
                 </CellTemplate>
             </TemplateColumn>
-            <TemplateColumn Title="Actions" Groupable="false" Filterable="false" ShowColumnOptions="false"
+            <TemplateColumn Title="操作" Groupable="false" Filterable="false" ShowColumnOptions="false"
                             HeaderStyle="padding-left: 0px;"
                             CellClass="tab__actions"
                             Sortable="false">
@@ -238,8 +238,8 @@
                         {
                             <MudMenuItem Disabled="@IsRunActionDisabled(context.Item)" OnClick="@(async () => await OnResumeScheduleJob(context.Item))">
                                 <div class="d-flex gap-1">
-                                    <MudIcon Icon="@Icons.Material.Filled.PlayArrow" Title="Enable" Size="Size.Small"/>
-                                    <MudText Typo="Typo.body1">Enable</MudText>
+                                    <MudIcon Icon="@Icons.Material.Filled.PlayArrow" Title="启用" Size="Size.Small"/>
+                                    <MudText Typo="Typo.body1">启用</MudText>
                                 </div>
                             </MudMenuItem>
                         }
@@ -247,15 +247,15 @@
                         {
                             <MudMenuItem Disabled="@IsPauseActionDisabled(context.Item)" OnClick="@(async () => await OnPauseScheduleJob(context.Item))">
                                 <div class="d-flex gap-1">
-                                    <MudIcon Icon="@Icons.Material.Filled.Pause" Title="Disable" Size="Size.Small"/>
-                                    <MudText Typo="Typo.body1">Disable</MudText>
+                                    <MudIcon Icon="@Icons.Material.Filled.Pause" Title="停用" Size="Size.Small"/>
+                                    <MudText Typo="Typo.body1">停用</MudText>
                                 </div>
                             </MudMenuItem>
                         }
                         <MudMenuItem Disabled="@IsHistoryActionDisabled(context.Item)" OnClick="@(() => OnJobHistory(context.Item))">
                             <div class="d-flex gap-1">
-                                <MudIcon Icon="@Icons.Material.Filled.ListAlt" Title="History" Size="Size.Small"/>
-                                <MudText Typo="Typo.body1">History</MudText>
+                                <MudIcon Icon="@Icons.Material.Filled.ListAlt" Title="历史" Size="Size.Small"/>
+                                <MudText Typo="Typo.body1">历史</MudText>
                             </div>
                         </MudMenuItem>
                     </MudMenu>

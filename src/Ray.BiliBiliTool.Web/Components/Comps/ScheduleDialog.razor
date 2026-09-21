@@ -7,10 +7,10 @@
         <MudButtonGroup OverrideStyles="false" Class="pb-4">
             <MudButton Color="Color.Default" Size="Size.Large" DisableElevation="true"
                     Variant="@(SelectedTab == ScheduleDialogTab.Job ? Variant.Filled : Variant.Text)"
-                    OnClick="() => OnSelectedTabChanged(ScheduleDialogTab.Job)">Job Details</MudButton>
+                    OnClick="() => OnSelectedTabChanged(ScheduleDialogTab.Job)">任务详情</MudButton>
             <MudButton Color="Color.Default" Size="Size.Large" DisableElevation="true"
                     Variant="@(SelectedTab == ScheduleDialogTab.Trigger ? Variant.Filled : Variant.Text)"
-                    OnClick="() => OnSelectedTabChanged(ScheduleDialogTab.Trigger)">Trigger Details</MudButton>
+                    OnClick="() => OnSelectedTabChanged(ScheduleDialogTab.Trigger)">触发器详情</MudButton>
         </MudButtonGroup>
 
         @if (SelectedTab == ScheduleDialogTab.Job)
@@ -26,7 +26,7 @@
     <DialogActions>
         <div class="d-flex justify-space-between flex-grow-1 pa-3">
             <MudButton OnClick="OnCancel" Variant="Variant.Filled"
-                Style="width: 100px;">Cancel</MudButton>
+                Style="width: 100px;">取消</MudButton>
             <div class="d-flex gap-4">
                 <MudButton @ref="_backBtn"
                     Style="width: 100px;"
@@ -34,7 +34,7 @@
                     Color="Color.Secondary"
                     StartIcon="@Icons.Material.Filled.NavigateBefore"
                     Variant="Variant.Filled"
-                    OnClick="OnBack">Back</MudButton>
+                    OnClick="OnBack">返回</MudButton>
                 <MudButton Color="Color.Primary"
                     Style="width: 100px;"
                     OnClick="OnSubmit"

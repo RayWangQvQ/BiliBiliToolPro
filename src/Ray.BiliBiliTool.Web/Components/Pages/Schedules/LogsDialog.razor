@@ -6,7 +6,7 @@
 <MudDialog>
     <TitleContent>
         <div class="d-flex">
-            <MudText Typo="Typo.h5">Logs</MudText>
+            <MudText Typo="Typo.h5">日志</MudText>
             <MudIconButton Icon="@Icons.Material.Filled.Refresh"
                            OnClick="OnRefreshLogs" />
         </div>
@@ -14,7 +14,7 @@
     <DialogContent>
         <div class="terminal-container">
             <div class="terminal-header">
-                <div class="terminal-title">Logs Terminal</div>
+                <div class="terminal-title">日志终端</div>
                 <div class="terminal-controls">
                     <div class="control-dot dot-red"></div>
                     <div class="control-dot dot-yellow"></div>
@@ -27,8 +27,8 @@
                 {
                     <div class="log-entry">
                         <span class="log-timestamp">@DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")</span>
-                        <span class="log-level log-level-info">SYSTEM</span>
-                        <span class="log-message">Loading logs from database...</span>
+                        <span class="log-level log-level-info">系统</span>
+                        <span class="log-message">正在从数据库加载日志...</span>
                     </div>
                 }
                 else
@@ -54,7 +54,7 @@
             <div class="terminal-footer">
                 <div class="connection-status">
                     <span class="status-indicator status-connected"></span>
-                    <span>LIVE</span>
+                    <span>实时</span>
                 </div>
                 <div>
                     <MudIconButton Icon="@Icons.Material.Filled.Refresh" Color="Color.Inherit" Size="Size.Small"
@@ -63,12 +63,12 @@
                                    Class="clear-button" OnClick="ClearDisplay" />
                 </div>
                 <div>
-                    <span>Auto-refresh: 3s</span>
+                    <span>自动刷新：3 秒</span>
                 </div>
             </div>
         </div>
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="Close">Close</MudButton>
+        <MudButton OnClick="Close">关闭</MudButton>
     </DialogActions>
 </MudDialog>

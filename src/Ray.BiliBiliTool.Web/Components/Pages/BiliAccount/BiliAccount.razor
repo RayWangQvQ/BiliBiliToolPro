@@ -1,23 +1,32 @@
 @page "/BiliAccount"
 @using Microsoft.AspNetCore.Authorization
+@using Ray.BiliBiliTool.Web.Services
 @using Ray.BiliBiliTool.Web.Services.Pages.BiliAccount
 @using Ray.BiliBiliTool.Web.Components.Pages.BiliAccount
 @rendermode InteractiveServer
 @attribute [Authorize]
 
 @inject IBiliAccountPageWorkflow Workflow
+@inject IBiliAccountProbe Probe
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
 
-<PageTitle>Bili Account</PageTitle>
+<PageTitle>账号管理</PageTitle>
 
-<MudText Typo="Typo.h5">Bili Account</MudText>
+<MudText Typo="Typo.h5">账号管理</MudText>
+<MudText Typo="Typo.body2" Class="mud-text-secondary mb-2">
+    账号列表直接读取本地配置，打开即显示。「昵称 / 等级」需要访问 B 站，点「检测」按需获取。
+</MudText>
 
 <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add"
-           Class="mt-2 mb-2" OnClick="OpenAddDialog">Add Account</MudButton>
+           Class="mt-2 mb-2" OnClick="OpenAddDialog">添加账号</MudButton>
 
 <MudButton Variant="Variant.Outlined" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.QrCodeScanner"
-           Class="mt-2 mb-2 ml-2" OnClick="OpenQrLoginDialog">Login with QR</MudButton>
+           Class="mt-2 mb-2 ml-2" OnClick="OpenQrLoginDialog">扫码登录</MudButton>
+
+<MudButton Variant="Variant.Outlined" Color="Color.Info" StartIcon="@Icons.Material.Filled.HealthAndSafety"
+           Class="mt-2 mb-2 ml-2" Disabled="@(_accounts.Count == 0 || _probingAll)"
+           OnClick="ProbeAllAsync">检测全部账号</MudButton>
 
 @if (_loading)
 {
@@ -25,26 +34,52 @@
 }
 else if (_accounts.Count == 0)
 {
-    <MudText Typo="Typo.body1" Class="mt-4">No accounts configured.</MudText>
+    <MudText Typo="Typo.body1" Class="mt-4">还没有配置账号。</MudText>
 }
 else
 {
     <MudTable Items="_accounts" Hover="true" Striped="true" Class="mt-4">
         <HeaderContent>
             <MudTh>#</MudTh>
-            <MudTh>UserId</MudTh>
+            <MudTh>UID</MudTh>
+            <MudTh>昵称</MudTh>
+            <MudTh>等级</MudTh>
+            <MudTh>状态</MudTh>
             <MudTh>Cookie</MudTh>
-            <MudTh>Actions</MudTh>
+            <MudTh>操作</MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="#">@context.Index</MudTd>
-            <MudTd DataLabel="UserId">@context.UserId</MudTd>
-            <MudTd DataLabel="Cookie">
-                <MudTooltip Text="@context.CookieStr">
-                    @(context.CookieStr.Length > 80 ? context.CookieStr[..80] + "..." : context.CookieStr)
-                </MudTooltip>
+            <MudTd DataLabel="#">@(context.Index + 1)</MudTd>
+            <MudTd DataLabel="UID">@context.UserId</MudTd>
+            <MudTd DataLabel="昵称">@(ProbeOf(context.Index)?.UserName ?? "—")</MudTd>
+            <MudTd DataLabel="等级">@(LevelText(context.Index))</MudTd>
+            <MudTd DataLabel="状态">
+                @if (_probePending.Contains(context.Index))
+                {
+                    <MudProgressCircular Size="Size.Small" Indeterminate="true" />
+                }
+                else if (ProbeOf(context.Index) is { } probe)
+                {
+                    <MudChip T="string" Size="Size.Small"
+                             Color="@(probe.Success ? Color.Success : Color.Error)">
+                        @(probe.Success ? "Cookie 有效" : probe.Message ?? "Cookie 无效")
+                    </MudChip>
+                }
+                else
+                {
+                    <MudText Typo="Typo.caption" Class="mud-text-secondary">未检测</MudText>
+                }
             </MudTd>
-            <MudTd DataLabel="Actions">
+            <MudTd DataLabel="Cookie">
+                @* 只显示截断值：完整 Cookie 不进 DOM（需要编辑时走「编辑」对话框按需获取） *@
+                <MudText Typo="Typo.caption" Class="mud-text-secondary">
+                    @(context.CookieStr.Length > 40 ? context.CookieStr[..40] + "..." : context.CookieStr)
+                </MudText>
+            </MudTd>
+            <MudTd DataLabel="操作">
+                <MudButton Size="Size.Small" Variant="Variant.Text" Color="Color.Info"
+                           Disabled="@(_probePending.Contains(context.Index))"
+                           OnClick="@(() => ProbeOneAsync(context))">检测</MudButton>
                 <MudIconButton Icon="@Icons.Material.Filled.KeyboardArrowUp" Size="Size.Small"
                                Disabled="@(context.Index == 0)"
                                OnClick="@(() => MoveUp(context))" />
@@ -67,7 +102,12 @@ else
 
 @code {
     private bool _loading = true;
+    private bool _probingAll;
     private List<BiliAccountDto> _accounts = [];
+
+    /// <summary>按列表下标缓存检测结果（BiliAccountProbe 内部还有一层按 UID 的缓存）</summary>
+    private readonly Dictionary<int, BiliAccountProbeResult> _probes = new();
+    private readonly HashSet<int> _probePending = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -79,11 +119,90 @@ else
         _loading = true;
         _accounts = await Workflow.GetAllAccountsAsync();
         _loading = false;
+
+        // 账号顺序变了，旧的检测结果对不上号，清掉重来
+        if (_probes.Count > 0)
+        {
+            _probes.Clear();
+        }
+    }
+
+    private BiliAccountProbeResult? ProbeOf(int index) =>
+        _probes.TryGetValue(index, out var r) ? r : null;
+
+    private string LevelText(int index)
+    {
+        var probe = ProbeOf(index);
+        return probe?.Level is { } lv ? $"Lv{lv}" : "—";
+    }
+
+    private async Task ProbeOneAsync(BiliAccountDto account)
+    {
+        if (!long.TryParse(account.UserId, out var uid))
+        {
+            Snackbar.Add($"账号 {account.Index + 1} 的 UID 无法解析", Severity.Error);
+            return;
+        }
+
+        _probePending.Add(account.Index);
+        StateHasChanged();
+        try
+        {
+            _probes[account.Index] = await Probe.ProbeAsync(uid, force: true);
+        }
+        finally
+        {
+            _probePending.Remove(account.Index);
+            StateHasChanged();
+        }
+    }
+
+    private async Task ProbeAllAsync()
+    {
+        _probingAll = true;
+        try
+        {
+            var parseable = _accounts
+                .Where(a => long.TryParse(a.UserId, out _))
+                .ToList();
+
+            foreach (var a in parseable)
+            {
+                _probePending.Add(a.Index);
+            }
+            StateHasChanged();
+
+            var idMap = parseable.ToDictionary(
+                a => a.Index,
+                a => long.Parse(a.UserId)
+            );
+
+            // 并发探测，页面只等最慢的一个
+            var results = await Probe.ProbeManyAsync(idMap.Values, force: true);
+
+            foreach (var (index, uid) in idMap)
+            {
+                if (results.TryGetValue(uid, out var r))
+                {
+                    _probes[index] = r;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"检测失败：{ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _probePending.Clear();
+            _probingAll = false;
+            StateHasChanged();
+        }
     }
 
     private async Task OpenAddDialog()
     {
-        var dialog = await DialogService.ShowAsync<AddAccountDialog>("Add Account");
+        var dialog = await DialogService.ShowAsync<AddAccountDialog>("添加账号");
         var result = await dialog.Result;
         if (!result.Canceled && result.Data is string cookieStr)
         {
@@ -93,7 +212,7 @@ else
 
     private async Task OpenQrLoginDialog()
     {
-        var dialog = await DialogService.ShowAsync<QrLoginDialog>("QR Code Login");
+        var dialog = await DialogService.ShowAsync<QrLoginDialog>("扫码登录");
         var result = await dialog.Result;
         if (!result.Canceled)
         {
@@ -104,7 +223,7 @@ else
     private async Task OpenEditDialog(BiliAccountDto account)
     {
         var parameters = new DialogParameters { ["CookieStr"] = account.CookieStr };
-        var dialog = await DialogService.ShowAsync<EditAccountDialog>("Edit Account", parameters);
+        var dialog = await DialogService.ShowAsync<EditAccountDialog>("编辑账号", parameters);
         var result = await dialog.Result;
         if (!result.Canceled && result.Data is string newCookieStr)
         {
@@ -115,7 +234,7 @@ else
     private async Task OpenDeleteDialog(BiliAccountDto account)
     {
         var parameters = new DialogParameters { ["UserId"] = account.UserId };
-        var dialog = await DialogService.ShowAsync<DeleteAccountDialog>("Delete Account", parameters);
+        var dialog = await DialogService.ShowAsync<DeleteAccountDialog>("删除账号", parameters);
         var result = await dialog.Result;
         if (!result.Canceled)
         {

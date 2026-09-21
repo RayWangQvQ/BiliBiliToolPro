@@ -270,6 +270,16 @@ public class DailyTaskCharacterizationTests
         {
             throw new NotSupportedException();
         }
+
+        public Task<VideoInfoDto> GetRandomVideoForWatchAndShare(BiliCookie ck)
+        {
+            throw new NotSupportedException();
+        }
+
+        public Task<bool> OpenVideo(VideoInfoDto videoInfo, BiliCookie ck)
+        {
+            throw new NotSupportedException();
+        }
     }
 
     private sealed class ArticleDomainServiceDouble(List<string> callLog) : IArticleDomainService

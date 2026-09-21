@@ -1,4 +1,4 @@
-﻿@rendermode InteractiveServer
+@rendermode InteractiveServer
 
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
@@ -9,25 +9,31 @@
     </div>
 </div>
 
-<input type="checkbox" title="Navigation menu" class="navbar-toggler" id="navToggler"/>
+<input type="checkbox" title="导航菜单" class="navbar-toggler" id="navToggler"/>
 
 <div class="nav-scrollable">
     <nav class="flex-column">
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> 首页
             </NavLink>
         </div>
 
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="Schedules">
-                <span class="bi bi-calendar-nav-menu" aria-hidden="true"></span> Schedules
+                <span class="bi bi-calendar-nav-menu" aria-hidden="true"></span> 计划任务
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="Today">
+                <span class="bi bi-check2-square" aria-hidden="true"></span> 今日任务
             </NavLink>
         </div>
 
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="BiliAccount">
-                <span class="bi bi-people-fill" aria-hidden="true"></span> Bili Account
+                <span class="bi bi-people-fill" aria-hidden="true"></span> 账号管理
             </NavLink>
         </div>
 
@@ -35,7 +41,7 @@
             <div @onclick="@(() => { _showConfigSubMenu = !_showConfigSubMenu; })"
                  class="nav-link d-flex justify-content-between align-items-center">
                 <div>
-                    <span class="bi bi-sliders me-1" aria-hidden="true"></span> Configurations
+                    <span class="bi bi-sliders me-1" aria-hidden="true"></span> 任务配置
                 </div>
                 <span class="bi @(_showConfigSubMenu ? "bi-chevron-down" : "bi-chevron-right")" aria-hidden="true"></span>
             </div>
@@ -46,61 +52,61 @@
             <div class="submenu-container">
                 <div class="nav-item px-3 ms-4 submenu-item">
                     <NavLink class="nav-link" href="Configurations/DailyJobConfig">
-                        <span class="bi bi-coin" aria-hidden="true"></span> Daily Job
+                        <span class="bi bi-coin" aria-hidden="true"></span> 每日任务
                     </NavLink>
                 </div>
 
                 <div class="nav-item px-3 ms-4 submenu-item">
                     <NavLink class="nav-link" href="Configurations/MangaTaskConfig">
-                        <span class="bi bi-book" aria-hidden="true"></span> Manga Task
+                        <span class="bi bi-book" aria-hidden="true"></span> 漫画任务
                     </NavLink>
                 </div>
 
                 <div class="nav-item px-3 ms-4 submenu-item">
                     <NavLink class="nav-link" href="Configurations/MangaPrivilegeTaskConfig">
-                        <span class="bi bi-book-half" aria-hidden="true"></span> Manga Privilege
+                        <span class="bi bi-book-half" aria-hidden="true"></span> 漫画特权
                     </NavLink>
                 </div>
 
                 <div class="nav-item px-3 ms-4 submenu-item">
                     <NavLink class="nav-link" href="Configurations/Silver2CoinTaskConfig">
-                        <span class="bi bi-currency-exchange" aria-hidden="true"></span> Silver2Coin
+                        <span class="bi bi-currency-exchange" aria-hidden="true"></span> 银瓜子换硬币
                     </NavLink>
                 </div>
 
                 <div class="nav-item px-3 ms-4 submenu-item">
                     <NavLink class="nav-link" href="Configurations/ChargeTaskConfig">
-                        <span class="bi bi-lightning-charge" aria-hidden="true"></span> Charge Task
+                        <span class="bi bi-lightning-charge" aria-hidden="true"></span> 充电任务
                     </NavLink>
                 </div>
 
                 <div class="nav-item px-3 ms-4 submenu-item">
                     <NavLink class="nav-link" href="Configurations/VipPrivilegeConfig">
-                        <span class="bi bi-star" aria-hidden="true"></span> VIP Privilege
+                        <span class="bi bi-star" aria-hidden="true"></span> 大会员福利
                     </NavLink>
                 </div>
 
                 <div class="nav-item px-3 ms-4 submenu-item">
                     <NavLink class="nav-link" href="Configurations/VipBigPointConfig">
-                        <span class="bi bi-award" aria-hidden="true"></span> VIP Big Point
+                        <span class="bi bi-award" aria-hidden="true"></span> 大会员积分
                     </NavLink>
                 </div>
 
                 <div class="nav-item px-3 ms-4 submenu-item">
                     <NavLink class="nav-link" href="Configurations/LiveLotteryTaskConfig">
-                        <span class="bi bi-gift" aria-hidden="true"></span> Live Lottery
+                        <span class="bi bi-gift" aria-hidden="true"></span> 直播抽奖
                     </NavLink>
                 </div>
 
                 <div class="nav-item px-3 ms-4 submenu-item">
                     <NavLink class="nav-link" href="Configurations/LiveFansMedalTaskConfig">
-                        <span class="bi bi-badge-cc" aria-hidden="true"></span> Fans Medal
+                        <span class="bi bi-badge-cc" aria-hidden="true"></span> 粉丝勋章
                     </NavLink>
                 </div>
 
                 <div class="nav-item px-3 ms-4 submenu-item">
                     <NavLink class="nav-link" href="Configurations/UnfollowBatchedTaskConfig">
-                        <span class="bi bi-person-dash" aria-hidden="true"></span> Unfollow Batch
+                        <span class="bi bi-person-dash" aria-hidden="true"></span> 批量取关
                     </NavLink>
                 </div>
             </div>
@@ -108,7 +114,7 @@
 
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="Admin">
-                <span class="bi bi-person-circle" aria-hidden="true"></span> Admin
+                <span class="bi bi-person-circle" aria-hidden="true"></span> 管理账户
             </NavLink>
         </div>
     </nav>
