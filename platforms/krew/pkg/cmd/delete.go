@@ -10,8 +10,8 @@ import (
 	"sigs.k8s.io/kustomize/api/types"
 	"sigs.k8s.io/yaml"
 
-	"github.com/RayWangQvQ/BiliBiliToolPro/krew/pkg/options"
-	helper "github.com/RayWangQvQ/BiliBiliToolPro/krew/pkg/utils"
+	"github.com/RayWangQvQ/BiliBiliToolPro/platforms/krew/pkg/options"
+	helper "github.com/RayWangQvQ/BiliBiliToolPro/platforms/krew/pkg/utils"
 	"github.com/spf13/cobra"
 )
 

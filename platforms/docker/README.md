@@ -27,7 +27,7 @@ apt-get install curl
 ## 2. 方式一：一键脚本(推荐)
 
 ```
-bash <(curl -sSL https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/docker/install.sh)
+bash <(curl -sSL https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/platforms/docker/install.sh)
 ```
 
 ## 3. 方式二：手动 Docker Compose
@@ -39,10 +39,10 @@ bash <(curl -sSL https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/ma
 mkdir bili_tool_web && cd bili_tool_web
 
 # 下载
-wget https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/docker/sample/docker-compose.yml
+wget https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/platforms/docker/sample/docker-compose.yml
 mkdir -p config
 cd ./config
-wget https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/docker/sample/config/cookies.json
+wget https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/platforms/docker/sample/config/cookies.json
 cd ..
 
 # 启动

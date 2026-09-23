@@ -37,7 +37,7 @@ jobs:
         run: npm i -g serverless-cloud-framework
       - name: deploy serverless
         run: |
-          cd ./tencentScf
+          cd ./platforms/tencentScf
           echo "开始配置云函数："
           echo "$Tencent_Serverless_Yml"
           [ -z "$Tencent_Serverless_Yml" ] && echo "未配置serverless.yml，使用默认值" || echo "$Tencent_Serverless_Yml" > serverless.yml

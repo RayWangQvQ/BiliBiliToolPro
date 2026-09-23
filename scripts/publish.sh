@@ -115,7 +115,7 @@ publish_self_contained() {
 publish_tencentScf() {
     echo "---------start publishing 【tencent scf】 release---------"
     cd $publishDir
-    cp -r $repoDir/tencentScf/bootstrap $repoDir/tencentScf/index.sh ./linux-x64/
+    cp -r $repoDir/platforms/tencentScf/bootstrap $repoDir/platforms/tencentScf/index.sh ./linux-x64/
     cd ./linux-x64
     chmod 755 index.sh bootstrap
     zip -r ../bilibili-tool-pro-v$version-tencent-scf.zip ./*
