@@ -39,16 +39,16 @@ tidy: #### run go mod tidy
 .PHONY: build
 build: #### build the plugin
 	@echo "build on ${GOOS}/${GOARCH}" && \
-		GOOS=${GOOS} GOARCH=${GOARCH} CGO_ENABLED=0 go build -mod readonly -ldflags "-X github.com/RayWangQvQ/BiliBiliToolPro/krew/pkg/cmd.version=${GITCOMMIT}" -o bin/$(BIN_NAME) cmd/kubectl-bilipro.go
+		GOOS=${GOOS} GOARCH=${GOARCH} CGO_ENABLED=0 go build -mod readonly -ldflags "-X github.com/RayWangQvQ/BiliBiliToolPro/platforms/krew/pkg/cmd.version=${GITCOMMIT}" -o bin/$(BIN_NAME) cmd/kubectl-bilipro.go
 
 .PHONY: install
 install: #### install the plugin
-	@cd ${ROOT_DIR}/krew/bin && \
+	@cd ${ROOT_DIR}/platforms/krew/bin && \
       sudo install ./$(BIN_NAME) ${KUBECTL_DIR}/$(BIN_NAME)
 
 .PHONY: test
 test: #### run tests
-	@cd ${ROOT_DIR}/krew/pkg/utils && \
+	@cd ${ROOT_DIR}/platforms/krew/pkg/utils && \
 	rm -rf fixtures && \
 	mkdir fixtures && \
 	go test ./... -cover && \

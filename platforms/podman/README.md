@@ -70,7 +70,7 @@ mkdir -p Logs
 # 下载appsettings.json
 mkdir -p config
 cd ./config
-wget https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/docker/sample/config/cookies.json
+wget https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/platforms/docker/sample/config/cookies.json
 cd ..
 
 # 运行

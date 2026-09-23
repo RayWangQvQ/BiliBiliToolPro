@@ -1,4 +1,4 @@
-module github.com/RayWangQvQ/BiliBiliToolPro/krew
+module github.com/RayWangQvQ/BiliBiliToolPro/platforms/krew
 
 go 1.20
 
@@ -64,4 +64,4 @@ require (
 	sigs.k8s.io/structured-merge-diff/v4 v4.2.3 // indirect
 )
 
-// replace github.com/RayWangQvQ/BiliBiliToolPro/krew => ../krew
+// replace github.com/RayWangQvQ/BiliBiliToolPro/platforms/krew => ../krew

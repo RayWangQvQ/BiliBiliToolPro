@@ -67,7 +67,7 @@ BiliTool版本号：`x.x.x`
 - [ ] 否
 - [ ] 是，信息如下
 
-查看方式参考文档：[提示文件不存在或路径异常怎么排查](https://github.com/RayWangQvQ/BiliBiliToolPro/blob/main/qinglong/README.md#43-提示文件不存在或路径异常怎么排查)
+查看方式参考文档：[提示文件不存在或路径异常怎么排查](https://github.com/RayWangQvQ/BiliBiliToolPro/blob/main/platforms/qinglong/README.md#43-提示文件不存在或路径异常怎么排查)
 
 BiliTool仓库文件路径：`<粘贴路径>`
 

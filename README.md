@@ -105,17 +105,17 @@ BiliTool 实现自动完成任务的原理，是通过调用一系列开放的ap
 
 #### 1.1.2. 方式二：青龙
 
-[>>青龙部署教程](qinglong/README.md)
+[>>青龙部署教程](platforms/qinglong/README.md)
 
 #### 1.1.3. 方式三：白虎面板
 
-[>>白虎面板部署教程](baihu/README.md)
+[>>白虎面板部署教程](platforms/baihu/README.md)
 
 #### 1.1.4. 方式四：Docker 或 Podman 运行
 
-[>>Docker 部署说明](docker/README.md)
+[>>Docker 部署说明](platforms/docker/README.md)
 
-[>>Podman 部署说明](podman/README.md)
+[>>Podman 部署说明](platforms/podman/README.md)
 
 #### 1.1.5. 方式五：下载程序包到本地或服务器运行
 
@@ -123,7 +123,7 @@ BiliTool 实现自动完成任务的原理，是通过调用一系列开放的ap
 
 #### 1.1.6. 方式六：Chart部署
 
-[>>Chart部署说明](helm/README.md)
+[>>Chart部署说明](platforms/helm/README.md)
 
 ### 1.2. 消息推送（可选）
 

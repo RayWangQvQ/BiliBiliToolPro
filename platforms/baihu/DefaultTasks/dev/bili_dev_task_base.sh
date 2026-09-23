@@ -403,7 +403,7 @@ install() {
             install_dotnet || {
                 say_err "安装失败"
                 say_err "请根据文档自行在白虎面板环境中安装dotnet（进入“编程语言”页面安装）"
-                say_err "或者尝试切换运行模式为bilitool，它不需要安装dotnet：https://github.com/RayWangQvQ/BiliBiliToolPro/blob/develop/baihu/README.md"
+                say_err "或者尝试切换运行模式为bilitool，它不需要安装dotnet：https://github.com/RayWangQvQ/BiliBiliToolPro/blob/develop/platforms/baihu/README.md"
                 return 1
             }
         fi
@@ -411,7 +411,7 @@ install() {
         if [ "$prefer_mode" == "bilitool" ]; then
             install_bilitool || {
                 say_err "安装失败，请检查日志并重试"
-                say_err "或者尝试切换运行模式为dotnet：https://github.com/RayWangQvQ/BiliBiliToolPro/blob/develop/baihu/README.md"
+                say_err "或者尝试切换运行模式为dotnet：https://github.com/RayWangQvQ/BiliBiliToolPro/blob/develop/platforms/baihu/README.md"
             }
         fi
     fi

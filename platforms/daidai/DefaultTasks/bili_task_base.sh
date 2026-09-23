@@ -345,14 +345,14 @@ install() {
         if [ "$prefer_mode" == "dotnet" ]; then
             install_dotnet || {
                 say_err "安装失败，请根据文档自行在面板容器中安装dotnet，或切换为 bilitool 模式"
-                say_err "文档：https://github.com/RayWangQvQ/BiliBiliToolPro/blob/develop/daidai/README.md"
+                say_err "文档：https://github.com/RayWangQvQ/BiliBiliToolPro/blob/develop/platforms/daidai/README.md"
                 return 1
             }
         fi
         if [ "$prefer_mode" == "bilitool" ]; then
             install_bilitool || {
                 say_err "安装失败，请检查日志并重试，或切换为 dotnet 模式"
-                say_err "文档：https://github.com/RayWangQvQ/BiliBiliToolPro/blob/develop/daidai/README.md"
+                say_err "文档：https://github.com/RayWangQvQ/BiliBiliToolPro/blob/develop/platforms/daidai/README.md"
             }
         fi
     fi
