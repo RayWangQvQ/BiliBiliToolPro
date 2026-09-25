@@ -6,6 +6,9 @@ on:
     paths-ignore:
       - "**.md"
       - "docs/**"
+      - ".github/workflows/**"
+      - ".editorconfig"
+      - "bruno/**"
 
 permissions:
   contents: read
