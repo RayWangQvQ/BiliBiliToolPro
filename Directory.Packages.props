@@ -72,7 +72,7 @@
     <PackageVersion Include="Refit.HttpClientFactory" Version="8.0.0" />
     <PackageVersion Include="Scrutor" Version="6.1.0" />
     <PackageVersion Include="QRCoder" Version="1.8.0" />
-    <PackageVersion Include="MudBlazor" Version="8.15.0" />
+    <PackageVersion Include="MudBlazor" Version="9.10.0" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="8.1.4" />
     <PackageVersion Include="Rougamo.Fody" Version="5.0.2" />
     <PackageVersion

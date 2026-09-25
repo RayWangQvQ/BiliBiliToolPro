@@ -396,7 +396,7 @@ public partial class Schedules : ComponentBase, IDisposable
 
     private async Task OnTriggerNow(ScheduleModel model)
     {
-        bool? confirmed = await DialogSvc.ShowMessageBox(
+        bool? confirmed = await DialogSvc.ShowMessageBoxAsync(
             title: "Confirm",
             markupMessage: (MarkupString)"Do you want to trigger this job now?",
             yesText: "Trigger",
