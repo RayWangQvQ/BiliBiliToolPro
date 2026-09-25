@@ -1,5 +1,7 @@
 ## 4.0.6
 - **BREAKING**: 部署平台目录统一迁移至 `platforms/` 下（`qinglong`、`baihu`、`daidai`、`docker`、`podman`、`helm`、`tencentScf`、`gitHubActions`、`krew`）；通过 `raw.githubusercontent.com/.../main/<旧路径>` 直接拉取脚本或示例文件（例如青龙 `ray-dotnet-install.sh`、Docker `install.sh`、`docker/sample/*`）的存量部署将 404，请改用新路径 `platforms/<平台>/...`
+- Fix[#1140]: 补齐 Quartz 3.22 升级遗漏的 EF 迁移，修复 Web 面板启动时因模型与迁移不一致（`PendingModelChangesWarning`）而直接退出的问题；首次启动会自动为 `QRTZ_TRIGGERS`/`QRTZ_FIRED_TRIGGERS` 补列并创建 `QRTZ_PAUSED_JOB_GRPS` 表
+- 维护[#1125]: 依赖批量升级 17 项（Quartz 3.14.0→3.22.0、MudBlazor 8.6.0→8.15.0、AppAny.Quartz.EntityFrameworkCore.Migrations.SQLite 0.6.0→0.6.1、Serilog、Serilog.Sinks.Console、QRCoder、CronExpressionDescriptor、Ray.Infrastructure、bunit、xunit 等）
 - 维护：统一仓库文本文件换行符为 LF（`platforms/tencentScf/README.md`、`.editorconfig`、`bruno/.env.sample`），并收窄预览镜像触发路径——仅改工作流或配置文件不再产出 alpha 预览镜像
 ## 4.0.5
 - Feature[#1106]: Web 新增「今日任务」页面：逐账号列出每个任务今天该不该做、做了没有，并提供单项/整账号/全部补做
