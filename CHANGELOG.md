@@ -1,4 +1,6 @@
 ## 4.0.6
+- **BREAKING**: 部署平台目录统一迁移至 `platforms/` 下（`qinglong`、`baihu`、`daidai`、`docker`、`podman`、`helm`、`tencentScf`、`gitHubActions`、`krew`）；通过 `raw.githubusercontent.com/.../main/<旧路径>` 直接拉取脚本或示例文件（例如青龙 `ray-dotnet-install.sh`、Docker `install.sh`、`docker/sample/*`）的存量部署将 404，请改用新路径 `platforms/<平台>/...`
+- 维护：统一仓库文本文件换行符为 LF（`platforms/tencentScf/README.md`、`.editorconfig`、`bruno/.env.sample`），并收窄预览镜像触发路径——仅改工作流或配置文件不再产出 alpha 预览镜像
 ## 4.0.5
 - Feature[#1106]: Web 新增「今日任务」页面：逐账号列出每个任务今天该不该做、做了没有，并提供单项/整账号/全部补做
 - Feature[#1106]: 漏做的任务可自动补做，间隔与记录保留天数由 `AutoRecoverConfig` 配置（默认每 2 小时检查一次，文档见 `docs/configuration.md`）

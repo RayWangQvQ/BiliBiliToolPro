@@ -61,51 +61,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{
 		.github\workflows\repo-sync.yml = .github\workflows\repo-sync.yml
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker", "docker", "{A93210FD-27B6-40E4-B08D-391F96CA2754}"
-	ProjectSection(SolutionItems) = preProject
-		docker\README.md = docker\README.md
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sample", "sample", "{2F1CB892-336C-4672-8A0A-FBAEB4B9EA8A}"
-	ProjectSection(SolutionItems) = preProject
-		docker\sample\docker-compose.yml = docker\sample\docker-compose.yml
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{C0173851-1515-4BE1-A018-84E0B64A6877}"
 	ProjectSection(SolutionItems) = preProject
 		docs\configuration.md = docs\configuration.md
 		docs\donate-list.md = docs\donate-list.md
 		docs\questions.md = docs\questions.md
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tencentScf", "tencentScf", "{DD86F293-AE70-46CF-837C-8870D8F51237}"
-	ProjectSection(SolutionItems) = preProject
-		tencentScf\bootstrap = tencentScf\bootstrap
-		tencentScf\index.sh = tencentScf\index.sh
-		tencentScf\publish.bat = tencentScf\publish.bat
-		tencentScf\publish.sh = tencentScf\publish.sh
-		tencentScf\README.md = tencentScf\README.md
-		tencentScf\serverless.yml = tencentScf\serverless.yml
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "qinglong", "qinglong", "{1C6CC38A-A5D5-41EF-9072-70AEEEA211F7}"
-	ProjectSection(SolutionItems) = preProject
-		qinglong\dotnet-install.sh = qinglong\dotnet-install.sh
-		qinglong\extra.sh = qinglong\extra.sh
-		qinglong\ray-dotnet-install.sh = qinglong\ray-dotnet-install.sh
-		qinglong\README.md = qinglong\README.md
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DefaultTasks", "DefaultTasks", "{DE60A16C-CA3B-45E9-8A9D-0E91ACEBDEE0}"
-	ProjectSection(SolutionItems) = preProject
-		qinglong\DefaultTasks\bili_dev_task_daily.sh = qinglong\DefaultTasks\bili_dev_task_daily.sh
-		qinglong\DefaultTasks\bili_dev_task_liveLottery.sh = qinglong\DefaultTasks\bili_dev_task_liveLottery.sh
-		qinglong\DefaultTasks\bili_dev_task_test.sh = qinglong\DefaultTasks\bili_dev_task_test.sh
-		qinglong\DefaultTasks\bili_dev_task_unfollowBatched.sh = qinglong\DefaultTasks\bili_dev_task_unfollowBatched.sh
-		qinglong\DefaultTasks\bili_task_daily.sh = qinglong\DefaultTasks\bili_task_daily.sh
-		qinglong\DefaultTasks\bili_task_liveLottery.sh = qinglong\DefaultTasks\bili_task_liveLottery.sh
-		qinglong\DefaultTasks\bili_task_test.sh = qinglong\DefaultTasks\bili_task_test.sh
-		qinglong\DefaultTasks\bili_task_unfollowBatched.sh = qinglong\DefaultTasks\bili_task_unfollowBatched.sh
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ISSUE_TEMPLATE", "ISSUE_TEMPLATE", "{830361B7-BCC1-4853-879A-761B0FD86826}"
@@ -117,13 +77,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ISSUE_TEMPLATE", "ISSUE_TEM
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BiliAgentTest", "test\BiliAgentTest\BiliAgentTest.csproj", "{F6B8ED3A-5428-4D26-8172-8B41FBF0C4CF}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{75A9CC5C-DF92-4D72-A14C-625AA902855B}"
-	ProjectSection(SolutionItems) = preProject
-		docker\build\buildImage.cmd = docker\build\buildImage.cmd
-		docker\build\buildImage_amd64.cmd = docker\build\buildImage_amd64.cmd
-		docker\build\buildImage_arm64.cmd = docker\build\buildImage_arm64.cmd
-	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppServiceTest", "test\AppServiceTest\AppServiceTest.csproj", "{1D9DFF34-71EA-44AE-85B0-1F10C9BA0D81}"
 EndProject
@@ -138,17 +91,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ray.BiliBiliTool.CharacterizationTests", "test\Ray.BiliBiliTool.CharacterizationTests\Ray.BiliBiliTool.CharacterizationTests.csproj", "{4EEA79A2-5AA2-4A0B-9F0F-91EC802087B4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ray.BiliBiliTool.Host.IntegrationTests", "test\Ray.BiliBiliTool.Host.IntegrationTests\Ray.BiliBiliTool.Host.IntegrationTests.csproj", "{53FB6CD4-5061-4129-B505-FB0978F62784}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{2B5FD099-CC28-4FBC-9F20-F20300C5DFD2}"
-	ProjectSection(SolutionItems) = preProject
-		scripts\clean.cmd = scripts\clean.cmd
-		scripts\publish.bat = scripts\publish.bat
-		scripts\publish.ps1 = scripts\publish.ps1
-		scripts\publish.sh = scripts\publish.sh
-		scripts\report-version.sh = scripts\report-version.sh
-		scripts\ut.ps1 = scripts\ut.ps1
-		scripts\version.sh = scripts\version.sh
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ray.BiliBiliTool.Web.Client", "src\Ray.BiliBiliTool.Web.Client\Ray.BiliBiliTool.Web.Client.csproj", "{5772E00F-271F-4B25-8B10-A3C24D8D3E10}"
 EndProject
@@ -298,14 +240,8 @@ Global
 		{7105652A-B1C1-4F9E-BA38-8034BC8B26B4} = {120917DC-474C-448B-9EBB-1B3BA3A20B9D}
 		{73DD457B-E06E-45ED-A6BA-7E3C02F8BDF1} = {F3DE0D72-426B-4AD9-B3ED-3343CF4223F1}
 		{61613EF4-3644-42D4-A620-70547291FB38} = {73DD457B-E06E-45ED-A6BA-7E3C02F8BDF1}
-		{A93210FD-27B6-40E4-B08D-391F96CA2754} = {F3DE0D72-426B-4AD9-B3ED-3343CF4223F1}
-		{2F1CB892-336C-4672-8A0A-FBAEB4B9EA8A} = {A93210FD-27B6-40E4-B08D-391F96CA2754}
-		{DD86F293-AE70-46CF-837C-8870D8F51237} = {F3DE0D72-426B-4AD9-B3ED-3343CF4223F1}
-		{1C6CC38A-A5D5-41EF-9072-70AEEEA211F7} = {F3DE0D72-426B-4AD9-B3ED-3343CF4223F1}
-		{DE60A16C-CA3B-45E9-8A9D-0E91ACEBDEE0} = {1C6CC38A-A5D5-41EF-9072-70AEEEA211F7}
 		{830361B7-BCC1-4853-879A-761B0FD86826} = {73DD457B-E06E-45ED-A6BA-7E3C02F8BDF1}
 		{F6B8ED3A-5428-4D26-8172-8B41FBF0C4CF} = {E9BDDCBE-A57D-4E3B-8252-708088386ADF}
-		{75A9CC5C-DF92-4D72-A14C-625AA902855B} = {A93210FD-27B6-40E4-B08D-391F96CA2754}
 		{1D9DFF34-71EA-44AE-85B0-1F10C9BA0D81} = {E9BDDCBE-A57D-4E3B-8252-708088386ADF}
 		{26B21C30-7358-4E7B-A73E-2272F10A6CA8} = {E9BDDCBE-A57D-4E3B-8252-708088386ADF}
 		{90C1DB73-B3DB-4BE5-AD1A-5248FE47860E} = {E9BDDCBE-A57D-4E3B-8252-708088386ADF}
@@ -313,7 +249,6 @@ Global
 		{6B3F684D-2F35-4F59-8D09-5AC85F69359F} = {E9BDDCBE-A57D-4E3B-8252-708088386ADF}
 		{4EEA79A2-5AA2-4A0B-9F0F-91EC802087B4} = {E9BDDCBE-A57D-4E3B-8252-708088386ADF}
 		{53FB6CD4-5061-4129-B505-FB0978F62784} = {E9BDDCBE-A57D-4E3B-8252-708088386ADF}
-		{2B5FD099-CC28-4FBC-9F20-F20300C5DFD2} = {F3DE0D72-426B-4AD9-B3ED-3343CF4223F1}
 		{5772E00F-271F-4B25-8B10-A3C24D8D3E10} = {38736647-2196-417E-8519-C48A012A63D9}
 		{189F1FF4-2BFA-4F91-A6B2-00D00AC2910C} = {38736647-2196-417E-8519-C48A012A63D9}
 		{C947CA59-157C-47F0-A842-7912FACDADA7} = {98051127-2868-4F5C-9B2C-2150975E05F3}
