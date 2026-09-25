@@ -3,6 +3,7 @@
 - Fix[#1140]: 补齐 Quartz 3.22 升级遗漏的 EF 迁移，修复 Web 面板启动时因模型与迁移不一致（`PendingModelChangesWarning`）而直接退出的问题；首次启动会自动为 `QRTZ_TRIGGERS`/`QRTZ_FIRED_TRIGGERS` 补列并创建 `QRTZ_PAUSED_JOB_GRPS` 表
 - 维护[#1125]: 依赖批量升级 17 项（Quartz 3.14.0→3.22.0、MudBlazor 8.6.0→8.15.0、AppAny.Quartz.EntityFrameworkCore.Migrations.SQLite 0.6.0→0.6.1、Serilog、Serilog.Sinks.Console、QRCoder、CronExpressionDescriptor、Ray.Infrastructure、bunit、xunit 等）
 - 维护：统一仓库文本文件换行符为 LF（`platforms/tencentScf/README.md`、`.editorconfig`、`bruno/.env.sample`），并收窄预览镜像触发路径——仅改工作流或配置文件不再产出 alpha 预览镜像
+- 维护：精简换行符规则，`.gitattributes` 只保留 `* text=auto eol=lf` 兜底加 `.bat`/`.cmd` 的 CRLF 例外与二进制声明，删去 14 条被兜底覆盖的逐扩展名条目；`.editorconfig` 去掉与 pre-commit 的 CSharpier 互相拉扯的 `insert_final_newline = false`（保存 `.cs` 丢行尾换行导致整文件差异），并补上 `[*.{bat,cmd}] end_of_line = crlf`
 ## 4.0.5
 - Feature[#1106]: Web 新增「今日任务」页面：逐账号列出每个任务今天该不该做、做了没有，并提供单项/整账号/全部补做
 - Feature[#1106]: 漏做的任务可自动补做，间隔与记录保留天数由 `AutoRecoverConfig` 配置（默认每 2 小时检查一次，文档见 `docs/configuration.md`）

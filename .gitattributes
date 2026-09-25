@@ -1,33 +1,12 @@
-# Auto detect text files and perform LF normalization
+# 文本文件：仓库内存 LF，检出到工作区也写 LF。
+# eol=lf 优先于每个人本机的 core.autocrlf，因此不需要再按扩展名逐个声明。
 * text=auto eol=lf
 
-# Markdown files
-*.md text eol=lf
-
-# Source code
-*.cs text eol=lf
-*.csproj text eol=lf
-*.sln text eol=lf
-*.json text eol=lf
-*.xml text eol=lf
-*.yml text eol=lf
-*.yaml text eol=lf
-
-# Scripts
-*.sh text eol=lf
-*.ps1 text eol=lf
-
-# Windows batch files must use CRLF
+# Windows 批处理必须是 CRLF
 *.bat text eol=crlf
 *.cmd text eol=crlf
 
-# Documentation
-*.txt text eol=lf
-README text eol=lf
-LICENSE text eol=lf
-CHANGELOG text eol=lf
-
-# Binary files
+# 二进制：不做换行转换，也不参与 diff/merge
 *.dll binary
 *.exe binary
 *.png binary
