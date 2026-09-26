@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
 # 呆呆面板订阅「钩子脚本」：复用 qinglong 的各任务脚本，避免在 daidai 里重复维护。
-# 配置方式：在订阅的「钩子脚本」里填  bash daidai/copyshfile.sh
+# 配置方式：在订阅的「钩子脚本」里填  bash platforms/daidai/copyshfile.sh
 # 运行时机：呆呆面板在“拉库之后、自动建任务之前”执行本钩子（CWD 即仓库目录）。
 #
 # 做的事：
-#   1. 把 qinglong/DefaultTasks 下的 bili_task_*.sh（base 除外）拷到 daidai/DefaultTasks；
-#   2. 把 qinglong/DefaultTasks/dev 下的 bili_dev_task_*.sh（base 除外）拷到 daidai/DefaultTasks/dev；
-#   3. 删除 qinglong 目录，避免青龙版脚本（依赖 /ql 路径）被面板误登记成任务。
+#   1. 把 platforms/qinglong/DefaultTasks 下的 bili_task_*.sh（base 除外）拷到 platforms/daidai/DefaultTasks；
+#   2. 把 platforms/qinglong/DefaultTasks/dev 下的 bili_dev_task_*.sh（base 除外）拷到 platforms/daidai/DefaultTasks/dev；
+#   3. 删除 platforms/qinglong 目录，避免青龙版脚本（依赖 /ql 路径）被面板误登记成任务。
 # 各任务脚本只是 `. bili_task_base.sh; run_task "Xxx"`，与面板无关，所以可直接复用；
 # 真正面板相关的“环境安装/定位”只在 daidai 自己的 bili_task_base.sh 里实现。
 
@@ -18,11 +18,11 @@ if [ -n "${SUB_DIR:-}" ]; then
     REPO_ROOT="$SUB_DIR"
 else
     CURRENT_FILE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-    REPO_ROOT="$(dirname "$CURRENT_FILE_DIR")"
+    REPO_ROOT="$(dirname "$(dirname "$CURRENT_FILE_DIR")")"
 fi
 
-SRC_ROOT="$REPO_ROOT/qinglong/DefaultTasks"
-DST_ROOT="$REPO_ROOT/daidai/DefaultTasks"
+SRC_ROOT="$REPO_ROOT/platforms/qinglong/DefaultTasks"
+DST_ROOT="$REPO_ROOT/platforms/daidai/DefaultTasks"
 
 if [ ! -d "$SRC_ROOT" ]; then
     echo ">>> 未找到 $SRC_ROOT，跳过同步（可能已同步过）。"
@@ -52,6 +52,6 @@ for file in "$SRC_ROOT"/dev/bili_dev_task_*.sh; do
 done
 
 echo ">>> 清理 qinglong 目录，避免被重复登记成任务 ..."
-rm -rf "$REPO_ROOT/qinglong"
+rm -rf "$REPO_ROOT/platforms/qinglong"
 
 echo ">>> 同步完成。"
