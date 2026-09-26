@@ -10,7 +10,10 @@ public abstract class BaseJob<TJob>(ILogger<TJob> logger) : IJob
 {
     protected ILogger<TJob> Logger { get; } = logger;
 
-    public async Task Execute(IJobExecutionContext context)
+    public async ValueTask Execute(
+        IJobExecutionContext context,
+        CancellationToken cancellationToken
+    )
     {
         var fireInstanceId = context.FireInstanceId;
 

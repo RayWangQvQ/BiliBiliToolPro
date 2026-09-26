@@ -16,7 +16,6 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" />
     <PackageReference Include="Quartz" />
     <PackageReference Include="Quartz.AspNetCore" />
-    <PackageReference Include="Quartz.Serialization.SystemTextJson" />
     <PackageReference Include="Serilog.AspNetCore" />
     <PackageReference Include="Serilog.Sinks.SQLite.Microsoft" />
     <PackageReference Include="Ray.Serilog.Sinks.CoolPushBatched" />

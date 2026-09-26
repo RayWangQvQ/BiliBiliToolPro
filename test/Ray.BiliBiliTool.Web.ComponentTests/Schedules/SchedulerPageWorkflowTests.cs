@@ -168,8 +168,8 @@ public class SchedulerPageWorkflowTests
         public Task UpdateSchedule(Key oj, Key? ot, JobDetailModel nj, TriggerDetailModel nt) =>
             Task.CompletedTask;
 
-        public Task<Quartz.SchedulerMetaData> GetMetadataAsync() =>
-            Task.FromResult<Quartz.SchedulerMetaData>(default!);
+        public Task<Quartz.SchedulerMetadata> GetMetadataAsync() =>
+            Task.FromResult<Quartz.SchedulerMetadata>(default!);
 
         public Task<System.Collections.Generic.IList<System.Collections.Generic.KeyValuePair<
             string,

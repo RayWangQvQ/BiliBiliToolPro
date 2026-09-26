@@ -78,6 +78,8 @@ public partial class Schedules : ComponentBase, IDisposable
         SchedulerListenerSvc.OnJobUnscheduled += SchedulerListenerSvc_OnJobUnscheduled;
         SchedulerListenerSvc.OnTriggerResumed += SchedulerListenerSvc_OnTriggerResumed;
         SchedulerListenerSvc.OnTriggerPaused += SchedulerListenerSvc_OnTriggerPaused;
+        SchedulerListenerSvc.OnTriggerInError += SchedulerListenerSvc_OnTriggerInError;
+        SchedulerListenerSvc.OnTriggersInError += SchedulerListenerSvc_OnTriggersInError;
     }
 
     private async Task RefreshJobs()
@@ -106,6 +108,8 @@ public partial class Schedules : ComponentBase, IDisposable
         SchedulerListenerSvc.OnJobUnscheduled -= SchedulerListenerSvc_OnJobUnscheduled;
         SchedulerListenerSvc.OnTriggerResumed -= SchedulerListenerSvc_OnTriggerResumed;
         SchedulerListenerSvc.OnTriggerPaused -= SchedulerListenerSvc_OnTriggerPaused;
+        SchedulerListenerSvc.OnTriggerInError -= SchedulerListenerSvc_OnTriggerInError;
+        SchedulerListenerSvc.OnTriggersInError -= SchedulerListenerSvc_OnTriggersInError;
     }
 
     private async void SchedulerListenerSvc_OnTriggerPaused(object? sender, EventArgs<TriggerKey> e)
@@ -138,6 +142,38 @@ public partial class Schedules : ComponentBase, IDisposable
                 model.JobStatus = JobStatus.Idle;
                 StateHasChanged();
             }
+        });
+    }
+
+    private async void SchedulerListenerSvc_OnTriggerInError(
+        object? sender,
+        EventArgs<TriggerKey> e
+    )
+    {
+        TriggerKey triggerKey = e.Args;
+
+        await InvokeAsync(() =>
+        {
+            ScheduleModel? model = FindScheduleModelByTrigger(triggerKey).SingleOrDefault();
+            if (model != null)
+            {
+                model.JobStatus = JobStatus.Error;
+                StateHasChanged();
+            }
+        });
+    }
+
+    private async void SchedulerListenerSvc_OnTriggersInError(object? sender, EventArgs<JobKey> e)
+    {
+        JobKey jobKey = e.Args;
+
+        await InvokeAsync(() =>
+        {
+            List<ScheduleModel> modelList = ScheduledJobs
+                .Where(s => s.JobName == jobKey.Name && s.JobGroup == jobKey.Group)
+                .ToList();
+            modelList.ForEach(s => s.JobStatus = JobStatus.Error);
+            StateHasChanged();
         });
     }
 

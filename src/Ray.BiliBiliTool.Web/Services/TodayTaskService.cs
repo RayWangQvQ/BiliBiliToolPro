@@ -462,7 +462,7 @@ public class TodayTaskService(
             );
             var scheduler = await schedulerFactory.GetScheduler();
             var triggerKey = AutoRecoverJob.TriggerKeyValue;
-            if (!await scheduler.CheckExists(triggerKey))
+            if (!await scheduler.Exists(triggerKey))
             {
                 return;
             }
@@ -472,7 +472,9 @@ public class TodayTaskService(
                 .WithIdentity(triggerKey)
                 .ForJob(AutoRecoverJob.Key)
                 .StartAt(DateTimeOffset.UtcNow.AddMinutes(1))
-                .WithSimpleSchedule(x => x.WithIntervalInHours(intervalHours).RepeatForever())
+                .WithSimpleSchedule(x =>
+                    x.WithInterval(TimeSpan.FromHours(intervalHours)).RepeatForever()
+                )
                 .Build();
 
             await scheduler.RescheduleJob(triggerKey, newTrigger);

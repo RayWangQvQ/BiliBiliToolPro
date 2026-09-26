@@ -8,12 +8,14 @@ namespace BlazingQuartz.Jobs.Abstractions
 {
     public static class JobExecutionContextExtensions
     {
+        // MergedJobDataMap is copied per firing and never written back, so these keys stay the
+        // job -> listener channel they were under Quartz 3's removed IJobExecutionContext.Put/Get.
         public static IJobExecutionContext SetReturnCode(
             this IJobExecutionContext context,
             string value
         )
         {
-            context.Put(JobDataMapKeys.ReturnCode, value);
+            context.MergedJobDataMap[JobDataMapKeys.ReturnCode] = value;
             return context;
         }
 
@@ -22,7 +24,7 @@ namespace BlazingQuartz.Jobs.Abstractions
             int value
         )
         {
-            context.Put(JobDataMapKeys.ReturnCode, value.ToString());
+            context.MergedJobDataMap[JobDataMapKeys.ReturnCode] = value.ToString();
             return context;
         }
 
@@ -31,7 +33,7 @@ namespace BlazingQuartz.Jobs.Abstractions
             string execDetails
         )
         {
-            context.Put(JobDataMapKeys.ExecutionDetails, execDetails);
+            context.MergedJobDataMap[JobDataMapKeys.ExecutionDetails] = execDetails;
             return context;
         }
 
@@ -40,13 +42,13 @@ namespace BlazingQuartz.Jobs.Abstractions
             bool success
         )
         {
-            context.Put(JobDataMapKeys.IsSuccess, success);
+            context.MergedJobDataMap[JobDataMapKeys.IsSuccess] = success;
             return context;
         }
 
         public static string? GetReturnCode(this IJobExecutionContext context)
         {
-            var val = context.Get(JobDataMapKeys.ReturnCode);
+            context.MergedJobDataMap.TryGetValue(JobDataMapKeys.ReturnCode, out var val);
             if (val != null)
                 return Convert.ToString(val, CultureInfo.InvariantCulture);
             return null;
@@ -54,7 +56,7 @@ namespace BlazingQuartz.Jobs.Abstractions
 
         public static string? GetExecutionDetails(this IJobExecutionContext context)
         {
-            var val = context.Get(JobDataMapKeys.ExecutionDetails);
+            context.MergedJobDataMap.TryGetValue(JobDataMapKeys.ExecutionDetails, out var val);
             if (val != null)
                 return Convert.ToString(val, CultureInfo.InvariantCulture);
 
@@ -63,7 +65,7 @@ namespace BlazingQuartz.Jobs.Abstractions
 
         public static bool? GetIsSuccess(this IJobExecutionContext context)
         {
-            var value = context.Get(JobDataMapKeys.IsSuccess);
+            context.MergedJobDataMap.TryGetValue(JobDataMapKeys.IsSuccess, out var value);
             if (value == null)
                 return null;
             return Convert.ToBoolean(value);
