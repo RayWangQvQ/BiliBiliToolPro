@@ -79,8 +79,8 @@ dotnet() {
 
 # 目录
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-# 脚本在 baihu/DefaultTasks/dev/ 下，需向上跳三级到达仓库根目录
-baihu_bili_repo_dir="$(dirname $(dirname $(dirname "$CURRENT_DIR")))"
+# 脚本在 platforms/baihu/DefaultTasks/dev/ 下，需向上跳四级到达仓库根目录
+baihu_bili_repo_dir="$(dirname $(dirname $(dirname $(dirname "$CURRENT_DIR"))))"
 say "bili仓库目录: $baihu_bili_repo_dir"
 
 current_linux_os="debian"  # 或alpine

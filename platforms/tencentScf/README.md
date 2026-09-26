@@ -49,7 +49,7 @@
 **Ⅱ.点击新建密钥按钮，创建一个密钥。复制并保存 `SecretId` 和 `SecretKey` 两项内容，待会儿会用到它们**
 
 如下图所示：
-![新建密钥](../docs/imgs/tencent-scf-secret.png)
+![新建密钥](../../docs/imgs/tencent-scf-secret.png)
 
 #### 3.1.3. 通过 Secrets 添加配置
 进入自己 fork 的仓库，点击 Settings-> Secrets-> New repository secret，添加如下 Secrets 作为配置：
@@ -81,7 +81,7 @@ Actions 使用 `Serverless Framework` 来部署，通过 `serverless.yml` 来配
       Ray_Security__IntervalSecondsBetweenRequestApi: 20
 ```
 
-注意：其中 cookie 是必填项，其他应用配置的也可以通过添加相应的环境变量实现，建议自己添加UA、推送等配置。（更多配置项请参考[配置说明文档](../docs/configuration.md)，仅用于参考环境变量，请只关注表格中的`环境变量`一项，并参照上面的方式添加）
+注意：其中 cookie 是必填项，其他应用配置的也可以通过添加相应的环境变量实现，建议自己添加UA、推送等配置。（更多配置项请参考[配置说明文档](../../docs/configuration.md)，仅用于参考环境变量，请只关注表格中的`环境变量`一项，并参照上面的方式添加）
 
 > 如果你不熟悉 yml 或者部署时遇到格式问题，建议花几分钟阅读 [YAML 入门教程](https://www.runoob.com/w3cnote/yaml-intro.html)
 > 常犯错误：
@@ -97,7 +97,7 @@ Actions 使用 `Serverless Framework` 来部署，通过 `serverless.yml` 来配
 | serverless.yml内容 | `TENCENT_SERVERLESS_YML` | 刚才拷贝的整个文件内容 |
 
 如下图所示：
-![新增serverless.yml配置到secret](../docs/imgs/tencent-scf-secret_yml.png)
+![新增serverless.yml配置到secret](../../docs/imgs/tencent-scf-secret_yml.png)
 
 ##### 3.1.3.3. 自动定时更新部署配置
 
@@ -113,7 +113,7 @@ Actions 使用 `Serverless Framework` 来部署，通过 `serverless.yml` 来配
 在自己仓库页面，依次点击 Actions ——> auto-deploy-tencent-scf ——> Run workfolw ,手动触发部署工作流。
 
 如下图所示：
-![运行actions](../docs/imgs/tencent-scf-actions.png)
+![运行actions](../../docs/imgs/tencent-scf-actions.png)
 
 #### 3.1.5. 测试云函数
 如果部署成功，那么登录自己的腾讯云函数控制台，就可以看到对应的函数应用了。
@@ -129,7 +129,7 @@ Actions 使用 `Serverless Framework` 来部署，通过 `serverless.yml` 来配
 
 如下图：
 
-![tencent-scf-create.png](../docs/imgs/tencent-scf-create.png)
+![tencent-scf-create.png](../../docs/imgs/tencent-scf-create.png)
 
 **Ⅱ.填写基本信息**
 * 创建方式：选择自定义创建
@@ -142,7 +142,7 @@ Actions 使用 `Serverless Framework` 来部署，通过 `serverless.yml` 来配
 
 如下图：
 
-![tencent-scf-create-basic.png](../docs/imgs/tencent-scf-create-basic.png)
+![tencent-scf-create-basic.png](../../docs/imgs/tencent-scf-create-basic.png)
 
 **Ⅲ.点击展开高级配置，添加配置**
 * 初始化超时时间：30
@@ -154,7 +154,7 @@ Actions 使用 `Serverless Framework` 来部署，通过 `serverless.yml` 来配
 
 如下图：
 
-![tencent-scf-create-env.png](../docs/imgs/tencent-scf-create-env.png)
+![tencent-scf-create-env.png](../../docs/imgs/tencent-scf-create-env.png)
 
 **Ⅳ.继续下滚，找到执行配置模块：**
 * 异步执行：勾选启用
@@ -162,7 +162,7 @@ Actions 使用 `Serverless Framework` 来部署，通过 `serverless.yml` 来配
 
 如下图：
 
-![tencent-scf-create-async.png](../docs/imgs/tencent-scf-create-async.png)
+![tencent-scf-create-async.png](../../docs/imgs/tencent-scf-create-async.png)
 
 **Ⅴ.点击完成按钮，创建函数**
 
@@ -176,7 +176,7 @@ Actions 使用 `Serverless Framework` 来部署，通过 `serverless.yml` 来配
 
 如下图：
 
-![tencent-scf-trigger-create.png](../docs/imgs/tencent-scf-trigger-create.png)
+![tencent-scf-trigger-create.png](../../docs/imgs/tencent-scf-trigger-create.png)
 
 **Ⅱ.填写触发器信息**
 * 触发方式：定时触发
@@ -188,7 +188,7 @@ Actions 使用 `Serverless Framework` 来部署，通过 `serverless.yml` 来配
 * 立即启用：勾选启用
 填完后点击提交按钮提交，即可完成。如下图：
 
-![tencent-scf-trigger-add.png](../docs/imgs/tencent-scf-trigger-add.png)
+![tencent-scf-trigger-add.png](../../docs/imgs/tencent-scf-trigger-add.png)
 
 这里的附加信息将作为runTasks（欲运行的任务编码）配置，通过命令行传入程序。想多个任务共用一个触发器的话，可以使用&号拼接任务编码，填入附加信息，如 `Daily&LiveLottery`
 
@@ -200,13 +200,13 @@ Actions 使用 `Serverless Framework` 来部署，通过 `serverless.yml` 来配
 
 如下图：
 
-![tencent-scf-test-1.png](../docs/imgs/tencent-scf-test-1.png)
+![tencent-scf-test-1.png](../../docs/imgs/tencent-scf-test-1.png)
 
 **Ⅱ.下拉，找到测试按钮，点击运行测试，页面下方会同步显示日志。如果运行正常，则表示部署已成功。**
 
 如下图:
 
-![tencent-scf-test-2](../docs/imgs/tencent-scf-test-2.png)
+![tencent-scf-test-2](../../docs/imgs/tencent-scf-test-2.png)
 
 **Ⅲ.返回函数配置页面，将之前配置的环境变量`Ray_RunTasks`删除，后续函数将自动执行触发器中配置的功能任务**
 
@@ -214,16 +214,16 @@ Actions 使用 `Serverless Framework` 来部署，通过 `serverless.yml` 来配
 
 **Ⅰ.腾讯云关于CLS日志的免费额度说明如下：**
 
-![Tencent-log-docs-1.png](../docs/imgs/Tencent-log-docs-1.png)
+![Tencent-log-docs-1.png](../../docs/imgs/Tencent-log-docs-1.png)
 
 **Ⅱ.实测每日运行函数日志花费如图：**
 
-![Tencent-log-bill-1.png](../docs/imgs/Tencent-log-bill-1.png)
+![Tencent-log-bill-1.png](../../docs/imgs/Tencent-log-bill-1.png)
 
 **Ⅲ.如果需要完全白嫖(即不需要任何费用)的话，可以切至[腾讯云日志服务页](https://console.cloud.tencent.com/cls/overview)**
 
 **Ⅳ.点击侧边栏的日志主题，并找到云函数所在地域，如图所示：**
 
-![Tencent-logpage-1.png](../docs/imgs/Tencent-logpage-1.png)
+![Tencent-logpage-1.png](../../docs/imgs/Tencent-logpage-1.png)
 
 **Ⅴ.点击删除，则将删除此日志主题，云函数因为无法定位到日志集，就不会产生额外费用。**

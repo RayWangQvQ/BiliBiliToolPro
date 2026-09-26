@@ -72,7 +72,7 @@
 
 如果正常，拉库成功后，会自动添加bilibili相关的task任务。
 
-![qinglong-tasks.png](../docs/imgs/qinglong-tasks.png)
+![qinglong-tasks.png](../../docs/imgs/qinglong-tasks.png)
 
 ### 1.4. 配置青龙Client Secret（可选）
 
@@ -84,7 +84,7 @@
 
 青龙 -> 系统设置 -> 应用设置，点击新建。
 
-![qinglong-application](../docs/imgs/qinglong-application.png)
+![qinglong-application](../../docs/imgs/qinglong-application.png)
 
 #### 1.4.2. 密钥配置到环境变量
 
@@ -95,17 +95,17 @@ Name分别为：
 - Ray_QingLongConfig__ClientId
 - Ray_QingLongConfig__ClientSecret
 
-![qinglong-app-env](../docs/imgs/qinglong-application-key.png)
+![qinglong-app-env](../../docs/imgs/qinglong-application-key.png)
 
 
 ### 1.5. Bili登录
 
 在青龙定时任务中，点击运行`bili扫码登录`任务，查看运行日志，扫描日志中的二维码进行登录。
-![qinglong-login.png](../docs/imgs/qinglong-login.png)
+![qinglong-login.png](../../docs/imgs/qinglong-login.png)
 
 登录成功后，如果已配置了上述的Application，会将cookie保存到青龙的环境变量中：
 
-![qinglong-env.png](../docs/imgs/qinglong-env.png)
+![qinglong-env.png](../../docs/imgs/qinglong-env.png)
 
 如果未配置Application，会打印出cookie，请手动自己到环境变量中添加。
 
@@ -160,7 +160,7 @@ export BILI_MODE="bilitool" # bili运行模式，dotnet或bilitool
 export BILI_GITHUB_PROXY="https://github.moeyy.xyz/" # 下载二进制包时使用的加速代理，不要的话则置空
 ```
 
-![qinglong-login.png](../docs/imgs/qinglong-run-as-bilitool.png)
+![qinglong-login.png](../../docs/imgs/qinglong-run-as-bilitool.png)
 
 bilitool没有先行版的概念，因为只有main分支才会打包，更新会稍慢一点。
 

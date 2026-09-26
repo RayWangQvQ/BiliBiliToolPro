@@ -23,20 +23,20 @@ GA 是微软（巨硬）收购 G 站之后新增的内置 CI/CD 方案，其核�
 ### 添加 Secrets 配置
 进入自己 fork 的仓库，点击 Settings-> Secrets-> New Secrets， 添加 1 个 Secrets，其名称为`COOKIESTR`，值为刚才我们保存的 `cookie 字符串`。它们将作为配置项，在应用启动时传入程序。
 
-![Secrets图示](../docs/imgs/git-secrets.png)
+![Secrets图示](../../docs/imgs/git-secrets.png)
 
-![添加CookieStr图示](../docs/imgs/git-secrets-add-cookie.png)
+![添加CookieStr图示](../../docs/imgs/git-secrets-add-cookie.png)
 
 
 ### 测试运行 Actions
 刚 Fork 完，所有 Actions 都是默认关闭的，都配置好后，需要手动点击 Enable 开启 Actions。开启后请手动执行一次工作流，验证是否可以正常工作，操作步骤如下图所示：
 
-![Actions图示](../docs/imgs/run-workflow.png)
+![Actions图示](../../docs/imgs/run-workflow.png)
 
 运行结束后，请查看运行日志：
 
-![Actions日志图示](../docs/imgs/github-actions-log-1.png)
-![Actions日志图示](../docs/imgs/github-actions-log-2.png)
+![Actions日志图示](../../docs/imgs/github-actions-log-1.png)
+![Actions日志图示](../../docs/imgs/github-actions-log-2.png)
 
 
 ## 其他

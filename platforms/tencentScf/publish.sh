@@ -1,10 +1,10 @@
 # https://docs.microsoft.com/zh-cn/dotnet/core/tools/dotnet-publish
 
-cd ../src/Ray.BiliBiliTool.Console
+cd ../../src/Ray.BiliBiliTool.Console
 
-dotnet publish --configuration Release --runtime linux-x64 --self-contained true -p:PublishTrimmed=true -o ../../tencentScf/bin/publish
+dotnet publish --configuration Release --runtime linux-x64 --self-contained true -p:PublishTrimmed=true -o ../../platforms/tencentScf/bin/publish
 
-cd ../../tencentScf
+cd ../../platforms/tencentScf
 cp -r ./bootstrap ./index.sh ./bin/publish/
 
 cd ./bin/publish

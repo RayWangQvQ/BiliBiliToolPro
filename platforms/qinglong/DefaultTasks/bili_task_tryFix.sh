@@ -30,7 +30,7 @@ if [[ "$dotnetMajor" =~ ^[0-9]+$ && "$dotnetMajor" -ge "$requiredDotnetMajor" ]]
 else
     echo "which dotnet: $(which dotnet)"
     echo "Path: $PATH"
-    if ! bash "$qinglong_bili_repo_dir/qinglong/ray-dotnet-install.sh"; then
+    if ! bash "$qinglong_bili_repo_dir/platforms/qinglong/ray-dotnet-install.sh"; then
         echo "安装 .NET $requiredDotnetMajor SDK 失败"
         exit 1
     fi

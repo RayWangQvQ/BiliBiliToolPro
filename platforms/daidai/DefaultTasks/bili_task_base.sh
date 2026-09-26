@@ -5,8 +5,8 @@
 # 呆呆面板（Daidai Panel）基础脚本。
 # 设计与 qinglong / baihu 的集成一致：每个面板只维护“自己这一份 base（环境安装部分）”，
 # 而 bili_task_daily.sh 等“各任务脚本”完全复用 qinglong 目录里的同名脚本——
-# 由订阅钩子 daidai/copyshfile.sh 在拉库后、建任务前从 qinglong/DefaultTasks 拷贝过来。
-# 所以本目录默认只放 base，不重复维护各任务脚本（详见 daidai/README.md）。
+# 由订阅钩子 platforms/daidai/copyshfile.sh 在拉库后、建任务前从 platforms/qinglong/DefaultTasks 拷贝过来。
+# 所以本目录默认只放 base，不重复维护各任务脚本（详见 platforms/daidai/README.md）。
 #
 # 本 base 与 qinglong 版的差异只在“面板专属的运行环境安装/定位”：
 #   1. 用仓库根标记文件（Ray.BiliBiliTool.sln）向上查找仓库根目录，stable 与 dev 共用同一份 base；
@@ -67,9 +67,9 @@ find_repo_root() {
 
 BILI_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 bilitool_repo_dir="$(find_repo_root "$BILI_SCRIPT_DIR" || true)"
-# 兜底：找不到标记文件时按目录层级回退（DefaultTasks/ 上跳两级）
+# 兜底：找不到标记文件时按目录层级回退（platforms/daidai/DefaultTasks/ 上跳三级）
 if [ -z "$bilitool_repo_dir" ]; then
-    bilitool_repo_dir="$(cd "$BILI_SCRIPT_DIR/../.." >/dev/null 2>&1 && pwd)"
+    bilitool_repo_dir="$(cd "$BILI_SCRIPT_DIR/../../.." >/dev/null 2>&1 && pwd)"
 fi
 say "bilitool仓库目录: $bilitool_repo_dir"
 

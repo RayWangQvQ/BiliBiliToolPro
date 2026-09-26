@@ -9,7 +9,7 @@
 
 ## Install Plugin
 
-Command: `cd ./krew && make deploy`
+Command: `cd ./platforms/krew && make deploy`
 The binary will be generated in cmd/ install it alonside the kubectl binary.
 
 For example: the kubectl is installed under `/usr/bin`, then put the bilibilipro plugin under `/usr/bin` too.
@@ -35,7 +35,7 @@ Required Options:
 
 - `--config=<config.yaml>`
 
-The content of <config.yaml> is a yaml array, please refer to the example config yaml under the krew directory.
+The content of <config.yaml> is a yaml array, please refer to the example config yaml under the platforms/krew directory.
 
 For example
 
