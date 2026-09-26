@@ -2,7 +2,7 @@
 
 [呆呆面板](https://github.com/linzixuanzz/daidai-panel) 是一款轻量、现代的定时任务管理面板（Go + Vue + SQLite），定位与青龙类似但更轻量。
 
-本目录提供 BiliBiliToolPro 在呆呆面板中运行的脚本与说明，整体思路与 [`qinglong/`](../qinglong/README.md)、[`baihu/`](../baihu/README.md) 一致：
+本目录提供 BiliBiliToolPro 在呆呆面板中运行的脚本与说明，整体思路与 [`platforms/qinglong/`](../qinglong/README.md)、[`platforms/baihu/`](../baihu/README.md) 一致：
 
 > 利用面板的「订阅管理」拉取本仓库源码，自动添加 cron 定时任务，然后在面板容器中安装 `dotnet` 环境或下载 `bilitool` 二进制包，定时运行相应的 Task。
 
@@ -10,7 +10,7 @@
 
 各任务脚本（`bili_task_daily.sh` 等）的内容与青龙版**完全一致**——都只是 `. bili_task_base.sh; run_task "Xxx"`，与具体面板无关。所以本目录**不重复维护这些脚本**，而是：
 
-- `daidai/` 只保留一份**面板专属的 `bili_task_base.sh`**（负责呆呆面板下的运行环境安装与定位）；
+- `platforms/daidai/` 只保留一份**面板专属的 `bili_task_base.sh`**（负责呆呆面板下的运行环境安装与定位）；
 - 各任务脚本由订阅钩子 [`platforms/daidai/copyshfile.sh`](./copyshfile.sh) 在拉库后、建任务前，从 `platforms/qinglong/DefaultTasks` 复用拷贝过来；
 - `stable` 与 `dev` 共用同一份 base（靠仓库根标记文件 `Ray.BiliBiliTool.sln` 向上定位仓库根目录），进一步减少重复。
 

@@ -49,7 +49,7 @@ done
 
 echo ">>> 同步完成。"
 
-# 3. 清理 qinglong 目录
-echo ">>> 正在清理 qinglong 目录..."
+# 3. 清理 platforms/qinglong 目录
+echo ">>> 正在清理 platforms/qinglong 目录..."
 rm -rf "$REPO_ROOT/platforms/qinglong"
 echo ">>> 清理完成。"

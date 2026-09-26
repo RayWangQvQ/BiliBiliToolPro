@@ -109,9 +109,9 @@ podman exec -it bili bash
 
 扫码进行登录。
 
-![trigger](../docs/imgs/web-trigger-login.png)
+![trigger](../../docs/imgs/web-trigger-login.png)
 
-![login](../docs/imgs/docker-login.png)
+![login](../../docs/imgs/docker-login.png)
 
 ## 5. 自己构建镜像（非必须）
 

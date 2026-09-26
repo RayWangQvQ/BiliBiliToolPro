@@ -12,7 +12,7 @@ BiliBiliTool 是一个自动执行任务的工具，当我们忘记做某项任�
 
 ```console
 $ git clone https://github.com/RayWangQvQ/BiliBiliToolPro.git
-$ cd ${local_code_repo}/helm/bilibili-tool
+$ cd ${local_code_repo}/platforms/helm/bilibili-tool
 [optional]$ vim values.yaml # provides your own settings like cookies
 $ helm install <my_release_name> .
 ```

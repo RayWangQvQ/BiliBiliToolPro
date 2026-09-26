@@ -5,4 +5,4 @@ echo "start to build"
 echo "Start to build docker image with multi-arch"
 # $image="zai7lou/bilibili_tool_pro"
 # $version="0.0.5"
-docker buildx build --tag "zai7lou/bilibili_tool_pro:0.0.5" --tag "zai7lou/bilibili_tool_pro:latest" --output "type=image,push=true" --platform linux/amd64,linux/arm64 ../..
+docker buildx build --tag "zai7lou/bilibili_tool_pro:0.0.5" --tag "zai7lou/bilibili_tool_pro:latest" --output "type=image,push=true" --platform linux/amd64,linux/arm64 ../../..

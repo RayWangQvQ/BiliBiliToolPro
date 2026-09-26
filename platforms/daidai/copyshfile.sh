@@ -51,7 +51,7 @@ for file in "$SRC_ROOT"/dev/bili_dev_task_*.sh; do
     echo "已同步: dev/$filename"
 done
 
-echo ">>> 清理 qinglong 目录，避免被重复登记成任务 ..."
+echo ">>> 清理 platforms/qinglong 目录，避免被重复登记成任务 ..."
 rm -rf "$REPO_ROOT/platforms/qinglong"
 
 echo ">>> 同步完成。"
