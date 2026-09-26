@@ -192,6 +192,16 @@ public class SchedulesComponentTests : TestContext
             add { }
             remove { }
         }
+        public event EventHandler<EventArgs<TriggerKey>>? OnTriggerInError
+        {
+            add { }
+            remove { }
+        }
+        public event EventHandler<EventArgs<JobKey>>? OnTriggersInError
+        {
+            add { }
+            remove { }
+        }
         public event EventHandler<EventArgs<string?>>? OnTriggerGroupPaused
         {
             add { }

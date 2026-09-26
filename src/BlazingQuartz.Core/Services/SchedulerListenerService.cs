@@ -33,6 +33,8 @@ namespace BlazingQuartz.Core.Services
         public event EventHandler<EventArgs<ITrigger>>? OnTriggerMisfired;
         public event EventHandler<EventArgs<TriggerKey>>? OnTriggerPaused;
         public event EventHandler<EventArgs<TriggerKey>>? OnTriggerResumed;
+        public event EventHandler<EventArgs<TriggerKey>>? OnTriggerInError;
+        public event EventHandler<EventArgs<JobKey>>? OnTriggersInError;
         public event EventHandler<EventArgs<string?>>? OnTriggerGroupPaused;
         public event EventHandler<EventArgs<string?>>? OnTriggerGroupResumed;
         public event EventHandler<TriggerEventArgs>? OnTriggerComplete;
@@ -40,19 +42,27 @@ namespace BlazingQuartz.Core.Services
 
         public string Name => "BlazingQuartzNetUI";
 
-        public Task JobAdded(IJobDetail jobDetail, CancellationToken cancellationToken = default)
+        public ValueTask JobAdded(
+            IScheduler scheduler,
+            IJobDetail jobDetail,
+            CancellationToken cancellationToken = default
+        )
         {
             OnJobAdded?.Invoke(this, new EventArgs<IJobDetail>(jobDetail, cancellationToken));
-            return Task.CompletedTask;
+            return ValueTask.CompletedTask;
         }
 
-        public Task JobDeleted(JobKey jobKey, CancellationToken cancellationToken = default)
+        public ValueTask JobDeleted(
+            IScheduler scheduler,
+            JobKey jobKey,
+            CancellationToken cancellationToken = default
+        )
         {
             OnJobDeleted?.Invoke(this, new EventArgs<JobKey>(jobKey, cancellationToken));
-            return Task.CompletedTask;
+            return ValueTask.CompletedTask;
         }
 
-        public Task JobExecutionVetoed(
+        public ValueTask JobExecutionVetoed(
             IJobExecutionContext context,
             CancellationToken cancellationToken = default
         )
@@ -61,46 +71,70 @@ namespace BlazingQuartz.Core.Services
                 this,
                 new EventArgs<IJobExecutionContext>(context, cancellationToken)
             );
-            return Task.CompletedTask;
+            return ValueTask.CompletedTask;
         }
 
-        public Task JobInterrupted(JobKey jobKey, CancellationToken cancellationToken = default)
+        public ValueTask JobInterrupted(
+            IScheduler scheduler,
+            JobKey jobKey,
+            CancellationToken cancellationToken = default
+        )
         {
             OnJobInterrupted?.Invoke(this, new EventArgs<JobKey>(jobKey, cancellationToken));
-            return Task.CompletedTask;
+            return ValueTask.CompletedTask;
         }
 
-        public Task JobPaused(JobKey jobKey, CancellationToken cancellationToken = default)
+        public ValueTask JobPaused(
+            IScheduler scheduler,
+            JobKey jobKey,
+            CancellationToken cancellationToken = default
+        )
         {
             OnJobPaused?.Invoke(this, new EventArgs<JobKey>(jobKey, cancellationToken));
-            return Task.CompletedTask;
+            return ValueTask.CompletedTask;
         }
 
-        public Task JobResumed(JobKey jobKey, CancellationToken cancellationToken = default)
+        public ValueTask JobResumed(
+            IScheduler scheduler,
+            JobKey jobKey,
+            CancellationToken cancellationToken = default
+        )
         {
             OnJobResumed?.Invoke(this, new EventArgs<JobKey>(jobKey, cancellationToken));
-            return Task.CompletedTask;
+            return ValueTask.CompletedTask;
         }
 
-        public Task JobScheduled(ITrigger trigger, CancellationToken cancellationToken = default)
+        public ValueTask JobScheduled(
+            IScheduler scheduler,
+            ITrigger trigger,
+            CancellationToken cancellationToken = default
+        )
         {
             OnJobScheduled?.Invoke(this, new EventArgs<ITrigger>(trigger, cancellationToken));
-            return Task.CompletedTask;
+            return ValueTask.CompletedTask;
         }
 
-        public Task JobsPaused(string jobGroup, CancellationToken cancellationToken = default)
+        public ValueTask JobsPaused(
+            IScheduler scheduler,
+            string jobGroup,
+            CancellationToken cancellationToken = default
+        )
         {
             OnJobsPaused?.Invoke(this, new EventArgs<string>(jobGroup, cancellationToken));
-            return Task.CompletedTask;
+            return ValueTask.CompletedTask;
         }
 
-        public Task JobsResumed(string jobGroup, CancellationToken cancellationToken = default)
+        public ValueTask JobsResumed(
+            IScheduler scheduler,
+            string jobGroup,
+            CancellationToken cancellationToken = default
+        )
         {
             OnJobsResumed?.Invoke(this, new EventArgs<string>(jobGroup, cancellationToken));
-            return Task.CompletedTask;
+            return ValueTask.CompletedTask;
         }
 
-        public Task JobToBeExecuted(
+        public ValueTask JobToBeExecuted(
             IJobExecutionContext context,
             CancellationToken cancellationToken = default
         )
@@ -109,10 +143,11 @@ namespace BlazingQuartz.Core.Services
                 this,
                 new EventArgs<IJobExecutionContext>(context, cancellationToken)
             );
-            return Task.CompletedTask;
+            return ValueTask.CompletedTask;
         }
 
-        public Task JobUnscheduled(
+        public ValueTask JobUnscheduled(
+            IScheduler scheduler,
             TriggerKey triggerKey,
             CancellationToken cancellationToken = default
         )
@@ -121,10 +156,10 @@ namespace BlazingQuartz.Core.Services
                 this,
                 new EventArgs<TriggerKey>(triggerKey, cancellationToken)
             );
-            return Task.CompletedTask;
+            return ValueTask.CompletedTask;
         }
 
-        public Task JobWasExecuted(
+        public ValueTask JobWasExecuted(
             IJobExecutionContext context,
             JobExecutionException? jobException,
             CancellationToken cancellationToken = default
@@ -137,12 +172,12 @@ namespace BlazingQuartz.Core.Services
                     JobException = jobException,
                 }
             );
-            return Task.CompletedTask;
+            return ValueTask.CompletedTask;
         }
 
-        public Task SchedulerError(
-            string msg,
-            SchedulerException cause,
+        public ValueTask SchedulerError(
+            IScheduler scheduler,
+            SchedulerErrorContext errorContext,
             CancellationToken cancellationToken = default
         )
         {
@@ -150,51 +185,69 @@ namespace BlazingQuartz.Core.Services
                 this,
                 new SchedulerErrorEventArgs
                 {
-                    ErrorMessage = msg,
-                    Exception = cause,
+                    ErrorMessage = errorContext.Message,
+                    Exception = errorContext.Exception,
                     CancelToken = cancellationToken,
                 }
             );
-            return Task.CompletedTask;
+            return ValueTask.CompletedTask;
         }
 
-        public Task SchedulerInStandbyMode(CancellationToken cancellationToken = default)
+        public ValueTask SchedulerInStandbyMode(
+            IScheduler scheduler,
+            CancellationToken cancellationToken = default
+        )
         {
             OnSchedulerInStandbyMode?.Invoke(this, cancellationToken);
-            return Task.CompletedTask;
+            return ValueTask.CompletedTask;
         }
 
-        public Task SchedulerShutdown(CancellationToken cancellationToken = default)
+        public ValueTask SchedulerShutdown(
+            IScheduler scheduler,
+            CancellationToken cancellationToken = default
+        )
         {
             OnSchedulerShutdown?.Invoke(this, cancellationToken);
-            return Task.CompletedTask;
+            return ValueTask.CompletedTask;
         }
 
-        public Task SchedulerShuttingdown(CancellationToken cancellationToken = default)
+        public ValueTask SchedulerShuttingDown(
+            IScheduler scheduler,
+            CancellationToken cancellationToken = default
+        )
         {
             OnSchedulerShuttingdown?.Invoke(this, cancellationToken);
-            return Task.CompletedTask;
+            return ValueTask.CompletedTask;
         }
 
-        public Task SchedulerStarted(CancellationToken cancellationToken = default)
+        public ValueTask SchedulerStarted(
+            IScheduler scheduler,
+            CancellationToken cancellationToken = default
+        )
         {
             OnSchedulerStarted?.Invoke(this, cancellationToken);
-            return Task.CompletedTask;
+            return ValueTask.CompletedTask;
         }
 
-        public Task SchedulerStarting(CancellationToken cancellationToken = default)
+        public ValueTask SchedulerStarting(
+            IScheduler scheduler,
+            CancellationToken cancellationToken = default
+        )
         {
             OnSchedulerStarting?.Invoke(this, cancellationToken);
-            return Task.CompletedTask;
+            return ValueTask.CompletedTask;
         }
 
-        public Task SchedulingDataCleared(CancellationToken cancellationToken = default)
+        public ValueTask SchedulingDataCleared(
+            IScheduler scheduler,
+            CancellationToken cancellationToken = default
+        )
         {
             OnSchedulingDataCleared?.Invoke(this, cancellationToken);
-            return Task.CompletedTask;
+            return ValueTask.CompletedTask;
         }
 
-        public Task TriggerComplete(
+        public ValueTask TriggerComplete(
             ITrigger trigger,
             IJobExecutionContext context,
             SchedulerInstruction triggerInstructionCode,
@@ -205,44 +258,64 @@ namespace BlazingQuartz.Core.Services
                 this,
                 new TriggerEventArgs(trigger, context, cancellationToken)
             );
-            return Task.CompletedTask;
+            return ValueTask.CompletedTask;
         }
 
-        public Task TriggerFinalized(
+        public ValueTask TriggerFinalized(
+            IScheduler scheduler,
             ITrigger trigger,
             CancellationToken cancellationToken = default
         )
         {
             OnTriggerFinalized?.Invoke(this, new EventArgs<ITrigger>(trigger, cancellationToken));
-            return Task.CompletedTask;
+            return ValueTask.CompletedTask;
         }
 
-        public Task TriggerFired(
+        public ValueTask TriggerFired(
             ITrigger trigger,
             IJobExecutionContext context,
             CancellationToken cancellationToken = default
         )
         {
             OnTriggerFired?.Invoke(this, new TriggerEventArgs(trigger, context, cancellationToken));
-            return Task.CompletedTask;
+            return ValueTask.CompletedTask;
         }
 
-        public Task TriggerMisfired(ITrigger trigger, CancellationToken cancellationToken = default)
+        public ValueTask TriggerInError(
+            IScheduler scheduler,
+            TriggerKey triggerKey,
+            CancellationToken cancellationToken = default
+        )
+        {
+            OnTriggerInError?.Invoke(
+                this,
+                new EventArgs<TriggerKey>(triggerKey, cancellationToken)
+            );
+            return ValueTask.CompletedTask;
+        }
+
+        public ValueTask TriggerMisfired(
+            ITrigger trigger,
+            IScheduler scheduler,
+            CancellationToken cancellationToken = default
+        )
         {
             OnTriggerMisfired?.Invoke(this, new EventArgs<ITrigger>(trigger, cancellationToken));
-            return Task.CompletedTask;
+            return ValueTask.CompletedTask;
         }
 
-        public Task TriggerPaused(
+        public ValueTask TriggerPaused(
+            IScheduler scheduler,
             TriggerKey triggerKey,
             CancellationToken cancellationToken = default
         )
         {
             OnTriggerPaused?.Invoke(this, new EventArgs<TriggerKey>(triggerKey, cancellationToken));
-            return Task.CompletedTask;
+            return ValueTask.CompletedTask;
         }
 
-        public Task TriggerResumed(
+        public ValueTask TriggerResumed(
+            IScheduler scheduler,
             TriggerKey triggerKey,
             CancellationToken cancellationToken = default
         )
@@ -251,10 +324,21 @@ namespace BlazingQuartz.Core.Services
                 this,
                 new EventArgs<TriggerKey>(triggerKey, cancellationToken)
             );
-            return Task.CompletedTask;
+            return ValueTask.CompletedTask;
         }
 
-        public Task TriggersPaused(
+        public ValueTask TriggersInError(
+            IScheduler scheduler,
+            JobKey jobKey,
+            CancellationToken cancellationToken = default
+        )
+        {
+            OnTriggersInError?.Invoke(this, new EventArgs<JobKey>(jobKey, cancellationToken));
+            return ValueTask.CompletedTask;
+        }
+
+        public ValueTask TriggersPaused(
+            IScheduler scheduler,
             string? triggerGroup,
             CancellationToken cancellationToken = default
         )
@@ -263,10 +347,11 @@ namespace BlazingQuartz.Core.Services
                 this,
                 new EventArgs<string?>(triggerGroup, cancellationToken)
             );
-            return Task.CompletedTask;
+            return ValueTask.CompletedTask;
         }
 
-        public Task TriggersResumed(
+        public ValueTask TriggersResumed(
+            IScheduler scheduler,
             string? triggerGroup,
             CancellationToken cancellationToken = default
         )
@@ -275,16 +360,16 @@ namespace BlazingQuartz.Core.Services
                 this,
                 new EventArgs<string?>(triggerGroup, cancellationToken)
             );
-            return Task.CompletedTask;
+            return ValueTask.CompletedTask;
         }
 
-        public Task<bool> VetoJobExecution(
+        public ValueTask<bool> VetoJobExecution(
             ITrigger trigger,
             IJobExecutionContext context,
             CancellationToken cancellationToken = default
         )
         {
-            return Task.FromResult(false);
+            return new ValueTask<bool>(false);
         }
     }
 }
