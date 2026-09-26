@@ -128,7 +128,13 @@ try
 }
 catch (Exception ex)
 {
+    // 记完日志后必须重新抛出，让进程以非 0 退出码结束。
+    // 否则顶层语句正常返回、退出码为 0，Docker / 青龙 / SCF 等编排层会把
+    // 「启动崩溃」当成「正常退出」：不重启、不告警，只是端口从未监听。
+    // 退出码由运行时按未处理异常决定（Linux 134，Windows 0xE0434352），
+    // 详见 docs/adr/0001-web-startup-failure-must-exit-nonzero.md。
     Log.Fatal(ex, "Application terminated unexpectedly");
+    throw;
 }
 finally
 {
