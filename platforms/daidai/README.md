@@ -11,7 +11,7 @@
 各任务脚本（`bili_task_daily.sh` 等）的内容与青龙版**完全一致**——都只是 `. bili_task_base.sh; run_task "Xxx"`，与具体面板无关。所以本目录**不重复维护这些脚本**，而是：
 
 - `daidai/` 只保留一份**面板专属的 `bili_task_base.sh`**（负责呆呆面板下的运行环境安装与定位）；
-- 各任务脚本由订阅钩子 [`daidai/copyshfile.sh`](./copyshfile.sh) 在拉库后、建任务前，从 `qinglong/DefaultTasks` 复用拷贝过来；
+- 各任务脚本由订阅钩子 [`platforms/daidai/copyshfile.sh`](./copyshfile.sh) 在拉库后、建任务前，从 `platforms/qinglong/DefaultTasks` 复用拷贝过来；
 - `stable` 与 `dev` 共用同一份 base（靠仓库根标记文件 `Ray.BiliBiliTool.sln` 向上定位仓库根目录），进一步减少重复。
 
 这样后续青龙脚本有改动，呆呆面板自动跟随，不需要两边都改。
@@ -89,14 +89,14 @@
 分支：develop
 定时类型：crontab
 定时规则：2 2 28 * *
-钩子脚本：bash daidai/copyshfile.sh
+钩子脚本：bash platforms/daidai/copyshfile.sh
 白名单：bili_task_
 文件后缀：sh
 ```
 
-> - **钩子脚本填 `bash daidai/copyshfile.sh`**：呆呆面板会在“拉库之后、自动建任务之前”执行它，把青龙目录里的各任务脚本复用到 `daidai/DefaultTasks`，并清理 `qinglong` 目录。这是各任务脚本能复用、不重复维护的关键。
+> - **钩子脚本填 `bash platforms/daidai/copyshfile.sh`**：呆呆面板会在“拉库之后、自动建任务之前”执行它，把青龙目录里的各任务脚本复用到 `platforms/daidai/DefaultTasks`，并清理 `platforms/qinglong` 目录。这是各任务脚本能复用、不重复维护的关键。
 > - **白名单填 `bili_task_`**：只把 `bili_task_*.sh` 登记成定时任务，不会把仓库里其他文件也建成任务。
-> - **不要**限制「指定子目录」：钩子需要 `qinglong/` 源、`dotnet` 模式需要编译 `src/` 源码，都要求拉取完整仓库。
+> - **不要**限制「指定子目录」：钩子需要 `platforms/qinglong/` 源、`dotnet` 模式需要编译 `src/` 源码，都要求拉取完整仓库。
 > - 没提到的选项保持默认即可（自动添加任务、自动同步默认是开的）。
 > - 呆呆面板适配目前在 `develop`（先行版）分支，所以**分支填 `develop`**；等合并进 `main` 后可改回 `main`。
 
@@ -196,6 +196,6 @@ Alpine 容器仅 Alpine `3.23` 支持通过包管理器安装 `dotnet10-sdk`。�
 
 去订阅的运行日志看：
 
-- 是否有 `[执行订阅钩子]` 且同步了脚本 → 没有就检查「钩子脚本」是否填了 `bash daidai/copyshfile.sh`；
+- 是否有 `[执行订阅钩子]` 且同步了脚本 → 没有就检查「钩子脚本」是否填了 `bash platforms/daidai/copyshfile.sh`；
 - 「扫描脚本…识别出 N 个含 cron 的脚本」→ 为 0 就检查白名单是否写成了 `bili_task_`、文件后缀是否含 `sh`；
 - 一个文件都没扫到 → 多半是拉库失败。

@@ -4,13 +4,13 @@
 # 优先使用环境变量 CURR_REPO_DIR，如果不存在则从当前脚本路径推算
 if [ -z "${CURR_REPO_DIR:-}" ]; then
     CURRENT_FILE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-    REPO_ROOT="$(dirname "$CURRENT_FILE_DIR")"
+    REPO_ROOT="$(dirname "$(dirname "$CURRENT_FILE_DIR")")"
 else
     REPO_ROOT="$CURR_REPO_DIR"
 fi
 
-SRC_ROOT="$REPO_ROOT/qinglong/DefaultTasks"
-DST_ROOT="$REPO_ROOT/baihu/DefaultTasks"
+SRC_ROOT="$REPO_ROOT/platforms/qinglong/DefaultTasks"
+DST_ROOT="$REPO_ROOT/platforms/baihu/DefaultTasks"
 
 
 
@@ -51,5 +51,5 @@ echo ">>> 同步完成。"
 
 # 3. 清理 qinglong 目录
 echo ">>> 正在清理 qinglong 目录..."
-rm -rf "$REPO_ROOT/qinglong"
+rm -rf "$REPO_ROOT/platforms/qinglong"
 echo ">>> 清理完成。"
