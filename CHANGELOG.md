@@ -1,6 +1,6 @@
 ## 4.0.7
-- Fix[#1144]: Web 面板启动失败改为以非 0 退出码结束（此前恒为 0），Docker / 青龙 / tencentScf 等编排层不再把「启动崩溃」当成「正常退出」；副作用是存量部署里一直潜伏的配置错误会显形为容器反复重启，这正是本次想要的效果。退出码由运行时决定、不保证跨平台一致（Linux 134，Windows `0xE0434352`），排查请看日志里的 `Application terminated unexpectedly`
-- Fix[#1147][#1149]: 补齐 #1138 迁移到 `platforms/` 后仍遗留的旧路径（两轮）：呆呆/白虎的 `copyshfile.sh` 钩子与白虎任务脚本定位仓库根少一级（白虎任务全部失败）、`tencentScf` 的 publish 脚本相对路径失效（`auto-deploy-tencent-scf` 定时部署中断）、青龙 `bili_task_tryFix.sh` 找不到 dotnet 安装脚本、docker/podman 构建脚本的上下文多退一级，另有 5 个平台 README 共 30 处 `../docs/` 断链
+- Fix[#1144]: Web 面板启动失败改为以非 0 退出码结束（此前恒为 0），Docker / 青龙等编排层不再把「启动崩溃」当成「正常退出」；退出码由运行时决定、不保证跨平台一致（Linux 134，Windows `0xE0434352`）
+- Fix[#1147][#1149]: 补齐 #1138 迁移到 `platforms/` 后仍遗留的旧路径（两轮）：呆呆/白虎的 `copyshfile.sh` 钩子与白虎任务脚本定位仓库根少一级、青龙 `bili_task_tryFix.sh` 找不到 dotnet 安装脚本、docker/podman 构建脚本的上下文多退一级，另有 5 个平台 README 共 30 处 `../docs/` 断链
 ## 4.0.6
 - **BREAKING[#1138]**: 部署平台目录统一迁移至 `platforms/` 下（`docker`、`podman`、`qinglong`、`baihu`、`daidai`、`helm`、`tencentScf`、`gitHubActions`、`krew`）；按 `raw.githubusercontent.com/.../main/<旧路径>` 直接拉取脚本或示例文件的存量部署会 404，请改用 `platforms/<平台>/...`
 - Fix[#1140]: 修复 Web 面板启动时因模型与迁移不一致（`PendingModelChangesWarning`）而直接退出的问题；首次启动会自动为 `QRTZ_TRIGGERS`/`QRTZ_FIRED_TRIGGERS` 补列并创建 `QRTZ_PAUSED_JOB_GRPS` 表
