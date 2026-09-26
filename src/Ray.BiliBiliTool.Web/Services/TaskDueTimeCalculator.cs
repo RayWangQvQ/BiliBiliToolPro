@@ -17,7 +17,19 @@ public static class TaskDueTimeCalculator
     public static List<DateTimeOffset> GetFireTimesOfDay(string? cron, DateTimeOffset day)
     {
         var result = new List<DateTimeOffset>();
-        if (string.IsNullOrWhiteSpace(cron) || !CronExpression.IsValidExpression(cron))
+        if (string.IsNullOrWhiteSpace(cron))
+        {
+            return result;
+        }
+
+        // Quartz 4 removed IsValidExpression: the constructor is the parser, and a bad
+        // expression is a FormatException rather than a false answer.
+        CronExpression parsed;
+        try
+        {
+            parsed = new CronExpression(cron);
+        }
+        catch (FormatException)
         {
             return result;
         }
@@ -27,15 +39,14 @@ public static class TaskDueTimeCalculator
         // （例如机器在 UTC 而传入的是 +08:00 的时刻，当天的触发点会被判成落在窗口之外）。
         // 运行时的 now 来自 DateTimeOffset.Now，其 Offset 就是宿主机本地时区，
         // 也就是 Quartz 触发器默认使用的时区，因此这里与调度实际行为一致。
-        var expression = new CronExpression(cron)
-        {
-            TimeZone = TimeZoneInfo.CreateCustomTimeZone(
+        var expression = parsed.WithTimeZone(
+            TimeZoneInfo.CreateCustomTimeZone(
                 $"BiliCronUtc{(day.Offset < TimeSpan.Zero ? "-" : "+")}{day.Offset.Duration():hh\\:mm}",
                 day.Offset,
                 "BiliCron",
                 "BiliCron"
-            ),
-        };
+            )
+        );
         var midnight = new DateTimeOffset(day.Year, day.Month, day.Day, 0, 0, 0, day.Offset);
 
         // 起点回退 1 秒：Quartz 的 GetNextValidTimeAfter 返回「严格晚于」的时间，

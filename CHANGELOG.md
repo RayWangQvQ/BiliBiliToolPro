@@ -1,3 +1,10 @@
+## 4.0.6
+- **BREAKING[#1138]**: 部署平台目录统一迁移至 `platforms/` 下（`docker`、`podman`、`qinglong`、`baihu`、`daidai`、`helm`、`tencentScf`、`gitHubActions`、`krew`）；按 `raw.githubusercontent.com/.../main/<旧路径>` 直接拉取脚本或示例文件的存量部署会 404，请改用 `platforms/<平台>/...`
+- Fix[#1140]: 修复 Web 面板启动时因模型与迁移不一致（`PendingModelChangesWarning`）而直接退出的问题；首次启动会自动为 `QRTZ_TRIGGERS`/`QRTZ_FIRED_TRIGGERS` 补列并创建 `QRTZ_PAUSED_JOB_GRPS` 表
+- Fix[#1133]: 触发器进入 ERROR 状态时面板立刻刷新，补齐 Quartz 4 的 `OnTriggerInError`/`OnTriggersInError` 回调，不再要等下一轮轮询才发现
+- 维护[#1133]: 升级到 Quartz.NET 4.1.1；作业存储的 System.Text.Json 实现 4.x 已并入 `Quartz` 核心，故删去独立的 `Quartz.Serialization.SystemTextJson` 引用
+- 维护[#1125][#1131]: 依赖批量升级，含 MudBlazor 8.6.0→9.10.0、AppAny.Quartz.EntityFrameworkCore.Migrations.SQLite 0.6.0→0.6.1、Serilog、QRCoder、CronExpressionDescriptor、Ray.Infrastructure、bunit、xunit 等
+- 维护[#1139][#1142]: 统一仓库文本文件换行符为 LF（`.bat`/`.cmd` 保留 CRLF），`.gitattributes` 只留兜底与例外声明，`.editorconfig` 去掉与 CSharpier 互相拉扯的 `insert_final_newline = false`；预览镜像触发路径收窄为仅工作流或配置文件变更
 ## 4.0.5
 - Feature[#1106]: Web 新增「今日任务」页面：逐账号列出每个任务今天该不该做、做了没有，并提供单项/整账号/全部补做
 - Feature[#1106]: 漏做的任务可自动补做，间隔与记录保留天数由 `AutoRecoverConfig` 配置（默认每 2 小时检查一次，文档见 `docs/configuration.md`）

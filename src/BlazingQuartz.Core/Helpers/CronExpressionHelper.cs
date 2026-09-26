@@ -7,7 +7,20 @@ namespace BlazingQuartz.Core.Helpers
     {
         public static bool IsValidExpression(string cronExpression)
         {
-            return CronExpression.IsValidExpression(cronExpression);
+            if (string.IsNullOrEmpty(cronExpression))
+            {
+                return false;
+            }
+
+            try
+            {
+                _ = new CronExpression(cronExpression);
+                return true;
+            }
+            catch (FormatException)
+            {
+                return false;
+            }
         }
     }
 }

@@ -3,16 +3,17 @@
 # top-most EditorConfig file
 root = true
 
-# Default settings:
-# A newline ending every file
-# Use CRLF line break
-# Use 4 spaces as indentation
+# 默认：LF 换行、文件末尾保留换行、4 空格缩进
 [*]
 end_of_line = lf
 trim_trailing_whitespace = true
 insert_final_newline = true
 indent_style = space
 indent_size = 4
+
+# Windows 批处理必须是 CRLF，与 .gitattributes 保持一致
+[*.{bat,cmd}]
+end_of_line = crlf
 
 # Json config files
 [*.json]
@@ -39,10 +40,6 @@ indent_size = 2
 indent_size = 4
 indent_style = space
 tab_width = 4
-
-# 新行首选项
-end_of_line = lf
-insert_final_newline = false
 
 #### .NET 编码约定 ####
 

@@ -221,7 +221,7 @@ internal class SchedulerEventLoggingService : BackgroundService, ISchedulerEvent
             var reschedule = true;
 
             // determine if already exists
-            if (await scheduler.CheckExists(triggerKey))
+            if (await scheduler.Exists(triggerKey))
             {
                 // determine if same cron schedule
                 var trig = await scheduler.GetTrigger(triggerKey);
@@ -254,13 +254,17 @@ internal class SchedulerEventLoggingService : BackgroundService, ISchedulerEvent
                     .StartNow()
                     .Build();
 
-                await scheduler.ScheduleJob(job, new[] { trigger, nowTrigger }, true);
+                await scheduler.ScheduleJob(
+                    job,
+                    new[] { trigger, nowTrigger },
+                    ScheduleJobOptions.Replacing
+                );
             }
         }
         else
         {
             // delete housekeeping schedule
-            if (await scheduler.CheckExists(triggerKey))
+            if (await scheduler.Exists(triggerKey))
             {
                 _logger.LogInformation(
                     "Housekeeping ExecutionLogs has no cron schedule specified. Delete scheduled job"

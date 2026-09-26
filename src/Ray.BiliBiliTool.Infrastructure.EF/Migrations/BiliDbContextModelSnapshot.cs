@@ -98,6 +98,10 @@ namespace Ray.BiliBiliTool.Web.Migrations
                         .HasColumnType("text")
                         .HasColumnName("ENTRY_ID");
 
+                    b.Property<string>("ExecutionGroup")
+                        .HasColumnType("text")
+                        .HasColumnName("EXECUTION_GROUP");
+
                     b.Property<long>("FiredTime")
                         .HasColumnType("bigint")
                         .HasColumnName("FIRED_TIME");
@@ -236,6 +240,21 @@ namespace Ray.BiliBiliTool.Web.Migrations
                     b.HasKey("SchedulerName", "LockName");
 
                     b.ToTable("QRTZ_LOCKS", (string)null);
+                });
+
+            modelBuilder.Entity("AppAny.Quartz.EntityFrameworkCore.Migrations.QuartzPausedJobGroup", b =>
+                {
+                    b.Property<string>("SchedulerName")
+                        .HasColumnType("text")
+                        .HasColumnName("SCHED_NAME");
+
+                    b.Property<string>("JobGroup")
+                        .HasColumnType("text")
+                        .HasColumnName("JOB_GROUP");
+
+                    b.HasKey("SchedulerName", "JobGroup");
+
+                    b.ToTable("QRTZ_PAUSED_JOB_GRPS", (string)null);
                 });
 
             modelBuilder.Entity("AppAny.Quartz.EntityFrameworkCore.Migrations.QuartzPausedTriggerGroup", b =>
@@ -400,6 +419,10 @@ namespace Ray.BiliBiliTool.Web.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("END_TIME");
 
+                    b.Property<string>("ExecutionGroup")
+                        .HasColumnType("text")
+                        .HasColumnName("EXECUTION_GROUP");
+
                     b.Property<byte[]>("JobData")
                         .HasColumnType("bytea")
                         .HasColumnName("JOB_DATA");
@@ -426,6 +449,16 @@ namespace Ray.BiliBiliTool.Web.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("NEXT_FIRE_TIME");
 
+                    b.Property<string>("PreferredNode")
+                        .HasColumnType("text")
+                        .HasColumnName("PREFERRED_NODE");
+
+                    b.Property<bool>("PreferredNodeAuto")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false)
+                        .HasColumnName("PREFERRED_NODE_AUTO");
+
                     b.Property<long?>("PreviousFireTime")
                         .HasColumnType("bigint")
                         .HasColumnName("PREV_FIRE_TIME");
@@ -433,6 +466,14 @@ namespace Ray.BiliBiliTool.Web.Migrations
                     b.Property<int?>("Priority")
                         .HasColumnType("integer")
                         .HasColumnName("PRIORITY");
+
+                    b.Property<int?>("RetryAttempt")
+                        .HasColumnType("integer")
+                        .HasColumnName("RETRY_ATTEMPT");
+
+                    b.Property<string>("RetryPolicy")
+                        .HasColumnType("text")
+                        .HasColumnName("RETRY_POLICY");
 
                     b.Property<long>("StartTime")
                         .HasColumnType("bigint")
@@ -503,7 +544,7 @@ namespace Ray.BiliBiliTool.Web.Migrations
                     b.HasIndex("FireInstanceIdComputed")
                         .HasDatabaseName("IX_Logs_FireInstanceIdComputed");
 
-                    b.ToTable("bili_logs", (string)null);
+                    b.ToTable("bili_logs");
                 });
 
             modelBuilder.Entity("Ray.BiliBiliTool.Domain.ExecutionLog", b =>
@@ -581,7 +622,7 @@ namespace Ray.BiliBiliTool.Web.Migrations
 
                     b.HasIndex("TriggerName", "TriggerGroup", "JobName", "JobGroup", "DateAddedUtc");
 
-                    b.ToTable("bili_execution_logs", (string)null);
+                    b.ToTable("bili_execution_logs");
                 });
 
             modelBuilder.Entity("Ray.BiliBiliTool.Domain.TaskRecord", b =>
@@ -657,7 +698,7 @@ namespace Ray.BiliBiliTool.Web.Migrations
                     b.HasIndex("Username")
                         .IsUnique();
 
-                    b.ToTable("bili_user", (string)null);
+                    b.ToTable("bili_user");
                 });
 
             modelBuilder.Entity("AppAny.Quartz.EntityFrameworkCore.Migrations.QuartzBlobTrigger", b =>

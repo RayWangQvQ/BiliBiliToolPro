@@ -797,7 +797,7 @@ BiliBiliTool 使用 Serilog 作为日志组件，所以可以参考 Serilog 的�
 <a id="markdown-393-定时任务相关" name="393-定时任务相关"></a>
 #### 3.9.3. 定时任务相关
 
-适用于 [方式四：docker容器化运行（推荐）](../docker/README.md)，用于配置定时任务。
+适用于 [方式四：docker容器化运行（推荐）](../platforms/docker/README.md)，用于配置定时任务。
 
 <a id="markdown-394-定时任务" name="394-定时任务"></a>
 #### 3.9.4. 定时任务
@@ -816,7 +816,7 @@ BiliBiliTool 使用 Serilog 作为日志组件，所以可以参考 Serilog 的�
 <a id="markdown-310-自动补做相关" name="310-自动补做相关"></a>
 ### 3.10. 自动补做相关
 
-适用于 `Ray.BiliBiliTool.Web`（网页版，即 [方式四：docker容器化运行（推荐）](../docker/README.md)）。
+适用于 `Ray.BiliBiliTool.Web`（网页版，即 [方式四：docker容器化运行（推荐）](../platforms/docker/README.md)）。
 
 网页版的「今日任务」页面会记录每个任务每天的执行结果。当某个任务已经到点、但当天漏做了（或者做了但失败、且还没到自动重试上限）时，自动补做会把它补跑一次，不用人工去页面上点。
 

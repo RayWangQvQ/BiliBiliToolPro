@@ -45,6 +45,16 @@ namespace BlazingQuartz.Core.Services
         event EventHandler<EventArgs<ITrigger>>? OnTriggerMisfired;
         event EventHandler<EventArgs<TriggerKey>>? OnTriggerPaused;
         event EventHandler<EventArgs<TriggerKey>>? OnTriggerResumed;
+
+        /// <summary>
+        /// A trigger moved into the error state (Quartz 4 notifications).
+        /// </summary>
+        event EventHandler<EventArgs<TriggerKey>>? OnTriggerInError;
+
+        /// <summary>
+        /// Every trigger of one job moved into the error state (Quartz 4 notifications).
+        /// </summary>
+        event EventHandler<EventArgs<JobKey>>? OnTriggersInError;
         event EventHandler<EventArgs<string?>>? OnTriggerGroupPaused;
         event EventHandler<EventArgs<string?>>? OnTriggerGroupResumed;
 

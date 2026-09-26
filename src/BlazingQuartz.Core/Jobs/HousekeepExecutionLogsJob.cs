@@ -20,7 +20,10 @@ namespace BlazingQuartz.Core.Jobs
             _options = options.Value;
         }
 
-        public async Task Execute(IJobExecutionContext context)
+        public async ValueTask Execute(
+            IJobExecutionContext context,
+            CancellationToken cancellationToken
+        )
         {
             try
             {

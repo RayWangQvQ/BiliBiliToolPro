@@ -49,9 +49,9 @@ namespace BlazingQuartz.Core
             return TriggerType.Unknown;
         }
 
-        public static TimeOfDay ToTimeOfDay(this TimeSpan timeSpan)
+        public static TimeOnly ToTimeOnly(this TimeSpan timeSpan)
         {
-            return new TimeOfDay(timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds);
+            return new TimeOnly(timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds);
         }
 
         public static Quartz.IntervalUnit ToQuartzIntervalUnit(this IntervalUnit value)

@@ -354,18 +354,18 @@ MigrationBackup/
 
 #
 .idea/
-tencentScf/.env
+platforms/tencentScf/.env
 .obsidian
 
 # vs code
 .vscode
 
 # krew
-krew/bilipro
-krew/cmd/kubectl-bilipro
-krew/kustomization.yaml
 bilipro
-krew/pkg/utils/fixtures
+platforms/krew/bilipro
+platforms/krew/cmd/kubectl-bilipro
+platforms/krew/kustomization.yaml
+platforms/krew/pkg/utils/fixtures
 kustomization.yaml
 
 # cookie config

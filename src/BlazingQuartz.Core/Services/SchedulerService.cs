@@ -3,7 +3,6 @@ using BlazingQuartz.Core.Models;
 using BlazingQuartz.Jobs;
 using Microsoft.Extensions.Logging;
 using Quartz;
-using Quartz.Impl.Matchers;
 
 namespace BlazingQuartz.Core.Services;
 
@@ -60,7 +59,11 @@ public class SchedulerService(ILogger<SchedulerService> logger, ISchedulerFactor
     public async Task<IList<KeyValuePair<string, int>>> GetScheduledJobSummary()
     {
         var scheduler = await schedulerFactory.GetScheduler();
-        var executingCount = (await scheduler.GetCurrentlyExecutingJobs()).Count;
+        var executingCount = (
+            await scheduler.QueryFireInstances(new FireInstanceQuery { Take = PagedQuery.All })
+        )
+            .Items
+            .Count;
         var jobCount = (await scheduler.GetJobKeys(GroupMatcher<JobKey>.AnyGroup())).Count;
         var triggerCount = (
             await scheduler.GetTriggerKeys(GroupMatcher<TriggerKey>.AnyGroup())
@@ -84,10 +87,10 @@ public class SchedulerService(ILogger<SchedulerService> logger, ISchedulerFactor
         };
     }
 
-    public async Task<SchedulerMetaData> GetMetadataAsync()
+    public async Task<SchedulerMetadata> GetMetadataAsync()
     {
         var scheduler = await schedulerFactory.GetScheduler();
-        return await scheduler.GetMetaData();
+        return await scheduler.GetMetadata();
     }
 
     private async Task<ScheduleModel> CreateScheduleModel(
@@ -98,8 +101,13 @@ public class SchedulerService(ILogger<SchedulerService> logger, ISchedulerFactor
     {
         var scheduler = await schedulerFactory.GetScheduler();
         var triggerState = (await scheduler.GetTriggerState(trigger.Key));
-        var runningTrigger = (await scheduler.GetCurrentlyExecutingJobs(cancellationToken))
-            .Where(context => context.Trigger.Equals(trigger))
+        var runningTrigger = (
+            await scheduler.QueryFireInstances(
+                new FireInstanceQuery { Take = PagedQuery.All },
+                cancellationToken
+            )
+        )
+            .Items.Where(fireInstance => fireInstance.TriggerKey.Equals(trigger.Key))
             .FirstOrDefault();
 
         return new ScheduleModel
@@ -113,8 +121,8 @@ public class SchedulerService(ILogger<SchedulerService> logger, ISchedulerFactor
             TriggerDescription = trigger.Description,
             TriggerType = trigger.GetTriggerType(),
             TriggerTypeClassName = trigger.GetType().Name,
-            NextTriggerTime = trigger.GetNextFireTimeUtc(),
-            PreviousTriggerTime = trigger.GetPreviousFireTimeUtc(),
+            NextTriggerTime = trigger.NextFireTimeUtc,
+            PreviousTriggerTime = trigger.PreviousFireTimeUtc,
             JobStatus =
                 runningTrigger != null
                     ? JobStatus.Running
@@ -150,7 +158,11 @@ public class SchedulerService(ILogger<SchedulerService> logger, ISchedulerFactor
                 var jobTriggers = new List<ITrigger>(1);
                 jobTriggers.Add(trigger);
 
-                await scheduler.ScheduleJob(existingJob, jobTriggers.AsReadOnly(), true);
+                await scheduler.ScheduleJob(
+                    existingJob,
+                    jobTriggers.AsReadOnly(),
+                    ScheduleJobOptions.Replacing
+                );
                 return;
             }
         }
@@ -175,7 +187,7 @@ public class SchedulerService(ILogger<SchedulerService> logger, ISchedulerFactor
         // determine if old triggerKey exists
         if (
             oldTriggerKey != null
-            && await scheduler.CheckExists(oldTriggerKey.ToTriggerKey()).ConfigureAwait(false)
+            && await scheduler.Exists(oldTriggerKey.ToTriggerKey()).ConfigureAwait(false)
         )
         {
             await scheduler.UnscheduleJob(oldTriggerKey.ToTriggerKey()).ConfigureAwait(false);
@@ -199,7 +211,9 @@ public class SchedulerService(ILogger<SchedulerService> logger, ISchedulerFactor
         await scheduler.DeleteJob(oJobKey).ConfigureAwait(false);
 
         // save new job with triggers
-        await scheduler.ScheduleJob(newJob, triggers, replace: true).ConfigureAwait(false);
+        await scheduler
+            .ScheduleJob(newJob, triggers, ScheduleJobOptions.Replacing)
+            .ConfigureAwait(false);
     }
 
     public async Task<JobDetailModel?> GetJobDetail(string jobName, string groupName)
@@ -216,7 +230,7 @@ public class SchedulerService(ILogger<SchedulerService> logger, ISchedulerFactor
             Group = jd.Key.Group,
             Description = jd.Description,
             JobDataMap = jd.JobDataMap,
-            JobClass = jd.JobType,
+            JobClass = jd.JobType.Type,
             IsDurable = jd.Durable,
         };
     }
@@ -235,13 +249,13 @@ public class SchedulerService(ILogger<SchedulerService> logger, ISchedulerFactor
     public async Task<bool> ContainsTriggerKey(string triggerName, string triggerGroup)
     {
         var scheduler = await schedulerFactory.GetScheduler();
-        return await scheduler.CheckExists(new TriggerKey(triggerName, triggerGroup));
+        return await scheduler.Exists(new TriggerKey(triggerName, triggerGroup));
     }
 
     public async Task<bool> ContainsJobKey(string jobName, string jobGroup)
     {
         var scheduler = await schedulerFactory.GetScheduler();
-        return await scheduler.CheckExists(new JobKey(jobName, jobGroup));
+        return await scheduler.Exists(new JobKey(jobName, jobGroup));
     }
 
     public async Task<IReadOnlyCollection<string>> GetCalendarNames(
@@ -335,7 +349,7 @@ public class SchedulerService(ILogger<SchedulerService> logger, ISchedulerFactor
                     jobKey.Name
                 );
 
-                if (await scheduler.CheckExists(jobKey))
+                if (await scheduler.Exists(jobKey))
                 {
                     logger.LogInformation(
                         "Manually delete job [{jobGroup}.{jobName}].",
@@ -447,16 +461,17 @@ public class SchedulerService(ILogger<SchedulerService> logger, ISchedulerFactor
             Priority = trigger.Priority,
         };
 
-        switch (trigger.MisfireInstruction)
+        // -1 and 0 mean the same policy in every trigger family, so this one stays generic.
+        switch (trigger.MisfireInstructionCode)
         {
-            case MisfireInstruction.IgnoreMisfirePolicy:
+            case (int)CronTriggerMisfireInstruction.IgnoreMisfires:
                 model.MisfireAction = MisfireAction.IgnoreMisfirePolicy;
                 break;
             // comment out same as SmartPolicy
             //case MisfireInstruction.InstructionNotSet:
             //    model.MisfireAction = MisfireAction.InstructionNotSet;
             //    break;
-            case MisfireInstruction.SmartPolicy:
+            case (int)CronTriggerMisfireInstruction.SmartPolicy:
                 model.MisfireAction = MisfireAction.SmartPolicy;
                 break;
         }
@@ -469,10 +484,10 @@ public class SchedulerService(ILogger<SchedulerService> logger, ISchedulerFactor
                 model.InTimeZone = cron.TimeZone;
                 switch (cron.MisfireInstruction)
                 {
-                    case MisfireInstruction.CronTrigger.DoNothing:
+                    case CronTriggerMisfireInstruction.DoNothing:
                         model.MisfireAction = MisfireAction.DoNothing;
                         break;
-                    case MisfireInstruction.CronTrigger.FireOnceNow:
+                    case CronTriggerMisfireInstruction.FireAndProceed:
                         model.MisfireAction = MisfireAction.FireOnceNow;
                         break;
                 }
@@ -485,10 +500,10 @@ public class SchedulerService(ILogger<SchedulerService> logger, ISchedulerFactor
                 }
                 switch (daily.MisfireInstruction)
                 {
-                    case MisfireInstruction.DailyTimeIntervalTrigger.DoNothing:
+                    case DailyTimeIntervalTriggerMisfireInstruction.DoNothing:
                         model.MisfireAction = MisfireAction.DoNothing;
                         break;
-                    case MisfireInstruction.DailyTimeIntervalTrigger.FireOnceNow:
+                    case DailyTimeIntervalTriggerMisfireInstruction.FireAndProceed:
                         model.MisfireAction = MisfireAction.FireOnceNow;
                         break;
                 }
@@ -515,10 +530,10 @@ public class SchedulerService(ILogger<SchedulerService> logger, ISchedulerFactor
                 var calTrigger = (ICalendarIntervalTrigger)trigger;
                 switch (calTrigger.MisfireInstruction)
                 {
-                    case MisfireInstruction.CalendarIntervalTrigger.DoNothing:
+                    case CalendarIntervalTriggerMisfireInstruction.DoNothing:
                         model.MisfireAction = MisfireAction.DoNothing;
                         break;
-                    case MisfireInstruction.CalendarIntervalTrigger.FireOnceNow:
+                    case CalendarIntervalTriggerMisfireInstruction.FireAndProceed:
                         model.MisfireAction = MisfireAction.FireOnceNow;
                         break;
                 }
@@ -537,7 +552,8 @@ public class SchedulerService(ILogger<SchedulerService> logger, ISchedulerFactor
         ArgumentNullException.ThrowIfNull(jobDetailModel.JobClass);
 
         return JobBuilder
-            .Create(jobDetailModel.JobClass)
+            .Create()
+            .OfType(jobDetailModel.JobClass)
             .WithIdentity(jobDetailModel.Name, jobDetailModel.Group)
             .WithDescription(jobDetailModel.Description)
             .UsingJobData(new JobDataMap(jobDetailModel.JobDataMap))
@@ -553,7 +569,7 @@ public class SchedulerService(ILogger<SchedulerService> logger, ISchedulerFactor
             .WithDescription(triggerDetailModel.Description)
             .WithPriority(triggerDetailModel.Priority)
             .UsingJobData(new JobDataMap(triggerDetailModel.TriggerDataMap))
-            .ModifiedByCalendar(triggerDetailModel.ModifiedByCalendar);
+            .WithCalendarName(triggerDetailModel.ModifiedByCalendar);
 
         if (jobKey != null)
         {
@@ -583,13 +599,17 @@ public class SchedulerService(ILogger<SchedulerService> logger, ISchedulerFactor
                         switch (triggerDetailModel.MisfireAction)
                         {
                             case MisfireAction.DoNothing:
-                                x.WithMisfireHandlingInstructionDoNothing();
+                                x.WithMisfireInstruction(CronTriggerMisfireInstruction.DoNothing);
                                 break;
                             case MisfireAction.FireOnceNow:
-                                x.WithMisfireHandlingInstructionFireAndProceed();
+                                x.WithMisfireInstruction(
+                                    CronTriggerMisfireInstruction.FireAndProceed
+                                );
                                 break;
                             case MisfireAction.IgnoreMisfirePolicy:
-                                x.WithMisfireHandlingInstructionIgnoreMisfires();
+                                x.WithMisfireInstruction(
+                                    CronTriggerMisfireInstruction.IgnoreMisfires
+                                );
                                 break;
                         }
                         x.InTimeZone(triggerDetailModel.InTimeZone);
@@ -602,23 +622,29 @@ public class SchedulerService(ILogger<SchedulerService> logger, ISchedulerFactor
                     switch (triggerDetailModel.MisfireAction)
                     {
                         case MisfireAction.DoNothing:
-                            x.WithMisfireHandlingInstructionDoNothing();
+                            x.WithMisfireInstruction(
+                                DailyTimeIntervalTriggerMisfireInstruction.DoNothing
+                            );
                             break;
                         case MisfireAction.FireOnceNow:
-                            x.WithMisfireHandlingInstructionFireAndProceed();
+                            x.WithMisfireInstruction(
+                                DailyTimeIntervalTriggerMisfireInstruction.FireAndProceed
+                            );
                             break;
                         case MisfireAction.IgnoreMisfirePolicy:
-                            x.WithMisfireHandlingInstructionIgnoreMisfires();
+                            x.WithMisfireInstruction(
+                                DailyTimeIntervalTriggerMisfireInstruction.IgnoreMisfires
+                            );
                             break;
                     }
                     x.OnDaysOfTheWeek(triggerDetailModel.GetDailyOnDaysOfWeek());
                     if (triggerDetailModel.StartDailyTime.HasValue)
                     {
-                        x.StartingDailyAt(triggerDetailModel.StartDailyTime.Value.ToTimeOfDay());
+                        x.StartingDailyAt(triggerDetailModel.StartDailyTime.Value.ToTimeOnly());
                     }
                     if (triggerDetailModel.EndDailyTime.HasValue)
                     {
-                        x.EndingDailyAt(triggerDetailModel.EndDailyTime.Value.ToTimeOfDay());
+                        x.EndingDailyAt(triggerDetailModel.EndDailyTime.Value.ToTimeOnly());
                     }
                     x.InTimeZone(triggerDetailModel.InTimeZone);
                     if (
@@ -641,22 +667,32 @@ public class SchedulerService(ILogger<SchedulerService> logger, ISchedulerFactor
                     switch (triggerDetailModel.MisfireAction)
                     {
                         case MisfireAction.FireNow:
-                            x.WithMisfireHandlingInstructionFireNow();
+                            x.WithMisfireInstruction(SimpleTriggerMisfireInstruction.FireNow);
                             break;
                         case MisfireAction.RescheduleNextWithExistingCount:
-                            x.WithMisfireHandlingInstructionNextWithExistingCount();
+                            x.WithMisfireInstruction(
+                                SimpleTriggerMisfireInstruction.NextWithExistingCount
+                            );
                             break;
                         case MisfireAction.RescheduleNextWithRemainingCount:
-                            x.WithMisfireHandlingInstructionNextWithRemainingCount();
+                            x.WithMisfireInstruction(
+                                SimpleTriggerMisfireInstruction.NextWithRemainingCount
+                            );
                             break;
                         case MisfireAction.RescheduleNowWithExistingRepeatCount:
-                            x.WithMisfireHandlingInstructionNowWithExistingCount();
+                            x.WithMisfireInstruction(
+                                SimpleTriggerMisfireInstruction.NowWithExistingCount
+                            );
                             break;
                         case MisfireAction.RescheduleNowWithRemainingRepeatCount:
-                            x.WithMisfireHandlingInstructionNowWithRemainingCount();
+                            x.WithMisfireInstruction(
+                                SimpleTriggerMisfireInstruction.NowWithRemainingCount
+                            );
                             break;
                         case MisfireAction.IgnoreMisfirePolicy:
-                            x.WithMisfireHandlingInstructionIgnoreMisfires();
+                            x.WithMisfireInstruction(
+                                SimpleTriggerMisfireInstruction.IgnoreMisfires
+                            );
                             break;
                     }
 
@@ -705,13 +741,19 @@ public class SchedulerService(ILogger<SchedulerService> logger, ISchedulerFactor
                     switch (triggerDetailModel.MisfireAction)
                     {
                         case MisfireAction.DoNothing:
-                            x.WithMisfireHandlingInstructionDoNothing();
+                            x.WithMisfireInstruction(
+                                CalendarIntervalTriggerMisfireInstruction.DoNothing
+                            );
                             break;
                         case MisfireAction.FireOnceNow:
-                            x.WithMisfireHandlingInstructionFireAndProceed();
+                            x.WithMisfireInstruction(
+                                CalendarIntervalTriggerMisfireInstruction.FireAndProceed
+                            );
                             break;
                         case MisfireAction.IgnoreMisfirePolicy:
-                            x.WithMisfireHandlingInstructionIgnoreMisfires();
+                            x.WithMisfireInstruction(
+                                CalendarIntervalTriggerMisfireInstruction.IgnoreMisfires
+                            );
                             break;
                     }
 
@@ -740,19 +782,19 @@ public class SchedulerService(ILogger<SchedulerService> logger, ISchedulerFactor
     {
         switch (simple.MisfireInstruction)
         {
-            case MisfireInstruction.SimpleTrigger.RescheduleNextWithExistingCount:
+            case SimpleTriggerMisfireInstruction.NextWithExistingCount:
                 model.MisfireAction = MisfireAction.RescheduleNextWithExistingCount;
                 break;
-            case MisfireInstruction.SimpleTrigger.RescheduleNextWithRemainingCount:
+            case SimpleTriggerMisfireInstruction.NextWithRemainingCount:
                 model.MisfireAction = MisfireAction.RescheduleNextWithRemainingCount;
                 break;
-            case MisfireInstruction.SimpleTrigger.RescheduleNowWithExistingRepeatCount:
+            case SimpleTriggerMisfireInstruction.NowWithExistingCount:
                 model.MisfireAction = MisfireAction.RescheduleNowWithExistingRepeatCount;
                 break;
-            case MisfireInstruction.SimpleTrigger.RescheduleNowWithRemainingRepeatCount:
+            case SimpleTriggerMisfireInstruction.NowWithRemainingCount:
                 model.MisfireAction = MisfireAction.RescheduleNowWithRemainingRepeatCount;
                 break;
-            case MisfireInstruction.SimpleTrigger.FireNow:
+            case SimpleTriggerMisfireInstruction.FireNow:
                 model.MisfireAction = MisfireAction.FireNow;
                 break;
         }

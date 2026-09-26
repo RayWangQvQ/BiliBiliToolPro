@@ -21,12 +21,9 @@ public static class ServiceCollectionQuartzConfiguratorExtensions
         {
             q.UsePersistentStore(storeOptions =>
             {
-                storeOptions.UseMicrosoftSQLite(sqlLiteOptions =>
-                {
-                    sqlLiteOptions.UseDriverDelegate<SQLiteDelegate>();
-                    sqlLiteOptions.ConnectionString = sqliteConnStr;
-                    sqlLiteOptions.TablePrefix = "QRTZ_";
-                });
+                storeOptions.UseSqlite(sqliteConnStr);
+                storeOptions.UseDriverDelegate<SQLiteDelegate>();
+                storeOptions.ConfigureStore(store => store.TablePrefix = "QRTZ_");
                 storeOptions.UseSystemTextJsonSerializer();
             });
 
@@ -37,8 +34,8 @@ public static class ServiceCollectionQuartzConfiguratorExtensions
         return services;
     }
 
-    public static IServiceCollectionQuartzConfigurator AddBiliJobs(
-        this IServiceCollectionQuartzConfigurator quartz,
+    public static IQuartzBuilder AddBiliJobs(
+        this IQuartzBuilder quartz,
         IConfiguration configuration
     )
     {
@@ -122,7 +119,9 @@ public static class ServiceCollectionQuartzConfiguratorExtensions
             opts.ForJob(AutoRecoverJob.Key)
                 .WithIdentity(AutoRecoverJob.TriggerKeyValue)
                 .StartAt(DateTimeOffset.UtcNow.AddMinutes(1))
-                .WithSimpleSchedule(x => x.WithIntervalInHours(autoRecoverInterval).RepeatForever())
+                .WithSimpleSchedule(x =>
+                    x.WithInterval(TimeSpan.FromHours(autoRecoverInterval)).RepeatForever()
+                )
         );
 
         // Test bili job
@@ -132,7 +131,7 @@ public static class ServiceCollectionQuartzConfiguratorExtensions
     }
 
     private static void AddBiliJob<TJob>(
-        IServiceCollectionQuartzConfigurator quartz,
+        IQuartzBuilder quartz,
         JobKey key,
         string? configCronKey,
         IConfiguration configuration

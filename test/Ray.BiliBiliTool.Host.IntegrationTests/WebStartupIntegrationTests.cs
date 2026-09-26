@@ -12,6 +12,7 @@ using Ray.BiliBiliTool.Web.Services.Pages.Schedules;
 
 namespace Ray.BiliBiliTool.Host.IntegrationTests;
 
+[Collection("Host boot")]
 public class WebStartupIntegrationTests
 {
     [Fact]
