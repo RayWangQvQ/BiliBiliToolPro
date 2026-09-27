@@ -45,12 +45,12 @@ read_var_from_user() {
 }
 
 get_version() {
-    # CI 通过 RELEASE_VERSION 显式传入；本地直接运行时回落到最新稳定 tag，
-    # 还没有任何 tag 就用本地开发兜底号。
+    # CI 通过 RELEASE_VERSION 显式传入；本地兜底见下方 if 块。
     # 用 bash 显式调用：.sh 提交为 mode 100644，直接执行在 Linux 上是 Permission denied
     if [ -z "$version" ]; then
-        version=$(bash "$repoDir/scripts/version-next.sh" latest)
-        version=${version:-0.0.0-dev}
+        # 本地直接运行恒为 0.0.0-dev，与 common.props 兜底一致（ADR-0002）：
+        # zip 文件名和程序集版本不会再出现"文件名是稳定号、程序集是 dev"的错配。
+        version="0.0.0-dev"
     fi
     echo -e "current version: $version \n\n"
 
@@ -80,6 +80,7 @@ publish_dotnet_dependent() {
     echo "dotnet publish..."
     dotnet publish --configuration Release \
         --self-contained false \
+        -p:Version="$version" \
         -p:PublishSingleFile=true \
         -p:DebugType=None \
         -p:DebugSymbols=false \
@@ -106,6 +107,7 @@ publish_self_contained() {
     dotnet publish --configuration Release \
         --self-contained true \
         --runtime $runtime \
+        -p:Version="$version" \
         -p:PublishSingleFile=true \
         -p:DebugType=None \
         -p:DebugSymbols=false \

@@ -69,6 +69,9 @@ jobs:
       - name: Release notes fixtures
         run: bash ./scripts/test-release-notes.sh
 
+      - name: Update changelog fixtures
+        run: bash ./scripts/test-update-changelog.sh
+
       # alpha workflow 的版本计算步骤在 PR 上的 dry-run 冒烟（只算不推）
       - name: Alpha version dry-run
         run: |

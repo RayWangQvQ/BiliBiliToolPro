@@ -145,7 +145,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      # [skip ci]：这次 bot 提交本身不该再触发 alpha 构建
+      # [skip ci]：这次 bot 提交本身不该再触发 alpha 构建。
+      # update-changelog.sh 重跑安全：顶部已是同版本段落时替换而非重复插入。
       - name: Prepend CHANGELOG section and push
         env:
           VERSION: ${{ needs.decide.outputs.version }}
@@ -153,8 +154,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          { bash ./scripts/release-notes.sh section "$VERSION" --since "$SINCE"; cat CHANGELOG.md; } > CHANGELOG.new
-          mv CHANGELOG.new CHANGELOG.md
+          bash ./scripts/update-changelog.sh "$VERSION" --since "$SINCE"
           git add CHANGELOG.md
           git commit -m "docs: CHANGELOG $VERSION [skip ci]"
           git push origin HEAD:main

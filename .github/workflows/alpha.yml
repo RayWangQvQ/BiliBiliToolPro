@@ -1,7 +1,7 @@
 name: Publish alpha image
 
 # 新发布策略（ADR-0002）的 alpha 通道：main 的每次合并（squash）自动产出一个
-# alpha 预览镜像。版本号由 scripts/version-next.sh 从 git tag 历史推导，
+# alpha 版本镜像。版本号由 scripts/version-next.sh 从 git tag 历史推导，
 # 不打 git tag、不建 Release、不出 zip —— alpha 用后即弃，制品最小化。
 on:
   push:

@@ -7,10 +7,9 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /code
 
 # 版本一律由 CI 显式注入（构建时烘焙，ADR-0002）：
-# VERSION 是完整版本号（alpha 的 x.y.z-alpha.N 或稳定版 x.y.z），
-# VERSION_SUFFIX 是旧预览流程的遗留，等新流程全量切换后删除。
+# VERSION 是完整版本号（alpha 的 x.y.z-alpha.N 或稳定版 x.y.z）；
+# 本地手动 docker build 不传时，产物为 common.props 的 0.0.0-dev 兜底。
 ARG VERSION=""
-ARG VERSION_SUFFIX=""
 
 COPY ["Directory.Packages.props", "./"]
 COPY ["src/Ray.BiliBiliTool.Web/Ray.BiliBiliTool.Web.csproj", "src/Ray.BiliBiliTool.Web/"]
@@ -31,16 +30,13 @@ RUN dotnet restore "src/Ray.BiliBiliTool.Web/Ray.BiliBiliTool.Web.csproj"
 COPY . .
 WORKDIR "/code/src/Ray.BiliBiliTool.Web"
 RUN version_arg="" \
-    && if [ -n "$VERSION" ]; then version_arg="-p:Version=$VERSION"; \
-       elif [ -n "$VERSION_SUFFIX" ]; then version_arg="-p:VersionSuffix=$VERSION_SUFFIX"; fi \
+    && if [ -n "$VERSION" ]; then version_arg="-p:Version=$VERSION"; fi \
     && dotnet build "Ray.BiliBiliTool.Web.csproj" -c Release -o /app/build $version_arg
 
 FROM build AS publish
 ARG VERSION=""
-ARG VERSION_SUFFIX=""
 RUN version_arg="" \
-    && if [ -n "$VERSION" ]; then version_arg="-p:Version=$VERSION"; \
-       elif [ -n "$VERSION_SUFFIX" ]; then version_arg="-p:VersionSuffix=$VERSION_SUFFIX"; fi \
+    && if [ -n "$VERSION" ]; then version_arg="-p:Version=$VERSION"; fi \
     && dotnet publish "Ray.BiliBiliTool.Web.csproj" -c Release -o /app/publish $version_arg
 
 FROM base AS final
