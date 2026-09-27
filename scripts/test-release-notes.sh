@@ -8,35 +8,7 @@ set -euo pipefail
 repo_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 sut="$repo_dir/scripts/release-notes.sh"
 
-pass=0
-fail=0
-
-ok() {
-    pass=$((pass + 1))
-    echo "ok $pass - $1"
-}
-
-not_ok() {
-    fail=$((fail + 1))
-    echo "FAIL - $1" >&2
-    echo "--- 期望 ---" >&2
-    echo "$2" >&2
-    echo "--- 实际 ---" >&2
-    echo "$3" >&2
-}
-
-assert_eq() { # <msg> <expected> <actual>
-    if [ "$2" = "$3" ]; then ok "$1"; else not_ok "$1" "$2" "$3"; fi
-}
-
-assert_exit_nonzero() { # <msg> <cmd...>
-    local msg=$1; shift
-    if "$@" >/dev/null 2>&1; then
-        not_ok "$msg" "非 0 退出码" "0"
-    else
-        ok "$msg"
-    fi
-}
+source "$repo_dir/scripts/test-lib.sh"
 
 titles_file=$(mktemp)
 
@@ -71,21 +43,23 @@ expected='- Fix[#1001]: 第一个修复 (#1001)
 
 assert_eq "同类内保持输入顺序" "$expected" "$(bash "$sut" notes --from-file "$titles_file")"
 
-# --- 场景 3：空列表阻止发版 ---
+# --- 场景 3：空列表阻止发版，且给出可读错误信息 ---
 : > "$titles_file"
 assert_exit_nonzero "空 PR 列表报错退出" bash "$sut" notes --from-file "$titles_file"
 assert_exit_nonzero "空 PR 列表时 section 同样报错" bash "$sut" section 4.0.8 --from-file "$titles_file"
+err=$(bash "$sut" notes --from-file "$titles_file" 2>&1 >/dev/null || true)
+assert_contains "空列表错误信息可读" "没有合并的 PR" "$err"
 
-# --- 场景 4：CHANGELOG 段落格式 ---
+# --- 场景 4：CHANGELOG 段落格式与仓库现有风格一致（标题后无空行）---
 cat > "$titles_file" <<'EOF'
 Fix[#1144]: 某个修复 (#1147)
 EOF
 
 expected='## 4.0.8
-
 - Fix[#1144]: 某个修复 (#1147)'
 
-assert_eq "section 输出 '## 版本号 + 空行 + 条目'" "$expected" "$(bash "$sut" section 4.0.8 --from-file "$titles_file")"
+assert_eq "section 输出 '## 版本号 + 条目'（无空行，同现有 CHANGELOG）" \
+    "$expected" "$(bash "$sut" section 4.0.8 --from-file "$titles_file")"
 
 # --- 场景 5：全是不合规标题也能出（全进"其他"，不中断）---
 cat > "$titles_file" <<'EOF'
@@ -98,8 +72,8 @@ expected='- Update something
 
 assert_eq "全不合规标题原样收录" "$expected" "$(bash "$sut" notes --from-file "$titles_file")"
 
+# 与 test-version-next.sh 同一策略：只在 CI 上删除临时文件；
+# 本地沙箱可能对 rm 临时路径直接 SIGTERM，会误杀测试进程。
 if [ "${CI:-}" = "true" ]; then rm -f "$titles_file" 2>/dev/null || true; fi
 
-echo
-echo "通过 $pass，失败 $fail"
-[ "$fail" -eq 0 ]
+finish

@@ -8,36 +8,9 @@ set -euo pipefail
 repo_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 sut="$repo_dir/scripts/version-next.sh"
 
-pass=0
-fail=0
+source "$repo_dir/scripts/test-lib.sh"
 
-ok() {
-    pass=$((pass + 1))
-    echo "ok $pass - $1"
-}
-
-not_ok() {
-    fail=$((fail + 1))
-    echo "FAIL - $1" >&2
-    echo "  期望: $2" >&2
-    echo "  实际: $3" >&2
-}
-
-assert_eq() { # <msg> <expected> <actual>
-    if [ "$2" = "$3" ]; then ok "$1"; else not_ok "$1" "$2" "$3"; fi
-}
-
-assert_exit_nonzero() { # <msg> <cmd...>
-    local msg=$1; shift
-    if "$@" >/dev/null 2>&1; then
-        not_ok "$msg" "非 0 退出码" "0"
-    else
-        ok "$msg"
-    fi
-}
-
-# 在临时目录造一个 git 仓库，全局变量 FIX 指向它。
-# fixture 根目录放系统临时目录；删除失败（如本地沙箱拦截）不致命，临时目录泄漏可接受。
+# 在临时目录造一个 git 仓库，全局变量 FIX 指向它
 FIX=""
 new_fixture() {
     FIX=$(mktemp -d)
@@ -107,9 +80,15 @@ assert_eq "发版后首个 alpha: 基底=4.0.9，N 复位为 1" "4.0.9-alpha.1" 
 cleanup
 
 new_fixture
-commit "c1"; tag "4.1.0"   # 跨 minor 后发版
+commit "c1"; tag "4.1.0"   # 跨 minor 发版之后
 commit "c2"
-assert_eq "minor 版之后: alpha 基底为其下一 patch" "4.1.1-alpha.1" "$(run alpha)"
+assert_eq "跨 minor 后: alpha 基底为其下一 patch" "4.1.1-alpha.1" "$(run alpha)"
+cleanup
+
+new_fixture
+commit "c1"; tag "5.0.0"   # 跨 major 发版之后
+commit "c2"
+assert_eq "跨 major 后: alpha 基底为其下一 patch" "5.0.1-alpha.1" "$(run alpha)"
 cleanup
 
 # --- 场景 5：异类 tag 不算稳定 tag ---
@@ -128,6 +107,4 @@ commit "c1"; tag "4.0.7"
 assert_exit_nonzero "HEAD 无新提交时 alpha 报错" run alpha
 cleanup
 
-echo
-echo "通过 $pass，失败 $fail"
-[ "$fail" -eq 0 ]
+finish

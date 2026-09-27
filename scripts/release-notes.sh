@@ -51,7 +51,7 @@ read_titles() { # <since> <from_file>
 }
 
 latest_stable() {
-    git -C "$repo_dir" tag -l | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -1 || true
+    bash "$repo_dir/scripts/version-next.sh" latest
 }
 
 entries() { # <since> <from_file>：条目列表；空列表报错
@@ -89,7 +89,8 @@ notes | section)
     [ -n "$from_file" ] || since=${since:-$(latest_stable)}
     body=$(entries "$since" "$from_file")
     if [ "$cmd" = section ]; then
-        printf '## %s\n\n%s\n' "$version" "$body"
+        # 与仓库现有 CHANGELOG 风格一致：二级标题后直接跟条目，不空行
+        printf '## %s\n%s\n' "$version" "$body"
     else
         echo "$body"
     fi
