@@ -75,13 +75,22 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
+      # fetch-depth: 0：最后的 dry-run 要在真实 tag 历史上演算 alpha 版本
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Version derivation fixtures
         run: bash ./scripts/test-version-next.sh
 
       - name: Release notes fixtures
         run: bash ./scripts/test-release-notes.sh
+
+      # alpha workflow 的版本计算步骤在 PR 上的 dry-run 冒烟（只算不推）
+      - name: Alpha version dry-run
+        run: |
+          planned=$(bash ./scripts/version-next.sh alpha)
+          echo "本 PR 合并后将产出 alpha：$planned"
 
   # 只构建不推送，用来保证合并到 develop/main 之后镜像可以构建
   ImageSmoke:

@@ -1,0 +1,88 @@
+name: Publish alpha image
+
+# 新发布策略（ADR-0002）的 alpha 通道：main 的每次合并（squash）自动产出一个
+# alpha 预览镜像。版本号由 scripts/version-next.sh 从 git tag 历史推导，
+# 不打 git tag、不建 Release、不出 zip —— alpha 用后即弃，制品最小化。
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+      - ".github/workflows/**"
+      - ".editorconfig"
+      - "bruno/**"
+
+permissions:
+  contents: read
+  packages: write # 推 GHCR
+
+# 必须串行：alpha 序号 = 自上个稳定 tag 以来的提交数，
+# 并发 run 算出同号会互相覆盖镜像 tag。
+concurrency:
+  group: alpha-main
+  cancel-in-progress: false
+
+env:
+  DOCKER_IMG_NAME: zai7lou/bili_tool_web
+  GHCR_IMG_NAME: ghcr.io/raywangqvq/bili_tool_web
+
+jobs:
+  decide:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      # fetch-depth: 0 是为了拿到全部 tag —— alpha 序号由 tag 历史推导，
+      # 浅克隆算出的 N 是错的。
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - id: version
+        run: |
+          version=$(bash ./scripts/version-next.sh alpha)
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "alpha 版本：$version"
+
+  push:
+    needs: decide
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Login to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/setup-qemu-action@v3
+
+      - uses: docker/setup-buildx-action@v3
+
+      # 完整版本号显式注入（构建时烘焙），容器内 informational version 与镜像 tag 一致。
+      # :alpha 是浮动 tag，永远指向最新 alpha；:latest 只由稳定版 workflow 推动。
+      - uses: docker/build-push-action@v7
+        with:
+          context: .
+          push: true
+          platforms: linux/amd64,linux/arm64
+          build-args: |
+            VERSION=${{ needs.decide.outputs.version }}
+          tags: |
+            ${{ env.DOCKER_IMG_NAME }}:${{ needs.decide.outputs.version }}
+            ${{ env.DOCKER_IMG_NAME }}:alpha
+            ${{ env.GHCR_IMG_NAME }}:${{ needs.decide.outputs.version }}
+            ${{ env.GHCR_IMG_NAME }}:alpha
+          cache-from: type=gha,scope=alpha
+          cache-to: type=gha,scope=alpha,mode=max

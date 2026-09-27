@@ -6,7 +6,10 @@ EXPOSE 8080
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /code
 
-# develop 的预览镜像用它注入 -alpha.N，使容器内的版本号和镜像 tag 一致
+# 版本一律由 CI 显式注入（构建时烘焙，ADR-0002）：
+# VERSION 是完整版本号（alpha 的 x.y.z-alpha.N 或稳定版 x.y.z），
+# VERSION_SUFFIX 是旧预览流程的遗留，等新流程全量切换后删除。
+ARG VERSION=""
 ARG VERSION_SUFFIX=""
 
 COPY ["Directory.Packages.props", "./"]
@@ -27,13 +30,22 @@ COPY ["src/BlazingQuartz.Jobs.Abstractions/BlazingQuartz.Jobs.Abstractions.cspro
 RUN dotnet restore "src/Ray.BiliBiliTool.Web/Ray.BiliBiliTool.Web.csproj"
 COPY . .
 WORKDIR "/code/src/Ray.BiliBiliTool.Web"
-RUN dotnet build "Ray.BiliBiliTool.Web.csproj" -c Release -o /app/build -p:VersionSuffix="$VERSION_SUFFIX"
+RUN version_arg="" \
+    && if [ -n "$VERSION" ]; then version_arg="-p:Version=$VERSION"; \
+       elif [ -n "$VERSION_SUFFIX" ]; then version_arg="-p:VersionSuffix=$VERSION_SUFFIX"; fi \
+    && dotnet build "Ray.BiliBiliTool.Web.csproj" -c Release -o /app/build $version_arg
 
 FROM build AS publish
+ARG VERSION=""
 ARG VERSION_SUFFIX=""
-RUN dotnet publish "Ray.BiliBiliTool.Web.csproj" -c Release -o /app/publish -p:VersionSuffix="$VERSION_SUFFIX"
+RUN version_arg="" \
+    && if [ -n "$VERSION" ]; then version_arg="-p:Version=$VERSION"; \
+       elif [ -n "$VERSION_SUFFIX" ]; then version_arg="-p:VersionSuffix=$VERSION_SUFFIX"; fi \
+    && dotnet publish "Ray.BiliBiliTool.Web.csproj" -c Release -o /app/publish $version_arg
 
 FROM base AS final
+ARG VERSION=""
+LABEL org.opencontainers.image.version="${VERSION}"
 WORKDIR /app
 COPY --from=publish /app/publish .
 COPY platforms/docker/entrypoint.sh /app/entrypoint.sh
