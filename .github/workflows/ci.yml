@@ -69,6 +69,20 @@ jobs:
           BASE_REF: ${{ github.base_ref }}
         run: bash ./scripts/report-version.sh post "$BASE_REF"
 
+  # 发布脚本的 fixture 测试：在临时 git 仓库/模拟 PR 标题上验证算号与 notes 生成。
+  # 发布逻辑是发布系统的命脉，但它不碰 .NET 代码，所以独立于 Verify。
+  ScriptTests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Version derivation fixtures
+        run: bash ./scripts/test-version-next.sh
+
+      - name: Release notes fixtures
+        run: bash ./scripts/test-release-notes.sh
+
   # 只构建不推送，用来保证合并到 develop/main 之后镜像可以构建
   ImageSmoke:
     runs-on: ubuntu-latest
