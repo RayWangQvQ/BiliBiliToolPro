@@ -3,7 +3,7 @@ version: 2
 updates:
   - package-ecosystem: github-actions
     directory: "/"
-    target-branch: develop
+    target-branch: main
     schedule:
       interval: weekly
       day: monday
@@ -13,7 +13,7 @@ updates:
 
   - package-ecosystem: nuget
     directory: "/"
-    target-branch: develop
+    target-branch: main
     schedule:
       interval: weekly
       day: monday

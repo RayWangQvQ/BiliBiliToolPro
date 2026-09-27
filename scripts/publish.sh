@@ -45,19 +45,25 @@ read_var_from_user() {
 }
 
 get_version() {
-    # CI 通过 RELEASE_VERSION 传入；本地直接运行时回落到 common.props 的前缀。
+    # CI 通过 RELEASE_VERSION 显式传入；本地直接运行时回落到最新稳定 tag，
+    # 还没有任何 tag 就用本地开发兜底号。
     # 用 bash 显式调用：.sh 提交为 mode 100644，直接执行在 Linux 上是 Permission denied
-    [ -n "$version" ] || version=$(bash "$repoDir/scripts/version.sh" prefix)
+    if [ -z "$version" ]; then
+        version=$(bash "$repoDir/scripts/version-next.sh" latest)
+        version=${version:-0.0.0-dev}
+    fi
     echo -e "current version: $version \n\n"
 
     mkdir -p $publishDir
 }
 
 extract_release_notes() {
-    echo "Extracting release notes from CHANGELOG.md..."
+    echo "Generating release notes from PR titles..."
     mkdir -p $publishDir
 
-    bash "$repoDir/scripts/version.sh" release-notes > "$publishDir/release_notes.md"
+    # 本地可能没有可归纳的 PR 标题（如无 tag），失败不阻断本地打包
+    bash "$repoDir/scripts/release-notes.sh" notes > "$publishDir/release_notes.md" \
+        || echo "(no release notes)" > "$publishDir/release_notes.md"
 
     echo "Release notes saved to $publishDir/release_notes.md"
 }
