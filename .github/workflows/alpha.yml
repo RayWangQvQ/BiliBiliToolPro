@@ -68,7 +68,7 @@ jobs:
 
       - uses: docker/setup-qemu-action@v3
 
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v4
 
       # 完整版本号显式注入（构建时烘焙），容器内 informational version 与镜像 tag 一致。
       # :alpha 是浮动 tag，永远指向最新 alpha；:latest 只由稳定版 workflow 推动。
