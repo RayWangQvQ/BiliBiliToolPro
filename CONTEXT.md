@@ -24,6 +24,15 @@ _Avoid_: 崩溃、启动慢
 catch 里只记日志、却不改变进程结果的写法：调用方拿到的仍是「成功」。捕获本身没问题，吞掉结果才是问题。
 _Avoid_: 捕获异常
 
+**alpha 版本**:
+PR 合入主干后由 CI 自动产出的预览版本，形如 `x.y.z-alpha.N`（N 自上个稳定 tag 起从 1 递增）；只推 Docker 镜像，用后即弃，其 x.y.z 基底是"暂定下一 patch"，与最终稳定版号可能错配。
+_Avoid_: 预览版、beta、开发版
+
+**稳定版**:
+维护者手动触发发版 workflow、选定 patch/minor/major 后由 CI 算号并发布的正式版本：打纯数字三段式 git tag、建 GitHub Release、出全套制品。
+_Avoid_: 正式版、release 版
+
 ## 相关
 
 - [ADR-0001：Web 面板启动失败必须以非 0 退出码结束](docs/adr/0001-web-startup-failure-must-exit-nonzero.md)
+- [ADR-0002：单主干 + CI 托管版本号](docs/adr/0002-ci-managed-versioning-trunk-based.md)
