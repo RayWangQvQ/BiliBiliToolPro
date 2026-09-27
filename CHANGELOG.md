@@ -1,3 +1,5 @@
+## 4.0.8
+- 维护[#1152]: 补齐 AI 协作者的仓库配置：根目录新增 `AGENTS.md`，指向 issue 跟踪（GitHub issue + `gh` CLI）、triage 标签词表、领域文档布局三份 `docs/agents/` 说明；术语表由 `docs/glossary.md` 迁至根目录 `CONTEXT.md`
 ## 4.0.7
 - Fix[#1144]: Web 面板启动失败改为以非 0 退出码结束（此前恒为 0），Docker / 青龙等编排层不再把「启动崩溃」当成「正常退出」；退出码由运行时决定、不保证跨平台一致（Linux 134，Windows `0xE0434352`）
 - Fix[#1147][#1149]: 补齐 #1138 迁移到 `platforms/` 后仍遗留的旧路径（两轮）：呆呆/白虎的 `copyshfile.sh` 钩子与白虎任务脚本定位仓库根少一级、青龙 `bili_task_tryFix.sh` 找不到 dotnet 安装脚本、docker/podman 构建脚本的上下文多退一级，另有 5 个平台 README 共 30 处 `../docs/` 断链
