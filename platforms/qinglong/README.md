@@ -115,7 +115,7 @@ Name分别为：
 
 仓库已改为单主干（只有 `main` 分支，ADR-0002）。想提前体验未发布的新功能，请使用每次合并自动构建的 **alpha 版本镜像**（`zai7lou/bili_tool_web:alpha`）；拉库分支一律填 `main`。
 
-> 旧文档中"分支填 `develop`、白名单加 `bili_dev_task_`"的玩法属于双主干时代，`develop` 分支已删除，`dev/` 目录下的 `bili_dev_task_*` 脚本为遗留，待清理。
+> 旧文档中"分支填 `develop`、白名单加 `bili_dev_task_`"的玩法属于双主干时代，`develop` 分支与 `dev/` 目录下的 `bili_dev_task_*` 脚本均已删除。
 
 其他选项同上。
 
@@ -157,7 +157,7 @@ export BILI_GITHUB_PROXY="https://github.moeyy.xyz/" # 下载二进制包时使�
 
 ![qinglong-login.png](../../docs/imgs/qinglong-run-as-bilitool.png)
 
-bilitool没有先行版的概念，因为只有main分支才会打包，更新会稍慢一点。
+bilitool模式的二进制包只在发布稳定版时产出（alpha 通道只出 Docker 镜像、不出二进制包），所以想用未发布的新功能请改用 Docker 部署 + alpha 镜像，bilitool 模式更新会慢一些。
 
 ### 4.2. Couldn't find a valid ICU package installed on the system
 
