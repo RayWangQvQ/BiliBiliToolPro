@@ -28,7 +28,7 @@
   - [2.4. 检查定时任务](#24-检查定时任务)
   - [2.5. 扫码登录](#25-扫码登录)
 - [3. 运行模式：dotnet vs bilitool](#3-运行模式dotnet-vs-bilitool)
-- [4. 先行版（dev）](#4-先行版dev)
+- [4. 先行版](#4-先行版)
 - [5. GitHub 加速](#5-github-加速)
 - [6. 常见问题](#6-常见问题)
 
@@ -137,11 +137,9 @@
 - 想要**登录自动写回 Cookie 现在就能用** → 用默认的 `dotnet` 模式（拉本仓库源码编译）。
 - 面板资源紧张、不想装 dotnet，且能接受首次手动填一次 Cookie（或等新版本二进制） → 用 `bilitool` 模式。
 
-## 4. 先行版（遗留说明）
+## 4. 先行版
 
-仓库已改为单主干（只有 `main`，ADR-0002），原 `develop` 分支的 `bili_dev_task_*.sh` 玩法随之失效——`develop` 已删除，这些 dev 脚本为遗留，待清理。想体验未发布的新功能，请改用每次合并自动构建的 **alpha 版本镜像**（`zai7lou/bili_tool_web:alpha`）。
-
-钩子脚本会一并把 `dev/bili_dev_task_*.sh` 复用过来，它们共用同一份 base（`dev/bili_dev_task_base.sh` 只是 source 了上一级的 `bili_task_base.sh`）。
+仓库已改为单主干（只有 `main`，ADR-0002），原 `develop` 分支与 `dev/bili_dev_task_*.sh` 脚本均已删除。想提前体验未发布的新功能，请使用每次合并自动构建的 **alpha 版本镜像**（`zai7lou/bili_tool_web:alpha`）。
 
 ## 5. GitHub 加速
 
