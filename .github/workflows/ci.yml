@@ -3,6 +3,10 @@ name: CI
 on:
   pull_request:
     branches: [main]
+  # 供 stable.yml 的 changelog job 手动 dispatch：
+  # GITHUB_TOKEN 创建的 PR 不会自动触发任何 workflow（GitHub 防递归规则），
+  # required checks 只能靠 dispatch 在该分支上补跑。
+  workflow_dispatch:
 
 permissions:
   contents: read
