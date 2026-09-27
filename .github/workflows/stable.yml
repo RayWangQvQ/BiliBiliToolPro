@@ -1,0 +1,160 @@
+name: Stable release
+
+# 新发布策略（ADR-0002）的稳定版通道：维护者在 Actions 页面手动 Run workflow，
+# 下拉选择升级级别，之后全自动：算号 → zip → Release → 镜像 → CHANGELOG 回写。
+on:
+  workflow_dispatch:
+    inputs:
+      level:
+        description: "升级级别（基于最新稳定 tag 计算下一版本）"
+        type: choice
+        default: patch
+        options:
+          - patch
+          - minor
+          - major
+
+permissions:
+  contents: write # 建 tag、GitHub Release、CHANGELOG 回写
+  packages: write # 推 GHCR
+  discussions: write # 发版时自动开 Discussion
+
+# 一次发版全流程串行，避免并发算出同一个版本号
+concurrency:
+  group: stable-release
+  cancel-in-progress: false
+
+env:
+  DOCKER_IMG_NAME: zai7lou/bili_tool_web
+  GHCR_IMG_NAME: ghcr.io/raywangqvq/bili_tool_web
+
+jobs:
+  decide:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      since: ${{ steps.version.outputs.since }}
+    steps:
+      # fetch-depth: 0：版本号与 notes 都依赖完整 tag 历史
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - id: version
+        env:
+          LEVEL: ${{ inputs.level }}
+        run: |
+          since=$(bash ./scripts/version-next.sh latest)
+          version=$(bash ./scripts/version-next.sh stable "$LEVEL")
+          # 防御：正常流程下算出的版本不可能已有 tag（那它自己就是 latest），
+          # 存在即说明历史被手工动过，宁可失败也不发错版本。
+          if git rev-parse -q --verify "refs/tags/$version" >/dev/null; then
+            echo "::error::tag $version 已存在，git 历史异常，拒绝发版"
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "since=$since" >> "$GITHUB_OUTPUT"
+          echo "发版：${since:-仓库起点} -> $version（$LEVEL）"
+
+  publish:
+    needs: decide
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      # 版本号显式传入，构建时烘焙进程序集 informational version
+      - name: Publish all runtimes
+        env:
+          RELEASE_VERSION: ${{ needs.decide.outputs.version }}
+        run: bash ./scripts/publish.sh --runtime all
+
+      # notes 取自上个稳定 tag 以来合并的 PR 标题（不合规标题原样收录）。
+      # 若期间没有任何合并，脚本会报错让发版失败 —— 不允许发空版本。
+      - name: Collect release notes
+        env:
+          SINCE: ${{ needs.decide.outputs.since }}
+        run: bash ./scripts/release-notes.sh notes --since "$SINCE" > release_notes.md
+
+      # 已存在则更新，不报错：重跑失败的发版（同一 run 的 retry）不会撞车
+      - name: Create GitHub Release and tag
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.decide.outputs.version }}
+          name: BiliBiliToolPro-V${{ needs.decide.outputs.version }}
+          body_path: release_notes.md
+          files: ./src/Ray.BiliBiliTool.Console/bin/Publish/*.zip
+          discussion_category_name: Announcements
+          make_latest: "true"
+          fail_on_unmatched_files: true
+
+  image:
+    needs: [decide, publish]
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Login to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/setup-qemu-action@v3
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/build-push-action@v7
+        with:
+          context: .
+          push: true
+          platforms: linux/amd64,linux/arm64
+          build-args: |
+            VERSION=${{ needs.decide.outputs.version }}
+          tags: |
+            ${{ env.DOCKER_IMG_NAME }}:${{ needs.decide.outputs.version }}
+            ${{ env.DOCKER_IMG_NAME }}:latest
+            ${{ env.GHCR_IMG_NAME }}:${{ needs.decide.outputs.version }}
+            ${{ env.GHCR_IMG_NAME }}:latest
+          cache-from: type=gha,scope=stable
+          cache-to: type=gha,scope=stable,mode=max
+
+  changelog:
+    needs: [decide, publish]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      # 用默认 GITHUB_TOKEN 推送回 main。
+      # 注意：若 main 开了分支保护，需在保护规则里允许 Actions bot 推送，否则本步会 403。
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # [skip ci]：这次 bot 提交本身不该再触发 alpha 构建
+      - name: Prepend CHANGELOG section and push
+        env:
+          VERSION: ${{ needs.decide.outputs.version }}
+          SINCE: ${{ needs.decide.outputs.since }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          { bash ./scripts/release-notes.sh section "$VERSION" --since "$SINCE"; cat CHANGELOG.md; } > CHANGELOG.new
+          mv CHANGELOG.new CHANGELOG.md
+          git add CHANGELOG.md
+          git commit -m "docs: CHANGELOG $VERSION [skip ci]"
+          git push origin HEAD:main
