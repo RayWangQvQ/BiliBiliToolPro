@@ -86,7 +86,7 @@
 名称：Bilibili
 类型：Git 仓库（公开仓库）
 链接：https://github.com/RayWangQvQ/BiliBiliToolPro.git
-分支：develop
+分支：main
 定时类型：crontab
 定时规则：2 2 28 * *
 钩子脚本：bash platforms/daidai/copyshfile.sh
@@ -98,7 +98,7 @@
 > - **白名单填 `bili_task_`**：只把 `bili_task_*.sh` 登记成定时任务，不会把仓库里其他文件也建成任务。
 > - **不要**限制「指定子目录」：钩子需要 `platforms/qinglong/` 源、`dotnet` 模式需要编译 `src/` 源码，都要求拉取完整仓库。
 > - 没提到的选项保持默认即可（自动添加任务、自动同步默认是开的）。
-> - 呆呆面板适配目前在 `develop`（先行版）分支，所以**分支填 `develop`**；等合并进 `main` 后可改回 `main`。
+> - 仓库已改为单主干（ADR-0002），**分支填 `main`**。
 
 保存后点「运行」拉库。日志里会先看到 `[执行订阅钩子]`（同步脚本），再看到自动扫描 `# cron:` / `# new Env("...")` 并**自动创建 bilibili 定时任务**。
 
@@ -137,13 +137,9 @@
 - 想要**登录自动写回 Cookie 现在就能用** → 用默认的 `dotnet` 模式（拉本仓库源码编译）。
 - 面板资源紧张、不想装 dotnet，且能接受首次手动填一次 Cookie（或等新版本二进制） → 用 `bilitool` 模式。
 
-## 4. 先行版（dev）
+## 4. 先行版（遗留说明）
 
-`develop` 分支的 `bili_dev_task_*.sh` 是开发中的新功能脚本。默认白名单 `bili_task_` 不会匹配它们；如果想体验先行版，把订阅白名单改成：
-
-```
-白名单：bili_task_,bili_dev_task_
-```
+仓库已改为单主干（只有 `main`，ADR-0002），原 `develop` 分支的 `bili_dev_task_*.sh` 玩法随之失效——`develop` 已删除，这些 dev 脚本为遗留，待清理。想体验未发布的新功能，请改用每次合并自动构建的 **alpha 版本镜像**（`zai7lou/bili_tool_web:alpha`）。
 
 钩子脚本会一并把 `dev/bili_dev_task_*.sh` 复用过来，它们共用同一份 base（`dev/bili_dev_task_base.sh` 只是 source 了上一级的 `bili_task_base.sh`）。
 

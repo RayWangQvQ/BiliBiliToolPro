@@ -2,7 +2,7 @@ name: CodeQL
 
 on:
   pull_request:
-    branches: [main, develop]
+    branches: [main]
     # 同上：Analyze 是 required check，加 paths 过滤会让纯文档 PR 卡在 Expected
 
 permissions:

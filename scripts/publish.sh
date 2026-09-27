@@ -45,19 +45,25 @@ read_var_from_user() {
 }
 
 get_version() {
-    # CI 通过 RELEASE_VERSION 传入；本地直接运行时回落到 common.props 的前缀。
+    # CI 通过 RELEASE_VERSION 显式传入；本地兜底见下方 if 块。
     # 用 bash 显式调用：.sh 提交为 mode 100644，直接执行在 Linux 上是 Permission denied
-    [ -n "$version" ] || version=$(bash "$repoDir/scripts/version.sh" prefix)
+    if [ -z "$version" ]; then
+        # 本地直接运行恒为 0.0.0-dev，与 common.props 兜底一致（ADR-0002）：
+        # zip 文件名和程序集版本不会再出现"文件名是稳定号、程序集是 dev"的错配。
+        version="0.0.0-dev"
+    fi
     echo -e "current version: $version \n\n"
 
     mkdir -p $publishDir
 }
 
 extract_release_notes() {
-    echo "Extracting release notes from CHANGELOG.md..."
+    echo "Generating release notes from PR titles..."
     mkdir -p $publishDir
 
-    bash "$repoDir/scripts/version.sh" release-notes > "$publishDir/release_notes.md"
+    # 本地可能没有可归纳的 PR 标题（如无 tag），失败不阻断本地打包
+    bash "$repoDir/scripts/release-notes.sh" notes > "$publishDir/release_notes.md" \
+        || echo "(no release notes)" > "$publishDir/release_notes.md"
 
     echo "Release notes saved to $publishDir/release_notes.md"
 }
@@ -74,6 +80,7 @@ publish_dotnet_dependent() {
     echo "dotnet publish..."
     dotnet publish --configuration Release \
         --self-contained false \
+        -p:Version="$version" \
         -p:PublishSingleFile=true \
         -p:DebugType=None \
         -p:DebugSymbols=false \
@@ -100,6 +107,7 @@ publish_self_contained() {
     dotnet publish --configuration Release \
         --self-contained true \
         --runtime $runtime \
+        -p:Version="$version" \
         -p:PublishSingleFile=true \
         -p:DebugType=None \
         -p:DebugSymbols=false \

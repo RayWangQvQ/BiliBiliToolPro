@@ -1,8 +1,10 @@
 <Project>
   <PropertyGroup>
     <Authors>Ray</Authors>
-    <!-- 版本真相来源：只写前缀。develop 上由 CI 注入 -alpha.N 后缀，main 上无后缀即正式版。 -->
-    <VersionPrefix>4.0.7</VersionPrefix>
+    <!-- 仅本地开发兜底：版本权威源是 git tag 历史（ADR-0002），CI 构建一律
+         通过 -p:Version= 显式注入。本地构建产物版本恒为 0.0.0-dev，无需维护。 -->
+    <VersionPrefix>0.0.0</VersionPrefix>
+    <VersionSuffix>dev</VersionSuffix>
     <NoWarn>$(NoWarn);CS1591;CS0436</NoWarn>
   </PropertyGroup>
 </Project>

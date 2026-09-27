@@ -2,7 +2,7 @@ name: CI
 
 on:
   pull_request:
-    branches: [main, develop]
+    branches: [main]
 
 permissions:
   contents: read
@@ -13,20 +13,15 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # 版本号一致性 + 构建 + 离线单元测试
+  # 构建 + 离线单元测试
   # [Trait("Category", "External")]，被过滤掉，只在本地或按需手动执行。
   Verify:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
       contents: read
-      pull-requests: write # 只为把算出来的版本号播报成 PR 评论
     steps:
-      # fetch-depth: 0 是为了拿到全部 tag —— 预览版的 -alpha.N 由已有 tag 推算，
-      # 浅克隆看不到 tag，N 就永远算成 1，会和已推过的预览镜像撞号。
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -57,19 +52,33 @@ jobs:
           dotnet test Ray.BiliBiliTool.sln --configuration Release --no-build
           --filter "Category!=External" --nologo
 
-      - name: Version matches CHANGELOG
-        run: bash ./scripts/version.sh check-consistency
+  # 发布脚本的 fixture 测试：在临时 git 仓库/模拟 PR 标题上验证算号与 notes 生成。
+  # 发布逻辑是发布系统的命脉，但它不碰 .NET 代码，所以独立于 Verify。
+  ScriptTests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      # fetch-depth: 0：最后的 dry-run 要在真实 tag 历史上演算 alpha 版本
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Report planned version
-        if: github.event.pull_request.head.repo.full_name == github.repository
-        continue-on-error: true
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          BASE_REF: ${{ github.base_ref }}
-        run: bash ./scripts/report-version.sh post "$BASE_REF"
+      - name: Version derivation fixtures
+        run: bash ./scripts/test-version-next.sh
 
-  # 只构建不推送，用来保证合并到 develop/main 之后镜像可以构建
+      - name: Release notes fixtures
+        run: bash ./scripts/test-release-notes.sh
+
+      - name: Update changelog fixtures
+        run: bash ./scripts/test-update-changelog.sh
+
+      # alpha workflow 的版本计算步骤在 PR 上的 dry-run 冒烟（只算不推）
+      - name: Alpha version dry-run
+        run: |
+          planned=$(bash ./scripts/version-next.sh alpha)
+          echo "本 PR 合并后将产出 alpha：$planned"
+
+  # 只构建不推送，用来保证合并到 main 之后镜像可以构建
   ImageSmoke:
     runs-on: ubuntu-latest
     timeout-minutes: 30
