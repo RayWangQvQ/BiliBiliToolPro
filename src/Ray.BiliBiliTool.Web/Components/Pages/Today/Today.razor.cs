@@ -20,6 +20,9 @@ public partial class Today : ComponentBase
     [Inject]
     private ISnackbar Snackbar { get; set; } = null!;
 
+    [Inject]
+    private IDialogService DialogService { get; set; } = null!;
+
     private List<AccountTodayTasksDto> _accounts = [];
     private bool _loadingLocal;
     private bool _busy;
@@ -172,8 +175,23 @@ public partial class Today : ComponentBase
         await ManualRefreshAsync();
     }
 
+    /// <summary>
+    /// 关闭分享任务。这是全局开关（对所有账号生效），所以先弹确认，
+    /// 并且不挂在单个任务行上——放在设置区才对得上它的作用范围。
+    /// </summary>
     private async Task DisableShareAsync()
     {
+        var confirmed = await DialogService.ShowMessageBoxAsync(
+            "不再尝试分享",
+            "这会关闭所有账号的分享任务，之后不再自动尝试分享。确定吗？",
+            "确定关闭",
+            "取消"
+        );
+        if (confirmed != true)
+        {
+            return;
+        }
+
         _busy = true;
         try
         {
@@ -214,33 +232,61 @@ public partial class Today : ComponentBase
         }
     }
 
+    /// <summary>是否有任何一项提供了「不再尝试分享」的入口（分享任务仍开启时才会有）</summary>
+    private bool AnyShareDisable =>
+        _accounts.SelectMany(a => a.Groups).SelectMany(g => g.Items).Any(i => i.CanDisableShare);
+
+    /// <summary>
+    /// 整任务算一项的任务（<see cref="TodayTaskItemDto.ItemKey"/> 为 null，如「充电」「批量取关」）：
+    /// 任务名与检查项名完全相同，页面上不再拆成两级，直接渲染成一行。
+    /// </summary>
+    private static bool IsSingleItemTask(TodayTaskGroupDto group) =>
+        group.Items.Count == 1 && group.Items[0].ItemKey is null;
+
+    /// <summary>
+    /// 账号级进度。「本日无需执行」与「已关闭」既不算完成也不算待办，直接排除在分母外。
+    /// </summary>
+    private static (int Done, int Total) ProgressOf(AccountTodayTasksDto account) =>
+        ProgressOf(account.Groups.SelectMany(g => g.Items));
+
+    /// <summary>任务级进度，口径同上。</summary>
+    private static (int Done, int Total) ProgressOf(IEnumerable<TodayTaskItemDto> items)
+    {
+        var tracked = items
+            .Where(i => i.State is not (TodayTaskItemState.NotToday or TodayTaskItemState.Disabled))
+            .ToList();
+
+        return (tracked.Count(i => i.State == TodayTaskItemState.Completed), tracked.Count);
+    }
+
     private static string StateIcon(TodayTaskItemDto item) =>
-        item.IsBiliPending ? "⏳" : StateIcon(item.State);
+        item.IsBiliPending ? Icons.Material.Filled.HourglassEmpty : StateIcon(item.State);
 
     private static string StateIcon(TodayTaskItemState state) =>
         state switch
         {
-            TodayTaskItemState.Completed => "✅",
-            TodayTaskItemState.NotDone => "❌",
-            TodayTaskItemState.Failed => "⚠️",
-            TodayTaskItemState.RetryExhausted => "⚠️",
-            TodayTaskItemState.Waiting => "⏳",
-            TodayTaskItemState.NotToday => "➖",
-            TodayTaskItemState.Disabled => "⛔",
-            TodayTaskItemState.Unknown => "❓",
-            _ => "•",
+            TodayTaskItemState.Completed => Icons.Material.Filled.CheckCircle,
+            TodayTaskItemState.NotDone => Icons.Material.Filled.Cancel,
+            TodayTaskItemState.Failed => Icons.Material.Filled.ErrorOutline,
+            TodayTaskItemState.RetryExhausted => Icons.Material.Filled.WarningAmber,
+            TodayTaskItemState.Waiting => Icons.Material.Filled.Schedule,
+            TodayTaskItemState.NotToday => Icons.Material.Filled.RemoveCircleOutline,
+            TodayTaskItemState.Disabled => Icons.Material.Filled.Block,
+            TodayTaskItemState.Unknown => Icons.Material.Filled.HelpOutline,
+            _ => Icons.Material.Filled.HelpOutline,
         };
 
-    private static string StateClass(TodayTaskItemDto item) =>
-        item.IsBiliPending ? "state-muted" : StateClass(item.State);
+    private static Color StateColor(TodayTaskItemDto item) =>
+        item.IsBiliPending ? Color.Default : StateColor(item.State);
 
-    private static string StateClass(TodayTaskItemState state) =>
+    private static Color StateColor(TodayTaskItemState state) =>
         state switch
         {
-            TodayTaskItemState.Completed => "state-ok",
-            TodayTaskItemState.NotDone => "state-bad",
-            TodayTaskItemState.Failed or TodayTaskItemState.RetryExhausted => "state-warn",
-            TodayTaskItemState.Unknown => "state-bad",
-            _ => "state-muted",
+            TodayTaskItemState.Completed => Color.Success,
+            TodayTaskItemState.NotDone => Color.Error,
+            TodayTaskItemState.Failed or TodayTaskItemState.RetryExhausted => Color.Warning,
+            TodayTaskItemState.Waiting => Color.Info,
+            TodayTaskItemState.Unknown => Color.Error,
+            _ => Color.Default,
         };
 }

@@ -36,9 +36,26 @@ _Avoid_: 预览版、beta、开发版
 维护者手动触发发版 workflow、选定 patch/minor/major 后由 CI 算号并发布的正式版本：打纯数字三段式 git tag、建 GitHub Release、出全套制品。
 _Avoid_: 正式版、release 版
 
+**检查项**:
+今日任务页上的**二级**条目、一行的状态单元（如「观看视频」「投币」），对应 `TaskItemDefinition`，展示态是 `TodayTaskItemDto`。归属于一个任务。
+_Avoid_: 任务项、条目、子任务
+
+**任务**:
+今日任务页上的**一级**条目（如「每日任务」「充电」「批量取关」），对应 `TaskDefinition`（`taskKey`），补做时按它定位。一个任务下辖一到多个检查项：只有「每日任务」下辖多项，其余都是**整任务算一项**（检查项的 `ItemKey` 为 null，名字与任务名相同）。`TodayTaskGroupDto` 只是「任务 + 其检查项」在页面上的承载结构，不是独立概念。
+_Avoid_: 任务分组、分类、类别、模块
+
+**漏做**:
+今天该做、但到检查时仍未完成的检查项（`NotDone`）。与「失败」是两回事——失败是跑过但没成功。
+_Avoid_: 没做、未完成、缺失
+
+**补做**:
+对某个检查项重新执行一次任务。分手动（用户在今日任务页点「补做」）与自动（`AutoRecoverJob` 触发）两种，靠 `TaskRecordTrigger` 区分——每日自动补做次数上限统计的就是 `Trigger=Auto` 的记录，传错会导致上限失效。
+_Avoid_: 重试、重跑、恢复
+
 ## 相关
 
 - [ADR-0001：Web 面板启动失败必须以非 0 退出码结束](docs/adr/0001-web-startup-failure-must-exit-nonzero.md)
 - [ADR-0002：单主干 + CI 托管版本号](docs/adr/0002-ci-managed-versioning-trunk-based.md)
 - [ADR-0003：应用版本以程序集 InformationalVersion 为唯一载体](docs/adr/0003-app-version-carrier-and-display.md)
 - [ADR-0004：镜像构建跑在宿主机架构上，不用 QEMU 模拟 arm64](docs/adr/0004-image-cross-build-on-buildplatform.md)
+- [ADR-0005：MudBlazor 四个 Provider 逐个页面声明，不上提到 App.razor / MainLayout](docs/adr/0005-mudblazor-providers-stay-per-page.md)
