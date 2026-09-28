@@ -1,29 +1,83 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.JSInterop
+@inject IJSRuntime JSRuntime
 @inherits LayoutComponentBase
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu/>
-    </div>
+<MudLayout>
+    <MudAppBar Elevation="1" Fixed="false">
+        <MudText Typo="Typo.h6" Class="ml-3">BiliTool</MudText>
+        <MudSpacer/>
+        <MudIconButton Icon="@Icons.Material.Filled.Brightness4"
+                       OnClick="ToggleDarkMode" Color="Color.Inherit"
+                       HtmlAttributes="@(new Dictionary<string, object> { { "title", "切换暗色模式" } })"/>
+        <MudButton Href="about" Color="Color.Inherit">关于项目</MudButton>
+        <AuthorizeView>
+            <Authorized>
+                <MudButton Href="/auth/logout" Color="Color.Inherit">退出登录</MudButton>
+            </Authorized>
+        </AuthorizeView>
+    </MudAppBar>
 
-    <main>
-        <div class="top-row px-4">
-            <a href="about">关于项目</a>
-            <AuthorizeView>
-                <Authorized>
-                    <a href="/auth/logout" class="nav-link">退出登录</a>
-                </Authorized>
-            </AuthorizeView>
-        </div>
+    <MudDrawer Open="true" Variant="DrawerVariant.Persistent" Anchor="Anchor.Start" Elevation="1" Width="280">
+        <MudNavMenu Class="d-flex flex-column h-100">
+            <NavMenu/>
+        </MudNavMenu>
+    </MudDrawer>
 
-        <article class="content px-4">
+    <MudMainContent>
+        <MudContainer MaxWidth="MaxWidth.Large" Class="my-4">
             @Body
-        </article>
-    </main>
-</div>
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
 
-<div id="blazor-error-ui">
-    发生了未处理的错误。
-    <a href="" class="reload">重新加载</a>
-    <a class="dismiss">🗙</a>
-</div>
+<MudThemeProvider Theme="_theme" IsDarkMode="_isDarkMode"/>
+<MudPopoverProvider/>
+<MudDialogProvider/>
+<MudSnackbarProvider/>
+
+@code {
+    private bool _isDarkMode;
+
+    private MudTheme _theme => new MudTheme
+    {
+        PaletteLight = new PaletteLight
+        {
+            Primary = "#1976D2",
+            Secondary = "#42A5F5",
+            AppbarBackground = "#1976D2",
+            Background = "#f5f7fa",
+            Surface = "#ffffff",
+        },
+        PaletteDark = new PaletteDark
+        {
+            Primary = "#42A5F5",
+            AppbarBackground = "#1f1f1f",
+            Background = "#121212",
+            Surface = "#1e1e1e",
+            DrawerBackground = "#1a1a1a",
+        },
+    };
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        var stored = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "bilitool-dark");
+        var dark = stored is "1" or "true";
+        if (dark != _isDarkMode)
+        {
+            _isDarkMode = dark;
+            StateHasChanged();
+        }
+    }
+
+    private void ToggleDarkMode()
+    {
+        _isDarkMode = !_isDarkMode;
+        JSRuntime.InvokeVoidAsync("localStorage.setItem", "bilitool-dark", _isDarkMode ? "1" : "0");
+    }
+}
