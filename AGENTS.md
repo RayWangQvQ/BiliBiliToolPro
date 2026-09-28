@@ -15,3 +15,9 @@ Single-context layout: one `CONTEXT.md` at the repo root plus `docs/adr/` (ADRs)
 ### Commit messages
 
 Never put the literal string `[skip ci]` (or any CI-skip marker) in a commit message or PR title/body: squash-merging it to `main` silently skips the alpha image build for that push. The changelog bot does not need skip markers — commits made by `GITHUB_TOKEN` never trigger workflows anyway.
+
+### Language conventions
+
+- **Code comments**: keep them concise; write in **English**.
+- **Git commits**: use **English** commit messages by default.
+- **PR titles/bodies**: use **English** by default.
