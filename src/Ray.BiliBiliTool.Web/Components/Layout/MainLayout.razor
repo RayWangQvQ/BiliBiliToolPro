@@ -1,10 +1,19 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Routing
 @using Microsoft.JSInterop
 @inject IJSRuntime JSRuntime
+@inject NavigationManager Navigation
+@inject IBrowserViewportService BrowserViewportService
+@implements IDisposable
 @inherits LayoutComponentBase
 
 <MudLayout>
-    <MudAppBar Elevation="1" Fixed="false">
+    <MudAppBar Elevation="1" Fixed="true">
+        @* Rendered below Md only: at Md and up the drawer is persistent and needs no toggle. *@
+        <MudIconButton Icon="@Icons.Material.Filled.Menu"
+                       Class="d-flex d-md-none"
+                       OnClick="ToggleDrawer" Color="Color.Inherit"
+                       HtmlAttributes="@(new Dictionary<string, object> { { "title", "菜单" } })"/>
         <MudText Typo="Typo.h6" Class="ml-3">BiliTool</MudText>
         <MudSpacer/>
         <MudIconButton Icon="@Icons.Material.Filled.Brightness4"
@@ -18,7 +27,14 @@
         </AuthorizeView>
     </MudAppBar>
 
-    <MudDrawer Open="true" Variant="DrawerVariant.Persistent" Anchor="Anchor.Start" Elevation="1" Width="280">
+    @* Responsive drawer: persistent (pushes content) at Md and up, overlay below Md.
+       ClipMode.Always keeps the app bar full width and puts the drawer underneath it.
+       Width needs a CSS unit - MudBlazor writes it verbatim into --mud-drawer-width-left. *@
+    <MudDrawer @bind-Open="_drawerOpen"
+               Variant="DrawerVariant.Responsive"
+               Breakpoint="Breakpoint.Md"
+               ClipMode="DrawerClipMode.Always"
+               Anchor="Anchor.Start" Elevation="1" Width="280px">
         <MudNavMenu Class="d-flex flex-column h-100">
             <NavMenu/>
         </MudNavMenu>
@@ -38,6 +54,46 @@
 
 @code {
     private bool _isDarkMode;
+    private bool _drawerOpen = true;
+
+    protected override void OnInitialized()
+    {
+        Navigation.LocationChanged += OnLocationChanged;
+    }
+
+    public void Dispose()
+    {
+        Navigation.LocationChanged -= OnLocationChanged;
+    }
+
+    private void ToggleDrawer()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        // Navigating must not leave the overlay drawer covering the new page.
+        _ = CloseDrawerOnNavigationAsync();
+    }
+
+    private async Task CloseDrawerOnNavigationAsync()
+    {
+        if (!_drawerOpen)
+        {
+            return;
+        }
+
+        // Xs/Sm are the breakpoints below Md, where the drawer is an overlay instead of persistent.
+        var breakpoint = await BrowserViewportService.GetCurrentBreakpointAsync();
+        if (breakpoint is not (Breakpoint.Xs or Breakpoint.Sm))
+        {
+            return;
+        }
+
+        _drawerOpen = false;
+        await InvokeAsync(StateHasChanged);
+    }
 
     private MudTheme _theme => new MudTheme
     {

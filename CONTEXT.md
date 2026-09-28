@@ -60,3 +60,4 @@ _Avoid_: 重试、重跑、恢复
 - [ADR-0004：镜像构建跑在宿主机架构上，不用 QEMU 模拟 arm64](docs/adr/0004-image-cross-build-on-buildplatform.md)
 - [ADR-0005：MudBlazor 四个 Provider 逐个页面声明，不上提到 App.razor / MainLayout](docs/adr/0005-mudblazor-providers-stay-per-page.md)（已被 ADR-0006 作废）
 - [ADR-0006：Web UI 全站 MudBlazor 化 + 自定义深空蓝主题 + 暗色模式](docs/adr/0006-web-ui-mudblazor-native-theme.md)
+- [ADR-0007：面板窄屏改用响应式抽屉，侧栏宽度必须带 CSS 单位](docs/adr/0007-web-narrow-viewport-drawer.md)
