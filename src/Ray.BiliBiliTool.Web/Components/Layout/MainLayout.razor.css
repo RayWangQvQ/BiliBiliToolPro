@@ -10,6 +10,9 @@ main {
 
 .sidebar {
     background-image: linear-gradient(180deg, rgb(5, 39, 103) 0%, #3a0647 70%);
+    /* 纵向 flex：菜单区撑开剩余高度，把版本号压到侧边栏最底部 */
+    display: flex;
+    flex-direction: column;
 }
 
 .top-row {

@@ -26,6 +26,9 @@ public static class ServiceCollectionExtension
         services.AddScoped<IHistoryDialogWorkflow, HistoryDialogWorkflow>();
         services.AddScoped<IBiliAccountPageWorkflow, BiliAccountPageWorkflow>();
 
+        // 应用版本：宿主程序集元数据，进程内不变，单例即可
+        services.AddSingleton<IAppInfoProvider, AppInfoProvider>();
+
         // 「今日任务」相关
         services.AddSingleton<ITaskRecordWriter, TaskRecordWriter>();
         services.AddSingleton<IBiliAccountProbe, BiliAccountProbe>();

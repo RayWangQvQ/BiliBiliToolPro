@@ -38,8 +38,8 @@ public abstract class BaseJob<TJob>(ILogger<TJob> logger) : IJob
             {
                 logger.LogInformation("---");
                 logger.LogInformation(
-                    "v{version} 开源 by {url}",
-                    Config.AppVersion.InformationalOf(typeof(Program).Assembly),
+                    "{version} 开源 by {url}",
+                    Config.AppVersion.DisplayOf(typeof(Program).Assembly),
                     Config.Constants.SourceCodeUrl + Environment.NewLine
                 );
             }

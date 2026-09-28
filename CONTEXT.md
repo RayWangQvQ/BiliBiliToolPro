@@ -24,6 +24,10 @@ _Avoid_: 崩溃、启动慢
 catch 里只记日志、却不改变进程结果的写法：调用方拿到的仍是「成功」。捕获本身没问题，吞掉结果才是问题。
 _Avoid_: 捕获异常
 
+**应用版本**:
+面板上给用户看的那一项版本信息（侧边栏底部与 `/about`）：CI 产物显示版本号（如 `4.0.8-alpha.3`），非 CI 产物显示 `开发版`。载体是宿主程序集的 InformationalVersion（ADR-0003）。
+_Avoid_: 版本号（在仓库里专指 `x.y.z` 那三段）、版本信息、程序版本
+
 **alpha 版本**:
 PR 合入主干后由 CI 自动产出的预览版本，形如 `x.y.z-alpha.N`（N 自上个稳定 tag 起从 1 递增）；只推 Docker 镜像，用后即弃，其 x.y.z 基底是"暂定下一 patch"，与最终稳定版号可能错配。
 _Avoid_: 预览版、beta、开发版
@@ -36,3 +40,4 @@ _Avoid_: 正式版、release 版
 
 - [ADR-0001：Web 面板启动失败必须以非 0 退出码结束](docs/adr/0001-web-startup-failure-must-exit-nonzero.md)
 - [ADR-0002：单主干 + CI 托管版本号](docs/adr/0002-ci-managed-versioning-trunk-based.md)
+- [ADR-0003：应用版本以程序集 InformationalVersion 为唯一载体](docs/adr/0003-app-version-carrier-and-display.md)
