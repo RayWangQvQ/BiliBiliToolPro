@@ -98,7 +98,7 @@ jobs:
   image:
     needs: [decide, publish]
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
 
@@ -115,8 +115,7 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: docker/setup-qemu-action@v4
-
+      # 不需要 QEMU：编译阶段跑在 BUILDPLATFORM 上，final 层一条 RUN 都没有（ADR-0004）
       - uses: docker/setup-buildx-action@v4
 
       - uses: docker/build-push-action@v7
@@ -131,8 +130,8 @@ jobs:
             ${{ env.DOCKER_IMG_NAME }}:latest
             ${{ env.GHCR_IMG_NAME }}:${{ needs.decide.outputs.version }}
             ${{ env.GHCR_IMG_NAME }}:latest
-          cache-from: type=gha,scope=stable
-          cache-to: type=gha,scope=stable,mode=max
+          cache-from: type=registry,ref=ghcr.io/raywangqvq/bili_tool_web:buildcache-stable
+          cache-to: type=registry,ref=ghcr.io/raywangqvq/bili_tool_web:buildcache-stable,mode=max,image-manifest=true
 
   changelog:
     needs: [decide, publish]

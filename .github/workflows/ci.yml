@@ -97,5 +97,6 @@ jobs:
           push: false
           platforms: linux/amd64
           tags: bili-tool-web:smoke
-          cache-from: type=gha,scope=smoke
-          cache-to: type=gha,scope=smoke,mode=max
+          # 不带缓存：交叉编译后冒烟构建只要 2-3 分钟，而 gha 缓存导出固定要 5 分钟，
+          # 等于为了省 2 分钟先花 5 分钟；registry 缓存在 GHCR 上是私有的
+          # （匿名拉取 401），fork PR 的 token 也读不到，借读会直接失败。

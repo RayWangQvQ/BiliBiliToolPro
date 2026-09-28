@@ -49,7 +49,8 @@ jobs:
   push:
     needs: decide
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    # 交叉编译后全原生：两个架构各约 2-3 分钟，留足 20 分钟只为异常时能快速失败
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
 
@@ -66,8 +67,8 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: docker/setup-qemu-action@v4
-
+      # 不需要 QEMU：编译阶段跑在 BUILDPLATFORM 上，final 层一条 RUN 都没有
+      # （ADR-0004），全程不执行任何目标架构指令。
       - uses: docker/setup-buildx-action@v4
 
       # 完整版本号显式注入（构建时烘焙），容器内 informational version 与镜像 tag 一致。
@@ -84,5 +85,9 @@ jobs:
             ${{ env.DOCKER_IMG_NAME }}:alpha
             ${{ env.GHCR_IMG_NAME }}:${{ needs.decide.outputs.version }}
             ${{ env.GHCR_IMG_NAME }}:alpha
-          cache-from: type=gha,scope=alpha
-          cache-to: type=gha,scope=alpha,mode=max
+          # 缓存存进 GHCR 而非 GHA Actions Cache：后者每次导出要 5 分钟
+          # （preparing 97s + sending 211s），registry 走镜像层直推快得多，
+          # 也不占 Actions Cache 的 10GB 额度。image-manifest=true 是 GHCR 要求的
+          # OCI media type，不加会推失败。
+          cache-from: type=registry,ref=ghcr.io/raywangqvq/bili_tool_web:buildcache-alpha
+          cache-to: type=registry,ref=ghcr.io/raywangqvq/bili_tool_web:buildcache-alpha,mode=max,image-manifest=true
