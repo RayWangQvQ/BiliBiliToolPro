@@ -7,26 +7,49 @@
 <PageTitle>今日任务</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.Large" Class="my-4">
+    @if (_busy)
+    {
+        <MudProgressLinear Indeterminate="true" Color="Color.Primary" Class="mb-3" />
+    }
+
     <MudText Typo="Typo.h5">今日任务</MudText>
     <MudText Typo="Typo.body2" Class="mud-text-secondary mb-3">
         显示每个账号今天的任务完成情况。漏做的会自动补做（每项每天最多自动补 3 次），也可以自己点「补做」。
     </MudText>
 
-    <MudPaper Class="pa-3 mb-4" Elevation="1">
+    @* 操作区：时间信息 + 刷新 / 一键补做 *@
+    <MudPaper Class="pa-3 mb-3" Elevation="1">
         <div class="d-flex flex-wrap align-center gap-3">
-            <MudText Typo="Typo.body2">日期：@DateTime.Now.ToString("yyyy-MM-dd")</MudText>
+            <div class="d-flex align-center gap-1">
+                <MudIcon Icon="@Icons.Material.Filled.Event" Size="Size.Small" Class="mud-text-secondary" />
+                <MudText Typo="Typo.body2">@DateTime.Now.ToString("yyyy-MM-dd")</MudText>
+            </div>
+
             @if (_lastRefresh.HasValue)
             {
-                <MudText Typo="Typo.body2">最后检查：@_lastRefresh.Value.ToString("HH:mm:ss")</MudText>
+                <div class="d-flex align-center gap-1">
+                    <MudIcon Icon="@Icons.Material.Filled.Update" Size="Size.Small" Class="mud-text-secondary" />
+                    <MudText Typo="Typo.body2">最后检查 @_lastRefresh.Value.ToString("HH:mm:ss")</MudText>
+                </div>
             }
+
+            <div class="flex-grow-1"></div>
+
             <MudButton Variant="Variant.Filled" Color="Color.Primary"
                        StartIcon="@Icons.Material.Filled.Refresh"
                        Disabled="_busy" OnClick="ManualRefreshAsync">立即刷新</MudButton>
             <MudButton Variant="Variant.Outlined" Color="Color.Secondary"
+                       StartIcon="@Icons.Material.Filled.PlayArrow"
                        Disabled="_busy" OnClick="RedoAllAsync">一键补做全部漏做项</MudButton>
         </div>
+    </MudPaper>
 
-        <MudDivider Class="my-3" />
+    @* 设置区：自动补做 + 关闭分享 *@
+    <MudPaper Class="pa-3 mb-4" Elevation="1">
+        <div class="d-flex align-center gap-2 mb-2">
+            <MudIcon Icon="@Icons.Material.Filled.Settings" Size="Size.Small" Class="mud-text-secondary" />
+            <MudText Typo="Typo.subtitle2">自动补做设置</MudText>
+        </div>
 
         <div class="d-flex flex-wrap align-center gap-3">
             <MudSwitch @bind-Value="_autoEnable" Color="Color.Primary" Label="自动补做" />
@@ -35,76 +58,153 @@
             <MudNumericField @bind-Value="_retentionDays" Label="记录保留天数"
                              Min="1" Max="90" Style="max-width:170px" />
             <MudButton Variant="Variant.Filled" Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Save"
                        Disabled="_busy" OnClick="SaveSettingsAsync">保存设置</MudButton>
         </div>
+
+        @if (AnyShareDisable)
+        {
+            <MudDivider Class="my-3" />
+            <div class="d-flex flex-wrap align-center gap-2">
+                <MudButton Variant="Variant.Outlined" Color="Color.Warning" Size="Size.Small"
+                           StartIcon="@Icons.Material.Filled.Block"
+                           Disabled="_busy" OnClick="DisableShareAsync">不再尝试分享</MudButton>
+                <MudText Typo="Typo.caption" Class="mud-text-secondary">
+                    对所有账号生效：关闭后不再自动尝试分享任务。
+                </MudText>
+            </div>
+        }
     </MudPaper>
 
     @if (_loadingLocal)
     {
-        <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+        <div class="d-flex justify-center py-8">
+            <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+        </div>
     }
     else if (_accounts.Count == 0)
     {
-        <MudAlert Severity="Severity.Info">还没有添加 B 站账号，请先到「账号管理」添加或扫码登录。</MudAlert>
+        <MudAlert Severity="Severity.Info">
+            还没有添加 B 站账号，请先到
+            <MudLink Href="/BiliAccount">账号管理</MudLink>
+            添加或扫码登录。
+        </MudAlert>
     }
     else
     {
         @foreach (var account in _accounts)
         {
+            @* 「本日无需执行 / 已关闭」不计入分母 *@
+            var (doneCount, totalCount) = ProgressOf(account);
+            var percent = totalCount == 0 ? 0.0 : doneCount * 100.0 / totalCount;
+
             <MudCard Class="mb-3">
                 <MudCardHeader>
+                    <CardHeaderAvatar>
+                        <MudAvatar Color="Color.Primary" Variant="Variant.Outlined">
+                            <MudIcon Icon="@Icons.Material.Filled.Person" />
+                        </MudAvatar>
+                    </CardHeaderAvatar>
                     <CardHeaderContent>
-                        <MudText Typo="Typo.h6">👤 账号@(account.Index + 1) · @account.UserName</MudText>
+                        <MudText Typo="Typo.h6">账号@(account.Index + 1) · @account.UserName</MudText>
                         <MudText Typo="Typo.caption" Class="mud-text-secondary">UID @account.UserId</MudText>
                     </CardHeaderContent>
                     <CardHeaderActions>
-                        <MudButton Size="Size.Small" Variant="Variant.Outlined"
+                        <MudButton Size="Size.Small" Variant="Variant.Filled" Color="Color.Primary"
+                                   StartIcon="@Icons.Material.Filled.PlayArrow"
                                    Disabled="_busy"
                                    OnClick="@(() => RedoAccountAsync(account))">整卡补做</MudButton>
                     </CardHeaderActions>
                 </MudCardHeader>
+
                 <MudCardContent Class="pt-0">
+                    <div class="d-flex align-center gap-3 mb-3">
+                        <MudText Typo="Typo.caption" Class="mud-text-secondary" Style="white-space:nowrap">
+                            已完成 @doneCount / @totalCount
+                        </MudText>
+                        <MudProgressLinear Value="percent" Size="Size.Small" Rounded="true"
+                                           Color="@(doneCount == totalCount ? Color.Success : Color.Primary)"
+                                           Class="flex-grow-1" />
+                    </div>
+
                     @if (_biliChecked && !account.IsCookieValid)
                     {
                         <MudAlert Severity="Severity.Warning" Dense="true" Class="mb-2">
-                            该账号 Cookie 可能已失效，请到「账号管理」重新检测或扫码登录。
+                            该账号 Cookie 可能已失效，请到
+                            <MudLink Href="/BiliAccount">账号管理</MudLink>
+                            重新检测或扫码登录。
                         </MudAlert>
                     }
 
                     @foreach (var group in account.Groups)
                     {
-                        foreach (var item in group.Items)
-                        {
-                            <div class="d-flex align-center justify-space-between py-1 task-row">
-                                <div class="d-flex align-center gap-2">
-                                    <span class="state-icon">@StateIcon(item)</span>
-                                    <MudText Typo="Typo.body2">@item.DisplayName</MudText>
+                        @* 整任务算一项时（ItemKey 为 null），任务名与检查项名相同：
+                           不再拆成两级，直接渲染成一行，避免同一个名字出现两遍 *@
+                        var single = IsSingleItemTask(group);
+                        var (groupDone, groupTotal) = ProgressOf(group.Items);
+
+                        <div class="task-group">
+                            @if (!single)
+                            {
+                                <div class="task-group-header">
+                                    <MudIcon Icon="@Icons.Material.Filled.TaskAlt" Size="Size.Small"
+                                             Color="Color.Primary" />
+                                    <MudText Typo="Typo.subtitle2">@group.DisplayName</MudText>
+                                    <MudChip T="string" Size="Size.Small" Variant="Variant.Text">
+                                        @groupDone / @groupTotal
+                                    </MudChip>
                                 </div>
-                                <div class="d-flex align-center gap-3">
-                                    <MudText Typo="Typo.body2" Class="@StateClass(item)">
-                                        @item.StateText@(item.Message is null ? "" : $"（{item.Message}）")
-                                    </MudText>
-                                    @if (item.CompletedAt.HasValue)
-                                    {
-                                        <MudText Typo="Typo.caption" Class="mud-text-secondary">
-                                            @item.CompletedAt.Value.ToLocalTime().ToString("MM-dd HH:mm")
+                            }
+
+                            <div class="@(single ? null : "task-group-items")">
+                                @foreach (var item in group.Items)
+                                {
+                                    <div class="task-row d-flex align-center justify-space-between py-1">
+                                        <MudText Typo="Typo.body2">
+                                            @(single ? group.DisplayName : item.DisplayName)
                                         </MudText>
-                                    }
-                                    @if (item.CanRedo)
-                                    {
-                                        <MudButton Size="Size.Small" Variant="Variant.Text"
-                                                   Color="Color.Primary" Disabled="_busy"
-                                                   OnClick="@(() => RedoItemAsync(account, group.TaskKey, item))">补做</MudButton>
-                                    }
-                                    @if (item.CanDisableShare)
-                                    {
-                                        <MudButton Size="Size.Small" Variant="Variant.Text"
-                                                   Color="Color.Warning" Disabled="_busy"
-                                                   OnClick="DisableShareAsync">不再尝试</MudButton>
-                                    }
-                                </div>
+
+                                        <div class="d-flex align-center gap-2">
+                                            @if (item.Message is null)
+                                            {
+                                                <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined"
+                                                         Color="@StateColor(item)" Icon="@StateIcon(item)">
+                                                    @item.StateText
+                                                </MudChip>
+                                            }
+                                            else
+                                            {
+                                                @* Message 可能很长，塞进 tooltip，不再挤在状态文字后面 *@
+                                                <MudTooltip Text="@item.Message">
+                                                    <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined"
+                                                             Color="@StateColor(item)" Icon="@StateIcon(item)">
+                                                        @item.StateText
+                                                    </MudChip>
+                                                </MudTooltip>
+                                            }
+
+                                            @if (item.CompletedAt.HasValue)
+                                            {
+                                                <MudText Typo="Typo.caption" Class="mud-text-secondary">
+                                                    @item.CompletedAt.Value.ToLocalTime().ToString("MM-dd HH:mm")
+                                                </MudText>
+                                            }
+
+                                            @if (item.CanRedo)
+                                            {
+                                                <MudButton Size="Size.Small" Variant="Variant.Filled"
+                                                           Color="Color.Primary"
+                                                           StartIcon="@Icons.Material.Filled.PlayArrow"
+                                                           Disabled="_busy"
+                                                           OnClick="@(() => RedoItemAsync(account, group.TaskKey, item))">
+                                                    补做
+                                                </MudButton>
+                                            }
+                                        </div>
+                                    </div>
+                                }
                             </div>
-                        }
+                        </div>
                     }
                 </MudCardContent>
             </MudCard>
@@ -112,33 +212,7 @@
     }
 </MudContainer>
 
-<style>
-    .task-row {
-        border-bottom: 1px solid var(--mud-palette-lines-default);
-    }
-
-    .task-row:last-child {
-        border-bottom: none;
-    }
-
-    .state-icon {
-        width: 1.2rem;
-        text-align: center;
-    }
-
-    .state-ok {
-        color: var(--mud-palette-success);
-    }
-
-    .state-warn {
-        color: var(--mud-palette-warning);
-    }
-
-    .state-bad {
-        color: var(--mud-palette-error);
-    }
-
-    .state-muted {
-        color: var(--mud-palette-text-secondary);
-    }
-</style>
+<MudThemeProvider/>
+<MudPopoverProvider/>
+<MudDialogProvider/>
+<MudSnackbarProvider/>

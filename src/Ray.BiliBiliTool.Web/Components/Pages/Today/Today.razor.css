@@ -1,0 +1,27 @@
+.task-group {
+    margin-top: 0.75rem;
+}
+
+/* 一级：任务。左侧竖色条把它和二级检查项区分开 */
+.task-group-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.375rem 0 0.375rem 0.625rem;
+    border-left: 3px solid var(--mud-palette-primary);
+}
+
+/* 二级：检查项。缩进 + 引导线表达从属关系 */
+.task-group-items {
+    margin-left: 0.75rem;
+    padding-left: 0.75rem;
+    border-left: 1px solid var(--mud-palette-lines-default);
+}
+
+.task-row {
+    border-bottom: 1px solid var(--mud-palette-lines-default);
+}
+
+.task-row:last-child {
+    border-bottom: none;
+}

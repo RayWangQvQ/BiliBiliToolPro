@@ -1,4 +1,6 @@
 @rendermode InteractiveServer
+@using Ray.BiliBiliTool.Web.Services
+@inject IAppInfoProvider AppInfoProvider
 
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
@@ -118,6 +120,10 @@
             </NavLink>
         </div>
     </nav>
+</div>
+
+<div class="nav-version px-3" title="应用版本">
+    版本号：@AppInfoProvider.AppVersion
 </div>
 
 @code {

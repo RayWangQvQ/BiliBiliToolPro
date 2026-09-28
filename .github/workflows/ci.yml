@@ -3,6 +3,10 @@ name: CI
 on:
   pull_request:
     branches: [main]
+  # 供 stable.yml 的 changelog job 手动 dispatch：
+  # GITHUB_TOKEN 创建的 PR 不会自动触发任何 workflow（GitHub 防递归规则），
+  # required checks 只能靠 dispatch 在该分支上补跑。
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -21,10 +25,10 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v6
         with:
           dotnet-version: "10.0.x"
           # 不要开 cache：setup-dotnet 的缓存只认 packages.lock.json，
@@ -59,7 +63,7 @@ jobs:
     timeout-minutes: 10
     steps:
       # fetch-depth: 0：最后的 dry-run 要在真实 tag 历史上演算 alpha 版本
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -83,9 +87,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v4
 
       - uses: docker/build-push-action@v7
         with:
@@ -93,5 +97,6 @@ jobs:
           push: false
           platforms: linux/amd64
           tags: bili-tool-web:smoke
-          cache-from: type=gha,scope=smoke
-          cache-to: type=gha,scope=smoke,mode=max
+          # 不带缓存：交叉编译后冒烟构建只要 2-3 分钟，而 gha 缓存导出固定要 5 分钟，
+          # 等于为了省 2 分钟先花 5 分钟；registry 缓存在 GHCR 上是私有的
+          # （匿名拉取 401），fork PR 的 token 也读不到，借读会直接失败。

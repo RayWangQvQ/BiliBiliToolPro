@@ -4,6 +4,8 @@ on:
   pull_request:
     branches: [main]
     # 同上：Analyze 是 required check，加 paths 过滤会让纯文档 PR 卡在 Expected
+  # 同 ci.yml：供 stable.yml 的 changelog job 手动 dispatch 补跑 required checks。
+  workflow_dispatch:
 
 permissions:
   actions: read
@@ -20,10 +22,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v6
         with:
           dotnet-version: "10.0.x"
 

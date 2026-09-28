@@ -30,26 +30,9 @@ for file in "$SRC_ROOT"/bili_task_*.sh; do
     echo "已同步: $filename"
 done
 
-# 2. 处理 dev 目录 (bili_dev_task_*)
-echo ">>> 正在从 $SRC_ROOT/dev 同步 dev 任务脚本..."
-mkdir -p "$DST_ROOT/dev"
-for file in "$SRC_ROOT"/dev/bili_dev_task_*.sh; do
-    # 确保文件存在
-    [ -e "$file" ] || continue
-    
-    filename=$(basename "$file")
-    # 排除 base 文件
-    if [[ "$filename" == "bili_dev_task_base.sh" ]]; then
-        continue
-    fi
-    
-    cp -f "$file" "$DST_ROOT/dev/"
-    echo "已同步: dev/$filename"
-done
-
 echo ">>> 同步完成。"
 
-# 3. 清理 platforms/qinglong 目录
+# 2. 清理 platforms/qinglong 目录
 echo ">>> 正在清理 platforms/qinglong 目录..."
 rm -rf "$REPO_ROOT/platforms/qinglong"
 echo ">>> 清理完成。"

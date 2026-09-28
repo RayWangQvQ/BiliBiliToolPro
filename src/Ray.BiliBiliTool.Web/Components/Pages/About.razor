@@ -1,0 +1,34 @@
+@page "/about"
+@rendermode InteractiveServer
+@using Ray.BiliBiliTool.Web.Services
+@using ConfigConstants = Ray.BiliBiliTool.Config.Constants
+@inject IAppInfoProvider AppInfoProvider
+
+<PageTitle>关于</PageTitle>
+
+<MudCard Class="mx-auto my-4" Style="max-width: 500px;">
+    <MudCardHeader>
+        <MudText Typo="Typo.h5">关于 BiliTool</MudText>
+    </MudCardHeader>
+    <MudCardContent>
+        <MudText Typo="Typo.body1">版本号：@AppInfoProvider.AppVersion</MudText>
+        <MudText Typo="Typo.body2" Class="mt-3">
+            B 站每日任务自动化工具。多宿主（面板 / 命令行 / 云函数），开源免费。
+        </MudText>
+        <MudText Typo="Typo.body2" Class="mt-2">
+            版本号由 CI 在构建时注入。显示「开发版」说明这份产物不是 CI 构建的，
+            报问题时请一并说明获取方式。
+        </MudText>
+    </MudCardContent>
+    <MudCardActions>
+        <MudButton Variant="Variant.Text" Color="Color.Primary"
+                   Href="@ConfigConstants.SourceCodeUrl" Target="_blank">源码仓库</MudButton>
+        <MudButton Variant="Variant.Text" Color="Color.Primary"
+                   Href="@(ConfigConstants.SourceCodeUrl + "/issues")" Target="_blank">问题反馈</MudButton>
+    </MudCardActions>
+</MudCard>
+
+<MudThemeProvider/>
+<MudPopoverProvider/>
+<MudDialogProvider/>
+<MudSnackbarProvider/>

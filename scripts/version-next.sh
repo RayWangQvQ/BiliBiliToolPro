@@ -8,6 +8,10 @@
 #
 # 测试 seam：VERSION_REPO_DIR 可指向任意 git 仓库（fixture 测试用），
 # 缺省为本脚本所在仓库。CI 需要 fetch-depth: 0，否则看不到 tag。
+#
+# 注意：alpha 序号 = 自上个稳定 tag 以来的提交数，依赖每次合并都真实触发。
+# 若提交信息/PR 标题里出现 CI-skip 标记（[skip ci] 等字面量），GitHub 会整体
+# 跳过那次 push 的全部 workflow —— alpha 构建静默缺失、序号断号，且不报任何错。
 set -euo pipefail
 
 repo_dir=${VERSION_REPO_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}
