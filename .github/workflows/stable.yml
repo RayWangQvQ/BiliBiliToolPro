@@ -137,28 +137,32 @@ jobs:
   changelog:
     needs: [decide, publish]
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 10
     permissions:
       contents: write # 推分支
-      pull-requests: write # 开 PR + 开 auto-merge
-      checks: read # gh pr checks --watch
-      actions: write # gh workflow run 手动 dispatch
+      pull-requests: write # 开 PR
     steps:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
-      # 为什么不直接推 main：ruleset 要求所有变更经 PR。
+      # 已验证的约束（4.0.8 发版实测）：
+      # - ruleset 要求 main 所有变更经 PR，GITHUB_TOKEN 直推必 403；
+      # - GITHUB_TOKEN 建的 PR 不触发 CI（防递归规则），dispatch 补跑的检查也
+      #   不会进入 PR 的状态汇总（GitHub 限制），required checks 永远缺失、
+      #   auto-merge 永不触发——所以本 job 只负责开到 PR，合并靠维护者一键
+      #   （纯文档变更，admin 可无视检查缺失）。想全自动需 fine-grained PAT
+      #   或自建 GitHub App 作 bypass（GitHub Actions app 不可作 bypass，API 422 实测）。
       # 为什么不用 CI-skip 标记：提交信息里的 [skip ci] 字面量会让 squash 合并到
-      # main 的那次 push 整体跳过 alpha 构建（GitHub 按提交信息全文匹配），
-      # 而 GITHUB_TOKEN 产生的提交/合并天然不触发任何 workflow，根本不需要它。
+      # main 的那次 push 整体跳过 alpha 构建（GitHub 按提交信息全文匹配）。
       # update-changelog.sh 重跑安全：顶部已是同版本段落时替换而非重复插入，
       # 内容无变化时本 job 直接成功退出（整个发版 run 的 retry 幂等）。
-      - name: Commit CHANGELOG section on a branch
-        id: branch
+      - name: Commit CHANGELOG section and open PR
         env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION: ${{ needs.decide.outputs.version }}
           SINCE: ${{ needs.decide.outputs.since }}
+          BRANCH: chore/changelog-${{ needs.decide.outputs.version }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -166,40 +170,16 @@ jobs:
           git add CHANGELOG.md
           if git diff --cached --quiet; then
             echo "CHANGELOG 顶部已是 $VERSION 段落且内容一致，无需回写"
-            echo "changed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          git checkout -b "chore/changelog-$VERSION"
+          git checkout -b "$BRANCH"
           git commit -m "docs(changelog): $VERSION"
-          git push -f origin "chore/changelog-$VERSION"
-          echo "changed=true" >> "$GITHUB_OUTPUT"
-
-      # GITHUB_TOKEN 创建的 PR 不会自动触发 CI（GitHub 防递归规则），
-      # 而 required checks（Verify/ScriptTests/ImageSmoke/Analyze）不绿 auto-merge 不会合，
-      # 所以这里手动 dispatch ci.yml 与 codeql-analysis.yml 在该分支上补跑。
-      # auto-merge 是服务端行为：检查全绿后由 GitHub 自动 squash 合并，
-      # 合并提交同样出自 GITHUB_TOKEN，不会再触发任何 push workflow（包括 alpha）。
-      - name: Open PR, enable auto-merge, run required checks
-        if: steps.branch.outputs.changed == 'true'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ needs.decide.outputs.version }}
-          BRANCH: chore/changelog-${{ needs.decide.outputs.version }}
-        run: |
+          git push -f origin "$BRANCH"
           pr_url=$(gh pr view "$BRANCH" --json url -q .url 2>/dev/null || true)
           if [ -z "$pr_url" ]; then
             pr_url=$(gh pr create --base main --head "$BRANCH" \
               --title "docs(changelog): $VERSION" \
-              --body "Stable release $VERSION 的 CHANGELOG 回写，由 stable.yml changelog job 自动生成。检查全绿后 auto-merge 自动合并。")
+              --body "Stable release $VERSION 的 CHANGELOG 回写，由 stable.yml changelog job 自动生成。纯文档变更，required checks 不会因 bot PR 而运行，由维护者（admin）直接合并即可。")
           fi
-          echo "PR: $pr_url"
-          gh pr merge --auto --squash "$pr_url"
-          gh workflow run ci.yml --ref "$BRANCH"
-          gh workflow run codeql-analysis.yml --ref "$BRANCH"
-          # dispatch 是异步的，等 4 个 required checks 注册出来再 watch
-          for i in $(seq 1 12); do
-            n=$(gh pr checks "$pr_url" --json name -q 'length' 2>/dev/null || echo 0)
-            [ "$n" -ge 4 ] && break
-            sleep 10
-          done
-          gh pr checks "$pr_url" --watch --interval 30
+          echo "CHANGELOG PR 已就绪，等待维护者合并：$pr_url"
+          echo "::notice title=CHANGELOG 回写::$pr_url 等待维护者合并（纯文档变更，可直接 --admin 合并）"
