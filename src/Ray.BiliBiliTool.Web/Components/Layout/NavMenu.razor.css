@@ -162,6 +162,16 @@
     display: block;
 }
 
+/* 侧边栏最底部：菜单区 flex 撑开剩余高度，版本号始终压在最下方，不随菜单滚动 */
+.nav-version {
+    flex: 0 0 auto;
+    padding: 0.75rem 0;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.55);
+    background-color: rgb(58, 6, 71);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
 .submenu-container {
     background-color: rgba(0, 0, 0, 0.1);
     margin-bottom: 0.5rem;
@@ -183,8 +193,11 @@
         /* Never collapse the sidebar for wide screens */
         display: block;
 
+        /* 吃掉侧边栏除品牌栏与版本号外的全部高度；min-height:0 才允许它内部滚动 */
+        flex: 1 1 auto;
+        min-height: 0;
+
         /* Allow sidebar to scroll for tall menus */
-        height: calc(100vh - 3.5rem);
         overflow-y: auto;
     }
 }
