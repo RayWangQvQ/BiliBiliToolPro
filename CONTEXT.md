@@ -41,3 +41,4 @@ _Avoid_: 正式版、release 版
 - [ADR-0001：Web 面板启动失败必须以非 0 退出码结束](docs/adr/0001-web-startup-failure-must-exit-nonzero.md)
 - [ADR-0002：单主干 + CI 托管版本号](docs/adr/0002-ci-managed-versioning-trunk-based.md)
 - [ADR-0003：应用版本以程序集 InformationalVersion 为唯一载体](docs/adr/0003-app-version-carrier-and-display.md)
+- [ADR-0004：镜像构建跑在宿主机架构上，不用 QEMU 模拟 arm64](docs/adr/0004-image-cross-build-on-buildplatform.md)
