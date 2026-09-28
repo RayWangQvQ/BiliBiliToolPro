@@ -34,10 +34,15 @@
                Variant="DrawerVariant.Responsive"
                Breakpoint="Breakpoint.Md"
                ClipMode="DrawerClipMode.Always"
-               Anchor="Anchor.Start" Elevation="1" Width="280px">
-        <MudNavMenu Class="d-flex flex-column h-100">
-            <NavMenu/>
-        </MudNavMenu>
+               Anchor="Anchor.Start" Elevation="1" Width="250px">
+        @* Body is an explicit flex column: the nav list takes the free space and scrolls,
+           the version footer keeps its own height at the bottom. *@
+        <div class="app-drawer-body">
+            <MudNavMenu Class="app-drawer-nav">
+                <NavMenu/>
+            </MudNavMenu>
+            <AppVersionFooter/>
+        </div>
     </MudDrawer>
 
     <MudMainContent>

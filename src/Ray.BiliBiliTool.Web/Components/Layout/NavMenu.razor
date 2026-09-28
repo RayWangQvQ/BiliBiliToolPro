@@ -1,5 +1,4 @@
-@using Ray.BiliBiliTool.Web.Services
-@inject IAppInfoProvider AppInfoProvider
+@* Nav links only - the app-version footer lives in MainLayout, at the drawer bottom. *@
 
 <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">
     首页
@@ -53,7 +52,3 @@
 <MudNavLink Href="Admin" Icon="@Icons.Material.Filled.AccountCircle">
     管理账户
 </MudNavLink>
-
-<MudText Typo="Typo.caption" Class="px-4 py-2 mud-text-secondary" Style="margin-top:auto">
-    版本号：@AppInfoProvider.AppVersion
-</MudText>

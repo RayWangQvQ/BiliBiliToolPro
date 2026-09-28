@@ -1,0 +1,7 @@
+@using Ray.BiliBiliTool.Web.Services
+@inject IAppInfoProvider AppInfoProvider
+
+@* Pinned to the drawer bottom: the nav list above it scrolls on its own. *@
+<MudText Typo="Typo.caption" Class="app-drawer-footer px-4 py-2 mud-text-secondary">
+    版本号：@AppInfoProvider.AppVersion
+</MudText>
