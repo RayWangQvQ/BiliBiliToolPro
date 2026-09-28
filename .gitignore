@@ -382,4 +382,4 @@ bruno/.env
 src/**/BiliBiliTool.db*
 
 # agent
-.workbuddy/memory
+.workbuddy
