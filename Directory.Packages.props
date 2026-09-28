@@ -61,8 +61,8 @@
     <PackageVersion Include="Ray.Serilog.Sinks.WorkWeiXinAppBatched" Version="0.1.5" />
     <PackageVersion Include="Ray.Serilog.Sinks.WorkWeiXinBatched" Version="0.1.5" />
     <!-- Quartz -->
-    <PackageVersion Include="Quartz" Version="4.1.1" />
-    <PackageVersion Include="Quartz.AspNetCore" Version="4.1.1" />
+    <PackageVersion Include="Quartz" Version="4.2.2" />
+    <PackageVersion Include="Quartz.AspNetCore" Version="4.2.2" />
     <PackageVersion Include="AppAny.Quartz.EntityFrameworkCore.Migrations.SQLite" Version="0.6.1" />
     <PackageVersion Include="CronExpressionDescriptor" Version="2.51.0" />
     <!-- Other packages - 修复版本兼容性问题 -->
@@ -71,7 +71,7 @@
     <PackageVersion Include="Refit.HttpClientFactory" Version="8.0.0" />
     <PackageVersion Include="Scrutor" Version="7.0.0" />
     <PackageVersion Include="QRCoder" Version="1.8.0" />
-    <PackageVersion Include="MudBlazor" Version="9.10.0" />
+    <PackageVersion Include="MudBlazor" Version="9.11.0" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="8.1.4" />
     <PackageVersion Include="Rougamo.Fody" Version="5.0.2" />
     <PackageVersion
