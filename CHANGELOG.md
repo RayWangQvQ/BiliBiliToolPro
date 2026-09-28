@@ -1,3 +1,11 @@
+## 4.1.0
+- feat(web): 全站 MudBlazor 化、首页 UI 重做与暗色模式 (#1179)
+- feat(web): 今日任务页 UI 重做，并补上侧边栏缺失的图标 (#1178)
+- feat(web): 面板展示应用版本 (#1176)
+- fix: changelog job 不再尝试 auto-merge，改为开到 PR 等维护者合并（#1159） (#1175)
+- Bump Scrutor from 6.1.0 to 7.0.0 (#1169)
+- perf(ci): 镜像构建改为宿主机架构交叉编译，不再用 QEMU 模拟 arm64 (#1177)
+- docs(changelog): 4.0.8 (#1174)
 ## 4.0.8
 - fix: changelog 回写改走 auto-merge PR 流，适配 main 的 ruleset 保护（#1159） (#1170)
 - 维护[#1153]: 发布策略重构——CI 托管版本号与单主干 alpha/stable 通道 (#1160)
