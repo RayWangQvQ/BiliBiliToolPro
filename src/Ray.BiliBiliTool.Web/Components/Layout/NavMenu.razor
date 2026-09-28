@@ -1,131 +1,59 @@
-@rendermode InteractiveServer
 @using Ray.BiliBiliTool.Web.Services
 @inject IAppInfoProvider AppInfoProvider
 
-<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">
-            <img src="/favicon.png" alt="Logo" class="navbar-logo" />
-            BiliTool
-        </a>
-    </div>
-</div>
+<MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">
+    首页
+</MudNavLink>
 
-<input type="checkbox" title="导航菜单" class="navbar-toggler" id="navToggler"/>
+<MudNavLink Href="BiliAccount" Icon="@Icons.Material.Filled.People">
+    账号管理
+</MudNavLink>
 
-<div class="nav-scrollable">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> 首页
-            </NavLink>
-        </div>
+<MudNavLink Href="Today" Icon="@Icons.Material.Filled.CheckBox">
+    今日任务
+</MudNavLink>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="Schedules">
-                <span class="bi bi-calendar-nav-menu" aria-hidden="true"></span> 计划任务
-            </NavLink>
-        </div>
+<MudNavLink Href="Schedules" Icon="@Icons.Material.Filled.CalendarMonth">
+    计划任务
+</MudNavLink>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="Today">
-                <span class="bi bi-check2-square" aria-hidden="true"></span> 今日任务
-            </NavLink>
-        </div>
+<MudNavGroup Title="任务配置" Icon="@Icons.Material.Filled.Tune">
+    <MudNavLink Href="Configurations/DailyJobConfig" Icon="@Icons.Material.Filled.Paid">
+        每日任务
+    </MudNavLink>
+    <MudNavLink Href="Configurations/MangaTaskConfig" Icon="@Icons.Material.Filled.Book">
+        漫画任务
+    </MudNavLink>
+    <MudNavLink Href="Configurations/MangaPrivilegeTaskConfig" Icon="@Icons.Material.Filled.MenuBook">
+        漫画特权
+    </MudNavLink>
+    <MudNavLink Href="Configurations/Silver2CoinTaskConfig" Icon="@Icons.Material.Filled.SwapHoriz">
+        银瓜子换硬币
+    </MudNavLink>
+    <MudNavLink Href="Configurations/ChargeTaskConfig" Icon="@Icons.Material.Filled.Bolt">
+        充电任务
+    </MudNavLink>
+    <MudNavLink Href="Configurations/VipPrivilegeConfig" Icon="@Icons.Material.Filled.Star">
+        大会员福利
+    </MudNavLink>
+    <MudNavLink Href="Configurations/VipBigPointConfig" Icon="@Icons.Material.Filled.MilitaryTech">
+        大会员积分
+    </MudNavLink>
+    <MudNavLink Href="Configurations/LiveLotteryTaskConfig" Icon="@Icons.Material.Filled.CardGiftcard">
+        直播抽奖
+    </MudNavLink>
+    <MudNavLink Href="Configurations/LiveFansMedalTaskConfig" Icon="@Icons.Material.Filled.Badge">
+        粉丝勋章
+    </MudNavLink>
+    <MudNavLink Href="Configurations/UnfollowBatchedTaskConfig" Icon="@Icons.Material.Filled.PersonRemove">
+        批量取关
+    </MudNavLink>
+</MudNavGroup>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="BiliAccount">
-                <span class="bi bi-people-fill" aria-hidden="true"></span> 账号管理
-            </NavLink>
-        </div>
+<MudNavLink Href="Admin" Icon="@Icons.Material.Filled.AccountCircle">
+    管理账户
+</MudNavLink>
 
-        <div class="nav-item px-3">
-            <div @onclick="@(() => { _showConfigSubMenu = !_showConfigSubMenu; })"
-                 class="nav-link d-flex justify-content-between align-items-center">
-                <div>
-                    <span class="bi bi-sliders me-1" aria-hidden="true"></span> 任务配置
-                </div>
-                <span class="bi @(_showConfigSubMenu ? "bi-chevron-down" : "bi-chevron-right")" aria-hidden="true"></span>
-            </div>
-        </div>
-
-        @if (_showConfigSubMenu)
-        {
-            <div class="submenu-container">
-                <div class="nav-item px-3 ms-4 submenu-item">
-                    <NavLink class="nav-link" href="Configurations/DailyJobConfig">
-                        <span class="bi bi-coin" aria-hidden="true"></span> 每日任务
-                    </NavLink>
-                </div>
-
-                <div class="nav-item px-3 ms-4 submenu-item">
-                    <NavLink class="nav-link" href="Configurations/MangaTaskConfig">
-                        <span class="bi bi-book" aria-hidden="true"></span> 漫画任务
-                    </NavLink>
-                </div>
-
-                <div class="nav-item px-3 ms-4 submenu-item">
-                    <NavLink class="nav-link" href="Configurations/MangaPrivilegeTaskConfig">
-                        <span class="bi bi-book-half" aria-hidden="true"></span> 漫画特权
-                    </NavLink>
-                </div>
-
-                <div class="nav-item px-3 ms-4 submenu-item">
-                    <NavLink class="nav-link" href="Configurations/Silver2CoinTaskConfig">
-                        <span class="bi bi-currency-exchange" aria-hidden="true"></span> 银瓜子换硬币
-                    </NavLink>
-                </div>
-
-                <div class="nav-item px-3 ms-4 submenu-item">
-                    <NavLink class="nav-link" href="Configurations/ChargeTaskConfig">
-                        <span class="bi bi-lightning-charge" aria-hidden="true"></span> 充电任务
-                    </NavLink>
-                </div>
-
-                <div class="nav-item px-3 ms-4 submenu-item">
-                    <NavLink class="nav-link" href="Configurations/VipPrivilegeConfig">
-                        <span class="bi bi-star" aria-hidden="true"></span> 大会员福利
-                    </NavLink>
-                </div>
-
-                <div class="nav-item px-3 ms-4 submenu-item">
-                    <NavLink class="nav-link" href="Configurations/VipBigPointConfig">
-                        <span class="bi bi-award" aria-hidden="true"></span> 大会员积分
-                    </NavLink>
-                </div>
-
-                <div class="nav-item px-3 ms-4 submenu-item">
-                    <NavLink class="nav-link" href="Configurations/LiveLotteryTaskConfig">
-                        <span class="bi bi-gift" aria-hidden="true"></span> 直播抽奖
-                    </NavLink>
-                </div>
-
-                <div class="nav-item px-3 ms-4 submenu-item">
-                    <NavLink class="nav-link" href="Configurations/LiveFansMedalTaskConfig">
-                        <span class="bi bi-badge-cc" aria-hidden="true"></span> 粉丝勋章
-                    </NavLink>
-                </div>
-
-                <div class="nav-item px-3 ms-4 submenu-item">
-                    <NavLink class="nav-link" href="Configurations/UnfollowBatchedTaskConfig">
-                        <span class="bi bi-person-dash" aria-hidden="true"></span> 批量取关
-                    </NavLink>
-                </div>
-            </div>
-        }
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="Admin">
-                <span class="bi bi-person-circle" aria-hidden="true"></span> 管理账户
-            </NavLink>
-        </div>
-    </nav>
-</div>
-
-<div class="nav-version px-3" title="应用版本">
+<MudText Typo="Typo.caption" Class="px-4 py-2 mud-text-secondary" Style="margin-top:auto">
     版本号：@AppInfoProvider.AppVersion
-</div>
-
-@code {
-    private bool _showConfigSubMenu;
-}
+</MudText>

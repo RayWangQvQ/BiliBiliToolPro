@@ -58,4 +58,5 @@ _Avoid_: 重试、重跑、恢复
 - [ADR-0002：单主干 + CI 托管版本号](docs/adr/0002-ci-managed-versioning-trunk-based.md)
 - [ADR-0003：应用版本以程序集 InformationalVersion 为唯一载体](docs/adr/0003-app-version-carrier-and-display.md)
 - [ADR-0004：镜像构建跑在宿主机架构上，不用 QEMU 模拟 arm64](docs/adr/0004-image-cross-build-on-buildplatform.md)
-- [ADR-0005：MudBlazor 四个 Provider 逐个页面声明，不上提到 App.razor / MainLayout](docs/adr/0005-mudblazor-providers-stay-per-page.md)
+- [ADR-0005：MudBlazor 四个 Provider 逐个页面声明，不上提到 App.razor / MainLayout](docs/adr/0005-mudblazor-providers-stay-per-page.md)（已被 ADR-0006 作废）
+- [ADR-0006：Web UI 全站 MudBlazor 化 + 自定义深空蓝主题 + 暗色模式](docs/adr/0006-web-ui-mudblazor-native-theme.md)

@@ -1,0 +1,13 @@
+/* 首页 Hero 横幅：实色品牌底色 + 对比色文字，扁平、不渐变、不引入阴影 */
+.home-hero {
+    background: var(--mud-palette-primary);
+}
+
+.home-hero-title {
+    color: var(--mud-palette-primary-contrast) !important;
+}
+
+.home-hero-subtitle {
+    color: var(--mud-palette-primary-contrast) !important;
+    opacity: 0.85;
+}
