@@ -1,6 +1,7 @@
 using Bunit;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
+using MudBlazor.Services;
 using Ray.BiliBiliTool.Config;
 using Ray.BiliBiliTool.Web.Components.Layout;
 using Ray.BiliBiliTool.Web.Services;
@@ -14,6 +15,11 @@ namespace Ray.BiliBiliTool.Web.ComponentTests;
 public class NavMenuTests : TestContext
 {
     private const string TestVersion = "4.0.8-alpha.3";
+
+    public NavMenuTests()
+    {
+        Services.AddMudServices();
+    }
 
     [Fact]
     public void NavMenu_Renders_ShowsAppVersion()
