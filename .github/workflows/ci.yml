@@ -3,9 +3,12 @@ name: CI
 on:
   pull_request:
     branches: [main]
-  # 供 stable.yml 的 changelog job 手动 dispatch：
-  # GITHUB_TOKEN 创建的 PR 不会自动触发任何 workflow（GitHub 防递归规则），
-  # required checks 只能靠 dispatch 在该分支上补跑。
+    # 这里不能加 paths/paths-ignore：被路径过滤跳过的 workflow 不产生任何检查，
+    # required checks 会永远停在 Expected 上锁。文档判定一律放 job 级（见 Scope）。
+  # 供 stable.yml 的 changelog job 手动 dispatch。注意 GITHUB_TOKEN 创建的 PR
+  # 仍会触发本 workflow，只是运行停在「需要审批」状态，要有写权限的人点
+  # Approve 才开跑（GitHub 防递归规则）；而 dispatch 出来的检查不进 PR 的状态
+  # 汇总，所以它只是「能手动补跑一次」的后路。
   workflow_dispatch:
 
 permissions:
@@ -17,9 +20,53 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # 变更范围判定：本次 PR 是否只碰了文档。纯文档变更跳过下面全部重活
+  # （ADR-0011）。判定必须放 job 级：workflow 级 paths 过滤会让 required
+  # checks 停在 Pending 阻塞合并，而 job 被 if 跳过会报 Success。
+  # 白名单与 alpha.yml 的 paths-ignore 对齐，只少一项 .github/workflows/**：
+  # 改 workflow 的 PR 要跑 CI 自检。两处清单改动时要一起改。
+  Scope:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      # 'true' 表示所有变更文件都命中白名单，重活全部跳过
+      docs_only: ${{ steps.scope.outputs.docs_only }}
+    steps:
+      # fetch-depth: 0：要比对 base..head，浅克隆里没有 base commit
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - id: scope
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          # fail-open：默认按「有代码变更」处理，只有成功枚举出文件列表、
+          # 且每一个都命中白名单，才置 true。git 报错／空 diff 一律跑全量。
+          pattern='^(.*\.md|docs/.*|\.editorconfig|bruno/.*)$'
+          files=$(git diff --no-renames --name-only "$BASE_SHA...$HEAD_SHA" || true)
+
+          docs_only=false
+          if [ -n "$files" ] && ! printf '%s\n' "$files" | grep -qvE "$pattern"; then
+            docs_only=true
+          fi
+          echo "docs_only=$docs_only" >> "$GITHUB_OUTPUT"
+
+          echo "docs_only=$docs_only，变更文件："
+          # 必须整段包在 if 里：空 files 时 `[ -n "$f" ] && echo` 会让循环退出码为 1，
+          # 而 run 默认是 bash -e，Scope 会失败 → 下游因 needs 失败被跳过、跳过报
+          # Success → 变成静默零校验。Scope 这一步绝不允许失败。
+          if [ -n "$files" ]; then
+            while IFS= read -r f; do echo "  $f"; done <<< "$files"
+          fi
+
   # 构建 + 离线单元测试
   # [Trait("Category", "External")]，被过滤掉，只在本地或按需手动执行。
   Verify:
+    needs: Scope
+    if: needs.Scope.outputs.docs_only != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -59,6 +106,8 @@ jobs:
   # 发布脚本的 fixture 测试：在临时 git 仓库/模拟 PR 标题上验证算号与 notes 生成。
   # 发布逻辑是发布系统的命脉，但它不碰 .NET 代码，所以独立于 Verify。
   ScriptTests:
+    needs: Scope
+    if: needs.Scope.outputs.docs_only != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -84,6 +133,8 @@ jobs:
 
   # 只构建不推送，用来保证合并到 main 之后镜像可以构建
   ImageSmoke:
+    needs: Scope
+    if: needs.Scope.outputs.docs_only != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:

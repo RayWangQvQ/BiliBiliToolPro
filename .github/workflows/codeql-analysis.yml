@@ -3,8 +3,9 @@ name: CodeQL
 on:
   pull_request:
     branches: [main]
-    # 同上：Analyze 是 required check，加 paths 过滤会让纯文档 PR 卡在 Expected
-  # 同 ci.yml：供 stable.yml 的 changelog job 手动 dispatch 补跑 required checks。
+    # 这里不能加 paths/paths-ignore：Analyze 是 required check，被路径过滤跳过的
+    # workflow 不产生检查，PR 会永远卡在 Expected。文档判定放 job 级（见 Scope）。
+  # 同 ci.yml：供 stable.yml 的 changelog job 手动 dispatch 补跑一次。
   workflow_dispatch:
 
 permissions:
@@ -17,8 +18,52 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # 与 ci.yml 的 Scope 同一套判定（清单第二份，改动时要一起改，见 ADR-0011）。
+  # job 名故意不叫 Scope：检查上下文名取自 job 名，跨 workflow 重名会让
+  # PR 的检查框出现两个同名条目，将来谁把它设成 required 就会歧义。
+  # 纯文档变更下 Analyze 会报 Success 而不是 Pending，所以不会阻塞合并。
+  CodeQLScope:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    outputs:
+      docs_only: ${{ steps.scope.outputs.docs_only }}
+    steps:
+      # fetch-depth: 0：要比对 base..head，浅克隆里没有 base commit
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - id: scope
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          # fail-open：默认按「有代码变更」处理，只有成功枚举出文件列表、
+          # 且每一个都命中白名单，才置 true。git 报错／空 diff 一律跑全量。
+          pattern='^(.*\.md|docs/.*|\.editorconfig|bruno/.*)$'
+          files=$(git diff --no-renames --name-only "$BASE_SHA...$HEAD_SHA" || true)
+
+          docs_only=false
+          if [ -n "$files" ] && ! printf '%s\n' "$files" | grep -qvE "$pattern"; then
+            docs_only=true
+          fi
+          echo "docs_only=$docs_only" >> "$GITHUB_OUTPUT"
+
+          echo "docs_only=$docs_only，变更文件："
+          # 必须整段包在 if 里：空 files 时 `[ -n "$f" ] && echo` 会让循环退出码为 1，
+          # 而 run 默认是 bash -e，CodeQLScope 会失败 → Analyze 因 needs 失败被跳过、
+          # 跳过报 Success → 变成静默零校验。这一步绝不允许失败。
+          if [ -n "$files" ]; then
+            while IFS= read -r f; do echo "  $f"; done <<< "$files"
+          fi
+
   Analyze:
     name: Analyze
+    needs: CodeQLScope
+    if: needs.CodeQLScope.outputs.docs_only != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
