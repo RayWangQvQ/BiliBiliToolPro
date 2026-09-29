@@ -30,3 +30,7 @@ The Web panel is MudBlazor-native (`Ray.BiliBiliTool.Web`, see ADR-0006). Two tr
 - **A flex child that must scroll needs `min-height:0`.** Flex items default to `min-height:auto` and will not shrink below their content, which pushes anything after them out of the viewport instead of scrolling.
 
 Sidebar structure follows from both: `MainLayout` renders `div.app-drawer-body` (flex column) containing `MudNavMenu.app-drawer-nav` (fills + scrolls) and `AppVersionFooter` (pinned). The rules live in `wwwroot/app.css`.
+
+### Docker publish
+
+The image build restores before copying sources (for layer caching) and publishes with `--no-restore`. That restore state has no `.razor` items, so the SDK decides `RequiresAspNetWebAssets=false` and drops `_framework/blazor.web.js` from the publish output — see ADR-0008. `Ray.BiliBiliTool.Web.csproj` pins the property explicitly and the Dockerfile asserts the file exists after `dotnet publish`. Never remove that assertion.
