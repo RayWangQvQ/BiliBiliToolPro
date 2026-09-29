@@ -8,8 +8,14 @@ namespace Ray.BiliBiliTool.Web.Services;
 public interface IAuthService
 {
     Task<ClaimsIdentity> LoginAsync(string username, string password);
-    Task ChangePasswordAsync(string username, string currentPassword, string newPassword);
-    Task<string> GetAdminUserNameAsync();
+
+    Task<AdminAccountInfo> GetAdminAccountAsync();
+
+    /// <summary>Rewrites the password hash only - the login name is left untouched.</summary>
+    Task ChangePasswordAsync(string currentPassword, string newPassword);
+
+    /// <summary>Rewrites the login name only - the password hash is left untouched.</summary>
+    Task ChangeUsernameAsync(string newUsername, string currentPassword);
 }
 
 public class AuthService(IUserRepository userRepository) : IAuthService
@@ -34,31 +40,44 @@ public class AuthService(IUserRepository userRepository) : IAuthService
         return new ClaimsIdentity();
     }
 
-    public async Task ChangePasswordAsync(
-        string username,
-        string currentPassword,
-        string newPassword
-    )
+    public async Task<AdminAccountInfo> GetAdminAccountAsync()
     {
         var user = await userRepository.GetAdminAsync();
+        return new AdminAccountInfo(user.Username, user.Roles);
+    }
 
-        if (!PasswordHelper.VerifyPassword(currentPassword, user.Salt, user.PasswordHash))
-        {
-            throw new Exception("Current password is incorrect.");
-        }
+    public async Task ChangePasswordAsync(string currentPassword, string newPassword)
+    {
+        var user = await userRepository.GetAdminAsync();
+        EnsureCurrentPasswordMatches(user, currentPassword);
 
         var (hash, salt) = PasswordHelper.HashPassword(newPassword);
 
         user.Salt = salt;
         user.PasswordHash = hash;
-        user.Username = username;
 
         await userRepository.UpdateAsync(user);
     }
 
-    public async Task<string> GetAdminUserNameAsync()
+    public async Task ChangeUsernameAsync(string newUsername, string currentPassword)
     {
         var user = await userRepository.GetAdminAsync();
-        return user.Username;
+        EnsureCurrentPasswordMatches(user, currentPassword);
+
+        user.Username = newUsername;
+
+        await userRepository.UpdateAsync(user);
+    }
+
+    /// <summary>
+    /// Both account mutations are authorised by the current password, so a stolen
+    /// session cookie alone cannot rewrite the credentials.
+    /// </summary>
+    private static void EnsureCurrentPasswordMatches(User user, string currentPassword)
+    {
+        if (!PasswordHelper.VerifyPassword(currentPassword, user.Salt, user.PasswordHash))
+        {
+            throw new InvalidOperationException("当前密码不正确");
+        }
     }
 }
