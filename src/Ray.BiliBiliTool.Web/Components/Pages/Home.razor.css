@@ -3,11 +3,13 @@
     background: var(--mud-palette-primary);
 }
 
+/* 文字色取 --mud-palette-primary-text：MudBlazor 9.x 并不存在
+   "--mud-palette-primary-contrast" 变量，写它会静默失效、文字回落到正文色。 */
 .home-hero-title {
-    color: var(--mud-palette-primary-contrast) !important;
+    color: var(--mud-palette-primary-text) !important;
 }
 
 .home-hero-subtitle {
-    color: var(--mud-palette-primary-contrast) !important;
+    color: var(--mud-palette-primary-text) !important;
     opacity: 0.85;
 }

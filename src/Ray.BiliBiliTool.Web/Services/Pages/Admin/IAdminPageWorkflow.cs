@@ -1,12 +1,12 @@
 namespace Ray.BiliBiliTool.Web.Services.Pages.Admin;
 
 /// <summary>
-/// Web-layer contract for the Admin page password-change workflow.
-/// Phase 14 provides the concrete implementation; this phase defines
-/// the contract and result shape so Phase 14 can migrate the component
-/// without reopening API design questions.
+/// Web-layer contract for the Admin page account mutations. Changing the login
+/// name and changing the password are separate operations (ADR-0009).
 /// </summary>
 public interface IAdminPageWorkflow
 {
-    Task<AdminPasswordChangeResult> ChangePasswordAsync(AdminPasswordChangeRequest request);
+    Task<AdminAccountChangeResult> ChangePasswordAsync(AdminPasswordChangeRequest request);
+
+    Task<AdminAccountChangeResult> ChangeUsernameAsync(AdminUsernameChangeRequest request);
 }

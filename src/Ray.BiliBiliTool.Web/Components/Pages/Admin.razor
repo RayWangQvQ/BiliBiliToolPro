@@ -3,42 +3,130 @@
 @rendermode InteractiveServer
 @attribute [Authorize]
 
-<PageTitle>修改密码</PageTitle>
+<PageTitle>管理员</PageTitle>
 
-<MudText Typo="Typo.h5">修改密码</MudText>
+@* Hero banner: same treatment as Home.razor - solid brand colour, flat, no shadow. *@
+<MudPaper Class="admin-hero pa-5 mb-4" Elevation="0">
+    <MudText Typo="Typo.h5" Class="admin-hero-title">管理员账户</MudText>
+    <MudText Typo="Typo.body2" Class="admin-hero-subtitle mt-1">
+        登录名与密码相互独立，改其中一个不会影响另一个；两项修改都需要当前密码确认，成功后当前会话将退出，需重新登录。
+    </MudText>
+</MudPaper>
 
-<MudCard Class="mx-auto my-4" Style="max-width: 500px;">
-    <MudCardContent>
-        @if (!string.IsNullOrEmpty(_errorMessage))
-        {
-            <MudAlert Severity="Severity.Error" Class="mb-3">@_errorMessage</MudAlert>
-        }
-        @if (!string.IsNullOrEmpty(_successMessage))
-        {
-            <MudAlert Severity="Severity.Success" Class="mb-3">@_successMessage</MudAlert>
-        }
-        <MudTextField @bind-Value="_username" Label="新用户名" Required="true" RequiredError="Username cannot be empty" />
-        <MudTextField @bind-Value="_currentPassword" Label="当前密码" Required="true" RequiredError="Password cannot be empty"
-                      InputType="@_currentPasswordInput" Adornment="Adornment.End"
-                      AdornmentIcon="@_currentPasswordInputIcon" OnAdornmentClick="ToggleCurrentPasswordVisibility" />
-        <MudTextField @bind-Value="_newPassword" Label="新密码" Required="true" RequiredError="Password cannot be empty"
-                      InputType="@_passwordInput" Adornment="Adornment.End"
-                      AdornmentIcon="@_passwordInputIcon" OnAdornmentClick="TogglePasswordVisibility" />
-        <MudTextField @bind-Value="_confirmPassword" Label="确认新密码" Required="true" RequiredError="Password cannot be empty"
-                      InputType="@_passwordInput" Adornment="Adornment.End"
-                      AdornmentIcon="@_passwordInputIcon" OnAdornmentClick="TogglePasswordVisibility" />
-    </MudCardContent>
-    <MudCardActions>
-        @if (_showLogoutButton)
-        {
-            <MudButton Variant="Variant.Filled" Color="Color.Warning" OnClick="Logout"
-                       Class="ml-auto">退出登录</MudButton>
-        }
-        else
-        {
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ChangePasswordAsync"
-                       Class="ml-auto">提交</MudButton>
-        }
-    </MudCardActions>
-</MudCard>
+<MudGrid Spacing="3">
 
+    @* Account identity, plus the rename form. *@
+    <MudItem xs="12" md="5">
+        <MudCard Class="mud-height-full">
+            <MudCardHeader>
+                <CardHeaderAvatar>
+                    <MudAvatar Color="Color.Primary" Variant="Variant.Outlined">
+                        <MudIcon Icon="@Icons.Material.Filled.Badge" />
+                    </MudAvatar>
+                </CardHeaderAvatar>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">账户信息</MudText>
+                    <MudText Typo="Typo.caption" Class="mud-text-secondary">当前登录身份与权限</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudText Typo="Typo.caption" Class="mud-text-secondary">用户名</MudText>
+                <MudText Typo="Typo.body1">@_account.Username</MudText>
+
+                <MudText Typo="Typo.caption" Class="mud-text-secondary mt-3">角色</MudText>
+                @if (_account.Roles.Count == 0)
+                {
+                    <MudText Typo="Typo.body2" Class="mud-text-secondary">—</MudText>
+                }
+                else
+                {
+                    <div class="d-flex flex-wrap gap-2 mt-1">
+                        @foreach (var role in _account.Roles)
+                        {
+                            <MudChip T="string" Size="Size.Small" Color="Color.Primary" Variant="Variant.Outlined"
+                                     Icon="@Icons.Material.Filled.VerifiedUser">@DisplayRole(role)</MudChip>
+                        }
+                    </div>
+                }
+
+                <MudDivider Class="my-4" />
+
+                <MudText Typo="Typo.subtitle2" Class="mb-2">修改用户名</MudText>
+                <MudForm @ref="_usernameForm">
+                    <MudTextField @bind-Value="_newUsername" InputId="admin-new-username" Label="新用户名" Required="true"
+                                  RequiredError="请输入新用户名"
+                                  HelperText="保存后当前会话将退出，请用新用户名重新登录" />
+                    <MudTextField @bind-Value="_usernamePassword.Value" InputId="admin-rename-current-password"
+                                  Label="当前密码" Required="true"
+                                  RequiredError="请输入当前密码"
+                                  InputType="@_usernamePassword.InputType" Adornment="Adornment.End"
+                                  AdornmentIcon="@_usernamePassword.Icon"
+                                  OnAdornmentClick="@(() => Toggle(_usernamePassword))" />
+                </MudForm>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto"
+                           Disabled="_usernameSubmitting" OnClick="ChangeUsernameAsync">
+                    @if (_usernameSubmitting)
+                    {
+                        <MudProgressCircular Size="Size.Small" Indeterminate="true" Color="Color.Inherit" Class="mr-2" />
+                    }
+                    保存用户名
+                </MudButton>
+            </MudCardActions>
+        </MudCard>
+    </MudItem>
+
+    @* Password form. *@
+    <MudItem xs="12" md="7">
+        <MudCard Class="mud-height-full">
+            <MudCardHeader>
+                <CardHeaderAvatar>
+                    <MudAvatar Color="Color.Primary" Variant="Variant.Outlined">
+                        <MudIcon Icon="@Icons.Material.Filled.Lock" />
+                    </MudAvatar>
+                </CardHeaderAvatar>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">修改密码</MudText>
+                    <MudText Typo="Typo.caption" Class="mud-text-secondary">用户名保持不变</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudForm @ref="_passwordForm">
+                    <MudTextField @bind-Value="_currentPassword.Value" InputId="admin-current-password"
+                                  Label="当前密码" Required="true"
+                                  RequiredError="请输入当前密码"
+                                  InputType="@_currentPassword.InputType" Adornment="Adornment.End"
+                                  AdornmentIcon="@_currentPassword.Icon"
+                                  OnAdornmentClick="@(() => Toggle(_currentPassword))" />
+                    <MudTextField @bind-Value="_newPassword.Value" InputId="admin-new-password"
+                                  Label="新密码" Required="true"
+                                  RequiredError="请输入新密码"
+                                  InputType="@_newPassword.InputType" Adornment="Adornment.End"
+                                  AdornmentIcon="@_newPassword.Icon"
+                                  OnAdornmentClick="@(() => Toggle(_newPassword))" />
+                    <MudTextField @bind-Value="_confirmPassword.Value" InputId="admin-confirm-password"
+                                  Label="确认新密码" Required="true"
+                                  RequiredError="请再次输入新密码"
+                                  Validation="@(new Func<string, string?>(ValidateConfirmPassword))"
+                                  InputType="@_confirmPassword.InputType" Adornment="Adornment.End"
+                                  AdornmentIcon="@_confirmPassword.Icon"
+                                  OnAdornmentClick="@(() => Toggle(_confirmPassword))" />
+                </MudForm>
+                <MudText Typo="Typo.caption" Class="mud-text-secondary mt-2">
+                    保存后当前会话将退出，请用新密码重新登录
+                </MudText>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto"
+                           Disabled="_passwordSubmitting" OnClick="ChangePasswordAsync">
+                    @if (_passwordSubmitting)
+                    {
+                        <MudProgressCircular Size="Size.Small" Indeterminate="true" Color="Color.Inherit" Class="mr-2" />
+                    }
+                    修改密码
+                </MudButton>
+            </MudCardActions>
+        </MudCard>
+    </MudItem>
+</MudGrid>
