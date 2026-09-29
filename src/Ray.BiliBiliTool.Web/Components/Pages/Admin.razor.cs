@@ -8,7 +8,7 @@ namespace Ray.BiliBiliTool.Web.Components.Pages;
 public partial class Admin : ComponentBase
 {
     /// <summary>How long the success message stays up before the forced re-login.</summary>
-    private const int RenameLogoutDelayMs = 1200;
+    private const int LogoutDelayMs = 1200;
 
     [Inject]
     private NavigationManager NavigationManager { get; set; } = null!;
@@ -93,8 +93,7 @@ public partial class Admin : ComponentBase
             Snackbar.Add(result.SuccessMessage ?? "用户名已更新", Severity.Success);
             _account = _account with { Username = _newUsername.Trim() };
             _newUsername = "";
-            await Task.Delay(RenameLogoutDelayMs);
-            NavigationManager.NavigateTo("/auth/logout", forceLoad: true);
+            await SignOutAfterDelayAsync();
         }
         finally
         {
@@ -136,11 +135,25 @@ public partial class Admin : ComponentBase
             _currentPassword.Value = "";
             _newPassword.Value = "";
             _confirmPassword.Value = "";
+
+            // Same as the rename path: the session was authenticated with the old
+            // credentials, so it has to be re-established with the new ones.
+            await SignOutAfterDelayAsync();
         }
         finally
         {
             _passwordSubmitting = false;
         }
+    }
+
+    /// <summary>
+    /// Both credential changes invalidate the current session, so the user is sent
+    /// back to the login page once the success message has been readable for a moment.
+    /// </summary>
+    private async Task SignOutAfterDelayAsync()
+    {
+        await Task.Delay(LogoutDelayMs);
+        NavigationManager.NavigateTo("/auth/logout", forceLoad: true);
     }
 
     /// <summary>

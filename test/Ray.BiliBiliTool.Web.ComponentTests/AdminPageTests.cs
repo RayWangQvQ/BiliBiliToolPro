@@ -69,10 +69,11 @@ public class AdminPageTests : TestContext
 
         _workflow.PasswordCalled.Should().BeTrue();
         LastSnackbarMessage().Should().Be("当前密码不正确");
+        GetRequiredService<NavigationManager>().Uri.Should().NotEndWith("/auth/logout");
     }
 
     [Fact]
-    public async Task Admin_ChangePasswordWithWorkflowSuccess_ShowsSuccessSnackbar()
+    public async Task Admin_ChangePasswordWithWorkflowSuccess_ShowsSuccessSnackbarAndLogsOut()
     {
         _workflow.Result = new AdminAccountChangeResult(true, null, "密码修改成功");
         var cut = RenderComponent<Admin>();
@@ -81,6 +82,8 @@ public class AdminPageTests : TestContext
         await Submit(cut, PasswordButtonLabel);
 
         LastSnackbarMessage().Should().Be("密码修改成功");
+        // The session was authenticated with the old password, so it must be re-established.
+        GetRequiredService<NavigationManager>().Uri.Should().EndWith("/auth/logout");
     }
 
     [Fact]
