@@ -14,7 +14,7 @@ ruleset 只认检查名（`Verify` / `ScriptTests` / `ImageSmoke` / `Analyze`）
 
 ## 明确的代价
 
-- **CodeQL 分析类别（category）重置**：`category` 默认由 workflow 文件名推导，原值 `.github/workflows/codeql-analysis.yml:analyze` 变成 `.github/workflows/ci.yml:analyze`。对 code scanning 而言这是另一条分析线：Security 页面的历史告警基线不再连续，已 dismissed 的告警不会被重开，但会作为新告警重新出现。有意接受——不值得为此长期维护一个手写字符串。
+- **CodeQL 分析类别（category）重置**：`category` 由 workflow 文件名 + **job 名**推导（文档写的是「动作名」，实测是 job 名）。实测值从 `.github/workflows/codeql-analysis.yml:Analyze` 变成 `.github/workflows/ci.yml:Analyze`（合并时在本 PR 的 `code-scanning/analyses` 里可见）。对 code scanning 而言这是另一条分析线：Security 页面的历史告警基线不再连续，已 dismissed 的告警不会被重开，但会作为新告警重新出现。有意接受——不值得为此长期维护一个手写字符串。
 - **CodeQL 与 CI 共用一个 concurrency group**：改 PR 时 `Analyze` 会和其它 job 一起被取消（原先两者各有一个 group）。这是想要的行为：一次取消就是整轮取消。
 - **手动补跑只需 dispatch `CI` 一个 workflow**（原先要分别补 CI 与 CodeQL）。
 
