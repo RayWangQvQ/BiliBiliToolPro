@@ -3,12 +3,11 @@ name: CI
 on:
   pull_request:
     branches: [main]
-    # 这里不能加 paths/paths-ignore：被路径过滤跳过的 workflow 不产生任何检查，
-    # required checks 会永远停在 Expected 上锁。文档判定一律放 job 级（见 Scope）。
-  # 供 stable.yml 的 changelog job 手动 dispatch。注意 GITHUB_TOKEN 创建的 PR
-  # 仍会触发本 workflow，只是运行停在「需要审批」状态，要有写权限的人点
-  # Approve 才开跑（GitHub 防递归规则）；而 dispatch 出来的检查不进 PR 的状态
-  # 汇总，所以它只是「能手动补跑一次」的后路。
+    # Never add a paths filter here: a skipped workflow reports no checks, so the
+    # required checks stay Pending forever. Gating is job-level (see Scope).
+  # Backfill entry point for stable.yml's changelog job. GITHUB_TOKEN-created PRs
+  # do trigger this; they just wait for approval. Dispatched checks are not
+  # reported on the PR, so this is only a manual fallback.
   workflow_dispatch:
 
 permissions:
@@ -20,19 +19,15 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # 变更范围判定：本次 PR 是否只碰了文档。纯文档变更跳过下面全部重活
-  # （ADR-0011）。判定必须放 job 级：workflow 级 paths 过滤会让 required
-  # checks 停在 Pending 阻塞合并，而 job 被 if 跳过会报 Success。
-  # 白名单与 alpha.yml 的 paths-ignore 对齐，只少一项 .github/workflows/**：
-  # 改 workflow 的 PR 要跑 CI 自检。两处清单改动时要一起改。
+  # Docs-only PRs skip every heavy job below (ADR-0011). Job-level on purpose:
+  # a skipped job reports Success, a skipped workflow would leave checks Pending.
   Scope:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
-      # 'true' 表示所有变更文件都命中白名单，重活全部跳过
       docs_only: ${{ steps.scope.outputs.docs_only }}
     steps:
-      # fetch-depth: 0：要比对 base..head，浅克隆里没有 base commit
+      # fetch-depth: 0: the base..head diff needs the base commit
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
@@ -43,8 +38,7 @@ jobs:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
-          # fail-open：默认按「有代码变更」处理，只有成功枚举出文件列表、
-          # 且每一个都命中白名单，才置 true。git 报错／空 diff 一律跑全量。
+          # fail-open: only a successfully enumerated diff that is fully whitelisted counts
           pattern='^(.*\.md|docs/.*|\.editorconfig|bruno/.*)$'
           files=$(git diff --no-renames --name-only "$BASE_SHA...$HEAD_SHA" || true)
 
@@ -55,9 +49,8 @@ jobs:
           echo "docs_only=$docs_only" >> "$GITHUB_OUTPUT"
 
           echo "docs_only=$docs_only，变更文件："
-          # 必须整段包在 if 里：空 files 时 `[ -n "$f" ] && echo` 会让循环退出码为 1，
-          # 而 run 默认是 bash -e，Scope 会失败 → 下游因 needs 失败被跳过、跳过报
-          # Success → 变成静默零校验。Scope 这一步绝不允许失败。
+          # Wrapped in `if`: an empty $files makes the loop exit non-zero under the
+          # default `bash -e`, which would fail Scope and silently skip every job below.
           if [ -n "$files" ]; then
             while IFS= read -r f; do echo "  $f"; done <<< "$files"
           fi

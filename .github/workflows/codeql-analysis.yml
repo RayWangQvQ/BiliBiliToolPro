@@ -3,9 +3,9 @@ name: CodeQL
 on:
   pull_request:
     branches: [main]
-    # 这里不能加 paths/paths-ignore：Analyze 是 required check，被路径过滤跳过的
-    # workflow 不产生检查，PR 会永远卡在 Expected。文档判定放 job 级（见 Scope）。
-  # 同 ci.yml：供 stable.yml 的 changelog job 手动 dispatch 补跑一次。
+    # Never add a paths filter here: a skipped workflow reports no checks, so the
+    # required Analyze check stays Pending forever. Gating is job-level (see below).
+  # Manual backfill, same as ci.yml.
   workflow_dispatch:
 
 permissions:
@@ -18,10 +18,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # 与 ci.yml 的 Scope 同一套判定（清单第二份，改动时要一起改，见 ADR-0011）。
-  # job 名故意不叫 Scope：检查上下文名取自 job 名，跨 workflow 重名会让
-  # PR 的检查框出现两个同名条目，将来谁把它设成 required 就会歧义。
-  # 纯文档变更下 Analyze 会报 Success 而不是 Pending，所以不会阻塞合并。
+  # Same docs-only gate as ci.yml's Scope (second copy of the whitelist, see ADR-0011).
+  # Kept out of the name "Scope" to avoid two identically named checks on a PR.
   CodeQLScope:
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -30,7 +28,7 @@ jobs:
     outputs:
       docs_only: ${{ steps.scope.outputs.docs_only }}
     steps:
-      # fetch-depth: 0：要比对 base..head，浅克隆里没有 base commit
+      # fetch-depth: 0: the base..head diff needs the base commit
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
@@ -41,8 +39,7 @@ jobs:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
-          # fail-open：默认按「有代码变更」处理，只有成功枚举出文件列表、
-          # 且每一个都命中白名单，才置 true。git 报错／空 diff 一律跑全量。
+          # fail-open: only a successfully enumerated diff that is fully whitelisted counts
           pattern='^(.*\.md|docs/.*|\.editorconfig|bruno/.*)$'
           files=$(git diff --no-renames --name-only "$BASE_SHA...$HEAD_SHA" || true)
 
@@ -53,9 +50,8 @@ jobs:
           echo "docs_only=$docs_only" >> "$GITHUB_OUTPUT"
 
           echo "docs_only=$docs_only，变更文件："
-          # 必须整段包在 if 里：空 files 时 `[ -n "$f" ] && echo` 会让循环退出码为 1，
-          # 而 run 默认是 bash -e，CodeQLScope 会失败 → Analyze 因 needs 失败被跳过、
-          # 跳过报 Success → 变成静默零校验。这一步绝不允许失败。
+          # Wrapped in `if`: an empty $files makes the loop exit non-zero under the
+          # default `bash -e`, which would fail this job and silently skip Analyze.
           if [ -n "$files" ]; then
             while IFS= read -r f; do echo "  $f"; done <<< "$files"
           fi
