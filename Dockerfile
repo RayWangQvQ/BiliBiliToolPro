@@ -46,9 +46,15 @@ WORKDIR "/code/src/Ray.BiliBiliTool.Web"
 # 输出目录不同，会让增量判断失效、整套方案重编两遍（arm64 上白扔约 8 分钟）。
 # --no-restore：assets 已由上面的 restore 层生成，publish 不必再还原一遍。
 # UseAppHost=false：入口是 `dotnet Ray.BiliBiliTool.Web.dll`，用不到 apphost。
+# 最后一步是冒烟断言：--no-restore 复用的是一个「还没有 .razor 文件时」做出的
+# 还原结果，`_framework/blazor.web.js` 曾经因此被静默漏掉，页面能开但每个按钮
+# 都点不动（见 ADR-0008）。产物里没有这个脚本就直接让构建失败。
 RUN version_arg="" \
     && if [ -n "$VERSION" ]; then version_arg="-p:Version=$VERSION"; fi \
-    && dotnet publish "Ray.BiliBiliTool.Web.csproj" -c Release -o /app/publish --no-restore -p:UseAppHost=false $version_arg
+    && dotnet publish "Ray.BiliBiliTool.Web.csproj" -c Release -o /app/publish --no-restore -p:UseAppHost=false $version_arg \
+    && if [ ! -f /app/publish/wwwroot/_framework/blazor.web.js ]; then \
+       echo "ERROR: _framework/blazor.web.js missing from the publish output (see ADR-0008)"; exit 1; \
+       fi
 
 FROM base AS final
 ARG VERSION=""

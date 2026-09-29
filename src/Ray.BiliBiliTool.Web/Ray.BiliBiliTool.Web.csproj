@@ -5,6 +5,12 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>1970628b-9d9e-45d1-b337-32d4d1e64e95</UserSecretsId>
+    <!-- Pull in Microsoft.AspNetCore.App.Internal.Assets, which carries the Blazor
+         framework scripts (_framework/blazor.web.js, blazor.server.js). The SDK only
+         auto-enables this when it sees a .razor item at restore time, so a Docker
+         build that restores before copying sources silently drops those assets and
+         every page loses interactivity. Pin it explicitly. -->
+    <RequiresAspNetWebAssets>true</RequiresAspNetWebAssets>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
