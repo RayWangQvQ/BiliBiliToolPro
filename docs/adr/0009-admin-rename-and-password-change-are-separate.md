@@ -3,6 +3,7 @@
 - 状态：已接受
 - 日期：2026-09-29
 - 关联：`src/Ray.BiliBiliTool.Web/Services/AuthService.cs`、`Services/Pages/Admin/`、`Components/Pages/Admin.razor`
+- 后续：ADR-0010（改密的登出行为已与改名统一）
 
 ## 背景
 

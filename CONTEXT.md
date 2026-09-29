@@ -9,7 +9,7 @@ B 站每日任务自动化工具：多宿主（Web 面板 / Console / 各类云�
 _Avoid_: 网站、前端、UI
 
 **面板管理员**:
-登录面板用的那个账号，在 `/Admin` 页维护。整个面板**只有一个**（`bili_user` 表 `Id=1`，角色 `Administrator`，默认用户名 `admin`），登录名与密码是两个可独立变更的属性——改一个不会顺带改另一个（ADR-0009）。
+登录面板用的那个账号，在 `/Admin` 页维护。整个面板**只有一个**（`bili_user` 表 `Id=1`，角色 `Administrator`，默认用户名 `admin`），登录名与密码是两个可独立变更的属性——改一个不会顺带改另一个（ADR-0009），但两者成功后都会强制重新登录（ADR-0010）。
 _Avoid_: 用户、账户、账号、管理账户
 
 **B 站账号**:
@@ -71,3 +71,4 @@ _Avoid_: 重试、重跑、恢复
 - [ADR-0007：面板窄屏改用响应式抽屉，侧栏宽度必须带 CSS 单位](docs/adr/0007-web-narrow-viewport-drawer.md)
 - [ADR-0008：Blazor 框架脚本必须显式声明 `RequiresAspNetWebAssets` 随包发布](docs/adr/0008-blazor-framework-assets-must-be-published.md)
 - [ADR-0009：面板管理员的改名与改密是两个独立操作](docs/adr/0009-admin-rename-and-password-change-are-separate.md)
+- [ADR-0010：凭据变更成功后一律强制重新登录](docs/adr/0010-credential-change-forces-relogin.md)
