@@ -55,7 +55,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\auto-deploy-tencent-scf.yml = .github\workflows\auto-deploy-tencent-scf.yml
 		.github\workflows\ci.yml = .github\workflows\ci.yml
-		.github\workflows\codeql-analysis.yml = .github\workflows\codeql-analysis.yml
 		.github\workflows\preview-image.yml = .github\workflows\preview-image.yml
 		.github\workflows\release.yml = .github\workflows\release.yml
 		.github\workflows\repo-sync.yml = .github\workflows\repo-sync.yml

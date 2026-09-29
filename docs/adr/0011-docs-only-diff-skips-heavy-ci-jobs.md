@@ -2,6 +2,8 @@
 
 `ci.yml` 与 `codeql-analysis.yml` 各加一个前置 job `Scope`：枚举本次 PR 的全部变更文件，若每一个都命中文档白名单（`**.md`、`docs/**`、`.editorconfig`、`bruno/**`），就输出 `docs_only=true`，`Verify` / `ScriptTests` / `ImageSmoke` / `Analyze` 四个重活 job 随之跳过。被条件跳过的 job 报 Success，PR 直接可合。
 
+> **已被 ADR-0012 部分取代**：`codeql-analysis.yml` 已并入 `ci.yml`，`CodeQLScope` 取消，文档白名单只剩一份。下文凡涉及「两个 workflow 各一份清单」的描述都已成为历史。
+
 ## 症状与代价
 
 只改 `CHANGELOG.md`（+5 行）的 PR #1186 触发了 CI 与 CodeQL 两整套运行：`ScriptTests` 6s、`Verify` 78s、`ImageSmoke` 85s、CodeQL `Analyze` 264s，合计约 5 分钟构建机时间，全部花在一行 markdown 上。

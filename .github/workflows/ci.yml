@@ -144,3 +144,36 @@ jobs:
           # 不带缓存：交叉编译后冒烟构建只要 2-3 分钟，而 gha 缓存导出固定要 5 分钟，
           # 等于为了省 2 分钟先花 5 分钟；registry 缓存在 GHCR 上是私有的
           # （匿名拉取 401），fork PR 的 token 也读不到，借读会直接失败。
+
+  # CodeQL analysis (moved out of codeql-analysis.yml, see ADR-0012). The job
+  # name must stay "Analyze": it is a required check in the main ruleset.
+  Analyze:
+    name: Analyze
+    needs: Scope
+    if: needs.Scope.outputs.docs_only != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    # Job-level on purpose: "security-events: write" must not leak to the other jobs
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: csharp
+
+      # C# is compiled: CodeQL needs a real build to resolve the call graph
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v4
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4

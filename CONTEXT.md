@@ -45,7 +45,7 @@ _Avoid_: 预览版、beta、开发版
 _Avoid_: 正式版、release 版
 
 **CI 门禁**:
-合入 `main` 前必须通过的 GitHub required status check，目前四项：`Verify`、`ScriptTests`、`ImageSmoke`、`Analyze`。名字由 ruleset 绑定，取自 job 名——改 job 名的同时必须改 ruleset，否则检查永远停在 Expected。纯文档变更下这四项会被 job 级 `if` 跳过（ADR-0011），跳过报 Success 而非 Pending，所以不影响合入。
+合入 `main` 前必须通过的 GitHub required status check，目前四项：`Verify`、`ScriptTests`、`ImageSmoke`、`Analyze`，全部由同一个 workflow `ci.yml` 产生（ADR-0012）。名字由 ruleset 绑定，取自 job 名——改 job 名的同时必须改 ruleset，否则检查永远停在 Expected。纯文档变更下这四项会被 job 级 `if` 跳过（ADR-0011），跳过报 Success 而非 Pending，所以不影响合入。
 _Avoid_: 检查项（那是今日任务页的二级条目）、必需检查、门禁
 
 **检查项**:
@@ -76,4 +76,5 @@ _Avoid_: 重试、重跑、恢复
 - [ADR-0008：Blazor 框架脚本必须显式声明 `RequiresAspNetWebAssets` 随包发布](docs/adr/0008-blazor-framework-assets-must-be-published.md)
 - [ADR-0009：面板管理员的改名与改密是两个独立操作](docs/adr/0009-admin-rename-and-password-change-are-separate.md)
 - [ADR-0010：凭据变更成功后一律强制重新登录](docs/adr/0010-credential-change-forces-relogin.md)
-- [ADR-0011：纯文档变更跳过 CI 门禁的重活](docs/adr/0011-docs-only-diff-skips-heavy-ci-jobs.md)
+- [ADR-0011：纯文档变更跳过 CI 门禁的重活](docs/adr/0011-docs-only-diff-skips-heavy-ci-jobs.md)（清单存两份的描述已由 ADR-0012 取代）
+- [ADR-0012：PR 门禁合并成单一 workflow](docs/adr/0012-single-pr-gate-workflow.md)
