@@ -1,0 +1,16 @@
+/* Admin hero banner: the same treatment as the Home page hero. The text colour must
+   come from --mud-palette-primary-text - MudBlazor 9.x does not emit a
+   "--mud-palette-primary-contrast" variable, so such a declaration is silently dropped.
+   !important is required because .mud-paper sets its own background. */
+.admin-hero {
+    background: var(--mud-palette-primary) !important;
+}
+
+.admin-hero-title {
+    color: var(--mud-palette-primary-text) !important;
+}
+
+.admin-hero-subtitle {
+    color: var(--mud-palette-primary-text) !important;
+    opacity: 0.85;
+}

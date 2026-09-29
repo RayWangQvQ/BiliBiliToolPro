@@ -1,7 +1,9 @@
 using System.Security.Claims;
 using Bunit;
 using FluentAssertions;
+using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
+using MudBlazor;
 using MudBlazor.Services;
 using Ray.BiliBiliTool.Web.Components.Pages;
 using Ray.BiliBiliTool.Web.Services;
@@ -12,86 +14,211 @@ namespace Ray.BiliBiliTool.Web.ComponentTests;
 
 /// <summary>
 /// Component tests for the Admin page.
-/// Uses FakeAdminPageWorkflow to control workflow outcomes and
-/// FakeAuthService for username loading (OnInitializedAsync).
+/// Uses FakeAdminPageWorkflow to control the outcome of each account mutation
+/// and FakeAuthService for the account header (OnInitializedAsync).
 /// </summary>
 public class AdminPageTests : TestContext
 {
     private const string TestUsername = "testadmin";
 
+    private const string PasswordButtonLabel = "修改密码";
+    private const string UsernameButtonLabel = "保存用户名";
+
+    private readonly FakeAdminPageWorkflow _workflow = new();
+
     public AdminPageTests()
     {
         Services.AddMudServices();
         JSInterop.Mode = JSRuntimeMode.Loose;
-        Services.AddSingleton<IAuthService>(new FakeAuthService(TestUsername));
+        Services.AddSingleton<IAuthService>(new FakeAuthService());
+        Services.AddSingleton<IAdminPageWorkflow>(_workflow);
     }
 
     [Fact]
-    public void Admin_OnInitialized_DisplaysUsernameFromAuthService()
+    public void Admin_OnInitialized_DisplaysAccountFromAuthService()
     {
-        Services.AddSingleton<IAdminPageWorkflow>(
-            new FakeAdminPageWorkflow(new AdminPasswordChangeResult(false, null, null))
-        );
         var cut = RenderComponent<Admin>();
 
         cut.Markup.Should().Contain(TestUsername);
+        // The role is persisted as "Administrator" and must not leak into the UI untranslated.
+        cut.Markup.Should().Contain("管理员");
+        cut.Markup.Should().NotContain("Administrator");
     }
 
     [Fact]
-    public async Task Admin_SubmitWithWorkflowReturningError_ShowsErrorMessage()
+    public void Admin_RendersBothAccountAndPasswordForms()
     {
-        var errorResult = new AdminPasswordChangeResult(false, "Password cannot be empty", null);
-        Services.AddSingleton<IAdminPageWorkflow>(new FakeAdminPageWorkflow(errorResult));
         var cut = RenderComponent<Admin>();
 
-        await cut.Find("button.mud-button-filled").ClickAsync(new());
-
-        cut.Markup.Should().Contain("Password cannot be empty");
+        cut.FindAll("#admin-new-username").Count.Should().Be(1);
+        cut.FindAll("#admin-rename-current-password").Count.Should().Be(1);
+        cut.FindAll("#admin-current-password").Count.Should().Be(1);
+        cut.FindAll("#admin-new-password").Count.Should().Be(1);
+        cut.FindAll("#admin-confirm-password").Count.Should().Be(1);
+        cut.FindAll("button.mud-button-filled").Count.Should().Be(2);
     }
 
     [Fact]
-    public async Task Admin_SubmitWithWorkflowReturningSuccess_ShowsLogoutButton()
+    public async Task Admin_ChangePasswordWithWorkflowError_ShowsErrorSnackbar()
     {
-        var successResult = new AdminPasswordChangeResult(
-            true,
-            null,
-            "Password updated successfully."
-        );
-        Services.AddSingleton<IAdminPageWorkflow>(new FakeAdminPageWorkflow(successResult));
+        _workflow.Result = new AdminAccountChangeResult(false, "当前密码不正确", null);
         var cut = RenderComponent<Admin>();
+        FillPasswordForm(cut, current: "wrong", newPassword: "newpass", confirmation: "newpass");
 
-        await cut.Find("button.mud-button-filled").ClickAsync(new());
+        await Submit(cut, PasswordButtonLabel);
 
-        cut.Markup.Should().Contain("退出登录");
-        cut.Markup.Should().Contain("Password updated successfully.");
+        _workflow.PasswordCalled.Should().BeTrue();
+        LastSnackbarMessage().Should().Be("当前密码不正确");
     }
 
     [Fact]
-    public void Admin_RendersExpectedNumberOfInputFields()
+    public async Task Admin_ChangePasswordWithWorkflowSuccess_ShowsSuccessSnackbar()
     {
-        Services.AddSingleton<IAdminPageWorkflow>(
-            new FakeAdminPageWorkflow(new AdminPasswordChangeResult(false, null, null))
-        );
+        _workflow.Result = new AdminAccountChangeResult(true, null, "密码修改成功");
         var cut = RenderComponent<Admin>();
+        FillPasswordForm(cut, current: "current", newPassword: "newpass", confirmation: "newpass");
 
-        cut.FindAll("input").Count.Should().BeGreaterThanOrEqualTo(4);
+        await Submit(cut, PasswordButtonLabel);
+
+        LastSnackbarMessage().Should().Be("密码修改成功");
     }
 
-    private sealed class FakeAdminPageWorkflow(AdminPasswordChangeResult result)
-        : IAdminPageWorkflow
+    [Fact]
+    public async Task Admin_ChangePasswordWithMismatchedConfirmation_DoesNotCallWorkflow()
     {
-        public Task<AdminPasswordChangeResult> ChangePasswordAsync(
+        _workflow.Result = new AdminAccountChangeResult(true, null, "密码修改成功");
+        var cut = RenderComponent<Admin>();
+        FillPasswordForm(cut, current: "current", newPassword: "newpass", confirmation: "other");
+
+        await Submit(cut, PasswordButtonLabel);
+
+        _workflow.PasswordCalled.Should().BeFalse();
+        LastSnackbarMessage().Should().BeNull();
+        cut.Markup.Should().Contain("两次输入的新密码不一致");
+    }
+
+    [Fact]
+    public async Task Admin_ChangePasswordWithEmptyFields_DoesNotCallWorkflow()
+    {
+        _workflow.Result = new AdminAccountChangeResult(true, null, "密码修改成功");
+        var cut = RenderComponent<Admin>();
+
+        await Submit(cut, PasswordButtonLabel);
+
+        _workflow.PasswordCalled.Should().BeFalse();
+        cut.Markup.Should().Contain("请输入当前密码");
+    }
+
+    [Fact]
+    public async Task Admin_ChangeUsernameWithWorkflowSuccess_ShowsMessageAndLogsOut()
+    {
+        _workflow.Result = new AdminAccountChangeResult(true, null, "用户名已更新");
+        var cut = RenderComponent<Admin>();
+        FillUsernameForm(cut, newUsername: "renamed", currentPassword: "current");
+
+        await Submit(cut, UsernameButtonLabel);
+
+        _workflow.UsernameCalled.Should().BeTrue();
+        _workflow.LastUsernameRequest!.NewUsername.Should().Be("renamed");
+        LastSnackbarMessage().Should().Be("用户名已更新");
+        // The cookie still carries the old name, so the page must force a re-login.
+        GetRequiredService<NavigationManager>().Uri.Should().EndWith("/auth/logout");
+    }
+
+    [Fact]
+    public async Task Admin_ChangeUsernameWithWorkflowError_StaysOnPage()
+    {
+        _workflow.Result = new AdminAccountChangeResult(false, "当前密码不正确", null);
+        var cut = RenderComponent<Admin>();
+        FillUsernameForm(cut, newUsername: "renamed", currentPassword: "wrong");
+
+        await Submit(cut, UsernameButtonLabel);
+
+        _workflow.UsernameCalled.Should().BeTrue();
+        LastSnackbarMessage().Should().Be("当前密码不正确");
+        GetRequiredService<NavigationManager>().Uri.Should().NotEndWith("/auth/logout");
+    }
+
+    private static void FillPasswordForm(
+        IRenderedComponent<Admin> cut,
+        string current,
+        string newPassword,
+        string confirmation
+    )
+    {
+        cut.Find("#admin-current-password").Change(current);
+        cut.Find("#admin-new-password").Change(newPassword);
+        cut.Find("#admin-confirm-password").Change(confirmation);
+    }
+
+    private static void FillUsernameForm(
+        IRenderedComponent<Admin> cut,
+        string newUsername,
+        string currentPassword
+    )
+    {
+        cut.Find("#admin-new-username").Change(newUsername);
+        cut.Find("#admin-rename-current-password").Change(currentPassword);
+    }
+
+    private static async Task Submit(IRenderedComponent<Admin> cut, string label)
+    {
+        var button = cut.FindAll("button.mud-button-filled")
+            .Single(b => b.TextContent.Contains(label));
+
+        await button.ClickAsync(new());
+    }
+
+    /// <summary>
+    /// bUnit's TestServiceProvider is both an IServiceProvider and an IServiceCollection,
+    /// which makes the GetRequiredService extension methods ambiguous.
+    /// </summary>
+    private T GetRequiredService<T>()
+        where T : notnull => ((IServiceProvider)Services).GetRequiredService<T>();
+
+    private string? LastSnackbarMessage() =>
+        GetRequiredService<ISnackbar>().ShownSnackbars.LastOrDefault()?.Message;
+
+    private sealed class FakeAdminPageWorkflow : IAdminPageWorkflow
+    {
+        public AdminAccountChangeResult Result { get; set; } = new(false, null, null);
+
+        public bool PasswordCalled { get; private set; }
+
+        public bool UsernameCalled { get; private set; }
+
+        public AdminUsernameChangeRequest? LastUsernameRequest { get; private set; }
+
+        public Task<AdminAccountChangeResult> ChangePasswordAsync(
             AdminPasswordChangeRequest request
-        ) => Task.FromResult(result);
+        )
+        {
+            PasswordCalled = true;
+            return Task.FromResult(Result);
+        }
+
+        public Task<AdminAccountChangeResult> ChangeUsernameAsync(
+            AdminUsernameChangeRequest request
+        )
+        {
+            UsernameCalled = true;
+            LastUsernameRequest = request;
+            return Task.FromResult(Result);
+        }
     }
 
-    private sealed class FakeAuthService(string username) : IAuthService
+    private sealed class FakeAuthService : IAuthService
     {
         public Task<ClaimsIdentity> LoginAsync(string u, string p) =>
             Task.FromResult(new ClaimsIdentity());
 
-        public Task ChangePasswordAsync(string u, string c, string n) => Task.CompletedTask;
+        public Task<AdminAccountInfo> GetAdminAccountAsync() =>
+            Task.FromResult(new AdminAccountInfo(TestUsername, ["Administrator"]));
 
-        public Task<string> GetAdminUserNameAsync() => Task.FromResult(username);
+        public Task ChangePasswordAsync(string currentPassword, string newPassword) =>
+            Task.CompletedTask;
+
+        public Task ChangeUsernameAsync(string newUsername, string currentPassword) =>
+            Task.CompletedTask;
     }
 }
