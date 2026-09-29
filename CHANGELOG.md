@@ -1,3 +1,8 @@
+## 4.1.1
+- fix(web): publish Blazor framework scripts so the panel stays interactive (#1184)
+- fix(web): pin app version footer to the bottom of the sidebar drawer (#1183)
+- fix(web): prevent sidebar from covering content on narrow viewports (#1182)
+- docs(changelog): 4.1.0 (#1181)
 ## 4.1.0
 - feat(web): 全站 MudBlazor 化、首页 UI 重做与暗色模式 (#1179)
 - feat(web): 今日任务页 UI 重做，并补上侧边栏缺失的图标 (#1178)
