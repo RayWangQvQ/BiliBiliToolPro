@@ -28,6 +28,8 @@ It supports QR-code login and cookie updates, multiple Bilibili accounts, daily 
 > This project is intended for learning and testing. Review the tasks and configuration before running them, use it responsibly, and comply with Bilibili's terms. Do not expose account cookies or other secrets in issues or public configuration.
 
 <p align="center">
+  <img src="docs/imgs/web-index.png" alt="Web panel schedules" width="800">
+  <br>
   <img src="docs/imgs/web-schedules.png" alt="Web panel schedules" width="800">
   <br>
   <img src="docs/imgs/web-schedules-log.png" alt="Web panel execution logs" width="800">
