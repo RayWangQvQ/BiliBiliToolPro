@@ -87,7 +87,7 @@ jobs:
 
       # 已存在则更新，不报错：重跑失败的发版（同一 run 的 retry）不会撞车
       - name: Create GitHub Release and tag
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ needs.determine-version.outputs.version }}
           name: BiliBiliToolPro-V${{ needs.determine-version.outputs.version }}
