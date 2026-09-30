@@ -42,3 +42,9 @@ ADR-0005 的失效条件是「面板迁到全局交互或 `MudLayout` 体系」�
 **B. 页面级精修，骨架不动。** 最保守，但「风格断层」根源未触及。未采纳。
 
 **C. 主题/Provider 留在每页（维持 ADR-0005）。** 与「全站 MudBlazor 化」目标相悖，且多份 Provider 仍是维护负担。未采纳。
+
+## 后续视觉规范（2026-09-30）
+
+保留本 ADR 的 MudBlazor 原生骨架、全局 Provider 与 `bilitool-dark` 暗色偏好；面板视觉更新为克制的浅/暗双模式仪表盘。`MainLayout.razor` 中的当前主色改为 B 站粉：浅色 `#C73869`、暗色 `#FF8BAD`，选用与文本有足够对比度的色阶。导航、卡片、表单沿用 MudBlazor 组件，不另起组件库；共享间距、表面边框、焦点样式和响应式调整集中在 `wwwroot/app.css`。`Login` 和 `Error` 页面不套用业务页 hero。
+
+业务页标题统一使用 `Components/Comps/PageHero.razor`（唯一 `h1`），仅放标题、说明及已有操作：`Size.Large` 给首页和管理员，默认 `Size.Medium` 给账号、今日任务和计划任务，`Size.Small` 给配置和关于。统计数据、表单和任务操作仍在原页面内容区，不新增 hero 查询；配置页保留既有字段顺序和提交按钮。桌面侧栏仍按 ADR-0007 在 Md 断点切为覆盖式抽屉；导航区保持 `min-height: 0` 才能独立滚动，等高卡片使用 `mud-height-full`，不要使用不存在的 `h-100`。

@@ -5,13 +5,8 @@
 
 <PageTitle>管理员</PageTitle>
 
-@* Hero banner: same treatment as Home.razor - solid brand colour, flat, no shadow. *@
-<MudPaper Class="admin-hero pa-5 mb-4" Elevation="0">
-    <MudText Typo="Typo.h5" Class="admin-hero-title">管理员账户</MudText>
-    <MudText Typo="Typo.body2" Class="admin-hero-subtitle mt-1">
-        登录名与密码相互独立，改其中一个不会影响另一个；两项修改都需要当前密码确认，成功后当前会话将退出，需重新登录。
-    </MudText>
-</MudPaper>
+<PageHero Size="Size.Large" Title="管理员账户"
+          Description="登录名与密码相互独立，改其中一个不会影响另一个；两项修改都需要当前密码确认，成功后当前会话将退出，需重新登录。" />
 
 <MudGrid Spacing="3">
 

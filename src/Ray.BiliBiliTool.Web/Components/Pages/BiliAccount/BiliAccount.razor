@@ -13,20 +13,17 @@
 
 <PageTitle>账号管理</PageTitle>
 
-<MudText Typo="Typo.h5">账号管理</MudText>
-<MudText Typo="Typo.body2" Class="mud-text-secondary mb-2">
-    账号列表直接读取本地配置，打开即显示。「昵称 / 等级」需要访问 B 站，点「检测」按需获取。
-</MudText>
-
-<MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add"
-           Class="mt-2 mb-2" OnClick="OpenAddDialog">添加账号</MudButton>
-
-<MudButton Variant="Variant.Outlined" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.QrCodeScanner"
-           Class="mt-2 mb-2 ml-2" OnClick="OpenQrLoginDialog">扫码登录</MudButton>
-
-<MudButton Variant="Variant.Outlined" Color="Color.Info" StartIcon="@Icons.Material.Filled.HealthAndSafety"
-           Class="mt-2 mb-2 ml-2" Disabled="@(_accounts.Count == 0 || _probingAll)"
-           OnClick="ProbeAllAsync">检测全部账号</MudButton>
+<PageHero Title="账号管理" Description="账号列表直接读取本地配置，打开即显示。「昵称 / 等级」需要访问 B 站，点「检测」按需获取。">
+    <Actions>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add"
+                   OnClick="OpenAddDialog">添加账号</MudButton>
+        <MudButton Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.QrCodeScanner"
+                   OnClick="OpenQrLoginDialog">扫码登录</MudButton>
+        <MudButton Variant="Variant.Outlined" Color="Color.Info" StartIcon="@Icons.Material.Filled.HealthAndSafety"
+                   Disabled="@(_accounts.Count == 0 || _probingAll)"
+                   OnClick="ProbeAllAsync">检测全部账号</MudButton>
+    </Actions>
+</PageHero>
 
 @if (_loading)
 {
