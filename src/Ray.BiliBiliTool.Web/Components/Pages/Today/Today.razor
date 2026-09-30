@@ -6,16 +6,13 @@
 
 <PageTitle>今日任务</PageTitle>
 
-<MudContainer MaxWidth="MaxWidth.Large" Class="my-4">
+<div>
+    <PageHero Title="今日任务"
+              Description="显示每个账号今天的任务完成情况。漏做的会自动补做（每项每天最多自动补 3 次），也可以自己点「补做」。" />
     @if (_busy)
     {
         <MudProgressLinear Indeterminate="true" Color="Color.Primary" Class="mb-3" />
     }
-
-    <MudText Typo="Typo.h5">今日任务</MudText>
-    <MudText Typo="Typo.body2" Class="mud-text-secondary mb-3">
-        显示每个账号今天的任务完成情况。漏做的会自动补做（每项每天最多自动补 3 次），也可以自己点「补做」。
-    </MudText>
 
     @* 操作区：时间信息 + 刷新 / 一键补做 *@
     <MudPaper Class="pa-3 mb-3" Elevation="1">
@@ -210,5 +207,4 @@
             </MudCard>
         }
     }
-</MudContainer>
-
+</div>

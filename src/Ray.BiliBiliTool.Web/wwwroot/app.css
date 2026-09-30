@@ -1,8 +1,4 @@
-/* 全局样式仅保留与 MudBlazor 不冲突、且模板必需的残留项。
-   字体、链接色、按钮色、布局栅格等已交由 MudBlazor 主题与组件接管。 */
-
-/* MudBlazor 布局（MudLayout/MudDrawer）依赖 html,body 具备确定高度才能撑满视口，
-   否则 height:100% 会退化成内容高度，导致侧边栏导航无法铺满、底部版本号无法定位。 */
+/* MudLayout and MudDrawer need a definite viewport height. */
 html, body {
     height: 100%;
 }
@@ -11,9 +7,7 @@ body {
     margin: 0;
 }
 
-/* Sidebar layout: nav list fills the drawer and scrolls, version footer stays pinned.
-   min-height:0 is required - flex items default to min-height:auto and would otherwise
-   refuse to shrink below their content, pushing the footer out of the viewport. */
+/* Keep the navigation scrollable without moving the version footer. */
 .app-drawer-body {
     display: flex;
     flex-direction: column;
@@ -29,6 +23,220 @@ body {
 .app-drawer-footer {
     flex: 0 0 auto;
     border-top: 1px solid var(--mud-palette-lines-default);
+}
+
+.app-shell .app-topbar {
+    border-bottom: 1px solid var(--mud-palette-lines-default);
+}
+
+.app-brand {
+    font-weight: 700 !important;
+    letter-spacing: -.03em;
+    white-space: nowrap;
+}
+
+.app-brand-dot {
+    color: var(--mud-palette-primary);
+}
+
+.app-shell .app-sidebar {
+    border-right: 1px solid var(--mud-palette-lines-default);
+}
+
+.app-shell .app-drawer-nav {
+    padding: 16px 10px;
+}
+
+.app-shell .app-drawer-nav .mud-nav-link {
+    border-radius: 10px;
+    margin-bottom: 3px;
+}
+
+.app-shell .app-drawer-nav .mud-nav-link.active {
+    background: color-mix(in srgb, var(--mud-palette-primary) 12%, transparent);
+    color: var(--mud-palette-primary);
+    font-weight: 600;
+}
+
+.app-shell .app-drawer-nav .mud-nav-link:focus-visible,
+.app-shell a:focus-visible,
+.app-shell button:focus-visible {
+    outline: 2px solid var(--mud-palette-primary);
+    outline-offset: 2px;
+}
+
+.app-shell .app-content {
+    padding-top: 32px;
+    padding-bottom: 56px;
+}
+
+.app-shell .app-content .app-config-page {
+    padding: 0;
+}
+
+.app-hero {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 24px;
+    border-radius: 16px !important;
+    background: var(--mud-palette-surface) !important;
+    border: 1px solid var(--mud-palette-lines-default);
+    border-left: 4px solid var(--mud-palette-primary);
+    padding: 24px 28px;
+}
+
+.app-hero-content {
+    min-width: 0;
+}
+
+.app-hero .app-hero-title {
+    font-size: clamp(1.45rem, 2.3vw, 1.9rem);
+    line-height: 1.25;
+    font-weight: 700;
+    letter-spacing: -.025em;
+}
+
+.app-hero .app-hero-description {
+    margin-top: 10px;
+    color: var(--mud-palette-text-secondary);
+    line-height: 1.65;
+    max-width: 72ch;
+}
+
+.app-hero-large {
+    background: var(--mud-palette-primary) !important;
+    border: 0;
+    padding: 38px 40px;
+}
+
+.app-hero-large .app-hero-title {
+    color: var(--mud-palette-primary-text);
+    font-size: clamp(1.8rem, 3vw, 2.35rem);
+}
+
+.app-hero-large .app-hero-description {
+    color: var(--mud-palette-primary-text);
+    opacity: .9;
+}
+
+.app-hero-small {
+    padding: 18px 24px;
+    margin-bottom: 20px;
+}
+
+.app-hero-small .app-hero-title {
+    font-size: 1.4rem;
+}
+
+.app-hero-small .app-hero-description {
+    margin-top: 5px;
+    font-size: .9rem;
+}
+
+.app-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.app-shell .app-content .mud-card,
+.app-shell .app-content .app-stat,
+.app-shell .app-content .mud-table-container,
+.app-shell .app-content .mud-data-grid,
+.app-shell .app-content > div > .mud-paper:not(.app-hero) {
+    border: 1px solid var(--mud-palette-lines-default);
+    border-radius: 12px;
+    box-shadow: none;
+}
+
+.app-shell .app-content .mud-card-header,
+.app-shell .app-content .mud-card-content {
+    padding: 20px 24px;
+}
+
+.app-shell .app-content .mud-card-actions {
+    padding: 12px 24px 20px;
+}
+
+.app-shell .app-content .mud-input-control {
+    max-width: 100%;
+}
+
+.app-about-card {
+    max-width: 640px;
+}
+
+.app-shell .app-content .mud-table-container,
+.app-shell .app-content .mud-data-grid {
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+.app-table-scroll {
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+.app-table-scroll .mud-data-grid {
+    min-width: 850px;
+}
+
+@media (max-width: 959.98px) {
+    .app-shell .app-content {
+        padding-top: 20px;
+        padding-bottom: 32px;
+    }
+
+    .app-hero,
+    .app-hero-large {
+        padding: 24px;
+    }
+
+    .app-hero {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+@media (max-width: 599.98px) {
+    .app-shell .app-topbar {
+        padding-inline: 8px;
+    }
+
+    .app-shell .app-brand {
+        font-size: 1rem !important;
+        margin-left: 4px !important;
+    }
+
+    .app-shell .app-topbar .mud-button-root {
+        min-width: 0;
+        padding-inline: 4px;
+        font-size: .78rem;
+    }
+
+    .app-hero,
+    .app-hero-small,
+    .app-hero-large {
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .app-hero-actions .mud-button {
+        margin: 0;
+    }
+
+    .app-shell .app-content .mud-card-header,
+    .app-shell .app-content .mud-card-content {
+        padding: 16px;
+    }
+
+    .app-shell .app-content .mud-card-actions {
+        padding: 8px 16px 16px;
+    }
 }
 
 .blazor-error-boundary {

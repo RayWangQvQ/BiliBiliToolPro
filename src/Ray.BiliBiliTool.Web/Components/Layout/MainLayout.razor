@@ -7,18 +7,18 @@
 @implements IDisposable
 @inherits LayoutComponentBase
 
-<MudLayout>
-    <MudAppBar Elevation="1" Fixed="true">
+<MudLayout Class="app-shell">
+    <MudAppBar Elevation="0" Fixed="true" Class="app-topbar">
         @* Rendered below Md only: at Md and up the drawer is persistent and needs no toggle. *@
         <MudIconButton Icon="@Icons.Material.Filled.Menu"
                        Class="d-flex d-md-none"
                        OnClick="ToggleDrawer" Color="Color.Inherit"
-                       HtmlAttributes="@(new Dictionary<string, object> { { "title", "菜单" } })"/>
-        <MudText Typo="Typo.h6" Class="ml-3">BiliTool</MudText>
+                       HtmlAttributes="@(new Dictionary<string, object> { { "title", "菜单" }, { "aria-label", "打开或关闭菜单" } })"/>
+        <MudText Typo="Typo.h6" Class="app-brand ml-3">BiliTool<span class="app-brand-dot">.</span></MudText>
         <MudSpacer/>
         <MudIconButton Icon="@Icons.Material.Filled.Brightness4"
                        OnClick="ToggleDarkMode" Color="Color.Inherit"
-                       HtmlAttributes="@(new Dictionary<string, object> { { "title", "切换暗色模式" } })"/>
+                       HtmlAttributes="@(new Dictionary<string, object> { { "title", "切换暗色模式" }, { "aria-label", "切换暗色模式" } })"/>
         <MudButton Href="about" Color="Color.Inherit">关于项目</MudButton>
         <AuthorizeView>
             <Authorized>
@@ -34,7 +34,7 @@
                Variant="DrawerVariant.Responsive"
                Breakpoint="Breakpoint.Md"
                ClipMode="DrawerClipMode.Always"
-               Anchor="Anchor.Start" Elevation="1" Width="250px">
+               Anchor="Anchor.Start" Elevation="0" Width="250px" Class="app-sidebar">
         @* Body is an explicit flex column: the nav list takes the free space and scrolls,
            the version footer keeps its own height at the bottom. *@
         <div class="app-drawer-body">
@@ -46,7 +46,7 @@
     </MudDrawer>
 
     <MudMainContent>
-        <MudContainer MaxWidth="MaxWidth.Large" Class="my-4">
+        <MudContainer MaxWidth="MaxWidth.Large" Class="app-content">
             @Body
         </MudContainer>
     </MudMainContent>
@@ -104,19 +104,23 @@
     {
         PaletteLight = new PaletteLight
         {
-            Primary = "#1976D2",
-            Secondary = "#42A5F5",
-            AppbarBackground = "#1976D2",
-            Background = "#f5f7fa",
+            Primary = "#C73869",
+            Secondary = "#516278",
+            AppbarBackground = "#ffffff",
+            AppbarText = "#242638",
+            Background = "#f7f8fb",
             Surface = "#ffffff",
+            DrawerBackground = "#ffffff",
         },
         PaletteDark = new PaletteDark
         {
-            Primary = "#42A5F5",
-            AppbarBackground = "#1f1f1f",
-            Background = "#121212",
-            Surface = "#1e1e1e",
-            DrawerBackground = "#1a1a1a",
+            Primary = "#FF8BAD",
+            Secondary = "#AFBCD0",
+            AppbarBackground = "#20232d",
+            AppbarText = "#f5f5fa",
+            Background = "#171923",
+            Surface = "#242733",
+            DrawerBackground = "#20232d",
         },
     };
 

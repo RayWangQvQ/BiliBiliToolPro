@@ -10,8 +10,9 @@
 <PageTitle>计划任务</PageTitle>
 
 <div>
-    <MudText Typo="Typo.h5">计划任务</MudText>
+    <PageHero Title="计划任务" Description="查看定时任务状态与执行历史，管理任务运行。" />
 
+    <div class="app-table-scroll">
     <MudDataGrid @ref="_scheduleDataGrid" Items="@ScheduledJobs"
                  MultiSelection="true" Filterable="false"
                  ShowColumnOptions="false" SortMode="SortMode.None"
@@ -266,5 +267,5 @@
             <MudDataGridPager T="ScheduleModel"/>
         </PagerContent>
     </MudDataGrid>
+    </div>
 </div>
-

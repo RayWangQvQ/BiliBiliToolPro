@@ -1,0 +1,19 @@
+<MudPaper Class="@($"app-hero app-hero-{Size.ToString().ToLowerInvariant()}")" Elevation="0">
+    <div class="app-hero-content">
+        <MudText Typo="Typo.h1" Class="app-hero-title">@Title</MudText>
+        <MudText Typo="Typo.body1" Class="app-hero-description">@Description</MudText>
+    </div>
+    @if (Actions is not null)
+    {
+        <div class="app-hero-actions">
+            @Actions
+        </div>
+    }
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired] public string Title { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string Description { get; set; } = string.Empty;
+    [Parameter] public Size Size { get; set; } = Size.Medium;
+    [Parameter] public RenderFragment? Actions { get; set; }
+}

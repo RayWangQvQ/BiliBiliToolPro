@@ -8,15 +8,8 @@
 
 <PageTitle>首页</PageTitle>
 
-<MudContainer MaxWidth="MaxWidth.Large" Class="my-4">
-
-    @* Hero 横幅：品牌色实底，第一屏落点 *@
-    <MudPaper Class="home-hero pa-5 mb-4" Elevation="0">
-        <MudText Typo="Typo.h5" Class="home-hero-title">欢迎使用 BiliBiliToolPro</MudText>
-        <MudText Typo="Typo.body2" Class="home-hero-subtitle mt-1">
-            B 站自动任务管理面板：每日任务、投币充电、漫画签到、直播抽奖、粉丝勋章等，都在浏览器中配置与管理。
-        </MudText>
-    </MudPaper>
+    <PageHero Size="Size.Large" Title="欢迎使用 BiliBiliToolPro"
+              Description="B 站自动任务管理面板：每日任务、投币充电、漫画签到、直播抽奖、粉丝勋章等，都在浏览器中配置与管理。" />
 
     @* 统计条：全部本地数据、零网络 *@
     @if (_loading)
@@ -27,13 +20,13 @@
     {
         <MudGrid Spacing="3" Class="mb-1">
             <MudItem xs="12" sm="6">
-                <MudPaper Class="pa-3" Elevation="1">
+                <MudPaper Class="app-stat pa-3" Elevation="0">
                     <MudText Typo="Typo.caption" Class="mud-text-secondary">账号数</MudText>
                     <MudText Typo="Typo.h4" Class="mt-1">@AccountCountDisplay</MudText>
                 </MudPaper>
             </MudItem>
             <MudItem xs="12" sm="6">
-                <MudPaper Class="pa-3" Elevation="1">
+                <MudPaper Class="app-stat pa-3" Elevation="0">
                     <MudText Typo="Typo.caption" Class="mud-text-secondary">今日完成</MudText>
                     <MudText Typo="Typo.h4" Class="mt-1">
                         @if (_totalCount > 0)
@@ -53,7 +46,7 @@
     @* 入口卡片墙 *@
     <MudGrid Spacing="3" Class="mt-3">
         <MudItem xs="12" sm="6" md="3">
-            <MudCard Class="h-100">
+            <MudCard Class="mud-height-full">
                 <MudCardHeader>
                     <CardHeaderAvatar>
                         <MudAvatar Color="Color.Primary" Variant="Variant.Outlined">
@@ -72,7 +65,7 @@
         </MudItem>
         
         <MudItem xs="12" sm="6" md="3">
-            <MudCard Class="h-100">
+            <MudCard Class="mud-height-full">
                 <MudCardHeader>
                     <CardHeaderAvatar>
                         <MudAvatar Color="Color.Primary" Variant="Variant.Outlined">
@@ -91,7 +84,7 @@
         </MudItem>
 
         <MudItem xs="12" sm="6" md="3">
-            <MudCard Class="h-100">
+            <MudCard Class="mud-height-full">
                 <MudCardHeader>
                     <CardHeaderAvatar>
                         <MudAvatar Color="Color.Primary" Variant="Variant.Outlined">
@@ -110,7 +103,7 @@
         </MudItem>
 
         <MudItem xs="12" sm="6" md="3">
-            <MudCard Class="h-100">
+            <MudCard Class="mud-height-full">
                 <MudCardHeader>
                     <CardHeaderAvatar>
                         <MudAvatar Color="Color.Primary" Variant="Variant.Outlined">
@@ -132,6 +125,4 @@
     <MudAlert Severity="Severity.Info" Class="mt-4">
         <b>首次使用指引：</b>先在「账号管理」中用手机 B 站 App 扫码添加账号（可添加多个），然后在「任务配置」中确认需要开启的任务与执行时间，之后在「今日任务」里就能看到每个账号当天的完成情况。
     </MudAlert>
-
-</MudContainer>
 

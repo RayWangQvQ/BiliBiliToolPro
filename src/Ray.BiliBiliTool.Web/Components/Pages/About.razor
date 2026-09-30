@@ -6,9 +6,11 @@
 
 <PageTitle>关于</PageTitle>
 
-<MudCard Class="mx-auto my-4" Style="max-width: 500px;">
+<PageHero Size="Size.Small" Title="关于 BiliTool" Description="了解项目版本、源码与反馈渠道。" />
+
+<MudCard Class="app-about-card">
     <MudCardHeader>
-        <MudText Typo="Typo.h5">关于 BiliTool</MudText>
+        <MudText Typo="Typo.h6">项目信息</MudText>
     </MudCardHeader>
     <MudCardContent>
         <MudText Typo="Typo.body1">版本号：@AppInfoProvider.AppVersion</MudText>
@@ -27,4 +29,3 @@
                    Href="@(ConfigConstants.SourceCodeUrl + "/issues")" Target="_blank">问题反馈</MudButton>
     </MudCardActions>
 </MudCard>
-
