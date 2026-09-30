@@ -35,7 +35,7 @@ public class AdminPageTests : TestContext
     }
 
     [Fact]
-    public void Admin_OnInitialized_DisplaysAccountFromAuthService()
+    public void RenderComponent_AuthenticatedAdmin_DisplaysAccountFromAuthService()
     {
         var cut = RenderComponent<Admin>();
 
@@ -46,7 +46,7 @@ public class AdminPageTests : TestContext
     }
 
     [Fact]
-    public void Admin_RendersBothAccountAndPasswordForms()
+    public void RenderComponent_DefaultState_RendersAccountAndPasswordForms()
     {
         var cut = RenderComponent<Admin>();
 
@@ -59,7 +59,7 @@ public class AdminPageTests : TestContext
     }
 
     [Fact]
-    public async Task Admin_ChangePasswordWithWorkflowError_ShowsErrorSnackbar()
+    public async Task Submit_PasswordWorkflowError_ShowsErrorSnackbar()
     {
         _workflow.Result = new AdminAccountChangeResult(false, "当前密码不正确", null);
         var cut = RenderComponent<Admin>();
@@ -73,7 +73,7 @@ public class AdminPageTests : TestContext
     }
 
     [Fact]
-    public async Task Admin_ChangePasswordWithWorkflowSuccess_ShowsSuccessSnackbarAndLogsOut()
+    public async Task Submit_PasswordWorkflowSuccess_ShowsSuccessSnackbarAndLogsOut()
     {
         _workflow.Result = new AdminAccountChangeResult(true, null, "密码修改成功");
         var cut = RenderComponent<Admin>();
@@ -87,7 +87,7 @@ public class AdminPageTests : TestContext
     }
 
     [Fact]
-    public async Task Admin_ChangePasswordWithMismatchedConfirmation_DoesNotCallWorkflow()
+    public async Task Submit_MismatchedPasswordConfirmation_DoesNotCallWorkflow()
     {
         _workflow.Result = new AdminAccountChangeResult(true, null, "密码修改成功");
         var cut = RenderComponent<Admin>();
@@ -101,7 +101,7 @@ public class AdminPageTests : TestContext
     }
 
     [Fact]
-    public async Task Admin_ChangePasswordWithEmptyFields_DoesNotCallWorkflow()
+    public async Task Submit_EmptyPasswordFields_DoesNotCallWorkflow()
     {
         _workflow.Result = new AdminAccountChangeResult(true, null, "密码修改成功");
         var cut = RenderComponent<Admin>();
@@ -113,7 +113,7 @@ public class AdminPageTests : TestContext
     }
 
     [Fact]
-    public async Task Admin_ChangeUsernameWithWorkflowSuccess_ShowsMessageAndLogsOut()
+    public async Task Submit_UsernameWorkflowSuccess_ShowsMessageAndLogsOut()
     {
         _workflow.Result = new AdminAccountChangeResult(true, null, "用户名已更新");
         var cut = RenderComponent<Admin>();
@@ -129,7 +129,7 @@ public class AdminPageTests : TestContext
     }
 
     [Fact]
-    public async Task Admin_ChangeUsernameWithWorkflowError_StaysOnPage()
+    public async Task Submit_UsernameWorkflowError_StaysOnPage()
     {
         _workflow.Result = new AdminAccountChangeResult(false, "当前密码不正确", null);
         var cut = RenderComponent<Admin>();

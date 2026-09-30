@@ -22,7 +22,7 @@ public class AppVersionFooterTests : TestContext
     }
 
     [Fact]
-    public void AppVersionFooter_Renders_ShowsAppVersion()
+    public void RenderComponent_ConfiguredVersion_ShowsAppVersion()
     {
         Services.AddSingleton<IAppInfoProvider>(new FakeAppInfoProvider(TestVersion));
 
@@ -32,7 +32,7 @@ public class AppVersionFooterTests : TestContext
     }
 
     [Fact]
-    public void AppVersionFooter_LocalBuild_ShowsFallbackText()
+    public void RenderComponent_LocalBuild_ShowsFallbackText()
     {
         Services.AddSingleton<IAppInfoProvider>(
             new FakeAppInfoProvider(AppVersion.LocalBuildDisplay)

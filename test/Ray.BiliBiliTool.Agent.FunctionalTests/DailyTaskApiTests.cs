@@ -24,7 +24,7 @@ public class DailyTaskApiTests
             //"HTTPS_PROXY=localhost:8888"
         };
         IHost host = Program.CreateHost(envs.ToArray());
-        _ck = host.Services.GetRequiredService<BiliCookie>();
+        _ck = ExternalCookie.Require(host.Services);
         _api = host.Services.GetRequiredService<IApiApi>();
     }
 
@@ -32,7 +32,7 @@ public class DailyTaskApiTests
     public async Task GetDailyTaskRewardInfo_Normal_Success()
     {
         // Act
-        BiliApiResponse<DailyTaskInfo> re = await _api.GetDailyTaskRewardInfoAsync(null);
+        BiliApiResponse<DailyTaskInfo> re = await _api.GetDailyTaskRewardInfoAsync(_ck.ToString());
 
         // Arrange
 
@@ -45,7 +45,7 @@ public class DailyTaskApiTests
     public async Task GetDonateCoinExp_Normal_Success()
     {
         // Act
-        BiliApiResponse<int> re = await _api.GetDonateCoinExpAsync(null);
+        BiliApiResponse<int> re = await _api.GetDonateCoinExpAsync(_ck.ToString());
 
         // Arrange
 
@@ -61,7 +61,7 @@ public class DailyTaskApiTests
         BiliApiResponse re = await _api.ReceiveVipPrivilegeAsync(
             (int)VipPrivilegeType.BCoinCoupon,
             _ck.BiliJct,
-            null
+            _ck.ToString()
         );
 
         // Arrange

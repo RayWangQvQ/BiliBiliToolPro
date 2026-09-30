@@ -110,6 +110,8 @@ Follow [releases](https://github.com/RayWangQvQ/BiliBiliToolPro/releases) for pu
 
 Code and documentation contributions are welcome:
 
+For test naming, levels, and safe local execution, see the [testing guide](docs/testing.md).
+
 1. Search existing issues before starting. For substantial or uncertain changes, open an issue to discuss the approach first.
 2. Fork the repository and make changes based on `main`.
 3. Open a pull request targeting `main` with a clear title and description. After review and successful checks, maintainers squash-merge accepted changes.

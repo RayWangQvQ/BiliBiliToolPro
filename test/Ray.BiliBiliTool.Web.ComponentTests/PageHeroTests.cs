@@ -20,7 +20,10 @@ public class PageHeroTests : TestContext
     [InlineData(Size.Large, "app-hero-large")]
     [InlineData(Size.Medium, "app-hero-medium")]
     [InlineData(Size.Small, "app-hero-small")]
-    public void PageHero_RendersAccessibleHeadingAndTier(Size size, string cssClass)
+    public void RenderComponent_SelectedSize_RendersAccessibleHeadingAndTier(
+        Size size,
+        string cssClass
+    )
     {
         var cut = RenderComponent<PageHero>(parameters =>
             parameters
@@ -35,7 +38,7 @@ public class PageHeroTests : TestContext
     }
 
     [Fact]
-    public void PageHero_RendersExistingActionsWhenProvided()
+    public void RenderComponent_ProvidedActions_RendersActionContent()
     {
         var cut = RenderComponent<PageHero>(parameters =>
             parameters

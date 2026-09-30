@@ -56,8 +56,8 @@ jobs:
             while IFS= read -r f; do echo "  $f"; done <<< "$files"
           fi
 
-  # 构建 + 离线单元测试
-  # [Trait("Category", "External")]，被过滤掉，只在本地或按需手动执行。
+  # 构建 + 离线回归测试（含单元、组件、架构和集成测试）
+  # [Trait("Category", "External")] 的真实外部调用被过滤，只能显式手动执行。
   build-and-test:
     name: Build and test .NET
     needs: classify-changes
