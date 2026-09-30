@@ -22,7 +22,6 @@ base_dir="${current_dir}/bili_tool_web"
 github_proxy=""
 github_branch="main"
 remote_compose_url="${github_proxy}https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/refs/heads/${github_branch}/platforms/docker/sample/docker-compose.yml"
-remote_ckJson_url="${github_proxy}https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/refs/heads/${github_branch}/platforms/docker/sample/config/cookies.json"
 docker_img_name="ghcr.io/raywangqvq/bili_tool_web"
 container_name="bili_tool_web"
 
@@ -265,13 +264,6 @@ downloadResources() {
 
     # docker compose
     [ -f "docker-compose.yml" ] || download $remote_compose_url ./docker-compose.yml
-
-    # ckJson
-    mkdir -p config
-    cd ./config
-    [ -f "cookies.json" ] || download $remote_ckJson_url ./cookies.json
-    chmod +x ./cookies.json
-    cd ..
 
     ls -l
 }

@@ -40,10 +40,6 @@ mkdir bili_tool_web && cd bili_tool_web
 
 # 下载
 wget https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/platforms/docker/sample/docker-compose.yml
-mkdir -p config
-cd ./config
-wget https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/platforms/docker/sample/config/cookies.json
-cd ..
 
 # 启动
 docker compose up -d
@@ -58,7 +54,7 @@ docker logs -f bili_tool_web
 bili_tool_web
 ├── Logs
 ├── config
-├──── cookies.json
+├──── BiliBiliTool.db
 └── docker-compose.yml
 ```
 
@@ -102,7 +98,7 @@ docker run -d --name="bili_tool_web" \
 docker logs -f bili_tool_web
 ```
 
-其中，`cookie`需要替换为自己真实的cookie字符串
+首次启动后，通过 Web 面板扫码添加 B 站账号；账号信息保存在 `config/BiliBiliTool.db`，不再读取 `config/cookies.json`。已有部署中仅保存在旧 JSON 文件的账号需要在面板重新添加，旧文件不会自动迁移或删除。
 
 ### 4.2. 其他指令参考
 
