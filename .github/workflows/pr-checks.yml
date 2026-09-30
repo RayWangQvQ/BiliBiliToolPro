@@ -5,7 +5,7 @@ on:
     branches: [main]
     # Never add a paths filter here: a skipped workflow reports no checks, so the
     # required checks stay Pending forever. Gating is job-level (see classify-changes).
-  # Backfill entry point for stable.yml's changelog job. GITHUB_TOKEN-created PRs
+  # Backfill entry point for publish-stable-release.yml's changelog job. GITHUB_TOKEN-created PRs
   # do trigger this; they just wait for approval. Dispatched checks are not
   # reported on the PR, so this is only a manual fallback.
   workflow_dispatch:

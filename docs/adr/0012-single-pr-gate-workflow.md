@@ -1,6 +1,6 @@
 # PR 门禁合并成单一 workflow
 
-`codeql-analysis.yml` 删除，其 CodeQL job 搬进 `ci.yml`，与构建测试、发布脚本测试、Docker 构建共用同一个变更范围判定 job；原 `CodeQLScope` 随之取消。`main` ruleset 的必需检查认的是 job **显示名**，与 workflow 文件名和 job ID 无关。因此将四个 required checks 重命名为 `Build and test .NET` / `Test release scripts` / `Build Docker image` / `Scan code with CodeQL` 时，必须同步迁移 ruleset。
+`codeql-analysis.yml` 删除，其 CodeQL job 搬进 `pr-checks.yml`（原 `ci.yml`），与构建测试、发布脚本测试、Docker 构建共用同一个变更范围判定 job；原 `CodeQLScope` 随之取消。`main` ruleset 的必需检查认的是 job **显示名**，与 workflow 文件名和 job ID 无关。因此将四个 required checks 重命名为 `Build and test .NET` / `Test release scripts` / `Build Docker image` / `Scan code with CodeQL` 时，必须同步迁移 ruleset。
 
 ## 为什么可以合
 
@@ -14,7 +14,7 @@ ruleset 只认检查名（`Build and test .NET` / `Test release scripts` / `Buil
 
 ## 明确的代价
 
-- **CodeQL 分析类别（category）重置**：`category` 由 workflow 文件名 + **job ID** 推导（文档写的是「动作名」，实测随 job ID 改变）。实测值先从 `.github/workflows/codeql-analysis.yml:Analyze` 变成 `.github/workflows/ci.yml:Analyze`（本 PR 的 `code-scanning/analyses` 可见）；ID 重命名后将变成 `.github/workflows/ci.yml:codeql-scan`。对 code scanning 而言这是另一条分析线：Security 页面的历史告警基线不再连续，已 dismissed 的告警不会被重开，但会作为新告警重新出现。有意接受——不值得为此长期维护一个手写字符串。
+- **CodeQL 分析类别（category）重置**：`category` 由 workflow 文件名 + **job ID** 推导（文档写的是「动作名」，实测随 job ID 改变）。实测值先从 `.github/workflows/codeql-analysis.yml:Analyze` 变成 `.github/workflows/ci.yml:Analyze`（本 PR 的 `code-scanning/analyses` 可见）；job ID 改名后变成 `.github/workflows/ci.yml:codeql-scan`；workflow 文件改名后将变成 `.github/workflows/pr-checks.yml:codeql-scan`。对 code scanning 而言这是另一条分析线：Security 页面的历史告警基线不再连续，已 dismissed 的告警不会被重开，但会作为新告警重新出现。有意接受——不值得为此长期维护一个手写字符串。
 - **CodeQL 与 CI 共用一个 concurrency group**：改 PR 时 CodeQL job 会和其它 job 一起被取消（原先两者各有一个 group）。这是想要的行为：一次取消就是整轮取消。
 - **手动补跑只需 dispatch `PR checks` 一个 workflow**（原先要分别补 CI 与 CodeQL）。
 

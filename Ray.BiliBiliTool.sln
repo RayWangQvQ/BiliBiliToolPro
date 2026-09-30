@@ -53,11 +53,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{73DD
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{61613EF4-3644-42D4-A620-70547291FB38}"
 	ProjectSection(SolutionItems) = preProject
-		.github\workflows\auto-deploy-tencent-scf.yml = .github\workflows\auto-deploy-tencent-scf.yml
-		.github\workflows\ci.yml = .github\workflows\ci.yml
-		.github\workflows\preview-image.yml = .github\workflows\preview-image.yml
-		.github\workflows\release.yml = .github\workflows\release.yml
-		.github\workflows\repo-sync.yml = .github\workflows\repo-sync.yml
+		.github\workflows\close-stale-issues.yml = .github\workflows\close-stale-issues.yml
+		.github\workflows\deploy-tencent-scf.yml = .github\workflows\deploy-tencent-scf.yml
+		.github\workflows\moderate-comments.yml = .github\workflows\moderate-comments.yml
+		.github\workflows\pr-checks.yml = .github\workflows\pr-checks.yml
+		.github\workflows\publish-alpha-docker-images.yml = .github\workflows\publish-alpha-docker-images.yml
+		.github\workflows\publish-stable-release.yml = .github\workflows\publish-stable-release.yml
+		.github\workflows\sync-fork-with-upstream.yml = .github\workflows\sync-fork-with-upstream.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{C0173851-1515-4BE1-A018-84E0B64A6877}"

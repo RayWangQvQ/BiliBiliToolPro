@@ -182,7 +182,7 @@ jobs:
           if [ -z "$pr_url" ]; then
             pr_url=$(gh pr create --base main --head "$BRANCH" \
               --title "docs(changelog): $VERSION" \
-              --body "Stable release $VERSION 的 CHANGELOG 回写，由 stable.yml update-changelog job 自动生成。纯文档变更，required checks 不会因 bot PR 而运行，由维护者（admin）直接合并即可。")
+              --body "Stable release $VERSION 的 CHANGELOG 回写，由 publish-stable-release.yml update-changelog job 自动生成。纯文档变更，required checks 不会因 bot PR 而运行，由维护者（admin）直接合并即可。")
           fi
           echo "CHANGELOG PR 已就绪，等待维护者合并：$pr_url"
           echo "::notice title=CHANGELOG 回写::$pr_url 等待维护者合并（纯文档变更，可直接 --admin 合并）"

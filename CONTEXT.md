@@ -45,7 +45,7 @@ _Avoid_: 预览版、beta、开发版
 _Avoid_: 正式版、release 版
 
 **CI 门禁**:
-合入 `main` 前必须通过的 GitHub required status check，目前四项：`Build and test .NET`、`Test release scripts`、`Build Docker image`、`Scan code with CodeQL`，全部由同一个 workflow `ci.yml` 产生（ADR-0012）。名字由 ruleset 绑定，取自 job 显示名——改名的同时必须改 ruleset，否则检查永远停在 Expected。纯文档变更下这四项会被 job 级 `if` 跳过（ADR-0011），跳过报 Success 而非 Pending，所以不影响合入。
+合入 `main` 前必须通过的 GitHub required status check，目前四项：`Build and test .NET`、`Test release scripts`、`Build Docker image`、`Scan code with CodeQL`，全部由同一个 workflow `pr-checks.yml` 产生（ADR-0012）。名字由 ruleset 绑定，取自 job 显示名——改名的同时必须改 ruleset，否则检查永远停在 Expected。纯文档变更下这四项会被 job 级 `if` 跳过（ADR-0011），跳过报 Success 而非 Pending，所以不影响合入。
 _Avoid_: 检查项（那是今日任务页的二级条目）、必需检查、门禁
 
 **检查项**:
