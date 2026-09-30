@@ -60,6 +60,7 @@
 @code {
     private bool _isDarkMode;
     private bool _drawerOpen = true;
+    private readonly MudTheme _theme = AppTheme.Create();
 
     protected override void OnInitialized()
     {
@@ -100,30 +101,6 @@
         await InvokeAsync(StateHasChanged);
     }
 
-    private MudTheme _theme => new MudTheme
-    {
-        PaletteLight = new PaletteLight
-        {
-            Primary = "#C73869",
-            Secondary = "#516278",
-            AppbarBackground = "#ffffff",
-            AppbarText = "#242638",
-            Background = "#f7f8fb",
-            Surface = "#ffffff",
-            DrawerBackground = "#ffffff",
-        },
-        PaletteDark = new PaletteDark
-        {
-            Primary = "#FF8BAD",
-            Secondary = "#AFBCD0",
-            AppbarBackground = "#20232d",
-            AppbarText = "#f5f5fa",
-            Background = "#171923",
-            Surface = "#242733",
-            DrawerBackground = "#20232d",
-        },
-    };
-
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender)
@@ -131,8 +108,7 @@
             return;
         }
 
-        var stored = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "bilitool-dark");
-        var dark = stored is "1" or "true";
+        var dark = await AppTheme.IsDarkModePreferredAsync(JSRuntime);
         if (dark != _isDarkMode)
         {
             _isDarkMode = dark;

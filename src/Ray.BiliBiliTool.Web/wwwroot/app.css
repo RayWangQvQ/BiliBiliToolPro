@@ -7,6 +7,17 @@ body {
     margin: 0;
 }
 
+.app-login-shell .mud-main-content {
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    padding-top: 0;
+}
+
+.app-login-content {
+    padding-block: 32px;
+}
+
 /* Keep the navigation scrollable without moving the version footer. */
 .app-drawer-body {
     display: flex;
@@ -96,6 +107,11 @@ body {
     line-height: 1.25;
     font-weight: 700;
     letter-spacing: -.025em;
+}
+
+/* Keep route-change heading focus for assistive technology without a visual ring. */
+.app-hero .app-hero-title:focus {
+    outline: none;
 }
 
 .app-hero .app-hero-description {

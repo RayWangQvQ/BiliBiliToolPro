@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using MudBlazor;
 using Ray.BiliBiliTool.Web.Services.Pages.Login;
 
@@ -11,6 +12,9 @@ public partial class Login : ComponentBase
 
     [Inject]
     private ILoginPageStateFactory LoginPageStateFactory { get; set; } = null!;
+
+    [Inject]
+    private AuthenticationStateProvider AuthenticationStateProvider { get; set; } = null!;
 
     private string _username = "";
     private string _password = "";
@@ -38,8 +42,15 @@ public partial class Login : ComponentBase
     private string? returnUrl;
     private bool _loginError = false;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
+        var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        if (authenticationState.User.Identity?.IsAuthenticated == true)
+        {
+            NavigationManager.NavigateTo("/", replace: true);
+            return;
+        }
+
         var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
         var state = LoginPageStateFactory.Create(uri);
         returnUrl = state.ReturnUrl;

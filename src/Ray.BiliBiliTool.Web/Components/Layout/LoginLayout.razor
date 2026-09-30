@@ -1,0 +1,38 @@
+@inject IJSRuntime JSRuntime
+@inherits LayoutComponentBase
+
+<MudLayout Class="app-login-shell">
+    <MudMainContent>
+        <MudContainer MaxWidth="MaxWidth.Small" Class="app-login-content">
+            <MudText Typo="Typo.h4" Align="Align.Center" Class="app-brand">
+                BiliTool<span class="app-brand-dot">.</span>
+            </MudText>
+            @Body
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+
+<MudThemeProvider Theme="_theme" IsDarkMode="_isDarkMode"/>
+<MudPopoverProvider/>
+<MudDialogProvider/>
+<MudSnackbarProvider/>
+
+@code {
+    private readonly MudTheme _theme = AppTheme.Create();
+    private bool _isDarkMode;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        var dark = await AppTheme.IsDarkModePreferredAsync(JSRuntime);
+        if (dark != _isDarkMode)
+        {
+            _isDarkMode = dark;
+            StateHasChanged();
+        }
+    }
+}
