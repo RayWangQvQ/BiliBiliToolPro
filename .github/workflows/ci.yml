@@ -1,10 +1,10 @@
-name: CI
+name: PR checks
 
 on:
   pull_request:
     branches: [main]
     # Never add a paths filter here: a skipped workflow reports no checks, so the
-    # required checks stay Pending forever. Gating is job-level (see Scope).
+    # required checks stay Pending forever. Gating is job-level (see classify-changes).
   # Backfill entry point for stable.yml's changelog job. GITHUB_TOKEN-created PRs
   # do trigger this; they just wait for approval. Dispatched checks are not
   # reported on the PR, so this is only a manual fallback.
@@ -21,7 +21,8 @@ concurrency:
 jobs:
   # Docs-only PRs skip every heavy job below (ADR-0011). Job-level on purpose:
   # a skipped job reports Success, a skipped workflow would leave checks Pending.
-  Scope:
+  classify-changes:
+    name: Classify changed files
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
@@ -50,16 +51,17 @@ jobs:
 
           echo "docs_only=$docs_only，变更文件："
           # Wrapped in `if`: an empty $files makes the loop exit non-zero under the
-          # default `bash -e`, which would fail Scope and silently skip every job below.
+          # default `bash -e`, which would fail this job and silently skip every job below.
           if [ -n "$files" ]; then
             while IFS= read -r f; do echo "  $f"; done <<< "$files"
           fi
 
   # 构建 + 离线单元测试
   # [Trait("Category", "External")]，被过滤掉，只在本地或按需手动执行。
-  Verify:
-    needs: Scope
-    if: needs.Scope.outputs.docs_only != 'true'
+  build-and-test:
+    name: Build and test .NET
+    needs: classify-changes
+    if: needs.classify-changes.outputs.docs_only != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -97,10 +99,11 @@ jobs:
           --filter "Category!=External" --nologo
 
   # 发布脚本的 fixture 测试：在临时 git 仓库/模拟 PR 标题上验证算号与 notes 生成。
-  # 发布逻辑是发布系统的命脉，但它不碰 .NET 代码，所以独立于 Verify。
-  ScriptTests:
-    needs: Scope
-    if: needs.Scope.outputs.docs_only != 'true'
+  # 发布逻辑是发布系统的命脉，但它不碰 .NET 代码，所以独立于 build-and-test。
+  test-release-scripts:
+    name: Test release scripts
+    needs: classify-changes
+    if: needs.classify-changes.outputs.docs_only != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -125,9 +128,10 @@ jobs:
           echo "本 PR 合并后将产出 alpha：$planned"
 
   # 只构建不推送，用来保证合并到 main 之后镜像可以构建
-  ImageSmoke:
-    needs: Scope
-    if: needs.Scope.outputs.docs_only != 'true'
+  build-docker-image:
+    name: Build Docker image
+    needs: classify-changes
+    if: needs.classify-changes.outputs.docs_only != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -145,12 +149,11 @@ jobs:
           # 等于为了省 2 分钟先花 5 分钟；registry 缓存在 GHCR 上是私有的
           # （匿名拉取 401），fork PR 的 token 也读不到，借读会直接失败。
 
-  # CodeQL analysis (moved out of codeql-analysis.yml, see ADR-0012). The job
-  # name must stay "Analyze": it is a required check in the main ruleset.
-  Analyze:
-    name: Analyze
-    needs: Scope
-    if: needs.Scope.outputs.docs_only != 'true'
+  # CodeQL analysis (moved out of codeql-analysis.yml, see ADR-0012).
+  codeql-scan:
+    name: Scan code with CodeQL
+    needs: classify-changes
+    if: needs.classify-changes.outputs.docs_only != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 45
     # Job-level on purpose: "security-events: write" must not leak to the other jobs

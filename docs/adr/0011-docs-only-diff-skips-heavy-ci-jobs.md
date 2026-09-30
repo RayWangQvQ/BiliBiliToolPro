@@ -3,6 +3,7 @@
 `ci.yml` 与 `codeql-analysis.yml` 各加一个前置 job `Scope`：枚举本次 PR 的全部变更文件，若每一个都命中文档白名单（`**.md`、`docs/**`、`.editorconfig`、`bruno/**`），就输出 `docs_only=true`，`Verify` / `ScriptTests` / `ImageSmoke` / `Analyze` 四个重活 job 随之跳过。被条件跳过的 job 报 Success，PR 直接可合。
 
 > **已被 ADR-0012 部分取代**：`codeql-analysis.yml` 已并入 `ci.yml`，`CodeQLScope` 取消，文档白名单只剩一份。下文凡涉及「两个 workflow 各一份清单」的描述都已成为历史。
+> **命名变更**：以下沿用当时的 job 名；当前 `ci.yml` 的四个 required checks 已重命名为 `Build and test .NET` / `Test release scripts` / `Build Docker image` / `Scan code with CodeQL`，前置 job 为 `Classify changed files`。
 
 ## 症状与代价
 
