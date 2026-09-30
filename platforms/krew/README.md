@@ -1,71 +1,65 @@
-# BiliBiliPro Kubectl Plugin
+# BiliBiliPro kubectl plugin
+
+The `kubectl-bilipro` plugin deploys a Bilibili tool Deployment using bundled Kustomize resources. **Legacy integration:** its default image is `zai7lou/bilibili_tool_pro:2.0.1` and its `--login` path runs the old console DLL. This is not a deployment guide for the current Web image; verify image availability and compatibility before using it.
 
 ## Prerequisites
 
-- Kubernetes >= v1.23.0.
-- go >= v1.18
-- kubectl installed on your local machine, configured to an existing healthy Kubernetes cluster.
-- [krew](https://krew.sigs.k8s.io/docs/user-guide/setup/install/) plugin installed
+- A working Kubernetes cluster and a locally installed, configured `kubectl` with permission to manage namespaces and Deployments.
+- Go **1.20 or newer**, as declared in [`go.mod`](./go.mod).
+- [krew](https://krew.sigs.k8s.io/docs/user-guide/setup/install/) is optional if installing directly from source. This repository does not include a published krew plugin manifest.
 
-## Install Plugin
+The old prerequisite “Kubernetes >= v1.23.0” is not enforced in the plugin source; check compatibility with your cluster separately.
 
-Command: `cd ./platforms/krew && make deploy`
-The binary will be generated in cmd/ install it alonside the kubectl binary.
+## Build and install
 
-For example: the kubectl is installed under `/usr/bin`, then put the bilibilipro plugin under `/usr/bin` too.
+From the repository root:
 
-## Plugin Commands
+```bash
+cd platforms/krew
+make deploy
+```
 
-### Deployment && Update
+The [Makefile](./Makefile) builds `bin/kubectl-bilipro` and uses `sudo install` to copy it alongside the `kubectl` binary. Check that directory and your privileges before running the install target. Alternatively, `make build` produces the binary in `bin/` for you to install in a directory on `PATH`.
 
-Prerequsites: please make sure you have the right permission to at least manage namespaces/deployments
+## Deploy or update
 
-Command: `kubectl bilipro init --config config.yaml`
+Use `init` again to apply updated deployment configuration:
 
-Creates Deployment with the needed environments.
+```bash
+kubectl bilipro init --config config.yaml
+```
 
-Optional Options:
+The `--config` file is a YAML list of Kubernetes environment-variable objects, like the bundled [config.yaml](./config.yaml):
 
-- `--image=zai7lou/bilibili_tool_pro:2.0.1`
-- `--namespace=bilipro`
-- `--image-pull-secret=<docker secrets>`
-- `--login` to scan QR code to login
-
-Required Options:
-
-- `--config=<config.yaml>`
-
-The content of <config.yaml> is a yaml array, please refer to the example config yaml under the platforms/krew directory.
-
-For example
-
-````yaml
-- name: Ray_BiliBiliCookies__2
-  value: "cookie"
-  # DailyTrigger - required
+```yaml
+- name: Ray_BiliBiliCookies__1
+  value: "your Cookie"
 - name: Ray_DailyTaskConfig__Cron
   value: "11 11 * * *"
-````
+```
 
-Suggestions: Deploy this workload in namespace other than default or kube-* namespace, because the delete logic should be improved
+Keep credentials in that file private. The old guide called the cron variable required; the plugin only reads and adds the provided list and does not validate these particular keys. Its defaults and options are:
 
-### Deletion
+| Option | Behavior |
+| --- | --- |
+| `--config=config.yaml` | Path to the environment-variable list; supply a real file. |
+| `--image=zai7lou/bilibili_tool_pro:2.0.1` | Override the legacy default image. A different image may not support these commands. |
+| `--namespace=bilipro` | Target namespace (default `bilipro`). |
+| `--image-pull-secret=<secret-name>` | Optional Kubernetes image pull secret. |
+| `--login` | After deployment, attempt QR login by executing the legacy console DLL in a pod. |
+| `--output` | Print generated YAML; **not** a safe dry run: the implementation still executes `kubectl apply`. |
 
-Command: `kubectl bilipro delete [options]`
+The generated Deployment defaults to the `bilipro` namespace. Avoid `default` and `kube-*` namespaces for this plugin: its delete command unconditionally attempts to delete the namespace too.
 
-Deletes Deployment.
-v
-Optional Options:
+## Inspect, delete, and version
 
-- `--namespace=<deploy-namespace>`
-- `--name=<deploy-name>`
+```bash
+kubectl bilipro get --namespace=bilipro --name=bilibilipro
+kubectl bilipro version
+```
 
-### Version
+**Deletion warning:** `kubectl bilipro delete --namespace=bilipro --name=bilibilipro` runs `kubectl delete -f -` for the bundled Deployment and then `kubectl delete ns bilipro`. It does not honor `--name` when constructing the manifest and can delete other workloads when removing the namespace. Inspect the namespace and its resources before using this command; for a shared namespace, use `kubectl delete deployment bilibilipro -n bilipro` instead and leave the namespace intact.
 
-Command: `kubectl bilipro version`
+## Packaging for krew
 
-Output the plugin version.
-
-## Package
-
-Pls refer to [installation](https://krew.sigs.k8s.io/docs), you can package your own krew plugin
+See [krew's packaging instructions](https://krew.sigs.k8s.io/docs) if you want to package and publish the built plugin yourself; `make deploy` installs locally and does not publish it to the krew index.

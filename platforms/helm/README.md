@@ -1,139 +1,85 @@
 <!--- app-name: bilibili-tool -->
 
-# BiliBili Tool
+# BiliBili Tool Helm chart
 
-BiliBiliTool 是一个自动执行任务的工具，当我们忘记做某项任务时，它会像一个贴心小助手，按照我们预先吩咐它的命令，在指定频率、时间范围内帮助我们完成计划的任务。
+The chart in [`bilibili-tool/`](./bilibili-tool/) defines a Kubernetes Deployment and a ConfigMap for a legacy console-and-cron container. **Compatibility warning:** its default `zai7lou/bilibili_tool_pro:1.0.1` image, cron entry scripts, and Cookie environment settings predate the current Web image (`bili_tool_web`). The chart has not been updated to deploy the current Web panel; do not substitute the new image and assume the templates still work.
 
-[Overview of BiliBili Tool](https://github.com/RayWangQvQ/BiliBiliToolPro)
+[Project overview](https://github.com/RayWangQvQ/BiliBiliToolPro)
 
-## TL;DR
+## Quick start (legacy chart)
 
-### 在集群中通过chart部署
+With a Kubernetes cluster and [Helm](https://helm.sh) configured, inspect and adapt the chart's [values.yaml](bilibili-tool/values.yaml) before use:
 
-```console
-$ git clone https://github.com/RayWangQvQ/BiliBiliToolPro.git
-$ cd ${local_code_repo}/platforms/helm/bilibili-tool
-[optional]$ vim values.yaml # provides your own settings like cookies
-$ helm install <my_release_name> .
+```bash
+git clone https://github.com/RayWangQvQ/BiliBiliToolPro.git
+cd BiliBiliToolPro/platforms/helm/bilibili-tool
+helm install my-release .
+kubectl logs -f <pod_name>
 ```
 
-如果没有在values.yaml中提供cookie，那么需要手动扫描日志中的二维码进行登录
-
-```console
-$kubectl logs -f <pod_name>
-```
-
-如果在values.yaml中提供了cookie，那么可以不扫描也可以扫描进行登录，上面的步骤可以暂时不执行
-
-## Introduction
-
-这个chart通过[Helm](https://helm.sh)在[Kubernetes](https://kubernetes.io)集群上拉起一个[BiliBiliToolPro](https://github.com/RayWangQvQ/BiliBiliToolPro)deployment
+The legacy entry script attempts QR sign-in in the pod on startup. If the legacy image supports the Cookie supplied in `values.yaml`, QR sign-in may not be needed. Verify image availability and behavior before relying on this deployment.
 
 ## Prerequisites
 
-- Kubernetes
-- Helm
+- A working Kubernetes cluster (a local [kind](https://kind.sigs.k8s.io/docs/user/quick-start/) cluster also works for chart experiments).
+- Helm and `kubectl` configured for that cluster.
+- An image compatible with the chart's console/cron entry scripts; the current Web image is **not** a drop-in replacement.
 
-或者
+## Install and uninstall
 
-- Kind
-- Helm
+This repository provides a **local chart**, not a configured Helm repository. The former example `helm repo add my-repo <my_chart_repo>` was a placeholder for a separately hosted chart, not a repository provided here.
 
-## 安装Chart
-
-安装Chart并命名为 `my-release`:
-
-```console
-$helm repo add my-repo <my_chart_repo>
-$helm install my-release my-repo/bilibili-tool(:1.0.1)
+```bash
+helm install my-release ./platforms/helm/bilibili-tool -f ./platforms/helm/bilibili-tool/values.yaml
+helm list
+helm uninstall my-release
 ```
 
-上述命令需要用户在values.yaml里提供cookie等必须信息
-[Parameters](#parameters) 部分列出了所有可供自定义的值
-
-> **Tip**: `helm list` 可以列出当前已经列出的所有的release
-
-## 卸载 Chart
-
-卸载 `my-release` deployment:
-
-```console
-$helm delete my-release
-```
-
-上述命令卸载掉所有的release相关资源
+Run these commands from the repository root. `helm uninstall` removes the chart-managed resources; hostPath data or other external storage must be managed separately.
 
 ## Parameters
 
-| Name                      | Description                                     | Value | Required |
-| ------------------------- | ----------------------------------------------- | ----- | -------- |
-| `replicaCount`    | Deployment Relicas Count                   | `1`  | true |
-| `namespace`    | Deployment and ConfigMap deployed namespace                   | `default`  | true |
-| `configmap.name`    | ConfigMap name contains the entry files                   | `entry`  | true |
-| `image.repository` | Global Dockevr registry | `zai7lou/bilibili_tool_pro`  | true |
-| `image.tag`     | Image Tag    | `1.0.1`  | true |
-| `image.pullPolicy`     | Image Pull Policy    | `IfNotPresent`  | true |
-| `imagePullSecrets` | Image Pull Secrets | `[]` | false |
-| `nameOverride` | Deployment name in the Chart | `""` | false |
-| `fullnameOverride` | Release name when set | `""` | false |
-| `resources.limits`      | The resources limits for the BiliBili Tool containers                                 | `{}`            | true |
-| `resources.limits.memory`                         | The limited memory for the BiliBili Tool containers                                                                                                                                                 | `180Mi`         | true |
-| `resources.limits.cpu`                            | The limited cpu for the BiliBili Tool containers     | `100m` | true |
-| `resources.requests`      | The resources requests for the BiliBili Tool containers                                                                                                       | `{}`            | true |
-| `resources.requests.memory`                         | The requested memory for the BiliBili Tool containers                                                                                                                                                 | `180Mi`         | true |
-| `resources.requests.cpu`                            | The requested cpu for the BiliBili Tool containers     | `100m` | true |
-| `affinity`                                          | Affinity for pod assignment                                                                                                                                                                       | `{}`            | false |
-| `nodeSelector`                                      | Node labels for pod assignment                                                                                                                                                                    | `{}`            | false |
-| `tolerations`                                       | Tolerations for pod assignment                                                                                                                                                                    | `[]`            | false |
-| `env` | Environment variables for the BiliBili Tool container, Ray_BiliBiliCookies__1 and Ray_DailyTaskConfig__Cron are required, others vars pls take a look at [supported envvars](https://github.com/RayWangQvQ/BiliBiliToolPro/blob/main/docs/configuration.md) | `[]` | true |
-| `volumes.log.enabled` | Enable persistent log volume for BiliBili Tool or not | `"false"` | true |
-| `volumes.log.path` | The host path mounted into pod | `"/tmp/Logs"` | false |
-| `volumes.log.name` | The volume name | `"bili-tool-vol"` | false |
-| `volumes.login.enabled` | Enable persistent log volume contains the entries for BiliBili Tool or not | `"false"` | true |
-| `volumes.login.name` | The volume name | `"entry"` | false |
-| `podAnnotations` | The annotations for the BiliBili Tool pod | `{}` | false |
+The following are the values actually present in [`values.yaml`](bilibili-tool/values.yaml). These are **legacy chart settings**, not recommended values for the current Web container.
 
-可以用指定helm install命令行参数 `--set key=value[,key=value]`， 比如
+| Name | Purpose | Current chart default |
+| --- | --- | --- |
+| `namespace` | Deployment and ConfigMap namespace | `default` |
+| `replicaCount` | Declared replica count (not referenced by the Deployment template) | `1` |
+| `configmap.name` | Name of the entry-scripts ConfigMap | `entry` |
+| `image.repository` | Legacy container repository | `zai7lou/bilibili_tool_pro` |
+| `image.tag` | Container tag (falls back to chart `appVersion`) | `1.0.1` |
+| `image.pullPolicy` | Pull policy | `IfNotPresent` |
+| `imagePullSecrets` | Image pull secret references | `[]` |
+| `nameOverride`, `fullnameOverride` | Template naming overrides | `""`, `""` |
+| `resources.limits.cpu`, `resources.limits.memory` | Container limits | `100m`, `120Mi` |
+| `resources.requests.cpu`, `resources.requests.memory` | Container requests | `100m`, `120Mi` |
+| `affinity`, `nodeSelector`, `tolerations` | Pod scheduling settings | `{}`, `{}`, `[]` |
+| `env` | Container environment variables | Legacy `Ray_BiliBiliCookies__1` (empty) and `Ray_DailyTaskConfig__Cron` (`10 8 * * *`) |
+| `volumes.log.enabled`, `volumes.log.path`, `volumes.log.name` | Legacy hostPath log mount | `true`, `/tmp/logs`, `bili-tool-vol` |
+| `volumes.login.enabled`, `volumes.login.name` | Entry-scripts ConfigMap mount | `true`, `entry` |
+| `podAnnotations` | Pod annotations | `{}` |
 
-```console
-$ helm install my-release \
-  --set  \
-    relicas=1
-```
+The template does not reference `replicaCount`; setting it does not change the number of pods. The ConfigMap entry script uses legacy `Ray_*` cron variables and runs `Ray.BiliBiliTool.Console.dll`, so inspect the template before changing images. See the [configuration guide](../../docs/configuration.md) for current application settings.
 
-也可以通过指定一个YAML格式的values文件来配置以上参数，比如
+Override values with a file or `--set`:
 
-```console
-$helm install my-release -f values.yaml my_chart_repo/bilibili-tool
-```
-
-> **Tip**: 你可以使用默认的 [values.yaml](bilibili-tool/values.yaml)进行配置
-
-当想更新一些变量时，可以通过指定参数或者直接修改YAML的values文件进行更新
-
-```console
-$helm upgrade my-release my_chart_repo/bilibili-tool <-f values> or <--set-file ...> 
+```bash
+helm install my-release ./platforms/helm/bilibili-tool -f ./platforms/helm/bilibili-tool/values.yaml
+helm install my-release ./platforms/helm/bilibili-tool --set namespace=default
+helm upgrade my-release ./platforms/helm/bilibili-tool -f ./platforms/helm/bilibili-tool/values.yaml
 ```
 
 ## Upgrade
 
-建议重新装release
+The earlier guide recommended reinstalling the release. Helm supports `helm upgrade` as shown above, but upgrading this legacy chart does **not** make it compatible with the current Web image. Test changes in a non-production cluster first.
 
-## [Optional]本地Cluster运行
+## Optional: local kind cluster
 
-通过安装[kind](https://kind.sigs.k8s.io/docs/user/quick-start/)工具在本地运行一个Kubernetes Cluster
+For local experimentation, install Go, Docker, and kind. For example, the earlier guide used:
 
-go 1.17+ and Docker installed
-
-```console
-$ go install sigs.k8s.io/kind@v0.17.0 && kind create cluster <--config kind_config_file>
-$ cat <kind_config_file>
-$ kind: Cluster
-apiVersion: kind.x-k8s.io/v1alpha4
-nodes:
-- role: control-plane
-- role: worker 
-$ EOF
+```bash
+go install sigs.k8s.io/kind@v0.17.0
+kind create cluster
 ```
 
-at least one worker node otherwise you have to provides tolerations in the values.yaml to schedule on master node
+For a multi-node cluster, provide a kind config with `kind: Cluster`, `apiVersion: kind.x-k8s.io/v1alpha4`, and `control-plane` / `worker` nodes. The former example's `cat <kind_config_file>` and `kind create cluster <--config ...>` placeholders were not executable commands. A single control-plane cluster may require scheduling tolerations depending on its configuration.
