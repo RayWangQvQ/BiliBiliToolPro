@@ -1,6 +1,6 @@
 # https://github.com/June1991/serverless-express
 
-name: auto-deploy-tencent-scf
+name: Deploy Tencent SCF
 
 on:
   workflow_dispatch:
@@ -11,7 +11,8 @@ env:
   IsAutoDeployTencentScf: ${{ secrets.IS_AUTO_DEPLOY_TENCENT_SCF }} # 是否开启自动部署云函数
 
 jobs:
-  pre-check:
+  check-deployment-setting:
+    name: Check deployment setting
     runs-on: ubuntu-latest
     outputs:
       result: ${{ steps.check.outputs.result }} # 不能直接传递secrets的值，否则会被skip，需要转一下
@@ -20,12 +21,12 @@ jobs:
         run: |
           [ ${{ github.event_name }} == 'workflow_dispatch' -o true == "${{ env.IsAutoDeployTencentScf }}" ] && echo "result=开启" >> $GITHUB_OUTPUT || echo "result=关闭" >> $GITHUB_OUTPUT
 
-  deploy:
-    name: deploy serverless
+  deploy-tencent-scf:
+    name: Deploy Tencent SCF
     runs-on: ubuntu-latest
-    needs: pre-check
+    needs: check-deployment-setting
     # if: env.IsAutoDeployTencentScf=='true' # 这里job.if读取不到env或secrets，很坑...但是发现可以读到needs的outputs值
-    if: needs.pre-check.outputs.result=='开启'
+    if: needs.check-deployment-setting.outputs.result=='开启'
     steps:
       - name: clone local repository
         uses: actions/checkout@v7

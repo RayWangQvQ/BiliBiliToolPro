@@ -1,6 +1,6 @@
 # 自动同步上游仓库
 
-name: repo-sync
+name: Sync fork with upstream
 
 on:
   workflow_dispatch:
@@ -9,7 +9,8 @@ on:
     # UTC时区，比我们东八区早8小时，上面示例为：每周一、三、五的9点。
 
 jobs:
-  repo-sync:
+  sync-upstream:
+    name: Sync upstream main
     if: ${{ github.repository != 'RayWangQvQ/BiliBiliToolPro' }}
 
     runs-on: ubuntu-latest

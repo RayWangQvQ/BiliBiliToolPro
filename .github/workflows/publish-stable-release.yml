@@ -1,4 +1,4 @@
-name: Stable release
+name: Publish stable release
 
 # 新发布策略（ADR-0002）的稳定版通道：维护者在 Actions 页面手动 Run workflow，
 # 下拉选择升级级别，之后全自动：算号 → zip → Release → 镜像 → CHANGELOG 回写。
@@ -29,7 +29,8 @@ env:
   GHCR_IMG_NAME: ghcr.io/raywangqvq/bili_tool_web
 
 jobs:
-  decide:
+  determine-version:
+    name: Determine stable version
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.version.outputs.version }}
@@ -57,8 +58,9 @@ jobs:
           echo "since=$since" >> "$GITHUB_OUTPUT"
           echo "发版：${since:-仓库起点} -> $version（$LEVEL）"
 
-  publish:
-    needs: decide
+  publish-release:
+    name: Build artifacts and create release
+    needs: determine-version
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -73,30 +75,31 @@ jobs:
       # 版本号显式传入，构建时烘焙进程序集 informational version
       - name: Publish all runtimes
         env:
-          RELEASE_VERSION: ${{ needs.decide.outputs.version }}
+          RELEASE_VERSION: ${{ needs.determine-version.outputs.version }}
         run: bash ./scripts/publish.sh --runtime all
 
       # notes 取自上个稳定 tag 以来合并的 PR 标题（不合规标题原样收录）。
       # 若期间没有任何合并，脚本会报错让发版失败 —— 不允许发空版本。
       - name: Collect release notes
         env:
-          SINCE: ${{ needs.decide.outputs.since }}
+          SINCE: ${{ needs.determine-version.outputs.since }}
         run: bash ./scripts/release-notes.sh notes --since "$SINCE" > release_notes.md
 
       # 已存在则更新，不报错：重跑失败的发版（同一 run 的 retry）不会撞车
       - name: Create GitHub Release and tag
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ needs.decide.outputs.version }}
-          name: BiliBiliToolPro-V${{ needs.decide.outputs.version }}
+          tag_name: ${{ needs.determine-version.outputs.version }}
+          name: BiliBiliToolPro-V${{ needs.determine-version.outputs.version }}
           body_path: release_notes.md
           files: ./src/Ray.BiliBiliTool.Console/bin/Publish/*.zip
           discussion_category_name: Announcements
           make_latest: "true"
           fail_on_unmatched_files: true
 
-  image:
-    needs: [decide, publish]
+  publish-images:
+    name: Publish stable Docker images
+    needs: [determine-version, publish-release]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -124,17 +127,18 @@ jobs:
           push: true
           platforms: linux/amd64,linux/arm64
           build-args: |
-            VERSION=${{ needs.decide.outputs.version }}
+            VERSION=${{ needs.determine-version.outputs.version }}
           tags: |
-            ${{ env.DOCKER_IMG_NAME }}:${{ needs.decide.outputs.version }}
+            ${{ env.DOCKER_IMG_NAME }}:${{ needs.determine-version.outputs.version }}
             ${{ env.DOCKER_IMG_NAME }}:latest
-            ${{ env.GHCR_IMG_NAME }}:${{ needs.decide.outputs.version }}
+            ${{ env.GHCR_IMG_NAME }}:${{ needs.determine-version.outputs.version }}
             ${{ env.GHCR_IMG_NAME }}:latest
           cache-from: type=registry,ref=ghcr.io/raywangqvq/bili_tool_web:buildcache-stable
           cache-to: type=registry,ref=ghcr.io/raywangqvq/bili_tool_web:buildcache-stable,mode=max,image-manifest=true
 
-  changelog:
-    needs: [decide, publish]
+  update-changelog:
+    name: Update changelog via PR
+    needs: [determine-version, publish-release]
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -159,9 +163,9 @@ jobs:
       - name: Commit CHANGELOG section and open PR
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ needs.decide.outputs.version }}
-          SINCE: ${{ needs.decide.outputs.since }}
-          BRANCH: chore/changelog-${{ needs.decide.outputs.version }}
+          VERSION: ${{ needs.determine-version.outputs.version }}
+          SINCE: ${{ needs.determine-version.outputs.since }}
+          BRANCH: chore/changelog-${{ needs.determine-version.outputs.version }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -178,7 +182,7 @@ jobs:
           if [ -z "$pr_url" ]; then
             pr_url=$(gh pr create --base main --head "$BRANCH" \
               --title "docs(changelog): $VERSION" \
-              --body "Stable release $VERSION 的 CHANGELOG 回写，由 stable.yml changelog job 自动生成。纯文档变更，required checks 不会因 bot PR 而运行，由维护者（admin）直接合并即可。")
+              --body "Stable release $VERSION 的 CHANGELOG 回写，由 publish-stable-release.yml update-changelog job 自动生成。纯文档变更，required checks 不会因 bot PR 而运行，由维护者（admin）直接合并即可。")
           fi
           echo "CHANGELOG PR 已就绪，等待维护者合并：$pr_url"
           echo "::notice title=CHANGELOG 回写::$pr_url 等待维护者合并（纯文档变更，可直接 --admin 合并）"

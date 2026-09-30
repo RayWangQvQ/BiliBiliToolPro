@@ -1,4 +1,4 @@
-name: Publish alpha image
+name: Publish alpha Docker images
 
 # 新发布策略（ADR-0002）的 alpha 通道：main 的每次合并（squash）自动产出一个
 # alpha 版本镜像。版本号由 scripts/version-next.sh 从 git tag 历史推导，
@@ -28,7 +28,8 @@ env:
   GHCR_IMG_NAME: ghcr.io/raywangqvq/bili_tool_web
 
 jobs:
-  decide:
+  determine-version:
+    name: Determine alpha version
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.version.outputs.version }}
@@ -46,8 +47,9 @@ jobs:
           echo "version=$version" >> "$GITHUB_OUTPUT"
           echo "alpha 版本：$version"
 
-  push:
-    needs: decide
+  publish-images:
+    name: Build and push alpha images
+    needs: determine-version
     runs-on: ubuntu-latest
     # 交叉编译后全原生：两个架构各约 2-3 分钟，留足 20 分钟只为异常时能快速失败
     timeout-minutes: 20
@@ -79,11 +81,11 @@ jobs:
           push: true
           platforms: linux/amd64,linux/arm64
           build-args: |
-            VERSION=${{ needs.decide.outputs.version }}
+            VERSION=${{ needs.determine-version.outputs.version }}
           tags: |
-            ${{ env.DOCKER_IMG_NAME }}:${{ needs.decide.outputs.version }}
+            ${{ env.DOCKER_IMG_NAME }}:${{ needs.determine-version.outputs.version }}
             ${{ env.DOCKER_IMG_NAME }}:alpha
-            ${{ env.GHCR_IMG_NAME }}:${{ needs.decide.outputs.version }}
+            ${{ env.GHCR_IMG_NAME }}:${{ needs.determine-version.outputs.version }}
             ${{ env.GHCR_IMG_NAME }}:alpha
           # 缓存存进 GHCR 而非 GHA Actions Cache：后者每次导出要 5 分钟
           # （preparing 97s + sending 211s），registry 走镜像层直推快得多，

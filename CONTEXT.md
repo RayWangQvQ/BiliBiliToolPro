@@ -44,6 +44,10 @@ _Avoid_: 预览版、beta、开发版
 维护者手动触发发版 workflow、选定 patch/minor/major 后由 CI 算号并发布的正式版本：打纯数字三段式 git tag、建 GitHub Release、出全套制品。
 _Avoid_: 正式版、release 版
 
+**CI 门禁**:
+合入 `main` 前必须通过的 GitHub required status check，目前四项：`Build and test .NET`、`Test release scripts`、`Build Docker image`、`Scan code with CodeQL`，全部由同一个 workflow `pr-checks.yml` 产生（ADR-0012）。名字由 ruleset 绑定，取自 job 显示名——改名的同时必须改 ruleset，否则检查永远停在 Expected。纯文档变更下这四项会被 job 级 `if` 跳过（ADR-0011），跳过报 Success 而非 Pending，所以不影响合入。
+_Avoid_: 检查项（那是今日任务页的二级条目）、必需检查、门禁
+
 **检查项**:
 今日任务页上的**二级**条目、一行的状态单元（如「观看视频」「投币」），对应 `TaskItemDefinition`，展示态是 `TodayTaskItemDto`。归属于一个任务。
 _Avoid_: 任务项、条目、子任务
@@ -72,3 +76,5 @@ _Avoid_: 重试、重跑、恢复
 - [ADR-0008：Blazor 框架脚本必须显式声明 `RequiresAspNetWebAssets` 随包发布](docs/adr/0008-blazor-framework-assets-must-be-published.md)
 - [ADR-0009：面板管理员的改名与改密是两个独立操作](docs/adr/0009-admin-rename-and-password-change-are-separate.md)
 - [ADR-0010：凭据变更成功后一律强制重新登录](docs/adr/0010-credential-change-forces-relogin.md)
+- [ADR-0011：纯文档变更跳过 CI 门禁的重活](docs/adr/0011-docs-only-diff-skips-heavy-ci-jobs.md)（清单存两份的描述已由 ADR-0012 取代）
+- [ADR-0012：PR 门禁合并成单一 workflow](docs/adr/0012-single-pr-gate-workflow.md)

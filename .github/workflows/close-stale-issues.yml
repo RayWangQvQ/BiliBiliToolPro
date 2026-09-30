@@ -10,7 +10,8 @@ permissions:
   pull-requests: write
 
 jobs:
-  close_stale_issues:
+  mark-and-close-stale-issues:
+    name: Mark and close stale issues
     runs-on: ubuntu-latest
     steps:
       - name: Close Stale Issues
