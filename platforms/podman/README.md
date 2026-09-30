@@ -1,128 +1,76 @@
-# Podman 使用说明
-<!-- TOC depthFrom:2 -->
+# Podman deployment
 
-- [1. 前期工作](#1-前期工作)
-    - [1.1. Podman环境](#11-podman环境)
-    - [1.2. 从Docker迁移](#12-从docker迁移)
-- [2. 运行容器](#2-运行容器)
-    - [2.1. 极简版](#21-极简版)
-    - [2.2. 综合版](#22-综合版)
-- [3. 登录](#3-登录)
-- [4. 添加 Bili 账号](#4-添加-bili-账号)
-- [5. 自己构建镜像（非必须）](#5-自己构建镜像非必须)
-- [6. 其他](#6-其他)
+Run the Web container with Podman instead of Docker.
 
-<!-- /TOC -->
+## Prerequisites
 
-## 1. 前期工作
+Install [Podman](https://podman.io/) and check your setup:
 
-### 1.1. Podman环境
-
-请确认已安装了Podman所需环境（[Podman](https://podman.io/)
-
-安装完成后，请执行`podman -v`检查是否安装成功，请执行`podman info`检查虚拟机环境是否正常。
-
-常用命令参考：
-
-```
-# 查看版本
+```bash
 podman -v
-
-# 初始化虚拟机
-podman machine init
-
-# 启动虚拟机
-podman machine start
-
-# 查看信息
 podman info
 ```
 
-### 1.2. 从Docker迁移
+On systems that use a Podman machine, initialize and start it first:
 
-Podman可以和Docker共存，命令也基本可以通用。
-
-但挂载逻辑有点区别，podman挂载时，如果宿主机下没有指定的文件夹，podman不会像docker一样去自动创建文件夹，而是会报异常。
-
-所以在挂载文件夹时，需要先手动在宿主机上mkdir创建文件夹。
-
-## 2. 运行容器
-
-以下提供极简版和综合版两个版本，一个简单一个复杂，供参考
-
-### 2.1. 极简版
-
+```bash
+podman machine init
+podman machine start
+podman info
 ```
-# 生成并运行容器
-podman run -itd --name="bili_tool_web" docker.io/zai7lou/bili_tool_web
 
-# 查看实时日志
+Podman can coexist with Docker and uses similar commands. Create host directories before mounting them; do not assume Podman will create missing bind-mount directories.
+
+## Run the container
+
+### Minimal example
+
+This starts the container without publishing the Web port or persisting its data. Use the full example below for Web access and persistent account storage.
+
+```bash
+podman run -itd --name="bili_tool_web" docker.io/zai7lou/bili_tool_web
 podman logs -f bili_tool_web
 ```
 
-### 2.2. 综合版
+### Full example
 
-```
-# 创建文件和文件夹
+```bash
 mkdir -p /bili_tool_web && cd /bili_tool_web
 mkdir -p Logs config
-
-# 账号通过 Web 面板添加，保存在 config/BiliBiliTool.db
-
-# 运行
 podman run -itd --name="bili_tool_web" \
-    -v ./Logs:/app/Logs \
-    -v ./config:/app/config \
+    -p 22330:8080 \
+    -v "$(pwd)/Logs:/app/Logs" \
+    -v "$(pwd)/config:/app/config" \
     -e DailyTaskConfig__Cron="0 0 15 * * ?" \
     -e LiveLotteryTaskConfig__Cron="0 0 22 * * ?" \
     -e UnfollowBatchedTaskConfig__Cron="0 0 6 1 * ?" \
     -e VipBigPointConfig__Cron="0 7 1 * * *" \
-    -e DailyTaskConfig__NumberOfCoins="5"
+    -e DailyTaskConfig__NumberOfCoins="5" \
     docker.io/zai7lou/bili_tool_web
-
-# 查看实时日志
-podman logs -f bili
+podman logs -f bili_tool_web
 ```
 
-Web 面板不再读取 `config/cookies.json`；已有部署中仅保存在旧 JSON 文件的账号需在面板重新添加，旧文件不会自动迁移或删除。
+The Web panel stores accounts in `config/BiliBiliTool.db` rather than reading `config/cookies.json`. Re-add accounts held only in an older JSON file through the panel; the file is not migrated or deleted automatically.
 
-其他指令参考：
-
-```
-# 查看容器运行状态
+```bash
 podman ps -a
-
-# 进入容器
-podman exec -it bili bash
+podman exec -it bili_tool_web /bin/bash
 ```
 
-## 3. 登录
+## Sign in and add an account
 
-- 默认用户：`admin`
-- 默认密码：`BiliTool@2233`
+For the full example, open the Web panel on port `22330`. The initial username is `admin` and password is `BiliTool@2233`; change the password on the **Admin** page after first sign-in. Scan the QR code to add your account.
 
-首次登陆后，请到`Admin`页面修改密码。
+![Trigger account sign-in](../../docs/imgs/web-trigger-login.png)
 
-## 4. 添加 Bili 账号
+![Scan the login QR code](../../docs/imgs/docker-login.png)
 
-扫码进行登录。
+## Build your own image (optional)
 
-![trigger](../../docs/imgs/web-trigger-login.png)
+The example pulls the [published Docker Hub image (`zai7lou/bili_tool_web`)](https://hub.docker.com/repository/docker/zai7lou/bili_tool_web). To build from source, run this at the repository root (which contains `Dockerfile`):
 
-![login](../../docs/imgs/docker-login.png)
+```bash
+podman build -t TARGET_NAME .
+```
 
-## 5. 自己构建镜像（非必须）
-
-目前我提供和维护的镜像：`[zai7lou/bilibili_tool_web](https://hub.docker.com/repository/docker/zai7lou/bilibili_tool_web)`;
-
-如果有需要（大部分都不需要），可以使用源码自己构建镜像，如下：
-
-在有项目的Dockerfile的目录运行
-
-`podman build -t TARGET_NAME .`
-
- `TARGET_NAME`为镜像名称和版本，可以自己起个名字
-
-## 6. 其他
-
-镜像使用的是docker仓库的镜像。
+Replace `TARGET_NAME` with your chosen image name and tag. Podman uses the same Dockerfile as the Docker deployment.

@@ -1,126 +1,86 @@
-# Docker 使用说明
-<!-- TOC depthFrom:2 -->
+# Docker deployment
 
-- [1. 前期工作](#1-前期工作)
-- [2. 方式一：一键脚本(推荐)](#2-方式一一键脚本推荐)
-- [3. 方式二：手动 Docker Compose](#3-方式二手动-docker-compose)
-    - [3.1. 启动](#31-启动)
-    - [3.2. 其他命令参考](#32-其他命令参考)
-- [4. 方式三：手动Docker指令](#4-方式三手动docker指令)
-    - [4.1. Docker启动](#41-docker启动)
-    - [4.2. 其他指令参考](#42-其他指令参考)
-    - [4.3. 使用Watchtower更新容器](#43-使用watchtower更新容器)
-- [5. 登录](#5-登录)
-- [6. 添加 Bili 账号](#6-添加-bili-账号)
-- [7. 自己构建镜像（非必须）](#7-自己构建镜像非必须)
-- [8. 其他](#8-其他)
+The current container runs the Web panel. Choose the installer, Docker Compose, or a direct `docker run` command.
 
-<!-- /TOC -->
+## Prerequisites
 
-## 1. 前期工作
+Install Docker (and the Compose plugin if using Compose). On Debian/Ubuntu, install `curl` for the one-command installer:
 
-```
+```bash
 apt-get update
 apt-get install curl
 ```
 
-## 2. 方式一：一键脚本(推荐)
+## Option 1: installer script
 
-```
+The script attempts to install Docker if missing, downloads the Compose sample into `bili_tool_web/`, and starts the container (falling back to `docker run` if Compose is unavailable). Review a remote script before running it:
+
+```bash
 bash <(curl -sSL https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/platforms/docker/install.sh)
 ```
 
-## 3. 方式二：手动 Docker Compose
+## Option 2: Docker Compose
 
-### 3.1. 启动
+### Start
 
-```
-# 创建目录
+```bash
 mkdir bili_tool_web && cd bili_tool_web
-
-# 下载
 wget https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/platforms/docker/sample/docker-compose.yml
-
-# 启动
 docker compose up -d
-
-# 查看启动日志
 docker logs -f bili_tool_web
 ```
 
-最终文件结构如下：
+The sample mounts `./Logs` and `./config` into the container and publishes port `22330` to container port `8080`. After the first run, the directory looks like:
 
-```
-bili_tool_web
-├── Logs
-├── config
-├──── BiliBiliTool.db
+```text
+bili_tool_web/
+├── Logs/
+├── config/
+│   └── BiliBiliTool.db
 └── docker-compose.yml
 ```
 
-### 3.2. 其他命令参考
+### Other commands
 
-```
-# 启动 docker-compose
+```bash
 docker compose up -d
-
-# 停止 docker-compose
 docker compose stop
-
-# 查看实时日志
 docker logs -f bili_tool_web
-
-# 进入容器
 docker exec -it bili_tool_web /bin/bash
-
-# 手动更新容器
 docker compose pull && docker compose up -d
 ```
 
-## 4. 方式三：手动Docker指令
+## Option 3: direct Docker commands
 
-### 4.1. Docker启动
+### Start
 
-```
-# 创建目录
+```bash
 mkdir bili_tool_web && cd bili_tool_web
-
-# 生成并运行容器
 docker pull ghcr.io/raywangqvq/bili_tool_web
 docker run -d --name="bili_tool_web" \
     -p 22330:8080 \
     -e TZ=Asia/Shanghai \
-    -v ./Logs:/app/Logs \
-    -v ./config:/app/config \
+    -v "$(pwd)/Logs:/app/Logs" \
+    -v "$(pwd)/config:/app/config" \
     ghcr.io/raywangqvq/bili_tool_web
-
-# 查看实时日志
 docker logs -f bili_tool_web
 ```
 
-首次启动后，通过 Web 面板扫码添加 B 站账号；账号信息保存在 `config/BiliBiliTool.db`，不再读取 `config/cookies.json`。已有部署中仅保存在旧 JSON 文件的账号需要在面板重新添加，旧文件不会自动迁移或删除。
+Add Bilibili accounts by scanning a QR code in the Web panel. Accounts are stored in `config/BiliBiliTool.db`; the Web panel no longer reads `config/cookies.json`. If an older installation has accounts only in that JSON file, add them again in the panel. The old file is not migrated or removed automatically.
 
-### 4.2. 其他指令参考
+### Container management
 
-```
-# 启动容器
+```bash
 docker start bili_tool_web
-
-# 停止容器
 docker stop bili_tool_web
-
-# 重启容器
 docker restart bili_tool_web
-
-# 删除容器
 docker rm bili_tool_web
-
-# 进入容器
 docker exec -it bili_tool_web /bin/bash
 ```
 
-### 4.3. 使用Watchtower更新容器
-```
+### One-time update with Watchtower
+
+```bash
 docker run --rm \
     -v /var/run/docker.sock:/var/run/docker.sock \
     containrrr/watchtower \
@@ -128,40 +88,22 @@ docker run --rm \
     bili_tool_web
 ```
 
-## 5. 登录
+## Sign in and add an account
 
-- 默认用户：`admin`
-- 默认密码：`BiliTool@2233`
+Open the Web panel on port `22330`. The initial username is `admin` and the initial password is `BiliTool@2233`. Change the password on the **Admin** page after your first sign-in. Scan the QR code to add a Bilibili account:
 
-首次登陆后，请到`Admin`页面修改密码。
+![Trigger account sign-in](../../docs/imgs/web-trigger-login.png)
 
-## 6. 添加 Bili 账号
+![Scan the login QR code](../../docs/imgs/docker-login.png)
 
-扫码进行账号添加。
+## Build your own image (optional)
 
-![trigger](../../docs/imgs/web-trigger-login.png)
+Published images include [Docker Hub (`zai7lou/bili_tool_web`)](https://hub.docker.com/repository/docker/zai7lou/bili_tool_web) and [GitHub Container Registry (`bili_tool_web`)](https://github.com/RayWangQvQ/BiliBiliToolPro/pkgs/container/bili_tool_web). To build locally, run this from the repository root, where `Dockerfile` is located:
 
-![login](../../docs/imgs/docker-login.png)
+```bash
+docker build -t TARGET_NAME .
+```
 
-## 7. 自己构建镜像（非必须）
+Replace `TARGET_NAME` with your chosen image name and tag. The Dockerfile builds with `mcr.microsoft.com/dotnet/sdk:10.0` and runs with `mcr.microsoft.com/dotnet/aspnet:10.0`.
 
-目前我提供和维护的镜像：
-
-- DockerHub: `[zai7lou/bili_tool_web](https://hub.docker.com/repository/docker/zai7lou/bili_tool_web)`
-- GitHub: `[bili_tool_web](https://github.com/RayWangQvQ/BiliBiliToolPro/pkgs/container/bili_tool_web)`
-
-如果有需要（大部分都不需要），可以使用源码自己构建镜像，如下：
-
-在有项目的Dockerfile的目录运行
-
-`docker build -t TARGET_NAME .`
-
-`TARGET_NAME`为镜像名称和版本，可以自己起个名字
-
-## 8. 其他
-
-代码编译和发布环境: mcr.microsoft.com/dotnet/sdk:10.0
-
-代码运行环境: mcr.microsoft.com/dotnet/aspnet:10.0
-
-如果下载`github`资源有问题，可以尝试添加加速器。
+If GitHub downloads fail, check network access before choosing a proxy; third-party proxy availability varies.

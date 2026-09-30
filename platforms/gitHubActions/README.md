@@ -1,47 +1,32 @@
-# GitHub Actions 部署
+# GitHub Actions task runner (archived)
 
-<!-- TOC depthFrom:2 -->
+> **Archived recipe — not deployable as-is.** The Bilibili task workflows exist only under [`bak/`](./bak/), not under `.github/workflows/`. GitHub Actions will not discover or run workflows from `platforms/gitHubActions/bak/`. The root [`.github/workflows/`](../../.github/workflows/) contains CI, release, fork-sync, and Tencent SCF workflows, but no Bilibili daily-task runner. Forking the repository, enabling Actions, and adding `COOKIESTR` **will not** run Bilibili tasks.
 
-- [介绍](#介绍)
-- [步骤](#步骤)
-    - [复刻项目](#复刻项目)
-    - [添加 Secrets 配置](#添加-secrets-配置)
-    - [测试运行 Actions](#测试运行-actions)
-- [其他](#其他)
+This page preserves the original setup intent and screenshots for historical reference; it is not an installation walkthrough for a supported current deployment. The archived [daily](./bak/bilibili-daily-task.yml), [live-lottery](./bak/live-lottery-task.yml), [unfollow](./bak/unfollow-batched-task.yml), and [manual/empty](./bak/empty-task.yml) YAML files need review and updates before anyone could use them. In particular, they install .NET 6 while the project targets .NET 10; the daily task's pre-check references `IsOpenDailyTask` without defining it, and the older workflows use deprecated `::set-output` syntax. Do **not** copy them into `.github/workflows/` and assume they will run.
 
-<!-- /TOC -->
+## Historical setup: fork the repository
 
-## 介绍
-GA 是微软（巨硬）收购 G 站之后新增的内置 CI/CD 方案，其核心就是一个可以运行脚本的小型服务器。
+The old instructions started by forking the repository. A fork alone contains only the archived task YAML under `bak/`, so there is no task runner to enable. The separate [fork-sync workflow](../../.github/workflows/sync-fork-with-upstream.yml) targets `main` and requires a `PAT` secret; it synchronizes source, **not** task execution.
 
-有了它，我们就可以实现每天线上自动运行我们的应用程序，通过配置还可以实现版本的自动同步更新。
+## Historical setup: configure secrets
 
-## 步骤
-### 复刻项目
-首先点击本页面右上角的 fork 按钮，复刻本项目到自己的仓库
+The archived daily-task workflow maps the `COOKIESTR` repository secret to `Ray_BiliBiliCookies__1` (and `COOKIESTR2` / `COOKIESTR3` to additional accounts). The old UI path was **Settings → Secrets and variables → Actions → New repository secret**. Treat Cookies as sensitive credentials. **No active task workflow reads these secrets**; do not add them merely to follow this archived guide.
 
-### 添加 Secrets 配置
-进入自己 fork 的仓库，点击 Settings-> Secrets-> New Secrets， 添加 1 个 Secrets，其名称为`COOKIESTR`，值为刚才我们保存的 `cookie 字符串`。它们将作为配置项，在应用启动时传入程序。
+![Repository secrets](../../docs/imgs/git-secrets.png)
 
-![Secrets图示](../../docs/imgs/git-secrets.png)
+![Add a Cookie secret](../../docs/imgs/git-secrets-add-cookie.png)
 
-![添加CookieStr图示](../../docs/imgs/git-secrets-add-cookie.png)
+## Historical workflow screenshots
 
+The screenshots below show how the old task workflow was manually started and how its logs appeared. **There is no matching task workflow in the current Actions tab.** Enabling Actions on a fork does not restore it. The existing Tencent SCF deploy workflow is a different deployment target.
 
-### 测试运行 Actions
-刚 Fork 完，所有 Actions 都是默认关闭的，都配置好后，需要手动点击 Enable 开启 Actions。开启后请手动执行一次工作流，验证是否可以正常工作，操作步骤如下图所示：
+![Run a workflow](../../docs/imgs/run-workflow.png)
 
-![Actions图示](../../docs/imgs/run-workflow.png)
+![Workflow log, first view](../../docs/imgs/github-actions-log-1.png)
+![Workflow log, second view](../../docs/imgs/github-actions-log-2.png)
 
-运行结束后，请查看运行日志：
+## Historical scheduling and startup delay
 
-![Actions日志图示](../../docs/imgs/github-actions-log-1.png)
-![Actions日志图示](../../docs/imgs/github-actions-log-2.png)
+The archived [daily YAML](./bak/bilibili-daily-task.yml) schedules `0 16 * * *` (16:00 UTC, midnight in UTC+8) and the old instructions recommended avoiding the hour to spread API traffic. The archived [`empty-task.yml`](./bak/empty-task.yml) was a manually triggered test task. Neither runs from its current location. The old instructions also described a 0–30 minute random startup delay, but the console's checked-in `appsettings.json` currently sets `Security:RandomSleepMaxMin` to `0`; do not rely on the old default. A newly written workflow would need its own verified schedule, current .NET setup, and configuration.
 
-
-## 其他
-Actions 的执行策略默认是每天 0 点整触发运行，如要设置为指定的运行时间，请详见下面**常见问题**章节中的《**Actions 如何修改定时任务的执行时间？**》
-
-**建议每个人都设置下每日执行时间！不要使用默认时间！最好也不要设定在整点，错开峰值，避免 G 站的同一个IP在相同时间去请求 B 站接口，导致 IP 被禁！**
-
-**应用运行后，会进行0到30分钟的随机睡眠，是为了使每天定时运行时间在范围内波动。刚开始如果需要频繁调试，建议使用empty-task.yml来调试，或者参考下面的个性化自定义配置章节，将睡眠配置为1分钟，避免每次测试都需要等待半小时**
+For an existing GitHub Actions deployment path, see the separate [SCF deployment guide](../tencentScf/README.md); its workflow deploys a cloud function and is **not** a daily Bilibili task runner.
