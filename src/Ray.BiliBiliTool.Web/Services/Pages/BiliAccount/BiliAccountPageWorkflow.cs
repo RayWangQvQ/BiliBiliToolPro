@@ -17,6 +17,41 @@ public class BiliAccountPageWorkflow(
             "IConfigurationRoot not available — cannot access Providers or Reload()"
         );
 
+    public static void CompactStoredAccounts(IConfigurationRoot configuration)
+    {
+        var provider = configuration.Providers.OfType<SqliteConfigurationProvider>().Single();
+        var indices = provider
+            .GetChildKeys([], "BiliBiliCookies")
+            .Select(key => int.TryParse(key, out var index) ? index : -1)
+            .Where(index => index >= 0)
+            .Order()
+            .ToList();
+        var cookies = indices
+            .Select(index =>
+            {
+                provider.TryGet($"BiliBiliCookies:{index}", out var value);
+                return value;
+            })
+            .Where(value => !string.IsNullOrEmpty(value))
+            .ToList();
+
+        if (
+            indices.Count == cookies.Count
+            && indices.SequenceEqual(Enumerable.Range(0, cookies.Count))
+        )
+            return;
+
+        var values = cookies
+            .Select((value, index) => new { Key = $"BiliBiliCookies:{index}", Value = value! })
+            .ToDictionary(item => item.Key, item => item.Value);
+        var keysToDelete = indices
+            .Where(index => index >= cookies.Count)
+            .Select(index => $"BiliBiliCookies:{index}")
+            .ToList();
+        provider.BatchSet(values, keysToDelete);
+        configuration.Reload();
+    }
+
     public Task<List<BiliAccountDto>> GetAllAccountsAsync()
     {
         var cookieList = _configurationRoot.GetSection("BiliBiliCookies").Get<List<string>>() ?? [];
@@ -63,20 +98,18 @@ public class BiliAccountPageWorkflow(
             ?? throw new InvalidOperationException("SqliteConfigurationProvider not found");
 
         var cookieList = _configurationRoot.GetSection("BiliBiliCookies").Get<List<string>>() ?? [];
+        if (index < 0 || index >= cookieList.Count)
+            throw new ArgumentOutOfRangeException(nameof(index));
+
         var newCount = cookieList.Count - 1;
 
-        // Re-key all higher indices down by 1
         var rekeyDict = new Dictionary<string, string>();
         for (int i = index + 1; i < cookieList.Count; i++)
         {
             rekeyDict[$"BiliBiliCookies:{i - 1}"] = cookieList[i];
         }
 
-        if (rekeyDict.Count > 0)
-            provider.BatchSet(rekeyDict);
-
-        // Blank, not drop: an absent row would let cookies.json resurrect the deleted cookie
-        provider.Set($"BiliBiliCookies:{newCount}", string.Empty);
+        provider.BatchSet(rekeyDict, [$"BiliBiliCookies:{newCount}"]);
         ReloadConfiguration();
         return Task.CompletedTask;
     }

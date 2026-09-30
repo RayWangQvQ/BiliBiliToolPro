@@ -65,13 +65,9 @@ podman logs -f bili_tool_web
 ```
 # 创建文件和文件夹
 mkdir -p /bili_tool_web && cd /bili_tool_web
-mkdir -p Logs
+mkdir -p Logs config
 
-# 下载appsettings.json
-mkdir -p config
-cd ./config
-wget https://raw.githubusercontent.com/RayWangQvQ/BiliBiliToolPro/main/platforms/docker/sample/config/cookies.json
-cd ..
+# 账号通过 Web 面板添加，保存在 config/BiliBiliTool.db
 
 # 运行
 podman run -itd --name="bili_tool_web" \
@@ -87,6 +83,8 @@ podman run -itd --name="bili_tool_web" \
 # 查看实时日志
 podman logs -f bili
 ```
+
+Web 面板不再读取 `config/cookies.json`；已有部署中仅保存在旧 JSON 文件的账号需在面板重新添加，旧文件不会自动迁移或删除。
 
 其他指令参考：
 

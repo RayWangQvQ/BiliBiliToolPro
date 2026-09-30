@@ -8,6 +8,7 @@ using Ray.BiliBiliTool.Infrastructure.EF;
 using Ray.BiliBiliTool.Infrastructure.EF.Extensions;
 using Ray.BiliBiliTool.Web.Components;
 using Ray.BiliBiliTool.Web.Extensions;
+using Ray.BiliBiliTool.Web.Services.Pages.BiliAccount;
 using Serilog;
 using Serilog.Debugging;
 
@@ -18,10 +19,6 @@ try
 {
     var builder = WebApplication.CreateBuilder(args);
 
-    // cookies.json as fallback source — loaded before SQLite so that
-    // SQLite keys take precedence when both exist.
-    builder.Configuration.AddJsonFile("config/cookies.json", optional: true, reloadOnChange: true);
-
     var sqliteConnStr = builder.Configuration.GetConnectionString("Sqlite");
     if (!string.IsNullOrEmpty(sqliteConnStr))
     {
@@ -31,6 +28,7 @@ try
             keyColumnName: "Key",
             valueColumnName: "Value"
         );
+        BiliAccountPageWorkflow.CompactStoredAccounts(builder.Configuration);
     }
 
     builder

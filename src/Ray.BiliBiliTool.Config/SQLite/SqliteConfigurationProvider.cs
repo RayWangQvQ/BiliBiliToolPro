@@ -60,7 +60,10 @@ public class SqliteConfigurationProvider(SqliteConfigurationSource source) : Con
         Data[key] = value;
     }
 
-    public void BatchSet(Dictionary<string, string> configValues)
+    public void BatchSet(
+        Dictionary<string, string> configValues,
+        IReadOnlyCollection<string>? keysToDelete = null
+    )
     {
         using var connection = CreateOpenConnection();
 
@@ -84,7 +87,21 @@ public class SqliteConfigurationProvider(SqliteConfigurationSource source) : Con
                 Data[kvp.Key] = kvp.Value;
             }
 
+            if (keysToDelete is not null)
+            {
+                command.CommandText = $"DELETE FROM [{_tableName}] WHERE [{_keyColumnName}] = @key";
+                foreach (var key in keysToDelete)
+                {
+                    command.Parameters.Clear();
+                    command.Parameters.AddWithValue("@key", key);
+                    command.ExecuteNonQuery();
+                }
+            }
+
             transaction.Commit();
+            if (keysToDelete is not null)
+                foreach (var key in keysToDelete)
+                    Data.Remove(key);
         }
         catch
         {

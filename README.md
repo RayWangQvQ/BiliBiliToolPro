@@ -161,7 +161,9 @@ BiliTool 实现自动完成任务的原理，是通过调用一系列开放的ap
 
 青龙平台会添加环境变量里，Key 为 `Ray_BiliBiliCookies__0`、`Ray_BiliBiliCookies__1`、`Ray_BiliBiliCookies__2`...
 
-其他平台默认会添加到名为cookies.json的账号配置文件中：
+Web 面板会将 B 站账号保存在 `config/BiliBiliTool.db` 中，可在面板扫码添加。
+
+Console 等非 Web 平台默认会添加到名为 cookies.json 的账号配置文件中：
 ```
 {
   "BiliBiliCookies": [

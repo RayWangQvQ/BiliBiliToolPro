@@ -23,20 +23,22 @@ public class BiliAccountPageWorkflowTests : IDisposable
     {
         Directory.CreateDirectory(_rootDirectory);
 
-        // Mirrors Program.cs: cookies.json supplies the list, SQLite is layered on top
         _configuration = new ConfigurationBuilder()
-            .AddInMemoryCollection(
-                new Dictionary<string, string?>
-                {
-                    ["BiliBiliCookies:0"] = FirstCookie,
-                    ["BiliBiliCookies:1"] = SecondCookie,
-                }
-            )
             .AddSqlite(
                 $"Data Source={Path.Combine(_rootDirectory, "BiliBiliTool.db")}",
                 tableName: Ray.BiliBiliTool.Config.Constants.SqliteTableName
             )
             .Build();
+
+        var provider = _configuration.Providers.OfType<SqliteConfigurationProvider>().Single();
+        provider.BatchSet(
+            new Dictionary<string, string>
+            {
+                ["BiliBiliCookies:0"] = FirstCookie,
+                ["BiliBiliCookies:1"] = SecondCookie,
+            }
+        );
+        _configuration.Reload();
 
         // loginDomainService is only reachable from the QR login methods
         _workflow = new BiliAccountPageWorkflow(_configuration, null!);
@@ -86,14 +88,77 @@ public class BiliAccountPageWorkflowTests : IDisposable
     }
 
     [Fact]
-    public async Task DeleteAsync_DroppedAccountNoLongerResurfacesFromTheJsonSource()
+    public async Task DeleteAsync_RemovesRowAndCompactsAccounts()
     {
         await _workflow.DeleteAsync(0);
 
         var accounts = await _workflow.GetAllAccountsAsync();
 
-        accounts.Should().NotContain(a => a.CookieStr == FirstCookie);
-        accounts[0].CookieStr.Should().Be(SecondCookie);
+        accounts.Select(a => a.CookieStr).Should().Equal(SecondCookie);
+
+        _configuration.Reload();
+        (await _workflow.GetAllAccountsAsync())
+            .Select(a => a.CookieStr)
+            .Should()
+            .Equal(SecondCookie);
+
+        await _workflow.AddAsync("DedeUserID=333; SESSDATA=ccc");
+        (await _workflow.GetAllAccountsAsync())
+            .Select(a => a.CookieStr)
+            .Should()
+            .Equal(SecondCookie, "DedeUserID=333; SESSDATA=ccc");
+
+        ReadCookieRows()
+            .Should()
+            .Equal(
+                new KeyValuePair<string, string>("BiliBiliCookies:0", SecondCookie),
+                new KeyValuePair<string, string>(
+                    "BiliBiliCookies:1",
+                    "DedeUserID=333; SESSDATA=ccc"
+                )
+            );
+    }
+
+    [Fact]
+    public async Task DeleteAsync_LastAccountLeavesNoPlaceholder()
+    {
+        await _workflow.DeleteAsync(1);
+        await _workflow.DeleteAsync(0);
+
+        _configuration.Reload();
+        (await _workflow.GetAllAccountsAsync()).Should().BeEmpty();
+        ReadCookieRows().Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task CompactStoredAccounts_RemovesLegacyBlankRowsAndKeepsRemainingAccounts()
+    {
+        var provider = _configuration.Providers.OfType<SqliteConfigurationProvider>().Single();
+        provider.BatchSet(
+            new Dictionary<string, string>
+            {
+                ["BiliBiliCookies:0"] = "",
+                ["BiliBiliCookies:1"] = SecondCookie,
+                ["BiliBiliCookies:2"] = "",
+                ["BiliBiliCookies:3"] = "DedeUserID=333; SESSDATA=ccc",
+            }
+        );
+        _configuration.Reload();
+
+        BiliAccountPageWorkflow.CompactStoredAccounts(_configuration);
+        (await _workflow.GetAllAccountsAsync())
+            .Select(a => a.CookieStr)
+            .Should()
+            .Equal(SecondCookie, "DedeUserID=333; SESSDATA=ccc");
+        ReadCookieRows()
+            .Should()
+            .Equal(
+                new KeyValuePair<string, string>("BiliBiliCookies:0", SecondCookie),
+                new KeyValuePair<string, string>(
+                    "BiliBiliCookies:1",
+                    "DedeUserID=333; SESSDATA=ccc"
+                )
+            );
     }
 
     [Fact]
@@ -113,7 +178,24 @@ public class BiliAccountPageWorkflowTests : IDisposable
         while (reader.Read())
             keys.Add(reader.GetString(0));
 
-        keys.Should().Equal("BiliBiliCookies:0");
+        keys.Should().Equal("BiliBiliCookies:0", "BiliBiliCookies:1");
+    }
+
+    private List<KeyValuePair<string, string>> ReadCookieRows()
+    {
+        using var connection = new SqliteConnection(
+            $"Data Source={Path.Combine(_rootDirectory, "BiliBiliTool.db")}"
+        );
+        connection.Open();
+        using var command = connection.CreateCommand();
+        command.CommandText =
+            "SELECT [Key], [Value] FROM bili_appsettings WHERE [Key] LIKE 'BiliBiliCookies:%' ORDER BY [Key]";
+        using var reader = command.ExecuteReader();
+
+        var rows = new List<KeyValuePair<string, string>>();
+        while (reader.Read())
+            rows.Add(new KeyValuePair<string, string>(reader.GetString(0), reader.GetString(1)));
+        return rows;
     }
 
     public void Dispose()
