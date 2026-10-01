@@ -4,6 +4,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
 using MudBlazor;
+using MudBlazor.Extensions;
 using MudBlazor.Services;
 using Ray.BiliBiliTool.Web.Components;
 using Ray.BiliBiliTool.Web.Services;
@@ -15,7 +16,7 @@ namespace Ray.BiliBiliTool.Web.ComponentTests;
 public class RoutesTests : TestContext
 {
     [Fact]
-    public void UnauthorizedAdmin_RedirectsToLoginWithReturnUrl()
+    public void RenderComponent_UnauthorizedAdmin_RedirectsToLoginWithReturnUrl()
     {
         Services.AddMudServices();
         Services.AddSingleton<IAppInfoProvider>(new FakeAppInfoProvider("test"));
@@ -37,7 +38,7 @@ public class RoutesTests : TestContext
     }
 
     [Fact]
-    public void Login_UsesDedicatedLayoutWithoutBusinessNavigation()
+    public void RenderComponent_LoginRoute_UsesDedicatedLayoutWithoutBusinessNavigation()
     {
         Services.AddMudServices();
         JSInterop.Mode = JSRuntimeMode.Loose;
@@ -53,7 +54,7 @@ public class RoutesTests : TestContext
     }
 
     [Fact]
-    public void Login_UsesSavedDarkModePreference()
+    public void RenderComponent_LoginWithSavedDarkMode_UsesSavedPreference()
     {
         Services.AddMudServices();
         JSInterop.Mode = JSRuntimeMode.Loose;
@@ -65,12 +66,15 @@ public class RoutesTests : TestContext
         var cut = RenderComponent<Routes>();
 
         cut.WaitForAssertion(() =>
-            cut.FindComponent<MudThemeProvider>().Instance.IsDarkMode.Should().BeTrue()
+            cut.FindComponent<MudThemeProvider>()
+                .Instance.GetState(x => x.IsDarkMode)
+                .Should()
+                .BeTrue()
         );
     }
 
     [Fact]
-    public void About_Navigation_KeepsHeadingFocusForAssistiveTechnology()
+    public void RenderComponent_AboutRoute_FocusesHeadingForAssistiveTechnology()
     {
         Services.AddMudServices();
         Services.AddSingleton<IAppInfoProvider>(new FakeAppInfoProvider("test"));

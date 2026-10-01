@@ -2,19 +2,20 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
-using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.AccountApi;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.ApiApi.Charge;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Console;
 
 namespace Ray.BiliBiliTool.Agent.FunctionalTests;
 
 [Trait("Category", "External")]
-public class AccountApiTests
+public class ChargeApiTests
 {
-    private readonly IAccountApi _api;
+    private readonly IApiApi _target;
+
     private readonly BiliCookie _ck;
 
-    public AccountApiTests()
+    public ChargeApiTests()
     {
         var envs = new List<string>
         {
@@ -23,20 +24,34 @@ public class AccountApiTests
             //"HTTPS_PROXY=localhost:8888"
         };
         IHost host = Program.CreateHost(envs.ToArray());
-        _api = host.Services.GetRequiredService<IAccountApi>();
         _ck = ExternalCookie.Require(host.Services);
+        _target = host.Services.GetRequiredService<IApiApi>();
     }
 
-    [Fact]
-    public async Task GetCoinBalance_Normal_GetCoinBalance()
-    {
-        // Act
-        BiliApiResponse<CoinBalance> re = await _api.GetCoinBalanceAsync(_ck.ToString());
+    #region ChargeV2Async
 
+    [Fact]
+    public async Task ChargeV2Async_SendRequest_NotEnough()
+    {
         // Arrange
+        var upId = 220893216;
+        var req = new ChargeRequest(2, upId, _ck.BiliJct);
+
+        // Act
+        BiliApiResponse<ChargeV2Response> re = await _target.ChargeV2Async(req, _ck.ToString());
 
         // Assert
         re.Code.Should().Be(0);
-        re.Data!.Money.Should().NotBeNull();
+        re.Data!.Status.Should()
+            .BeOneOf(
+                -4, //bp.to.battery http failed, invalid args, errNo=800409904: B ������
+                4
+            );
     }
+
+    #endregion
+
+    #region ChargeCommentAsync
+
+    #endregion
 }

@@ -26,7 +26,7 @@ public class ArticleApiTests
             //"HTTPS_PROXY=localhost:8888"
         };
         IHost host = Program.CreateHost(envs.ToArray());
-        _ck = host.Services.GetRequiredService<BiliCookie>();
+        _ck = ExternalCookie.Require(host.Services);
         _wbiService = host.Services.GetRequiredService<IWbiService>();
         _api = host.Services.GetRequiredService<IApiApi>();
     }
@@ -39,7 +39,7 @@ public class ArticleApiTests
         // Arrange
         var mid = 1585227649;
         var req = new SearchArticlesByUpIdDto() { mid = mid };
-        await _wbiService.SetWridAsync(req, null);
+        await _wbiService.SetWridAsync(req, _ck);
 
         // Act
         BiliApiResponse<SearchUpArticlesResponse> re = await _api.SearchUpArticlesByUpIdAsync(req);
@@ -96,7 +96,10 @@ public class ArticleApiTests
         var req = new AddCoinForArticleRequest(selfCvId, long.Parse(_ck.UserId), _ck.BiliJct);
 
         // Act
-        BiliBiliAgent.Dtos.BiliApiResponse re = await _api.AddCoinForArticleAsync(req, null);
+        BiliBiliAgent.Dtos.BiliApiResponse re = await _api.AddCoinForArticleAsync(
+            req,
+            _ck.ToString()
+        );
 
         // Assert
         re.Code.Should().Be(34002);
@@ -112,7 +115,10 @@ public class ArticleApiTests
         var req = new AddCoinForArticleRequest(cvId, upId, _ck.BiliJct);
 
         // Act
-        BiliBiliAgent.Dtos.BiliApiResponse re = await _api.AddCoinForArticleAsync(req, null);
+        BiliBiliAgent.Dtos.BiliApiResponse re = await _api.AddCoinForArticleAsync(
+            req,
+            _ck.ToString()
+        );
 
         // Assert
         re.Code.Should()
@@ -133,7 +139,7 @@ public class ArticleApiTests
         var cvid = 34150576;
 
         // Act
-        var re = await _api.LikeAsync(cvid, _ck.BiliJct, null);
+        var re = await _api.LikeAsync(cvid, _ck.BiliJct, _ck.ToString());
 
         // Assert
         re.Code.Should()

@@ -45,7 +45,7 @@ public class BiliAccountPageWorkflowTests : IDisposable
     }
 
     [Fact]
-    public async Task GetAllAccountsAsync_ReturnsAccountsInConfiguredOrder()
+    public async Task GetAllAccountsAsync_ConfiguredAccounts_ReturnsConfiguredOrder()
     {
         var accounts = await _workflow.GetAllAccountsAsync();
 
@@ -54,7 +54,7 @@ public class BiliAccountPageWorkflowTests : IDisposable
     }
 
     [Fact]
-    public async Task UpdateAsync_PersistedValueIsReadBackThroughConfiguration()
+    public async Task UpdateAsync_ChangedCookie_PersistsValueToConfiguration()
     {
         await _workflow.UpdateAsync(1, "DedeUserID=999; SESSDATA=zzz");
 
@@ -65,7 +65,7 @@ public class BiliAccountPageWorkflowTests : IDisposable
     }
 
     [Fact]
-    public async Task AddAsync_AppendsWithoutDisturbingExistingAccounts()
+    public async Task AddAsync_NewCookie_AppendsWithoutDisturbingExistingAccounts()
     {
         await _workflow.AddAsync("DedeUserID=333; SESSDATA=ccc");
 
@@ -78,7 +78,7 @@ public class BiliAccountPageWorkflowTests : IDisposable
     }
 
     [Fact]
-    public async Task ReorderAsync_SwapsPositionsPersistently()
+    public async Task ReorderAsync_TwoExistingAccounts_PersistsSwappedPositions()
     {
         await _workflow.ReorderAsync(0, 1);
 
@@ -88,7 +88,7 @@ public class BiliAccountPageWorkflowTests : IDisposable
     }
 
     [Fact]
-    public async Task DeleteAsync_RemovesRowAndCompactsAccounts()
+    public async Task DeleteAsync_FirstAccount_RemovesRowAndCompactsAccounts()
     {
         await _workflow.DeleteAsync(0);
 
@@ -120,7 +120,7 @@ public class BiliAccountPageWorkflowTests : IDisposable
     }
 
     [Fact]
-    public async Task DeleteAsync_LastAccountLeavesNoPlaceholder()
+    public async Task DeleteAsync_LastAccount_LeavesNoPlaceholder()
     {
         await _workflow.DeleteAsync(1);
         await _workflow.DeleteAsync(0);
@@ -131,7 +131,7 @@ public class BiliAccountPageWorkflowTests : IDisposable
     }
 
     [Fact]
-    public async Task CompactStoredAccounts_RemovesLegacyBlankRowsAndKeepsRemainingAccounts()
+    public async Task CompactStoredAccounts_LegacyBlankRows_KeepsRemainingAccounts()
     {
         var provider = _configuration.Providers.OfType<SqliteConfigurationProvider>().Single();
         provider.BatchSet(
@@ -162,7 +162,7 @@ public class BiliAccountPageWorkflowTests : IDisposable
     }
 
     [Fact]
-    public async Task Writes_UseHierarchicalKeysThatConfigurationCanBind()
+    public async Task UpdateAsync_ChangedCookie_WritesBindableHierarchicalKeys()
     {
         await _workflow.UpdateAsync(0, "DedeUserID=111; SESSDATA=changed");
 

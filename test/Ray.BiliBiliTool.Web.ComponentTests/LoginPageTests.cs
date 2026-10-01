@@ -26,7 +26,7 @@ public class LoginPageTests : TestContext
     }
 
     [Fact]
-    public void Login_WithNoError_RendersWithoutErrorAlert()
+    public void RenderComponent_NoLoginError_RendersWithoutErrorAlert()
     {
         Services.AddSingleton<ILoginPageStateFactory>(
             new FakeLoginPageStateFactory(new LoginPageState(ReturnUrl: null, HasLoginError: false))
@@ -38,7 +38,7 @@ public class LoginPageTests : TestContext
     }
 
     [Fact]
-    public void Login_WithHasLoginErrorTrue_RendersErrorAlert()
+    public void RenderComponent_LoginError_RendersErrorAlert()
     {
         Services.AddSingleton<ILoginPageStateFactory>(
             new FakeLoginPageStateFactory(new LoginPageState(ReturnUrl: null, HasLoginError: true))
@@ -50,7 +50,7 @@ public class LoginPageTests : TestContext
     }
 
     [Fact]
-    public void Login_RendersPasswordFieldWithVisibilityToggle()
+    public void RenderComponent_DefaultState_RendersPasswordFieldWithVisibilityToggle()
     {
         Services.AddSingleton<ILoginPageStateFactory>(
             new FakeLoginPageStateFactory(new LoginPageState(ReturnUrl: null, HasLoginError: false))
@@ -63,7 +63,7 @@ public class LoginPageTests : TestContext
     }
 
     [Fact]
-    public void Login_WhenAlreadyAuthenticated_NavigatesHome()
+    public void RenderComponent_AlreadyAuthenticated_NavigatesHome()
     {
         this.AddTestAuthorization().SetAuthorized("admin");
         Services.AddSingleton<ILoginPageStateFactory>(
@@ -78,7 +78,7 @@ public class LoginPageTests : TestContext
     }
 
     [Fact]
-    public void Login_WithReturnUrl_PreservesItInPostForm()
+    public void RenderComponent_WithReturnUrl_PreservesItInPostForm()
     {
         Services.AddSingleton<ILoginPageStateFactory>(new LoginPageStateFactory());
         ((IServiceProvider)Services)

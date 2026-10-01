@@ -9,7 +9,7 @@ namespace Ray.BiliBiliTool.Web.ComponentTests;
 public class AppInfoProviderTests
 {
     [Fact]
-    public void AppVersion_ReadsFromGivenAssembly()
+    public void AppVersion_GivenAssembly_ReadsItsDisplayVersion()
     {
         var assembly = typeof(AppVersion).Assembly;
         var provider = new AppInfoProvider(assembly);
@@ -18,7 +18,7 @@ public class AppInfoProviderTests
     }
 
     [Fact]
-    public void AppVersion_NeverExposesPlaceholderVersion()
+    public void AppVersion_ApplicationAssembly_DoesNotExposePlaceholderVersion()
     {
         var provider = new AppInfoProvider(typeof(AppVersion).Assembly);
 

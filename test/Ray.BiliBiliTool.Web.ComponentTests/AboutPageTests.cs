@@ -22,7 +22,7 @@ public class AboutPageTests : TestContext
     }
 
     [Fact]
-    public void About_Renders_ShowsAppVersion()
+    public void RenderComponent_ConfiguredVersion_ShowsAppVersion()
     {
         Services.AddSingleton<IAppInfoProvider>(new FakeAppInfoProvider(TestVersion));
 
@@ -32,7 +32,7 @@ public class AboutPageTests : TestContext
     }
 
     [Fact]
-    public void About_Renders_LinksToSourceRepo()
+    public void RenderComponent_DefaultState_LinksToSourceRepo()
     {
         Services.AddSingleton<IAppInfoProvider>(new FakeAppInfoProvider(TestVersion));
 

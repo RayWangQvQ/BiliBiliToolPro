@@ -13,7 +13,7 @@ public class HistoryDialogWorkflowTests
         new HistoryDialogWorkflow(logService ?? new FakeLogService());
 
     [Fact]
-    public async Task GetHistoryPageAsync_DelegatesToExecutionLogService()
+    public async Task GetHistoryPageAsync_ValidRequest_DelegatesToExecutionLogService()
     {
         var expectedPage = new PagedList<ExecutionLog>(Array.Empty<ExecutionLog>());
         var fake = new FakeLogService(expectedPage);
