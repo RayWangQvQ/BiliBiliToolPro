@@ -40,6 +40,9 @@ public class ScheduleConfigurationTests : TestContext, IDisposable
             options.IsEnable = true;
             options.Cron = "0 5 0 * * ?";
         });
+        Services.Configure<LiveFansMedalTaskOptions>(
+            _configuration.GetSection("LiveFansMedalTaskConfig")
+        );
         JSInterop.Mode = JSRuntimeMode.Loose;
     }
 
@@ -234,10 +237,16 @@ public class ScheduleConfigurationTests : TestContext, IDisposable
         }
     }
 
-    [Fact]
-    public async Task LiveMedalPage_ExclusionsStayDraftUntilSavedAndSurviveReload()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task LiveMedalPage_ExclusionsUpdateRuntimeAndSurviveReload(bool initiallyExcluded)
     {
         Services.AddSingleton<ILiveMedalDashboardService, ExampleMedalDashboard>();
+        var original = initiallyExcluded ? "11" : "";
+        var expected = initiallyExcluded ? "" : "11";
+        _configuration["LiveFansMedalTaskConfig:ExcludedAnchorIds"] = original;
+        _configuration.Reload();
         var scheduler = await PrepareAsync<LiveFansMedalJob>(LiveFansMedalJob.Key, "0 5 0 * * ?");
         try
         {
@@ -245,16 +254,45 @@ public class ScheduleConfigurationTests : TestContext, IDisposable
                 IOptionsMonitor<LiveFansMedalTaskOptions>
             >();
             var page = RenderComponent<LiveFansMedalTaskConfig>();
+            const string checkbox = "article[data-anchor='11'] input[aria-label='排除主播 星河']";
             page.WaitForAssertion(() => Assert.Equal(2, page.FindAll("article").Count));
-            page.Find("article[data-anchor='11'] input").Change(true);
-            Assert.Equal("", options.CurrentValue.ExcludedAnchorIds);
-            Assert.Null(_configuration["LiveFansMedalTaskConfig:ExcludedAnchorIds"]);
+            page.Find(checkbox).Change(!initiallyExcluded);
+            Assert.Equal(original, options.CurrentValue.ExcludedAnchorIds);
+            Assert.Equal(original, _configuration["LiveFansMedalTaskConfig:ExcludedAnchorIds"]);
+
+            // Reloading without saving must discard the draft.
+            page.FindAll("button").Single(b => b.TextContent.Contains("重新加载")).Click();
+            page.WaitForAssertion(() =>
+                Assert.Equal(initiallyExcluded, page.Find(checkbox).HasAttribute("checked"))
+            );
+            page.Find(checkbox).Change(!initiallyExcluded);
             page.Find("form").Submit();
             page.WaitForAssertion(() =>
-                Assert.Equal("11", _configuration["LiveFansMedalTaskConfig:ExcludedAnchorIds"])
+            {
+                Assert.Contains("Configuration saved successfully", page.Markup);
+                Assert.Equal(expected, options.CurrentValue.ExcludedAnchorIds);
+                Assert.Equal(
+                    !initiallyExcluded,
+                    options.CurrentValue.GetExcludedAnchorIds().Contains(11)
+                );
+            });
+
+            page.FindAll("button").Single(b => b.TextContent.Contains("重新加载")).Click();
+            page.WaitForAssertion(() =>
+                Assert.Equal(!initiallyExcluded, page.Find(checkbox).HasAttribute("checked"))
             );
-            _configuration.Reload();
-            Assert.Equal("11", _configuration["LiveFansMedalTaskConfig:ExcludedAnchorIds"]);
+            page.Dispose();
+            var reopened = RenderComponent<LiveFansMedalTaskConfig>();
+            reopened.WaitForAssertion(() =>
+                Assert.Equal(!initiallyExcluded, reopened.Find(checkbox).HasAttribute("checked"))
+            );
+
+            // A separate provider verifies persistence beyond the current circuit.
+            var persisted = new ConfigurationBuilder()
+                .AddSqlite($"Data Source={Path.Combine(_directory.FullName, "settings.db")}")
+                .Build();
+            using var persistedLifetime = (IDisposable)persisted;
+            Assert.Equal(expected, persisted["LiveFansMedalTaskConfig:ExcludedAnchorIds"]);
         }
         finally
         {
@@ -287,8 +325,20 @@ public class ScheduleConfigurationTests : TestContext, IDisposable
                 Assert.Equal("11", _configuration["LiveFansMedalTaskConfig:IncludedAnchorIds"])
             );
             Assert.Equal("true", _configuration["LiveFansMedalTaskConfig:OnlySelectedAnchors"]);
-            _configuration.Reload();
-            Assert.Equal("11", _configuration["LiveFansMedalTaskConfig:IncludedAnchorIds"]);
+            page.WaitForAssertion(() =>
+            {
+                Assert.True(options.CurrentValue.OnlySelectedAnchors);
+                Assert.Equal("11", options.CurrentValue.IncludedAnchorIds);
+            });
+            page.Dispose();
+            var reopened = RenderComponent<LiveFansMedalTaskConfig>();
+            reopened.WaitForAssertion(() =>
+                Assert.True(
+                    reopened
+                        .Find("article[data-anchor='11'] input[aria-label='选择主播 星河']")
+                        .HasAttribute("checked")
+                )
+            );
         }
         finally
         {
