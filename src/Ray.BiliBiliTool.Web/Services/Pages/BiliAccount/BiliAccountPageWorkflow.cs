@@ -1,5 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 using Ray.BiliBiliTool.Agent;
+using Ray.BiliBiliTool.Application.Contracts.Cookies;
 using Ray.BiliBiliTool.Config.SQLite;
 using Ray.BiliBiliTool.DomainService.Dtos;
 using Ray.BiliBiliTool.DomainService.Interfaces;
@@ -8,7 +9,9 @@ namespace Ray.BiliBiliTool.Web.Services.Pages.BiliAccount;
 
 public class BiliAccountPageWorkflow(
     IConfiguration configuration,
-    ILoginDomainService loginDomainService
+    ILoginDomainService loginDomainService,
+    ICookieTaskGuard? cookieTaskGuard = null,
+    ILogger<BiliAccountPageWorkflow>? logger = null
 ) : IBiliAccountPageWorkflow
 {
     private readonly IConfigurationRoot _configurationRoot =
@@ -77,7 +80,7 @@ public class BiliAccountPageWorkflow(
             _configurationRoot.GetSection("BiliBiliCookies").Get<List<string>>()?.Count ?? 0;
         provider.Set($"BiliBiliCookies:{currentCount}", cookieStr);
         ReloadConfiguration();
-        return Task.CompletedTask;
+        return CheckSavedCookieAsync(cookieStr);
     }
 
     public Task UpdateAsync(int index, string cookieStr)
@@ -88,7 +91,7 @@ public class BiliAccountPageWorkflow(
 
         provider.Set($"BiliBiliCookies:{index}", cookieStr);
         ReloadConfiguration();
-        return Task.CompletedTask;
+        return CheckSavedCookieAsync(cookieStr);
     }
 
     public Task DeleteAsync(int index)
@@ -156,6 +159,24 @@ public class BiliAccountPageWorkflow(
         // Per D-02: enrich cookie via SetCookieAsync, then save to SQLite
         var enriched = await loginDomainService.SetCookieAsync(rawCookie, CancellationToken.None);
         await AddAsync(enriched.CookieStr);
+    }
+
+    private async Task CheckSavedCookieAsync(string cookie)
+    {
+        if (
+            cookieTaskGuard is null
+            || !_configurationRoot.GetValue("CookieCheck:AutoCheckEnabled", true)
+        )
+            return;
+        try
+        {
+            await cookieTaskGuard.CheckNowAsync(ParseUserId(cookie), cookie);
+        }
+        catch (Exception)
+        {
+            // A failed check must not undo a saved login or expose request details.
+            logger?.LogWarning("账号已保存，登录状态检查稍后重试");
+        }
     }
 
     private SqliteConfigurationProvider? GetSqliteProvider()

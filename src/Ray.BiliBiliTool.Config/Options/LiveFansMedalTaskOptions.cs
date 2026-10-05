@@ -1,71 +1,64 @@
-﻿namespace Ray.BiliBiliTool.Config.Options;
+using System.ComponentModel.DataAnnotations;
 
-/// <summary>
-/// 粉丝牌等级任务相关配置
-/// </summary>
+namespace Ray.BiliBiliTool.Config.Options;
+
 public class LiveFansMedalTaskOptions : BaseConfigOptions
 {
     public override string SectionName => "LiveFansMedalTaskConfig";
 
-    /// <summary>
-    /// 自定义发送弹幕内容，如 "打卡" 等来触发直播间内机器人关键词
-    /// </summary>
+    // Existing installations keep their custom budgets until this is enabled.
+    public bool FollowDailyTaskLimit { get; set; }
+    public bool EnableLike { get; set; } = true;
+    public bool EnableDanmaku { get; set; } = true;
+    public bool EnableWatch { get; set; } = true;
+    public bool DanmakuOnlyWhenOffline { get; set; }
+    public string ExcludedAnchorIds { get; set; } = "";
+
+    public HashSet<long> GetExcludedAnchorIds() =>
+        ExcludedAnchorIds
+            .Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+            .Select(value => long.TryParse(value, out var id) && id > 0 ? id : 0)
+            .Where(id => id > 0)
+            .ToHashSet();
+
+    [Required(ErrorMessage = "请输入弹幕内容")]
+    [StringLength(30, ErrorMessage = "弹幕内容最多 30 个字符")]
     public string DanmakuContent { get; set; } = "OvO";
 
-    /// <summary>
-    /// 心跳包发送的个数 / 挂机的时间，单位为分钟
-    /// </summary>
+    [Range(0, 1440, ErrorMessage = "观看时长应为 0～1440 分钟")]
     public int HeartBeatNumber { get; set; } = 70;
 
-    /// <summary>
-    /// 当心跳包发送连续失败多少次时放弃
-    /// </summary>
+    [Range(1, 10)]
     public int HeartBeatSendGiveUpThreshold { get; set; } = 5;
-
-    /// <summary>
-    /// 对于直播时长任务是否跳过粉丝牌等级大于等于 20 的
-    /// </summary>
-    public bool IsSkipLevel20Medal { get; set; } = true;
 
     public const int HeartBeatInterval = 60;
 
-    /// <summary>
-    /// 点赞次数，默认值为30（用于点亮粉丝勋章）
-    /// </summary>
+    [Range(0, 5000, ErrorMessage = "点赞次数应为 0～5000")]
     public int LikeNumber { get; set; } = 30;
 
-    /// <summary>
-    /// 发送弹幕次数
-    /// </summary>
+    [Range(0, 100, ErrorMessage = "弹幕次数应为 0～100")]
     public int SendDanmakuNumber { get; set; } = 1;
 
-    /// <summary>
-    /// 弹幕发送失败多少次时放弃
-    /// </summary>
+    [Range(1, 10)]
     public int SendDanmakugiveUpThreshold { get; set; } = 3;
 
     public override Dictionary<string, string> ToConfigDictionary()
     {
-        return MergeConfigDictionary(
-            new Dictionary<string, string>
-            {
-                { $"{SectionName}:{nameof(DanmakuContent)}", DanmakuContent },
-                { $"{SectionName}:{nameof(HeartBeatNumber)}", HeartBeatNumber.ToString() },
-                {
-                    $"{SectionName}:{nameof(HeartBeatSendGiveUpThreshold)}",
-                    HeartBeatSendGiveUpThreshold.ToString()
-                },
-                {
-                    $"{SectionName}:{nameof(IsSkipLevel20Medal)}",
-                    IsSkipLevel20Medal.ToString().ToLower()
-                },
-                { $"{SectionName}:{nameof(LikeNumber)}", LikeNumber.ToString() },
-                { $"{SectionName}:{nameof(SendDanmakuNumber)}", SendDanmakuNumber.ToString() },
-                {
-                    $"{SectionName}:{nameof(SendDanmakugiveUpThreshold)}",
-                    SendDanmakugiveUpThreshold.ToString()
-                },
-            }
-        );
+        var values = new Dictionary<string, string>();
+        foreach (
+            var property in typeof(LiveFansMedalTaskOptions)
+                .GetProperties()
+                .Where(property =>
+                    property.DeclaringType == typeof(LiveFansMedalTaskOptions)
+                    && property.Name != nameof(SectionName)
+                )
+        )
+        {
+            var value = property.GetValue(this);
+            values[$"{SectionName}:{property.Name}"] = value is bool flag
+                ? flag.ToString().ToLowerInvariant()
+                : value?.ToString() ?? "";
+        }
+        return MergeConfigDictionary(values);
     }
 }

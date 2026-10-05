@@ -74,6 +74,11 @@ public abstract class BaseConfigComponent<T> : ComponentBase
 
         try
         {
+            // Validate the generated schedule before persisting settings.
+            if (string.IsNullOrWhiteSpace(_config.Cron))
+                _config.Cron = Ray.BiliBiliTool.Web.Services.TaskSchedulePlan.DefaultCron;
+            _ = new CronExpression(_config.Cron);
+
             // 保存配置
             var sqliteProvider = GetSqliteConfigurationProvider();
             if (sqliteProvider == null)
