@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Quartz;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Application.Contracts;
+using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.Config.SQLite;
 using Ray.BiliBiliTool.Domain;
 using Ray.BiliBiliTool.DomainService.Interfaces;
@@ -81,6 +82,8 @@ public class TodayTaskService(
             rewards = await rewardTask;
         }
 
+        var donationOptions =
+            configuration.GetSection("DailyTaskConfig").Get<DailyTaskOptions>() ?? new();
         var result = new List<AccountTodayTasksDto>();
 
         foreach (var (account, userId) in accounts)
@@ -132,7 +135,12 @@ public class TodayTaskService(
                         Task = task,
                         Item = item,
                         IsTaskEnabled = task.IsEnabled(configuration),
-                        IsItemEnabled = item.IsEnabled(configuration),
+                        IsItemEnabled =
+                            item.IsEnabled(configuration)
+                            && (
+                                item.ItemKey != "DonateCoin"
+                                || !donationOptions.ShouldSkipCoinDonation(profile?.Level)
+                            ),
                         HasFireTimeToday = due.HasFireTimeToday,
                         IsPastDueTime = due.IsPastDueTime,
                         BiliReward = biliReward,

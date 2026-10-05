@@ -120,6 +120,38 @@ public class DailyTaskTests
         logging.Collector.Entries.Should().Contain(entry => entry.Message.Contains("异常："));
     }
 
+    [Theory]
+    [InlineData(3, false, true)]
+    [InlineData(4, false, false)]
+    [InlineData(6, false, false)]
+    [InlineData(3, true, true)]
+    [InlineData(4, true, false)]
+    public async Task ConfiguredLevelThreshold_AppliesToBothDonationModes(
+        int level,
+        bool articles,
+        bool shouldDonate
+    )
+    {
+        var calls = new List<string>();
+        using var logging = TestLoggingContext.Create();
+        var service = CreateService(
+            BuildConfiguration("Web", CreateCookieString("201")),
+            logging,
+            calls,
+            new AccountDomainServiceDouble(calls, level: level),
+            new VideoDomainServiceDouble(calls),
+            new ArticleDomainServiceDouble(calls),
+            new DonateCoinDomainServiceDouble(calls),
+            new VipPrivilegeDomainServiceDouble(calls),
+            new LoginDomainServiceDouble(calls),
+            new DailyTaskOptions { CoinDonationStopLevel = 4, IsDonateCoinForArticle = articles }
+        );
+        await service.DoTaskAsync();
+        var donated = calls.Contains("AddCoinsForVideos") || calls.Contains("AddCoinForArticles");
+        donated.Should().Be(shouldDonate);
+        calls.Should().Contain("ReceiveVipPrivilege");
+    }
+
     private static Ray.BiliBiliTool.Application.DailyTaskAppService CreateService(
         IConfiguration configuration,
         TestLoggingContext logging,
@@ -198,7 +230,8 @@ public class DailyTaskTests
 
     private sealed class AccountDomainServiceDouble(
         List<string> callLog,
-        int? throwOnLoginCall = null
+        int? throwOnLoginCall = null,
+        int level = 1
     ) : IAccountDomainService
     {
         public int LoginByCookieCallCount { get; private set; }
@@ -213,7 +246,7 @@ public class DailyTaskTests
                 throw new InvalidOperationException("login failure");
             }
 
-            return Task.FromResult(CreateUserInfo());
+            return Task.FromResult(CreateUserInfo(level));
         }
 
         public Task<DailyTaskInfo> GetDailyTaskStatus(BiliCookie ck)

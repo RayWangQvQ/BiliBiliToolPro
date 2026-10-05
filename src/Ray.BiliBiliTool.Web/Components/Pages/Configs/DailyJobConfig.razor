@@ -70,8 +70,12 @@
                             </MudItem>
 
                             <MudItem xs="12" md="6">
-                                <MudSwitch T="bool" @bind-Value="_config.SaveCoinsWhenLv6"
-                                    Label="达到六级后开始白嫖" Color="Color.Primary" />
+                                <MudSelect T="int" Value="_config.EffectiveCoinDonationStopLevel" ValueChanged="ChangeStopLevel"
+                                    Label="达到指定等级后停止投币" HelperText="按每个 B 站账号的等级判断。">
+                                    <MudSelectItem Value="0">不按等级停止</MudSelectItem>
+                                    @foreach (var level in Enumerable.Range(1, 6))
+                                    { <MudSelectItem Value="@level">Lv.@level 及以上停止</MudSelectItem> }
+                                </MudSelect>
 
                                 <MudSwitch T="bool" @bind-Value="_config.SelectLike"
                                     Label="投币时点赞" Color="Color.Primary" Class="mt-3" />
@@ -106,3 +110,11 @@
         }
     }
 </MudContainer>
+
+@code {
+    private void ChangeStopLevel(int level)
+    {
+        _config.CoinDonationStopLevel = level;
+        _config.SaveCoinsWhenLv6 = false;
+    }
+}
