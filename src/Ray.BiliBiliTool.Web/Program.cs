@@ -36,6 +36,7 @@ try
         .AddInteractiveServerComponents()
         .AddInteractiveWebAssemblyComponents();
     builder.Services.AddControllers();
+    builder.Services.AddBiliForwardedHeaders(builder.Configuration);
 
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen(c =>
@@ -88,6 +89,9 @@ try
 
     var app = builder.Build();
 
+    // Restore the original scheme before authentication or redirects run.
+    app.UseForwardedHeaders();
+
     Global.ServiceProviderRoot = app.Services;
     await app.InitializeBiliToolAsync();
 
@@ -102,6 +106,8 @@ try
     }
 
     app.UseHttpsRedirection();
+    app.UseAuthentication();
+    app.UseAuthorization();
 
     app.UseStaticFiles();
     app.MapStaticAssets();
