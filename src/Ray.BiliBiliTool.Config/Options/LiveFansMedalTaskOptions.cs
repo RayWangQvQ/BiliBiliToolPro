@@ -12,10 +12,17 @@ public class LiveFansMedalTaskOptions : BaseConfigOptions
     public bool EnableDanmaku { get; set; } = true;
     public bool EnableWatch { get; set; } = true;
     public bool DanmakuOnlyWhenOffline { get; set; }
+    public bool OnlySelectedAnchors { get; set; }
+    public string IncludedAnchorIds { get; set; } = "";
+
+    public HashSet<long> GetIncludedAnchorIds() => ParseAnchorIds(IncludedAnchorIds);
+
     public string ExcludedAnchorIds { get; set; } = "";
 
-    public HashSet<long> GetExcludedAnchorIds() =>
-        ExcludedAnchorIds
+    public HashSet<long> GetExcludedAnchorIds() => ParseAnchorIds(ExcludedAnchorIds);
+
+    private static HashSet<long> ParseAnchorIds(string value) =>
+        value
             .Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
             .Select(value => long.TryParse(value, out var id) && id > 0 ? id : 0)
             .Where(id => id > 0)

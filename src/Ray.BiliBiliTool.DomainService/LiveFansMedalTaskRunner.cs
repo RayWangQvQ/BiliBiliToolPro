@@ -117,6 +117,7 @@ public class LiveFansMedalTaskRunner(
     {
         var result = new Dictionary<long, FansMedalPanelItem>();
         var excluded = options.GetExcludedAnchorIds();
+        var included = options.GetIncludedAnchorIds();
         for (var page = 1; page <= 1000; page++)
         {
             var data = Require(
@@ -129,6 +130,7 @@ public class LiveFansMedalTaskRunner(
                     item.Medal.Target_id > 0
                     && item.Room_info.Room_id > 0
                     && !excluded.Contains(item.Medal.Target_id)
+                    && (!options.OnlySelectedAnchors || included.Contains(item.Medal.Target_id))
                 )
                     result.TryAdd(item.Medal.Target_id, item);
             }

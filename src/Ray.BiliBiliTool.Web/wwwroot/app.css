@@ -360,6 +360,7 @@ body {
 .medal-live.is-live::before { content: ''; display: inline-block; width: 6px; height: 6px; margin-right: 5px; border-radius: 50%; background: var(--mud-palette-success); }
 .medal-anchor-row { align-items: flex-start; flex-wrap: wrap; }
 .medal-anchor-row h3 { margin: 0; font-size: 1rem; font-weight: 600; overflow-wrap: anywhere; }
+.medal-anchor-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; }
 .medal-exclude { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: .75rem; color: var(--mud-palette-text-secondary); white-space: nowrap; }
 .medal-exclude input { width: 16px; height: 16px; accent-color: var(--mud-palette-primary); cursor: pointer; }
 .medal-status-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 12px 0 20px; font-size: .75rem; color: var(--mud-palette-text-secondary); }

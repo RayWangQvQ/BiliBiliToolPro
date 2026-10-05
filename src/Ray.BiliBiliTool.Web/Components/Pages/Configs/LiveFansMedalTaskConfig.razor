@@ -21,8 +21,15 @@
         <EditForm Model="@_config" OnValidSubmit="HandleValidSubmitAsync">
             <DataAnnotationsValidator />
 
+            <MudCard Class="mb-4"><MudCardContent>
+                <MudSwitch T="bool" @bind-Value="_config.OnlySelectedAnchors" Label="仅为白名单主播执行任务" Color="Color.Primary" />
+                <Ray.BiliBiliTool.Web.Components.Comps.TaskSettingHelp TaskKey="LiveFansMedalAppService" SettingKey="OnlySelectedAnchors" />
+                @if (_config.OnlySelectedAnchors)
+                { <MudText Typo="Typo.body2" Color="Color.Secondary">在粉丝牌卡片上勾选主播。白名单为空时暂停全部粉丝牌任务，排除设置优先生效。</MudText> }
+            </MudCardContent></MudCard>
             <Ray.BiliBiliTool.Web.Components.Comps.LiveMedalDashboard Accounts="_accounts" AccountIndex="_accountIndex"
                 AccountIndexChanged="ChangeAccountAsync" Snapshot="_snapshot" Loading="_medalsLoading"
+                OnlySelectedAnchors="_config.OnlySelectedAnchors" @bind-IncludedAnchorIds="_config.IncludedAnchorIds"
                 @bind-ExcludedAnchorIds="_config.ExcludedAnchorIds" Refresh="RefreshMedalsAsync" />
 
             <!-- Base settings. -->

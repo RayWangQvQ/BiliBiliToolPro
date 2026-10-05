@@ -154,10 +154,13 @@ public class ScheduleConfigurationTests : TestContext, IDisposable
             var page = RenderComponent<LiveFansMedalTaskConfig>();
             Assert.DoesNotContain("粉丝牌等级 >= 20", page.Markup);
             Assert.Contains("执行目标", page.Markup);
-            var switches = page.FindAll("input[type=checkbox]");
-            switches[1].Change(true);
-            switches[2].Change(false);
-            switches[3].Change(false);
+            var switches = page.FindComponents<MudBlazor.MudSwitch<bool>>();
+            switches
+                .Single(c => c.Instance.Label == "跟随 B 站每日任务量")
+                .Find("input")
+                .Change(true);
+            switches.Single(c => c.Instance.Label == "点赞").Find("input").Change(false);
+            switches.Single(c => c.Instance.Label == "弹幕").Find("input").Change(false);
             page.Find("select[aria-label=小时]").Change("21");
             page.Find("select[aria-label=分钟]").Change("15");
             page.Find("form").Submit();
@@ -252,6 +255,40 @@ public class ScheduleConfigurationTests : TestContext, IDisposable
             );
             _configuration.Reload();
             Assert.Equal("11", _configuration["LiveFansMedalTaskConfig:ExcludedAnchorIds"]);
+        }
+        finally
+        {
+            await scheduler.Shutdown();
+        }
+    }
+
+    [Fact]
+    public async Task LiveMedalPage_WhitelistStaysDraftUntilSavedAndSurvivesReload()
+    {
+        Services.AddSingleton<ILiveMedalDashboardService, ExampleMedalDashboard>();
+        var scheduler = await PrepareAsync<LiveFansMedalJob>(LiveFansMedalJob.Key, "0 5 0 * * ?");
+        try
+        {
+            var options = ((IServiceProvider)Services).GetRequiredService<
+                IOptionsMonitor<LiveFansMedalTaskOptions>
+            >();
+            var page = RenderComponent<LiveFansMedalTaskConfig>();
+            page.FindComponents<MudBlazor.MudSwitch<bool>>()
+                .Single(c => c.Instance.Label == "仅为白名单主播执行任务")
+                .Find("input")
+                .Change(true);
+            page.WaitForAssertion(() => Assert.Equal(2, page.FindAll("article").Count));
+            page.Find("article[data-anchor='11'] input[aria-label='选择主播 星河']").Change(true);
+            Assert.False(options.CurrentValue.OnlySelectedAnchors);
+            Assert.Equal("", options.CurrentValue.IncludedAnchorIds);
+            Assert.Null(_configuration["LiveFansMedalTaskConfig:IncludedAnchorIds"]);
+            page.Find("form").Submit();
+            page.WaitForAssertion(() =>
+                Assert.Equal("11", _configuration["LiveFansMedalTaskConfig:IncludedAnchorIds"])
+            );
+            Assert.Equal("true", _configuration["LiveFansMedalTaskConfig:OnlySelectedAnchors"]);
+            _configuration.Reload();
+            Assert.Equal("11", _configuration["LiveFansMedalTaskConfig:IncludedAnchorIds"]);
         }
         finally
         {

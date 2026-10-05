@@ -36,3 +36,9 @@ All keys are under `LiveFansMedalTaskConfig`:
 [BLTH's maintained task implementation](https://github.com/andywang425/BLTH/tree/master/src/modules/dailyTasks/liveTasks/medalTasks) and [release history](https://github.com/andywang425/BLTH/releases) document the May–September 2026 task adaptations. They provide implementation evidence for the current task APIs, dynamic progress, heartbeat timing and duplicate panel entries. Actual quantities are read from Bilibili for each medal at execution time.
 
 Verification uses synthetic cookies, mocked APIs, independent signature vectors and panel component tests. It sends no live messages, likes, watch heartbeats or notification test pushes.
+
+## 主播白名单
+
+默认对全部粉丝牌执行任务，可在卡片上勾选排除主播。开启“仅为白名单主播执行任务”后，只有加入白名单的主播参与，空白名单暂停全部粉丝牌任务。排除设置优先生效。
+
+选择对面板中所有 B 站账号生效，切换账号后保留此前选择。修改后点击“保存配置”生效。配置键为 `OnlySelectedAnchors`、`IncludedAnchorIds` 和 `ExcludedAnchorIds`，ID 列表使用逗号分隔。

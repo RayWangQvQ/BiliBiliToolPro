@@ -366,6 +366,48 @@ public class LiveFansMedalTaskTests
         );
     }
 
+    [Theory]
+    [InlineData("like", "", "")]
+    [InlineData("sendDanmu", "", "")]
+    [InlineData("watchLive", "", "")]
+    [InlineData("like", "60", "60")]
+    [InlineData("sendDanmu", "60", "60")]
+    [InlineData("watchLive", "60", "60")]
+    public async Task Runner_EmptyWhitelistOrExcludedSelection_PerformsNoTaskReadsOrActivities(
+        string action,
+        string included,
+        string excluded
+    )
+    {
+        var env = new Environment();
+        env.Options.OnlySelectedAnchors = true;
+        env.Options.IncludedAnchorIds = included;
+        env.Options.ExcludedAnchorIds = excluded;
+        await env.Runner.RunAsync(env.Cookie, action);
+        Assert.Equal(0, env.TaskReads);
+        Assert.Empty(env.Likes);
+    }
+
+    [Fact]
+    public async Task Runner_WhitelistReadsOnlySelectedAnchorAndPersistsSettings()
+    {
+        var env = new Environment();
+        env.Options.OnlySelectedAnchors = true;
+        env.Options.IncludedAnchorIds = "60,999";
+        env.Panel = _ => new() { List = [Medal(20), Medal(60)] };
+        env.TaskData = (_, _) => Tasks("like", "点赞30次", "每日上限 10/10");
+        await env.Runner.RunAsync(env.Cookie, "like");
+        Assert.Equal(1, env.TaskReads);
+        Assert.Equal(
+            "true",
+            env.Options.ToConfigDictionary()["LiveFansMedalTaskConfig:OnlySelectedAnchors"]
+        );
+        Assert.Equal(
+            "60,999",
+            env.Options.ToConfigDictionary()["LiveFansMedalTaskConfig:IncludedAnchorIds"]
+        );
+    }
+
     private class Environment
     {
         public LiveFansMedalTaskOptions Options { get; } = new();

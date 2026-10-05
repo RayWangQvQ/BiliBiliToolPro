@@ -26,6 +26,27 @@ public class LiveMedalDashboardTests : TestContext
     }
 
     [Fact]
+    public void WhitelistSelection_PreservesOtherAccountsAndExclusionsWin()
+    {
+        string? selected = null;
+        var cut = RenderComponent<LiveMedalDashboard>(p =>
+            p.Add(x => x.Accounts, [new(0, "示例账号")])
+                .Add(x => x.Snapshot, Example())
+                .Add(x => x.OnlySelectedAnchors, true)
+                .Add(x => x.IncludedAnchorIds, "22,333")
+                .Add(x => x.ExcludedAnchorIds, "22")
+                .Add(x => x.IncludedAnchorIdsChanged, (string value) => selected = value)
+        );
+        Assert.Contains("未加入白名单", cut.Find("article[data-anchor='11']").TextContent);
+        Assert.Contains("已排除", cut.Find("article[data-anchor='22']").TextContent);
+        cut.Find("article[data-anchor='11'] input[aria-label='选择主播 星河']").Change(true);
+        Assert.Equal("11,22,333", selected);
+        cut.SetParametersAndRender(p => p.Add(x => x.IncludedAnchorIds, selected!));
+        Assert.Contains("参与任务", cut.Find("article[data-anchor='11']").TextContent);
+        Assert.Contains("已排除", cut.Find("article[data-anchor='22']").TextContent);
+    }
+
+    [Fact]
     public void Cards_ShowLevelsProgressAndKeepExcludedAnchorsVisible()
     {
         var cut = RenderComponent<LiveMedalDashboard>(p =>
