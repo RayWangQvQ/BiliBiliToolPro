@@ -65,6 +65,10 @@
                                 <MudNumericField T="int" @bind-Value="_config.NumberOfCoins" Label="每日投币数 [0-5]"
                                     Min="0" Max="5" Class="mt-3" />
 
+                                <MudNumericField T="int?" @bind-Value="_config.RandomDelayMaxMinutes"
+                                    Label="后台随机延迟上限（分钟）" Min="0" Max="1440"
+                                    Placeholder="继承全局设置" HelperText="留空使用全局随机延迟，填写 0 可立即执行。" Class="mt-3" />
+
                                 <MudNumericField T="int" @bind-Value="_config.NumberOfProtectedCoins" Label="要保留的硬币数量"
                                     Min="0" Class="mt-3" />
                             </MudItem>

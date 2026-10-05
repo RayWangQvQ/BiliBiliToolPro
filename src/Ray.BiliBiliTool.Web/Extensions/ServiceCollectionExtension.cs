@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Components.Authorization;
 using Ray.BiliBiliTool.Agent.Extensions;
 using Ray.BiliBiliTool.Application.Contracts;
@@ -18,6 +18,8 @@ public static class ServiceCollectionExtension
 {
     public static IServiceCollection AddWebServices(this IServiceCollection services)
     {
+        services.AddSingleton(TimeProvider.System);
+        services.AddSingleton<IScheduledDailyTaskDelay, ScheduledDailyTaskDelay>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<ILoginPageStateFactory, LoginPageStateFactory>();
         services.AddScoped<IAdminPageWorkflow, AdminPageWorkflow>();
