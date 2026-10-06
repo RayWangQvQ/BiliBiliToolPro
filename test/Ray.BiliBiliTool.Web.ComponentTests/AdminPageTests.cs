@@ -56,6 +56,10 @@ public class AdminPageTests : TestContext
         cut.FindAll("#admin-new-password").Count.Should().Be(1);
         cut.FindAll("#admin-confirm-password").Count.Should().Be(1);
         cut.FindAll("button.mud-button-filled").Count.Should().Be(2);
+        Assert.All(
+            cut.FindAll(".save-changes-button"),
+            button => Assert.True(button.HasAttribute("disabled"))
+        );
     }
 
     [Fact]
@@ -82,6 +86,9 @@ public class AdminPageTests : TestContext
         await Submit(cut, PasswordButtonLabel);
 
         LastSnackbarMessage().Should().Be("密码修改成功");
+        Assert.False(
+            cut.FindComponent<Ray.BiliBiliTool.Web.Components.Comps.UnsavedChangesGuard>().Instance.HasChanges
+        );
         // The session was authenticated with the old password, so it must be re-established.
         GetRequiredService<NavigationManager>().Uri.Should().EndWith("/auth/logout");
     }
@@ -109,7 +116,13 @@ public class AdminPageTests : TestContext
         await Submit(cut, PasswordButtonLabel);
 
         _workflow.PasswordCalled.Should().BeFalse();
-        cut.Markup.Should().Contain("请输入当前密码");
+        Assert.All(
+            cut.FindAll(".save-changes-button"),
+            button => Assert.True(button.HasAttribute("disabled"))
+        );
+        Assert.False(
+            cut.FindComponent<Ray.BiliBiliTool.Web.Components.Comps.UnsavedChangesGuard>().Instance.HasChanges
+        );
     }
 
     [Fact]
@@ -149,9 +162,9 @@ public class AdminPageTests : TestContext
         string confirmation
     )
     {
-        cut.Find("#admin-current-password").Change(current);
-        cut.Find("#admin-new-password").Change(newPassword);
-        cut.Find("#admin-confirm-password").Change(confirmation);
+        cut.Find("#admin-current-password").Input(current);
+        cut.Find("#admin-new-password").Input(newPassword);
+        cut.Find("#admin-confirm-password").Input(confirmation);
     }
 
     private static void FillUsernameForm(
@@ -160,8 +173,8 @@ public class AdminPageTests : TestContext
         string currentPassword
     )
     {
-        cut.Find("#admin-new-username").Change(newUsername);
-        cut.Find("#admin-rename-current-password").Change(currentPassword);
+        cut.Find("#admin-new-username").Input(newUsername);
+        cut.Find("#admin-rename-current-password").Input(currentPassword);
     }
 
     private static async Task Submit(IRenderedComponent<Admin> cut, string label)

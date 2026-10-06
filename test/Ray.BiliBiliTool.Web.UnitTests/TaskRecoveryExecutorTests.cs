@@ -5,14 +5,16 @@ using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Application.Contracts;
 using Ray.BiliBiliTool.Application.Contracts.Cookies;
 using Ray.BiliBiliTool.Infrastructure.Cookie;
+using Xunit;
 
 namespace Ray.BiliBiliTool.Web.UnitTests;
 
 public class TaskRecoveryExecutorTests
 {
-    private class FakeAccountTaskAppService : IAccountTaskAppService
+    private class FakeAccountTaskAppService(string taskKey = "MangaTaskAppService")
+        : IAccountTaskAppService
     {
-        public string TaskKey => "MangaTaskAppService";
+        public string TaskKey => taskKey;
         public long? RanFor { get; private set; }
 
         public Task DoTaskAsync(CancellationToken cancellationToken = default) =>
@@ -61,17 +63,21 @@ public class TaskRecoveryExecutorTests
         public Task EnsureValidAsync(
             string userId,
             string cookie,
-            CancellationToken token = default
+            CancellationToken cancellationToken = default
         ) => Task.CompletedTask;
     }
 
-    [Fact]
-    public async Task ExecuteAsync_RegisteredTaskForKnownAccount_CallsMatchingAppService()
+    [Theory]
+    [InlineData("MangaTaskAppService")]
+    [InlineData("VipPrivilegeTaskAppService")]
+    public async Task ExecuteAsync_RegisteredTaskForKnownAccount_CallsMatchingAppService(
+        string taskKey
+    )
     {
         var config = BuildConfig("DedeUserID=1001; bili_jct=abc; SESSDATA=def");
-        var fake = new FakeAccountTaskAppService();
+        var fake = new FakeAccountTaskAppService(taskKey);
         var executor = BuildExecutor(config, fake);
-        var task = TaskCatalog.All.Single(t => t.TaskKey == "MangaTaskAppService");
+        var task = TaskCatalog.All.Single(t => t.TaskKey == taskKey);
 
         await executor.ExecuteAsync(1001, task, task.Items[0]);
 

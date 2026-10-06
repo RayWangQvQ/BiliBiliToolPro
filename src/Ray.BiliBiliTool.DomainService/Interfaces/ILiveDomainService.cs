@@ -13,6 +13,14 @@ public interface ILiveDomainService : IDomainService
     /// </summary>
     Task LiveSign(BiliCookie ck);
 
+    Task RunFansMedalActionForAnchorAsync(
+        BiliCookie cookie,
+        long anchorId,
+        long roomId,
+        string action,
+        CancellationToken cancellationToken = default
+    );
+
     /// <summary>
     /// 银瓜子兑换硬币
     /// </summary>

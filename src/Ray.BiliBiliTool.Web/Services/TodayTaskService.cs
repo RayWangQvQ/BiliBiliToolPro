@@ -1,8 +1,11 @@
+using System.Collections.Concurrent;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Quartz;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Application.Contracts;
+using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.Config.SQLite;
 using Ray.BiliBiliTool.Domain;
 using Ray.BiliBiliTool.DomainService.Interfaces;
@@ -32,14 +35,20 @@ public class TodayTaskService(
     IBiliAccountProbe accountProbe,
     TaskRecoveryExecutor recoveryExecutor,
     ITaskRecordWriter recordWriter,
-    ILogger<TodayTaskService> logger
+    ILogger<TodayTaskService> logger,
+    ILiveMedalDashboardService liveMedals,
+    IServiceScopeFactory? recoveryScopeFactory = null,
+    TimeProvider? clock = null
 ) : ITodayTaskService
 {
     /// <summary>自动补做次数上限</summary>
     public const int MaxAutoAttempts = 3;
 
-    /// <summary>并发保护：自动补做与手动补做不能同时跑</summary>
-    private static readonly SemaphoreSlim RedoLock = new(1, 1);
+    // Serialize all recovery items for the same account and task.
+    private static readonly ConcurrentDictionary<
+        (long UserId, string Task),
+        SemaphoreSlim
+    > RedoLocks = new();
 
     private static readonly TimeSpan BiliQueryTimeout = TimeSpan.FromSeconds(20);
 
@@ -49,7 +58,7 @@ public class TodayTaskService(
         CancellationToken cancellationToken = default
     )
     {
-        var now = DateTimeOffset.Now;
+        var now = (clock ?? TimeProvider.System).GetLocalNow();
         var dateKey = now.ToString("yyyy-MM-dd");
 
         // 1) 账号列表：只读本地配置，不调 B 站
@@ -69,6 +78,10 @@ public class TodayTaskService(
         var dueInfo = await GetDueInfoAsync(now, cancellationToken);
 
         // 4) B 站状态：并发查（仅 includeBili 时）
+        var medalOptions =
+            configuration.GetSection("LiveFansMedalTaskConfig").Get<LiveFansMedalTaskOptions>()
+            ?? new();
+        var medalProgress = new Dictionary<long, LiveMedalCompletion>();
         var profiles = new Dictionary<long, BiliAccountProbeResult>();
         var rewards = new Dictionary<long, (BiliDailyRewardSnapshot? Reward, bool Failed)>();
         if (includeBili && accounts.Count > 0)
@@ -76,11 +89,20 @@ public class TodayTaskService(
             var userIds = accounts.Select(a => a.UserId).ToList();
             var profileTask = accountProbe.ProbeManyAsync(userIds, forceRefresh, cancellationToken);
             var rewardTask = QueryBiliRewardsAsync(userIds, cancellationToken);
-            await Task.WhenAll(profileTask, rewardTask);
+            var medalTask = QueryMedalsAsync(
+                accounts.Select(account => (account.UserId, account.Dto.Index)),
+                medalOptions,
+                forceRefresh,
+                cancellationToken
+            );
+            await Task.WhenAll(profileTask, rewardTask, medalTask);
+            medalProgress = await medalTask;
             profiles = await profileTask;
             rewards = await rewardTask;
         }
 
+        var donationOptions =
+            configuration.GetSection("DailyTaskConfig").Get<DailyTaskOptions>() ?? new();
         var result = new List<AccountTodayTasksDto>();
 
         foreach (var (account, userId) in accounts)
@@ -125,17 +147,35 @@ public class TodayTaskService(
                     );
 
                     var isBiliItem = item.Source == TaskItemSource.BiliDailyReward;
-                    var pending = isBiliItem && !includeBili;
+                    var isMedalItem = item.Source == TaskItemSource.LiveMedalProgress;
+                    var monitoredMedal = isMedalItem && medalOptions.UseLiveStateMonitoring;
+                    var pending =
+                        (isBiliItem || isMedalItem)
+                        && !includeBili
+                        && task.IsEnabled(configuration)
+                        && item.IsEnabled(configuration)
+                        && (monitoredMedal || due.HasFireTimeToday)
+                        && (monitoredMedal || due.IsPastDueTime);
 
                     var ctx = new TodayTaskItemContext
                     {
                         Task = task,
                         Item = item,
                         IsTaskEnabled = task.IsEnabled(configuration),
-                        IsItemEnabled = item.IsEnabled(configuration),
-                        HasFireTimeToday = due.HasFireTimeToday,
-                        IsPastDueTime = due.IsPastDueTime,
+                        IsItemEnabled =
+                            item.IsEnabled(configuration)
+                            && (
+                                item.ItemKey != "DonateCoin"
+                                || !donationOptions.ShouldSkipCoinDonation(profile?.Level)
+                            ),
+                        HasFireTimeToday = monitoredMedal || due.HasFireTimeToday,
+                        IsPastDueTime = monitoredMedal || due.IsPastDueTime,
                         BiliReward = biliReward,
+                        LiveMedal = medalProgress.GetValueOrDefault(userId),
+                        FollowMedalDailyTaskLimit =
+                            medalOptions.UseLiveStateMonitoring
+                            || medalOptions.FollowDailyTaskLimit,
+                        MonitorMedalLiveState = monitoredMedal,
                         BiliQueryFailed = isBiliItem && !pending && biliQueryFailed,
                         Records = taskRecords,
                         AutoAttempts = autoAttempts,
@@ -150,14 +190,21 @@ public class TodayTaskService(
                             ItemKey = item.ItemKey,
                             DisplayName = item.DisplayName,
                             State = evaluated.State,
-                            StateText = pending ? "检测中" : Describe(evaluated.State),
+                            StateText =
+                                pending ? "检测中"
+                                : isMedalItem && evaluated.State == TodayTaskItemState.NotDone
+                                    ? "未完成"
+                                : Describe(evaluated.State),
+                            ProgressSummary = isMedalItem && !pending ? evaluated.Message : null,
                             Message = pending ? null : evaluated.Message,
                             CompletedAt = evaluated.CompletedAt,
                             AutoAttempts = evaluated.AutoAttempts,
                             AttemptedToday = taskRecords.Count > 0,
                             IsBiliPending = pending,
                             CanAutoRedo =
-                                !pending && TaskStatusEvaluator.CanAutoRedo(ctx, evaluated),
+                                !pending
+                                && !monitoredMedal
+                                && TaskStatusEvaluator.CanAutoRedo(ctx, evaluated),
                             CanDisableShare =
                                 item.ItemKey == TaskCatalog.ShareItemKey
                                 && item.IsEnabled(configuration),
@@ -195,14 +242,43 @@ public class TodayTaskService(
             return new TaskRedoResultDto(false, $"未知检查项：{itemKey}");
         }
 
-        await RedoLock.WaitAsync(cancellationToken);
+        using var progressScope = new TaskRecoveryProgressScope(
+            $"{userId}/{taskKey}/{itemKey}",
+            userId
+        );
+        TaskRecoveryProgressScope.Report(
+            "task",
+            item.DisplayName,
+            TaskRecoveryProgressState.Waiting,
+            "等待该账号的同类补做结束"
+        );
+        var redoLock = RedoLocks.GetOrAdd((userId, taskKey), _ => new(1, 1));
+        await redoLock.WaitAsync(cancellationToken);
         try
         {
-            return await ExecuteAndRecordAsync(userId, task, item, trigger, cancellationToken);
+            TaskRecoveryProgressScope.Report(
+                "task",
+                item.DisplayName,
+                TaskRecoveryProgressState.Running,
+                "正在检查账号并执行任务"
+            );
+            var result =
+                await CheckRecoveryEligibilityAsync(userId, task, item, trigger, cancellationToken)
+                ?? await ExecuteAndRecordAsync(userId, task, item, trigger, cancellationToken);
+            TaskRecoveryProgressScope.Report(
+                "task",
+                item.DisplayName,
+                result.Skipped ? TaskRecoveryProgressState.Skipped
+                    : result.Success ? TaskRecoveryProgressState.Completed
+                    : progressScope.HasFailures ? TaskRecoveryProgressState.Failed
+                    : TaskRecoveryProgressState.Pending,
+                result.Message
+            );
+            return result;
         }
         finally
         {
-            RedoLock.Release();
+            redoLock.Release();
         }
     }
 
@@ -212,24 +288,67 @@ public class TodayTaskService(
     )
     {
         using var notificationScope = new TaskFailureNotificationScope(suppress: true);
+        TaskRecoveryProgressScope.Report(
+            "prepare",
+            "读取漏做任务",
+            TaskRecoveryProgressState.Running,
+            "正在读取当前账号的配置和 B 站今日进度"
+        );
         var status = await GetTodayStatusAsync(true, true, cancellationToken);
+        TaskRecoveryProgressScope.Report(
+            "prepare",
+            "读取漏做任务",
+            TaskRecoveryProgressState.Completed,
+            "已读取今日任务状态"
+        );
         var account = status.FirstOrDefault(a => a.UserId == userId);
-        return account is null ? 0 : await RedoAccountAsync(account, cancellationToken);
+        if (account is null)
+            return 0;
+        var total = account.Groups.SelectMany(group => group.Items).Count(item => item.CanRedo);
+        TaskRecoveryProgressScope.Report(
+            "batch",
+            "本轮补做",
+            TaskRecoveryProgressState.Running,
+            "正在处理当前账号的漏做项",
+            0,
+            total,
+            "项"
+        );
+        return await RedoAccountsAsync([account], cancellationToken, total);
     }
 
     public async Task<int> RedoAllMissingAsync(CancellationToken cancellationToken = default)
     {
         using var notificationScope = new TaskFailureNotificationScope(suppress: true);
+        TaskRecoveryProgressScope.Report(
+            "prepare",
+            "读取漏做任务",
+            TaskRecoveryProgressState.Running,
+            "正在读取全部账号的配置和 B 站今日进度"
+        );
         // 只查一次状态，避免逐账号重复请求 B 站接口
         var status = await GetTodayStatusAsync(true, true, cancellationToken);
+        TaskRecoveryProgressScope.Report(
+            "prepare",
+            "读取漏做任务",
+            TaskRecoveryProgressState.Completed,
+            "已读取今日任务状态"
+        );
+        var total = status
+            .SelectMany(account => account.Groups)
+            .SelectMany(group => group.Items)
+            .Count(item => item.CanRedo);
+        TaskRecoveryProgressScope.Report(
+            "batch",
+            "本轮补做",
+            TaskRecoveryProgressState.Running,
+            "正在处理全部账号的漏做项",
+            0,
+            total,
+            "项"
+        );
 
-        var count = 0;
-        foreach (var account in status)
-        {
-            count += await RedoAccountAsync(account, cancellationToken);
-        }
-
-        return count;
+        return await RedoAccountsAsync(status, cancellationToken, total);
     }
 
     public async Task DisableShareAsync(CancellationToken cancellationToken = default)
@@ -259,36 +378,208 @@ public class TodayTaskService(
 
     #region private
 
-    /// <summary>对已完成状态快照的账号执行全部可补做项</summary>
-    private async Task<int> RedoAccountAsync(
-        AccountTodayTasksDto account,
-        CancellationToken cancellationToken
+    private async Task<TaskRedoResultDto?> CheckRecoveryEligibilityAsync(
+        long userId,
+        TaskDefinition task,
+        TaskItemDefinition item,
+        TaskRecordTrigger trigger,
+        CancellationToken token
+    )
+    {
+        TaskRedoResultDto Skip(string message, bool complete = false) =>
+            new(complete, $"{item.DisplayName}：{message}", Skipped: true);
+
+        if (!task.IsEnabled(configuration) || !item.IsEnabled(configuration))
+            return Skip("已关闭，跳过补做");
+        var cookie = FindCookie(userId);
+        if (cookie is null)
+            return Skip("账号已移除，跳过补做");
+        var options =
+            configuration.GetSection("LiveFansMedalTaskConfig").Get<LiveFansMedalTaskOptions>()
+            ?? new();
+        if (trigger == TaskRecordTrigger.Auto)
+        {
+            if (!configuration.GetValue("AutoRecoverConfig:IsEnable", true))
+                return Skip("自动补做已关闭");
+            if (
+                item.ItemKey == TaskCatalog.ShareItemKey
+                || (
+                    item.Source == TaskItemSource.LiveMedalProgress
+                    && options.UseLiveStateMonitoring
+                )
+            )
+                return Skip("此项不参与自动补做");
+        }
+
+        try
+        {
+            List<TaskRecord> records = [];
+            if (item.Source == TaskItemSource.ExecutionRecord || trigger == TaskRecordTrigger.Auto)
+            {
+                await using var db = await dbContextFactory.CreateDbContextAsync(token);
+                var date = DateTimeOffset.Now.ToString("yyyy-MM-dd");
+                records = await db
+                    .TaskRecords.AsNoTracking()
+                    .Where(r =>
+                        r.UserId == userId
+                        && r.TaskKey == task.TaskKey
+                        && r.RecordDate == date
+                        && (r.TaskItemKey == item.ItemKey || r.TaskItemKey == null)
+                    )
+                    .ToListAsync(token);
+                if (
+                    trigger == TaskRecordTrigger.Auto
+                    && records.Count(r =>
+                        r.TaskItemKey == item.ItemKey && r.Trigger == TaskRecordTrigger.Auto
+                    ) >= MaxAutoAttempts
+                )
+                    return Skip($"今日自动补做已达到 {MaxAutoAttempts} 次");
+            }
+            if (
+                item.Source == TaskItemSource.ExecutionRecord
+                && records.Any(r => r.Status == TaskRecordStatus.Success)
+            )
+                return Skip("今日已完成，无需补做", true);
+            if (item.Source == TaskItemSource.BiliDailyReward)
+            {
+                var (reward, failed) = await QueryBiliRewardAsync(userId, token);
+                if (failed || reward is null)
+                    return Skip("今日进度暂未获取，请稍后重试");
+                if (IsDailyItemComplete(item, reward))
+                    return Skip("B 站已确认今日完成，无需补做", true);
+                if (item.ItemKey == "DonateCoin")
+                {
+                    var donation =
+                        configuration.GetSection("DailyTaskConfig").Get<DailyTaskOptions>()
+                        ?? new();
+                    if (donation.EffectiveCoinDonationStopLevel > 0)
+                    {
+                        var account = await accountDomainService
+                            .LoginByCookie(cookie)
+                            .WaitAsync(token);
+                        if (donation.ShouldSkipCoinDonation(account.Level_info?.Current_level))
+                            return Skip("已达到停止投币等级");
+                    }
+                }
+            }
+            if (item.Source == TaskItemSource.LiveMedalProgress)
+            {
+                var index = Enumerable
+                    .Range(0, cookieStrFactory.Count)
+                    .First(i => cookieStrFactory.GetCookie(i).UserId == cookie.UserId);
+                var progress = (await QueryMedalsAsync([(userId, index)], options, true, token))[
+                    userId
+                ];
+                if (progress.State != TodayTaskItemState.NotDone)
+                    return Skip(
+                        progress.Message ?? "当前无需补做",
+                        progress.State == TodayTaskItemState.Completed
+                    );
+                if (
+                    trigger == TaskRecordTrigger.Auto
+                    && !options.FollowDailyTaskLimit
+                    && records.Any(r => r.Status == TaskRecordStatus.Success)
+                )
+                    return Skip("今日设置的执行目标已执行");
+            }
+            // Re-read switches after platform queries, which may take several seconds.
+            if (
+                !task.IsEnabled(configuration)
+                || !item.IsEnabled(configuration)
+                || (
+                    trigger == TaskRecordTrigger.Auto
+                    && !configuration.GetValue("AutoRecoverConfig:IsEnable", true)
+                )
+            )
+                return Skip("配置已关闭，跳过补做");
+            token.ThrowIfCancellationRequested();
+            return null;
+        }
+        catch (OperationCanceledException) when (token.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning("Recovery eligibility check failed: {ErrorType}", ex.GetType().Name);
+            return Skip("补做条件暂未核实，请稍后重试");
+        }
+    }
+
+    private static bool IsDailyItemComplete(
+        TaskItemDefinition item,
+        BiliDailyRewardSnapshot reward
+    ) =>
+        item.ItemKey switch
+        {
+            "Login" => reward.Login,
+            "Watch" => reward.Watch,
+            TaskCatalog.ShareItemKey => reward.Share,
+            "DonateCoin" => reward.CoinExp > 0,
+            _ => false,
+        };
+
+    /// <summary>Runs eligible recovery items for accounts with a loaded status snapshot.</summary>
+    private async Task<int> RedoAccountsAsync(
+        IReadOnlyList<AccountTodayTasksDto> accounts,
+        CancellationToken cancellationToken,
+        int total
     )
     {
         var count = 0;
-        foreach (var group in account.Groups)
-        {
-            foreach (var item in group.Items.Where(i => i.CanRedo))
+        var executed = 0;
+        var progressGate = new object();
+        var groups = accounts
+            .SelectMany(account => account.Groups.Select(group => (account, group)))
+            .OrderBy(entry => entry.group.TaskKey == "LiveFansMedalAppService");
+        await Parallel.ForEachAsync(
+            groups,
+            new ParallelOptions
             {
-                var r = await RedoAsync(
-                    account.UserId,
-                    group.TaskKey,
-                    item.ItemKey,
-                    TaskRecordTrigger.Manual,
-                    cancellationToken
-                );
-                count++;
-                logger.LogInformation(
-                    "补做 {user}/{task}/{item}：{result}",
-                    account.UserId,
-                    group.TaskKey,
-                    item.ItemKey,
-                    r.Message
-                );
+                MaxDegreeOfParallelism = 4,
+                CancellationToken = cancellationToken,
+            },
+            async (entry, token) =>
+            {
+                var (account, group) = entry;
+                foreach (var item in group.Items.Where(i => i.CanRedo))
+                {
+                    var r = await RedoAsync(
+                        account.UserId,
+                        group.TaskKey,
+                        item.ItemKey,
+                        TaskRecordTrigger.Manual,
+                        token
+                    );
+                    if (!r.Skipped)
+                        Interlocked.Increment(ref executed);
+                    lock (progressGate)
+                    {
+                        count++;
+                        TaskRecoveryProgressScope.Report(
+                            "batch",
+                            "本轮补做",
+                            count == total
+                                ? TaskRecoveryProgressState.Completed
+                                : TaskRecoveryProgressState.Running,
+                            "已处理的任务结果见下方",
+                            count,
+                            total,
+                            "项"
+                        );
+                    }
+                    logger.LogInformation(
+                        "补做 {user}/{task}/{item}：{result}",
+                        account.UserId,
+                        group.TaskKey,
+                        item.ItemKey,
+                        r.Message
+                    );
+                }
             }
-        }
+        );
 
-        return count;
+        return executed;
     }
 
     /// <summary>并发查询多个账号的 B 站每日任务状态</summary>
@@ -324,20 +615,24 @@ public class TodayTaskService(
 
         try
         {
-            var info = await accountDomainService.GetDailyTaskStatus(ck);
+            var info = await accountDomainService.GetDailyTaskStatus(ck).WaitAsync(timeout.Token);
             if (info is null)
             {
                 return (null, true);
             }
 
-            var donatedCoins = await coinDomainService.GetDonatedCoins(ck);
+            var donatedCoins = await coinDomainService.GetDonatedCoins(ck).WaitAsync(timeout.Token);
 
             return (
                 new BiliDailyRewardSnapshot(info.Login, info.Watch, info.Share, donatedCoins * 10),
                 false
             );
         }
-        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch (OperationCanceledException)
         {
             logger.LogWarning("查询账号 {uid} 的每日任务状态超时", userId);
             return (null, true);
@@ -347,6 +642,44 @@ public class TodayTaskService(
             logger.LogWarning(ex, "查询账号 {uid} 的每日任务状态失败", userId);
             return (null, true);
         }
+    }
+
+    private async Task<Dictionary<long, LiveMedalCompletion>> QueryMedalsAsync(
+        IEnumerable<(long UserId, int Index)> accounts,
+        LiveFansMedalTaskOptions options,
+        bool forceRefresh,
+        CancellationToken token
+    )
+    {
+        if (!options.IsEnable)
+            return [];
+        var results = await Task.WhenAll(
+            accounts.Select(async account =>
+            {
+                LiveMedalSnapshot? snapshot = null;
+                try
+                {
+                    snapshot = await liveMedals.GetAsync(account.Index, forceRefresh, token);
+                }
+                catch (OperationCanceledException) when (token.IsCancellationRequested)
+                {
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    logger.LogDebug("Medal status read failed: {ErrorType}", ex.GetType().Name);
+                }
+                return (
+                    account.UserId,
+                    Result: LiveMedalCompletionEvaluator.Evaluate(
+                        snapshot,
+                        options,
+                        DateTimeOffset.UtcNow
+                    )
+                );
+            })
+        );
+        return results.ToDictionary(result => result.UserId, result => result.Result);
     }
 
     private async Task<TaskRedoResultDto> ExecuteAndRecordAsync(
@@ -360,28 +693,110 @@ public class TodayTaskService(
         string? error = null;
         try
         {
-            await recoveryExecutor.ExecuteAsync(userId, task, item, cancellationToken);
+            // Domain services may contain per-run caches. Keep concurrent accounts isolated.
+            using var executionScope = recoveryScopeFactory?.CreateScope();
+            var executor =
+                executionScope?.ServiceProvider.GetRequiredService<TaskRecoveryExecutor>()
+                ?? recoveryExecutor;
+            await executor.ExecuteAsync(userId, task, item, cancellationToken);
+        }
+        catch (TaskRecoverySkippedException ex)
+        {
+            return new(false, $"{item.DisplayName}：{ex.Message}", Skipped: true);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
         }
         catch (Exception ex)
         {
-            error = ex.Message;
+            error = TaskRecoveryProgressScope.DescribeFailure(ex);
+            TaskRecoveryProgressScope.Report(
+                "task",
+                item.DisplayName,
+                TaskRecoveryProgressState.Failed,
+                error
+            );
         }
 
-        // 记录写入交给 ITaskRecordWriter：它内部会吞掉写库异常。
-        // 若在这里直接写库并把写入和「任务执行」放进同一个 try，写库失败会被当成任务失败。
-        await recordWriter.WriteAsync(
-            userId,
-            task.TaskKey,
-            item.ItemKey,
-            error is null ? TaskRecordStatus.Success : TaskRecordStatus.Failed,
-            error,
-            trigger,
-            cancellationToken
-        );
+        async Task<TaskRedoResultDto> FinishAsync(TaskRedoResultDto result)
+        {
+            // Persist success only after the platform confirms progress-backed tasks.
+            await recordWriter.WriteAsync(
+                userId,
+                task.TaskKey,
+                item.ItemKey,
+                error is not null ? TaskRecordStatus.Failed
+                    : result.Success ? TaskRecordStatus.Success
+                    : TaskRecordStatus.Pending,
+                result.Success ? null : error ?? result.Message,
+                trigger,
+                cancellationToken
+            );
+            return result;
+        }
 
-        return error is null
-            ? new TaskRedoResultDto(true, $"{item.DisplayName}：执行完成")
-            : new TaskRedoResultDto(false, $"{item.DisplayName}：{error}");
+        if (error is null && item.Source == TaskItemSource.LiveMedalProgress)
+        {
+            TaskRecoveryProgressScope.Report(
+                "task",
+                item.DisplayName,
+                TaskRecoveryProgressState.Running,
+                "正在读取 B 站确认的今日进度"
+            );
+            var options =
+                configuration.GetSection("LiveFansMedalTaskConfig").Get<LiveFansMedalTaskOptions>()
+                ?? new();
+            var index = Enumerable
+                .Range(0, cookieStrFactory.Count)
+                .FirstOrDefault(
+                    index => cookieStrFactory.GetCookie(index).UserId == userId.ToString(),
+                    -1
+                );
+            if (index < 0)
+                return await FinishAsync(new(false, "粉丝牌进度暂未获取，请刷新"));
+            var results = await QueryMedalsAsync(
+                [(userId, index)],
+                options,
+                true,
+                cancellationToken
+            );
+            var completion = results.GetValueOrDefault(userId);
+            return await FinishAsync(
+                new(
+                    completion?.State == TodayTaskItemState.Completed,
+                    $"{item.DisplayName}：{completion?.Message ?? "请刷新查看今日进度"}"
+                )
+            );
+        }
+
+        if (error is null && item.Source == TaskItemSource.BiliDailyReward)
+        {
+            TaskRecoveryProgressScope.Report(
+                "task",
+                item.DisplayName,
+                TaskRecoveryProgressState.Running,
+                "正在读取 B 站确认的今日进度"
+            );
+            var (reward, failed) = await QueryBiliRewardAsync(userId, cancellationToken);
+            if (failed || reward is null)
+                return await FinishAsync(
+                    new(false, $"{item.DisplayName}：动作已执行，今日进度暂未获取")
+                );
+            var complete = IsDailyItemComplete(item, reward);
+            return await FinishAsync(
+                new(
+                    complete,
+                    $"{item.DisplayName}：{(complete ? "B 站已确认完成" : "动作已执行，B 站尚未确认完成")}"
+                )
+            );
+        }
+
+        return await FinishAsync(
+            error is null
+                ? new TaskRedoResultDto(true, $"{item.DisplayName}：执行完成")
+                : new TaskRedoResultDto(false, $"{item.DisplayName}：{error}")
+        );
     }
 
     /// <summary>每个任务今天有没有触发点、是否已过今天的最后一次触发时间</summary>
@@ -517,6 +932,8 @@ public class TodayTaskService(
             TodayTaskItemState.Failed => "失败",
             TodayTaskItemState.RetryExhausted => "已自动重试 3 次仍未完成",
             TodayTaskItemState.Waiting => "等待执行",
+            TodayTaskItemState.NoWork => "当前无需执行",
+            TodayTaskItemState.WaitingConditions => "等待任务条件",
             TodayTaskItemState.NotToday => "本日无需执行",
             TodayTaskItemState.Disabled => "已关闭",
             TodayTaskItemState.Unknown => "状态未知",

@@ -33,7 +33,10 @@
             <dl>
                 @if (!string.IsNullOrEmpty(help.ConfigurationPage) && TaskKey != "Notification")
                 {
-                    <div><dt>启用任务与执行时间</dt><dd>开启任务后，选择执行周期和时间，保存后按计划运行。</dd></div>
+                    @if (TaskKey == "LiveFansMedalAppService")
+                    { <div><dt>启用任务与执行方式</dt><dd>开启任务后，选择按主播状态自动执行或按固定时间执行，保存后生效。</dd></div> }
+                    else
+                    { <div><dt>启用任务与执行时间</dt><dd>开启任务后，选择执行周期和时间，保存后按计划运行。</dd></div> }
                 }
                 @foreach (var feature in help.Features.Where(item => item.SettingKey is not null))
                 {

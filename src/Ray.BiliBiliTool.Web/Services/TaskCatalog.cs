@@ -10,6 +10,9 @@ public enum TaskItemSource
 
     /// <summary>本工具的执行记录表</summary>
     ExecutionRecord,
+
+    // Current Bilibili medal progress, independent of execution outcomes.
+    LiveMedalProgress,
 }
 
 /// <summary>一个检查项（页面上的一行）。ItemKey 为 null 表示「整任务算一项」。</summary>
@@ -89,21 +92,9 @@ public static class TaskCatalog
                     TaskItemSource.BiliDailyReward,
                     c => c.GetValue("DailyTaskConfig:NumberOfCoins", 5) > 0
                 ),
-                new TaskItemDefinition(
-                    "VipPrivilege",
-                    "大会员福利",
-                    TaskItemSource.ExecutionRecord,
-                    c => c.GetValue("DailyTaskConfig:IsEnable", true)
-                ),
             ]
         ),
-        TaskLevel(
-            "LiveFansMedalAppService",
-            "LiveFansMedalJob",
-            "直播粉丝勋章",
-            "LiveFansMedalTaskConfig"
-        ),
-        TaskLevel("MangaTaskAppService", "MangaJob", "漫画签到/阅读", "MangaTaskConfig"),
+        TaskLevel("MangaTaskAppService", "MangaJob", "漫画任务", "MangaTaskConfig"),
         TaskLevel(
             "MangaPrivilegeTaskAppService",
             "MangaPrivilegeJob",
@@ -116,14 +107,26 @@ public static class TaskCatalog
             "银瓜子换硬币",
             "Silver2CoinTaskConfig"
         ),
+        TaskLevel("ChargeTaskAppService", "ChargeJob", "充电任务", "ChargeTaskConfig"),
+        TaskLevel(
+            "VipPrivilegeTaskAppService",
+            "VipPrivilegeJob",
+            "大会员福利",
+            "VipPrivilegeConfig"
+        ),
+        TaskLevel("VipBigPointAppService", "VipBigPointJob", "大会员积分", "VipBigPointConfig"),
         TaskLevel(
             "LiveLotteryTaskAppService",
             "LiveLotteryJob",
             "直播抽奖",
             "LiveLotteryTaskConfig"
         ),
-        TaskLevel("ChargeTaskAppService", "ChargeJob", "充电", "ChargeTaskConfig"),
-        TaskLevel("VipBigPointAppService", "VipBigPointJob", "大会员积分", "VipBigPointConfig"),
+        TaskLevel(
+            "LiveFansMedalAppService",
+            "LiveFansMedalJob",
+            "粉丝勋章",
+            "LiveFansMedalTaskConfig"
+        ),
         TaskLevel(
             "UnfollowBatchedTaskAppService",
             "UnfollowBatchedJob",
@@ -147,7 +150,16 @@ public static class TaskCatalog
             jobName,
             displayName,
             enabled,
-            [new TaskItemDefinition(null, displayName, TaskItemSource.ExecutionRecord, enabled)]
+            [
+                new TaskItemDefinition(
+                    null,
+                    displayName,
+                    taskKey == "LiveFansMedalAppService"
+                        ? TaskItemSource.LiveMedalProgress
+                        : TaskItemSource.ExecutionRecord,
+                    enabled
+                ),
+            ]
         );
     }
 }

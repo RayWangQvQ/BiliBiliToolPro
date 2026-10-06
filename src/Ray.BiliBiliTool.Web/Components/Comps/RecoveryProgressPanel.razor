@@ -1,0 +1,88 @@
+@using Ray.BiliBiliTool.Domain
+
+@if (Entries.Count > 0)
+{
+    <MudPaper Class="recovery-panel pa-4 mb-3" Elevation="1">
+        <div class="recovery-heading">
+            <MudText Typo="Typo.subtitle1">补做进度</MudText>
+            @if (Entries.FirstOrDefault(entry => entry.Key == "/batch") is { } batch)
+            {
+                <MudText Typo="Typo.body2" Class="mud-text-secondary">已处理 @(batch.Current ?? 0) / @(batch.Total ?? 0) 项</MudText>
+            }
+        </div>
+        <div class="recovery-entries" role="log" aria-live="polite" aria-label="补做详细进度">
+            @foreach (var entry in Entries.Where(entry => entry.Key != "/batch").OrderBy(RowPriority))
+            {
+                <div @key="entry.Key" class="recovery-entry" data-progress-key="@entry.Key" data-state="@entry.State">
+                    <div class="recovery-entry-heading">
+                        <div class="recovery-entry-title">
+                            <MudIcon Icon="@StateIcon(entry.State)" Color="@StateColor(entry.State)" Size="Size.Small" />
+                            <MudText Typo="Typo.body2">@entry.Title</MudText>
+                        </div>
+                        <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Color="@StateColor(entry.State)">@StateText(entry)</MudChip>
+                    </div>
+                    @if (entry.UserId is { } user && AccountNames.TryGetValue(user, out var name))
+                    {
+                        <MudText Typo="Typo.caption" Class="mud-text-secondary">@name</MudText>
+                    }
+                    @if (entry.Current is { } current && entry.Total is > 0)
+                    {
+                        <div class="recovery-meter">
+                            <MudText Typo="Typo.caption">@(entry.Unit == "秒" ? $"本次心跳 {TimeText(current)} / 计划 {TimeText(entry.Total.Value)}" : $"本次已发送 {current} / {entry.Total} {entry.Unit}")</MudText>
+                            <MudProgressLinear Value="@(Math.Clamp(current * 100d / entry.Total.Value, 0, 100))"
+                                               Color="@StateColor(entry.State)" Rounded="true" Size="Size.Small" />
+                        </div>
+                    }
+                    @if (entry.PlatformProgress is not null)
+                    {
+                        <MudText Typo="Typo.caption" Class="recovery-platform">B 站进度：@entry.PlatformProgress</MudText>
+                    }
+                    @if (entry.Detail is not null)
+                    {
+                        <MudText Typo="Typo.body2" Color="@(entry.State == TaskRecoveryProgressState.Failed ? Color.Error : Color.Default)" Class="recovery-detail">@entry.Detail</MudText>
+                    }
+                </div>
+            }
+        </div>
+    </MudPaper>
+}
+
+@code {
+    [Parameter] public IReadOnlyList<TaskRecoveryProgress> Entries { get; set; } = [];
+    [Parameter] public IReadOnlyDictionary<long, string> AccountNames { get; set; } = new Dictionary<long, string>();
+
+    private static string TimeText(int seconds) => seconds % 60 == 0
+        ? $"{seconds / 60} 分钟" : $"{seconds / 60} 分 {seconds % 60} 秒";
+    private static int RowPriority(TaskRecoveryProgress entry) => entry.State switch
+    {
+        TaskRecoveryProgressState.Failed => entry.Key.Contains("/medal/") ? 0 : 1,
+        TaskRecoveryProgressState.Pending or TaskRecoveryProgressState.Waiting or TaskRecoveryProgressState.Running => 2,
+        TaskRecoveryProgressState.Completed => 3,
+        _ => 4,
+    };
+    private static string StateText(TaskRecoveryProgress entry) => entry.State switch
+    {
+        TaskRecoveryProgressState.Waiting => "等待中",
+        TaskRecoveryProgressState.Running => "执行中",
+        TaskRecoveryProgressState.Completed => entry.Key.Contains("/stage/") || entry.Key.Contains("/action/") ? "已结束" : "已完成",
+        TaskRecoveryProgressState.Pending => "待继续",
+        TaskRecoveryProgressState.Skipped => "已跳过",
+        _ => "失败",
+    };
+    private static Color StateColor(TaskRecoveryProgressState state) => state switch
+    {
+        TaskRecoveryProgressState.Failed => Color.Error,
+        TaskRecoveryProgressState.Pending => Color.Warning,
+        TaskRecoveryProgressState.Completed => Color.Success,
+        TaskRecoveryProgressState.Skipped => Color.Default,
+        _ => Color.Info,
+    };
+    private static string StateIcon(TaskRecoveryProgressState state) => state switch
+    {
+        TaskRecoveryProgressState.Failed => Icons.Material.Filled.ErrorOutline,
+        TaskRecoveryProgressState.Completed => Icons.Material.Filled.CheckCircleOutline,
+        TaskRecoveryProgressState.Pending or TaskRecoveryProgressState.Waiting => Icons.Material.Filled.Schedule,
+        TaskRecoveryProgressState.Skipped => Icons.Material.Filled.SkipNext,
+        _ => Icons.Material.Filled.Sync,
+    };
+}

@@ -222,12 +222,17 @@ else
 
     private async Task OpenEditDialog(BiliAccountDto account)
     {
-        var parameters = new DialogParameters { ["CookieStr"] = account.CookieStr };
+        var parameters = new DialogParameters
+        {
+            ["CookieStr"] = account.CookieStr,
+            ["OnSave"] = (Func<string, Task>)(value => Workflow.UpdateAsync(account.Index, value)),
+        };
         var dialog = await DialogService.ShowAsync<EditAccountDialog>("编辑账号", parameters);
         var result = await dialog.Result;
         if (!result.Canceled && result.Data is string newCookieStr)
         {
-            await SaveAsync("Account updated", () => Workflow.UpdateAsync(account.Index, newCookieStr));
+            Snackbar.Add("账号配置已保存", Severity.Success);
+            await LoadAccounts();
         }
     }
 

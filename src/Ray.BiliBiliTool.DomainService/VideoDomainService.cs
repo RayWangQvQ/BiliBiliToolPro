@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
@@ -7,6 +7,7 @@ using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.ApiApi.Relation;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.ApiApi.Video;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Config.Options;
+using Ray.BiliBiliTool.Domain;
 using Ray.BiliBiliTool.Domain.Exceptions;
 using Ray.BiliBiliTool.DomainService.Dtos;
 using Ray.BiliBiliTool.DomainService.Interfaces;
@@ -188,7 +189,16 @@ public class VideoDomainService(
         else
         {
             logger.LogError("视频播放失败，原因：{msg}", apiResponse.Message);
+            throw new BiliBusinessException(
+                $"视频观看被 B 站拒绝，错误码 {apiResponse.Code}：{apiResponse.Message}"
+            );
         }
+        TaskRecoveryProgressScope.Report(
+            "video",
+            "观看视频",
+            TaskRecoveryProgressState.Completed,
+            "观看记录已提交"
+        );
     }
 
     /// <summary>
@@ -208,7 +218,16 @@ public class VideoDomainService(
         else
         {
             logger.LogError("视频分享失败，原因: {msg}", apiResponse.Message);
+            throw new BiliBusinessException(
+                $"视频分享被 B 站拒绝，错误码 {apiResponse.Code}：{apiResponse.Message}"
+            );
         }
+        TaskRecoveryProgressScope.Report(
+            "video",
+            "分享视频",
+            TaskRecoveryProgressState.Completed,
+            "分享记录已提交"
+        );
     }
 
     /// <summary>

@@ -6,40 +6,19 @@
 
 <PageTitle>今日任务</PageTitle>
 
-<div>
-    <PageHero Title="今日任务"
-              Description="显示每个账号今天的任务完成情况。漏做的会自动补做（每项每天最多自动补 3 次），也可以自己点「补做」。" />
+<Ray.BiliBiliTool.Web.Components.Comps.UnsavedChangesGuard HasChanges="SettingsChanged" Busy="_savingSettings" CanSave="@(!_busy)" SaveBeforeLeaving="SaveBeforeLeavingAsync" />
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="my-4">
     @if (_busy)
     {
         <MudProgressLinear Indeterminate="true" Color="Color.Primary" Class="mb-3" />
     }
 
-    @* 操作区：时间信息 + 刷新 / 一键补做 *@
-    <MudPaper Class="pa-3 mb-3" Elevation="1">
-        <div class="d-flex flex-wrap align-center gap-3">
-            <div class="d-flex align-center gap-1">
-                <MudIcon Icon="@Icons.Material.Filled.Event" Size="Size.Small" Class="mud-text-secondary" />
-                <MudText Typo="Typo.body2">@DateTime.Now.ToString("yyyy-MM-dd")</MudText>
-            </div>
-
-            @if (_lastRefresh.HasValue)
-            {
-                <div class="d-flex align-center gap-1">
-                    <MudIcon Icon="@Icons.Material.Filled.Update" Size="Size.Small" Class="mud-text-secondary" />
-                    <MudText Typo="Typo.body2">最后检查 @_lastRefresh.Value.ToString("HH:mm:ss")</MudText>
-                </div>
-            }
-
-            <div class="flex-grow-1"></div>
-
-            <MudButton Variant="Variant.Filled" Color="Color.Primary"
-                       StartIcon="@Icons.Material.Filled.Refresh"
-                       Disabled="_busy" OnClick="ManualRefreshAsync">立即刷新</MudButton>
-            <MudButton Variant="Variant.Outlined" Color="Color.Secondary"
-                       StartIcon="@Icons.Material.Filled.PlayArrow"
-                       Disabled="_busy" OnClick="RedoAllAsync">一键补做全部漏做项</MudButton>
-        </div>
-    </MudPaper>
+    <PageHero Title="今日任务"
+              Description="显示每个账号今天的任务完成情况。漏做的会自动补做（每项每天最多自动补 3 次），也可以自己点「补做」。" />
+    <MudText Typo="Typo.body2" Class="mud-text-secondary mb-3">
+        选择账号查看今天的任务完成情况，也可以查看全部账号。漏做的会自动补做（每项每天最多自动补 3 次），也可以自己点「补做」。
+    </MudText>
 
     @* 设置区：自动补做 + 关闭分享 *@
     <Ray.BiliBiliTool.Web.Components.Comps.TaskGuide TaskKey="AutoRecover" />
@@ -50,15 +29,19 @@
         </div>
 
         <div class="d-flex flex-wrap align-center gap-3">
-            <MudSwitch @bind-Value="_autoEnable" Color="Color.Primary" Label="自动补做" />
-            <MudNumericField @bind-Value="_intervalHours" Label="每几小时检查一次"
+            <MudSwitch Disabled="_savingSettings" @bind-Value="_autoEnable" @bind-Value:after="RecoverySettingsChanged" Color="Color.Primary" Label="自动补做" />
+            <MudNumericField Immediate="true" Disabled="_savingSettings" @bind-Value="_intervalHours" @bind-Value:after="RecoverySettingsChanged" Label="每几小时检查一次"
                              Min="1" Max="24" Style="max-width:190px" />
-            <MudNumericField @bind-Value="_retentionDays" Label="记录保留天数"
+            <MudNumericField Immediate="true" Disabled="_savingSettings" @bind-Value="_retentionDays" @bind-Value:after="RecoverySettingsChanged" Label="记录保留天数"
                              Min="1" Max="90" Style="max-width:170px" />
-            <MudButton Variant="Variant.Filled" Color="Color.Primary"
-                       StartIcon="@Icons.Material.Filled.Save"
-                       Disabled="_busy" OnClick="SaveSettingsAsync">保存设置</MudButton>
+            <Ray.BiliBiliTool.Web.Components.Comps.SaveChangesButton Label="保存设置" HasChanges="SettingsChanged"
+                Busy="_savingSettings" Saved="_settingsSaved" Disabled="_busy" OnClick="SaveSettingsAsync" />
         </div>
+
+        @if (_settingsError is not null)
+        {
+            <MudAlert Severity="Severity.Error" Class="mt-3" role="alert">@_settingsError</MudAlert>
+        }
 
         @if (AnyShareDisable)
         {
@@ -73,6 +56,80 @@
             </div>
         }
     </MudPaper>
+
+    @* Account navigation and actions use separate rows on small screens. *@
+    <MudPaper Class="pa-3 mb-3" Elevation="1">
+        <div class="today-toolbar">
+            @if (_accounts.Count > 0)
+            {
+                <div class="today-account-switcher">
+                <MudIconButton Icon="@Icons.Material.Filled.ChevronLeft" Color="Color.Primary" Variant="Variant.Outlined"
+                               aria-label="上一个账号" title="上一个账号" Disabled="@(_busy || _accounts.Count < 2)"
+                               OnClick="@(() => StepAccount(-1))" />
+                <MudSelect T="long" Label="查看账号" Value="@(_selectedUserId ?? 0)" ValueChanged="ChangeAccount"
+                           Variant="Variant.Outlined" Margin="Margin.Dense" Disabled="_busy"
+                           Class="today-account-select">
+                    @foreach (var account in _accounts)
+                    {
+                        <MudSelectItem T="long" Value="@account.UserId">账号@(account.Index + 1) · @account.UserName · UID @account.UserId</MudSelectItem>
+                    }
+                    <MudSelectItem T="long" Value="0">全部账号（@_accounts.Count 个）</MudSelectItem>
+                </MudSelect>
+                <MudIconButton Icon="@Icons.Material.Filled.ChevronRight" Color="Color.Primary" Variant="Variant.Outlined"
+                               aria-label="下一个账号" title="下一个账号" Disabled="@(_busy || _accounts.Count < 2)"
+                               OnClick="@(() => StepAccount(1))" />
+                </div>
+            }
+            <div class="today-toolbar-meta">
+            <div class="d-flex align-center gap-1">
+                <MudIcon Icon="@Icons.Material.Filled.Event" Size="Size.Small" Class="mud-text-secondary" />
+                <MudText Typo="Typo.body2">@DateTime.Now.ToString("yyyy-MM-dd")</MudText>
+            </div>
+
+            @if (_lastRefresh.HasValue)
+            {
+                <div class="d-flex align-center gap-1">
+                    <MudIcon Icon="@Icons.Material.Filled.Update" Size="Size.Small" Class="mud-text-secondary" />
+                    <MudText Typo="Typo.body2">最后检查 @_lastRefresh.Value.ToString("HH:mm:ss")</MudText>
+                </div>
+            }
+
+            </div>
+
+            <div class="today-toolbar-actions">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Refresh"
+                       Disabled="_busy" OnClick="ManualRefreshAsync">立即刷新</MudButton>
+            <MudButton Variant="Variant.Outlined" Color="Color.Secondary"
+                       StartIcon="@(RedoVisibleRunning ? null : Icons.Material.Filled.PlayArrow)"
+                       Class="today-redo-visible" aria-busy="@(RedoVisibleRunning ? "true" : "false")"
+                       Disabled="@(_busy || _accounts.Count == 0)" OnClick="RedoVisibleAsync">
+                @if (RedoVisibleRunning)
+                { <MudProgressCircular Indeterminate="true" Size="Size.Small" Style="width:16px;height:16px" Class="mr-2" aria-hidden="true" /> @RedoButtonText }
+                else
+                { @(_selectedUserId == 0 ? "补做全部账号漏做项" : "补做当前账号漏做项") }
+            </MudButton>
+            </div>
+        </div>
+    </MudPaper>
+
+    @if (_redoRequest is not null && (_redoRunning || _redoResult is not null))
+    {
+        <section @ref="_recoveryPanel" class="today-recovery-panel" tabindex="-1" aria-label="补做进度">
+        <MudAlert Severity="@(_redoRunning ? Severity.Info : _redoSeverity)" Class="today-redo-feedback mb-3"
+                  role="status" aria-live="polite" aria-atomic="true">
+            <div class="d-flex align-center gap-2">
+                @if (_redoRunning)
+                { <MudProgressCircular Indeterminate="true" Size="Size.Small" Style="width:18px;height:18px" aria-hidden="true" /> }
+                <div>
+                    <MudText Typo="Typo.subtitle2">@_redoRequest.Label</MudText>
+                    <MudText Typo="Typo.body2">@(_redoRunning ? RedoPhase : _redoResult)</MudText>
+                </div>
+            </div>
+        </MudAlert>
+        <Ray.BiliBiliTool.Web.Components.Comps.RecoveryProgressPanel Entries="@_recoveryProgress.Values.ToArray()" AccountNames="@RecoveryAccountNames" />
+        </section>
+    }
 
     @if (_loadingLocal)
     {
@@ -90,13 +147,13 @@
     }
     else
     {
-        @foreach (var account in _accounts)
+        @foreach (var account in VisibleAccounts)
         {
             @* 「本日无需执行 / 已关闭」不计入分母 *@
             var (doneCount, totalCount) = ProgressOf(account);
             var percent = totalCount == 0 ? 0.0 : doneCount * 100.0 / totalCount;
 
-            <MudCard Class="mb-3">
+            <MudCard @key="account.UserId" Class="today-account-card mb-3">
                 <MudCardHeader>
                     <CardHeaderAvatar>
                         <MudAvatar Color="Color.Primary" Variant="Variant.Outlined">
@@ -109,9 +166,14 @@
                     </CardHeaderContent>
                     <CardHeaderActions>
                         <MudButton Size="Size.Small" Variant="Variant.Filled" Color="Color.Primary"
-                                   StartIcon="@Icons.Material.Filled.PlayArrow"
-                                   Disabled="_busy"
-                                   OnClick="@(() => RedoAccountAsync(account))">整卡补做</MudButton>
+                                   StartIcon="@(RedoAccountRunning(account.UserId) ? null : Icons.Material.Filled.PlayArrow)"
+                                   Class="today-redo-account" aria-busy="@(RedoAccountRunning(account.UserId) ? "true" : "false")"
+                                   Disabled="_busy" OnClick="@(() => RedoAccountAsync(account))">
+                            @if (RedoAccountRunning(account.UserId))
+                            { <MudProgressCircular Indeterminate="true" Size="Size.Small" Style="width:16px;height:16px" Class="mr-2" aria-hidden="true" /> @RedoButtonText }
+                            else
+                            { <text>整卡补做</text> }
+                        </MudButton>
                     </CardHeaderActions>
                 </MudCardHeader>
 
@@ -124,6 +186,13 @@
                                            Color="@(doneCount == totalCount ? Color.Success : Color.Primary)"
                                            Class="flex-grow-1" />
                     </div>
+
+                    @if (MatchesRedoAccount(account.UserId) && (_redoRunning || _redoResult is not null))
+                    {
+                        <MudText Typo="Typo.body2" Class="today-redo-account-feedback mb-3" Color="@(_redoRunning ? Color.Info : _redoSeverity is Severity.Error or Severity.Warning ? Color.Warning : Color.Default)">
+                            @(_redoRunning ? RedoPhase : _redoResult)
+                        </MudText>
+                    }
 
                     @if (_biliChecked && !account.IsCookieValid)
                     {
@@ -155,16 +224,34 @@
                             }
 
                             <div class="@(single ? null : "task-group-items")">
-                                @foreach (var item in group.Items)
+                                @foreach (var item in group.Items.OrderBy(item => item.State == TodayTaskItemState.Completed))
                                 {
-                                    <div class="task-row today-task-row d-flex align-center justify-space-between py-1 gap-3">
+                                    <div @key="(account.UserId, group.TaskKey, item.ItemKey)" class="task-row today-task-row d-flex align-center justify-space-between py-1 gap-3">
                                         <div class="today-task-heading">
                                             <MudText Typo="Typo.body2">@(single ? group.DisplayName : item.DisplayName)</MudText>
                                             <Ray.BiliBiliTool.Web.Components.Comps.TaskBrief TaskKey="@group.TaskKey" ItemKey="@item.ItemKey" />
+                                            @if (MatchesRedoRow(account.UserId, group.TaskKey, item.ItemKey) && (_redoRunning || _redoResult is not null))
+                                            {
+                                                <MudText Typo="Typo.caption" Class="today-redo-row-feedback" Color="@(_redoRunning ? Color.Info : _redoSeverity is Severity.Error or Severity.Warning ? Color.Warning : Color.Default)">
+                                                    @(_redoRunning ? RedoPhase : _redoResult)
+                                                </MudText>
+                                            }
+                                            @if (item.ProgressSummary is not null)
+                                            {
+                                                <div class="today-medal-progress" role="status">
+                                                    <MudText Typo="Typo.caption" Class="mud-text-secondary">@item.ProgressSummary</MudText>
+                                                </div>
+                                            }
                                         </div>
 
                                         <div class="d-flex align-center gap-2">
-                                            @if (item.Message is null)
+                                            @if (_redoRunning && MatchesRedoRow(account.UserId, group.TaskKey, item.ItemKey))
+                                            {
+                                                <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Info" Icon="@Icons.Material.Filled.Sync">
+                                                    @RedoButtonText
+                                                </MudChip>
+                                            }
+                                            else if (item.Message is null)
                                             {
                                                 <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined"
                                                          Color="@StateColor(item)" Icon="@StateIcon(item)">
@@ -189,14 +276,17 @@
                                                 </MudText>
                                             }
 
-                                            @if (item.CanRedo)
+                                            @if (item.CanRedo || (_redoRunning && MatchesRedoRow(account.UserId, group.TaskKey, item.ItemKey)))
                                             {
                                                 <MudButton Size="Size.Small" Variant="Variant.Filled"
                                                            Color="Color.Primary"
-                                                           StartIcon="@Icons.Material.Filled.PlayArrow"
-                                                           Disabled="_busy"
-                                                           OnClick="@(() => RedoItemAsync(account, group.TaskKey, item))">
-                                                    补做
+                                                           StartIcon="@(_redoRunning && MatchesRedoRow(account.UserId, group.TaskKey, item.ItemKey) ? null : Icons.Material.Filled.PlayArrow)"
+                                                           Class="today-redo-item" aria-busy="@(_redoRunning && MatchesRedoRow(account.UserId, group.TaskKey, item.ItemKey) ? "true" : "false")"
+                                                           Disabled="_busy" OnClick="@(() => RedoItemAsync(account, group.TaskKey, item))">
+                                                    @if (_redoRunning && MatchesRedoRow(account.UserId, group.TaskKey, item.ItemKey))
+                                                    { <MudProgressCircular Indeterminate="true" Size="Size.Small" Style="width:16px;height:16px" Class="mr-2" aria-hidden="true" /> @RedoButtonText }
+                                                    else
+                                                    { <text>补做</text> }
                                                 </MudButton>
                                             }
                                         </div>
@@ -209,4 +299,4 @@
             </MudCard>
         }
     }
-</div>
+</MudContainer>

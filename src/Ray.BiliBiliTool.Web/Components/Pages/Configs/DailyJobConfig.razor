@@ -8,7 +8,7 @@
 
 <PageTitle>每日任务配置</PageTitle>
 
-<MudContainer Class="app-config-page">
+<MudContainer>
     <PageHero Size="Size.Small" Title="每日任务配置" Description="设置每日任务的开关与执行选项。" />
     <Ray.BiliBiliTool.Web.Components.Comps.TaskGuide TaskKey="DailyTaskAppService" Enabled="@(_isLoading ? (bool?)null : _config.IsEnable)" />
 
@@ -20,6 +20,7 @@
     {
         <EditForm Model="@_config" OnValidSubmit="HandleValidSubmitAsync">
             <DataAnnotationsValidator />
+            <Ray.BiliBiliTool.Web.Components.Comps.UnsavedChangesGuard HasChanges="HasChanges" Busy="_isSaving" SaveBeforeLeaving="SaveBeforeLeavingAsync" />
 
             <!-- 基础配置卡片 -->
             <MudCard Class="mb-4">
@@ -66,23 +67,30 @@
                                     Label="是否开启专栏投币" Color="Color.Primary" Class="mt-3" />
                                 <Ray.BiliBiliTool.Web.Components.Comps.TaskSettingHelp TaskKey="DailyTaskAppService" SettingKey="IsDonateCoinForArticle" />
 
-                                <MudNumericField T="int" @bind-Value="_config.NumberOfCoins" Label="每日投币数 [0-5]"
+                                <MudNumericField Immediate="true" T="int" @bind-Value="_config.NumberOfCoins" Label="每日投币数 [0-5]"
                                     Min="0" Max="5" Class="mt-3" HelperText="@(TaskHelpCatalog.SettingDescription("DailyTaskAppService", "NumberOfCoins"))" />
 
-                                <MudNumericField T="int" @bind-Value="_config.NumberOfProtectedCoins" Label="要保留的硬币数量"
+                                <MudNumericField Immediate="true" T="int?" @bind-Value="_config.RandomDelayMaxMinutes"
+                                    Label="后台随机延迟上限（分钟）" Min="0" Max="1440" Placeholder="继承全局设置"
+                                    HelperText="@(TaskHelpCatalog.SettingDescription("DailyTaskAppService", "RandomDelayMaxMinutes"))" Class="mt-3" />
+
+                                <MudNumericField Immediate="true" T="int" @bind-Value="_config.NumberOfProtectedCoins" Label="要保留的硬币数量"
                                     Min="0" Class="mt-3" HelperText="@(TaskHelpCatalog.SettingDescription("DailyTaskAppService", "NumberOfProtectedCoins"))" />
                             </MudItem>
 
                             <MudItem xs="12" md="6">
-                                <MudSwitch T="bool" @bind-Value="_config.SaveCoinsWhenLv6"
-                                    Label="六级后停止投币" Color="Color.Primary" />
-                                <Ray.BiliBiliTool.Web.Components.Comps.TaskSettingHelp TaskKey="DailyTaskAppService" SettingKey="SaveCoinsWhenLv6" />
+                                <MudSelect T="int" Value="_config.EffectiveCoinDonationStopLevel" ValueChanged="ChangeStopLevel"
+                                    Label="达到指定等级后停止投币" HelperText="@(TaskHelpCatalog.SettingDescription("DailyTaskAppService", "CoinDonationStopLevel"))">
+                                    <MudSelectItem Value="0">不按等级停止</MudSelectItem>
+                                    @foreach (var level in Enumerable.Range(1, 6))
+                                    { <MudSelectItem Value="@level">Lv.@level 及以上停止</MudSelectItem> }
+                                </MudSelect>
 
                                 <MudSwitch T="bool" @bind-Value="_config.SelectLike"
                                     Label="投币时点赞" Color="Color.Primary" Class="mt-3" />
                                 <Ray.BiliBiliTool.Web.Components.Comps.TaskSettingHelp TaskKey="DailyTaskAppService" SettingKey="SelectLike" />
 
-                                <MudTextField T="string" @bind-Value="_config.SupportUpIds" Label="支持的 UP 主 UID"
+                                <MudTextField Immediate="true" T="string" @bind-Value="_config.SupportUpIds" Label="支持的 UP 主 UID"
                                     HelperText="@(TaskHelpCatalog.SettingDescription("DailyTaskAppService", "SupportUpIds"))" Class="mt-3" />
 
                                 <MudSelect T="string" @bind-Value="_config.DevicePlatform" Label="执行客户端操作时的平台" Class="mt-3"
@@ -98,14 +106,14 @@
 
             <!-- 操作按钮 -->
             <MudCard Class="mt-4">
-                <MudCardActions>
-                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">保存配置</MudButton>
-                    <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="LoadConfigAsync" Class="ml-2">重新加载</MudButton>
+                <MudCardActions Class="save-actions">
+                    <Ray.BiliBiliTool.Web.Components.Comps.SaveChangesButton ButtonType="ButtonType.Submit" HasChanges="HasChanges" Busy="_isSaving" Saved="_saveSuccess" />
+                    <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Disabled="_isSaving" OnClick="LoadConfigAsync" Class="ml-2">重新加载</MudButton>
                 </MudCardActions>
             </MudCard>
         </EditForm>
 
-        @if (_saveMessage.HasValue)
+        @if (_saveMessage is not null && (!HasChanges || !_saveSuccess))
         {
             <MudAlert Severity="@(_saveSuccess ? Severity.Success : Severity.Error)" Class="mt-3">
                 @_saveMessage
@@ -113,3 +121,11 @@
         }
     }
 </MudContainer>
+
+@code {
+    private void ChangeStopLevel(int level)
+    {
+        _config.CoinDonationStopLevel = level;
+        _config.SaveCoinsWhenLv6 = false;
+    }
+}

@@ -2,11 +2,15 @@
 
 <MudDialog>
     <DialogContent>
-        <MudTextField @bind-Value="_cookieStr" Label="Cookie 字符串" Lines="5" Variant="Variant.Outlined" />
+        <MudTextField Immediate="true" Disabled="_saving" @bind-Value="_cookieStr" Label="Cookie 字符串" Lines="5" Variant="Variant.Outlined" />
+        @if (_error is not null)
+        {
+            <MudAlert Severity="Severity.Error" Class="mt-3" role="alert">@_error</MudAlert>
+        }
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="Cancel">取消</MudButton>
-        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="Submit" Disabled="@string.IsNullOrWhiteSpace(_cookieStr)">保存</MudButton>
+        <MudButton Disabled="_saving" OnClick="Cancel">取消</MudButton>
+        <Ray.BiliBiliTool.Web.Components.Comps.SaveChangesButton Label="保存" HasChanges="HasChanges" Busy="_saving" Disabled="@string.IsNullOrWhiteSpace(_cookieStr)" OnClick="Submit" />
     </DialogActions>
 </MudDialog>
 
@@ -17,10 +21,34 @@
     [Parameter]
     public string CookieStr { get; set; } = "";
 
+    [Parameter] public Func<string, Task>? OnSave { get; set; }
     private string _cookieStr = "";
+    private bool _saving;
+    private string? _error;
+    private bool HasChanges => _cookieStr.Trim() != CookieStr.Trim();
 
     protected override void OnInitialized() => _cookieStr = CookieStr;
 
     private void Cancel() => MudDialog.Cancel();
-    private void Submit() => MudDialog.Close(DialogResult.Ok(_cookieStr));
+    private async Task Submit()
+    {
+        if (_saving || !HasChanges || string.IsNullOrWhiteSpace(_cookieStr))
+            return;
+        _saving = true;
+        _error = null;
+        try
+        {
+            if (OnSave is not null)
+                await OnSave(_cookieStr);
+            MudDialog.Close(DialogResult.Ok(_cookieStr));
+        }
+        catch
+        {
+            _error = "保存失败，修改已保留，请重试";
+        }
+        finally
+        {
+            _saving = false;
+        }
+    }
 }

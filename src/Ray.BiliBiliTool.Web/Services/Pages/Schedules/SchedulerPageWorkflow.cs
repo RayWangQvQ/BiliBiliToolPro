@@ -1,14 +1,18 @@
 using BlazingQuartz.Core.Models;
 using BlazingQuartz.Core.Services;
+using Microsoft.Extensions.Options;
 using Quartz;
+using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.Domain;
 using Ray.BiliBiliTool.Web.Extensions;
+using Ray.BiliBiliTool.Web.Jobs;
 
 namespace Ray.BiliBiliTool.Web.Services.Pages.Schedules;
 
 public class SchedulerPageWorkflow(
     ISchedulerService schedulerService,
-    IExecutionLogService executionLogService
+    IExecutionLogService executionLogService,
+    IOptionsMonitor<LiveFansMedalTaskOptions>? medalOptions = null
 ) : ISchedulerPageWorkflow
 {
     public IAsyncEnumerable<ScheduleModel> GetAllJobsAsync(ScheduleJobFilter? filter = null) =>
@@ -66,6 +70,14 @@ public class SchedulerPageWorkflow(
             return new SchedulerActionResult(
                 false,
                 "Cannot resume schedule. Trigger name is null."
+            );
+        if (
+            model.JobName == LiveFansMedalJob.Key.Name
+            && medalOptions?.CurrentValue.UseLiveStateMonitoring == true
+        )
+            return new SchedulerActionResult(
+                false,
+                "粉丝牌任务正在使用自动模式，请在任务配置中切换为定时模式"
             );
         await schedulerService.ResumeTrigger(model.TriggerName, model.TriggerGroup);
         return new SchedulerActionResult(true, null);

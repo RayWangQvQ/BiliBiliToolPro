@@ -9,21 +9,24 @@
 
 <PageTitle>检查与提醒</PageTitle>
 
+<Ray.BiliBiliTool.Web.Components.Comps.UnsavedChangesGuard HasChanges="HasChanges" Busy="_saving" SaveBeforeLeaving="SaveBeforeLeavingAsync" />
+
 <MudContainer Class="app-config-page">
-    <PageHero Size="Size.Small" Title="检查与提醒" Description="设置登录状态检查、过期提醒和任务失败汇总。" />
+    <MudText Typo="Typo.h4" Class="mb-2">检查与提醒</MudText>
+    <MudText Typo="Typo.body2" Class="mud-text-secondary mb-4">设置登录状态检查、过期提醒和每日任务汇总。</MudText>
     <Ray.BiliBiliTool.Web.Components.Comps.TaskGuide TaskKey="Notification" />
     <MudGrid Spacing="3">
         <MudItem xs="12" md="6">
             <MudCard Class="mud-height-full">
                 <MudCardContent>
                     <MudText Typo="Typo.h6" Class="mb-2">登录状态检查</MudText>
-                    <MudSwitch T="bool" @bind-Value="_automatic" @bind-Value:after="SettingsChanged"
+                    <MudSwitch T="bool" Disabled="_saving" @bind-Value="_automatic" @bind-Value:after="SettingsChanged"
                                Label="自动检查登录状态" Color="Color.Primary" />
                     <MudText Typo="Typo.body2" Class="mb-4" Style="color: var(--mud-palette-text-secondary)">
                         @(_automatic ? "自动模式：每天首次活动前检查登录状态。账号过期时暂停活动，重新登录后复检。" : "手动模式：在账号管理中点击「检测」查看登录状态。")
                     </MudText>
                     <MudDivider Class="mb-3" />
-                    <MudSwitch T="bool" @bind-Value="_expiryEnabled" @bind-Value:after="SettingsChanged"
+                    <MudSwitch T="bool" Disabled="_saving" @bind-Value="_expiryEnabled" @bind-Value:after="SettingsChanged"
                                Label="Cookie 过期提醒" Color="Color.Primary" />
                     <MudText Typo="Typo.body2" Style="color: var(--mud-palette-text-secondary)">同一账号每天最多发送一次过期提醒。</MudText>
                 </MudCardContent>
@@ -33,12 +36,12 @@
             <MudCard Class="mud-height-full">
                 <MudCardContent>
                     <MudText Typo="Typo.h6" Class="mb-2">Server 酱</MudText>
-                    <MudText Typo="Typo.body2" Style="color: var(--mud-palette-text-secondary)" Class="mb-3">过期提醒和任务失败汇总共用此密钥。</MudText>
+                    <MudText Typo="Typo.body2" Style="color: var(--mud-palette-text-secondary)" Class="mb-3">过期提醒和每日任务汇总共用此密钥。</MudText>
                     <MudChip T="string" Color="@(_hasKey ? Color.Success : Color.Warning)" Variant="Variant.Outlined"
                              Icon="@(_hasKey ? Icons.Material.Filled.CheckCircle : Icons.Material.Filled.WarningAmber)" Class="mb-3">
                         @(_hasKey ? "SendKey 已配置" : "请配置 SendKey")
                     </MudChip>
-                    <MudTextField T="string" Value="@_newSendKey" ValueChanged="SendKeyChanged" Label="SendKey"
+                    <MudTextField T="string" Immediate="true" Disabled="_saving" Value="@_newSendKey" ValueChanged="SendKeyChanged" Label="SendKey"
                                   InputType="InputType.Password" Placeholder="@(_hasKey ? "********" : "请输入 SendKey")"
                                   HelperText="@(_hasKey ? "输入新密钥即可更换，留空保留已保存的密钥。" : "填写 SendKey 后保存。")" />
                     @if (!string.IsNullOrWhiteSpace(_newSendKey))
@@ -52,21 +55,38 @@
         <MudItem xs="12">
             <MudCard>
                 <MudCardContent>
-                    <MudText Typo="Typo.h6" Class="mb-2">任务失败汇总</MudText>
-                    <MudSwitch T="bool" @bind-Value="_failureEnabled" @bind-Value:after="SettingsChanged"
-                               Label="任务失败提醒" Color="Color.Primary" />
+                    <MudText Typo="Typo.h6" Class="mb-2">每日任务汇总</MudText>
+                    <MudSwitch T="bool" Disabled="_saving" @bind-Value="_failureEnabled" @bind-Value:after="SettingsChanged"
+                               Label="每日任务汇总提醒" Color="Color.Primary" />
                     <MudText Typo="Typo.body2" Style="color: var(--mud-palette-text-secondary)" Class="mb-4">
-                        后台定时任务结束后等待 2 分钟，汇总已选任务的失败记录并发送一条提醒。
+                        当天自动任务全部结束后统一发送一次。到最终汇总时间仍有未完成任务时，发送当天结果，列出失败和未完成项。
                     </MudText>
+                    <fieldset class="schedule-picker mb-4" disabled="@(_saving || !_failureEnabled)">
+                        <legend>最终汇总时间</legend>
+                        <div class="schedule-time-field">
+                            <span>选择每天的汇总时间</span>
+                            <div class="schedule-time-values" role="group" aria-label="最终汇总时间">
+                                <span class="schedule-select"><select aria-label="汇总小时" value="@_summaryHour" @onchange="SummaryHourChanged">
+                                    @for (var hour = 0; hour < 24; hour++) { <option value="@hour">@(hour.ToString("00")) 时</option> }
+                                </select></span>
+                                <span class="schedule-time-separator" aria-hidden="true">:</span>
+                                <span class="schedule-select"><select aria-label="汇总分钟" value="@_summaryMinute" @onchange="SummaryMinuteChanged">
+                                    @for (var minute = 0; minute < 60; minute++) { <option value="@minute">@(minute.ToString("00")) 分</option> }
+                                </select></span>
+                            </div>
+                        </div>
+                        <p class="schedule-summary">每天 @_summaryHour.ToString("00"):@_summaryMinute.ToString("00") · UTC+8</p>
+                    </fieldset>
+                    <MudText Typo="Typo.body2" Class="mb-4 mud-text-secondary">每天最多一条任务汇总。手动执行和补做不单独推送。</MudText>
                     <MudDivider Class="mb-3" />
-                    <MudText Typo="Typo.subtitle2" Class="mb-2">选择需要接收失败提醒的任务</MudText>
+                    <MudText Typo="Typo.subtitle2" Class="mb-2">选择需要纳入汇总的任务</MudText>
                     <MudGrid Spacing="1">
                         @foreach (var task in _tasks)
                         {
                             <MudItem @key="task.TaskKey" xs="12" sm="6" md="4">
                                 <div data-task-key="@task.TaskKey">
                                     <MudSwitch T="bool" @bind-Value="task.Enabled" @bind-Value:after="SettingsChanged"
-                                               Label="@task.DisplayName" Color="Color.Primary" Disabled="@(!_failureEnabled)" />
+                                               Label="@task.DisplayName" Color="Color.Primary" Disabled="@(_saving || !_failureEnabled)" />
                                 </div>
                             </MudItem>
                         }
@@ -77,12 +97,12 @@
     </MudGrid>
     @if (_message is not null)
     {
-        <div role="status" aria-live="polite">
+        <div class="save-result" role="status" aria-live="polite">
             <MudAlert Severity="@(_success ? Severity.Success : Severity.Error)" Class="mt-3">@_message</MudAlert>
         </div>
     }
     <MudStack Row="true" Justify="Justify.FlexEnd" Class="mt-4">
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Save">保存设置</MudButton>
+        <Ray.BiliBiliTool.Web.Components.Comps.SaveChangesButton Label="保存设置" HasChanges="HasChanges" Busy="_saving" Saved="_success" OnClick="Save" />
     </MudStack>
 </MudContainer>
 
@@ -95,6 +115,14 @@
     private List<TaskSwitch> _tasks = [];
     private string? _message;
     private bool _success;
+    private bool _saving;
+    private string _savedSettings = "";
+    private int _summaryHour;
+    private int _summaryMinute;
+    private string SettingsSignature => $"{_automatic}|{_expiryEnabled}|{_failureEnabled}|"
+        + string.Join("|", _tasks.OrderBy(task => task.TaskKey).Select(task => $"{task.TaskKey}:{task.Enabled}"))
+        + $"|{_summaryHour:00}:{_summaryMinute:00}";
+    private bool HasChanges => SettingsSignature != _savedSettings || !string.IsNullOrWhiteSpace(_newSendKey);
 
     protected override void OnInitialized()
     {
@@ -103,10 +131,26 @@
         _expiryEnabled = settings.Cookie.NotifyEnabled;
         _hasKey = settings.Cookie.HasSendKey;
         _failureEnabled = settings.TaskFailure.Enabled;
+        var time = Ray.BiliBiliTool.Web.Services.DailyTaskNotificationSchedule.Parse(settings.TaskFailure.DailySummaryTime);
+        _summaryHour = time.Hours;
+        _summaryMinute = time.Minutes;
         _tasks = settings.TaskFailure.Tasks.Select(task => new TaskSwitch(task.TaskKey, task.DisplayName, task.Enabled)).ToList();
+        _savedSettings = SettingsSignature;
     }
 
     private void SettingsChanged() => _message = null;
+    private void SummaryHourChanged(ChangeEventArgs args)
+    {
+        if (_saving || !_failureEnabled || !int.TryParse(args.Value?.ToString(), out var hour) || hour is < 0 or > 23) return;
+        _summaryHour = hour;
+        SettingsChanged();
+    }
+    private void SummaryMinuteChanged(ChangeEventArgs args)
+    {
+        if (_saving || !_failureEnabled || !int.TryParse(args.Value?.ToString(), out var minute) || minute is < 0 or > 59) return;
+        _summaryMinute = minute;
+        SettingsChanged();
+    }
 
     private void SendKeyChanged(string value)
     {
@@ -114,12 +158,26 @@
         SettingsChanged();
     }
 
-    private void Save()
+    private async Task Save()
     {
+        if (_saving || !HasChanges)
+            return;
+        _saving = true;
+        _message = null;
+        _success = false;
+        var signature = SettingsSignature;
+        var automatic = _automatic;
+        var expiry = _expiryEnabled;
+        var failure = _failureEnabled;
+        var key = _newSendKey;
+        var tasks = _tasks.ToDictionary(task => task.TaskKey, task => task.Enabled);
+        var summaryTime = $"{_summaryHour:00}:{_summaryMinute:00}";
+        StateHasChanged();
+        await Task.Yield();
         try
         {
-            Workflow.Save(_automatic, _expiryEnabled, _failureEnabled, _newSendKey,
-                _tasks.ToDictionary(task => task.TaskKey, task => task.Enabled));
+            Workflow.Save(automatic, expiry, failure, key, tasks, summaryTime);
+            _savedSettings = signature;
             _hasKey = Workflow.Read().Cookie.HasSendKey;
             _newSendKey = "";
             _success = true;
@@ -130,6 +188,17 @@
             _success = false;
             _message = error is InvalidOperationException ? error.Message : "保存失败，请稍后重试";
         }
+        finally
+        {
+            _saving = false;
+        }
+    }
+
+    private async Task<bool> SaveBeforeLeavingAsync()
+    {
+        await Save();
+        StateHasChanged();
+        return _success && !HasChanges;
     }
 
     private sealed class TaskSwitch(string taskKey, string displayName, bool enabled)

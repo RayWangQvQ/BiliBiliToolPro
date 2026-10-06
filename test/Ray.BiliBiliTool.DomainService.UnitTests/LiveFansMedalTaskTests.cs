@@ -10,6 +10,7 @@ using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.Domain.Exceptions;
 using Ray.BiliBiliTool.DomainService;
+using Xunit;
 
 namespace Ray.BiliBiliTool.DomainService.UnitTests;
 
@@ -52,6 +53,191 @@ public class LiveFansMedalTaskTests
             LiveFansMedalTaskPlanner.Plan(Tasks(action, title, progress), action).Remaining
         );
 
+    [Theory]
+    [InlineData("like", 90)]
+    [InlineData("sendDanmu", 5)]
+    [InlineData("watchLive", 75)]
+    public async Task AutoRunnerUsesRemainingQuotaInsteadOfLegacyCustomNumbers(
+        string action,
+        int expected
+    )
+    {
+        var env = new Environment();
+        env.Options.UseLiveStateMonitoring = true;
+        env.Options.FollowDailyTaskLimit = false;
+        env.Options.LikeNumber = env.Options.SendDanmakuNumber = env.Options.HeartBeatNumber = 1;
+        env.TaskData = (_, _) =>
+            action switch
+            {
+                "like" => Tasks(action, "点赞30次", $"每日上限 {7 + env.Likes.Sum() / 30}/10"),
+                "sendDanmu" => Tasks(action, "弹幕1次", $"每日上限 {3 + env.Danmaku}/8"),
+                _ => Tasks(
+                    action,
+                    "观看15分钟",
+                    $"每日上限 {7.5m + env.Heartbeats.Count / 30m}/10"
+                ),
+            };
+        await env.Runner.RunForAnchorAsync(env.Cookie, 60, 1060, action);
+        Assert.Equal(
+            expected,
+            action == "like" ? env.Likes.Sum()
+                : action == "sendDanmu" ? env.Danmaku
+                : env.Heartbeats.Count
+        );
+        Assert.Equal(0, env.Pages);
+    }
+
+    [Fact]
+    public async Task DefaultDanmakuBudgetCompletesTenMessageTaskAndDoesNotRepeat()
+    {
+        var env = new Environment();
+        env.Options.UseLiveStateMonitoring = true;
+        env.TaskData = (_, _) => Tasks("sendDanmu", "发弹幕", $"每日上限 {env.Danmaku}/10");
+        await env.Runner.RunForAnchorAsync(env.Cookie, 60, 1060, "sendDanmu");
+        Assert.Equal(10, env.Danmaku);
+        await env.Runner.RunForAnchorAsync(env.Cookie, 60, 1060, "sendDanmu");
+        Assert.Equal(10, env.Danmaku);
+    }
+
+    [Theory]
+    [InlineData("like", 13)]
+    [InlineData("sendDanmu", 2)]
+    [InlineData("watchLive", 4)]
+    public async Task ConfiguredDailyLimitsAreEditableAndDoNotRepeatOnLaterPolls(
+        string action,
+        int expected
+    )
+    {
+        var env = new Environment();
+        env.Options.UseLiveStateMonitoring = true;
+        env.Options.FollowDailyTaskLimit = true;
+        env.Options.DailyLikeNumber = 13;
+        env.Options.DailyDanmakuNumber = 2;
+        env.Options.DailyWatchMinutes = 2;
+        env.TaskData = (_, _) =>
+            action switch
+            {
+                "like" => Tasks(action, "点赞30次", $"每日上限 {env.Likes.Sum() / 30}/10"),
+                "sendDanmu" => Tasks(action, "弹幕1次", $"每日上限 {env.Danmaku}/8"),
+                _ => Tasks(action, "观看15分钟", $"每日上限 {env.Heartbeats.Count / 30m}/10"),
+            };
+        await env.Runner.RunForAnchorAsync(env.Cookie, 60, 1060, action);
+        await env.Runner.RunForAnchorAsync(env.Cookie, 60, 1060, action);
+        Assert.Equal(
+            expected,
+            action == "like" ? env.Likes.Sum()
+                : action == "sendDanmu" ? env.Danmaku
+                : env.Heartbeats.Count
+        );
+    }
+
+    [Theory]
+    [InlineData(200, 0)]
+    [InlineData(223, 13)]
+    [InlineData(500, 90)]
+    public async Task ConfiguredLimitsCountExistingPlatformProgressAndStopAtPlatformCompletion(
+        int configured,
+        int expected
+    )
+    {
+        var env = new Environment();
+        env.Options.UseLiveStateMonitoring = true;
+        env.Options.DailyLikeNumber = configured;
+        env.TaskData = (_, _) =>
+            Tasks("like", "点赞30次", $"每日上限 {7 + env.Likes.Sum() / 30}/10");
+        await env.Runner.RunForAnchorAsync(env.Cookie, 60, 1060, "like");
+        Assert.Equal(expected, env.Likes.Sum());
+    }
+
+    [Fact]
+    public void DailyLimitsPersistAcrossRestartKeepPartialRoundsAndResetOnChinaDate()
+    {
+        using var directory = new TemporaryBudgetDirectory();
+        var clock = new BudgetClock();
+        var path = Path.Combine(directory.Path, "usage.json");
+        var gate = new LiveFansMedalExecutionGate(clock, path);
+        Assert.Equal(13, gate.Remaining("1", 60, "like", 223, 210));
+        Assert.Equal(13, gate.Reserve("1", 60, "like", 223, 13));
+        var reopened = new LiveFansMedalExecutionGate(clock, path);
+        Assert.Equal(0, reopened.Remaining("1", 60, "like", 223, 210));
+        Assert.Equal(17, reopened.Remaining("1", 60, "like", 240, 210));
+        Assert.Equal(223, reopened.Remaining("2", 60, "like", 223));
+        Assert.Equal(223, reopened.Remaining("1", 61, "like", 223));
+        clock.Now = clock.Now.AddMinutes(2);
+        Assert.Equal(223, reopened.Remaining("1", 60, "like", 223));
+    }
+
+    public sealed class BudgetClock : TimeProvider
+    {
+        public DateTimeOffset Now = new(2026, 10, 6, 23, 59, 0, TimeSpan.FromHours(8));
+
+        public override DateTimeOffset GetUtcNow() => Now;
+    }
+
+    private sealed class TemporaryBudgetDirectory : IDisposable
+    {
+        private readonly DirectoryInfo _directory = Directory.CreateTempSubdirectory(
+            "medal-budget-"
+        );
+        public string Path => _directory.FullName;
+
+        public void Dispose() => _directory.Delete(true);
+    }
+
+    [Fact]
+    public async Task SharedExecutionGatePreventsManualAndMonitoredDuplicateInteractionsAndReleasesAfterCancellation()
+    {
+        var env = new Environment();
+        env.TaskData = (_, _) => Tasks("like", "点赞30次", $"每日上限 {env.Likes.Sum() / 30}/10");
+        var gate = new LiveFansMedalExecutionGate();
+        var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        using var cancel = new CancellationTokenSource();
+        var monitored = new LiveFansMedalTaskRunner(
+            env.Api,
+            env.Trace,
+            NullLogger.Instance,
+            env.Options,
+            "offline-test",
+            async (_, token) =>
+            {
+                entered.TrySetResult();
+                await Task.Delay(Timeout.Infinite, token);
+            },
+            gate
+        );
+        var manual = new LiveFansMedalTaskRunner(
+            env.Api,
+            env.Trace,
+            NullLogger.Instance,
+            env.Options,
+            "offline-test",
+            (_, _) => Task.CompletedTask,
+            gate
+        );
+        var running = monitored.RunForAnchorAsync(env.Cookie, 60, 1060, "like", cancel.Token);
+        await entered.Task.WaitAsync(TimeSpan.FromSeconds(5));
+        await manual.RunAsync(env.Cookie, "like");
+        Assert.Equal(10, env.Likes.Sum());
+        cancel.Cancel();
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => running);
+        await manual.RunForAnchorAsync(env.Cookie, 60, 1060, "like");
+        Assert.Equal(40, env.Likes.Sum());
+    }
+
+    [Fact]
+    public void MonitoredLikeBudgetIsSharedAcrossAnchorsAndSeparateForAccounts()
+    {
+        var env = new Environment();
+        var gate = new LiveFansMedalExecutionGate();
+        Assert.Equal(3000, gate.ReserveMonitoredLikes(env.Cookie, 3000));
+        Assert.Equal(2000, gate.ReserveMonitoredLikes(env.Cookie, 3000));
+        Assert.Equal(0, gate.ReserveMonitoredLikes(env.Cookie, 10));
+        Assert.Equal(
+            10,
+            gate.ReserveMonitoredLikes(new BiliCookie(new() { ["DedeUserID"] = "2" }), 10)
+        );
+    }
+
     [Fact]
     public void Planner_CompletedAndSavingsFullTasksNeedNoInteraction()
     {
@@ -88,6 +274,8 @@ public class LiveFansMedalTaskTests
             .AddInMemoryCollection(
                 new Dictionary<string, string?>
                 {
+                    ["LiveFansMedalTaskConfig:UseLiveStateMonitoring"] = "false",
+                    ["LiveFansMedalTaskConfig:FollowDailyTaskLimit"] = "false",
                     ["LiveFansMedalTaskConfig:IsSkipLevel20Medal"] = "true",
                     ["LiveFansMedalTaskConfig:HeartBeatNumber"] = "70",
                     ["LiveFansMedalTaskConfig:LikeNumber"] = "30",
@@ -208,13 +396,115 @@ public class LiveFansMedalTaskTests
     [Theory]
     [InlineData(0)]
     [InlineData(2)]
-    public async Task Runner_OfflineAndRoundPlayRoomsDoNotReceiveLikesOrHeartbeats(int status)
+    public async Task Runner_OfflineAndRoundPlayRoomsDoNotReceiveLikes(int status)
     {
         var env = new Environment { LiveStatus = status };
         await env.Runner.RunAsync(env.Cookie, "like");
-        await env.Runner.RunAsync(env.Cookie, "watchLive");
         Assert.Empty(env.Likes);
         Assert.Equal(0, env.Enters);
+    }
+
+    [Theory]
+    [InlineData(0, false)]
+    [InlineData(2, false)]
+    [InlineData(0, true)]
+    public async Task Runner_OfflineWatchingConfirmsPlatformProgressInBothModes(
+        int status,
+        bool monitored
+    )
+    {
+        var env = new Environment { LiveStatus = status };
+        env.Options.UseLiveStateMonitoring = monitored;
+        env.Options.FollowDailyTaskLimit = !monitored;
+        env.TaskData = (_, _) =>
+        {
+            var completed = env.Heartbeats.Count >= 30;
+            var data = Tasks(
+                "watchLive",
+                "观看直播15分钟",
+                completed ? "每日上限 10/10" : "每日上限 9/10"
+            );
+            data.Task_info[0].Is_done = completed;
+            return data;
+        };
+        await env.Runner.RunForAnchorAsync(env.Cookie, 60, 1060, "watchLive");
+        Assert.Equal(1, env.Enters);
+        Assert.Equal(30, env.Heartbeats.Count);
+        Assert.Equal(1, env.RoomReads);
+        Assert.True(env.TaskData(60, 0).Task_info[0].Is_done);
+    }
+
+    [Fact]
+    public async Task Runner_WatchingContinuesAfterOfflineTransitionWithStableAreaIdentity()
+    {
+        var env = new Environment();
+        env.Options.HeartBeatNumber = 1;
+        env.BeforeDelay = () =>
+        {
+            env.LiveStatus = 0;
+            env.AreaId = 9;
+            env.ParentAreaId = 8;
+        };
+        await env.Runner.RunForAnchorAsync(env.Cookie, 60, 1060, "watchLive");
+        Assert.Equal(2, env.Heartbeats.Count);
+        Assert.Equal(1, env.RoomReads);
+        Assert.All(
+            env.Heartbeats,
+            beat => Assert.Equal([1L, 1L], JsonSerializer.Deserialize<long[]>(beat.Id)!.Take(2))
+        );
+    }
+
+    [Theory]
+    [InlineData(0, 1)]
+    [InlineData(1, 0)]
+    [InlineData(-1, 1)]
+    public async Task Runner_WatchingRequiresBothValidAreaIdentifiers(int parent, int area)
+    {
+        var env = new Environment
+        {
+            LiveStatus = 0,
+            ParentAreaId = parent,
+            AreaId = area,
+        };
+        await env.Runner.RunForAnchorAsync(env.Cookie, 60, 1060, "watchLive");
+        Assert.Equal(0, env.Enters);
+        Assert.Empty(env.Heartbeats);
+    }
+
+    [Fact]
+    public async Task Runner_UnlitMedalDoesNotStartWatching()
+    {
+        var env = new Environment { LiveStatus = 0 };
+        env.TaskData = (_, _) => Tasks("watchLive", "观看15分钟", "每日上限 0/10", false);
+        await env.Runner.RunForAnchorAsync(env.Cookie, 60, 1060, "watchLive");
+        Assert.Equal(0, env.Enters);
+        Assert.Equal(0, env.RoomReads);
+    }
+
+    [Fact]
+    public async Task Runner_OfflineHeartbeatAcceptanceDoesNotSubstituteForTaskCompletion()
+    {
+        var env = new Environment { LiveStatus = 0 };
+        env.Options.FollowDailyTaskLimit = true;
+        env.TaskData = (_, _) => Tasks("watchLive", "观看1分钟", "每日上限 9/10");
+        await Assert.ThrowsAsync<BiliBusinessException>(() =>
+            env.Runner.RunForAnchorAsync(env.Cookie, 60, 1060, "watchLive")
+        );
+        Assert.Equal(2, env.Heartbeats.Count);
+        Assert.True(env.TaskReads >= 3);
+        Assert.False(env.TaskData(60, 0).Task_info[0].Is_done);
+    }
+
+    [Fact]
+    public async Task Runner_OfflineHeartbeatRejectionStopsAtConfiguredFailureLimit()
+    {
+        var env = new Environment { LiveStatus = 0, HeartbeatCode = -400 };
+        env.Options.HeartBeatSendGiveUpThreshold = 2;
+        await Assert.ThrowsAsync<BiliBusinessException>(() =>
+            env.Runner.RunForAnchorAsync(env.Cookie, 60, 1060, "watchLive")
+        );
+        Assert.Equal(2, env.Heartbeats.Count);
+        Assert.Equal(2, env.TaskReads);
     }
 
     [Fact]
@@ -239,6 +529,107 @@ public class LiveFansMedalTaskTests
                 .Select(value => (int)value)
         );
         Assert.Equal(60, env.Delays.Sum(value => value.TotalSeconds));
+    }
+
+    [Fact]
+    public async Task WatchHeartbeatKeepsServerScheduleDespiteResponseAndProgressLatency()
+    {
+        var env = new Environment
+        {
+            HeartbeatResponseDelay = TimeSpan.FromSeconds(2),
+            TaskReadDelay = TimeSpan.FromSeconds(7),
+        };
+        env.Options.HeartBeatNumber = 15;
+        await env.Runner.RunForAnchorAsync(env.Cookie, 60, 1060, "watchLive");
+        Assert.Equal(30, env.Heartbeats.Count);
+        Assert.Equal(1, env.Enters);
+        Assert.All(env.Heartbeats, beat => Assert.Equal((beat.Ets + beat.Time) * 1000, beat.Ts));
+        Assert.Equal(
+            1,
+            env.Heartbeats.Select(beat => beat.Ts - beat.Ets * 1000).Distinct().Count()
+        );
+        Assert.Contains(env.Delays, wait => wait < TimeSpan.FromSeconds(30));
+    }
+
+    [Fact]
+    public async Task RejectedHeartbeatRenewsSessionAndOnlyAcceptedTimeConsumesDailyBudget()
+    {
+        using var directory = new TemporaryBudgetDirectory();
+        var env = new Environment { HeartbeatCodeAt = n => n == 1 ? 1012002 : 0 };
+        env.Options.UseLiveStateMonitoring = true;
+        env.Options.DailyWatchMinutes = 1;
+        var path = Path.Combine(directory.Path, "usage.json");
+        var gate = new LiveFansMedalExecutionGate(env.Clock, path);
+        var runner = new LiveFansMedalTaskRunner(
+            env.Api,
+            env.Trace,
+            NullLogger.Instance,
+            env.Options,
+            "synthetic",
+            env.DelayAsync,
+            gate,
+            clock: env.Clock
+        );
+        await runner.RunForAnchorAsync(env.Cookie, 60, 1060, "watchLive");
+        Assert.Equal(2, env.Enters);
+        Assert.Equal(3, env.Heartbeats.Count);
+        Assert.Equal(
+            new long[] { 1, 1, 2 },
+            env.Heartbeats.Select(beat => JsonSerializer.Deserialize<long[]>(beat.Id)![2])
+        );
+        var reopened = new LiveFansMedalExecutionGate(env.Clock, path);
+        Assert.Equal(0, reopened.Remaining("1", 60, "watchLive", 60));
+        Assert.Equal(30, reopened.Remaining("1", 60, "watchLive", 90));
+    }
+
+    [Fact]
+    public async Task RepeatedRejectedHeartbeatsPreserveWatchBudgetAndStopAtFailureLimit()
+    {
+        using var directory = new TemporaryBudgetDirectory();
+        var env = new Environment { HeartbeatCode = 1012002 };
+        env.Options.UseLiveStateMonitoring = true;
+        env.Options.DailyWatchMinutes = 1;
+        env.Options.HeartBeatSendGiveUpThreshold = 2;
+        var path = Path.Combine(directory.Path, "usage.json");
+        var gate = new LiveFansMedalExecutionGate(env.Clock, path);
+        var runner = new LiveFansMedalTaskRunner(
+            env.Api,
+            env.Trace,
+            NullLogger.Instance,
+            env.Options,
+            "synthetic",
+            env.DelayAsync,
+            gate,
+            clock: env.Clock
+        );
+        await Assert.ThrowsAsync<BiliBusinessException>(() =>
+            runner.RunForAnchorAsync(env.Cookie, 60, 1060, "watchLive")
+        );
+        Assert.Equal(2, env.Heartbeats.Count);
+        Assert.Equal(2, env.Enters);
+        Assert.Equal(
+            60,
+            new LiveFansMedalExecutionGate(env.Clock, path).Remaining("1", 60, "watchLive", 60)
+        );
+    }
+
+    [Fact]
+    public async Task OversleptHeartbeatRenewsSessionBeforeSendingAnyStaleRequest()
+    {
+        var env = new Environment();
+        env.Options.HeartBeatNumber = 1;
+        var first = true;
+        env.BeforeDelay = () =>
+        {
+            if (!first)
+                return;
+            first = false;
+            env.Clock.Now = env.Clock.Now.AddSeconds(12);
+        };
+        await env.Runner.RunForAnchorAsync(env.Cookie, 60, 1060, "watchLive");
+        Assert.Equal(2, env.Enters);
+        Assert.Equal(2, env.Heartbeats.Count);
+        Assert.All(env.Heartbeats, beat => Assert.Equal((beat.Ets + beat.Time) * 1000, beat.Ts));
     }
 
     [Fact]
@@ -309,7 +700,8 @@ public class LiveFansMedalTaskTests
             {
                 cancellation.Cancel();
                 return Task.FromCanceled(token);
-            }
+            },
+            clock: env.Clock
         );
         await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
             runner.RunAsync(env.Cookie, "watchLive", cancellation.Token)
@@ -408,9 +800,402 @@ public class LiveFansMedalTaskTests
         );
     }
 
+    [Fact]
+    public async Task RecoveryReportsAcceptedWatchTimeSeparatelyFromConfirmedPlatformProgress()
+    {
+        var env = new Environment();
+        env.Options.UseLiveStateMonitoring = true;
+        env.Options.DailyWatchMinutes = 2;
+        env.TaskData = (_, _) => Tasks("watchLive", "观看15分钟", "每日上限 0/10");
+        var entries = new List<Ray.BiliBiliTool.Domain.TaskRecoveryProgress>();
+        using var scope = new Ray.BiliBiliTool.Domain.TaskRecoveryProgressScope(entries.Add);
+        await env.Runner.RunForAnchorAsync(env.Cookie, 60, 1060, "watchLive");
+        var watch = entries.Where(entry => entry.Key.EndsWith("/medal/60/watchLive")).ToArray();
+        Assert.Contains(watch, entry => entry.Current == 30 && entry.Total == 120);
+        Assert.Contains(
+            watch,
+            entry => entry.State == Ray.BiliBiliTool.Domain.TaskRecoveryProgressState.Waiting
+        );
+        Assert.Equal(120, watch.Last().Current);
+        Assert.Equal(Ray.BiliBiliTool.Domain.TaskRecoveryProgressState.Pending, watch.Last().State);
+        Assert.Contains("0/10", watch.Last().PlatformProgress);
+        Assert.DoesNotContain(
+            watch,
+            entry => entry.State == Ray.BiliBiliTool.Domain.TaskRecoveryProgressState.Completed
+        );
+    }
+
+    [Theory]
+    [InlineData("like", "未开播")]
+    [InlineData("sendDanmu", "等待主播下播")]
+    public async Task RecoveryReportsRoomConditionRatherThanStayingRunning(
+        string action,
+        string reason
+    )
+    {
+        var env = new Environment { LiveStatus = action == "like" ? 0 : 1 };
+        env.Options.DanmakuOnlyWhenOffline = true;
+        var entries = new List<Ray.BiliBiliTool.Domain.TaskRecoveryProgress>();
+        using var scope = new Ray.BiliBiliTool.Domain.TaskRecoveryProgressScope(entries.Add);
+        await env.Runner.RunForAnchorAsync(env.Cookie, 60, 1060, action);
+        var last = entries.Last(entry => entry.Key.EndsWith($"/medal/60/{action}"));
+        Assert.Equal(Ray.BiliBiliTool.Domain.TaskRecoveryProgressState.Pending, last.State);
+        Assert.Contains(reason, last.Detail);
+        Assert.Empty(env.Likes);
+        Assert.Equal(0, env.Danmaku);
+    }
+
+    [Fact]
+    public async Task RecoveryPreservesSpecificHeartbeatFailureAndRetryCount()
+    {
+        var env = new Environment { HeartbeatCode = 1012002 };
+        env.Options.HeartBeatSendGiveUpThreshold = 2;
+        var entries = new List<Ray.BiliBiliTool.Domain.TaskRecoveryProgress>();
+        using var scope = new Ray.BiliBiliTool.Domain.TaskRecoveryProgressScope(entries.Add);
+        await Assert.ThrowsAsync<BiliBusinessException>(() =>
+            env.Runner.RunForAnchorAsync(env.Cookie, 60, 1060, "watchLive")
+        );
+        var last = entries.Last(entry => entry.Key.EndsWith("/medal/60/watchLive"));
+        Assert.Equal(Ray.BiliBiliTool.Domain.TaskRecoveryProgressState.Failed, last.State);
+        Assert.Contains("1012002", last.Detail);
+        Assert.Contains("重试 2 次", last.Detail);
+    }
+
+    [Theory]
+    [InlineData("like", 10)]
+    [InlineData("sendDanmu", 1)]
+    public async Task RejectedInteractionsRefundPersistedBudgetAndAllowRecovery(
+        string action,
+        int limit
+    )
+    {
+        var env = new Environment();
+        env.Options.UseLiveStateMonitoring = true;
+        env.Options.DailyLikeNumber = env.Options.DailyDanmakuNumber = limit;
+        env.InteractionCodeAt = _ => -400;
+        env.TaskData = (_, _) =>
+            Tasks(
+                action,
+                action == "like" ? "点赞10次" : "发弹幕1次",
+                $"每日上限 {(action == "like" ? env.Likes.Sum() / 10 : env.Danmaku)}/1"
+            );
+        var path = Path.Combine(Path.GetTempPath(), $"refunded-budget-{Guid.NewGuid():N}.json");
+        try
+        {
+            var gate = new LiveFansMedalExecutionGate(env.Clock, path);
+            var runner = new LiveFansMedalTaskRunner(
+                env.Api,
+                env.Trace,
+                NullLogger.Instance,
+                env.Options,
+                "synthetic",
+                env.DelayAsync,
+                gate,
+                clock: env.Clock
+            );
+            await Assert.ThrowsAsync<BiliBusinessException>(() =>
+                runner.RunForAnchorAsync(env.Cookie, 60, 1060, action)
+            );
+            Assert.Equal(3, env.InteractionAttempts);
+            Assert.Equal(limit, gate.Remaining(env.Cookie.UserId, 60, action, limit));
+            var reopened = new LiveFansMedalExecutionGate(env.Clock, path);
+            Assert.Equal(limit, reopened.Remaining(env.Cookie.UserId, 60, action, limit));
+            env.InteractionCodeAt = _ => 0;
+            var recovery = new LiveFansMedalTaskRunner(
+                env.Api,
+                env.Trace,
+                NullLogger.Instance,
+                env.Options,
+                "synthetic",
+                env.DelayAsync,
+                reopened,
+                clock: env.Clock
+            );
+            await recovery.RunForAnchorAsync(env.Cookie, 60, 1060, action);
+            Assert.Equal(4, env.InteractionAttempts);
+            Assert.Equal(0, reopened.Remaining(env.Cookie.UserId, 60, action, limit));
+        }
+        finally
+        {
+            if (File.Exists(path))
+                File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public void InteractionReservationUsesActualAnchorAmountAndRefundsAccountCap()
+    {
+        var env = new Environment();
+        var gate = new LiveFansMedalExecutionGate(env.Clock);
+        Assert.Equal(4995, gate.ReserveMonitoredLikes(env.Cookie, 4995));
+        Assert.Equal(1, gate.ReserveInteraction(env.Cookie, 60, "like", 1, 10, out var date));
+        Assert.Equal(4, gate.ReserveMonitoredLikes(env.Cookie, 10));
+        gate.ReleaseRejectedInteraction(env.Cookie, 60, "like", 1, date);
+        Assert.Equal(1, gate.ReserveMonitoredLikes(env.Cookie, 10));
+        Assert.Equal(1, gate.Remaining(env.Cookie.UserId, 60, "like", 1));
+    }
+
+    [Fact]
+    public void OldRefundDoesNotConsumeOrReleaseNextDayBudget()
+    {
+        var env = new Environment();
+        var gate = new LiveFansMedalExecutionGate(env.Clock);
+        Assert.Equal(10, gate.ReserveInteraction(env.Cookie, 60, "like", 10, 10, out var oldDate));
+        env.Clock.Now = env.Clock.Now.AddDays(1);
+        Assert.Equal(10, gate.ReserveInteraction(env.Cookie, 60, "like", 10, 10, out _));
+        gate.ReleaseRejectedInteraction(env.Cookie, 60, "like", 10, oldDate);
+        Assert.Equal(0, gate.Remaining(env.Cookie.UserId, 60, "like", 10));
+        Assert.Equal(4990, gate.ReserveMonitoredLikes(env.Cookie, 5000));
+    }
+
+    [Fact]
+    public async Task UnknownTransportOutcomeRetainsReservation()
+    {
+        var env = new Environment();
+        env.Options.UseLiveStateMonitoring = true;
+        env.Options.DailyLikeNumber = 10;
+        env.TaskData = (_, _) => Tasks("like", "点赞10次", "每日上限 0/1");
+        env.InteractionCodeAt = _ => throw new HttpRequestException("synthetic timeout");
+        var gate = new LiveFansMedalExecutionGate(env.Clock);
+        var runner = new LiveFansMedalTaskRunner(
+            env.Api,
+            env.Trace,
+            NullLogger.Instance,
+            env.Options,
+            "synthetic",
+            env.DelayAsync,
+            gate,
+            clock: env.Clock
+        );
+        await Assert.ThrowsAsync<BiliBusinessException>(() =>
+            runner.RunForAnchorAsync(env.Cookie, 60, 1060, "like")
+        );
+        Assert.Equal(0, gate.Remaining(env.Cookie.UserId, 60, "like", 10));
+        Assert.Equal(1, env.InteractionAttempts);
+    }
+
+    [Theory]
+    [InlineData("like", 10)]
+    [InlineData("sendDanmu", 1)]
+    [InlineData("watchLive", 2)]
+    public async Task RepeatedMedalRecoveryOnlySendsIncompleteAnchorActions(
+        string action,
+        int expected
+    )
+    {
+        var env = new Environment();
+        env.Options.UseLiveStateMonitoring = true;
+        env.Panel = _ => new() { List = [Medal(60), Medal(61)] };
+        env.TaskData = (anchor, _) =>
+        {
+            var sent =
+                action == "like" ? env.Likes.Sum() / 10
+                : action == "sendDanmu" ? env.Danmaku
+                : env.Heartbeats.Count / 2;
+            return Tasks(
+                action,
+                action == "like" ? "点赞10次"
+                    : action == "sendDanmu" ? "发弹幕"
+                    : "观看1分钟",
+                $"每日上限 {(anchor == 60 ? 1 : sent)}/1"
+            );
+        };
+        var updates = new List<Ray.BiliBiliTool.Domain.TaskRecoveryProgress>();
+        using var scope = new Ray.BiliBiliTool.Domain.TaskRecoveryProgressScope(updates.Add);
+        await env.Runner.RunAsync(env.Cookie, action);
+        var first =
+            action == "like" ? env.Likes.Sum()
+            : action == "sendDanmu" ? env.Danmaku
+            : env.Heartbeats.Count;
+        Assert.Equal(expected, first);
+        await env.Runner.RunAsync(env.Cookie, action);
+        Assert.Equal(
+            first,
+            action == "like" ? env.Likes.Sum()
+                : action == "sendDanmu" ? env.Danmaku
+                : env.Heartbeats.Count
+        );
+        Assert.Contains(
+            updates,
+            update =>
+                update.Key.EndsWith($"/medal/60/{action}")
+                && update.State == Ray.BiliBiliTool.Domain.TaskRecoveryProgressState.Completed
+        );
+        Assert.Contains(
+            updates,
+            update =>
+                update.Key.EndsWith($"/medal/61/{action}")
+                && update.State == Ray.BiliBiliTool.Domain.TaskRecoveryProgressState.Completed
+        );
+        Assert.DoesNotContain(
+            updates,
+            update =>
+                update.Key.Contains("/medal/")
+                && update.State == Ray.BiliBiliTool.Domain.TaskRecoveryProgressState.Completed
+                && update.PlatformProgress?.Contains("未完成") == true
+        );
+    }
+
+    [Theory]
+    [InlineData("like", "7 次")]
+    [InlineData("sendDanmu", "2 次")]
+    [InlineData("watchLive", "1 分钟")]
+    public async Task ExhaustedBudgetMessageNamesPanelLimitAndConfiguredQuantity(
+        string action,
+        string quantity
+    )
+    {
+        var env = new Environment();
+        env.Options.UseLiveStateMonitoring = true;
+        env.Options.DailyLikeNumber = 7;
+        env.Options.DailyDanmakuNumber = 2;
+        env.Options.DailyWatchMinutes = 1;
+        env.TaskData = (_, _) =>
+            Tasks(
+                action,
+                action == "like" ? "点赞10次"
+                    : action == "sendDanmu" ? "发弹幕"
+                    : "观看1分钟",
+                action == "sendDanmu" ? "每日上限 2/10" : "每日上限 1/10"
+            );
+        var updates = new List<Ray.BiliBiliTool.Domain.TaskRecoveryProgress>();
+        using var scope = new Ray.BiliBiliTool.Domain.TaskRecoveryProgressScope(updates.Add);
+        await env.Runner.RunForAnchorAsync(env.Cookie, 60, 1060, action);
+        var entry = updates.Last(update => update.Key.EndsWith($"/medal/60/{action}"));
+        Assert.Equal(Ray.BiliBiliTool.Domain.TaskRecoveryProgressState.Pending, entry.State);
+        Assert.Contains("面板设置的每日", entry.Detail);
+        Assert.Contains(quantity, entry.Detail);
+        Assert.Contains("互动设置", entry.Detail);
+        Assert.Empty(env.Likes);
+        Assert.Equal(0, env.Danmaku);
+        Assert.Empty(env.Heartbeats);
+    }
+
+    [Fact]
+    public async Task WatchRechecksPlatformCompletionBeforeStartingItsSession()
+    {
+        var env = new Environment();
+        env.TaskData = (_, read) =>
+            Tasks("watchLive", "观看1分钟", $"每日上限 {(read > 1 ? 1 : 0)}/1");
+        await env.Runner.RunForAnchorAsync(env.Cookie, 60, 1060, "watchLive");
+        Assert.Equal(0, env.Enters);
+        Assert.Empty(env.Heartbeats);
+    }
+
+    [Fact]
+    public async Task WatchRechecksPartialProgressAndOnlySendsRemainingConfiguredTime()
+    {
+        var env = new Environment();
+        env.Options.UseLiveStateMonitoring = true;
+        env.Options.DailyWatchMinutes = 2;
+        env.TaskData = (_, read) =>
+            Tasks(
+                "watchLive",
+                "观看1分钟",
+                $"每日上限 {(read > 1 ? 1 + env.Heartbeats.Count / 2 : 0)}/10"
+            );
+        await env.Runner.RunForAnchorAsync(env.Cookie, 60, 1060, "watchLive");
+        Assert.Equal(2, env.Heartbeats.Count);
+    }
+
+    [Theory]
+    [InlineData("like", 10)]
+    [InlineData("sendDanmu", 1)]
+    public async Task AcceptedButUnconfirmedActionsShowPendingAndCanRetryWithoutRepeatingConfirmedActions(
+        string action,
+        int amount
+    )
+    {
+        var env = new Environment();
+        env.Options.UseLiveStateMonitoring = true;
+        env.Options.DailyLikeNumber = 10;
+        env.Options.DailyDanmakuNumber = 1;
+        var complete = false;
+        env.TaskData = (_, _) =>
+            Tasks(
+                action,
+                action == "like" ? "点赞10次" : "发弹幕",
+                $"每日上限 {(complete ? 1 : 0)}/1"
+            );
+        var updates = new List<Ray.BiliBiliTool.Domain.TaskRecoveryProgress>();
+        using var scope = new Ray.BiliBiliTool.Domain.TaskRecoveryProgressScope(updates.Add);
+        await env.Runner.RunForAnchorAsync(env.Cookie, 60, 1060, action);
+        await env.Runner.RunForAnchorAsync(env.Cookie, 60, 1060, action);
+        var entry = updates.Last(update => update.Key.EndsWith($"/medal/60/{action}"));
+        Assert.Equal(Ray.BiliBiliTool.Domain.TaskRecoveryProgressState.Pending, entry.State);
+        Assert.Contains("等待 B 站确认", entry.Detail);
+        Assert.Contains($"今日已确认 0 / {amount}", entry.Detail);
+        Assert.DoesNotContain("已用完", entry.Detail);
+        Assert.Equal(amount, action == "like" ? env.Likes.Sum() : env.Danmaku);
+        env.Clock.Now = env.Clock.Now.AddMinutes(6);
+        await env.Runner.RunForAnchorAsync(env.Cookie, 60, 1060, action);
+        Assert.Equal(amount * 2, action == "like" ? env.Likes.Sum() : env.Danmaku);
+        complete = true;
+        env.Clock.Now = env.Clock.Now.AddMinutes(6);
+        await env.Runner.RunForAnchorAsync(env.Cookie, 60, 1060, action);
+        Assert.Equal(amount * 2, action == "like" ? env.Likes.Sum() : env.Danmaku);
+        Assert.Equal(
+            Ray.BiliBiliTool.Domain.TaskRecoveryProgressState.Completed,
+            updates.Last(update => update.Key.EndsWith($"/medal/60/{action}")).State
+        );
+    }
+
+    [Fact]
+    public async Task WatchDiagnosticsKeepAcceptedTimeSeparateAndDoNotAddApiCalls()
+    {
+        var env = new Environment();
+        env.Options.UseLiveStateMonitoring = true;
+        env.Options.DailyWatchMinutes = 32;
+        env.TaskData = (_, _) => Tasks("watchLive", "观看15分钟", "每日上限 2/10");
+        var path = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+        try
+        {
+            var diagnostics = new LiveWatchDiagnostics(path, env.Clock);
+            var runner = new LiveFansMedalTaskRunner(
+                env.Api,
+                env.Trace,
+                NullLogger.Instance,
+                env.Options,
+                "offline-test",
+                env.DelayAsync,
+                clock: env.Clock,
+                watchDiagnostics: diagnostics
+            );
+            await runner.RunForAnchorAsync(env.Cookie, 60, 1060, "watchLive");
+            var samples = Directory
+                .GetFiles(path, "watch-*.jsonl")
+                .SelectMany(File.ReadLines)
+                .Select(line =>
+                    System.Text.Json.JsonSerializer.Deserialize<LiveWatchDiagnostics.Sample>(line)!
+                )
+                .ToArray();
+            var end = samples.Last();
+            Assert.Equal("end", end.Event);
+            Assert.Equal(120, end.SentSeconds);
+            Assert.Equal(1800, end.InitialConfirmedSeconds);
+            Assert.Equal(1800, end.ConfirmedSeconds);
+            Assert.False(end.TaskDone);
+            Assert.Equal("pending", end.Outcome);
+            Assert.Equal(4, samples.Count(sample => sample.Event == "heartbeat"));
+            Assert.Equal(4, env.TaskReads);
+            var text = string.Join(
+                '\n',
+                Directory.GetFiles(path, "watch-*.jsonl").SelectMany(File.ReadLines)
+            );
+            Assert.DoesNotContain(env.Cookie.ToString(), text);
+            Assert.DoesNotContain("offline-test", text);
+            Assert.DoesNotContain("synthetic", text);
+        }
+        finally
+        {
+            Directory.Delete(path, recursive: true);
+        }
+    }
+
     private class Environment
     {
-        public LiveFansMedalTaskOptions Options { get; } = new();
+        public LiveFansMedalTaskOptions Options { get; } =
+            new() { UseLiveStateMonitoring = false, FollowDailyTaskLimit = false };
         public BiliCookie Cookie { get; } =
             new(
                 new()
@@ -423,15 +1208,27 @@ public class LiveFansMedalTaskTests
         public ILiveApi Api { get; }
         public ILiveTraceApi Trace { get; }
         public LiveFansMedalTaskRunner Runner { get; }
+        public BudgetClock Clock { get; } =
+            new() { Now = new(2026, 10, 6, 12, 0, 0, TimeSpan.Zero) };
         public List<int> Likes { get; } = [];
         public List<HeartBeatRequest> Heartbeats { get; } = [];
         public List<TimeSpan> Delays { get; } = [];
         public int LiveStatus { get; set; } = 1;
+        public int ParentAreaId { get; set; } = 1;
+        public int AreaId { get; set; } = 1;
+        public int RoomReads { get; set; }
+        public int HeartbeatCode { get; set; }
+        public Func<int, int>? HeartbeatCodeAt { get; set; }
+        public TimeSpan HeartbeatResponseDelay { get; set; }
+        public TimeSpan TaskReadDelay { get; set; }
+        public Action? BeforeDelay { get; set; }
         public int TaskCode { get; set; }
         public int Pages { get; set; }
         public int TaskReads { get; set; }
         public int Enters { get; set; }
         public int Danmaku { get; set; }
+        public int InteractionAttempts { get; set; }
+        public Func<int, int>? InteractionCodeAt { get; set; }
         public string EntryDevice { get; set; } = "";
         public Func<int, FansMedalPanelResponse> Panel { get; set; } =
             _ => new() { List = [Medal(60)] };
@@ -490,8 +1287,8 @@ public class LiveFansMedalTaskTests
                                 Data = new()
                                 {
                                     Live_Status = LiveStatus,
-                                    Parent_area_id = 1,
-                                    Area_id = 1,
+                                    Parent_area_id = ParentAreaId,
+                                    Area_id = AreaId,
                                 },
                             }
                         ),
@@ -503,6 +1300,10 @@ public class LiveFansMedalTaskTests
                 {
                     if (method == "GetFansMedalPanel")
                         Pages++;
+                    if (method == "GetLiveRoomInfo")
+                        RoomReads++;
+                    if (method == "GetActivatedMedalInfo")
+                        Clock.Now = Clock.Now.Add(TaskReadDelay);
                 }
             );
             Trace = Proxy.Create<ILiveTraceApi>(
@@ -517,15 +1318,25 @@ public class LiveFansMedalTaskTests
                         Heartbeats.Add((HeartBeatRequest)args[0]!);
                     else
                         throw new InvalidOperationException(method);
+                    var code =
+                        method == "HeartBeat"
+                            ? HeartbeatCodeAt?.Invoke(Heartbeats.Count) ?? HeartbeatCode
+                            : 0;
+                    var serverTimestamp =
+                        method == "EnterRoom"
+                            ? Clock.Now.ToUnixTimeSeconds()
+                            : Heartbeats[^1].Ets + Heartbeats[^1].Time;
+                    if (method == "HeartBeat")
+                        Clock.Now = Clock.Now.Add(HeartbeatResponseDelay);
                     return Task.FromResult(
                         new BiliApiResponse<HeartBeatResponse>
                         {
-                            Code = 0,
+                            Code = code,
                             Data = new()
                             {
                                 Heartbeat_interval = 30,
                                 Secret_key = "synthetic",
-                                Timestamp = 1,
+                                Timestamp = serverTimestamp,
                             },
                         }
                     );
@@ -537,17 +1348,27 @@ public class LiveFansMedalTaskTests
                 NullLogger.Instance,
                 Options,
                 "offline-test",
-                (duration, token) =>
-                {
-                    token.ThrowIfCancellationRequested();
-                    Delays.Add(duration);
-                    return Task.CompletedTask;
-                }
+                DelayAsync,
+                clock: Clock
             );
+        }
+
+        public Task DelayAsync(TimeSpan duration, CancellationToken token)
+        {
+            token.ThrowIfCancellationRequested();
+            Delays.Add(duration);
+            Clock.Now = Clock.Now.Add(duration);
+            BeforeDelay?.Invoke();
+            return Task.CompletedTask;
         }
 
         private Task<BiliApiResponse> Like(string request)
         {
+            var code = InteractionCodeAt?.Invoke(++InteractionAttempts) ?? 0;
+            if (code != 0)
+                return Task.FromResult(
+                    new BiliApiResponse { Code = code, Message = "synthetic rejection" }
+                );
             Likes.Add(
                 int.Parse(
                     request.Split('&').First(pair => pair.StartsWith("click_time=")).Split('=')[1]
@@ -558,6 +1379,11 @@ public class LiveFansMedalTaskTests
 
         private Task<BiliApiResponse> Send()
         {
+            var code = InteractionCodeAt?.Invoke(++InteractionAttempts) ?? 0;
+            if (code != 0)
+                return Task.FromResult(
+                    new BiliApiResponse { Code = code, Message = "synthetic rejection" }
+                );
             Danmaku++;
             return Task.FromResult(new BiliApiResponse { Code = 0 });
         }

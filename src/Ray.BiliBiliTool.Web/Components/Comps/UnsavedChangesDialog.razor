@@ -1,0 +1,25 @@
+<MudDialog>
+    <DialogContent>
+        <MudText>当前页面有未保存的修改。请选择保存后离开、放弃修改或继续编辑。</MudText>
+        @if (!CanSave)
+        {
+            <MudText Typo="Typo.body2" Class="mud-text-secondary mt-2">当前操作完成后可以保存修改。</MudText>
+        }
+    </DialogContent>
+    <DialogActions>
+        <div class="unsaved-changes-actions">
+            <MudButton Variant="Variant.Text" Class="unsaved-changes-continue" OnClick="ContinueEditing">继续编辑</MudButton>
+            <MudButton Variant="Variant.Outlined" Class="unsaved-changes-discard" OnClick="Discard">放弃修改</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Save"
+                       Class="unsaved-changes-save" Disabled="@(!CanSave)" OnClick="Save">保存并离开</MudButton>
+        </div>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] private IMudDialogInstance Dialog { get; set; } = null!;
+    [Parameter] public bool CanSave { get; set; } = true;
+    private void ContinueEditing() => Dialog.Cancel();
+    private void Discard() => Dialog.Close(DialogResult.Ok(UnsavedChangesDecision.Discard));
+    private void Save() => Dialog.Close(DialogResult.Ok(UnsavedChangesDecision.Save));
+}

@@ -35,6 +35,33 @@ public partial class Admin : ComponentBase
 
     private bool _usernameSubmitting;
     private bool _passwordSubmitting;
+    private bool _credentialsSaved;
+    private bool HasUsernameChanges =>
+        !string.IsNullOrWhiteSpace(_newUsername) && _newUsername.Trim() != _account.Username;
+    private bool HasPasswordChanges =>
+        !string.IsNullOrEmpty(_newPassword.Value) || !string.IsNullOrEmpty(_confirmPassword.Value);
+    private bool HasChanges =>
+        !_credentialsSaved
+        && (
+            HasUsernameChanges
+            || HasPasswordChanges
+            || !string.IsNullOrEmpty(_usernamePassword.Value)
+            || !string.IsNullOrEmpty(_currentPassword.Value)
+        );
+
+    private async Task<bool> SaveBeforeLeavingAsync()
+    {
+        if (HasUsernameChanges && HasPasswordChanges)
+        {
+            Snackbar.Add("请先选择保存用户名或密码修改", Severity.Warning);
+            return false;
+        }
+        if (HasUsernameChanges)
+            await ChangeUsernameAsync();
+        else if (HasPasswordChanges)
+            await ChangePasswordAsync();
+        return _credentialsSaved;
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -64,7 +91,12 @@ public partial class Admin : ComponentBase
 
     private async Task ChangeUsernameAsync()
     {
-        if (_usernameSubmitting || _usernameForm is null)
+        if (
+            _credentialsSaved
+            || !HasUsernameChanges
+            || _usernameSubmitting
+            || _usernameForm is null
+        )
         {
             return;
         }
@@ -93,6 +125,7 @@ public partial class Admin : ComponentBase
             Snackbar.Add(result.SuccessMessage ?? "用户名已更新", Severity.Success);
             _account = _account with { Username = _newUsername.Trim() };
             _newUsername = "";
+            _credentialsSaved = true;
             await SignOutAfterDelayAsync();
         }
         finally
@@ -103,7 +136,12 @@ public partial class Admin : ComponentBase
 
     private async Task ChangePasswordAsync()
     {
-        if (_passwordSubmitting || _passwordForm is null)
+        if (
+            _credentialsSaved
+            || !HasPasswordChanges
+            || _passwordSubmitting
+            || _passwordForm is null
+        )
         {
             return;
         }
@@ -138,6 +176,7 @@ public partial class Admin : ComponentBase
 
             // Same as the rename path: the session was authenticated with the old
             // credentials, so it has to be re-established with the new ones.
+            _credentialsSaved = true;
             await SignOutAfterDelayAsync();
         }
         finally

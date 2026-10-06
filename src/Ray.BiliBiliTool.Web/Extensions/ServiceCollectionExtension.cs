@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Components.Authorization;
 using Ray.BiliBiliTool.Agent.Extensions;
 using Ray.BiliBiliTool.Application.Contracts;
@@ -20,6 +20,8 @@ public static class ServiceCollectionExtension
 {
     public static IServiceCollection AddWebServices(this IServiceCollection services)
     {
+        services.AddSingleton(TimeProvider.System);
+        services.AddSingleton<IScheduledDailyTaskDelay, ScheduledDailyTaskDelay>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<ILoginPageStateFactory, LoginPageStateFactory>();
         services.AddScoped<IAdminPageWorkflow, AdminPageWorkflow>();
@@ -33,7 +35,49 @@ public static class ServiceCollectionExtension
         >();
         services.AddScoped<INotificationSettingsWorkflow, NotificationSettingsWorkflow>();
         services.AddMemoryCache();
+        services.AddSingleton<ILiveMedalSnapshotStore>(provider => new FileLiveMedalSnapshotStore(
+            Path.Combine(
+                provider.GetRequiredService<IHostEnvironment>().ContentRootPath,
+                "config",
+                "live-medal-dashboard-cache"
+            ),
+            provider.GetRequiredService<ILogger<FileLiveMedalSnapshotStore>>()
+        ));
         services.AddScoped<ILiveMedalDashboardService, LiveMedalDashboardService>();
+        services.AddScoped<ILiveMedalParticipationWorkflow, LiveMedalParticipationWorkflow>();
+        services.AddSingleton<LiveMedalProgressUpdates>();
+        services.AddSingleton<Ray.BiliBiliTool.DomainService.ILiveFansMedalProgressObserver>(
+            provider => provider.GetRequiredService<LiveMedalProgressUpdates>()
+        );
+        services.AddSingleton(
+            provider => new Ray.BiliBiliTool.DomainService.LiveFansMedalExecutionGate(
+                provider.GetRequiredService<TimeProvider>(),
+                Path.Combine(
+                    provider.GetRequiredService<IHostEnvironment>().ContentRootPath,
+                    "config",
+                    "live-medal-daily-usage.json"
+                ),
+                int.TryParse(
+                    provider.GetRequiredService<IConfiguration>()[
+                        "LiveWatchDiagnostics:ConcurrentRooms"
+                    ],
+                    out var rooms
+                )
+                    ? rooms
+                    : 8
+            )
+        );
+        services.AddSingleton(provider => new Ray.BiliBiliTool.DomainService.LiveWatchDiagnostics(
+            Path.Combine(
+                provider.GetRequiredService<IHostEnvironment>().ContentRootPath,
+                "config",
+                "live-watch-diagnostics"
+            ),
+            provider.GetRequiredService<TimeProvider>()
+        ));
+        services.AddSingleton<ILiveMedalMonitorSource, LiveMedalMonitorSource>();
+        services.AddSingleton<LiveMedalMonitorCycle>();
+        services.AddHostedService<LiveMedalMonitorWorker>();
 
         // 应用版本：宿主程序集元数据，进程内不变，单例即可
         services.AddSingleton<IAppInfoProvider, AppInfoProvider>();
@@ -41,6 +85,10 @@ public static class ServiceCollectionExtension
         // 「今日任务」相关
         services.AddSingleton<ITaskRecordWriter, TaskRecordWriter>();
         services.AddSingleton<ITaskFailureBatchMonitor, TaskFailureBatchMonitor>();
+        services.AddSingleton<
+            IDailyTaskNotificationStatusSource,
+            DailyTaskNotificationStatusSource
+        >();
         services.AddHostedService<TaskFailureNotificationWorker>();
         services.AddScoped<
             ITaskFailureNotificationSettingsWorkflow,

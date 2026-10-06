@@ -14,6 +14,14 @@ namespace Ray.BiliBiliTool.Web.Components.Pages.Schedules;
 
 public partial class Schedules : ComponentBase, IDisposable
 {
+    [Inject]
+    private Microsoft.Extensions.Options.IOptionsMonitor<Ray.BiliBiliTool.Config.Options.LiveFansMedalTaskOptions> MedalOptions { get; set; } =
+        null!;
+
+    private bool IsMonitoredMedal(ScheduleModel model) =>
+        model.JobName == Jobs.LiveFansMedalJob.Key.Name
+        && MedalOptions.CurrentValue.UseLiveStateMonitoring;
+
     private ScheduleJobFilter _filter = new();
     private readonly Func<ScheduleModel, object> _groupDefinition = x => x.JobGroup;
     private MudDataGrid<ScheduleModel> _scheduleDataGrid = new();

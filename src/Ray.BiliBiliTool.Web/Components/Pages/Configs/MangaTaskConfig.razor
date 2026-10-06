@@ -8,7 +8,7 @@
 
 <PageTitle>漫画任务配置</PageTitle>
 
-<MudContainer Class="app-config-page">
+<MudContainer>
     <PageHero Size="Size.Small" Title="漫画任务配置" Description="设置漫画任务的开关与执行选项。" />
     <Ray.BiliBiliTool.Web.Components.Comps.TaskGuide TaskKey="MangaTaskAppService" Enabled="@(_isLoading ? (bool?)null : _config.IsEnable)" />
 
@@ -20,6 +20,7 @@
     {
         <EditForm Model="@_config" OnValidSubmit="HandleValidSubmitAsync">
             <DataAnnotationsValidator />
+            <Ray.BiliBiliTool.Web.Components.Comps.UnsavedChangesGuard HasChanges="HasChanges" Busy="_isSaving" SaveBeforeLeaving="SaveBeforeLeavingAsync" />
 
             <!-- 基础配置卡片 -->
             <MudCard Class="mb-4">
@@ -54,11 +55,11 @@
                     <MudCardContent>
                         <MudGrid>
                             <MudItem xs="12" md="6">
-                                <MudNumericField T="long" @bind-Value="_config.CustomComicId" Label="漫画编号"
+                                <MudNumericField Immediate="true" T="long" @bind-Value="_config.CustomComicId" Label="漫画编号"
                                     HelperText="@(TaskHelpCatalog.SettingDescription("MangaTaskAppService", "CustomComicId"))" />
                             </MudItem>
                             <MudItem xs="12" md="6">
-                                <MudNumericField T="long" @bind-Value="_config.CustomEpId" Label="章节编号"
+                                <MudNumericField Immediate="true" T="long" @bind-Value="_config.CustomEpId" Label="章节编号"
                                     HelperText="@(TaskHelpCatalog.SettingDescription("MangaTaskAppService", "CustomEpId"))" />
                             </MudItem>
                         </MudGrid>
@@ -68,14 +69,14 @@
 
             <!-- 操作按钮 -->
             <MudCard Class="mt-4">
-                <MudCardActions>
-                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">保存配置</MudButton>
-                    <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="LoadConfigAsync" Class="ml-2">重新加载</MudButton>
+                <MudCardActions Class="save-actions">
+                    <Ray.BiliBiliTool.Web.Components.Comps.SaveChangesButton ButtonType="ButtonType.Submit" HasChanges="HasChanges" Busy="_isSaving" Saved="_saveSuccess" />
+                    <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Disabled="_isSaving" OnClick="LoadConfigAsync" Class="ml-2">重新加载</MudButton>
                 </MudCardActions>
             </MudCard>
         </EditForm>
 
-        @if (_saveMessage.HasValue)
+        @if (_saveMessage is not null && (!HasChanges || !_saveSuccess))
         {
             <MudAlert Severity="@(_saveSuccess ? Severity.Success : Severity.Error)" Class="mt-3">
                 @_saveMessage

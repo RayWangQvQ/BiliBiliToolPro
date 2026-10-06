@@ -1,170 +1,230 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
 using Ray.BiliBiliTool.Application.Contracts.Notifications;
+using Xunit;
 
 namespace Ray.BiliBiliTool.Web.UnitTests;
 
 public class TaskFailureBatchMonitorTests
 {
     [Fact]
-    public async Task ConcurrentTasksAndAccounts_SendOneSummaryAfterLastTaskEnds()
+    public async Task SeparatedRoundsWaitForAllAutomaticTasksThenSendOnceAcrossRestart()
     {
         var f = new Fixture();
-        using var first = f.Monitor.BeginBatch();
-        var second = f.Monitor.BeginBatch();
-        await Task.WhenAll(
-            f.Monitor.RecordFailureAsync(123456, "DailyTaskAppService"),
-            f.Monitor.RecordFailureAsync(654321, "MangaTaskAppService"),
-            f.Monitor.RecordFailureAsync(123456, "DailyTaskAppService")
-        );
-        f.Clock.Advance(10);
-        await f.Monitor.FlushReadyAsync();
+        f.Source.Finished = false;
+        for (var round = 0; round < 3; round++)
+        {
+            using (f.Monitor.BeginBatch())
+                await f.Monitor.RecordFailureAsync(123456, "DailyTaskAppService");
+            f.Clock.Advance(20);
+            await f.Monitor.FlushReadyAsync();
+        }
         Assert.Empty(f.Notifier.Summaries);
-        first.Dispose();
-        second.Dispose();
-        await f.Monitor.FlushReadyAsync();
-        Assert.Empty(f.Notifier.Summaries);
-        f.Clock.Advance(2);
+        f.Source.Finished = true;
         await Task.WhenAll(f.Monitor.FlushReadyAsync(), f.Monitor.FlushReadyAsync());
         var summary = Assert.Single(f.Notifier.Summaries);
-        Assert.Equal(2, summary.Items.Count);
-        var daily = summary.Items.Single(item => item.TaskName == "每日任务");
-        Assert.Equal(2, daily.FailureCount);
-        Assert.Equal("***3456", Assert.Single(daily.MaskedAccounts));
-        Assert.Null(f.Store.State);
+        Assert.False(summary.CutoffReached);
+        Assert.Equal(3, summary.Items[0].FailureCount);
+        Assert.Equal("***3456", Assert.Single(summary.Items[0].MaskedAccounts));
+        Assert.NotNull(Assert.Single(f.Store.State!.Days!).SentAtUtc);
+        await f.Monitor.RecordActivityAsync();
+        await f.Monitor.RecordFailureAsync(123456, "DailyTaskAppService");
+        f.Clock.Advance(20);
+        await f.CreateMonitor().FlushReadyAsync();
+        Assert.Single(f.Notifier.Summaries);
     }
 
     [Fact]
-    public async Task AdjacentTask_StartsBeforeMergeDelay_StaysInSameBatch()
+    public async Task ActiveTasksAndQuietPeriodPreventPrematureCompletedSummary()
     {
         var f = new Fixture();
-        using (f.Monitor.BeginBatch())
-            await f.Monitor.RecordFailureAsync(1, "DailyTaskAppService");
-        f.Clock.Advance(1);
-        using (f.Monitor.BeginBatch())
-            await f.Monitor.RecordFailureAsync(2, "MangaTaskAppService");
+        var lease = f.Monitor.BeginBatch();
+        await f.Monitor.RecordActivityAsync();
+        f.Clock.Advance(5);
+        await f.Monitor.FlushReadyAsync();
+        Assert.Empty(f.Notifier.Summaries);
+        lease.Dispose();
         f.Clock.Advance(1);
         await f.Monitor.FlushReadyAsync();
         Assert.Empty(f.Notifier.Summaries);
         f.Clock.Advance(1);
         await f.Monitor.FlushReadyAsync();
-        Assert.Equal(2, Assert.Single(f.Notifier.Summaries).Items.Count);
+        Assert.True(Assert.Single(f.Notifier.Summaries).Items[0].Completed);
     }
 
     [Fact]
-    public async Task PerTaskSwitchAndGlobalSwitch_ExcludeFailuresAndTakeEffectImmediately()
+    public async Task ConfiguredCutoffSendsPendingAndFailedItemsEvenWhileRunningOnlyOnce()
     {
         var f = new Fixture();
-        f.Config[TaskFailureNotificationCatalog.SettingKey("MangaTaskAppService")] = "false";
-        await f.Monitor.RecordFailureAsync(1, "MangaTaskAppService");
-        Assert.Null(f.Store.State);
-        await f.Monitor.RecordFailureAsync(1, "DailyTaskAppService");
-        f.Config[TaskFailureNotificationCatalog.SettingKey("DailyTaskAppService")] = "false";
-        f.Clock.Advance(2);
+        f.Config[DailyTaskNotificationSchedule.CutoffKey] = "08:10";
+        f.Source.Finished = false;
+        f.Source.Running = true;
+        using var lease = f.Monitor.BeginBatch();
+        await f.Monitor.RecordFailureAsync(123456, "DailyTaskAppService");
+        f.Clock.Advance(9);
         await f.Monitor.FlushReadyAsync();
-        Assert.Null(f.Store.State);
         Assert.Empty(f.Notifier.Summaries);
-        f.Config["TaskFailureNotification:Enabled"] = "false";
-        f.Config[TaskFailureNotificationCatalog.SettingKey("DailyTaskAppService")] = "true";
-        await f.Monitor.RecordFailureAsync(1, "DailyTaskAppService");
-        Assert.Null(f.Store.State);
+        f.Clock.Advance(1);
+        await f.Monitor.FlushReadyAsync();
+        var summary = Assert.Single(f.Notifier.Summaries);
+        Assert.True(summary.CutoffReached);
+        Assert.Equal("***3456", Assert.Single(summary.Items[0].PendingAccounts!));
+        Assert.Equal(1, summary.Items[0].FailureCount);
+        f.Source.Finished = true;
+        f.Source.Running = false;
+        f.Clock.Advance(10);
+        await f.CreateMonitor().FlushReadyAsync();
+        Assert.Single(f.Notifier.Summaries);
     }
 
     [Fact]
-    public async Task FailedDelivery_RemainsPendingAndRetriesAfterBackoffAcrossRestart()
+    public async Task CutoffAlsoReportsMissedScheduledTasksWithoutRecordedActivity()
+    {
+        var f = new Fixture();
+        f.Source.Finished = false;
+        f.Config[DailyTaskNotificationSchedule.CutoffKey] = "08:00";
+        await f.Monitor.FlushReadyAsync();
+        Assert.True(Assert.Single(f.Notifier.Summaries).CutoffReached);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task UnconfirmedDeliveryDoesNotRepeatAfterTimeoutOrRestart(bool throws)
     {
         var f = new Fixture();
         f.Notifier.Accept = false;
-        await f.Monitor.RecordFailureAsync(1, "DailyTaskAppService");
+        f.Notifier.Throw = throws;
+        await f.Monitor.RecordActivityAsync();
         f.Clock.Advance(2);
         await f.Monitor.FlushReadyAsync();
-        Assert.NotNull(f.Store.State);
+        Assert.NotNull(Assert.Single(f.Store.State!.Days!).NotificationAttemptUtc);
+        Assert.Null(Assert.Single(f.Store.State.Days!).SentAtUtc);
+        f.Clock.Advance(30);
+        f.Notifier.Accept = true;
+        f.Notifier.Throw = false;
         await f.CreateMonitor().FlushReadyAsync();
         Assert.Single(f.Notifier.Summaries);
-        f.Clock.Advance(15);
-        f.Notifier.Accept = true;
-        await f.CreateMonitor().FlushReadyAsync();
-        Assert.Equal(2, f.Notifier.Summaries.Count);
-        Assert.Null(f.Store.State);
-        await f.CreateMonitor().FlushReadyAsync();
-        Assert.Equal(2, f.Notifier.Summaries.Count);
     }
 
     [Fact]
-    public async Task SuccessfulBatch_ProducesNoNotification_AndLaterBatchIsIndependent()
+    public async Task NextChinaDayHasIndependentSummaryAndDoesNotCarryOldFailures()
     {
         var f = new Fixture();
-        using (f.Monitor.BeginBatch()) { }
+        await f.Monitor.RecordFailureAsync(123456, "DailyTaskAppService");
         f.Clock.Advance(2);
+        await f.Monitor.FlushReadyAsync();
+        f.Clock.Advance(24 * 60);
+        var next = f.CreateMonitor();
+        await next.RecordActivityAsync();
+        f.Clock.Advance(2);
+        await next.FlushReadyAsync();
+        Assert.Equal(2, f.Notifier.Summaries.Count);
+        Assert.Equal(new DateOnly(2026, 10, 6), f.Notifier.Summaries[1].Day);
+        Assert.Equal(0, f.Notifier.Summaries[1].Items[0].FailureCount);
+        Assert.Equal(2, f.Store.State!.Days!.Count);
+    }
+
+    [Fact]
+    public async Task TaskAndGlobalSwitchesImmediatelyFilterOrStopDailySummary()
+    {
+        var f = new Fixture();
+        await f.Monitor.RecordFailureAsync(123456, "DailyTaskAppService");
+        f.Clock.Advance(2);
+        f.Config[TaskFailureNotificationCatalog.SettingKey("DailyTaskAppService")] = "false";
         await f.Monitor.FlushReadyAsync();
         Assert.Empty(f.Notifier.Summaries);
-        for (var i = 0; i < 2; i++)
-        {
-            using (f.Monitor.BeginBatch())
-                await f.Monitor.RecordFailureAsync(1, "DailyTaskAppService");
-            f.Clock.Advance(2);
-            await f.Monitor.FlushReadyAsync();
-        }
-        Assert.Equal(2, f.Notifier.Summaries.Count);
+        Assert.Null(Assert.Single(f.Store.State!.Days!).NotificationAttemptUtc);
+        f.Config[TaskFailureNotificationCatalog.SettingKey("DailyTaskAppService")] = "true";
+        f.Config["TaskFailureNotification:Enabled"] = "false";
+        await f.Monitor.FlushReadyAsync();
+        Assert.Empty(f.Notifier.Summaries);
+        f.Config["TaskFailureNotification:Enabled"] = "true";
+        await f.Monitor.FlushReadyAsync();
+        Assert.Single(f.Notifier.Summaries);
     }
 
     [Fact]
-    public async Task UnknownTasks_AreNotForwardedToNotification()
+    public async Task MissingSendKeyDoesNotConsumeDailyAttempt()
     {
         var f = new Fixture();
-        await f.Monitor.RecordFailureAsync(1, "secret-in-untrusted-task-name");
+        f.Config["CookieCheck:ServerChanSendKey"] = "";
+        await f.Monitor.RecordActivityAsync();
+        f.Clock.Advance(2);
+        await f.Monitor.FlushReadyAsync();
+        Assert.Null(Assert.Single(f.Store.State!.Days!).NotificationAttemptUtc);
+        f.Config["CookieCheck:ServerChanSendKey"] = "SCT123synthetic";
+        await f.Monitor.FlushReadyAsync();
+        Assert.Single(f.Notifier.Summaries);
+    }
+
+    [Fact]
+    public async Task SuppressedManualAndRecoveryOperationsDoNotCreateDailyActivity()
+    {
+        var f = new Fixture();
+        using (new TaskFailureNotificationScope(suppress: true))
+        {
+            await f.Monitor.RecordActivityAsync();
+            await f.Monitor.RecordFailureAsync(123456, "DailyTaskAppService");
+        }
+        Assert.Null(f.Store.State);
+        f.Clock.Advance(2);
+        await f.Monitor.FlushReadyAsync();
+        f.Config[DailyTaskNotificationSchedule.CutoffKey] = "08:00";
+        await f.Monitor.FlushReadyAsync();
+        Assert.Empty(f.Notifier.Summaries);
+    }
+
+    [Fact]
+    public async Task LegacyPendingStateMigratesAndPreservesFailureCounts()
+    {
+        var f = new Fixture();
+        await f.Store.WriteAsync(
+            new(
+                f.Clock.GetUtcNow(),
+                f.Clock.GetUtcNow(),
+                null,
+                [new("DailyTaskAppService", "***3456", 2)]
+            ),
+            default
+        );
+        f.Clock.Advance(2);
+        await f.Monitor.FlushReadyAsync();
+        Assert.Equal(2, Assert.Single(f.Notifier.Summaries).Items[0].FailureCount);
+        Assert.NotNull(Assert.Single(f.Store.State!.Days!).SentAtUtc);
+    }
+
+    [Fact]
+    public async Task UnknownTasksAreNotRecorded()
+    {
+        var f = new Fixture();
+        await f.Monitor.RecordFailureAsync(123456, "synthetic-unknown-task");
         Assert.Null(f.Store.State);
     }
 
     [Fact]
-    public async Task SuppressedOperations_DoNotChangeAnExistingScheduledSummary()
+    public async Task ConcurrentRecoveryAndScheduledTasksKeepNotificationContextsSeparate()
     {
         var f = new Fixture();
-        using (f.Monitor.BeginBatch())
-            await f.Monitor.RecordFailureAsync(1, "DailyTaskAppService");
-        var scheduledState = f.Store.State;
-        f.Clock.Advance(1);
-        using (new TaskFailureNotificationScope(suppress: true))
-        {
-            await f.Monitor.RecordFailureAsync(2, "MangaTaskAppService");
-            await f.Monitor.RecordFailureAsync(1, "DailyTaskAppService");
-        }
-        Assert.Equal(scheduledState, f.Store.State);
-        f.Clock.Advance(1);
-        await f.Monitor.FlushReadyAsync();
-        var item = Assert.Single(Assert.Single(f.Notifier.Summaries).Items);
-        Assert.Equal("每日任务", item.TaskName);
-        Assert.Equal(1, item.FailureCount);
-    }
-
-    [Fact]
-    public async Task ConcurrentRecoveryAndScheduledTasks_KeepNotificationContextsSeparate()
-    {
-        var f = new Fixture();
-        var recoveryStarted = new TaskCompletionSource(
-            TaskCreationOptions.RunContinuationsAsynchronously
+        await Task.WhenAll(
+            Task.Run(async () =>
+            {
+                using var scope = new TaskFailureNotificationScope(suppress: true);
+                await f.Monitor.RecordActivityAsync();
+                await f.Monitor.RecordFailureAsync(654321, "DailyTaskAppService");
+            }),
+            Task.Run(() => f.Monitor.RecordFailureAsync(123456, "DailyTaskAppService"))
         );
-        var finishRecovery = new TaskCompletionSource(
-            TaskCreationOptions.RunContinuationsAsynchronously
-        );
-        var recovery = Task.Run(async () =>
-        {
-            using var scope = new TaskFailureNotificationScope(suppress: true);
-            recoveryStarted.SetResult();
-            await finishRecovery.Task;
-            await f.Monitor.RecordFailureAsync(2, "MangaTaskAppService");
-        });
-        await recoveryStarted.Task;
-        await f.Monitor.RecordFailureAsync(1, "DailyTaskAppService");
-        finishRecovery.SetResult();
-        await recovery;
         f.Clock.Advance(2);
         await f.Monitor.FlushReadyAsync();
-        Assert.Equal("每日任务", Assert.Single(Assert.Single(f.Notifier.Summaries).Items).TaskName);
+        Assert.Equal(
+            "***3456",
+            Assert.Single(Assert.Single(f.Notifier.Summaries).Items[0].MaskedAccounts)
+        );
     }
 
     [Fact]
-    public void NestedScopes_RestorePriorContextAndCannotReenableSuppressedReminders()
+    public void NestedScopesRestorePriorContextAndCannotReenableSuppressedReminders()
     {
         using (new TaskFailureNotificationScope(suppress: true))
         {
@@ -178,16 +238,57 @@ public class TaskFailureBatchMonitorTests
     private sealed class Fixture
     {
         public IConfigurationRoot Config { get; } =
-            new ConfigurationBuilder().AddInMemoryCollection().Build();
+            new ConfigurationBuilder()
+                .AddInMemoryCollection(
+                    new Dictionary<string, string?>
+                    {
+                        ["CookieCheck:ServerChanSendKey"] = "SCT123synthetic",
+                    }
+                )
+                .Build();
         public MemoryStore Store { get; } = new();
         public FakeNotifier Notifier { get; } = new();
         public FakeClock Clock { get; } = new();
+        public FakeSource Source { get; } = new();
         public TaskFailureBatchMonitor Monitor { get; }
 
         public Fixture() => Monitor = CreateMonitor();
 
         public TaskFailureBatchMonitor CreateMonitor() =>
-            new(Config, Store, Notifier, Clock, NullLogger<TaskFailureBatchMonitor>.Instance);
+            new(
+                Config,
+                Store,
+                Notifier,
+                Clock,
+                NullLogger<TaskFailureBatchMonitor>.Instance,
+                Source
+            );
+    }
+
+    private sealed class FakeSource : IDailyTaskNotificationStatusSource
+    {
+        public bool Finished { get; set; } = true;
+        public bool Running { get; set; }
+
+        public Task<DailyTaskNotificationStatus> ReadAsync(
+            DateOnly day,
+            DateTimeOffset now,
+            CancellationToken token
+        ) =>
+            Task.FromResult(
+                new DailyTaskNotificationStatus(
+                    Finished,
+                    Running,
+                    [
+                        new(
+                            "DailyTaskAppService",
+                            "每日任务",
+                            ["***3456"],
+                            Finished ? [] : ["***3456"]
+                        ),
+                    ]
+                )
+            );
     }
 
     private sealed class FakeClock : TimeProvider
@@ -216,11 +317,14 @@ public class TaskFailureBatchMonitorTests
     private sealed class FakeNotifier : ITaskFailureNotifier
     {
         public bool Accept { get; set; } = true;
+        public bool Throw { get; set; }
         public List<TaskFailureSummary> Summaries { get; } = [];
 
         public Task<bool> SendAsync(TaskFailureSummary summary, CancellationToken token)
         {
             Summaries.Add(summary);
+            if (Throw)
+                throw new HttpRequestException("synthetic ambiguous response");
             return Task.FromResult(Accept);
         }
     }

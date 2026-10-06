@@ -50,7 +50,11 @@
                             Sortable="false"
                             ShowColumnOptions="false">
                 <CellTemplate>
-                    @switch (context.Item.JobStatus)
+                    @if (IsMonitoredMedal(context.Item))
+                    { <MudChip T="string" Size="Size.Small" Color="@(MedalOptions.CurrentValue.IsEnable ? Color.Primary : Color.Default)">@(MedalOptions.CurrentValue.IsEnable ? "自动检查" : "已关闭")</MudChip> }
+                    else
+                    {
+                    switch (context.Item.JobStatus)
                     {
                         case JobStatus.Running:
                             <MudProgressCircular Color="Color.Primary" Size="Size.Small"
@@ -105,6 +109,7 @@
                                      Size="Size.Small"/>
                             break;
                     }
+                    }
                 </CellTemplate>
             </TemplateColumn>
             <PropertyColumn Title="任务名" Property="x => x.JobName" ShowColumnOptions="false">
@@ -131,10 +136,10 @@
             </PropertyColumn>
             <PropertyColumn Title="执行计划" Property="x => x.TriggerType">
                 <CellTemplate>
-                    @if (context.Item.JobStatus == JobStatus.NoTrigger)
-                    {
-                        <MudText Typo="Typo.body1">--</MudText>
-                    }
+                    @if (IsMonitoredMedal(context.Item))
+                    { <MudText Typo="Typo.body2">每 @MedalOptions.CurrentValue.MonitorIntervalMinutes 分钟检查主播状态</MudText> }
+                    else if (context.Item.JobStatus == JobStatus.NoTrigger)
+                    { <MudText Typo="Typo.body1">--</MudText> }
                     else
                     {
                         @if (context.Item.TriggerDetail == null)
@@ -235,7 +240,9 @@
                                        OnClick="@(() => OnLogs(context.Item))"></MudIconButton>
                     </MudTooltip>
                     <MudMenu Icon="@Icons.Material.Filled.MoreHoriz" Size="Size.Small" Style="display: inline-block;">
-                        @if (context.Item.JobStatus is JobStatus.Paused or JobStatus.NoTrigger)
+                        @if (IsMonitoredMedal(context.Item))
+                        { <MudMenuItem Href="/Configurations/LiveFansMedalTaskConfig">调整自动执行设置</MudMenuItem> }
+                        else if (context.Item.JobStatus is JobStatus.Paused or JobStatus.NoTrigger)
                         {
                             <MudMenuItem Disabled="@IsRunActionDisabled(context.Item)" OnClick="@(async () => await OnResumeScheduleJob(context.Item))">
                                 <div class="d-flex gap-1">

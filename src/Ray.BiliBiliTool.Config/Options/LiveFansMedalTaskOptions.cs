@@ -6,8 +6,38 @@ public class LiveFansMedalTaskOptions : BaseConfigOptions
 {
     public override string SectionName => "LiveFansMedalTaskConfig";
 
-    // Existing installations keep their custom budgets until this is enabled.
-    public bool FollowDailyTaskLimit { get; set; }
+    public bool UseLiveStateMonitoring { get; set; } = true;
+
+    [Range(1, 30, ErrorMessage = "检查间隔应为 1～30 分钟")]
+    public int MonitorIntervalMinutes { get; set; } = 5;
+    public bool FollowDailyTaskLimit { get; set; } = true;
+
+    [Range(0, 5000, ErrorMessage = "每日点赞次数应为 0～5000")]
+    public int DailyLikeNumber { get; set; } = 300;
+
+    [Range(0, 100, ErrorMessage = "每日弹幕次数应为 0～100")]
+    public int DailyDanmakuNumber { get; set; } = 10;
+
+    [Range(0, 1440, ErrorMessage = "每日观看时长应为 0～1440 分钟")]
+    public int DailyWatchMinutes { get; set; } = 150;
+
+    public int GetInteractionLimit(string action) =>
+        action switch
+        {
+            "like" => Math.Clamp(UseLiveStateMonitoring ? DailyLikeNumber : LikeNumber, 0, 5000),
+            "sendDanmu" => Math.Clamp(
+                UseLiveStateMonitoring ? DailyDanmakuNumber : SendDanmakuNumber,
+                0,
+                100
+            ),
+            "watchLive" => Math.Clamp(
+                UseLiveStateMonitoring ? DailyWatchMinutes : HeartBeatNumber,
+                0,
+                1440
+            ) * 60,
+            _ => 0,
+        };
+
     public bool EnableLike { get; set; } = true;
     public bool EnableDanmaku { get; set; } = true;
     public bool EnableWatch { get; set; } = true;
@@ -20,6 +50,10 @@ public class LiveFansMedalTaskOptions : BaseConfigOptions
     public string ExcludedAnchorIds { get; set; } = "";
 
     public HashSet<long> GetExcludedAnchorIds() => ParseAnchorIds(ExcludedAnchorIds);
+
+    public string PinnedAnchorIds { get; set; } = "";
+
+    public HashSet<long> GetPinnedAnchorIds() => ParseAnchorIds(PinnedAnchorIds);
 
     private static HashSet<long> ParseAnchorIds(string value) =>
         value
@@ -56,7 +90,8 @@ public class LiveFansMedalTaskOptions : BaseConfigOptions
             var property in typeof(LiveFansMedalTaskOptions)
                 .GetProperties()
                 .Where(property =>
-                    property.DeclaringType == typeof(LiveFansMedalTaskOptions)
+                    property.CanWrite
+                    && property.DeclaringType == typeof(LiveFansMedalTaskOptions)
                     && property.Name != nameof(SectionName)
                 )
         )

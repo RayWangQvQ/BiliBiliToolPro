@@ -18,6 +18,14 @@ public interface INotificationSettingsWorkflow
         string? newSendKey,
         IReadOnlyDictionary<string, bool> tasks
     );
+    void Save(
+        bool autoCheckEnabled,
+        bool expiryNotifyEnabled,
+        bool failureNotifyEnabled,
+        string? newSendKey,
+        IReadOnlyDictionary<string, bool> tasks,
+        string? dailySummaryTime
+    ) => Save(autoCheckEnabled, expiryNotifyEnabled, failureNotifyEnabled, newSendKey, tasks);
 }
 
 public sealed class NotificationSettingsWorkflow(IConfiguration configuration)
@@ -35,8 +43,30 @@ public sealed class NotificationSettingsWorkflow(IConfiguration configuration)
         bool failureNotifyEnabled,
         string? newSendKey,
         IReadOnlyDictionary<string, bool> tasks
+    ) => Save(autoCheckEnabled, expiryNotifyEnabled, failureNotifyEnabled, newSendKey, tasks, null);
+
+    public void Save(
+        bool autoCheckEnabled,
+        bool expiryNotifyEnabled,
+        bool failureNotifyEnabled,
+        string? newSendKey,
+        IReadOnlyDictionary<string, bool> tasks,
+        string? dailySummaryTime
     )
     {
+        if (
+            dailySummaryTime is not null
+            && (
+                !TimeSpan.TryParseExact(
+                    dailySummaryTime,
+                    @"hh\:mm",
+                    System.Globalization.CultureInfo.InvariantCulture,
+                    out var parsedTime
+                )
+                || parsedTime >= TimeSpan.FromDays(1)
+            )
+        )
+            throw new InvalidOperationException("请选择有效的最终汇总时间");
         var key = string.IsNullOrWhiteSpace(newSendKey)
             ? ServerChanCookieExpiryNotifier.GetSendKey(configuration)
             : newSendKey.Trim();
@@ -63,6 +93,8 @@ public sealed class NotificationSettingsWorkflow(IConfiguration configuration)
         values["CookieCheck:AutoCheckEnabled"] = autoCheckEnabled.ToString();
         values["CookieCheck:NotifyEnabled"] = expiryNotifyEnabled.ToString();
         values["TaskFailureNotification:Enabled"] = failureNotifyEnabled.ToString();
+        if (dailySummaryTime is not null)
+            values[DailyTaskNotificationSchedule.CutoffKey] = dailySummaryTime;
         if (!string.IsNullOrWhiteSpace(newSendKey))
             values["CookieCheck:ServerChanSendKey"] = key!;
         provider.BatchSet(values);

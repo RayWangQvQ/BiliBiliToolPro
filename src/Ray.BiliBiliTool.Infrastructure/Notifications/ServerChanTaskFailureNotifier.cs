@@ -25,18 +25,29 @@ public sealed class ServerChanTaskFailureNotifier(
         );
         if (endpoint is null)
             return false;
-        var message = new StringBuilder("本批任务执行完毕，以下任务执行失败：\n\n");
-        foreach (var item in summary.Items)
-            message.AppendLine(
-                $"- {item.TaskName}：{item.FailureCount} 次失败（账号 {string.Join("、", item.MaskedAccounts)}）"
-            );
+        var message = new StringBuilder(
+            $"{summary.Day?.ToString("yyyy-MM-dd") ?? summary.CompletedAtUtc.ToOffset(TimeSpan.FromHours(8)).ToString("yyyy-MM-dd")} 自动任务汇总\n\n"
+        );
         message.AppendLine(
-            "\n请打开面板「今日任务」或执行记录查看详情，按需补做。\n\n本消息为本批任务的统一汇总提醒。"
+            summary.CutoffReached ? "已到设定的最终汇总时间。\n" : "当天自动任务已全部结束。\n"
+        );
+        foreach (var item in summary.Items)
+        {
+            message.AppendLine($"- {item.TaskName}：{(item.Completed ? "已结束" : "未完成")}");
+            if (item.FailureCount > 0)
+                message.AppendLine(
+                    $"  今日失败 {item.FailureCount} 次（账号 {string.Join("、", item.MaskedAccounts)}）"
+                );
+            if (item.PendingAccounts is { Count: > 0 })
+                message.AppendLine($"  未完成账号：{string.Join("、", item.PendingAccounts)}");
+        }
+        message.AppendLine(
+            "\n请打开面板「今日任务」或执行记录查看详情。\n\n本消息为当天自动任务的统一汇总提醒。"
         );
         using var content = new FormUrlEncodedContent(
             new Dictionary<string, string>
             {
-                ["title"] = "BiliBili 任务失败汇总",
+                ["title"] = "BiliBili 每日任务汇总",
                 ["desp"] = message.ToString(),
             }
         );

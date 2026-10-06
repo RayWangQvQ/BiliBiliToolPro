@@ -1,4 +1,4 @@
-﻿namespace Ray.BiliBiliTool.Config.Options;
+namespace Ray.BiliBiliTool.Config.Options;
 
 /// <summary>
 /// 程序自定义个性化配置
@@ -27,6 +27,9 @@ public class DailyTaskOptions : BaseConfigOptions
     /// </summary>
     public int NumberOfCoins { get; set; } = 5;
 
+    [System.ComponentModel.DataAnnotations.Range(0, 1440)]
+    public int? RandomDelayMaxMinutes { get; set; }
+
     /// <summary>
     /// 要保留的硬币数量 [0,int_max]
     /// </summary>
@@ -36,6 +39,18 @@ public class DailyTaskOptions : BaseConfigOptions
     /// 达到六级后是否开始白嫖
     /// </summary>
     public bool SaveCoinsWhenLv6 { get; set; } = false;
+
+    [System.ComponentModel.DataAnnotations.Range(0, 6)]
+    public int CoinDonationStopLevel { get; set; }
+
+    // A configured threshold takes precedence over the legacy Lv.6 switch.
+    public int EffectiveCoinDonationStopLevel =>
+        CoinDonationStopLevel > 0 ? CoinDonationStopLevel
+        : SaveCoinsWhenLv6 ? 6
+        : 0;
+
+    public bool ShouldSkipCoinDonation(int? currentLevel) =>
+        EffectiveCoinDonationStopLevel > 0 && currentLevel >= EffectiveCoinDonationStopLevel;
 
     /// <summary>
     /// 投币时是否点赞[false,true]
@@ -105,12 +120,20 @@ public class DailyTaskOptions : BaseConfigOptions
                 },
                 { $"{SectionName}:{nameof(NumberOfCoins)}", NumberOfCoins.ToString() },
                 {
+                    $"{SectionName}:{nameof(RandomDelayMaxMinutes)}",
+                    RandomDelayMaxMinutes?.ToString() ?? ""
+                },
+                {
                     $"{SectionName}:{nameof(NumberOfProtectedCoins)}",
                     NumberOfProtectedCoins.ToString()
                 },
                 {
                     $"{SectionName}:{nameof(SaveCoinsWhenLv6)}",
                     SaveCoinsWhenLv6.ToString().ToLower()
+                },
+                {
+                    $"{SectionName}:{nameof(CoinDonationStopLevel)}",
+                    CoinDonationStopLevel.ToString()
                 },
                 { $"{SectionName}:{nameof(SelectLike)}", SelectLike.ToString().ToLower() },
                 { $"{SectionName}:{nameof(SupportUpIds)}", SupportUpIds ?? "" },

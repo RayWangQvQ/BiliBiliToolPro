@@ -21,10 +21,13 @@ public class TaskFailureNotificationConfigTests : TestContext
         var page = RenderComponent<CookieNotificationConfig>();
         page.Find("[data-task-key=DailyTaskAppService] input").Change(false);
         page.Find("button").Click();
+        page.WaitForAssertion(() =>
+            Assert.Contains("设置已保存", page.Find(".save-result").TextContent)
+        );
         Assert.False(workflow.Tasks["DailyTaskAppService"]);
         Assert.True(workflow.Tasks["MangaTaskAppService"]);
         Assert.Contains("设置已保存", page.Find("[role=status]").TextContent);
-        Assert.Contains("2 分钟", page.Markup);
+        Assert.Contains("最终汇总时间", page.Markup);
         Assert.Contains("SendKey 已配置", page.Markup);
     }
 

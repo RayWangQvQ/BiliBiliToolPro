@@ -1,3 +1,5 @@
+@using Ray.BiliBiliTool.Web.Services
+
 @* Nav links only - the app-version footer lives in MainLayout, at the drawer bottom. *@
 
 <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">
@@ -20,38 +22,31 @@
     <MudNavLink Href="Configurations/NotificationConfig" Icon="@Icons.Material.Filled.NotificationsActive">
         检查与提醒
     </MudNavLink>
-    <MudNavLink Href="Configurations/DailyJobConfig" Icon="@Icons.Material.Filled.Paid">
-        每日任务
-    </MudNavLink>
-    <MudNavLink Href="Configurations/MangaTaskConfig" Icon="@Icons.Material.Filled.Book">
-        漫画任务
-    </MudNavLink>
-    <MudNavLink Href="Configurations/MangaPrivilegeTaskConfig" Icon="@Icons.Material.Filled.MenuBook">
-        漫画特权
-    </MudNavLink>
-    <MudNavLink Href="Configurations/Silver2CoinTaskConfig" Icon="@Icons.Material.Filled.SwapHoriz">
-        银瓜子换硬币
-    </MudNavLink>
-    <MudNavLink Href="Configurations/ChargeTaskConfig" Icon="@Icons.Material.Filled.Bolt">
-        充电任务
-    </MudNavLink>
-    <MudNavLink Href="Configurations/VipPrivilegeConfig" Icon="@Icons.Material.Filled.Star">
-        大会员福利
-    </MudNavLink>
-    <MudNavLink Href="Configurations/VipBigPointConfig" Icon="@Icons.Material.Filled.MilitaryTech">
-        大会员积分
-    </MudNavLink>
-    <MudNavLink Href="Configurations/LiveLotteryTaskConfig" Icon="@Icons.Material.Filled.CardGiftcard">
-        直播抽奖
-    </MudNavLink>
-    <MudNavLink Href="Configurations/LiveFansMedalTaskConfig" Icon="@Icons.Material.Filled.Badge">
-        粉丝勋章
-    </MudNavLink>
-    <MudNavLink Href="Configurations/UnfollowBatchedTaskConfig" Icon="@Icons.Material.Filled.PersonRemove">
-        批量取关
-    </MudNavLink>
+    @foreach (var task in TaskCatalog.All)
+    {
+        <MudNavLink @key="task.TaskKey" Href="@TaskHelpCatalog.ConfigurationUrl(task.TaskKey)" Icon="@TaskIcon(task.TaskKey)">
+            @task.DisplayName
+        </MudNavLink>
+    }
 </MudNavGroup>
 
 <MudNavLink Href="Admin" Icon="@Icons.Material.Filled.AdminPanelSettings">
     管理员
 </MudNavLink>
+
+@code {
+    private static string TaskIcon(string taskKey) => taskKey switch
+    {
+        "DailyTaskAppService" => Icons.Material.Filled.Paid,
+        "MangaTaskAppService" => Icons.Material.Filled.Book,
+        "MangaPrivilegeTaskAppService" => Icons.Material.Filled.MenuBook,
+        "Silver2CoinTaskAppService" => Icons.Material.Filled.SwapHoriz,
+        "ChargeTaskAppService" => Icons.Material.Filled.Bolt,
+        "VipPrivilegeTaskAppService" => Icons.Material.Filled.Star,
+        "VipBigPointAppService" => Icons.Material.Filled.MilitaryTech,
+        "LiveLotteryTaskAppService" => Icons.Material.Filled.CardGiftcard,
+        "LiveFansMedalAppService" => Icons.Material.Filled.Badge,
+        "UnfollowBatchedTaskAppService" => Icons.Material.Filled.PersonRemove,
+        _ => Icons.Material.Filled.TaskAlt,
+    };
+}

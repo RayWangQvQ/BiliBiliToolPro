@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Quartz;
 using Ray.BiliBiliTool.Application.Contracts;
 using Ray.BiliBiliTool.Web.Jobs;
+using Xunit;
 
 namespace Ray.BiliBiliTool.Web.UnitTests;
 
@@ -24,6 +25,7 @@ public class JobFailureNotificationTests
         Assert.Equal(!scheduled, service.Suppressed);
         Assert.Equal(scheduled ? 1 : 0, monitor.Batches);
         Assert.Equal(scheduled ? 1 : 0, monitor.Failures);
+        Assert.Equal(scheduled ? 1 : 0, monitor.Activities);
         Assert.Equal(0, monitor.ActiveBatches);
         Assert.False(TaskFailureNotificationScope.IsSuppressed);
     }
@@ -42,6 +44,14 @@ public class JobFailureNotificationTests
 
     private sealed class CaptureMonitor : ITaskFailureBatchMonitor
     {
+        public int Activities { get; private set; }
+
+        public Task RecordActivityAsync(CancellationToken token = default)
+        {
+            Activities++;
+            return Task.CompletedTask;
+        }
+
         public int Batches { get; private set; }
         public int ActiveBatches { get; private set; }
         public int Failures { get; private set; }

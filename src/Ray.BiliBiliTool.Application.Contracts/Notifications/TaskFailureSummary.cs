@@ -6,19 +6,34 @@ public sealed record TaskFailureBatchState(
     DateTimeOffset StartedAtUtc,
     DateTimeOffset LastFailureAtUtc,
     DateTimeOffset? NotificationAttemptUtc,
+    IReadOnlyList<TaskFailureEntry> Entries,
+    IReadOnlyList<TaskFailureDayState>? Days = null
+);
+
+public sealed record TaskFailureDayState(
+    DateOnly Day,
+    DateTimeOffset StartedAtUtc,
+    DateTimeOffset LastActivityUtc,
+    DateTimeOffset? NotificationAttemptUtc,
+    DateTimeOffset? SentAtUtc,
+    bool HasScheduledActivity,
     IReadOnlyList<TaskFailureEntry> Entries
 );
 
 public sealed record TaskFailureSummaryItem(
     string TaskName,
     IReadOnlyList<string> MaskedAccounts,
-    int FailureCount
+    int FailureCount,
+    IReadOnlyList<string>? PendingAccounts = null,
+    bool Completed = false
 );
 
 public sealed record TaskFailureSummary(
     DateTimeOffset StartedAtUtc,
     DateTimeOffset CompletedAtUtc,
-    IReadOnlyList<TaskFailureSummaryItem> Items
+    IReadOnlyList<TaskFailureSummaryItem> Items,
+    DateOnly? Day = null,
+    bool CutoffReached = false
 );
 
 public interface ITaskFailureNotifier

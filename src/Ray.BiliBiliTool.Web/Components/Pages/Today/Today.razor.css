@@ -25,3 +25,12 @@
 .task-row:last-child {
     border-bottom: none;
 }
+
+.today-recovery-panel {
+    scroll-margin-top: 80px;
+}
+.today-recovery-panel:focus-visible {
+    outline: 2px solid var(--mud-palette-primary);
+    outline-offset: 4px;
+    border-radius: var(--mud-default-borderradius);
+}

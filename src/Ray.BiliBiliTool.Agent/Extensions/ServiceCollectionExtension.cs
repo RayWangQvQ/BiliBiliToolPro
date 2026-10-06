@@ -178,6 +178,15 @@ public static class ServiceCollectionExtension
             httpClientBuilder.AddHttpMessageHandler<WridEncryptionDelegatingHandler>();
         }
 
+        if (typeof(TInterface) == typeof(ILiveApi) || typeof(TInterface) == typeof(ILiveTraceApi))
+        {
+            // Each live request supplies its account cookie explicitly. A pooled cookie jar
+            // can suppress device headers and share cookies between different accounts.
+            httpClientBuilder.ConfigurePrimaryHttpMessageHandler(() =>
+                new HttpClientHandler { UseCookies = false }
+            );
+        }
+
         return services;
     }
 

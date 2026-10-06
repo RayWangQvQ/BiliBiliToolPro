@@ -3,6 +3,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Application.Contracts;
 using Ray.BiliBiliTool.Application.Contracts.Cookies;
+using Ray.BiliBiliTool.Config.Options;
+using Ray.BiliBiliTool.Domain;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 using Ray.BiliBiliTool.Infrastructure.Cookie;
 
@@ -10,7 +12,7 @@ namespace Ray.BiliBiliTool.Web.Services;
 
 /// <summary>
 /// 单项补做：把「某个检查项」映射到具体的执行动作，只做那一项，不重跑整个任务。
-/// 各底层动作内部本来就带幂等判断（投币先查今日已投、观看先查是否看过），重复调用是安全的。
+/// Eligibility and serialization are handled by TodayTaskService before dispatch.
 /// </summary>
 public class TaskRecoveryExecutor(
     CookieStrFactory<BiliCookie> cookieStrFactory,
@@ -35,7 +37,22 @@ public class TaskRecoveryExecutor(
     )
     {
         var ck = FindCookie(userId) ?? throw new Exception($"未找到 UID 为 {userId} 的账号");
+        TaskRecoveryProgressScope.Report(
+            "account",
+            "账号检查",
+            TaskRecoveryProgressState.Running,
+            "正在检查登录状态"
+        );
         await cookieTaskGuard.EnsureValidAsync(ck.UserId, ck.ToString(), cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
+        if (!task.IsEnabled(configuration) || !item.IsEnabled(configuration))
+            throw new TaskRecoverySkippedException("配置已关闭，跳过补做");
+        TaskRecoveryProgressScope.Report(
+            "account",
+            "账号检查",
+            TaskRecoveryProgressState.Completed,
+            "登录状态有效"
+        );
 
         if (item.ItemKey is null)
         {
@@ -51,6 +68,12 @@ public class TaskRecoveryExecutor(
 
             case "Watch":
             {
+                TaskRecoveryProgressScope.Report(
+                    "video",
+                    "观看视频",
+                    TaskRecoveryProgressState.Running,
+                    "正在选择视频并提交观看记录"
+                );
                 var video = await videoDomainService.GetRandomVideoForWatchAndShare(ck);
                 await videoDomainService.WatchVideo(video, ck);
                 break;
@@ -58,6 +81,12 @@ public class TaskRecoveryExecutor(
 
             case TaskCatalog.ShareItemKey:
             {
+                TaskRecoveryProgressScope.Report(
+                    "video",
+                    "分享视频",
+                    TaskRecoveryProgressState.Running,
+                    "正在选择视频并提交分享记录"
+                );
                 var video = await videoDomainService.GetRandomVideoForWatchAndShare(ck);
                 try
                 {
@@ -74,6 +103,23 @@ public class TaskRecoveryExecutor(
             }
 
             case "DonateCoin":
+                TaskRecoveryProgressScope.Report(
+                    "coins",
+                    "投币",
+                    TaskRecoveryProgressState.Running,
+                    "正在核对等级和今日投币额度"
+                );
+                var donationOptions =
+                    configuration.GetSection("DailyTaskConfig").Get<DailyTaskOptions>() ?? new();
+                if (donationOptions.EffectiveCoinDonationStopLevel > 0)
+                {
+                    var account = await accountDomainService.LoginByCookie(ck);
+                    if (donationOptions.ShouldSkipCoinDonation(account.Level_info?.Current_level))
+                    {
+                        logger.LogInformation("已达到停止投币等级，跳过补做投币");
+                        throw new TaskRecoverySkippedException("已达到停止投币等级");
+                    }
+                }
                 if (configuration.GetValue("DailyTaskConfig:IsDonateCoinForArticle", false))
                 {
                     logger.LogInformation("已开启专栏投币，补做走视频投币分支");

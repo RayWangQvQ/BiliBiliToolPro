@@ -10,6 +10,7 @@ public sealed class TodayTaskItemDto
     public required TodayTaskItemState State { get; init; }
     public required string StateText { get; init; }
     public string? Message { get; init; }
+    public string? ProgressSummary { get; init; }
     public DateTimeOffset? CompletedAt { get; init; }
     public int AutoAttempts { get; init; }
 
@@ -52,7 +53,7 @@ public sealed class AccountTodayTasksDto
     public required List<TodayTaskGroupDto> Groups { get; init; }
 }
 
-public sealed record TaskRedoResultDto(bool Success, string Message);
+public sealed record TaskRedoResultDto(bool Success, string Message, bool Skipped = false);
 
 public interface ITodayTaskService
 {

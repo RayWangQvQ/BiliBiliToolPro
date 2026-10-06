@@ -48,7 +48,11 @@ public sealed class WebHostFactory : WebApplicationFactory<Program>
             (_, config) =>
             {
                 config.AddInMemoryCollection(
-                    new Dictionary<string, string?> { ["RunTasks"] = "Login" }
+                    new Dictionary<string, string?>
+                    {
+                        ["RunTasks"] = "Login",
+                        ["LiveFansMedalTaskConfig:UseLiveStateMonitoring"] = "false",
+                    }
                 );
             }
         );

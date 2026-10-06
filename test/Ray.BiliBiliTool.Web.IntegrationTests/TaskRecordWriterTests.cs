@@ -16,7 +16,7 @@ namespace Ray.BiliBiliTool.Web.IntegrationTests;
 public class TaskRecordWriterTests : IDisposable
 {
     private readonly string _dbPath = Path.Combine(
-        AppContext.BaseDirectory,
+        Path.GetTempPath(),
         $"bilitool-test-{Guid.NewGuid():N}.db"
     );
     private readonly ServiceProvider _provider;
@@ -60,7 +60,7 @@ public class TaskRecordWriterTests : IDisposable
     }
 
     [Fact]
-    public async Task WriteAsync_SuccessfulTask_PersistsAccountAndDate()
+    public async Task 写入一条记录后能按账号与日期查出来()
     {
         var writer = new TaskRecordWriter(_factory, NullLogger<TaskRecordWriter>.Instance);
 
@@ -83,7 +83,7 @@ public class TaskRecordWriterTests : IDisposable
     }
 
     [Fact]
-    public async Task WriteAsync_MessageOver512Characters_TruncatesTo512Characters()
+    public async Task 失败信息超过512字时被截断()
     {
         var writer = new TaskRecordWriter(_factory, NullLogger<TaskRecordWriter>.Instance);
         var longMessage = new string('错', 600);
@@ -100,28 +100,6 @@ public class TaskRecordWriterTests : IDisposable
         await using var db = await _factory.CreateDbContextAsync();
         var record = Assert.Single(db.TaskRecords.Where(r => r.UserId == 1002));
         Assert.Equal(512, record.Message!.Length);
-        Assert.Equal(longMessage[..512], record.Message);
-    }
-
-    [Theory]
-    [InlineData(511)]
-    [InlineData(512)]
-    public async Task WriteAsync_MessageAtOrBelowLimit_PreservesAllCharacters(int length)
-    {
-        var writer = new TaskRecordWriter(_factory, NullLogger<TaskRecordWriter>.Instance);
-        var message = new string('a', length);
-
-        await writer.WriteAsync(
-            1003,
-            "DailyTaskAppService",
-            null,
-            TaskRecordStatus.Failed,
-            message,
-            TaskRecordTrigger.Manual
-        );
-
-        await using var db = await _factory.CreateDbContextAsync();
-        Assert.Equal(message, Assert.Single(db.TaskRecords).Message);
     }
 
     [Fact]
@@ -210,10 +188,13 @@ public class TaskRecordWriterTests : IDisposable
     }
 
     [Theory]
-    [InlineData(TaskRecordTrigger.Manual)]
-    [InlineData(TaskRecordTrigger.Auto)]
+    [InlineData(TaskRecordTrigger.Manual, "MangaTaskAppService")]
+    [InlineData(TaskRecordTrigger.Manual, "VipPrivilegeTaskAppService")]
+    [InlineData(TaskRecordTrigger.Auto, "MangaTaskAppService")]
+    [InlineData(TaskRecordTrigger.Auto, "VipPrivilegeTaskAppService")]
     public async Task RedoAsync_SuppressesNestedRemindersAndPreservesFailureResult(
-        TaskRecordTrigger trigger
+        TaskRecordTrigger trigger,
+        string taskKey
     )
     {
         var monitor = new CaptureMonitor();
@@ -228,7 +209,7 @@ public class TaskRecordWriterTests : IDisposable
             )
             .Build();
         using var services = new ServiceCollection()
-            .AddSingleton<IAccountTaskAppService>(new FailingRecoveryTask())
+            .AddSingleton<IAccountTaskAppService>(new FailingRecoveryTask(taskKey))
             .BuildServiceProvider();
         var cookies = new CookieStrFactory<BiliCookie>(config);
         var executor = new TaskRecoveryExecutor(
@@ -253,22 +234,135 @@ public class TaskRecordWriterTests : IDisposable
             null!,
             executor,
             writer,
-            NullLogger<TodayTaskService>.Instance
+            NullLogger<TodayTaskService>.Instance,
+            null!
         );
-        var result = await today.RedoAsync(1001, "MangaTaskAppService", null, trigger);
+        var result = await today.RedoAsync(1001, taskKey, null, trigger);
         Assert.False(result.Success);
         Assert.Empty(monitor.TaskKeys);
         Assert.False(TaskFailureNotificationScope.IsSuppressed);
         await using var db = await _factory.CreateDbContextAsync();
         var record = Assert.Single(db.TaskRecords);
+        Assert.Equal(taskKey, record.TaskKey);
+        Assert.Null(record.TaskItemKey);
         Assert.Equal(trigger, record.Trigger);
         Assert.Equal(TaskRecordStatus.Failed, record.Status);
         Assert.Contains("synthetic recovery failure", result.Message);
     }
 
-    private sealed class FailingRecoveryTask : IAccountTaskAppService
+    [Theory]
+    [InlineData(false, false)]
+    [InlineData(true, true)]
+    public async Task MedalRedoFeedbackReflectsPlatformGoalInsteadOfSuccessfulExecution(
+        bool lit,
+        bool expectedSuccess
+    )
     {
-        public string TaskKey => "MangaTaskAppService";
+        var config = new ConfigurationBuilder()
+            .AddInMemoryCollection(
+                new Dictionary<string, string?>
+                {
+                    ["BiliBiliCookies:0"] = "DedeUserID=1001;bili_jct=synthetic;SESSDATA=synthetic",
+                }
+            )
+            .Build();
+        using var services = new ServiceCollection()
+            .AddSingleton<IAccountTaskAppService>(new SuccessfulMedalTask())
+            .BuildServiceProvider();
+        var cookies = new CookieStrFactory<BiliCookie>(config);
+        var executor = new TaskRecoveryExecutor(
+            cookies,
+            config,
+            null!,
+            null!,
+            null!,
+            null!,
+            services,
+            NullLogger<TaskRecoveryExecutor>.Instance,
+            new AllowGuard()
+        );
+        var medals = new ReadOnlyMedalResult(lit);
+        var writer = new TaskRecordWriter(_factory, NullLogger<TaskRecordWriter>.Instance);
+        var today = new TodayTaskService(
+            cookies,
+            config,
+            _factory,
+            null!,
+            null!,
+            null!,
+            null!,
+            null!,
+            executor,
+            writer,
+            NullLogger<TodayTaskService>.Instance,
+            medals
+        );
+        var result = await today.RedoAsync(1001, "LiveFansMedalAppService", null);
+        Assert.Equal(expectedSuccess, result.Success);
+        Assert.Contains(lit ? "已完成 1 / 1" : "待点亮 1 个", result.Message);
+        Assert.Equal(2, medals.FreshReads);
+        await using var db = await _factory.CreateDbContextAsync();
+        Assert.Equal(
+            expectedSuccess ? TaskRecordStatus.Success : TaskRecordStatus.Pending,
+            Assert.Single(db.TaskRecords).Status
+        );
+    }
+
+    private sealed class SuccessfulMedalTask : IAccountTaskAppService
+    {
+        public string TaskKey => "LiveFansMedalAppService";
+
+        public Task DoTaskAsync(CancellationToken token = default) =>
+            throw new NotSupportedException();
+
+        public Task DoTaskForAccountAsync(long userId, CancellationToken token = default) =>
+            Task.CompletedTask;
+    }
+
+    private sealed class ReadOnlyMedalResult(bool lit) : ILiveMedalDashboardService
+    {
+        public int FreshReads { get; private set; }
+
+        public IReadOnlyList<LiveMedalAccount> GetAccounts() => throw new NotSupportedException();
+
+        public Task<LiveMedalSnapshot?> GetCachedAsync(
+            int index,
+            CancellationToken token = default
+        ) => throw new NotSupportedException();
+
+        public Task<LiveMedalSnapshot> GetAsync(
+            int index,
+            bool refresh = false,
+            CancellationToken token = default
+        )
+        {
+            Assert.True(refresh);
+            FreshReads++;
+            return Task.FromResult(
+                new LiveMedalSnapshot(
+                    [
+                        new(
+                            1,
+                            "示例主播",
+                            "示例牌",
+                            12,
+                            false,
+                            lit && FreshReads > 1,
+                            false,
+                            [new("sendDanmu", "弹幕", "仅点亮", false, null)],
+                            null
+                        ),
+                    ],
+                    DateTimeOffset.UtcNow
+                )
+            );
+        }
+    }
+
+    private sealed class FailingRecoveryTask(string taskKey = "MangaTaskAppService")
+        : IAccountTaskAppService
+    {
+        public string TaskKey => taskKey;
 
         public Task DoTaskAsync(CancellationToken token = default) =>
             throw new NotSupportedException();

@@ -12,7 +12,8 @@ public sealed record TaskFailureNotificationSetting(
 public sealed record TaskFailureNotificationSettings(
     bool Enabled,
     bool HasSendKey,
-    IReadOnlyList<TaskFailureNotificationSetting> Tasks
+    IReadOnlyList<TaskFailureNotificationSetting> Tasks,
+    string DailySummaryTime = DailyTaskNotificationSchedule.DefaultTime
 );
 
 public interface ITaskFailureNotificationSettingsWorkflow
@@ -40,7 +41,10 @@ public sealed class TaskFailureNotificationSettingsWorkflow(IConfiguration confi
                         true
                     )
                 ))
-                .ToArray()
+                .ToArray(),
+            DailyTaskNotificationSchedule
+                .Parse(configuration[DailyTaskNotificationSchedule.CutoffKey])
+                .ToString(@"hh\:mm")
         );
 
     public void Save(bool enabled, IReadOnlyDictionary<string, bool> tasks)

@@ -28,6 +28,12 @@ public enum TodayTaskItemState
 
     /// <summary>⛔ 已关闭</summary>
     Disabled,
+
+    // No selected anchors or enabled platform tasks.
+    NoWork,
+
+    // Pending progress requires a different room state.
+    WaitingConditions,
 }
 
 /// <summary>B站每日任务接口的当日快照</summary>
@@ -53,6 +59,10 @@ public sealed class TodayTaskItemContext
 
     /// <summary>B站每日任务状态；仅当 Item.Source == BiliDailyReward 且查询成功时非 null</summary>
     public BiliDailyRewardSnapshot? BiliReward { get; init; }
+
+    public LiveMedalCompletion? LiveMedal { get; init; }
+    public bool FollowMedalDailyTaskLimit { get; init; }
+    public bool MonitorMedalLiveState { get; init; }
 
     /// <summary>B站查询是否失败（网络异常 / Cookie 失效）</summary>
     public bool BiliQueryFailed { get; init; }

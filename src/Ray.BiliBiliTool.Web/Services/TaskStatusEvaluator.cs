@@ -26,6 +26,22 @@ public static class TaskStatusEvaluator
             return new(TodayTaskItemState.Waiting, null, null, ctx.AutoAttempts);
         }
 
+        if (ctx.Item.Source == TaskItemSource.LiveMedalProgress)
+        {
+            var medal =
+                ctx.LiveMedal ?? new(TodayTaskItemState.Unknown, "今日粉丝牌进度暂未获取，请刷新");
+            var state = medal.State;
+            if (state == TodayTaskItemState.NotDone)
+            {
+                if (!ctx.MonitorMedalLiveState && ctx.AutoAttempts >= ctx.MaxAutoAttempts)
+                    state = TodayTaskItemState.RetryExhausted;
+                else if (ctx.Records.LastOrDefault()?.Status == TaskRecordStatus.Failed)
+                    state = TodayTaskItemState.Failed;
+            }
+            // A successful execution may have skipped interactions or used a custom budget.
+            return new(state, medal.Message, null, ctx.AutoAttempts);
+        }
+
         var completedAt = FindCompletedAt(ctx);
 
         if (ctx.BiliQueryFailed)
@@ -97,7 +113,13 @@ public static class TaskStatusEvaluator
     /// </summary>
     public static bool CanAutoRedo(TodayTaskItemContext ctx, TodayTaskItemResult result) =>
         result.State is TodayTaskItemState.NotDone or TodayTaskItemState.Failed
-        && ctx.Item.ItemKey != TaskCatalog.ShareItemKey;
+        && !ctx.MonitorMedalLiveState
+        && ctx.Item.ItemKey != TaskCatalog.ShareItemKey
+        && (
+            ctx.Item.Source != TaskItemSource.LiveMedalProgress
+            || ctx.FollowMedalDailyTaskLimit
+            || !ctx.Records.Any(record => record.Status == TaskRecordStatus.Success)
+        );
 
     private static bool IsCompleted(TodayTaskItemContext ctx) =>
         ctx.Item.Source switch

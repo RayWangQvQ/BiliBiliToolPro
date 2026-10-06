@@ -43,6 +43,7 @@ public enum TaskRecordStatus
 {
     Success,
     Failed,
+    Pending,
 }
 
 public enum TaskRecordTrigger

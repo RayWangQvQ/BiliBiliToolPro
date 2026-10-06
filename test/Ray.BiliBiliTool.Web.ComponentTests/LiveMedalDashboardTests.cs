@@ -147,6 +147,7 @@ public class LiveMedalDashboardTests : TestContext
                 }
         );
         var first = await service.GetAsync(0);
+        Assert.Same(first, await service.GetCachedAsync(0));
         Assert.Single(first.Medals);
         Assert.Equal(60, first.Medals[0].Level);
         Assert.Equal("星河", first.Medals[0].AnchorName);
@@ -156,6 +157,7 @@ public class LiveMedalDashboardTests : TestContext
         await service.GetAsync(0, refresh: true);
         Assert.Equal(2, reads);
         config["BiliBiliCookies:0"] = "DedeUserID=1;bili_jct=new-synthetic;SESSDATA=new-synthetic";
+        Assert.Null(await service.GetCachedAsync(0));
         await service.GetAsync(0);
         Assert.Equal(3, reads);
         await service.GetAsync(1);
@@ -191,6 +193,7 @@ public class LiveMedalDashboardTests : TestContext
         Assert.Empty(medal.Tasks);
         Assert.Null(medal.Lighted);
         Assert.Null(snapshot.Error);
+        Assert.Same(snapshot, await service.GetCachedAsync(0));
     }
 
     [Fact]
@@ -201,6 +204,66 @@ public class LiveMedalDashboardTests : TestContext
         );
         Assert.Null(task.Percent);
         Assert.False(task.Done);
+    }
+
+    [Fact]
+    public async Task Reader_RestoresPersistedCacheWithoutPlatformCallsAndInvalidatesNewCredentials()
+    {
+        var directory = Directory.CreateTempSubdirectory("medal-reader-cache-");
+        try
+        {
+            var config = Configuration();
+            var store = new FileLiveMedalSnapshotStore(
+                directory.FullName,
+                NullLogger<FileLiveMedalSnapshotStore>.Instance
+            );
+            using var firstCache = new MemoryCache(new MemoryCacheOptions());
+            var first = new LiveMedalDashboardService(
+                new CookieStrFactory<BiliCookie>(config),
+                ApiProxy.Make(
+                    (method, _) =>
+                        method == "GetFansMedalPanel"
+                            ? Task.FromResult(
+                                new BiliApiResponse<FansMedalPanelResponse>
+                                {
+                                    Code = 0,
+                                    Data = new() { List = [Panel(11)] },
+                                }
+                            )
+                            : Tasks(1, 0)
+                ),
+                firstCache,
+                NullLogger<LiveMedalDashboardService>.Instance,
+                store
+            );
+            var loaded = await first.GetAsync(0, refresh: true);
+            using var restartedCache = new MemoryCache(new MemoryCacheOptions());
+            var restarted = new LiveMedalDashboardService(
+                new CookieStrFactory<BiliCookie>(config),
+                ApiProxy.Make(
+                    (_, _) =>
+                        throw new InvalidOperationException(
+                            "Cache reads must not call the platform"
+                        )
+                ),
+                restartedCache,
+                NullLogger<LiveMedalDashboardService>.Instance,
+                store
+            );
+            var restored = await restarted.GetCachedAsync(0);
+            Assert.Equal(loaded.UpdatedAt, restored!.UpdatedAt);
+            Assert.Single(restored.Medals);
+            Assert.Null(await restarted.GetCachedAsync(1));
+            config["BiliBiliCookies:0"] =
+                "DedeUserID=1;bili_jct=changed-synthetic;SESSDATA=changed-synthetic";
+            Assert.Null(await restarted.GetCachedAsync(0));
+            var file = Assert.Single(Directory.GetFiles(directory.FullName));
+            Assert.DoesNotContain("synthetic", await File.ReadAllTextAsync(file));
+        }
+        finally
+        {
+            directory.Delete(recursive: true);
+        }
     }
 
     private static IConfigurationRoot Configuration() =>
@@ -294,7 +357,7 @@ public class LiveMedalDashboardTests : TestContext
                     null
                 ),
             ],
-            DateTimeOffset.Parse("2026-10-05T08:30:00+08:00")
+            DateTimeOffset.UtcNow
         );
 
     public class ApiProxy : DispatchProxy

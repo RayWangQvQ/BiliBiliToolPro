@@ -4,9 +4,10 @@
 @attribute [Authorize]
 
 <PageTitle>管理员</PageTitle>
+<Ray.BiliBiliTool.Web.Components.Comps.UnsavedChangesGuard HasChanges="HasChanges" Busy="@(!_credentialsSaved && (_usernameSubmitting || _passwordSubmitting))" SaveBeforeLeaving="SaveBeforeLeavingAsync" />
 
 <PageHero Size="Size.Large" Title="管理员账户"
-          Description="登录名与密码相互独立，改其中一个不会影响另一个；两项修改都需要当前密码确认，成功后当前会话将退出，需重新登录。" />
+          Description="登录名与密码可分别修改。保存后需要重新登录。" />
 
 <MudGrid Spacing="3">
 
@@ -48,10 +49,10 @@
 
                 <MudText Typo="Typo.subtitle2" Class="mb-2">修改用户名</MudText>
                 <MudForm @ref="_usernameForm">
-                    <MudTextField @bind-Value="_newUsername" InputId="admin-new-username" Label="新用户名" Required="true"
+                    <MudTextField Disabled="@(_credentialsSaved || _usernameSubmitting || _passwordSubmitting)" Immediate="true" @bind-Value="_newUsername" InputId="admin-new-username" Label="新用户名" Required="true"
                                   RequiredError="请输入新用户名"
                                   HelperText="保存后当前会话将退出，请用新用户名重新登录" />
-                    <MudTextField @bind-Value="_usernamePassword.Value" InputId="admin-rename-current-password"
+                    <MudTextField Disabled="@(_credentialsSaved || _usernameSubmitting || _passwordSubmitting)" Immediate="true" @bind-Value="_usernamePassword.Value" InputId="admin-rename-current-password"
                                   Label="当前密码" Required="true"
                                   RequiredError="请输入当前密码"
                                   InputType="@_usernamePassword.InputType" Adornment="Adornment.End"
@@ -60,14 +61,7 @@
                 </MudForm>
             </MudCardContent>
             <MudCardActions>
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto"
-                           Disabled="_usernameSubmitting" OnClick="ChangeUsernameAsync">
-                    @if (_usernameSubmitting)
-                    {
-                        <MudProgressCircular Size="Size.Small" Indeterminate="true" Color="Color.Inherit" Class="mr-2" />
-                    }
-                    保存用户名
-                </MudButton>
+                <Ray.BiliBiliTool.Web.Components.Comps.SaveChangesButton Label="保存用户名" HasChanges="HasUsernameChanges" Busy="_usernameSubmitting" Disabled="_credentialsSaved" OnClick="ChangeUsernameAsync" />
             </MudCardActions>
         </MudCard>
     </MudItem>
@@ -88,19 +82,19 @@
             </MudCardHeader>
             <MudCardContent>
                 <MudForm @ref="_passwordForm">
-                    <MudTextField @bind-Value="_currentPassword.Value" InputId="admin-current-password"
+                    <MudTextField Disabled="@(_credentialsSaved || _usernameSubmitting || _passwordSubmitting)" Immediate="true" @bind-Value="_currentPassword.Value" InputId="admin-current-password"
                                   Label="当前密码" Required="true"
                                   RequiredError="请输入当前密码"
                                   InputType="@_currentPassword.InputType" Adornment="Adornment.End"
                                   AdornmentIcon="@_currentPassword.Icon"
                                   OnAdornmentClick="@(() => Toggle(_currentPassword))" />
-                    <MudTextField @bind-Value="_newPassword.Value" InputId="admin-new-password"
+                    <MudTextField Disabled="@(_credentialsSaved || _usernameSubmitting || _passwordSubmitting)" Immediate="true" @bind-Value="_newPassword.Value" InputId="admin-new-password"
                                   Label="新密码" Required="true"
                                   RequiredError="请输入新密码"
                                   InputType="@_newPassword.InputType" Adornment="Adornment.End"
                                   AdornmentIcon="@_newPassword.Icon"
                                   OnAdornmentClick="@(() => Toggle(_newPassword))" />
-                    <MudTextField @bind-Value="_confirmPassword.Value" InputId="admin-confirm-password"
+                    <MudTextField Disabled="@(_credentialsSaved || _usernameSubmitting || _passwordSubmitting)" Immediate="true" @bind-Value="_confirmPassword.Value" InputId="admin-confirm-password"
                                   Label="确认新密码" Required="true"
                                   RequiredError="请再次输入新密码"
                                   Validation="@(new Func<string, string?>(ValidateConfirmPassword))"
@@ -113,14 +107,7 @@
                 </MudText>
             </MudCardContent>
             <MudCardActions>
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto"
-                           Disabled="_passwordSubmitting" OnClick="ChangePasswordAsync">
-                    @if (_passwordSubmitting)
-                    {
-                        <MudProgressCircular Size="Size.Small" Indeterminate="true" Color="Color.Inherit" Class="mr-2" />
-                    }
-                    修改密码
-                </MudButton>
+                <Ray.BiliBiliTool.Web.Components.Comps.SaveChangesButton Label="修改密码" HasChanges="HasPasswordChanges" Busy="_passwordSubmitting" Disabled="_credentialsSaved" OnClick="ChangePasswordAsync" />
             </MudCardActions>
         </MudCard>
     </MudItem>

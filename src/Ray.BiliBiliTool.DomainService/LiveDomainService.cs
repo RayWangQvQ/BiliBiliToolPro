@@ -29,7 +29,10 @@ public class LiveDomainService(
     IOptionsMonitor<LiveLotteryTaskOptions> liveLotteryTaskOptions,
     IOptionsMonitor<LiveFansMedalTaskOptions> liveFansMedalTaskOptions,
     IOptionsMonitor<SecurityOptions> securityOptions,
-    IOptionsMonitor<Silver2CoinTaskOptions> silver2CoinTaskOptions
+    IOptionsMonitor<Silver2CoinTaskOptions> silver2CoinTaskOptions,
+    LiveFansMedalExecutionGate? executionGate = null,
+    ILiveFansMedalProgressObserver? progressObserver = null,
+    LiveWatchDiagnostics? watchDiagnostics = null
 ) : ILiveDomainService
 {
     private readonly LiveLotteryTaskOptions _liveLotteryTaskOptions =
@@ -453,6 +456,32 @@ public class LiveDomainService(
 
     #endregion
 
+    public async Task RunFansMedalActionForAnchorAsync(
+        BiliCookie cookie,
+        long anchorId,
+        long roomId,
+        string action,
+        CancellationToken cancellationToken = default
+    )
+    {
+        if (!liveFansMedalTaskOptions.CurrentValue.IsEnable)
+            return;
+        cancellationToken.ThrowIfCancellationRequested();
+        if (action == "watchLive" && !await CheckLiveCookie(cookie, cancellationToken))
+            throw new BiliBusinessException("直播设备信息暂未获取，观看任务稍后重试");
+        var runner = new LiveFansMedalTaskRunner(
+            liveApi,
+            liveTraceApi,
+            logger,
+            liveFansMedalTaskOptions.CurrentValue,
+            securityOptions.CurrentValue.UserAgent,
+            executionGate: executionGate,
+            progressObserver: progressObserver,
+            watchDiagnostics: watchDiagnostics
+        );
+        await runner.RunForAnchorAsync(cookie, anchorId, roomId, action, cancellationToken);
+    }
+
     public Task SendDanmakuToFansMedalLive(
         BiliCookie ck,
         CancellationToken cancellationToken = default
@@ -473,14 +502,17 @@ public class LiveDomainService(
     )
     {
         cancellationToken.ThrowIfCancellationRequested();
-        if (!await CheckLiveCookie(ck))
-            throw new BiliBusinessException("直播 Cookie 配置失败");
+        if (action == "watchLive" && !await CheckLiveCookie(ck, cancellationToken))
+            throw new BiliBusinessException("直播设备信息暂未获取，观看任务稍后重试");
         var runner = new LiveFansMedalTaskRunner(
             liveApi,
             liveTraceApi,
             logger,
             liveFansMedalTaskOptions.CurrentValue,
-            securityOptions.CurrentValue.UserAgent
+            securityOptions.CurrentValue.UserAgent,
+            executionGate: executionGate,
+            progressObserver: progressObserver,
+            watchDiagnostics: watchDiagnostics
         );
         await runner.RunAsync(ck, action, cancellationToken);
     }
@@ -491,7 +523,7 @@ public class LiveDomainService(
     /// <returns>
     /// bool 成功配置 or not
     /// </returns>
-    private async Task<bool> CheckLiveCookie(BiliCookie ck)
+    private async Task<bool> CheckLiveCookie(BiliCookie ck, CancellationToken token)
     {
         // 检测 _biliCookie 是否正确配置
         if (!string.IsNullOrWhiteSpace(ck.LiveBuvid))
@@ -501,30 +533,46 @@ public class LiveDomainService(
         {
             logger.LogInformation("检测到直播 Cookie 未正确配置，尝试自动配置中...");
 
-            // 请求主播主页来正确配置 cookie
-            var liveHome = await liveApi.GetLiveHome(ck.ToString());
-            var liveHomeContent = JsonConvert.DeserializeObject<BiliApiResponse>(
-                await liveHome.Content.ReadAsStringAsync()
-            );
-            if (liveHomeContent?.Code != 0)
+            // The API may omit Set-Cookie for an authenticated request. Acquire only the
+            // live device cookie anonymously when needed, preserving all login credentials.
+            foreach (var requestCookie in new[] { ck.ToString(), "" })
             {
-                throw new BiliBusinessException(
-                    liveHomeContent?.Message ?? "Live API returned failure"
+                token.ThrowIfCancellationRequested();
+                using var liveHome = await liveApi.GetLiveHome(requestCookie).WaitAsync(token);
+                liveHome.EnsureSuccessStatusCode();
+                var liveHomeContent = JsonConvert.DeserializeObject<BiliApiResponse>(
+                    await liveHome.Content.ReadAsStringAsync(token)
                 );
+                if (liveHomeContent?.Code != 0)
+                    throw new BiliBusinessException(
+                        $"直播设备初始化失败，错误码 {liveHomeContent?.Code}"
+                    );
+                if (liveHome.Headers.TryGetValues("Set-Cookie", out var headers))
+                    ck.MergeCurrentCookieBySetCookieHeaders(
+                        headers.Where(header =>
+                            header.TrimStart().StartsWith("LIVE_BUVID=", StringComparison.Ordinal)
+                        )
+                    );
+                if (!string.IsNullOrWhiteSpace(ck.LiveBuvid))
+                {
+                    logger.LogInformation("直播设备信息配置成功");
+                    return true;
+                }
             }
-
-            var setHeader = liveHome.Headers.FirstOrDefault(header => header.Key == "Set-Cookie");
-            ck.MergeCurrentCookie(setHeader.Value.ToList());
-
-            logger.LogInformation("直播 Cookie 配置成功！");
+            logger.LogWarning("直播设备信息暂未获取");
+            return false;
+        }
+        catch (OperationCanceledException) when (token.IsCancellationRequested)
+        {
+            throw;
         }
         catch (Exception exception)
         {
-            logger.LogError("【配置直播Cookie】失败，放弃执行后续任务...");
-            logger.LogError("【原因】{message}", exception.Message);
+            logger.LogWarning(
+                "Live device initialization failed: {ErrorType}",
+                exception.GetType().Name
+            );
             return false;
         }
-
-        return true;
     }
 }

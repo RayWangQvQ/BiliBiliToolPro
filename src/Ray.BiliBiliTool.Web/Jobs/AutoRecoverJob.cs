@@ -47,15 +47,20 @@ public class AutoRecoverJob(
             cancellationToken: context.CancellationToken
         );
 
-        foreach (var account in status)
-        {
-            if (!account.IsCookieValid)
+        var groups = status
+            .Where(account => account.IsCookieValid)
+            .SelectMany(account => account.Groups.Select(group => (account, group)))
+            .OrderBy(entry => entry.group.TaskKey == "LiveFansMedalAppService");
+        await Parallel.ForEachAsync(
+            groups,
+            new ParallelOptions
             {
-                continue;
-            }
-
-            foreach (var group in account.Groups)
+                MaxDegreeOfParallelism = 4,
+                CancellationToken = context.CancellationToken,
+            },
+            async (entry, token) =>
             {
+                var (account, group) = entry;
                 foreach (var item in group.Items)
                 {
                     // 只补「漏做」与「执行过但失败且未达自动重试上限」的项。
@@ -71,7 +76,7 @@ public class AutoRecoverJob(
                         group.TaskKey,
                         item.ItemKey,
                         TaskRecordTrigger.Auto,
-                        context.CancellationToken
+                        token
                     );
                     logger.LogInformation(
                         "自动补做 {user}/{task}/{item}：{result}",
@@ -82,6 +87,6 @@ public class AutoRecoverJob(
                     );
                 }
             }
-        }
+        );
     }
 }

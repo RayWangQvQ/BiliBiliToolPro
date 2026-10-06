@@ -38,7 +38,19 @@ public abstract class BaseJob<TJob>(
         {
             try
             {
+                if (failureBatch is not null && failureMonitor is not null)
+                {
+                    try
+                    {
+                        await failureMonitor.RecordActivityAsync(cancellationToken);
+                    }
+                    catch (Exception)
+                    {
+                        logger.LogWarning("每日任务汇总活动记录暂时无法保存");
+                    }
+                }
                 logger.LogInformation($"{typeof(TJob).Name} started.");
+                await BeforeExecuteAsync(context, cancellationToken);
                 await DoExecuteAsync(context);
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
@@ -85,6 +97,11 @@ public abstract class BaseJob<TJob>(
             logger.LogWarning(ex, "Fail to push logs");
         }
     }
+
+    protected virtual Task BeforeExecuteAsync(
+        IJobExecutionContext context,
+        CancellationToken token
+    ) => Task.CompletedTask;
 
     protected abstract Task DoExecuteAsync(IJobExecutionContext context);
 }

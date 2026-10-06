@@ -43,6 +43,13 @@ public class NotificationSettingsWorkflowTests : IDisposable
         Assert.True(settings.Cookie.HasSendKey);
         Assert.True(settings.TaskFailure.Enabled);
         Assert.Equal(11, settings.TaskFailure.Tasks.Count);
+        Assert.Equal(
+            11,
+            settings.TaskFailure.Tasks.Select(task => task.TaskKey).Distinct().Count()
+        );
+        Assert.Single(
+            settings.TaskFailure.Tasks.Where(task => task.TaskKey == "VipPrivilegeTaskAppService")
+        );
         Assert.False(
             settings.TaskFailure.Tasks.Single(task => task.TaskKey == "DailyTaskAppService").Enabled
         );
@@ -94,6 +101,57 @@ public class NotificationSettingsWorkflowTests : IDisposable
         Assert.False(_workflow.Read().Cookie.AutoCheckEnabled);
         Assert.False(_workflow.Read().Cookie.HasSendKey);
         Assert.False(_workflow.Read().TaskFailure.Enabled);
+    }
+
+    [Fact]
+    public void DailySummaryTimePersistsAcrossReloadAndLegacySavePreservesIt()
+    {
+        Assert.Equal("23:55", _workflow.Read().TaskFailure.DailySummaryTime);
+        _workflow.Save(
+            true,
+            true,
+            true,
+            "SCT123synthetic",
+            new Dictionary<string, bool>(),
+            "18:30"
+        );
+        _configuration.Reload();
+        Assert.Equal(
+            "18:30",
+            new NotificationSettingsWorkflow(_configuration).Read().TaskFailure.DailySummaryTime
+        );
+        _workflow.Save(false, false, false, "", new Dictionary<string, bool>());
+        Assert.Equal("18:30", _workflow.Read().TaskFailure.DailySummaryTime);
+    }
+
+    [Theory]
+    [InlineData("24:00")]
+    [InlineData("18:60")]
+    [InlineData("invalid")]
+    public void InvalidDailySummaryTimeLeavesAllSettingsUnchanged(string value)
+    {
+        _workflow.Save(
+            true,
+            true,
+            true,
+            "SCT123synthetic",
+            new Dictionary<string, bool>(),
+            "18:30"
+        );
+        Assert.Throws<InvalidOperationException>(() =>
+            _workflow.Save(
+                false,
+                false,
+                false,
+                "SCT456synthetic",
+                new Dictionary<string, bool>(),
+                value
+            )
+        );
+        Assert.Equal("18:30", _workflow.Read().TaskFailure.DailySummaryTime);
+        Assert.True(_workflow.Read().TaskFailure.Enabled);
+        Assert.True(_workflow.Read().Cookie.AutoCheckEnabled);
+        Assert.Equal("SCT123synthetic", _configuration["CookieCheck:ServerChanSendKey"]);
     }
 
     public void Dispose()

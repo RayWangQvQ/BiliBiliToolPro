@@ -1,0 +1,26 @@
+<div class="save-changes-control" aria-busy="@Busy.ToString().ToLowerInvariant()">
+    <MudButton ButtonType="@ButtonType" Variant="Variant.Filled" Color="Color.Primary"
+               Disabled="@(Disabled || Busy || !HasChanges)" OnClick="OnClick"
+               StartIcon="@(Busy ? null : Icons.Material.Filled.Save)" Class="save-changes-button">
+        @if (Busy)
+        {
+            <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+        }
+        @(Busy ? "正在保存" : Label)
+    </MudButton>
+    <span class="save-changes-state @(Busy ? "is-saving" : HasChanges ? "is-dirty" : Saved ? "is-saved" : "")"
+          role="status" aria-live="polite">
+        <MudIcon Icon="@(Busy ? Icons.Material.Filled.Sync : HasChanges ? Icons.Material.Filled.EditNote : Saved ? Icons.Material.Filled.CheckCircle : Icons.Material.Filled.Check)" Size="Size.Small" />
+        @(Busy ? "保存中，请稍候" : HasChanges ? "有未保存修改" : Saved ? "已保存" : "未修改")
+    </span>
+</div>
+
+@code {
+    [Parameter] public bool HasChanges { get; set; }
+    [Parameter] public bool Busy { get; set; }
+    [Parameter] public bool Saved { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public string Label { get; set; } = "保存配置";
+    [Parameter] public ButtonType ButtonType { get; set; } = ButtonType.Button;
+    [Parameter] public EventCallback<MouseEventArgs> OnClick { get; set; }
+}

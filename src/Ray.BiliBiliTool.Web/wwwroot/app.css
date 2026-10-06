@@ -1,4 +1,8 @@
-/* MudLayout and MudDrawer need a definite viewport height. */
+/* 全局样式仅保留与 MudBlazor 不冲突、且模板必需的残留项。
+   字体、链接色、按钮色、布局栅格等已交由 MudBlazor 主题与组件接管。 */
+
+/* MudBlazor 布局（MudLayout/MudDrawer）依赖 html,body 具备确定高度才能撑满视口，
+   否则 height:100% 会退化成内容高度，导致侧边栏导航无法铺满、底部版本号无法定位。 */
 html, body {
     height: 100%;
 }
@@ -7,18 +11,9 @@ body {
     margin: 0;
 }
 
-.app-login-shell .mud-main-content {
-    min-height: 100dvh;
-    display: flex;
-    align-items: center;
-    padding-top: 0;
-}
-
-.app-login-content {
-    padding-block: 32px;
-}
-
-/* Keep the navigation scrollable without moving the version footer. */
+/* Sidebar layout: nav list fills the drawer and scrolls, version footer stays pinned.
+   min-height:0 is required - flex items default to min-height:auto and would otherwise
+   refuse to shrink below their content, pushing the footer out of the viewport. */
 .app-drawer-body {
     display: flex;
     flex-direction: column;
@@ -34,225 +29,6 @@ body {
 .app-drawer-footer {
     flex: 0 0 auto;
     border-top: 1px solid var(--mud-palette-lines-default);
-}
-
-.app-shell .app-topbar {
-    border-bottom: 1px solid var(--mud-palette-lines-default);
-}
-
-.app-brand {
-    font-weight: 700 !important;
-    letter-spacing: -.03em;
-    white-space: nowrap;
-}
-
-.app-brand-dot {
-    color: var(--mud-palette-primary);
-}
-
-.app-shell .app-sidebar {
-    border-right: 1px solid var(--mud-palette-lines-default);
-}
-
-.app-shell .app-drawer-nav {
-    padding: 16px 10px;
-}
-
-.app-shell .app-drawer-nav .mud-nav-link {
-    border-radius: 10px;
-    margin-bottom: 3px;
-}
-
-.app-shell .app-drawer-nav .mud-nav-link.active {
-    background: color-mix(in srgb, var(--mud-palette-primary) 12%, transparent);
-    color: var(--mud-palette-primary);
-    font-weight: 600;
-}
-
-.app-shell .app-drawer-nav .mud-nav-link:focus-visible,
-.app-shell a:focus-visible,
-.app-shell button:focus-visible {
-    outline: 2px solid var(--mud-palette-primary);
-    outline-offset: 2px;
-}
-
-.app-shell .app-content {
-    padding-top: 32px;
-    padding-bottom: 56px;
-}
-
-.app-shell .app-content .app-config-page {
-    padding: 0;
-}
-
-.app-hero {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 24px;
-    margin-bottom: 24px;
-    border-radius: 16px !important;
-    background: var(--mud-palette-surface) !important;
-    border: 1px solid var(--mud-palette-lines-default);
-    border-left: 4px solid var(--mud-palette-primary);
-    padding: 24px 28px;
-}
-
-.app-hero-content {
-    min-width: 0;
-}
-
-.app-hero .app-hero-title {
-    font-size: clamp(1.45rem, 2.3vw, 1.9rem);
-    line-height: 1.25;
-    font-weight: 700;
-    letter-spacing: -.025em;
-}
-
-/* Keep route-change heading focus for assistive technology without a visual ring. */
-.app-hero .app-hero-title:focus {
-    outline: none;
-}
-
-.app-hero .app-hero-description {
-    margin-top: 10px;
-    color: var(--mud-palette-text-secondary);
-    line-height: 1.65;
-    max-width: 72ch;
-}
-
-.app-hero-large {
-    background: var(--mud-palette-primary) !important;
-    border: 0;
-    padding: 38px 40px;
-}
-
-.app-hero-large .app-hero-title {
-    color: var(--mud-palette-primary-text);
-    font-size: clamp(1.8rem, 3vw, 2.35rem);
-}
-
-.app-hero-large .app-hero-description {
-    color: var(--mud-palette-primary-text);
-    opacity: .9;
-}
-
-.app-hero-small {
-    padding: 18px 24px;
-    margin-bottom: 20px;
-}
-
-.app-hero-small .app-hero-title {
-    font-size: 1.4rem;
-}
-
-.app-hero-small .app-hero-description {
-    margin-top: 5px;
-    font-size: .9rem;
-}
-
-.app-hero-actions {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 8px;
-    flex-shrink: 0;
-}
-
-.app-shell .app-content .mud-card,
-.app-shell .app-content .app-stat,
-.app-shell .app-content .mud-table-container,
-.app-shell .app-content .mud-data-grid,
-.app-shell .app-content > div > .mud-paper:not(.app-hero) {
-    border: 1px solid var(--mud-palette-lines-default);
-    border-radius: 12px;
-    box-shadow: none;
-}
-
-.app-shell .app-content .mud-card-header,
-.app-shell .app-content .mud-card-content {
-    padding: 20px 24px;
-}
-
-.app-shell .app-content .mud-card-actions {
-    padding: 12px 24px 20px;
-}
-
-.app-shell .app-content .mud-input-control {
-    max-width: 100%;
-}
-
-.app-about-card {
-    max-width: 640px;
-}
-
-.app-shell .app-content .mud-table-container,
-.app-shell .app-content .mud-data-grid {
-    max-width: 100%;
-    overflow-x: auto;
-}
-
-.app-table-scroll {
-    max-width: 100%;
-    overflow-x: auto;
-}
-
-.app-table-scroll .mud-data-grid {
-    min-width: 850px;
-}
-
-@media (max-width: 959.98px) {
-    .app-shell .app-content {
-        padding-top: 20px;
-        padding-bottom: 32px;
-    }
-
-    .app-hero,
-    .app-hero-large {
-        padding: 24px;
-    }
-
-    .app-hero {
-        flex-direction: column;
-        align-items: stretch;
-    }
-}
-
-@media (max-width: 599.98px) {
-    .app-shell .app-topbar {
-        padding-inline: 8px;
-    }
-
-    .app-shell .app-brand {
-        font-size: 1rem !important;
-        margin-left: 4px !important;
-    }
-
-    .app-shell .app-topbar .mud-button-root {
-        min-width: 0;
-        padding-inline: 4px;
-        font-size: .78rem;
-    }
-
-    .app-hero,
-    .app-hero-small,
-    .app-hero-large {
-        padding: 20px;
-        margin-bottom: 20px;
-    }
-
-    .app-hero-actions .mud-button {
-        margin: 0;
-    }
-
-    .app-shell .app-content .mud-card-header,
-    .app-shell .app-content .mud-card-content {
-        padding: 16px;
-    }
-
-    .app-shell .app-content .mud-card-actions {
-        padding: 8px 16px 16px;
-    }
 }
 
 .blazor-error-boundary {
@@ -315,9 +91,10 @@ body {
 .schedule-time-field { flex: 2 1 220px; }
 .schedule-select { display: block; position: relative; min-width: 0; }
 .schedule-select::after { content: ''; position: absolute; right: 16px; top: 18px; width: 7px; height: 7px; border-right: 2px solid var(--mud-palette-primary); border-bottom: 2px solid var(--mud-palette-primary); transform: rotate(45deg); pointer-events: none; }
-.schedule-fields select { appearance: none; width: 100%; min-height: 48px; padding: 11px 36px 11px 14px; border: 1px solid var(--mud-palette-lines-inputs); border-radius: 10px; background: var(--mud-palette-surface); color: var(--mud-palette-text-primary); font: inherit; font-size: .9375rem; font-weight: 500; cursor: pointer; transition: border-color .15s, box-shadow .15s; }
-.schedule-fields select:hover { border-color: var(--mud-palette-primary); }
-.schedule-fields select:focus-visible { outline: 2px solid var(--mud-palette-primary); outline-offset: 2px; }
+.schedule-select select { appearance: none; width: 100%; min-height: 48px; padding: 11px 36px 11px 14px; border: 1px solid var(--mud-palette-lines-inputs); border-radius: 10px; background: var(--mud-palette-surface); color: var(--mud-palette-text-primary); font: inherit; font-size: .9375rem; font-weight: 500; cursor: pointer; transition: border-color .15s, box-shadow .15s; }
+.schedule-select select:hover { border-color: var(--mud-palette-primary); }
+.schedule-select select:focus-visible { outline: 2px solid var(--mud-palette-primary); outline-offset: 2px; }
+.schedule-picker > .schedule-time-field, .schedule-picker > .schedule-time-field + .schedule-summary { max-width: 480px; }
 .schedule-time-values { display: flex; align-items: center; gap: 8px; }
 .schedule-time-values .schedule-select { flex: 1 1 0; }
 .schedule-time-with-seconds { flex-wrap: wrap; }
@@ -334,6 +111,9 @@ body {
 .schedule-picker:disabled select { cursor: default; box-shadow: none; }
 
 /* Medal cards use theme colors for both light and dark modes. */
+.unsaved-changes-actions { display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; padding: 0 8px 8px; }
+@media (max-width: 480px) { .unsaved-changes-actions { width: 100%; } .unsaved-changes-actions .mud-button-root { flex: 1 1 auto; } }
+
 .medal-dashboard { margin-bottom: 24px; padding: 24px; border: 1px solid var(--mud-palette-lines-default); border-radius: 16px; background: var(--mud-palette-surface); }
 .medal-dashboard-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
 .medal-dashboard h2 { font-size: 1.25rem; font-weight: 600; margin: 0; }
@@ -348,7 +128,7 @@ body {
 .medal-overview > div { display: flex; flex-direction: column; gap: 6px; padding: 14px 18px; border-radius: 12px; background: var(--mud-palette-background-gray); }
 .medal-overview span { color: var(--mud-palette-text-secondary); font-size: .8125rem; }
 .medal-overview strong { font-size: 1.5rem; font-weight: 600; }
-.medal-card-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.medal-card-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-content: start; }
 .medal-card { padding: 20px; border: 1px solid var(--mud-palette-lines-default); border-radius: 12px; min-width: 0; }
 .medal-card-excluded { background: var(--mud-palette-background-gray); border-style: dashed; }
 .medal-card-top, .medal-anchor-row, .medal-task-title { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
@@ -363,6 +143,15 @@ body {
 .medal-anchor-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; }
 .medal-exclude { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: .75rem; color: var(--mud-palette-text-secondary); white-space: nowrap; }
 .medal-exclude input { width: 16px; height: 16px; accent-color: var(--mud-palette-primary); cursor: pointer; }
+.medal-pin { display: inline-flex; align-items: center; gap: 4px; padding: 5px 8px; border: 1px solid var(--mud-palette-lines-default); border-radius: 6px; background: transparent; color: var(--mud-palette-text-secondary); font: inherit; font-size: .75rem; cursor: pointer; }
+.medal-pin:hover, .medal-pin.is-pinned { color: var(--mud-palette-primary); border-color: var(--mud-palette-primary); background: var(--mud-palette-primary-hover); }
+.medal-pin:focus-visible { outline: 2px solid var(--mud-palette-primary); outline-offset: 2px; }
+.medal-pagination { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--mud-palette-lines-default); }
+.medal-pagination:focus { outline: none; }
+.medal-pagination:focus-visible { outline: 2px solid var(--mud-palette-primary); outline-offset: 3px; }
+.medal-page-summary, .medal-refresh-status { color: var(--mud-palette-text-secondary); font-size: .8125rem; }
+.medal-refresh-status { margin: 8px 0 16px; }
+.medal-pagination .mud-pagination { gap: 4px; }
 .medal-status-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 12px 0 20px; font-size: .75rem; color: var(--mud-palette-text-secondary); }
 .medal-status { border-radius: 4px; padding: 3px 6px; }
 .medal-status.is-participating { color: var(--mud-palette-primary); background: var(--mud-palette-primary-hover); }
@@ -372,6 +161,8 @@ body {
 .medal-task-title > span:first-child { flex: 1; overflow-wrap: anywhere; }
 .medal-task-done { color: var(--mud-palette-success); white-space: nowrap; }
 .medal-task-pending { color: var(--mud-palette-text-secondary); white-space: nowrap; }
+.medal-task-waiting { color: var(--mud-palette-warning-darken); white-space: nowrap; }
+.medal-task-inactive { color: var(--mud-palette-text-secondary); white-space: nowrap; }
 .medal-task p { margin: 6px 0 0; color: var(--mud-palette-text-secondary); font-size: .75rem; }
 .medal-task .medal-progress { height: 5px; margin-top: 8px; border-radius: 4px; }
 .medal-empty, .medal-progress-message { color: var(--mud-palette-text-secondary); font-size: .875rem; padding: 16px 0; }
@@ -386,3 +177,39 @@ body {
     .schedule-time-values .schedule-select { flex-basis: 90px; }
     .schedule-time-separator { display: none; }
 }
+
+.today-medal-progress { margin-top: 8px; line-height: 1.6; overflow-wrap: anywhere; }
+.today-account-switcher { display: flex; align-items: center; gap: 8px; width: 100%; max-width: 430px; min-width: 0; }
+.today-account-switcher > .mud-select { flex: 1 1 0; min-width: 0; width: 0; }
+.today-account-switcher > button { flex: 0 0 auto; }
+.today-toolbar { display: grid; grid-template-columns: minmax(0, 430px) minmax(0, 1fr); grid-template-areas: "account actions" "meta meta"; align-items: center; gap: 12px; }
+.today-account-switcher { grid-area: account; }
+.today-toolbar-meta { grid-area: meta; display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
+.today-toolbar-actions { grid-area: actions; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 12px; }
+@media (max-width: 700px) {
+    .today-toolbar { grid-template-columns: minmax(0, 1fr); grid-template-areas: "account" "meta" "actions"; }
+    .today-toolbar-actions { justify-content: flex-start; }
+}
+
+.save-actions { flex-wrap: wrap; gap: 12px; padding: 16px; }
+.save-changes-control { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
+.save-changes-button { min-width: 120px; }
+.save-changes-state { display: inline-flex; align-items: center; gap: 5px; font-size: .875rem; color: var(--mud-palette-text-secondary); }
+.save-changes-state.is-dirty { color: var(--mud-palette-warning-darken); }
+.save-changes-state.is-saving { color: var(--mud-palette-primary); }
+.save-changes-state.is-saved { color: var(--mud-palette-success-darken); }
+@media (max-width: 600px) {
+    .save-actions { gap: 10px; }
+    .save-changes-control { gap: 10px; }
+}
+
+.medal-task-quota { color: var(--mud-palette-primary); font-weight: 500; }
+.medal-quota { background: var(--mud-palette-background-grey); }
+
+.today-redo-item, .today-redo-account { min-width: 92px; }
+.today-redo-feedback .mud-alert-message { min-width: 0; overflow-wrap: anywhere; }
+.today-redo-feedback .mud-progress-circular { flex-shrink: 0; }
+.today-redo-row-feedback, .today-redo-account-feedback { margin-top: 4px; overflow-wrap: anywhere; }
+
+.today-redo-row-feedback { display: block; }
+.medal-auto-update { display: inline-flex; align-items: center; gap: 4px; }

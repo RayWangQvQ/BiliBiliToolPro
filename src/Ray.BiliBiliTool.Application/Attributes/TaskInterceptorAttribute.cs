@@ -1,6 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Ray.BiliBiliTool.Application.Contracts;
+using Ray.BiliBiliTool.Domain;
 using Ray.BiliBiliTool.Infrastructure;
 using Rougamo;
 using Rougamo.Context;
@@ -24,6 +25,12 @@ public class TaskInterceptorAttribute(
     {
         if (taskName == null)
             return;
+        TaskRecoveryProgressScope.Report(
+            $"stage/{context.Method.Name}",
+            taskName,
+            TaskRecoveryProgressState.Running,
+            "正在执行"
+        );
         string end = taskLevel == TaskLevel.One ? Environment.NewLine : "";
         string delimiter = GetDelimiters();
         _logger.LogInformation(delimiter + "开始 {taskName} " + delimiter + end, taskName);
@@ -33,6 +40,12 @@ public class TaskInterceptorAttribute(
     {
         if (taskName == null)
             return;
+        TaskRecoveryProgressScope.Report(
+            $"stage/{context.Method.Name}",
+            taskName,
+            TaskRecoveryProgressState.Completed,
+            "动作执行结束"
+        );
 
         string delimiter = GetDelimiters();
         var append = new string(GetDelimiter(), taskName.Length);
@@ -44,6 +57,13 @@ public class TaskInterceptorAttribute(
 
     public override void OnException(MethodContext context)
     {
+        if (context.Exception is { } exception)
+            TaskRecoveryProgressScope.Report(
+                $"stage/{context.Method.Name}",
+                taskName ?? "任务动作",
+                TaskRecoveryProgressState.Failed,
+                TaskRecoveryProgressScope.DescribeFailure(exception)
+            );
         if (context.Exception is not OperationCanceledException)
             TaskExecutionFailureScope.MarkFailed();
         if (rethrowWhenException)

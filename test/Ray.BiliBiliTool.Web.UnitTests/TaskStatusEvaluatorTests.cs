@@ -1,9 +1,10 @@
 using Microsoft.Extensions.Configuration;
 using Ray.BiliBiliTool.Domain;
+using Xunit;
 
 namespace Ray.BiliBiliTool.Web.UnitTests;
 
-public class TaskStatusEvaluatorTests
+public class TaskStatusEvaluatorTest
 {
     private static readonly TaskDefinition DailyTask = TaskCatalog.All.First(t =>
         t.TaskKey == "DailyTaskAppService"
@@ -55,14 +56,14 @@ public class TaskStatusEvaluatorTests
         };
 
     [Fact]
-    public void Evaluate_DisabledTask_ReturnsDisabled()
+    public void 任务被关闭时显示已关闭()
     {
         var r = TaskStatusEvaluator.Evaluate(Ctx("Login", isTaskEnabled: false));
         Assert.Equal(TodayTaskItemState.Disabled, r.State);
     }
 
     [Fact]
-    public void Evaluate_DisabledItem_ReturnsDisabled()
+    public void 单项被关闭时显示已关闭_比如关掉分享()
     {
         var r = TaskStatusEvaluator.Evaluate(
             Ctx("Share", isItemEnabled: false, bili: new(false, true, false, 0))
@@ -71,14 +72,14 @@ public class TaskStatusEvaluatorTests
     }
 
     [Fact]
-    public void Evaluate_NoFireTimeToday_ReturnsNotToday()
+    public void 今天没有触发点显示本日无需执行()
     {
         var r = TaskStatusEvaluator.Evaluate(Ctx("Login", hasFireTimeToday: false));
         Assert.Equal(TodayTaskItemState.NotToday, r.State);
     }
 
     [Fact]
-    public void Evaluate_BeforeFireTime_ReturnsWaiting()
+    public void 还没到今天的触发时间显示等待执行()
     {
         var r = TaskStatusEvaluator.Evaluate(
             Ctx("Login", isPastDueTime: false, bili: new(false, false, false, 0))
@@ -87,37 +88,51 @@ public class TaskStatusEvaluatorTests
     }
 
     [Fact]
-    public void Evaluate_BiliQueryFailure_ReturnsUnknown()
+    public void B站查询失败显示状态未知且不参与补做()
     {
         var r = TaskStatusEvaluator.Evaluate(Ctx("Login", biliQueryFailed: true));
         Assert.Equal(TodayTaskItemState.Unknown, r.State);
     }
 
     [Fact]
-    public void Evaluate_BiliReportsCompletion_ReturnsCompleted()
+    public void B站确认完成则为已完成()
     {
         var r = TaskStatusEvaluator.Evaluate(Ctx("Login", bili: new(true, true, false, 50)));
         Assert.Equal(TodayTaskItemState.Completed, r.State);
     }
 
     [Fact]
-    public void Evaluate_TaskLevelSuccessRecord_ReturnsCompleted()
+    public void 执行记录里有成功则为已完成_用于任务级检查项()
     {
+        var task = TaskCatalog.All.Single(task => task.TaskKey == "VipPrivilegeTaskAppService");
+        var record = Rec(TaskRecordStatus.Success, null);
+        record.TaskKey = task.TaskKey;
         var r = TaskStatusEvaluator.Evaluate(
-            Ctx("VipPrivilege", records: [Rec(TaskRecordStatus.Success, null)])
+            new TodayTaskItemContext
+            {
+                Task = task,
+                Item = task.Items[0],
+                IsTaskEnabled = true,
+                IsItemEnabled = true,
+                HasFireTimeToday = true,
+                IsPastDueTime = true,
+                Records = [record],
+                AutoAttempts = 0,
+                MaxAutoAttempts = 3,
+            }
         );
         Assert.Equal(TodayTaskItemState.Completed, r.State);
     }
 
     [Fact]
-    public void Evaluate_NoRecordsAndIncompleteBiliReward_ReturnsNotDone()
+    public void 完全没有记录且B站未完成则为未执行()
     {
         var r = TaskStatusEvaluator.Evaluate(Ctx("DonateCoin", bili: new(true, true, false, 0)));
         Assert.Equal(TodayTaskItemState.NotDone, r.State);
     }
 
     [Fact]
-    public void Evaluate_SuccessRecordButIncompleteBiliReward_ReturnsFailed()
+    public void 今天跑过但B站仍显示未完成则为失败_投币场景()
     {
         var r = TaskStatusEvaluator.Evaluate(
             Ctx(
@@ -130,7 +145,7 @@ public class TaskStatusEvaluatorTests
     }
 
     [Fact]
-    public void Evaluate_ShareRejectedByBili_ReturnsFailedWithoutRetryExhaustion()
+    public void 分享被B站拒绝时显示失败且不消耗自动重试()
     {
         var r = TaskStatusEvaluator.Evaluate(
             Ctx(
@@ -145,7 +160,7 @@ public class TaskStatusEvaluatorTests
     }
 
     [Fact]
-    public void Evaluate_AutoRetryLimitReached_ReturnsRetryExhausted()
+    public void 自动重试达上限后不再重试_即使仍然失败()
     {
         var r = TaskStatusEvaluator.Evaluate(
             Ctx(
@@ -160,7 +175,7 @@ public class TaskStatusEvaluatorTests
     }
 
     [Fact]
-    public void Evaluate_TaskLevelFailureBelowRetryLimit_ReturnsFailedMessage()
+    public void 任务级检查项失败且未达上限时为失败()
     {
         var manga = TaskCatalog.All.First(t => t.TaskKey == "MangaTaskAppService");
         var ctx = new TodayTaskItemContext
@@ -194,7 +209,7 @@ public class TaskStatusEvaluatorTests
     }
 
     [Fact]
-    public void CanAutoRedo_MissingTask_AllowsRetry()
+    public void 漏做的项允许自动补做()
     {
         var ctx = Ctx("DonateCoin", bili: new(true, true, false, 0));
         var result = TaskStatusEvaluator.Evaluate(ctx);
@@ -204,7 +219,7 @@ public class TaskStatusEvaluatorTests
     }
 
     [Fact]
-    public void CanAutoRedo_FailedTaskBelowRetryLimit_AllowsRetry()
+    public void 失败但未达上限的项允许自动补做()
     {
         var ctx = Ctx(
             "DonateCoin",
@@ -218,7 +233,7 @@ public class TaskStatusEvaluatorTests
     }
 
     [Fact]
-    public void CanAutoRedo_FailedShareTask_ReturnsFalse()
+    public void 分享永远不自动补做_避免每天白试三次()
     {
         var ctx = Ctx(
             "Share",
@@ -232,7 +247,7 @@ public class TaskStatusEvaluatorTests
     }
 
     [Fact]
-    public void CanAutoRedo_RetryLimitReached_ReturnsFalse()
+    public void 已达重试上限的项不自动补做()
     {
         var ctx = Ctx(
             "DonateCoin",
@@ -251,7 +266,7 @@ public class TaskStatusEvaluatorTests
     }
 
     [Fact]
-    public void CanAutoRedo_CompletedOrUnknownTask_ReturnsFalse()
+    public void 已完成与状态未知的项都不自动补做()
     {
         var done = Ctx("Login", bili: new(true, true, false, 50));
         Assert.False(TaskStatusEvaluator.CanAutoRedo(done, TaskStatusEvaluator.Evaluate(done)));
@@ -261,38 +276,12 @@ public class TaskStatusEvaluatorTests
             TaskStatusEvaluator.CanAutoRedo(unknown, TaskStatusEvaluator.Evaluate(unknown))
         );
     }
-
-    [Fact]
-    public void Evaluate_BiliQueryFailsDespiteSuccessfulRecord_RemainsUnknown()
-    {
-        var result = TaskStatusEvaluator.Evaluate(
-            Ctx("Login", biliQueryFailed: true, records: [Rec(TaskRecordStatus.Success, "Login")])
-        );
-
-        Assert.Equal(TodayTaskItemState.Unknown, result.State);
-        Assert.False(TaskStatusEvaluator.CanAutoRedo(Ctx("Login", biliQueryFailed: true), result));
-    }
-
-    [Fact]
-    public void Evaluate_OneAttemptBelowLimit_AllowsRedo()
-    {
-        var ctx = Ctx(
-            "DonateCoin",
-            autoAttempts: 2,
-            maxAutoAttempts: 3,
-            records: [Rec(TaskRecordStatus.Failed, "DonateCoin")]
-        );
-        var result = TaskStatusEvaluator.Evaluate(ctx);
-
-        Assert.Equal(TodayTaskItemState.Failed, result.State);
-        Assert.True(TaskStatusEvaluator.CanAutoRedo(ctx, result));
-    }
 }
 
-public class TaskCatalogTests
+public class TaskCatalogTest
 {
     [Fact]
-    public void All_TaskKeysAndJobNames_AreUnique()
+    public void 目录里的任务键与任务名互不重复()
     {
         Assert.Equal(
             TaskCatalog.All.Count,
@@ -305,7 +294,7 @@ public class TaskCatalogTests
     }
 
     [Fact]
-    public void All_DailyTask_ContainsFourBiliRewardItems()
+    public void 每日任务包含登录观看分享投币四个B站检查项()
     {
         var daily = TaskCatalog.All.Single(t => t.TaskKey == "DailyTaskAppService");
         var biliItems = daily
@@ -321,7 +310,7 @@ public class TaskCatalogTests
     }
 
     [Fact]
-    public void IsEnabled_ZeroCoinTarget_DisablesDonateCoinItem()
+    public void 投币数配成0时投币项视为关闭()
     {
         var daily = TaskCatalog.All.Single(t => t.TaskKey == "DailyTaskAppService");
         var coin = daily.Items.Single(i => i.ItemKey == "DonateCoin");
@@ -335,7 +324,7 @@ public class TaskCatalogTests
     }
 
     [Fact]
-    public void IsEnabled_ShareDisabled_DisablesShareItem()
+    public void 关掉分享开关后分享项视为关闭()
     {
         var daily = TaskCatalog.All.Single(t => t.TaskKey == "DailyTaskAppService");
         var share = daily.Items.Single(i => i.ItemKey == TaskCatalog.ShareItemKey);

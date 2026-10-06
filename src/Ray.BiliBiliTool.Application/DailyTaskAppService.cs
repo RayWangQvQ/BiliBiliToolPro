@@ -172,9 +172,12 @@ public class DailyTaskAppService(
     private async Task AddCoins(UserInfo userInfo, BiliCookie ck)
     {
         // LV6 optimization: skip coin donation for max-level users to conserve coins
-        if (_dailyTaskOptions.SaveCoinsWhenLv6 && userInfo.Level_info?.Current_level >= 6)
+        if (_dailyTaskOptions.ShouldSkipCoinDonation(userInfo.Level_info?.Current_level))
         {
-            logger.LogInformation("已经为LV6大佬，开始白嫖");
+            logger.LogInformation(
+                "已达到停止投币等级 Lv.{level}，跳过投币",
+                _dailyTaskOptions.EffectiveCoinDonationStopLevel
+            );
             return;
         }
 

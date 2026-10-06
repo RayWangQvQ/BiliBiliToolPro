@@ -1,3 +1,4 @@
+using System.Text.Json;
 using BlazingQuartz.Core.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Options;
@@ -24,7 +25,16 @@ public abstract class BaseConfigComponent<T> : ComponentBase
 
     protected T _config = new();
     protected bool _isLoading = true;
-    protected MarkupString? _saveMessage;
+    protected string? _saveMessage;
+    protected bool _isSaving;
+    private Dictionary<string, string> _savedValues = [];
+    private bool _configLoaded;
+    protected bool HasChanges =>
+        _configLoaded
+        && !_isLoading
+        && !_savedValues
+            .OrderBy(pair => pair.Key)
+            .SequenceEqual(_config.ToConfigDictionary().OrderBy(pair => pair.Key));
     protected bool _saveSuccess;
 
     protected abstract IOptionsMonitor<T> OptionsMonitor { get; }
@@ -46,16 +56,24 @@ public abstract class BaseConfigComponent<T> : ComponentBase
 
     protected Task LoadConfigAsync()
     {
+        if (_isSaving)
+            return Task.CompletedTask;
         _isLoading = true;
+        _configLoaded = false;
         _saveMessage = null;
+        _saveSuccess = false;
 
         try
         {
-            _config = OptionsMonitor.CurrentValue;
+            // Edit an isolated draft so unsaved controls cannot affect scheduled jobs.
+            _config = Clone(OptionsMonitor.CurrentValue);
+            _savedValues = _config.ToConfigDictionary();
+            _configLoaded = true;
         }
         catch (Exception ex)
         {
-            _saveMessage = new MarkupString($"Failed to load configuration: {ex.Message}");
+            Logger.LogError(ex, "Failed to load configuration");
+            _saveMessage = "配置加载失败，请重新加载";
             _saveSuccess = false;
         }
         finally
@@ -67,52 +85,71 @@ public abstract class BaseConfigComponent<T> : ComponentBase
         return Task.CompletedTask;
     }
 
+    private static T Clone(T value) =>
+        JsonSerializer.Deserialize<T>(JsonSerializer.Serialize(value))!;
+
+    protected virtual bool IsScheduleEnabled(T submitted) => submitted.IsEnable;
+
+    protected virtual Dictionary<string, string> ValuesToPersist(T submitted) =>
+        submitted.ToConfigDictionary();
+
+    protected void UpdateSavedSetting(string key, string value) => _savedValues[key] = value;
+
+    protected async Task<bool> SaveBeforeLeavingAsync()
+    {
+        await HandleValidSubmitAsync();
+        return _saveSuccess && !HasChanges;
+    }
+
     protected virtual async Task HandleValidSubmitAsync()
     {
-        _isLoading = true;
+        if (_isSaving || !HasChanges)
+            return;
+        _isSaving = true;
         _saveMessage = null;
-
+        _saveSuccess = false;
+        var persisted = false;
+        // Capture exactly what this save submits, keeping subsequent edits separate from this snapshot.
+        StateHasChanged();
         try
         {
-            // Validate the generated schedule before persisting settings.
-            if (string.IsNullOrWhiteSpace(_config.Cron))
-                _config.Cron = Ray.BiliBiliTool.Web.Services.TaskSchedulePlan.DefaultCron;
-            _ = new CronExpression(_config.Cron);
-
-            // 保存配置
-            var sqliteProvider = GetSqliteConfigurationProvider();
-            if (sqliteProvider == null)
-            {
-                throw new InvalidOperationException("Unable to get SqliteConfigurationProvider");
-            }
-
-            var configValues = _config.ToConfigDictionary();
-            sqliteProvider.BatchSet(configValues);
-            // Publish the persisted draft to options monitors before updating the scheduler.
+            var originalCron = _config.Cron;
+            var submitted = Clone(_config);
+            await Task.Yield();
+            if (string.IsNullOrWhiteSpace(submitted.Cron))
+                submitted.Cron = Ray.BiliBiliTool.Web.Services.TaskSchedulePlan.DefaultCron;
+            _ = new CronExpression(submitted.Cron);
+            var provider =
+                GetSqliteConfigurationProvider()
+                ?? throw new InvalidOperationException(
+                    "SQLite configuration provider is unavailable"
+                );
+            var values = ValuesToPersist(submitted);
+            provider.BatchSet(values);
+            persisted = true;
             ((IConfigurationRoot)Configuration).Reload();
-
-            // 如果有对应的定时任务，同步更新 Quartz 任务状态和 Cron 表达式
+            _savedValues = submitted.ToConfigDictionary();
+            if (_config.Cron == originalCron)
+                _config.Cron = submitted.Cron;
             var jobKey = GetJobKey();
             if (jobKey != null && SchedulerService != null)
             {
-                // 更新 Cron 表达式
-                await UpdateJobCronAsync(jobKey, _config.Cron);
-
-                // 控制任务启停
-                await ControlScheduledJobAsyc(jobKey, _config.IsEnable);
+                await UpdateJobCronAsync(jobKey, submitted.Cron);
+                await ControlScheduledJobAsyc(jobKey, IsScheduleEnabled(submitted));
             }
-
-            _saveMessage = GetSaveSuccessMessage();
+            _saveMessage = "配置已保存";
             _saveSuccess = true;
         }
         catch (Exception ex)
         {
-            _saveMessage = new MarkupString($"Failed to save configuration: {ex.Message}");
-            _saveSuccess = false;
+            Logger.LogError(ex, "Failed to save configuration or update its schedule");
+            _saveMessage = persisted
+                ? "配置已保存，执行计划更新失败。请重新加载后检查任务状态。"
+                : "保存失败，修改已保留，请重试";
         }
         finally
         {
-            _isLoading = false;
+            _isSaving = false;
             StateHasChanged();
         }
     }
@@ -160,21 +197,8 @@ public abstract class BaseConfigComponent<T> : ComponentBase
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to update cron expression for job {JobKey}", jobKey);
+            throw;
         }
-    }
-
-    private MarkupString GetSaveSuccessMessage()
-    {
-        var jobKey = GetJobKey();
-        if (jobKey == null)
-        {
-            return new MarkupString("Configuration saved successfully!");
-        }
-
-        var status = _config.IsEnable ? "enabled" : "disabled";
-        return new MarkupString(
-            $"Configuration saved successfully!<br/>{jobKey} has been {status}."
-        );
     }
 
     private SqliteConfigurationProvider? GetSqliteConfigurationProvider()
