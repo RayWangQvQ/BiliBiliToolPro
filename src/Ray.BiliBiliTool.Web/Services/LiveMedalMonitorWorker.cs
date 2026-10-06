@@ -7,7 +7,8 @@ namespace Ray.BiliBiliTool.Web.Services;
 public sealed class LiveMedalMonitorWorker(
     LiveMedalMonitorCycle cycle,
     IOptionsMonitor<LiveFansMedalTaskOptions> options,
-    ILogger<LiveMedalMonitorWorker> logger
+    ILogger<LiveMedalMonitorWorker> logger,
+    TimeProvider? clock = null
 ) : BackgroundService
 {
     private readonly Channel<bool> _changes = Channel.CreateBounded<bool>(
@@ -38,11 +39,18 @@ public sealed class LiveMedalMonitorWorker(
                     );
                 }
                 using var wait = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
-                wait.CancelAfter(
-                    TimeSpan.FromMinutes(
-                        Math.Clamp(options.CurrentValue.MonitorIntervalMinutes, 1, 30)
-                    )
+                var duration = TimeSpan.FromMinutes(
+                    Math.Clamp(options.CurrentValue.MonitorIntervalMinutes, 1, 30)
                 );
+                var now = (clock ?? TimeProvider.System).GetUtcNow();
+                if (
+                    options.CurrentValue.EnableWatch
+                    && options.CurrentValue.NextWatchWindowBoundary(now) is { } boundary
+                )
+                    duration = TimeSpan.FromTicks(
+                        Math.Min(duration.Ticks, Math.Max(1, (boundary - now).Ticks))
+                    );
+                wait.CancelAfter(duration);
                 try
                 {
                     await _changes.Reader.ReadAsync(wait.Token);

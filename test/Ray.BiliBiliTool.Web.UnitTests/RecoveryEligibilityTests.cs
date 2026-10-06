@@ -61,6 +61,31 @@ public class RecoveryEligibilityTests : IDisposable
             );
     }
 
+    [Theory]
+    [InlineData(TaskRecordTrigger.Manual, true)]
+    [InlineData(TaskRecordTrigger.Auto, false)]
+    public async Task RecoveryPassesExplicitTriggerToWatchPolicy(
+        TaskRecordTrigger trigger,
+        bool manual
+    )
+    {
+        bool? observed = null;
+        using var services = Apps(
+            new App(
+                "MangaTaskAppService",
+                (_, _) =>
+                {
+                    observed = LiveFansMedalWatchScope.IsManual;
+                    return Task.CompletedTask;
+                }
+            )
+        );
+        var result = await Build(services).RedoAsync(91001, "MangaTaskAppService", null, trigger);
+        Assert.True(result.Success);
+        Assert.Equal(manual, observed);
+        Assert.False(LiveFansMedalWatchScope.IsManual);
+    }
+
     private readonly string _path = Path.Combine(
         Path.GetTempPath(),
         $"recovery-{Guid.NewGuid():N}.db"

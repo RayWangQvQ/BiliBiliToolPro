@@ -946,6 +946,77 @@ public class ScheduleConfigurationTests : TestContext, IDisposable
     }
 
     [Fact]
+    public async Task WatchWindowSavesSelectableTimesAndReopensWithoutChangingCron()
+    {
+        var scheduler = await PrepareAsync<LiveFansMedalJob>(LiveFansMedalJob.Key, "0 5 0 * * ?");
+        try
+        {
+            var page = RenderComponent<LiveFansMedalTaskConfig>();
+            Assert.Empty(page.FindAll("select[aria-label='开始时间小时']"));
+            page.FindComponents<MudSwitch<bool>>()
+                .Single(component => component.Instance.Label == "限制每日自动观看时段")
+                .Find("input")
+                .Change(true);
+            page.Find("select[aria-label='开始时间小时']").Change("22");
+            page.Find("select[aria-label='开始时间分钟']").Change("30");
+            page.Find("select[aria-label='结束时间小时']").Change("2");
+            page.Find("select[aria-label='结束时间分钟']").Change("15");
+            Assert.Contains("次日", page.Markup);
+            var save = page.FindAll("button")
+                .Single(button => button.TextContent.Contains("保存配置"));
+            Assert.False(save.HasAttribute("disabled"));
+            page.Find("form").Submit();
+            page.WaitForAssertion(() =>
+            {
+                Assert.Equal("true", _configuration["LiveFansMedalTaskConfig:UseWatchTimeWindow"]);
+                Assert.Equal("22:30", _configuration["LiveFansMedalTaskConfig:WatchStartTime"]);
+                Assert.Equal("02:15", _configuration["LiveFansMedalTaskConfig:WatchEndTime"]);
+                Assert.Equal("0 5 0 * * ?", _configuration["LiveFansMedalTaskConfig:Cron"]);
+                Assert.True(
+                    page.FindAll("button")
+                        .Single(button => button.TextContent.Contains("保存配置"))
+                        .HasAttribute("disabled")
+                );
+            });
+            var reopened = RenderComponent<LiveFansMedalTaskConfig>();
+            reopened.WaitForAssertion(() =>
+            {
+                Assert.Equal(
+                    "22",
+                    reopened.Find("select[aria-label='开始时间小时']").GetAttribute("value")
+                );
+                Assert.Contains("22:30", reopened.Markup);
+            });
+            var output = System.Environment.GetEnvironmentVariable("WATCH_WINDOW_PREVIEW");
+            if (!string.IsNullOrEmpty(output))
+                System.IO.File.WriteAllText(output, reopened.Markup);
+        }
+        finally
+        {
+            await scheduler.Shutdown();
+        }
+    }
+
+    [Fact]
+    public void EqualWatchTimesShowValidationAndKeepDraftUnsaved()
+    {
+        var page = RenderComponent<LiveFansMedalTaskConfig>();
+        page.FindComponents<MudSwitch<bool>>()
+            .Single(component => component.Instance.Label == "限制每日自动观看时段")
+            .Find("input")
+            .Change(true);
+        page.Find("select[aria-label='结束时间小时']").Change("8");
+        page.Find("form").Submit();
+        page.WaitForAssertion(() => Assert.Contains("开始与结束时间需不同", page.Markup));
+        Assert.Null(_configuration["LiveFansMedalTaskConfig:UseWatchTimeWindow"]);
+        Assert.False(
+            page.FindAll("button")
+                .Single(button => button.TextContent.Contains("保存配置"))
+                .HasAttribute("disabled")
+        );
+    }
+
+    [Fact]
     public async Task LiveMedalPage_ShowsCacheBeforeRefreshAndReplacesItWhenReady()
     {
         var dashboard = new DeferredMedalDashboard();

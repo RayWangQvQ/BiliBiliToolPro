@@ -495,10 +495,9 @@ public partial class Today : ComponentBase, IDisposable
             TodayTaskItemState.NotDone => Icons.Material.Filled.Cancel,
             TodayTaskItemState.Failed => Icons.Material.Filled.ErrorOutline,
             TodayTaskItemState.RetryExhausted => Icons.Material.Filled.WarningAmber,
-            TodayTaskItemState.Waiting or TodayTaskItemState.WaitingConditions => Icons
-                .Material
-                .Filled
-                .Schedule,
+            TodayTaskItemState.Waiting
+            or TodayTaskItemState.WaitingConditions
+            or TodayTaskItemState.WaitingWatchTime => Icons.Material.Filled.Schedule,
             TodayTaskItemState.NoWork => Icons.Material.Filled.RemoveCircleOutline,
             TodayTaskItemState.NotToday => Icons.Material.Filled.RemoveCircleOutline,
             TodayTaskItemState.Disabled => Icons.Material.Filled.Block,
@@ -515,7 +514,9 @@ public partial class Today : ComponentBase, IDisposable
             TodayTaskItemState.Completed => Color.Success,
             TodayTaskItemState.NotDone => Color.Error,
             TodayTaskItemState.Failed or TodayTaskItemState.RetryExhausted => Color.Warning,
-            TodayTaskItemState.Waiting or TodayTaskItemState.WaitingConditions => Color.Info,
+            TodayTaskItemState.Waiting
+            or TodayTaskItemState.WaitingConditions
+            or TodayTaskItemState.WaitingWatchTime => Color.Info,
             TodayTaskItemState.Unknown => Color.Error,
             _ => Color.Default,
         };

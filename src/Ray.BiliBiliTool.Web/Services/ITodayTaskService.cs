@@ -26,6 +26,7 @@ public sealed class TodayTaskItemDto
         && State
             is TodayTaskItemState.NotDone
                 or TodayTaskItemState.Failed
+                or TodayTaskItemState.WaitingWatchTime
                 or TodayTaskItemState.RetryExhausted;
 
     /// <summary>是否允许自动补做（分享恒为 false，见 TaskStatusEvaluator.CanAutoRedo）</summary>

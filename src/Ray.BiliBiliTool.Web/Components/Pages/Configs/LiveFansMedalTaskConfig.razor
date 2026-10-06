@@ -136,6 +136,23 @@
                         </MudGrid>
                     </MudCardContent>
                 </MudCard>
+                <MudCard Class="mb-4">
+                    <MudCardHeader><CardHeaderContent><MudText Typo="Typo.h6">观看执行时段</MudText></CardHeaderContent></MudCardHeader>
+                    <MudCardContent>
+                        <MudSwitch T="bool" @bind-Value="_config.UseWatchTimeWindow" Label="限制每日自动观看时段" Disabled="!_config.EnableWatch" Color="Color.Primary" />
+                        <MudText Typo="Typo.body2" Class="mud-text-secondary mb-3">关闭时段限制时，自动模式全天检查，定时模式按执行计划启动。手动补做立即排队，同一账号每次观看一个房间。</MudText>
+                        @if (_config.UseWatchTimeWindow)
+                        {
+                            <MudGrid>
+                                <MudItem xs="12" md="6"><Ray.BiliBiliTool.Web.Components.Comps.DailyClockPicker Label="开始时间" @bind-Value="_config.WatchStartTime" For="@(() => _config.WatchStartTime)" Disabled="!_config.EnableWatch" /></MudItem>
+                                <MudItem xs="12" md="6"><Ray.BiliBiliTool.Web.Components.Comps.DailyClockPicker Label="结束时间" @bind-Value="_config.WatchEndTime" For="@(() => _config.WatchEndTime)" Disabled="!_config.EnableWatch" /></MudItem>
+                            </MudGrid>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary" Class="mt-3">每天 @_config.WatchStartTime—@(string.CompareOrdinal(_config.WatchStartTime, _config.WatchEndTime) > 0 ? "次日 " : "")@_config.WatchEndTime（UTC+8）。到结束时间停止观看，下个时段重新核对当天进度。</MudText>
+                            @if (!_config.UseLiveStateMonitoring)
+                            { <MudText Typo="Typo.body2" Class="mud-text-secondary mt-2">定时模式仅在计划触发且处于观看时段时开始。</MudText> }
+                        }
+                    </MudCardContent>
+                </MudCard>
                 <MudExpansionPanels>
                     <MudExpansionPanel Text="异常处理">
                         <MudGrid>

@@ -1,4 +1,5 @@
 using Ray.BiliBiliTool.Config.Options;
+using Ray.BiliBiliTool.Domain;
 
 namespace Ray.BiliBiliTool.Web.Services;
 
@@ -67,7 +68,7 @@ public static class LiveMedalCompletionEvaluator
                 }
                 unlit++;
                 pending++;
-                actionable |= lighting.Any(task => CanRun(task.Action, medal, options));
+                actionable |= lighting.Any(task => CanRun(task.Action, medal, options, now));
             }
             else if (
                 medal.SavingsFull
@@ -77,7 +78,9 @@ public static class LiveMedalCompletionEvaluator
             else if (tasks.Any(task => !task.Done))
             {
                 pending++;
-                actionable |= tasks.Any(task => !task.Done && CanRun(task.Action, medal, options));
+                actionable |= tasks.Any(task =>
+                    !task.Done && CanRun(task.Action, medal, options, now)
+                );
             }
         }
         var total = completed + pending + unknown;
@@ -90,6 +93,21 @@ public static class LiveMedalCompletionEvaluator
             return new(TodayTaskItemState.NoWork, "当前没有已开启的粉丝牌任务");
         if (pending == 0)
             return new(TodayTaskItemState.Completed, message);
+        if (
+            !actionable
+            && !LiveFansMedalWatchScope.IsManual
+            && !options.IsWatchTimeAllowed(now)
+            && medals.Any(medal =>
+                medal.Lighted == true
+                && medal.Tasks.Any(task => task.Action == "watchLive" && !task.Done)
+            )
+            && IsActionEnabled("watchLive", options)
+        )
+            return new(
+                TodayTaskItemState.WaitingWatchTime,
+                message
+                    + $" · 等待观看时段 {options.WatchStartTime}—{options.WatchEndTime}（UTC+8）"
+            );
         if (!actionable)
             return new(
                 TodayTaskItemState.WaitingConditions,
@@ -125,12 +143,17 @@ public static class LiveMedalCompletionEvaluator
     internal static bool CanRun(
         string action,
         LiveMedalCard medal,
-        LiveFansMedalTaskOptions options
+        LiveFansMedalTaskOptions options,
+        DateTimeOffset? now = null
     ) =>
         action switch
         {
             "like" => medal.Live,
-            "watchLive" => medal.Lighted == true,
+            "watchLive" => medal.Lighted == true
+                && (
+                    LiveFansMedalWatchScope.IsManual
+                    || options.IsWatchTimeAllowed(now ?? DateTimeOffset.UtcNow)
+                ),
             "sendDanmu" => (!options.DanmakuOnlyWhenOffline || !medal.Live)
                 && !(medal.Lighted == false && medal.Live && options.EnableLike),
             _ => false,

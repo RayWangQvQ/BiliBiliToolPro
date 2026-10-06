@@ -231,6 +231,7 @@ public class TodayTaskService(
     )
     {
         using var notificationScope = new TaskFailureNotificationScope(suppress: true);
+        using var watchScope = new LiveFansMedalWatchScope(trigger == TaskRecordTrigger.Manual);
         var task = TaskCatalog.All.FirstOrDefault(t => t.TaskKey == taskKey);
         if (task is null)
         {
@@ -934,6 +935,7 @@ public class TodayTaskService(
             TodayTaskItemState.RetryExhausted => "已自动重试 3 次仍未完成",
             TodayTaskItemState.Waiting => "等待执行",
             TodayTaskItemState.NoWork => "当前无需执行",
+            TodayTaskItemState.WaitingWatchTime => "等待观看时段",
             TodayTaskItemState.WaitingConditions => "等待任务条件",
             TodayTaskItemState.NotToday => "本日无需执行",
             TodayTaskItemState.Disabled => "已关闭",

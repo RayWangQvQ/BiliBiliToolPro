@@ -1,4 +1,5 @@
 using Ray.BiliBiliTool.Config.Options;
+using Ray.BiliBiliTool.Domain;
 
 namespace Ray.BiliBiliTool.Web.Services;
 
@@ -11,6 +12,7 @@ public enum LiveMedalActionState
     WaitingOffline,
     WaitingLighting,
     WaitingConfirmation,
+    WaitingWatchTime,
     Disabled,
     Excluded,
     Unselected,
@@ -34,6 +36,7 @@ public sealed record LiveMedalActionStatus(
             LiveMedalActionState.WaitingLive
             or LiveMedalActionState.WaitingOffline
             or LiveMedalActionState.WaitingLighting
+            or LiveMedalActionState.WaitingWatchTime
             or LiveMedalActionState.WaitingConfirmation => "medal-task-waiting",
             _ => "medal-task-inactive",
         };
@@ -96,6 +99,16 @@ public static class LiveMedalActionStatusEvaluator
                 LiveMedalActionState.WaitingLighting,
                 "等待点亮",
                 "点亮粉丝牌后执行观看任务"
+            );
+        if (
+            task.Action == "watchLive"
+            && !LiveFansMedalWatchScope.IsManual
+            && !options.IsWatchTimeAllowed(now)
+        )
+            return new(
+                LiveMedalActionState.WaitingWatchTime,
+                "等待观看时段",
+                $"每天 {options.WatchStartTime}—{options.WatchEndTime}（UTC+8）自动观看"
             );
         if (task.Action == "like" && !medal.Live)
             return new(LiveMedalActionState.WaitingLive, "待开播", "主播开播后可点赞");

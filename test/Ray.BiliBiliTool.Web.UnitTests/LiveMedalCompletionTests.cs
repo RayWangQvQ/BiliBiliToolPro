@@ -36,6 +36,41 @@ public class LiveMedalCompletionTests
         );
     }
 
+    [Fact]
+    public void OutsideWatchWindowCanWaitAndStillAllowManualRecovery()
+    {
+        var options = new LiveFansMedalTaskOptions
+        {
+            EnableLike = false,
+            EnableDanmaku = false,
+            UseWatchTimeWindow = true,
+            WatchStartTime = "20:00",
+        };
+        var card = Medal(
+            lit: true,
+            tasks: [new("watchLive", "观看15分钟", "每日上限 0/10", false, 0)]
+        );
+        var progress = Evaluate(options, card);
+        Assert.Equal(TodayTaskItemState.WaitingWatchTime, progress.State);
+        Assert.Contains("20:00", progress.Message);
+        Assert.True(
+            new TodayTaskItemDto
+            {
+                State = progress.State,
+                StateText = "等待观看时段",
+                DisplayName = "示例",
+            }.CanRedo
+        );
+        Assert.False(
+            TaskStatusEvaluator.CanAutoRedo(
+                Context(progress),
+                TaskStatusEvaluator.Evaluate(Context(progress))
+            )
+        );
+        using var manual = new Ray.BiliBiliTool.Domain.LiveFansMedalWatchScope(true);
+        Assert.Equal(TodayTaskItemState.NotDone, Evaluate(options, card).State);
+    }
+
     private static readonly DateTimeOffset Now = new(2026, 10, 5, 18, 42, 0, TimeSpan.FromHours(8));
 
     private static LiveMedalCard Medal(

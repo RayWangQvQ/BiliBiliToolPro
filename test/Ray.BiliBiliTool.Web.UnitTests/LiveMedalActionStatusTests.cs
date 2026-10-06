@@ -6,6 +6,28 @@ namespace Ray.BiliBiliTool.Web.UnitTests;
 
 public class LiveMedalActionStatusTests
 {
+    [Fact]
+    public void UnfinishedWatchingShowsWindowButConfirmedCompletionRemainsComplete()
+    {
+        var task = new LiveMedalTaskProgress("watchLive", "观看15分钟", "每日上限 0/10", false, 0);
+        var medal = new LiveMedalCard(1, "示例", "示例", 12, true, true, false, [task], null);
+        var options = new LiveFansMedalTaskOptions
+        {
+            UseWatchTimeWindow = true,
+            WatchStartTime = "21:00",
+        };
+        var waiting = LiveMedalActionStatusEvaluator.Evaluate(task, medal, options, Now, Now);
+        Assert.Equal(LiveMedalActionState.WaitingWatchTime, waiting.State);
+        Assert.Equal("medal-task-waiting", waiting.CssClass);
+        Assert.False(waiting.Complete);
+        Assert.Equal(
+            LiveMedalActionState.Completed,
+            LiveMedalActionStatusEvaluator
+                .Evaluate(task with { Done = true }, medal, options, Now, Now)
+                .State
+        );
+    }
+
     private static readonly DateTimeOffset Now = new(2026, 10, 5, 20, 30, 0, TimeSpan.FromHours(8));
 
     [Theory]

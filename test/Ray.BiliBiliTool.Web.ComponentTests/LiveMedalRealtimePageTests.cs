@@ -216,11 +216,17 @@ public class LiveMedalRealtimePageTests : TestContext
     [Fact]
     public async Task DisposingPageStopsPollingAndRemovesProgressSubscription()
     {
+        var polled = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var dashboard = new Dashboard { AutoRefreshInterval = TimeSpan.FromMilliseconds(50) };
+        dashboard.Read = (index, count, token) =>
+        {
+            if (count >= 2)
+                polled.TrySetResult();
+            return Task.FromResult(Snapshot(index));
+        };
         Services.AddSingleton<ILiveMedalDashboardService>(dashboard);
         var host = RenderComponent<PageHost>();
-        var page = host.FindComponent<LiveFansMedalTaskConfig>();
-        page.WaitForAssertion(() => Assert.True(dashboard.Reads >= 2));
+        await polled.Task.WaitAsync(TimeSpan.FromSeconds(5));
         var listener = dashboard.Listeners[0];
         await host.InvokeAsync(() =>
             host.SetParametersAndRender(parameters => parameters.Add(item => item.Show, false))

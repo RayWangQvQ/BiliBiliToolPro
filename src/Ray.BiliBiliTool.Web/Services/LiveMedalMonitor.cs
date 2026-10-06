@@ -173,6 +173,7 @@ public sealed class LiveMedalMonitorCycle(
     private readonly ConcurrentDictionary<long, SemaphoreSlim> _watchSlots = new();
     private readonly ConcurrentDictionary<long, SemaphoreSlim> _interactionSlots = new();
     private string? _executionSettings;
+    private string? _watchSettings;
     private int _disposed;
     public int ActiveCount => _active.Count;
 
@@ -186,6 +187,9 @@ public sealed class LiveMedalMonitorCycle(
                         is not "LiveFansMedalTaskConfig:Cron"
                             and not "LiveFansMedalTaskConfig:PinnedAnchorIds"
                             and not "LiveFansMedalTaskConfig:MonitorIntervalMinutes"
+                            and not "LiveFansMedalTaskConfig:UseWatchTimeWindow"
+                            and not "LiveFansMedalTaskConfig:WatchStartTime"
+                            and not "LiveFansMedalTaskConfig:WatchEndTime"
                 )
                 .OrderBy(pair => pair.Key)
         );
@@ -197,6 +201,21 @@ public sealed class LiveMedalMonitorCycle(
                 work.Cancel();
             _executionSettings = signature;
             _retryAfter.Clear();
+        }
+        var watchSettings =
+            $"{options.UseWatchTimeWindow}|{options.WatchStartTime}|{options.WatchEndTime}";
+        if (watchSettings != _watchSettings)
+        {
+            var watching = _active
+                .Where(pair => pair.Key.Action == "watchLive")
+                .Select(pair => pair.Value)
+                .ToArray();
+            foreach (var work in watching)
+                work.Cancel();
+            await Task.WhenAll(watching.Select(work => work.Task)).WaitAsync(token);
+            foreach (var key in _retryAfter.Keys.Where(key => key.Action == "watchLive"))
+                _retryAfter.TryRemove(key, out _);
+            _watchSettings = watchSettings;
         }
         foreach (var work in _active.Values)
             if (work.Date != today)
@@ -259,7 +278,7 @@ public sealed class LiveMedalMonitorCycle(
                     {
                         if (
                             !LiveMedalCompletionEvaluator.IsActionEnabled(action, options)
-                            || !LiveMedalCompletionEvaluator.CanRun(action, medal, options)
+                            || !LiveMedalCompletionEvaluator.CanRun(action, medal, options, now)
                         )
                             continue;
                         var plan = medal
@@ -314,7 +333,7 @@ public sealed class LiveMedalMonitorCycle(
                                 logger.LogWarning("每日任务汇总活动记录暂时无法保存");
                             }
                         }
-                        work.Task = RunAsync(target, work);
+                        work.Task = RunAsync(target, work, options);
                         started.Add(work.Task);
                     }
                 }
@@ -352,9 +371,14 @@ public sealed class LiveMedalMonitorCycle(
         }
     }
 
-    private async Task RunAsync(LiveMedalMonitorTarget target, Work work)
+    private async Task RunAsync(
+        LiveMedalMonitorTarget target,
+        Work work,
+        LiveFansMedalTaskOptions options
+    )
     {
         using var notifications = new TaskFailureNotificationScope(suppress: false);
+        using var watchScope = new Ray.BiliBiliTool.Domain.LiveFansMedalWatchScope(manual: false);
         var slots =
             target.Action == "watchLive"
                 ? _watchSlots.GetOrAdd(target.UserId, _ => new(_executionGate.WatchConcurrency))
@@ -364,6 +388,9 @@ public sealed class LiveMedalMonitorCycle(
         {
             await slots.WaitAsync(work.Token);
             acquired = true;
+            work.Token.ThrowIfCancellationRequested();
+            if (target.Action == "watchLive" && !options.IsWatchTimeAllowed(clock.GetUtcNow()))
+                return;
             await source.ExecuteAsync(target, work.Token);
             await records.WriteAsync(
                 target.UserId,

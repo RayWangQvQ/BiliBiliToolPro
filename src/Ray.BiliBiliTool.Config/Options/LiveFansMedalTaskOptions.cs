@@ -1,8 +1,9 @@
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 
 namespace Ray.BiliBiliTool.Config.Options;
 
-public class LiveFansMedalTaskOptions : BaseConfigOptions
+public class LiveFansMedalTaskOptions : BaseConfigOptions, IValidatableObject
 {
     public override string SectionName => "LiveFansMedalTaskConfig";
 
@@ -20,6 +21,70 @@ public class LiveFansMedalTaskOptions : BaseConfigOptions
 
     [Range(0, 1440, ErrorMessage = "每日观看时长应为 0～1440 分钟")]
     public int DailyWatchMinutes { get; set; } = 150;
+
+    public bool UseWatchTimeWindow { get; set; }
+
+    [RegularExpression(@"^(?:[01]\d|2[0-3]):[0-5]\d$", ErrorMessage = "请选择观看开始时间")]
+    public string WatchStartTime { get; set; } = "08:00";
+
+    [RegularExpression(@"^(?:[01]\d|2[0-3]):[0-5]\d$", ErrorMessage = "请选择观看结束时间")]
+    public string WatchEndTime { get; set; } = "23:00";
+
+    public bool IsWatchTimeAllowed(DateTimeOffset now)
+    {
+        if (!UseWatchTimeWindow)
+            return true;
+        if (!TryWatchWindow(out var start, out var end))
+            return false;
+        var time = now.ToOffset(TimeSpan.FromHours(8)).TimeOfDay;
+        return start < end ? time >= start && time < end : time >= start || time < end;
+    }
+
+    public DateTimeOffset? NextWatchWindowBoundary(DateTimeOffset now)
+    {
+        if (!UseWatchTimeWindow || !TryWatchWindow(out var start, out var end))
+            return null;
+        var local = now.ToOffset(TimeSpan.FromHours(8));
+        var boundary = new DateTimeOffset(
+            local.Date + (IsWatchTimeAllowed(now) ? end : start),
+            local.Offset
+        );
+        return boundary <= local ? boundary.AddDays(1) : boundary;
+    }
+
+    private bool TryWatchWindow(out TimeSpan start, out TimeSpan end)
+    {
+        start = end = TimeSpan.Zero;
+        if (
+            !TimeOnly.TryParseExact(
+                WatchStartTime,
+                "HH:mm",
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.None,
+                out var first
+            )
+            || !TimeOnly.TryParseExact(
+                WatchEndTime,
+                "HH:mm",
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.None,
+                out var last
+            )
+        )
+            return false;
+        start = first.ToTimeSpan();
+        end = last.ToTimeSpan();
+        return start != end;
+    }
+
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        if (UseWatchTimeWindow && !TryWatchWindow(out _, out _))
+            yield return new ValidationResult(
+                "开始与结束时间需不同，全天执行可关闭时段限制",
+                [nameof(WatchEndTime)]
+            );
+    }
 
     public int GetInteractionLimit(string action) =>
         action switch

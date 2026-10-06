@@ -1,0 +1,40 @@
+@using System.Globalization
+@using System.Linq.Expressions
+
+<fieldset class="schedule-picker" disabled="@Disabled">
+    <legend>@Label</legend>
+    <div class="schedule-fields">
+        <div class="schedule-time-field">
+            <span>选择时间</span>
+            <div class="schedule-time-values" role="group" aria-label="@Label">
+                <span class="schedule-select"><select aria-label="@(Label + "小时")" value="@Parsed.Hour" @onchange="ChangeHourAsync">
+                    @for (var h = 0; h < 24; h++) { <option value="@h" selected="@(h == Parsed.Hour)">@(h.ToString("00")) 时</option> }
+                </select></span>
+                <span class="schedule-time-separator" aria-hidden="true">:</span>
+                <span class="schedule-select"><select aria-label="@(Label + "分钟")" value="@Parsed.Minute" @onchange="ChangeMinuteAsync">
+                    @for (var m = 0; m < 60; m++) { <option value="@m" selected="@(m == Parsed.Minute)">@(m.ToString("00")) 分</option> }
+                </select></span>
+            </div>
+        </div>
+    </div>
+    @if (For is not null) { <ValidationMessage For="For" /> }
+</fieldset>
+
+@code {
+    [Parameter] public string Label { get; set; } = "时间";
+    [Parameter] public string Value { get; set; } = "08:00";
+    [Parameter] public EventCallback<string> ValueChanged { get; set; }
+    [Parameter] public Expression<Func<string>>? For { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+    [CascadingParameter] private EditContext? FormContext { get; set; }
+    private TimeOnly Parsed => TimeOnly.TryParseExact(Value, "HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out var time) ? time : new(8, 0);
+    private Task ChangeHourAsync(ChangeEventArgs args) => ChangeAsync(args, true);
+    private Task ChangeMinuteAsync(ChangeEventArgs args) => ChangeAsync(args, false);
+    private async Task ChangeAsync(ChangeEventArgs args, bool hour)
+    {
+        if (Disabled || !int.TryParse(args.Value?.ToString(), out var value) || value < 0 || value > (hour ? 23 : 59)) return;
+        var time = new TimeOnly(hour ? value : Parsed.Hour, hour ? Parsed.Minute : value);
+        await ValueChanged.InvokeAsync(time.ToString("HH:mm", CultureInfo.InvariantCulture));
+        if (For is not null) FormContext?.NotifyFieldChanged(FieldIdentifier.Create(For));
+    }
+}

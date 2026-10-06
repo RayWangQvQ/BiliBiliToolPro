@@ -215,6 +215,56 @@ public class LiveMedalMonitorTests
     }
 
     [Fact]
+    public async Task OutsideWindowWaitsForWatchingButKeepsLikesActive()
+    {
+        await using var env = new Environment();
+        env.Options.UseWatchTimeWindow = true;
+        env.Options.WatchStartTime = "11:00";
+        env.Source.Accounts = [env.Account(1, Card(1, action: "watchLive"), Card(2))];
+        await env.Tick();
+        Assert.Equal("like", Assert.Single(env.Source.Started).Action);
+        env.Clock.Now = env.Clock.Now.AddHours(1);
+        env.Source.Accounts = [env.Account(1, Card(1, action: "watchLive"), Card(2, done: true))];
+        await env.Tick();
+        Assert.Contains(env.Source.Started, target => target.Action == "watchLive");
+    }
+
+    [Fact]
+    public async Task QueuedRoomDoesNotStartAfterWindowCloses()
+    {
+        await using var env = new Environment();
+        env.Options.UseWatchTimeWindow = true;
+        env.Options.WatchEndTime = "11:00";
+        var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        env.Source.Run = (target, token) => release.Task.WaitAsync(token);
+        env.Source.Accounts =
+        [
+            env.Account(1, Card(1, action: "watchLive"), Card(2, action: "watchLive")),
+        ];
+        await env.Tick();
+        Assert.Single(env.Source.Started);
+        env.Clock.Now = env.Clock.Now.AddHours(1);
+        release.SetResult();
+        await WaitUntil(() => env.Cycle.ActiveCount == 0);
+        Assert.Single(env.Source.Started);
+        Assert.Single(env.Records.Items);
+    }
+
+    [Fact]
+    public async Task ChangingWatchWindowOnlyCancelsWatching()
+    {
+        await using var env = new Environment();
+        env.Source.Run = (_, token) => Task.Delay(Timeout.Infinite, token);
+        env.Source.Accounts = [env.Account(1, Card(1, action: "watchLive"), Card(2))];
+        await env.Tick();
+        env.Options.UseWatchTimeWindow = true;
+        env.Options.WatchStartTime = "11:00";
+        await env.Tick();
+        Assert.Equal("watchLive", Assert.Single(env.Source.Canceled).Action);
+        Assert.Equal(1, env.Cycle.ActiveCount);
+    }
+
+    [Fact]
     public void DefaultsMonitorLiveStateAndUseDailyQuota()
     {
         var options = new LiveFansMedalTaskOptions();

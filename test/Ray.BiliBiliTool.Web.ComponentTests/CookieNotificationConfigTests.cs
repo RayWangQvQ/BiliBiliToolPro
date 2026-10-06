@@ -95,9 +95,13 @@ public class CookieNotificationConfigTests : TestContext
         var page = RenderComponent<CookieNotificationConfig>();
         page.Find("input[type=password]").Input("SCT123synthetic");
         page.Find("button").Click();
-        page.WaitForAssertion(() => Assert.Single(page.FindAll(".save-result")));
+        page.WaitForAssertion(() =>
+        {
+            Assert.Single(page.FindAll(".save-result"));
+            Assert.False(page.FindAll("input[type=checkbox]")[0].HasAttribute("disabled"));
+        });
         page.FindAll("input[type=checkbox]")[0].Change(false);
-        Assert.Empty(page.FindAll(".save-result"));
+        page.WaitForAssertion(() => Assert.Empty(page.FindAll(".save-result")));
     }
 
     [Fact]

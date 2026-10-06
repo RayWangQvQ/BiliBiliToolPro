@@ -34,6 +34,8 @@ public enum TodayTaskItemState
 
     // Pending progress requires a different room state.
     WaitingConditions,
+
+    WaitingWatchTime,
 }
 
 /// <summary>B站每日任务接口的当日快照</summary>
