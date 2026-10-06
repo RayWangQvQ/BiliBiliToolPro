@@ -258,13 +258,31 @@ check_unzip() {
     fi
 }
 
+get_dotnet_major_version() {
+    local dotnet_command="${1:-dotnet}"
+    local dotnet_version
+    # Respect SDK selection (including global.json) and reject failed commands.
+    dotnet_version="$("$dotnet_command" --version 2>/dev/null)" || return 1
+    # Some wrappers return SDK-list rows instead of one selected version.
+    printf '%s\n' "$dotnet_version" | awk '
+        /^[[:space:]]*[0-9]+\.[0-9]+\.[0-9]+(-[[:alnum:].-]+)?(\+[[:alnum:].-]+)?([[:space:]]+\[[^]]+\])?[[:space:]]*$/ {
+            split($1, version, ".")
+            if (version[1] + 0 > highest) highest = version[1] + 0
+        }
+        END {
+            if (highest > 0) print highest
+            else exit 1
+        }
+    '
+}
+
 # 检查dotnet
 check_dotnet() {
     eval $invocation
 
-    dotnetVersion=$(dotnet --version 2>/dev/null || true)
-    dotnetMajor=$(echo "$dotnetVersion" | grep -oE '^[0-9]+' || true)
-    say "当前dotnet版本：$dotnetVersion"
+    local dotnetMajor
+    dotnetMajor="$(get_dotnet_major_version dotnet || true)"
+    say "当前dotnet主版本：${dotnetMajor:-未检测到可用SDK}"
     if [[ "$dotnetMajor" =~ ^[0-9]+$ && "$dotnetMajor" -ge 10 ]]; then
         say "已安装，且版本满足"
         say "which dotnet: $(which dotnet)"
@@ -279,7 +297,7 @@ remove_legacy_dotnet_entry() {
     local legacyDotnet="/usr/local/bin/dotnet"
     if [[ -e "$legacyDotnet" || -L "$legacyDotnet" ]]; then
         local legacyDotnetMajor
-        legacyDotnetMajor=$("$legacyDotnet" --version 2>/dev/null | grep -oE '^[0-9]+' || true)
+        legacyDotnetMajor="$(get_dotnet_major_version "$legacyDotnet" || true)"
         if ! [[ "$legacyDotnetMajor" =~ ^[0-9]+$ && "$legacyDotnetMajor" -ge 10 ]]; then
             rm -f "$legacyDotnet"
             hash -r
