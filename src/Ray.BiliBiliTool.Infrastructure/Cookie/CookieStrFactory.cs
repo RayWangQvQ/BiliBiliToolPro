@@ -10,9 +10,13 @@ public class CookieStrFactory<TCookieInfo>(IConfiguration configuration)
 
     public int Count => CookieDictionary.Count;
 
-    public TCookieInfo GetCookie(int index)
+    public TCookieInfo GetCookie(int index) => CreateCookie(GetCookieDictionary()[index]);
+
+    public IReadOnlyList<TCookieInfo> GetCookies() =>
+        GetCookieDictionary().Values.Select(CreateCookie).ToArray();
+
+    private static TCookieInfo CreateCookie(Dictionary<string, string> dic)
     {
-        var dic = GetCookieDictionary()[index];
         return (TCookieInfo)Activator.CreateInstance(typeof(TCookieInfo), dic)!
             ?? throw new InvalidOperationException();
     }

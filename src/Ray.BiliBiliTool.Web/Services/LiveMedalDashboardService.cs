@@ -11,7 +11,11 @@ using Ray.BiliBiliTool.Infrastructure.Cookie;
 
 namespace Ray.BiliBiliTool.Web.Services;
 
-public sealed record LiveMedalAccount(int Index, string Label);
+public sealed record LiveMedalAccount(
+    int Index,
+    string Label,
+    [property: System.Text.Json.Serialization.JsonIgnore] string? Key = null
+);
 
 public sealed record LiveMedalTaskProgress(
     string Action,
@@ -145,9 +149,16 @@ public sealed class LiveMedalDashboardService(
     }
 
     public IReadOnlyList<LiveMedalAccount> GetAccounts() =>
-        Enumerable
-            .Range(0, cookies.Count)
-            .Select(index => new LiveMedalAccount(index, $"账号 {index + 1}"))
+        cookies
+            .GetCookies()
+            .Select(
+                (cookie, index) =>
+                    new LiveMedalAccount(
+                        index,
+                        $"账号 {index + 1}",
+                        LiveMedalProgressUpdates.AccountKey(cookie)
+                    )
+            )
             .ToList();
 
     private string AccountKey(int index) =>

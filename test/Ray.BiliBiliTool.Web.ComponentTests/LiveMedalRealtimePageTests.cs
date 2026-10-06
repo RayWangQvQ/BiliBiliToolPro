@@ -22,14 +22,28 @@ public class LiveMedalRealtimePageTests : TestContext
         public TimeSpan AutoRefreshInterval { get; set; } = TimeSpan.FromMinutes(1);
         public int Reads;
         public Func<int, int, CancellationToken, Task<LiveMedalSnapshot>>? Read;
+        public Func<int, CancellationToken, Task<LiveMedalSnapshot?>>? Cached;
+        public IReadOnlyList<LiveMedalAccount> Accounts =
+        [
+            new(0, "账号1", "synthetic-account-a"),
+            new(1, "账号2", "synthetic-account-b"),
+        ];
+        public int CacheReads;
+        public int FailNextAccountRead;
         public Dictionary<int, Action<LiveMedalSnapshot>> Listeners = [];
 
-        public IReadOnlyList<LiveMedalAccount> GetAccounts() => [new(0, "账号1"), new(1, "账号2")];
+        public IReadOnlyList<LiveMedalAccount> GetAccounts()
+        {
+            if (Interlocked.Exchange(ref FailNextAccountRead, 0) != 0)
+                throw new IOException("synthetic account lookup failure");
+            return Accounts;
+        }
 
-        public Task<LiveMedalSnapshot?> GetCachedAsync(
-            int index,
-            CancellationToken token = default
-        ) => Task.FromResult<LiveMedalSnapshot?>(null);
+        public Task<LiveMedalSnapshot?> GetCachedAsync(int index, CancellationToken token = default)
+        {
+            Interlocked.Increment(ref CacheReads);
+            return Cached?.Invoke(index, token) ?? Task.FromResult<LiveMedalSnapshot?>(null);
+        }
 
         public Task<LiveMedalSnapshot> GetAsync(
             int index,
@@ -261,5 +275,238 @@ public class LiveMedalRealtimePageTests : TestContext
         await page.InvokeAsync(() => pending.SetResult(Snapshot(current: 3, revision: 9)));
         page.WaitForAssertion(() => Assert.Contains("每日上限 10/10", page.Markup));
         Assert.DoesNotContain("每日上限 3/10", page.Markup);
+    }
+
+    [Fact]
+    public async Task LateCachedReadCannotOverwritePushedProgressWhenFullRefreshFails()
+    {
+        var cached = new TaskCompletionSource<LiveMedalSnapshot?>(
+            TaskCreationOptions.RunContinuationsAsynchronously
+        );
+        var dashboard = new Dashboard
+        {
+            Cached = (_, token) => cached.Task.WaitAsync(token),
+            Read = (_, _, _) =>
+                Task.FromException<LiveMedalSnapshot>(new IOException("synthetic refresh failure")),
+        };
+        Services.AddSingleton<ILiveMedalDashboardService>(dashboard);
+        var page = RenderComponent<LiveFansMedalTaskConfig>();
+        page.WaitForAssertion(() => Assert.Equal(1, dashboard.CacheReads));
+        await page.InvokeAsync(() => dashboard.Listeners[0](Snapshot(current: 10, revision: 10)));
+        page.WaitForAssertion(() =>
+            Assert.Equal(10, page.FindComponent<LiveMedalDashboard>().Instance.Snapshot!.Revision)
+        );
+        await page.InvokeAsync(() => cached.SetResult(Snapshot(current: 2, revision: 1)));
+        page.WaitForAssertion(() => Assert.Contains("稍后自动重试", page.Markup));
+        Assert.Contains("每日上限 10/10", page.Markup);
+        Assert.DoesNotContain("每日上限 2/10", page.Markup);
+    }
+
+    [Fact]
+    public async Task AddingAccountToInitiallyEmptyPageStartsLoadingWithoutReload()
+    {
+        var dashboard = new Dashboard
+        {
+            Accounts = [],
+            AutoRefreshInterval = TimeSpan.FromMilliseconds(50),
+        };
+        Services.AddSingleton<ILiveMedalDashboardService>(dashboard);
+        var page = RenderComponent<LiveFansMedalTaskConfig>();
+        page.WaitForAssertion(() => Assert.Contains("添加 B 站账号后", page.Markup));
+        await page.InvokeAsync(() => dashboard.Accounts = [new(0, "账号1", "synthetic-account-a")]);
+        page.WaitForAssertion(
+            () => Assert.Contains("账号1主播", page.Markup),
+            TimeSpan.FromSeconds(5)
+        );
+        Assert.True(dashboard.Reads > 0);
+        Assert.Single(dashboard.Listeners);
+    }
+
+    [Fact]
+    public async Task ManualRefreshAlsoDiscoversAccountsAddedToEmptyPage()
+    {
+        var dashboard = new Dashboard { Accounts = [] };
+        Services.AddSingleton<ILiveMedalDashboardService>(dashboard);
+        var page = RenderComponent<LiveFansMedalTaskConfig>();
+        await page.InvokeAsync(() => dashboard.Accounts = [new(0, "账号1", "synthetic-account-a")]);
+        await page.FindAll("button")
+            .Single(button => button.TextContent.Contains("刷新进度"))
+            .ClickAsync(new());
+        page.WaitForAssertion(() => Assert.Contains("账号1主播", page.Markup));
+    }
+
+    [Fact]
+    public async Task ReplacingAccountClearsOldCardsAndUsesNewAccountsCacheOnRefreshFailure()
+    {
+        var dashboard = new Dashboard { AutoRefreshInterval = TimeSpan.FromMilliseconds(50) };
+        Services.AddSingleton<ILiveMedalDashboardService>(dashboard);
+        var page = RenderComponent<LiveFansMedalTaskConfig>();
+        page.WaitForAssertion(() => Assert.Contains("账号1主播", page.Markup));
+        var previousListener = dashboard.Listeners[0];
+        await page.InvokeAsync(() =>
+        {
+            dashboard.Accounts = [new(0, "账号1", "synthetic-account-c")];
+            dashboard.Cached = (_, _) =>
+                Task.FromResult<LiveMedalSnapshot?>(Snapshot(account: 2, current: 7, revision: 2));
+            dashboard.Read = (_, _, _) =>
+                Task.FromException<LiveMedalSnapshot>(new IOException("synthetic refresh failure"));
+        });
+        page.WaitForAssertion(
+            () => Assert.Contains("账号3主播", page.Markup),
+            TimeSpan.FromSeconds(5)
+        );
+        await page.InvokeAsync(() => previousListener(Snapshot(current: 10, revision: 99)));
+        Assert.DoesNotContain("账号1主播", page.Markup);
+        Assert.Contains("每日上限 7/10", page.Markup);
+        Assert.Equal(2, dashboard.CacheReads);
+    }
+
+    [Fact]
+    public async Task RemovingLastAccountClearsCardsAndAddingAnotherAccountRecovers()
+    {
+        var dashboard = new Dashboard
+        {
+            Accounts = [new(0, "账号1", "synthetic-account-a")],
+            AutoRefreshInterval = TimeSpan.FromMilliseconds(50),
+        };
+        Services.AddSingleton<ILiveMedalDashboardService>(dashboard);
+        var page = RenderComponent<LiveFansMedalTaskConfig>();
+        page.WaitForAssertion(() => Assert.Contains("账号1主播", page.Markup));
+        await page.InvokeAsync(() => dashboard.Accounts = []);
+        page.WaitForAssertion(
+            () => Assert.Contains("添加 B 站账号后", page.Markup),
+            TimeSpan.FromSeconds(5)
+        );
+        Assert.Empty(page.FindAll("article"));
+        Assert.Empty(dashboard.Listeners);
+        await page.InvokeAsync(() =>
+        {
+            dashboard.Accounts = [new(0, "账号1", "synthetic-account-c")];
+            dashboard.Read = (_, _, _) => Task.FromResult(Snapshot(account: 2));
+        });
+        page.WaitForAssertion(
+            () => Assert.Contains("账号3主播", page.Markup),
+            TimeSpan.FromSeconds(5)
+        );
+        Assert.Single(dashboard.Listeners);
+    }
+
+    [Fact]
+    public async Task ReorderingAccountsKeepsSelectedIdentityAndMovesSubscription()
+    {
+        var dashboard = new Dashboard { AutoRefreshInterval = TimeSpan.FromMilliseconds(50) };
+        Services.AddSingleton<ILiveMedalDashboardService>(dashboard);
+        var page = RenderComponent<LiveFansMedalTaskConfig>();
+        page.WaitForAssertion(() => Assert.Contains("账号1主播", page.Markup));
+        await page.InvokeAsync(() =>
+        {
+            dashboard.Accounts =
+            [
+                new(0, "账号1", "synthetic-account-b"),
+                new(1, "账号2", "synthetic-account-a"),
+            ];
+            dashboard.Read = (_, _, _) =>
+                Task.FromException<LiveMedalSnapshot>(new IOException("synthetic refresh failure"));
+        });
+        page.WaitForAssertion(
+            () =>
+                Assert.Equal("1", page.Find("select[aria-label='查看账号']").GetAttribute("value")),
+            TimeSpan.FromSeconds(5)
+        );
+        Assert.Contains("账号1主播", page.Markup);
+        Assert.False(dashboard.Listeners.ContainsKey(0));
+        await page.InvokeAsync(() => dashboard.Listeners[1](Snapshot(current: 7, revision: 3)));
+        page.WaitForAssertion(() => Assert.Contains("每日上限 7/10", page.Markup));
+    }
+
+    [Fact]
+    public async Task DuplicateAccountEntriesDoNotUndoManualAccountSelection()
+    {
+        var dashboard = new Dashboard
+        {
+            Accounts =
+            [
+                new(0, "账号1", "synthetic-account-a"),
+                new(1, "账号2", "synthetic-account-a"),
+            ],
+            AutoRefreshInterval = TimeSpan.FromMilliseconds(50),
+        };
+        var polledSecond = new TaskCompletionSource(
+            TaskCreationOptions.RunContinuationsAsynchronously
+        );
+        var secondReads = 0;
+        dashboard.Read = (index, _, _) =>
+        {
+            if (index == 1 && Interlocked.Increment(ref secondReads) >= 2)
+                polledSecond.TrySetResult();
+            return Task.FromResult(Snapshot(index));
+        };
+        Services.AddSingleton<ILiveMedalDashboardService>(dashboard);
+        var page = RenderComponent<LiveFansMedalTaskConfig>();
+        page.WaitForAssertion(() => Assert.Contains("账号1主播", page.Markup));
+        await page.Find("select[aria-label='查看账号']")
+            .ChangeAsync(new ChangeEventArgs { Value = "1" });
+        await polledSecond.Task.WaitAsync(TimeSpan.FromSeconds(5));
+        Assert.Equal("1", page.Find("select[aria-label='查看账号']").GetAttribute("value"));
+        Assert.Contains("账号2主播", page.Markup);
+    }
+
+    [Fact]
+    public async Task AccountReplacementCancelsPendingRefreshAndRejectsItsLateResult()
+    {
+        var pending = new TaskCompletionSource<LiveMedalSnapshot>(
+            TaskCreationOptions.RunContinuationsAsynchronously
+        );
+        var started = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var dashboard = new Dashboard { AutoRefreshInterval = TimeSpan.FromMilliseconds(50) };
+        dashboard.Read = (_, count, _) =>
+        {
+            if (count == 1)
+                return Task.FromResult(Snapshot());
+            started.TrySetResult();
+            return pending.Task;
+        };
+        Services.AddSingleton<ILiveMedalDashboardService>(dashboard);
+        var page = RenderComponent<LiveFansMedalTaskConfig>();
+        await started.Task.WaitAsync(TimeSpan.FromSeconds(5));
+        await page.InvokeAsync(() =>
+        {
+            dashboard.Accounts = [new(0, "账号1", "synthetic-account-c")];
+            dashboard.Cached = (_, _) =>
+                Task.FromResult<LiveMedalSnapshot?>(Snapshot(account: 2, current: 7, revision: 2));
+            dashboard.Read = (_, _, _) =>
+                Task.FromException<LiveMedalSnapshot>(new IOException("synthetic refresh failure"));
+        });
+        page.WaitForAssertion(
+            () => Assert.Contains("账号3主播", page.Markup),
+            TimeSpan.FromSeconds(5)
+        );
+        await page.InvokeAsync(async () =>
+        {
+            pending.SetResult(Snapshot(current: 10, revision: 99));
+            await Task.Yield();
+        });
+        Assert.Contains("账号3主播", page.Markup);
+        Assert.DoesNotContain("账号1主播", page.Markup);
+        Assert.DoesNotContain("每日上限 10/10", page.Markup);
+    }
+
+    [Fact]
+    public async Task TransientAccountLookupFailureDoesNotStopAutomaticRefresh()
+    {
+        var dashboard = new Dashboard { AutoRefreshInterval = TimeSpan.FromMilliseconds(50) };
+        Services.AddSingleton<ILiveMedalDashboardService>(dashboard);
+        var page = RenderComponent<LiveFansMedalTaskConfig>();
+        page.WaitForAssertion(() => Assert.Contains("每日上限 0/10", page.Markup));
+        await page.InvokeAsync(() =>
+        {
+            dashboard.FailNextAccountRead = 1;
+            dashboard.Read = (_, _, _) => Task.FromResult(Snapshot(current: 7, revision: 2));
+        });
+        page.WaitForAssertion(
+            () => Assert.Contains("每日上限 7/10", page.Markup),
+            TimeSpan.FromSeconds(5)
+        );
+        Assert.DoesNotContain("synthetic account lookup failure", page.Markup);
     }
 }

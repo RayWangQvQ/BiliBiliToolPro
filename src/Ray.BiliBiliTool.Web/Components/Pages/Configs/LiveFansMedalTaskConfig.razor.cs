@@ -17,6 +17,7 @@ public partial class LiveFansMedalTaskConfig
     [Inject]
     private ILiveMedalDashboardService Dashboard { get; set; } = null!;
     private IReadOnlyList<LiveMedalAccount> _accounts = [];
+    private LiveMedalAccount? _selectedAccount;
     private int _accountIndex;
     private LiveMedalSnapshot? _snapshot;
     private bool _medalsLoading;
@@ -26,6 +27,7 @@ public partial class LiveFansMedalTaskConfig
     private long _subscriptionGeneration;
     private long _loadVersion;
     private bool _backgroundRefreshing;
+    private bool _subscriptionReady;
 
     [Inject]
     private IDialogService Dialogs { get; set; } = null!;
@@ -121,16 +123,17 @@ public partial class LiveFansMedalTaskConfig
     {
         await base.OnInitializedAsync();
         _accounts = Dashboard.GetAccounts();
+        _selectedAccount = _accounts.FirstOrDefault();
+        _accountIndex = _selectedAccount?.Index ?? 0;
         SubscribeToAccount();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender && _accounts.Count > 0)
+        if (firstRender && !_lifetime.IsCancellationRequested)
         {
+            _ = AutoRefreshAsync();
             await LoadMedalsAsync();
-            if (!_lifetime.IsCancellationRequested)
-                _ = AutoRefreshAsync();
         }
     }
 
@@ -171,22 +174,71 @@ public partial class LiveFansMedalTaskConfig
         }
     }
 
-    private Task RefreshMedalsAsync() => LoadMedalsAsync();
+    private Task RefreshMedalsAsync()
+    {
+        SyncAccounts();
+        return LoadMedalsAsync();
+    }
+
+    private void SyncAccounts()
+    {
+        var accounts = Dashboard.GetAccounts();
+        var selected = _selectedAccount?.Key is { } key
+            ? accounts.FirstOrDefault(account =>
+                account.Index == _accountIndex && account.Key == key
+            ) ?? accounts.FirstOrDefault(account => account.Key == key)
+            : null;
+        selected ??=
+            accounts.FirstOrDefault(account => account.Index == _accountIndex)
+            ?? accounts.FirstOrDefault();
+        var sameAccount = _selectedAccount is null
+            ? selected is null
+            : selected is not null
+                && (
+                    _selectedAccount.Key is not null || selected.Key is not null
+                        ? _selectedAccount.Key == selected.Key
+                        : _selectedAccount.Index == selected.Index
+                );
+        var accountsChanged = !_accounts.SequenceEqual(accounts);
+        var indexChanged = _selectedAccount?.Index != selected?.Index;
+        _accounts = accounts;
+        if (!sameAccount || indexChanged || !_subscriptionReady)
+            SelectAccount(selected, clearSnapshot: !sameAccount);
+        else
+            _selectedAccount = selected;
+        if (accountsChanged)
+            StateHasChanged();
+    }
+
+    private void SelectAccount(LiveMedalAccount? selected, bool clearSnapshot = true)
+    {
+        ++_loadVersion;
+        _selectedAccount = selected;
+        _accountIndex = selected?.Index ?? 0;
+        if (clearSnapshot)
+            _snapshot = null;
+        _medalRefreshError = null;
+        _medalsLoading = false;
+        _backgroundRefreshing = false;
+        SubscribeToAccount();
+    }
 
     private void SubscribeToAccount()
     {
+        _subscriptionReady = false;
         _progressSubscription?.Dispose();
+        _progressSubscription = null;
         _accountLifetime?.Cancel();
         _accountLifetime?.Dispose();
         _accountLifetime = CancellationTokenSource.CreateLinkedTokenSource(_lifetime.Token);
         var generation = ++_subscriptionGeneration;
-        _progressSubscription =
-            _accounts.Count == 0
-                ? null
-                : Dashboard.Subscribe(
-                    _accountIndex,
-                    snapshot => _ = ReceiveProgressAsync(snapshot, generation)
-                );
+        _progressSubscription = _selectedAccount is null
+            ? null
+            : Dashboard.Subscribe(
+                _accountIndex,
+                snapshot => _ = ReceiveProgressAsync(snapshot, generation)
+            );
+        _subscriptionReady = true;
     }
 
     private async Task ReceiveProgressAsync(LiveMedalSnapshot snapshot, long generation)
@@ -228,23 +280,31 @@ public partial class LiveFansMedalTaskConfig
         try
         {
             while (await timer.WaitForNextTickAsync(_lifetime.Token))
-                await InvokeAsync(async () =>
+            {
+                try
                 {
-                    if (_medalsLoading || _backgroundRefreshing)
-                        return;
-                    if (!_selectionBusy)
-                        SyncExclusionSetting();
-                    _accounts = Dashboard.GetAccounts();
-                    if (_accounts.Count == 0)
-                        return;
-                    if (!_accounts.Any(account => account.Index == _accountIndex))
+                    await InvokeAsync(() =>
                     {
-                        _accountIndex = _accounts[0].Index;
-                        _snapshot = null;
-                    }
-                    SubscribeToAccount();
-                    await LoadMedalsAsync(silent: true);
-                });
+                        SyncAccounts();
+                        if (!_selectionBusy)
+                            SyncExclusionSetting();
+                        // Keep checking account changes while an earlier request is pending.
+                        _ = LoadMedalsAsync(silent: true);
+                    });
+                }
+                catch (Exception error) when (!_lifetime.IsCancellationRequested)
+                {
+                    Logger.LogWarning(
+                        "Medal account refresh failed: {ErrorType}",
+                        error.GetType().Name
+                    );
+                    await InvokeAsync(() =>
+                    {
+                        _medalRefreshError = "账号列表更新未完成，稍后自动重试";
+                        StateHasChanged();
+                    });
+                }
+            }
         }
         catch (OperationCanceledException) when (_lifetime.IsCancellationRequested) { }
         catch (ObjectDisposedException) when (_lifetime.IsCancellationRequested) { }
@@ -255,16 +315,18 @@ public partial class LiveFansMedalTaskConfig
     {
         if (_medalsLoading || !_accounts.Any(account => account.Index == index))
             return;
-        _accountIndex = index;
-        _snapshot = null;
-        _backgroundRefreshing = false;
-        SubscribeToAccount();
+        SelectAccount(_accounts.First(account => account.Index == index));
         await LoadMedalsAsync();
     }
 
     private async Task LoadMedalsAsync(bool silent = false)
     {
-        if (_medalsLoading || _backgroundRefreshing || _lifetime.IsCancellationRequested)
+        if (
+            _selectedAccount is null
+            || _medalsLoading
+            || _backgroundRefreshing
+            || _lifetime.IsCancellationRequested
+        )
             return;
         var version = ++_loadVersion;
         var account = _accountIndex;
@@ -283,7 +345,8 @@ public partial class LiveFansMedalTaskConfig
                 var cached = await Dashboard.GetCachedAsync(account, token);
                 if (token.IsCancellationRequested || version != _loadVersion)
                     return;
-                _snapshot = cached;
+                if (_snapshot is null && cached is not null)
+                    AcceptSnapshot(cached);
                 if (!silent)
                     StateHasChanged();
             }
