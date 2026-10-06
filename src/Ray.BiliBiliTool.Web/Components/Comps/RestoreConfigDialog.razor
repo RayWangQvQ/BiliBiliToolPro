@@ -1,0 +1,15 @@
+<MudDialog>
+    <DialogContent>
+        <MudText>当前页面有未保存的修改。恢复后将替换为已保存的配置。</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Text" Class="restore-config-cancel" OnClick="Cancel">继续编辑</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="restore-config-confirm" OnClick="Confirm">放弃修改并恢复</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] private IMudDialogInstance Dialog { get; set; } = null!;
+    private void Cancel() => Dialog.Cancel();
+    private void Confirm() => Dialog.Close(DialogResult.Ok(true));
+}

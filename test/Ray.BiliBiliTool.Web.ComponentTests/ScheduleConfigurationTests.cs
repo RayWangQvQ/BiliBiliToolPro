@@ -421,8 +421,11 @@ public class ScheduleConfigurationTests : TestContext, IDisposable
             where T : Microsoft.AspNetCore.Components.IComponent
         {
             using var page = RenderComponent<T>();
+            Assert.Contains("恢复已保存配置", page.Find(".restore-config-button").TextContent);
+            page.Find(".restore-config-button").Click();
+            page.WaitForAssertion(() => Assert.Contains("已恢复保存的配置", page.Markup));
             Assert.True(page.Find(".save-changes-button").HasAttribute("disabled"));
-            Assert.Contains("未修改", page.Find(".save-changes-state").TextContent);
+            Assert.Contains("已保存", page.Find(".save-changes-state").TextContent);
             var toggle = page.FindComponents<MudBlazor.MudSwitch<bool>>().First();
             var original = toggle.Instance.Value;
             toggle.Find("input").Change(!original);
@@ -437,19 +440,42 @@ public class ScheduleConfigurationTests : TestContext, IDisposable
         }
     }
 
-    [Fact]
-    public void DailyTaskEditsRemainDraftAndReloadDiscardsChanges()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task DailyTaskRestoreRequiresDecisionAndDoesNotSave(bool confirm)
     {
         var monitor = ((IServiceProvider)Services).GetRequiredService<
             IOptionsMonitor<DailyTaskOptions>
         >();
         var original = monitor.CurrentValue.IsEnable;
+        var dialogs = RenderComponent<MudDialogProvider>();
         var page = RenderComponent<DailyJobConfig>();
         page.Find("input[type=checkbox]").Change(!original);
         Assert.Equal(original, monitor.CurrentValue.IsEnable);
-        page.FindAll("button").Single(b => b.TextContent.Contains("重新加载")).Click();
-        Assert.Equal(original, page.Find("input[type=checkbox]").HasAttribute("checked"));
-        Assert.True(page.Find(".save-changes-button").HasAttribute("disabled"));
+        var pending = page.Find(".restore-config-button").ClickAsync(new());
+        dialogs.WaitForAssertion(() => Assert.Single(dialogs.FindAll(".restore-config-confirm")));
+        Assert.Equal(!original, page.Find("input[type=checkbox]").HasAttribute("checked"));
+        Assert.Null(_configuration["DailyTaskConfig:IsEnable"]);
+        var preview = System.Environment.GetEnvironmentVariable("RESTORE_CONFIG_PREVIEW");
+        if (confirm && !string.IsNullOrEmpty(preview))
+            System.IO.File.WriteAllText(preview, page.Markup + dialogs.Markup);
+        await dialogs
+            .Find(confirm ? ".restore-config-confirm" : ".restore-config-cancel")
+            .ClickAsync(new());
+        await pending;
+        page.WaitForAssertion(() =>
+        {
+            Assert.Equal(
+                confirm ? original : !original,
+                page.Find("input[type=checkbox]").HasAttribute("checked")
+            );
+            Assert.Equal(confirm, page.Find(".save-changes-button").HasAttribute("disabled"));
+        });
+        Assert.Equal(original, monitor.CurrentValue.IsEnable);
+        Assert.Null(_configuration["DailyTaskConfig:IsEnable"]);
+        if (confirm)
+            Assert.Contains("已恢复保存的配置", page.Markup);
     }
 
     [Theory]
@@ -735,11 +761,11 @@ public class ScheduleConfigurationTests : TestContext, IDisposable
             });
             Assert.True(
                 page.FindAll("button")
-                    .Single(button => button.TextContent.Contains("保存配置"))
+                    .Single(button => button.ClassList.Contains("save-changes-button"))
                     .HasAttribute("disabled")
             );
 
-            page.FindAll("button").Single(b => b.TextContent.Contains("重新加载")).Click();
+            page.FindAll("button").Single(b => b.TextContent.Contains("恢复已保存配置")).Click();
             page.WaitForAssertion(() =>
                 Assert.Equal(!initiallyExcluded, page.Find(checkbox).HasAttribute("checked"))
             );
@@ -786,7 +812,7 @@ public class ScheduleConfigurationTests : TestContext, IDisposable
             Assert.Equal(!original, offline.Instance.Value);
             Assert.False(
                 page.FindAll("button")
-                    .Single(b => b.TextContent.Contains("保存配置"))
+                    .Single(b => b.ClassList.Contains("save-changes-button"))
                     .HasAttribute("disabled")
             );
             await new LiveMedalParticipationWorkflow(_configuration).SetExcludedAsync(22, true);
@@ -859,7 +885,7 @@ public class ScheduleConfigurationTests : TestContext, IDisposable
         Assert.Contains("设置已保存", page.Markup);
         Assert.True(
             page.FindAll("button")
-                .Single(b => b.TextContent.Contains("保存配置"))
+                .Single(b => b.ClassList.Contains("save-changes-button"))
                 .HasAttribute("disabled")
         );
     }
@@ -963,7 +989,7 @@ public class ScheduleConfigurationTests : TestContext, IDisposable
             page.Find("select[aria-label='结束时间分钟']").Change("15");
             Assert.Contains("次日", page.Markup);
             var save = page.FindAll("button")
-                .Single(button => button.TextContent.Contains("保存配置"));
+                .Single(button => button.ClassList.Contains("save-changes-button"));
             Assert.False(save.HasAttribute("disabled"));
             page.Find("form").Submit();
             page.WaitForAssertion(() =>
@@ -974,7 +1000,7 @@ public class ScheduleConfigurationTests : TestContext, IDisposable
                 Assert.Equal("0 5 0 * * ?", _configuration["LiveFansMedalTaskConfig:Cron"]);
                 Assert.True(
                     page.FindAll("button")
-                        .Single(button => button.TextContent.Contains("保存配置"))
+                        .Single(button => button.ClassList.Contains("save-changes-button"))
                         .HasAttribute("disabled")
                 );
             });
@@ -1011,7 +1037,7 @@ public class ScheduleConfigurationTests : TestContext, IDisposable
         Assert.Null(_configuration["LiveFansMedalTaskConfig:UseWatchTimeWindow"]);
         Assert.False(
             page.FindAll("button")
-                .Single(button => button.TextContent.Contains("保存配置"))
+                .Single(button => button.ClassList.Contains("save-changes-button"))
                 .HasAttribute("disabled")
         );
     }

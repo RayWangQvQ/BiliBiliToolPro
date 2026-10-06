@@ -136,7 +136,7 @@ public class LiveMedalRealtimePageTests : TestContext
         );
         Assert.False(
             page.FindAll("button")
-                .Single(button => button.TextContent.Contains("保存配置"))
+                .Single(button => button.ClassList.Contains("save-changes-button"))
                 .HasAttribute("disabled")
         );
     }

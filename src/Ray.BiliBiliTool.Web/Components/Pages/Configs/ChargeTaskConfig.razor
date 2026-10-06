@@ -86,7 +86,7 @@
             <MudCard Class="mt-4">
                 <MudCardActions Class="save-actions">
                     <Ray.BiliBiliTool.Web.Components.Comps.SaveChangesButton ButtonType="ButtonType.Submit" HasChanges="HasChanges" Busy="_isSaving" Saved="_saveSuccess" />
-                    <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Disabled="_isSaving" OnClick="LoadConfigAsync" Class="ml-2">重新加载</MudButton>
+                    <Ray.BiliBiliTool.Web.Components.Comps.RestoreConfigButton HasChanges="HasChanges" Busy="_isSaving" OnRestore="RestoreConfigAsync" />
                 </MudCardActions>
             </MudCard>
         </EditForm>

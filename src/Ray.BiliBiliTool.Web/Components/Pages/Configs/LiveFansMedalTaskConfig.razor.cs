@@ -171,8 +171,6 @@ public partial class LiveFansMedalTaskConfig
         }
     }
 
-    private Task ReloadAsync() => LoadConfigAsync();
-
     private Task RefreshMedalsAsync() => LoadMedalsAsync();
 
     private void SubscribeToAccount()

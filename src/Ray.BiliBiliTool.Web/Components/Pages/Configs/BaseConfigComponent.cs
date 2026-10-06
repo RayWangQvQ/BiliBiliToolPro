@@ -73,7 +73,7 @@ public abstract class BaseConfigComponent<T> : ComponentBase
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to load configuration");
-            _saveMessage = "配置加载失败，请重新加载";
+            _saveMessage = "配置加载失败，请点击恢复已保存配置重试";
             _saveSuccess = false;
         }
         finally
@@ -83,6 +83,18 @@ public abstract class BaseConfigComponent<T> : ComponentBase
         }
 
         return Task.CompletedTask;
+    }
+
+    protected async Task RestoreConfigAsync()
+    {
+        if (_isSaving)
+            return;
+        await LoadConfigAsync();
+        if (_configLoaded)
+        {
+            _saveMessage = "已恢复保存的配置";
+            _saveSuccess = true;
+        }
     }
 
     private static T Clone(T value) =>
@@ -144,7 +156,7 @@ public abstract class BaseConfigComponent<T> : ComponentBase
         {
             Logger.LogError(ex, "Failed to save configuration or update its schedule");
             _saveMessage = persisted
-                ? "配置已保存，执行计划更新失败。请重新加载后检查任务状态。"
+                ? "配置已保存，执行计划更新失败。请恢复已保存配置后检查任务状态。"
                 : "保存失败，修改已保留，请重试";
         }
         finally

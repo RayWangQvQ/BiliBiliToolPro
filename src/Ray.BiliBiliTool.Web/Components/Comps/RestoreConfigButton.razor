@@ -1,0 +1,47 @@
+@implements IDisposable
+@inject IDialogService Dialogs
+
+<MudButton ButtonType="ButtonType.Button" Variant="Variant.Outlined" Color="Color.Secondary"
+           Disabled="@(Busy || _pending)" OnClick="RestoreAsync" StartIcon="@Icons.Material.Filled.Restore"
+           Class="ml-2 restore-config-button" title="读取已保存的设置并替换当前表单">恢复已保存配置</MudButton>
+
+@code {
+    [Parameter] public bool HasChanges { get; set; }
+    [Parameter] public bool Busy { get; set; }
+    [Parameter] public EventCallback OnRestore { get; set; }
+    private bool _pending;
+    private bool _disposed;
+    private IDialogReference? _dialog;
+    private readonly CancellationTokenSource _lifetime = new();
+
+    private async Task RestoreAsync()
+    {
+        if (Busy || _pending || _disposed) return;
+        _pending = true;
+        try
+        {
+            if (HasChanges)
+            {
+                _dialog = await Dialogs.ShowAsync<RestoreConfigDialog>("恢复已保存配置？",
+                    new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, BackdropClick = false, CloseOnEscapeKey = true });
+                if (_disposed) { _dialog.Close(DialogResult.Cancel()); return; }
+                var result = await _dialog.Result.WaitAsync(_lifetime.Token);
+                if (result is null || result.Canceled || result.Data is not true) return;
+            }
+            if (!Busy && !_disposed) await OnRestore.InvokeAsync();
+        }
+        catch (OperationCanceledException) when (_disposed) { }
+        finally { _dialog = null; _pending = false; }
+    }
+
+    public void Dispose()
+    {
+        if (_disposed) return;
+        _disposed = true;
+        // Cancellation can complete the pending handler and clear the field immediately.
+        var dialog = _dialog;
+        _lifetime.Cancel();
+        dialog?.Close(DialogResult.Cancel());
+        _lifetime.Dispose();
+    }
+}
