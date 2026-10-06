@@ -63,7 +63,8 @@ public class VipBigPointAppService(
                 await DailyMissionsAsync(combine, ck, cancellationToken);
 
                 await CheckCombineAsync(ck, cancellationToken);
-            }
+            },
+            trackHandledFailures: true
         );
     }
 

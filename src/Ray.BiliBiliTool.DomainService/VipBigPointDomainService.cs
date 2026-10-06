@@ -143,11 +143,26 @@ public class VipBigPointDomainService(
             return;
         }
 
+        var failures = new List<Exception>();
         foreach (var targetTask in missionsNeedReceive)
         {
             logger.LogInformation("开始领取任务：{task}", targetTask.title);
-            await TryReceive(targetTask.task_code, ck);
+            try
+            {
+                await TryReceive(targetTask.task_code, ck);
+            }
+            catch (Exception exception) when (exception is not OperationCanceledException)
+            {
+                failures.Add(exception);
+                logger.LogError(
+                    "领取任务失败：{task}，{reason}",
+                    targetTask.title,
+                    exception.Message
+                );
+            }
         }
+        if (failures.Count > 0)
+            throw new AggregateException("部分大会员积分任务领取失败", failures);
     }
 
     public async Task ReceiveAndCompleteAsync(
@@ -189,8 +204,12 @@ public class VipBigPointDomainService(
             module = combine.Task_info.Modules.FirstOrDefault(x => x.module_title == moduleCode);
             bonusTask = module?.common_task_item.FirstOrDefault(x => x.task_code == taskCode);
             var success = bonusTask is { state: 3, complete_times: >= 1 };
-            logger.LogInformation("确认：{re}", success ? "成功，经验 +10" : "失败");
+            if (!success)
+                throw new BiliBusinessException("大会员积分任务已提交，任务列表尚未确认完成");
+            logger.LogInformation("确认：任务已完成");
         }
+        else
+            throw new BiliBusinessException("大会员积分任务提交失败");
     }
 
     public async Task<bool> CompleteAsync(string taskCode, BiliCookie ck)
@@ -199,7 +218,7 @@ public class VipBigPointDomainService(
         var re = await apiApi.VipBigPointCompleteAsync(request, ck.ToString());
         if (re.Code == 0)
         {
-            logger.LogInformation("已完成");
+            logger.LogInformation("完成请求已提交");
             return true;
         }
 
@@ -247,11 +266,11 @@ public class VipBigPointDomainService(
 
     public async Task<bool> CompleteV2Async(string taskCode, BiliCookie ck)
     {
-        var request = new ReceiveOrCompleteTaskRequest(taskCode);
+        var request = new VipPointV2TaskRequest(taskCode) { Csrf = ck.BiliJct };
         var re = await apiApi.VipBigPointCompleteV2(request, ck.ToString());
         if (re.Code == 0)
         {
-            logger.LogInformation("已完成");
+            logger.LogInformation("完成请求已提交");
             return true;
         }
 
@@ -266,21 +285,17 @@ public class VipBigPointDomainService(
     /// </summary>
     private async Task TryReceive(string taskCode, BiliCookie ck)
     {
-        BiliApiResponse? re = null;
-        try
+        var request = new VipPointV2TaskRequest(taskCode) { Csrf = ck.BiliJct };
+        var response = await apiApi.VipBigPointReceiveV2(request, ck.ToString());
+        if (response.Code != 0)
         {
-            var request = new ReceiveOrCompleteTaskRequest(taskCode);
-            re = await apiApi.VipBigPointReceiveV2(request, ck.ToString());
-            if (re.Code == 0)
-                logger.LogInformation("领取任务成功");
-            else
-                logger.LogInformation("领取任务失败：{msg}", re.ToJsonStr());
+            string reason =
+                response.Code == 6007000
+                    ? "接口要求更新客户端，请核对 App 请求配置"
+                    : response.Message ?? "接口未返回原因";
+            throw new BiliBusinessException($"领取任务失败（{response.Code}）：{reason}");
         }
-        catch (Exception e)
-        {
-            logger.LogError("领取任务异常");
-            logger.LogError(e.Message + re?.ToJsonStr());
-        }
+        logger.LogInformation("领取任务请求已接受");
     }
 
     private async Task<bool> WatchBangumi(BiliCookie ck)

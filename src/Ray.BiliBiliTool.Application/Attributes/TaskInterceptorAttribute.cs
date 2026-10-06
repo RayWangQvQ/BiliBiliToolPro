@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Ray.BiliBiliTool.Application.Diagnostics;
 using Ray.BiliBiliTool.Infrastructure;
 using Rougamo;
 using Rougamo.Context;
@@ -55,6 +56,7 @@ public class TaskInterceptorAttribute(
             taskName,
             context.Exception?.Message ?? ""
         );
+        TaskFlowDiagnosticScope.RecordHandledFailure(context.Exception);
         context.HandledException(this, null);
     }
 

@@ -1,11 +1,15 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Net;
+using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.NavApi;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Config.Options;
+using Ray.BiliBiliTool.Domain.Exceptions;
 using Ray.BiliBiliTool.DomainService.Interfaces;
+using Refit;
 
 namespace Ray.BiliBiliTool.DomainService;
 
@@ -34,12 +38,9 @@ public class MangaDomainService(
         {
             response = await mangaApi.ClockIn(_dailyTaskOptions.DevicePlatform, ck.ToString());
         }
-        catch (Exception)
+        catch (ApiException exception) when (IsDuplicateClockIn(exception))
         {
-            //ignore
-            //重复签到会报400异常,这里忽略掉
-            logger.LogInformation("【签到结果】失败");
-            logger.LogInformation("【原因】今日已签到过，无法重复签到");
+            logger.LogInformation("【签到结果】今日已签到");
             return;
         }
 
@@ -49,8 +50,7 @@ public class MangaDomainService(
         }
         else
         {
-            logger.LogInformation("【签到结果】失败");
-            logger.LogInformation("【原因】{msg}", response.Message);
+            throw new BiliBusinessException($"漫画签到失败（{response.Code}）：{response.Message}");
         }
     }
 
@@ -60,7 +60,10 @@ public class MangaDomainService(
     public async Task MangaRead(BiliCookie ck)
     {
         if (_mangaTaskOptions.CustomComicId <= 0)
+        {
+            logger.LogInformation("【漫画阅读】未配置漫画，跳过阅读记录提交");
             return;
+        }
         BiliApiResponse response = await mangaApi.ReadManga(
             _dailyTaskOptions.DevicePlatform,
             _mangaTaskOptions.CustomComicId,
@@ -70,13 +73,40 @@ public class MangaDomainService(
 
         if (response.Code == 0)
         {
-            logger.LogInformation("【漫画阅读】成功");
+            logger.LogInformation("【漫画阅读】阅读记录已提交");
+            logger.LogInformation("阅读时长和奖励请在漫画任务页查看");
         }
         else
         {
-            logger.LogInformation("【漫画阅读】失败");
-            logger.LogInformation("【原因】{msg}", response.Message);
+            throw new BiliBusinessException(
+                $"漫画阅读记录提交失败（{response.Code}）：{response.Message}"
+            );
         }
+    }
+
+    private static bool IsDuplicateClockIn(ApiException exception)
+    {
+        if (
+            exception.StatusCode != HttpStatusCode.BadRequest
+            || string.IsNullOrWhiteSpace(exception.Content)
+        )
+            return false;
+        try
+        {
+            using var document = JsonDocument.Parse(exception.Content);
+            var root = document.RootElement;
+            if (root.ValueKind != JsonValueKind.Object)
+                return false;
+            foreach (string key in new[] { "msg", "message" })
+                if (
+                    root.TryGetProperty(key, out var message)
+                    && message.ValueKind == JsonValueKind.String
+                    && message.GetString() == "clockin clockin is duplicate"
+                )
+                    return true;
+        }
+        catch (JsonException) { }
+        return false;
     }
 
     /// <summary>

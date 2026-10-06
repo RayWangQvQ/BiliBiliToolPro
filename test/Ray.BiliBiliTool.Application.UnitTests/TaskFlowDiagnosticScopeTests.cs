@@ -6,6 +6,64 @@ namespace Ray.BiliBiliTool.Application.UnitTests;
 public class TaskFlowDiagnosticScopeTests
 {
     [Fact]
+    public async Task ExecuteAsync_HandledStepFailure_IsReportedAfterOtherSteps()
+    {
+        var failure = new InvalidOperationException("step failed");
+        var continued = false;
+        var error = await Assert.ThrowsAsync<AggregateException>(() =>
+            TaskFlowDiagnosticScope.ExecuteAsync(
+                NullLogger.Instance,
+                "Manga",
+                () =>
+                {
+                    TaskFlowDiagnosticScope.RecordHandledFailure(failure);
+                    continued = true;
+                    return Task.CompletedTask;
+                },
+                trackHandledFailures: true
+            )
+        );
+        Assert.True(continued);
+        Assert.Same(failure, Assert.Single(error.InnerExceptions));
+        await TaskFlowDiagnosticScope.ExecuteAsync(
+            NullLogger.Instance,
+            "Next",
+            () => Task.CompletedTask,
+            trackHandledFailures: true
+        );
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_ConcurrentFlows_DoNotShareFailures()
+    {
+        var failure = new InvalidOperationException("failed");
+        var ready = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var first = TaskFlowDiagnosticScope.ExecuteAsync(
+            NullLogger.Instance,
+            "First",
+            async () =>
+            {
+                TaskFlowDiagnosticScope.RecordHandledFailure(failure);
+                await ready.Task;
+            },
+            trackHandledFailures: true
+        );
+        await TaskFlowDiagnosticScope.ExecuteAsync(
+            NullLogger.Instance,
+            "Second",
+            () => Task.CompletedTask,
+            trackHandledFailures: true
+        );
+        ready.SetResult();
+        Assert.Same(
+            failure,
+            Assert.Single(
+                (await Assert.ThrowsAsync<AggregateException>(() => first)).InnerExceptions
+            )
+        );
+    }
+
+    [Fact]
     public async Task ExecuteAsync_ActionSucceeds_InvokesExactlyOnce()
     {
         var count = 0;

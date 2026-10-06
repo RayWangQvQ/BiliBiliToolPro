@@ -557,6 +557,20 @@ The placeholder is replaced by a JSON-encoded log message, so do not wrap it in 
 | Default | `{"msgtype":"markdown","markdown":{"content":#msg#}}` |
 
 <a id="markdown-388-pushplus推荐" name="388-pushplus推荐"></a>
+##### 3.8.7.4. `headers`
+
+Optional HTTP headers for custom notification endpoints. Existing URL and JSON template settings continue to work.
+
+```json
+"headers": {
+  "Authorization": "Bearer your-api-token",
+  "X-Api-Key": "your-api-key"
+}
+```
+
+For environment variables, use `Ray_Serilog__WriteTo__8__Args__headers__X-Api-Key=your-api-key`.
+The index must match the custom API sink in your own configuration. Keep real header values in local configuration.
+
 #### 3.8.8. PushPlus (recommended)
 
 Service documentation: http://www.pushplus.plus/doc/

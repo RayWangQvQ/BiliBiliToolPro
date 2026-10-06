@@ -10,10 +10,10 @@ namespace Ray.BiliBiliTool.DomainService.UnitTests;
 public class AccountDomainServiceTests
 {
     [Theory]
-    [InlineData(0, 100, 6)]
+    [InlineData(0, 100, 7)]
     [InlineData(1, 100, 4)]
-    [InlineData(5, 100, 1)]
-    [InlineData(5, 1000, 37)]
+    [InlineData(5, 100, 2)]
+    [InlineData(5, 1000, 38)]
     [InlineData(5, 0, 0)]
     public void CalculateUpgradeTime_CoinAllowanceAndRemainingExp_UsesConfiguredDailyRate(
         int numberOfCoins,
@@ -23,7 +23,12 @@ public class AccountDomainServiceTests
     {
         var services = new ServiceCollection();
         services.AddOptions();
-        services.Configure<DailyTaskOptions>(options => options.NumberOfCoins = numberOfCoins);
+        services.Configure<DailyTaskOptions>(options =>
+        {
+            options.NumberOfCoins = numberOfCoins;
+            options.IsWatchVideo = true;
+            options.IsShareVideo = true;
+        });
         services.Configure<UnfollowBatchedTaskOptions>(_ => { });
         using var provider = services.BuildServiceProvider();
         var service = new AccountDomainService(
