@@ -18,12 +18,18 @@ namespace Ray.BiliBiliTool.Web.UnitTests;
 public class TodayMedalStatusTests
 {
     [Theory]
-    [InlineData(false, false)]
-    [InlineData(true, false)]
-    [InlineData(true, true)]
+    [InlineData(false, false, 5, 1, false)]
+    [InlineData(true, false, 5, 1, false)]
+    [InlineData(true, true, 5, 1, false)]
+    [InlineData(true, false, 2, 2, true)]
+    [InlineData(true, false, 2, 1, false)]
+    [InlineData(true, false, 1, 1, true)]
     public async Task TodayStatusUsesFreshMedalProgressAndLocalPhaseMakesNoPlatformCalls(
         bool includeBili,
-        bool force
+        bool force,
+        int coinTarget,
+        int confirmedCoins,
+        bool coinsComplete
     )
     {
         var folder = Directory.CreateTempSubdirectory("today-medal-");
@@ -34,6 +40,7 @@ public class TodayMedalStatusTests
                     ["ConnectionStrings:Sqlite"] =
                         $"Data Source={Path.Combine(folder.FullName, "test.db")}",
                     ["BiliBiliCookies:0"] = "DedeUserID=1001;bili_jct=synthetic;SESSDATA=synthetic",
+                    ["DailyTaskConfig:NumberOfCoins"] = coinTarget.ToString(),
                 }
             )
             .Build();
@@ -95,7 +102,7 @@ public class TodayMedalStatusTests
                 (_, _) =>
                 {
                     platformCalls++;
-                    return Task.FromResult(0);
+                    return Task.FromResult(confirmedCoins);
                 }
             );
             var probe = Proxy<IBiliAccountProbe>(
@@ -165,6 +172,18 @@ public class TodayMedalStatusTests
                 Assert.Equal(0, platformCalls);
             if (TaskDueTimeCalculator.IsDue("0 0 0 * * ?", DateTimeOffset.Now))
             {
+                if (includeBili)
+                {
+                    var coinItem = result
+                        .Single()
+                        .Groups.Single(group => group.TaskKey == "DailyTaskAppService")
+                        .Items.Single(check => check.ItemKey == "DonateCoin");
+                    Assert.Equal(
+                        coinsComplete ? TodayTaskItemState.Completed : TodayTaskItemState.NotDone,
+                        coinItem.State
+                    );
+                    Assert.Equal(!coinsComplete, coinItem.CanRedo);
+                }
                 Assert.Equal(!includeBili, item.IsBiliPending);
                 Assert.Equal(includeBili ? "未完成" : "检测中", item.StateText);
                 Assert.Equal(

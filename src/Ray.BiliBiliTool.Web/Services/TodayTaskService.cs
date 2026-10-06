@@ -171,6 +171,7 @@ public class TodayTaskService(
                         HasFireTimeToday = monitoredMedal || due.HasFireTimeToday,
                         IsPastDueTime = monitoredMedal || due.IsPastDueTime,
                         BiliReward = biliReward,
+                        CoinDonationTarget = donationOptions.NumberOfCoins,
                         LiveMedal = medalProgress.GetValueOrDefault(userId),
                         FollowMedalDailyTaskLimit =
                             medalOptions.UseLiveStateMonitoring
@@ -506,16 +507,16 @@ public class TodayTaskService(
         }
     }
 
-    private static bool IsDailyItemComplete(
-        TaskItemDefinition item,
-        BiliDailyRewardSnapshot reward
-    ) =>
+    private bool IsDailyItemComplete(TaskItemDefinition item, BiliDailyRewardSnapshot reward) =>
         item.ItemKey switch
         {
             "Login" => reward.Login,
             "Watch" => reward.Watch,
             TaskCatalog.ShareItemKey => reward.Share,
-            "DonateCoin" => reward.CoinExp > 0,
+            "DonateCoin" => TaskStatusEvaluator.IsCoinDonationComplete(
+                reward.CoinExp,
+                configuration.GetValue("DailyTaskConfig:NumberOfCoins", 5)
+            ),
             _ => false,
         };
 

@@ -38,7 +38,8 @@ public class TaskStatusEvaluatorTest
         bool biliQueryFailed = false,
         IReadOnlyList<TaskRecord>? records = null,
         int autoAttempts = 0,
-        int maxAutoAttempts = 3
+        int maxAutoAttempts = 3,
+        int coinTarget = 5
     ) =>
         new()
         {
@@ -49,11 +50,48 @@ public class TaskStatusEvaluatorTest
             HasFireTimeToday = hasFireTimeToday,
             IsPastDueTime = isPastDueTime,
             BiliReward = bili,
+            CoinDonationTarget = coinTarget,
             BiliQueryFailed = biliQueryFailed,
             Records = records ?? [],
             AutoAttempts = autoAttempts,
             MaxAutoAttempts = maxAutoAttempts,
         };
+
+    [Theory]
+    [InlineData(5, 10, false)]
+    [InlineData(5, 40, false)]
+    [InlineData(5, 50, true)]
+    [InlineData(2, 10, false)]
+    [InlineData(2, 20, true)]
+    [InlineData(1, 10, true)]
+    public void CoinCompletionRequiresConfiguredTarget(int target, int experience, bool complete)
+    {
+        var context = Ctx(
+            "DonateCoin",
+            bili: new(true, true, true, experience),
+            coinTarget: target
+        );
+        var result = TaskStatusEvaluator.Evaluate(context);
+        Assert.Equal(
+            complete ? TodayTaskItemState.Completed : TodayTaskItemState.NotDone,
+            result.State
+        );
+        Assert.Equal(!complete, TaskStatusEvaluator.CanAutoRedo(context, result));
+    }
+
+    [Fact]
+    public void DisabledZeroCoinTargetDoesNotBecomeRecoverable()
+    {
+        var context = Ctx(
+            "DonateCoin",
+            isItemEnabled: false,
+            coinTarget: 0,
+            bili: new(true, true, true, 0)
+        );
+        var result = TaskStatusEvaluator.Evaluate(context);
+        Assert.Equal(TodayTaskItemState.Disabled, result.State);
+        Assert.False(TaskStatusEvaluator.CanAutoRedo(context, result));
+    }
 
     [Fact]
     public void 任务被关闭时显示已关闭()

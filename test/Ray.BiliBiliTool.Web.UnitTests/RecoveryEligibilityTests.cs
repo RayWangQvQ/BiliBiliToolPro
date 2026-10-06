@@ -17,6 +17,50 @@ namespace Ray.BiliBiliTool.Web.UnitTests;
 
 public class RecoveryEligibilityTests : IDisposable
 {
+    [Theory]
+    [InlineData(5, 1, 1, false, false)]
+    [InlineData(5, 1, 5, true, false)]
+    [InlineData(2, 1, 2, true, false)]
+    [InlineData(2, 2, 2, true, true)]
+    [InlineData(0, 0, 0, false, true)]
+    public async Task CoinRecoveryUsesConfiguredGoalBeforeAndAfterExecution(
+        int target,
+        int initial,
+        int after,
+        bool complete,
+        bool skipped
+    )
+    {
+        _config["DailyTaskConfig:NumberOfCoins"] = target.ToString();
+        var account = DispatchProxy.Create<IAccountDomainService, Proxy>();
+        ((Proxy)account).Call = _ => Task.FromResult(new DailyTaskInfo());
+        var coin = DispatchProxy.Create<ICoinDomainService, Proxy>();
+        var donated = initial;
+        ((Proxy)coin).Call = _ => Task.FromResult(donated);
+        var donate = DispatchProxy.Create<IDonateCoinDomainService, Proxy>();
+        var submissions = 0;
+        ((Proxy)donate).Call = _ =>
+        {
+            submissions++;
+            donated = after;
+            return Task.CompletedTask;
+        };
+        using var services = Apps();
+        var result = await Build(services, account, coins: coin, donate: donate)
+            .RedoAsync(91001, "DailyTaskAppService", "DonateCoin");
+        Assert.Equal(complete, result.Success);
+        Assert.Equal(skipped, result.Skipped);
+        Assert.Equal(skipped ? 0 : 1, submissions);
+        using var db = _factory.CreateDbContext();
+        if (skipped)
+            Assert.Empty(db.TaskRecords);
+        else
+            Assert.Equal(
+                complete ? TaskRecordStatus.Success : TaskRecordStatus.Pending,
+                Assert.Single(db.TaskRecords).Status
+            );
+    }
+
     private readonly string _path = Path.Combine(
         Path.GetTempPath(),
         $"recovery-{Guid.NewGuid():N}.db"
@@ -276,18 +320,21 @@ public class RecoveryEligibilityTests : IDisposable
     private TodayTaskService Build(
         IServiceProvider services,
         IAccountDomainService? account = null,
-        IServiceScopeFactory? scopeFactory = null
+        IServiceScopeFactory? scopeFactory = null,
+        ICoinDomainService? coins = null,
+        IDonateCoinDomainService? donate = null
     )
     {
         var cookies = new CookieStrFactory<BiliCookie>(_config);
-        var coin = DispatchProxy.Create<ICoinDomainService, Proxy>();
-        ((Proxy)coin).Call = _ => Task.FromResult(0);
+        var coin = coins ?? DispatchProxy.Create<ICoinDomainService, Proxy>();
+        if (coins is null)
+            ((Proxy)coin).Call = _ => Task.FromResult(0);
         var executor = new TaskRecoveryExecutor(
             cookies,
             _config,
             account!,
             null!,
-            null!,
+            donate!,
             null!,
             services,
             NullLogger<TaskRecoveryExecutor>.Instance,

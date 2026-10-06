@@ -123,7 +123,19 @@ public class LiveFansMedalTaskRunner(
                     "正在获取今日任务要求和进度"
                 );
                 token.ThrowIfCancellationRequested();
+                var executionDay = _clock.GetUtcNow().ToOffset(TimeSpan.FromHours(8)).Date;
                 var data = await GetTasksAsync(cookie, medal, token);
+                if (_clock.GetUtcNow().ToOffset(TimeSpan.FromHours(8)).Date != executionDay)
+                {
+                    ReportMedal(
+                        cookie,
+                        medal,
+                        action,
+                        TaskRecoveryProgressState.Pending,
+                        "日期已切换，下轮会重新核对今日任务"
+                    );
+                    return;
+                }
                 if (action == "watchLive" && !data.Is_lighted)
                 {
                     ReportMedal(
@@ -213,7 +225,19 @@ public class LiveFansMedalTaskRunner(
                     using (await _executionGate.AcquireWatchSlotAsync(cookie.UserId, token))
                     {
                         // Progress may change while this watch session waits for a slot.
+                        var progressDay = _clock.GetUtcNow().ToOffset(TimeSpan.FromHours(8)).Date;
                         data = await GetTasksAsync(cookie, medal, token);
+                        if (_clock.GetUtcNow().ToOffset(TimeSpan.FromHours(8)).Date != progressDay)
+                        {
+                            ReportMedal(
+                                cookie,
+                                medal,
+                                action,
+                                TaskRecoveryProgressState.Pending,
+                                "日期已切换，下轮会重新核对今日任务"
+                            );
+                            return;
+                        }
                         plan = LiveFansMedalTaskPlanner.Plan(data, action);
                         if (plan.Remaining == 0)
                         {
@@ -263,7 +287,7 @@ public class LiveFansMedalTaskRunner(
                             );
                             return;
                         }
-                        await WatchAsync(cookie, medal, target, data, token);
+                        await WatchAsync(cookie, medal, target, data, progressDay, token);
                     }
                 }
                 else
@@ -349,7 +373,7 @@ public class LiveFansMedalTaskRunner(
         CancellationToken token
     )
     {
-        var observedAt = DateTimeOffset.UtcNow;
+        var observedAt = _clock.GetUtcNow();
         var progress = Require(
             await liveApi.GetActivatedMedalInfo(
                 medal.Medal.Target_id,
@@ -359,6 +383,12 @@ public class LiveFansMedalTaskRunner(
             ),
             "获取粉丝牌任务进度"
         );
+        // A response started yesterday cannot confirm today's execution budget.
+        if (
+            observedAt.ToOffset(TimeSpan.FromHours(8)).Date
+            != _clock.GetUtcNow().ToOffset(TimeSpan.FromHours(8)).Date
+        )
+            return progress;
         if (options.UseLiveStateMonitoring)
             foreach (var action in new[] { "like", "sendDanmu", "watchLive" })
             {
@@ -652,6 +682,7 @@ public class LiveFansMedalTaskRunner(
         FansMedalPanelItem medal,
         int target,
         ActivatedMedalResponse initialProgress,
+        DateTime sessionDay,
         CancellationToken token
     )
     {
@@ -660,8 +691,24 @@ public class LiveFansMedalTaskRunner(
             medal.Medal.Target_id,
             _executionGate.WatchConcurrency
         );
+        bool StopAtDayBoundary()
+        {
+            if (_clock.GetUtcNow().ToOffset(TimeSpan.FromHours(8)).Date == sessionDay)
+                return false;
+            diagnostic?.Finish("day_changed");
+            ReportMedal(
+                cookie,
+                medal,
+                "watchLive",
+                TaskRecoveryProgressState.Pending,
+                "日期已切换，旧观看会话已结束，下轮会核对今日任务"
+            );
+            return true;
+        }
         try
         {
+            if (StopAtDayBoundary())
+                return;
             var roomId = medal.Room_info.Room_id;
             var room = Require(await liveApi.GetLiveRoomInfo(roomId), "获取直播间分区");
             diagnostic?.Start(
@@ -716,6 +763,8 @@ public class LiveFansMedalTaskRunner(
             ActivatedMedalResponse? confirmed = null;
             while (watched < target)
             {
+                if (StopAtDayBoundary())
+                    return;
                 if (
                     state.Heartbeat_interval <= 0
                     || state.Heartbeat_interval > 300
@@ -759,6 +808,9 @@ public class LiveFansMedalTaskRunner(
                     await _delay(wait, token);
                 }
                 token.ThrowIfCancellationRequested();
+                // Never reuse yesterday's session or target after a wait crosses midnight.
+                if (StopAtDayBoundary())
+                    return;
                 if (_clock.GetUtcNow() - due > TimeSpan.FromSeconds(5))
                 {
                     if (++failures >= Math.Clamp(options.HeartBeatSendGiveUpThreshold, 1, 10))
@@ -833,6 +885,8 @@ public class LiveFansMedalTaskRunner(
                     response.Code,
                     response.Code == 0 && response.Data is not null
                 );
+                if (StopAtDayBoundary())
+                    return;
                 if (response.Code != 0 || response.Data is null)
                 {
                     if (options.UseLiveStateMonitoring && response.Code != 0)
@@ -880,6 +934,8 @@ public class LiveFansMedalTaskRunner(
                 if (watched - lastCheck >= 60 || watched >= target)
                 {
                     var data = await GetTasksAsync(cookie, medal, token);
+                    if (StopAtDayBoundary())
+                        return;
                     confirmed = data;
                     var progress = LiveFansMedalTaskPlanner.Plan(data, "watchLive");
                     var remaining = progress.Remaining;
@@ -920,7 +976,11 @@ public class LiveFansMedalTaskRunner(
                     if (FollowDaily && watched >= target)
                     {
                         await _delay(TimeSpan.FromSeconds(3), token);
+                        if (StopAtDayBoundary())
+                            return;
                         data = await GetTasksAsync(cookie, medal, token);
+                        if (StopAtDayBoundary())
+                            return;
                         progress = LiveFansMedalTaskPlanner.Plan(data, "watchLive");
                         diagnostic?.Progress(
                             progress.Completed,

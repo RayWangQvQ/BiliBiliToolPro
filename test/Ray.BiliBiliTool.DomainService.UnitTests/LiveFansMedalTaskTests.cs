@@ -16,6 +16,96 @@ namespace Ray.BiliBiliTool.DomainService.UnitTests;
 
 public class LiveFansMedalTaskTests
 {
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task MidnightEndsOldWatchSessionBeforeSendingAnotherHeartbeat(bool monitored)
+    {
+        var env = new Environment();
+        env.Clock.Now = new(2026, 10, 6, 23, 59, 45, TimeSpan.FromHours(8));
+        env.Options.UseLiveStateMonitoring = monitored;
+        env.Options.HeartBeatNumber = env.Options.DailyWatchMinutes = 1;
+        env.TaskData = (_, _) => Tasks("watchLive", "观看1分钟", "每日上限 0/10");
+        var updates = new List<Ray.BiliBiliTool.Domain.TaskRecoveryProgress>();
+        using var scope = new Ray.BiliBiliTool.Domain.TaskRecoveryProgressScope(updates.Add);
+        await env.Runner.RunForAnchorAsync(env.Cookie, 60, 1060, "watchLive");
+        Assert.Empty(env.Heartbeats);
+        Assert.Contains(
+            updates,
+            update =>
+                update.Detail.Contains("日期已切换")
+                && update.State == Ray.BiliBiliTool.Domain.TaskRecoveryProgressState.Pending
+        );
+        await env.Runner.RunForAnchorAsync(env.Cookie, 60, 1060, "watchLive");
+        Assert.Equal(2, env.Enters);
+        Assert.Equal(2, env.Heartbeats.Count);
+        Assert.All(
+            env.Heartbeats,
+            request =>
+                Assert.Equal(
+                    DateTimeOffset
+                        .FromUnixTimeSeconds(request.Ets)
+                        .ToOffset(TimeSpan.FromHours(8))
+                        .Date,
+                    DateTimeOffset
+                        .FromUnixTimeMilliseconds(request.Ts)
+                        .ToOffset(TimeSpan.FromHours(8))
+                        .Date
+                )
+        );
+    }
+
+    [Fact]
+    public async Task PreviousDayProgressResponseCannotUseTodaysBudget()
+    {
+        var env = new Environment();
+        env.Clock.Now = new(2026, 10, 6, 23, 59, 15, TimeSpan.FromHours(8));
+        env.Options.UseLiveStateMonitoring = true;
+        env.TaskReadDelay = TimeSpan.FromSeconds(30);
+        env.TaskData = (_, _) => Tasks("watchLive", "观看1分钟", "每日上限 1/10");
+        var gate = new LiveFansMedalExecutionGate(env.Clock);
+        var runner = new LiveFansMedalTaskRunner(
+            env.Api,
+            env.Trace,
+            NullLogger.Instance,
+            env.Options,
+            "offline-test",
+            env.DelayAsync,
+            executionGate: gate,
+            clock: env.Clock
+        );
+        await runner.RunForAnchorAsync(env.Cookie, 60, 1060, "watchLive");
+        Assert.Equal(0, env.Enters);
+        Assert.Empty(env.Heartbeats);
+        Assert.Equal(0, gate.Progress(env.Cookie.UserId, 60, "watchLive").Confirmed);
+    }
+
+    [Fact]
+    public async Task HeartbeatResponseArrivingAfterMidnightCannotConfirmTodaysProgress()
+    {
+        var env = new Environment();
+        env.Clock.Now = new(2026, 10, 6, 23, 59, 29, TimeSpan.FromHours(8));
+        env.Options.UseLiveStateMonitoring = true;
+        env.HeartbeatResponseDelay = TimeSpan.FromSeconds(2);
+        env.TaskData = (_, read) =>
+            Tasks("watchLive", "观看1分钟", $"每日上限 {(read > 2 ? 1 : 0)}/10");
+        var gate = new LiveFansMedalExecutionGate(env.Clock);
+        var runner = new LiveFansMedalTaskRunner(
+            env.Api,
+            env.Trace,
+            NullLogger.Instance,
+            env.Options,
+            "offline-test",
+            env.DelayAsync,
+            executionGate: gate,
+            clock: env.Clock
+        );
+        await runner.RunForAnchorAsync(env.Cookie, 60, 1060, "watchLive");
+        Assert.Single(env.Heartbeats);
+        Assert.Equal(2, env.TaskReads);
+        Assert.Equal(0, gate.Progress(env.Cookie.UserId, 60, "watchLive").Confirmed);
+    }
+
     private static ActivatedMedalResponse Tasks(
         string action,
         string title,

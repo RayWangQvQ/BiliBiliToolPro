@@ -140,10 +140,13 @@ public static class TaskStatusEvaluator
             "Login" => ctx.BiliReward.Login,
             "Watch" => ctx.BiliReward.Watch,
             TaskCatalog.ShareItemKey => ctx.BiliReward.Share,
-            "DonateCoin" => ctx.BiliReward.CoinExp > 0,
+            "DonateCoin" => IsCoinDonationComplete(ctx.BiliReward.CoinExp, ctx.CoinDonationTarget),
             _ => false,
         };
     }
+
+    public static bool IsCoinDonationComplete(int coinExperience, int targetCoins) =>
+        coinExperience >= Math.Clamp(targetCoins, 0, 5) * 10;
 
     private static DateTimeOffset? FindCompletedAt(TodayTaskItemContext ctx)
     {

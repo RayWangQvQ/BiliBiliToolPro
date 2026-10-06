@@ -7,6 +7,35 @@ namespace Ray.BiliBiliTool.Web.UnitTests;
 
 public class LiveMedalCompletionTests
 {
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void EmptyTaskListWithoutConfirmedDailyLimitRemainsUnknown(bool lighted)
+    {
+        var result = Evaluate(new(), Medal(lit: lighted, tasks: []));
+        Assert.Equal(TodayTaskItemState.Unknown, result.State);
+        Assert.Contains("进度待刷新", result.Message);
+        Assert.False(
+            TaskStatusEvaluator.CanAutoRedo(
+                Context(result),
+                TaskStatusEvaluator.Evaluate(Context(result))
+            )
+        );
+    }
+
+    [Fact]
+    public void ExplicitDailyLimitCanCompleteAnEmptyTaskList()
+    {
+        Assert.Equal(
+            TodayTaskItemState.Completed,
+            Evaluate(new(), Medal(lit: true, tasks: [], full: true)).State
+        );
+        Assert.Equal(
+            TodayTaskItemState.NoWork,
+            Evaluate(new() { ExcludedAnchorIds = "1" }, Medal(lit: true, tasks: [])).State
+        );
+    }
+
     private static readonly DateTimeOffset Now = new(2026, 10, 5, 18, 42, 0, TimeSpan.FromHours(8));
 
     private static LiveMedalCard Medal(

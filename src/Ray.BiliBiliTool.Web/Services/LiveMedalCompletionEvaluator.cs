@@ -52,14 +52,17 @@ public static class LiveMedalCompletionEvaluator
                 continue;
             }
             var tasks = medal.Tasks.Where(task => enabled.Contains(task.Action)).ToList();
+            if (medal.Tasks.Count == 0 && !(medal.Lighted == true && medal.SavingsFull))
+            {
+                unknown++;
+                continue;
+            }
             if (medal.Lighted == false)
             {
                 // Lighting alternatives share one goal: the medal must actually become lit.
                 var lighting = tasks.Where(task => task.Action is "like" or "sendDanmu").ToList();
                 if (lighting.Count == 0)
                 {
-                    if (medal.Tasks.Count == 0)
-                        unknown++;
                     continue;
                 }
                 unlit++;

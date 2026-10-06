@@ -14,6 +14,32 @@ namespace Ray.BiliBiliTool.Web.UnitTests;
 
 public class DailyTaskNotificationStatusTests
 {
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void EmptyMedalTasksMatchUnknownPageStateAndWaitForSummary(bool lighted)
+    {
+        var options = new LiveFansMedalTaskOptions();
+        var snapshot = new LiveMedalSnapshot(
+            [new(1, "Example", "Example", 20, false, lighted, false, [], null)],
+            Now
+        );
+        Assert.Equal(
+            TodayTaskItemState.Unknown,
+            LiveMedalCompletionEvaluator.Evaluate(snapshot, options, Now).State
+        );
+        Assert.False(
+            DailyTaskNotificationStatusSource.MedalFinished(
+                snapshot,
+                options,
+                1001,
+                Day,
+                Now,
+                new(new Clock())
+            )
+        );
+    }
+
     private static readonly DateTimeOffset Now = new(2026, 10, 6, 18, 0, 0, TimeSpan.FromHours(8));
     private static readonly DateOnly Day = new(2026, 10, 6);
 

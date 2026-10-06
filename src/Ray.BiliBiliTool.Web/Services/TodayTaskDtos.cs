@@ -60,6 +60,8 @@ public sealed class TodayTaskItemContext
     /// <summary>B站每日任务状态；仅当 Item.Source == BiliDailyReward 且查询成功时非 null</summary>
     public BiliDailyRewardSnapshot? BiliReward { get; init; }
 
+    public int CoinDonationTarget { get; init; } = 5;
+
     public LiveMedalCompletion? LiveMedal { get; init; }
     public bool FollowMedalDailyTaskLimit { get; init; }
     public bool MonitorMedalLiveState { get; init; }
