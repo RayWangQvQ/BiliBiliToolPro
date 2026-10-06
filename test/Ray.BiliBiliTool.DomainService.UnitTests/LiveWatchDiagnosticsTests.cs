@@ -154,7 +154,8 @@ public sealed class LiveWatchDiagnosticsTests : IDisposable
     [Fact]
     public async Task SingleRoomModeQueuesSameAccountButKeepsAccountsIndependent()
     {
-        var gate = new LiveFansMedalExecutionGate(watchConcurrency: 1);
+        var gate = new LiveFansMedalExecutionGate();
+        Assert.Equal(1, gate.WatchConcurrency);
         var first = await gate.AcquireWatchSlotAsync("first", CancellationToken.None);
         var waiting = gate.AcquireWatchSlotAsync("first", CancellationToken.None);
         Assert.False(waiting.IsCompleted);
@@ -167,7 +168,8 @@ public sealed class LiveWatchDiagnosticsTests : IDisposable
     [Fact]
     public async Task CanceledQueueDoesNotConsumeOrLeakWatchSlots()
     {
-        var gate = new LiveFansMedalExecutionGate(watchConcurrency: 1);
+        var gate = new LiveFansMedalExecutionGate();
+        Assert.Equal(1, gate.WatchConcurrency);
         var first = await gate.AcquireWatchSlotAsync("first", CancellationToken.None);
         using var cancel = new CancellationTokenSource();
         var waiting = gate.AcquireWatchSlotAsync("first", cancel.Token);

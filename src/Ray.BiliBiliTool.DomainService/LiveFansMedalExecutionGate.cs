@@ -6,8 +6,7 @@ namespace Ray.BiliBiliTool.DomainService;
 
 public sealed class LiveFansMedalExecutionGate(
     TimeProvider? clock = null,
-    string? budgetPath = null,
-    int watchConcurrency = 8
+    string? budgetPath = null
 )
 {
     private readonly TimeProvider _clock = clock ?? TimeProvider.System;
@@ -18,7 +17,9 @@ public sealed class LiveFansMedalExecutionGate(
     private readonly Dictionary<(string User, long Anchor, string Action), DailyUsage> _usage =
         new();
     private bool _loaded;
-    public int WatchConcurrency { get; } = Math.Clamp(watchConcurrency, 1, 8);
+
+    // Watch one room at a time per account, shared by monitoring and recovery.
+    public int WatchConcurrency => 1;
     private readonly ConcurrentDictionary<string, SemaphoreSlim> _watchSlots = new();
 
     public async Task<IDisposable> AcquireWatchSlotAsync(string user, CancellationToken token)

@@ -171,6 +171,50 @@ public class LiveMedalMonitorTests
         });
 
     [Fact]
+    public async Task SameAccountWatchesRoomsInSequenceWhileOtherWorkCanRun()
+    {
+        await using var env = new Environment();
+        var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        env.Source.Run = (target, token) =>
+            target.Action == "watchLive" && target.AnchorId == 1
+                ? release.Task.WaitAsync(token)
+                : Task.CompletedTask;
+        env.Source.Accounts =
+        [
+            env.Account(1, Card(1, action: "watchLive"), Card(2, action: "watchLive"), Card(3)),
+            env.Account(2, Card(4, action: "watchLive")),
+        ];
+        await env.Tick();
+        await env.Tick();
+        Assert.Equal(
+            1,
+            Assert
+                .Single(
+                    env.Source.Started.Where(target =>
+                        target.UserId == 1 && target.Action == "watchLive"
+                    )
+                )
+                .AnchorId
+        );
+        Assert.Contains(
+            env.Source.Started,
+            target => target.UserId == 1 && target.Action == "like"
+        );
+        Assert.Contains(
+            env.Source.Started,
+            target => target.UserId == 2 && target.Action == "watchLive"
+        );
+        Assert.DoesNotContain(env.Source.Started, target => target.AnchorId == 2);
+        release.SetResult();
+        await WaitUntil(() => env.Cycle.ActiveCount == 0);
+        Assert.Equal(
+            new long[] { 1, 2 },
+            env.Source.Started.Where(target => target.UserId == 1 && target.Action == "watchLive")
+                .Select(target => target.AnchorId)
+        );
+    }
+
+    [Fact]
     public void DefaultsMonitorLiveStateAndUseDailyQuota()
     {
         var options = new LiveFansMedalTaskOptions();

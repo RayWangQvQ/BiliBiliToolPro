@@ -357,7 +357,7 @@ public sealed class LiveMedalMonitorCycle(
         using var notifications = new TaskFailureNotificationScope(suppress: false);
         var slots =
             target.Action == "watchLive"
-                ? _watchSlots.GetOrAdd(target.UserId, _ => new(8))
+                ? _watchSlots.GetOrAdd(target.UserId, _ => new(_executionGate.WatchConcurrency))
                 : _interactionSlots.GetOrAdd(target.UserId, _ => new(2));
         var acquired = false;
         try

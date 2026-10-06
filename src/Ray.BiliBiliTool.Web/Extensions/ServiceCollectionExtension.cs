@@ -56,15 +56,7 @@ public static class ServiceCollectionExtension
                     provider.GetRequiredService<IHostEnvironment>().ContentRootPath,
                     "config",
                     "live-medal-daily-usage.json"
-                ),
-                int.TryParse(
-                    provider.GetRequiredService<IConfiguration>()[
-                        "LiveWatchDiagnostics:ConcurrentRooms"
-                    ],
-                    out var rooms
                 )
-                    ? rooms
-                    : 8
             )
         );
         services.AddSingleton(provider => new Ray.BiliBiliTool.DomainService.LiveWatchDiagnostics(
