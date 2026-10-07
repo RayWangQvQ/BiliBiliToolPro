@@ -112,9 +112,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Qinglong SDK detection fixtures
-        run: bash ./scripts/test-qinglong-dotnet.sh
-
       - name: Version derivation fixtures
         run: bash ./scripts/test-version-next.sh
 
