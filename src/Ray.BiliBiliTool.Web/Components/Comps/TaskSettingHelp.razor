@@ -1,0 +1,11 @@
+@using Ray.BiliBiliTool.Web.Services
+
+@if (TaskHelpCatalog.SettingDescription(TaskKey, SettingKey) is { } description)
+{
+    <p class="task-setting-help">@description</p>
+}
+
+@code {
+    [Parameter, EditorRequired] public string TaskKey { get; set; } = "";
+    [Parameter, EditorRequired] public string SettingKey { get; set; } = "";
+}

@@ -1,0 +1,141 @@
+@page "/Configurations/NotificationConfig"
+@page "/Configurations/CookieNotificationConfig"
+@page "/Configurations/TaskFailureNotificationConfig"
+@using Microsoft.AspNetCore.Authorization
+@using Ray.BiliBiliTool.Web.Services.Pages.Configs
+@attribute [Authorize]
+@rendermode InteractiveServer
+@inject INotificationSettingsWorkflow Workflow
+
+<PageTitle>检查与提醒</PageTitle>
+
+<MudContainer Class="app-config-page">
+    <PageHero Size="Size.Small" Title="检查与提醒" Description="设置登录状态检查、过期提醒和任务失败汇总。" />
+    <Ray.BiliBiliTool.Web.Components.Comps.TaskGuide TaskKey="Notification" />
+    <MudGrid Spacing="3">
+        <MudItem xs="12" md="6">
+            <MudCard Class="mud-height-full">
+                <MudCardContent>
+                    <MudText Typo="Typo.h6" Class="mb-2">登录状态检查</MudText>
+                    <MudSwitch T="bool" @bind-Value="_automatic" @bind-Value:after="SettingsChanged"
+                               Label="自动检查登录状态" Color="Color.Primary" />
+                    <MudText Typo="Typo.body2" Class="mb-4" Style="color: var(--mud-palette-text-secondary)">
+                        @(_automatic ? "自动模式：每天首次活动前检查登录状态。账号过期时暂停活动，重新登录后复检。" : "手动模式：在账号管理中点击「检测」查看登录状态。")
+                    </MudText>
+                    <MudDivider Class="mb-3" />
+                    <MudSwitch T="bool" @bind-Value="_expiryEnabled" @bind-Value:after="SettingsChanged"
+                               Label="Cookie 过期提醒" Color="Color.Primary" />
+                    <MudText Typo="Typo.body2" Style="color: var(--mud-palette-text-secondary)">同一账号每天最多发送一次过期提醒。</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+        <MudItem xs="12" md="6">
+            <MudCard Class="mud-height-full">
+                <MudCardContent>
+                    <MudText Typo="Typo.h6" Class="mb-2">Server 酱</MudText>
+                    <MudText Typo="Typo.body2" Style="color: var(--mud-palette-text-secondary)" Class="mb-3">过期提醒和任务失败汇总共用此密钥。</MudText>
+                    <MudChip T="string" Color="@(_hasKey ? Color.Success : Color.Warning)" Variant="Variant.Outlined"
+                             Icon="@(_hasKey ? Icons.Material.Filled.CheckCircle : Icons.Material.Filled.WarningAmber)" Class="mb-3">
+                        @(_hasKey ? "SendKey 已配置" : "请配置 SendKey")
+                    </MudChip>
+                    <MudTextField T="string" Value="@_newSendKey" ValueChanged="SendKeyChanged" Label="SendKey"
+                                  InputType="InputType.Password" Placeholder="@(_hasKey ? "********" : "请输入 SendKey")"
+                                  HelperText="@(_hasKey ? "输入新密钥即可更换，留空保留已保存的密钥。" : "填写 SendKey 后保存。")" />
+                    @if (!string.IsNullOrWhiteSpace(_newSendKey))
+                    {
+                        <MudText Typo="Typo.caption" Color="Color.Warning">新密钥待保存</MudText>
+                    }
+                    <MudLink Href="https://sct.ftqq.com/sendkey/" Target="_blank">获取 SendKey</MudLink>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+        <MudItem xs="12">
+            <MudCard>
+                <MudCardContent>
+                    <MudText Typo="Typo.h6" Class="mb-2">任务失败汇总</MudText>
+                    <MudSwitch T="bool" @bind-Value="_failureEnabled" @bind-Value:after="SettingsChanged"
+                               Label="任务失败提醒" Color="Color.Primary" />
+                    <MudText Typo="Typo.body2" Style="color: var(--mud-palette-text-secondary)" Class="mb-4">
+                        后台定时任务结束后等待 2 分钟，汇总已选任务的失败记录并发送一条提醒。
+                    </MudText>
+                    <MudDivider Class="mb-3" />
+                    <MudText Typo="Typo.subtitle2" Class="mb-2">选择需要接收失败提醒的任务</MudText>
+                    <MudGrid Spacing="1">
+                        @foreach (var task in _tasks)
+                        {
+                            <MudItem @key="task.TaskKey" xs="12" sm="6" md="4">
+                                <div data-task-key="@task.TaskKey">
+                                    <MudSwitch T="bool" @bind-Value="task.Enabled" @bind-Value:after="SettingsChanged"
+                                               Label="@task.DisplayName" Color="Color.Primary" Disabled="@(!_failureEnabled)" />
+                                </div>
+                            </MudItem>
+                        }
+                    </MudGrid>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+    @if (_message is not null)
+    {
+        <div role="status" aria-live="polite">
+            <MudAlert Severity="@(_success ? Severity.Success : Severity.Error)" Class="mt-3">@_message</MudAlert>
+        </div>
+    }
+    <MudStack Row="true" Justify="Justify.FlexEnd" Class="mt-4">
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Save">保存设置</MudButton>
+    </MudStack>
+</MudContainer>
+
+@code {
+    private bool _automatic;
+    private bool _expiryEnabled;
+    private bool _failureEnabled;
+    private bool _hasKey;
+    private string _newSendKey = "";
+    private List<TaskSwitch> _tasks = [];
+    private string? _message;
+    private bool _success;
+
+    protected override void OnInitialized()
+    {
+        var settings = Workflow.Read();
+        _automatic = settings.Cookie.AutoCheckEnabled;
+        _expiryEnabled = settings.Cookie.NotifyEnabled;
+        _hasKey = settings.Cookie.HasSendKey;
+        _failureEnabled = settings.TaskFailure.Enabled;
+        _tasks = settings.TaskFailure.Tasks.Select(task => new TaskSwitch(task.TaskKey, task.DisplayName, task.Enabled)).ToList();
+    }
+
+    private void SettingsChanged() => _message = null;
+
+    private void SendKeyChanged(string value)
+    {
+        _newSendKey = value;
+        SettingsChanged();
+    }
+
+    private void Save()
+    {
+        try
+        {
+            Workflow.Save(_automatic, _expiryEnabled, _failureEnabled, _newSendKey,
+                _tasks.ToDictionary(task => task.TaskKey, task => task.Enabled));
+            _hasKey = Workflow.Read().Cookie.HasSendKey;
+            _newSendKey = "";
+            _success = true;
+            _message = _hasKey ? "设置已保存。SendKey 已配置。" : "设置已保存。";
+        }
+        catch (Exception error)
+        {
+            _success = false;
+            _message = error is InvalidOperationException ? error.Message : "保存失败，请稍后重试";
+        }
+    }
+
+    private sealed class TaskSwitch(string taskKey, string displayName, bool enabled)
+    {
+        public string TaskKey { get; } = taskKey;
+        public string DisplayName { get; } = displayName;
+        public bool Enabled { get; set; } = enabled;
+    }
+}

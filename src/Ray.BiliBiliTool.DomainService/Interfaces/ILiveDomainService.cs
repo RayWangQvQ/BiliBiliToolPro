@@ -1,4 +1,4 @@
-﻿using Ray.BiliBiliTool.Agent;
+using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.LiveApi;
 
 namespace Ray.BiliBiliTool.DomainService.Interfaces;
@@ -31,15 +31,15 @@ public interface ILiveDomainService : IDomainService
     /// <summary>
     /// 发送弹幕
     /// </summary>
-    Task SendDanmakuToFansMedalLive(BiliCookie ck);
+    Task SendDanmakuToFansMedalLive(BiliCookie ck, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 直播时长挂机
     /// </summary>
-    Task SendHeartBeatToFansMedalLive(BiliCookie ck);
+    Task SendHeartBeatToFansMedalLive(BiliCookie ck, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 点赞直播间
     /// </summary>
-    Task LikeFansMedalLive(BiliCookie ck);
+    Task LikeFansMedalLive(BiliCookie ck, CancellationToken cancellationToken = default);
 }

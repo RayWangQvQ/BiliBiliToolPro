@@ -401,6 +401,26 @@ Specify a creator ID for automatic charging. Older behavior allowed charging you
 <a id="markdown-38-推送相关" name="38-推送相关"></a>
 ### 3.8. Notifications
 
+#### Account checks and scheduled-task failure summaries
+
+In the Web panel, open **Task configuration → Checks and reminders** to configure automatic account checks, Cookie expiry reminders, per-task failure reminders, and a shared ServerChan SendKey. Saved keys display a masked placeholder and a configured status. Leaving the input empty keeps the saved key.
+
+Automatic checking validates each account before its first activity each host-local calendar day. An expired account skips activities. Saving a new login triggers an immediate check. Manual mode uses the account page's **Check** button. Expiry reminders are limited to one successful delivery per account per day. An unconfirmed API or transport error is retried on a later activity.
+
+Failure summaries include enabled background scheduled tasks. After the last running task ends and no new failure arrives for two minutes, their failures are sent in one message. Run-now actions and manual or automatic recovery retain execution records without entering these summaries. Provider failures are retried after fifteen minutes. Only a successful provider acknowledgement clears the pending summary.
+
+| Configuration key | Default | Purpose |
+| --- | --- | --- |
+| `CookieCheck__AutoCheckEnabled` | `true` | Automatic checks before activities and after saving a login |
+| `CookieCheck__NotifyEnabled` | `true` | Cookie expiry reminders |
+| `CookieCheck__ServerChanSendKey` | Empty | Shared key for expiry and failure reminders |
+| `CookieCheck__StateFile` | `config/cookie-check-state.json` | Persistent check and reminder state |
+| `TaskFailureNotification__Enabled` | `true` | Scheduled-task failure summaries in the Web host |
+| `TaskFailureNotification__Tasks__<AppServiceName>` | `true` | Independent reminder switch for each supported task |
+| `TaskFailureNotification__StateFile` | `config/task-failure-batch.json` | Persistent pending summary |
+
+If a dedicated key is empty, the existing `ServerChanBatched` sink's `turboScKey` is reused. Turbo (`SCT`) and ServerChan 3 (`sctp`) keys are supported. Keep both state files on writable persistent storage and use one application instance per state file. The notifications include masked account identifiers. Provider requests and stored state do not include Cookie credentials in the message body. See [ServerChan](https://sct.ftqq.com/sendkey/) for a SendKey.
+
 Notifications are Serilog output sinks, alongside console and file logging. You can configure multiple sinks; each configured destination receives messages. Telegram, WeCom, ServerChan, and other supported services use the `Serilog__WriteTo__{index}__Args__...` keys below. Keep tokens and webhook URLs private.
 
 <a id="markdown-381-是否开启每个账号单独推送消息" name="381-是否开启每个账号单独推送消息"></a>

@@ -372,6 +372,8 @@ platforms/krew/pkg/utils/fixtures
 kustomization.yaml
 
 # cookie config
+**/cookie-check-state.json*
+**/task-failure-batch.json*
 **/Ray.BiliBiliTool.Console/cookies.json
 **/Ray.BiliBiliTool.Web/config/cookies.json
 

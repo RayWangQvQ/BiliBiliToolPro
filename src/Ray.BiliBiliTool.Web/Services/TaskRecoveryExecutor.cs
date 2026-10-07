@@ -2,6 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Application.Contracts;
+using Ray.BiliBiliTool.Application.Contracts.Cookies;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 using Ray.BiliBiliTool.Infrastructure.Cookie;
 
@@ -19,7 +20,8 @@ public class TaskRecoveryExecutor(
     IDonateCoinDomainService donateCoinDomainService,
     IVipPrivilegeDomainService vipPrivilegeDomainService,
     IServiceProvider serviceProvider,
-    ILogger<TaskRecoveryExecutor> logger
+    ILogger<TaskRecoveryExecutor> logger,
+    ICookieTaskGuard cookieTaskGuard
 )
 {
     /// <summary>
@@ -33,6 +35,7 @@ public class TaskRecoveryExecutor(
     )
     {
         var ck = FindCookie(userId) ?? throw new Exception($"未找到 UID 为 {userId} 的账号");
+        await cookieTaskGuard.EnsureValidAsync(ck.UserId, ck.ToString(), cancellationToken);
 
         if (item.ItemKey is null)
         {
