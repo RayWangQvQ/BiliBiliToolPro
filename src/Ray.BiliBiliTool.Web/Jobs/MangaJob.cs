@@ -1,10 +1,14 @@
 using Quartz;
 using Ray.BiliBiliTool.Application.Contracts;
+using Ray.BiliBiliTool.Web.Services;
 
 namespace Ray.BiliBiliTool.Web.Jobs;
 
-public class MangaJob(ILogger<MangaJob> logger, IMangaTaskAppService appService)
-    : BaseJob<MangaJob>(logger)
+public class MangaJob(
+    ILogger<MangaJob> logger,
+    IMangaTaskAppService appService,
+    ITaskFailureBatchMonitor? failureMonitor = null
+) : BaseJob<MangaJob>(logger, failureMonitor)
 {
     public static readonly JobKey Key = new(nameof(MangaJob), Constants.BiliJobGroup);
 
