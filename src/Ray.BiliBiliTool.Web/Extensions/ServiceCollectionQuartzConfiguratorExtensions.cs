@@ -1,6 +1,7 @@
 using Quartz;
 using Quartz.Impl.AdoJobStore;
 using Ray.BiliBiliTool.Web.Jobs;
+using Ray.BiliBiliTool.Web.Services;
 
 namespace Ray.BiliBiliTool.Web.Extensions;
 
@@ -29,6 +30,7 @@ public static class ServiceCollectionQuartzConfiguratorExtensions
 
             q.AddBiliJobs(configuration);
         });
+        services.AddHostedService<SchedulerConfigurationStartup>();
         services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 
         return services;

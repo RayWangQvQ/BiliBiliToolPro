@@ -190,6 +190,7 @@ public class TodayTaskService(
         CancellationToken cancellationToken = default
     )
     {
+        using var notificationScope = new TaskFailureNotificationScope(suppress: true);
         var task = TaskCatalog.All.FirstOrDefault(t => t.TaskKey == taskKey);
         if (task is null)
         {
@@ -218,6 +219,7 @@ public class TodayTaskService(
         CancellationToken cancellationToken = default
     )
     {
+        using var notificationScope = new TaskFailureNotificationScope(suppress: true);
         var status = await GetTodayStatusAsync(true, true, cancellationToken);
         var account = status.FirstOrDefault(a => a.UserId == userId);
         return account is null ? 0 : await RedoAccountAsync(account, cancellationToken);
@@ -225,6 +227,7 @@ public class TodayTaskService(
 
     public async Task<int> RedoAllMissingAsync(CancellationToken cancellationToken = default)
     {
+        using var notificationScope = new TaskFailureNotificationScope(suppress: true);
         // 只查一次状态，避免逐账号重复请求 B 站接口
         var status = await GetTodayStatusAsync(true, true, cancellationToken);
 

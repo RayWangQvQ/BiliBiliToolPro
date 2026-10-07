@@ -55,6 +55,11 @@ public class CoinDonationPolicyTests
             try
             {
                 var page = context.RenderComponent<DailyJobConfig>();
+                Assert.Contains(
+                    "达到所选等级后停止视频、专栏和补做投币",
+                    page.Find("form").TextContent
+                );
+                Assert.DoesNotContain("账号达到 Lv.6 后停止投币", page.Find("form").TextContent);
                 var select = page.FindComponents<MudSelect<int>>()
                     .Single(c => c.Instance.Label == "达到指定等级后停止投币");
                 Assert.Equal(6, select.Instance.GetState(x => x.Value));

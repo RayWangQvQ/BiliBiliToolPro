@@ -2,7 +2,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
+using Ray.BiliBiliTool.Agent;
+using Ray.BiliBiliTool.Application.Contracts;
+using Ray.BiliBiliTool.Application.Contracts.Cookies;
 using Ray.BiliBiliTool.Domain;
+using Ray.BiliBiliTool.Infrastructure.Cookie;
 using Ray.BiliBiliTool.Infrastructure.EF;
 using Ray.BiliBiliTool.Web.Services;
 using Xunit;
@@ -118,5 +122,190 @@ public class TaskRecordWriterTests : IDisposable
 
         await using var db = await _factory.CreateDbContextAsync();
         Assert.Equal(message, Assert.Single(db.TaskRecords).Message);
+    }
+
+    [Fact]
+    public async Task FailedRecordsEnterSummary_SuccessAndCookieExpiryDoNot()
+    {
+        var monitor = new CaptureMonitor();
+        var writer = new TaskRecordWriter(_factory, NullLogger<TaskRecordWriter>.Instance, monitor);
+        await writer.WriteAsync(
+            1001,
+            "DailyTaskAppService",
+            null,
+            TaskRecordStatus.Success,
+            null,
+            TaskRecordTrigger.Scheduled
+        );
+        await writer.WriteAsync(
+            1001,
+            "DailyTaskAppService",
+            null,
+            TaskRecordStatus.Failed,
+            "Cookie 已过期，本次活动已跳过，请在账号管理中重新登录",
+            TaskRecordTrigger.Scheduled
+        );
+        await writer.WriteAsync(
+            1001,
+            "MangaTaskAppService",
+            null,
+            TaskRecordStatus.Failed,
+            "synthetic error containing private details",
+            TaskRecordTrigger.Scheduled
+        );
+        Assert.Equal("MangaTaskAppService", Assert.Single(monitor.TaskKeys));
+    }
+
+    [Theory]
+    [InlineData(TaskRecordTrigger.Manual)]
+    [InlineData(TaskRecordTrigger.Auto)]
+    public async Task RecoveryFailures_KeepExecutionRecordsWithoutQueuingReminders(
+        TaskRecordTrigger trigger
+    )
+    {
+        var monitor = new CaptureMonitor();
+        var writer = new TaskRecordWriter(_factory, NullLogger<TaskRecordWriter>.Instance, monitor);
+        await writer.WriteAsync(
+            1001,
+            "MangaTaskAppService",
+            null,
+            TaskRecordStatus.Failed,
+            "synthetic recovery failure",
+            trigger
+        );
+        Assert.Empty(monitor.TaskKeys);
+        await using var db = await _factory.CreateDbContextAsync();
+        var record = Assert.Single(db.TaskRecords);
+        Assert.Equal(trigger, record.Trigger);
+        Assert.Equal(TaskRecordStatus.Failed, record.Status);
+        Assert.Equal("synthetic recovery failure", record.Message);
+    }
+
+    [Fact]
+    public async Task ManualExecutionScope_AlsoExcludesNestedScheduledRecords()
+    {
+        var monitor = new CaptureMonitor();
+        var writer = new TaskRecordWriter(_factory, NullLogger<TaskRecordWriter>.Instance, monitor);
+        using (new TaskFailureNotificationScope(suppress: true))
+            await writer.WriteAsync(
+                1001,
+                "MangaTaskAppService",
+                null,
+                TaskRecordStatus.Failed,
+                "synthetic failure",
+                TaskRecordTrigger.Scheduled
+            );
+        Assert.Empty(monitor.TaskKeys);
+        await writer.WriteAsync(
+            1001,
+            "DailyTaskAppService",
+            null,
+            TaskRecordStatus.Failed,
+            "synthetic failure",
+            TaskRecordTrigger.Scheduled
+        );
+        Assert.Equal("DailyTaskAppService", Assert.Single(monitor.TaskKeys));
+        await using var db = await _factory.CreateDbContextAsync();
+        Assert.Equal(2, await db.TaskRecords.CountAsync());
+    }
+
+    [Theory]
+    [InlineData(TaskRecordTrigger.Manual)]
+    [InlineData(TaskRecordTrigger.Auto)]
+    public async Task RedoAsync_SuppressesNestedRemindersAndPreservesFailureResult(
+        TaskRecordTrigger trigger
+    )
+    {
+        var monitor = new CaptureMonitor();
+        var writer = new TaskRecordWriter(_factory, NullLogger<TaskRecordWriter>.Instance, monitor);
+        var config = new ConfigurationBuilder()
+            .AddInMemoryCollection(
+                new Dictionary<string, string?>
+                {
+                    ["BiliBiliCookies:0"] =
+                        "DedeUserID=1001; bili_jct=synthetic; SESSDATA=synthetic",
+                }
+            )
+            .Build();
+        using var services = new ServiceCollection()
+            .AddSingleton<IAccountTaskAppService>(new FailingRecoveryTask())
+            .BuildServiceProvider();
+        var cookies = new CookieStrFactory<BiliCookie>(config);
+        var executor = new TaskRecoveryExecutor(
+            cookies,
+            config,
+            null!,
+            null!,
+            null!,
+            null!,
+            services,
+            NullLogger<TaskRecoveryExecutor>.Instance,
+            new AllowGuard()
+        );
+        var today = new TodayTaskService(
+            cookies,
+            config,
+            _factory,
+            null!,
+            null!,
+            null!,
+            null!,
+            null!,
+            executor,
+            writer,
+            NullLogger<TodayTaskService>.Instance
+        );
+        var result = await today.RedoAsync(1001, "MangaTaskAppService", null, trigger);
+        Assert.False(result.Success);
+        Assert.Empty(monitor.TaskKeys);
+        Assert.False(TaskFailureNotificationScope.IsSuppressed);
+        await using var db = await _factory.CreateDbContextAsync();
+        var record = Assert.Single(db.TaskRecords);
+        Assert.Equal(trigger, record.Trigger);
+        Assert.Equal(TaskRecordStatus.Failed, record.Status);
+        Assert.Contains("synthetic recovery failure", result.Message);
+    }
+
+    private sealed class FailingRecoveryTask : IAccountTaskAppService
+    {
+        public string TaskKey => "MangaTaskAppService";
+
+        public Task DoTaskAsync(CancellationToken token = default) =>
+            throw new NotSupportedException();
+
+        public async Task DoTaskForAccountAsync(long userId, CancellationToken token = default)
+        {
+            await Task.Yield();
+            Assert.True(TaskFailureNotificationScope.IsSuppressed);
+            throw new InvalidOperationException("synthetic recovery failure");
+        }
+    }
+
+    private sealed class AllowGuard : ICookieTaskGuard
+    {
+        public Task EnsureValidAsync(
+            string userId,
+            string cookie,
+            CancellationToken token = default
+        ) => Task.CompletedTask;
+    }
+
+    private sealed class CaptureMonitor : ITaskFailureBatchMonitor
+    {
+        public List<string> TaskKeys { get; } = [];
+
+        public IDisposable BeginBatch() => throw new NotSupportedException();
+
+        public Task RecordFailureAsync(
+            long? userId,
+            string taskKey,
+            CancellationToken token = default
+        )
+        {
+            TaskKeys.Add(taskKey);
+            return Task.CompletedTask;
+        }
+
+        public Task FlushReadyAsync(CancellationToken token = default) => Task.CompletedTask;
     }
 }

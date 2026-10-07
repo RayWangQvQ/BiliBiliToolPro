@@ -42,6 +42,7 @@
     </MudPaper>
 
     @* 设置区：自动补做 + 关闭分享 *@
+    <Ray.BiliBiliTool.Web.Components.Comps.TaskGuide TaskKey="AutoRecover" />
     <MudPaper Class="pa-3 mb-4" Elevation="1">
         <div class="d-flex align-center gap-2 mb-2">
             <MudIcon Icon="@Icons.Material.Filled.Settings" Size="Size.Small" Class="mud-text-secondary" />
@@ -156,10 +157,11 @@
                             <div class="@(single ? null : "task-group-items")">
                                 @foreach (var item in group.Items)
                                 {
-                                    <div class="task-row d-flex align-center justify-space-between py-1">
-                                        <MudText Typo="Typo.body2">
-                                            @(single ? group.DisplayName : item.DisplayName)
-                                        </MudText>
+                                    <div class="task-row today-task-row d-flex align-center justify-space-between py-1 gap-3">
+                                        <div class="today-task-heading">
+                                            <MudText Typo="Typo.body2">@(single ? group.DisplayName : item.DisplayName)</MudText>
+                                            <Ray.BiliBiliTool.Web.Components.Comps.TaskBrief TaskKey="@group.TaskKey" ItemKey="@item.ItemKey" />
+                                        </div>
 
                                         <div class="d-flex align-center gap-2">
                                             @if (item.Message is null)

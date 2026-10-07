@@ -7,6 +7,7 @@ using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.ApiApi.Daily;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.NavApi;
 using Ray.BiliBiliTool.Application.Attributes;
 using Ray.BiliBiliTool.Application.Contracts;
+using Ray.BiliBiliTool.Application.Contracts.Cookies;
 using Ray.BiliBiliTool.Application.Diagnostics;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Interfaces;
@@ -47,9 +48,16 @@ public class DailyTaskAppService(
     IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
     ILoginDomainService loginDomainService,
     IConfiguration configuration,
-    CookieStrFactory<BiliCookie> cookieStrFactory
+    CookieStrFactory<BiliCookie> cookieStrFactory,
+    ICookieTaskGuard cookieTaskGuard
 )
-    : BaseMultiAccountsAppService(logger, cookieStrFactory, loginDomainService, configuration),
+    : BaseMultiAccountsAppService(
+        logger,
+        cookieStrFactory,
+        loginDomainService,
+        configuration,
+        cookieTaskGuard
+    ),
         IDailyTaskAppService
 {
     private readonly DailyTaskOptions _dailyTaskOptions = dailyTaskOptions.CurrentValue;
@@ -163,7 +171,7 @@ public class DailyTaskAppService(
     [TaskInterceptor("投币", rethrowWhenException: false)]
     private async Task AddCoins(UserInfo userInfo, BiliCookie ck)
     {
-        // LV6 optimization: skip coin donation for max-level users to conserve coins
+        // Skip coin donation after reaching the configured account level.
         if (_dailyTaskOptions.ShouldSkipCoinDonation(userInfo.Level_info?.Current_level))
         {
             logger.LogInformation(

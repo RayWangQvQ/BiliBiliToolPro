@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Application.Attributes;
 using Ray.BiliBiliTool.Application.Contracts;
+using Ray.BiliBiliTool.Application.Contracts.Cookies;
 using Ray.BiliBiliTool.Application.Diagnostics;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Interfaces;
@@ -19,9 +20,16 @@ public class Silver2CoinTaskAppService(
     IConfiguration configuration,
     ILiveDomainService liveDomainService,
     ICoinDomainService coinDomainService,
-    CookieStrFactory<BiliCookie> cookieStrFactory
+    CookieStrFactory<BiliCookie> cookieStrFactory,
+    ICookieTaskGuard cookieTaskGuard
 )
-    : BaseMultiAccountsAppService(logger, cookieStrFactory, loginDomainService, configuration),
+    : BaseMultiAccountsAppService(
+        logger,
+        cookieStrFactory,
+        loginDomainService,
+        configuration,
+        cookieTaskGuard
+    ),
         ISilver2CoinTaskAppService
 {
     [TaskInterceptor("银瓜子兑换硬币任务", TaskLevel.One)]

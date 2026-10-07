@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.NavApi;
+using Ray.BiliBiliTool.Application.Contracts.Cookies;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 using Ray.BiliBiliTool.Infrastructure.Cookie;
 
@@ -47,6 +48,13 @@ public class CoinDonationRecoveryTests
             return Task.CompletedTask;
         };
         using var services = new ServiceCollection().BuildServiceProvider();
+        var cookieChecks = 0;
+        var guard = DispatchProxy.Create<ICookieTaskGuard, ApiProxy>();
+        ((ApiProxy)guard).Call = _ =>
+        {
+            cookieChecks++;
+            return Task.CompletedTask;
+        };
         var executor = new TaskRecoveryExecutor(
             new CookieStrFactory<BiliCookie>(config),
             config,
@@ -55,7 +63,8 @@ public class CoinDonationRecoveryTests
             donate,
             null!,
             services,
-            NullLogger<TaskRecoveryExecutor>.Instance
+            NullLogger<TaskRecoveryExecutor>.Instance,
+            guard
         );
         var task = TaskCatalog.All.Single(t => t.TaskKey == "DailyTaskAppService");
         await executor.ExecuteAsync(
@@ -64,6 +73,7 @@ public class CoinDonationRecoveryTests
             task.Items.Single(item => item.ItemKey == "DonateCoin")
         );
         Assert.Equal(expected, donations);
+        Assert.Equal(1, cookieChecks);
     }
 
     public class ApiProxy : DispatchProxy
