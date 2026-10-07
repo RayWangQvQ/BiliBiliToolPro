@@ -60,7 +60,7 @@ public class TaskRecordWriterTests : IDisposable
     }
 
     [Fact]
-    public async Task 写入一条记录后能按账号与日期查出来()
+    public async Task WriteAsync_SuccessfulTask_PersistsAccountAndDate()
     {
         var writer = new TaskRecordWriter(_factory, NullLogger<TaskRecordWriter>.Instance);
 
@@ -83,7 +83,7 @@ public class TaskRecordWriterTests : IDisposable
     }
 
     [Fact]
-    public async Task 失败信息超过512字时被截断()
+    public async Task WriteAsync_MessageOver512Characters_TruncatesTo512Characters()
     {
         var writer = new TaskRecordWriter(_factory, NullLogger<TaskRecordWriter>.Instance);
         var longMessage = new string('错', 600);
@@ -100,6 +100,27 @@ public class TaskRecordWriterTests : IDisposable
         await using var db = await _factory.CreateDbContextAsync();
         var record = Assert.Single(db.TaskRecords.Where(r => r.UserId == 1002));
         Assert.Equal(512, record.Message!.Length);
+    }
+
+    [Theory]
+    [InlineData(511)]
+    [InlineData(512)]
+    public async Task WriteAsync_MessageAtOrBelowLimit_PreservesAllCharacters(int length)
+    {
+        var writer = new TaskRecordWriter(_factory, NullLogger<TaskRecordWriter>.Instance);
+        var message = new string('a', length);
+
+        await writer.WriteAsync(
+            1003,
+            "DailyTaskAppService",
+            null,
+            TaskRecordStatus.Failed,
+            message,
+            TaskRecordTrigger.Manual
+        );
+
+        await using var db = await _factory.CreateDbContextAsync();
+        Assert.Equal(message, Assert.Single(db.TaskRecords).Message);
     }
 
     [Fact]

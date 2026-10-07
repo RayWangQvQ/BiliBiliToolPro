@@ -51,11 +51,6 @@ public static class TaskHelpCatalog
                     "按每个 B 站账号的等级判断，达到所选等级后停止视频和专栏投币，其他已开启的日常操作继续执行。",
                     "CoinDonationStopLevel"
                 ),
-                new(
-                    "后台随机延迟上限（分钟）",
-                    "定时每日任务执行前随机等待。留空使用全局设置，填写 0 可立即执行，手动执行和补做立即开始。",
-                    "RandomDelayMaxMinutes"
-                ),
                 new("投币时点赞", "给视频投币时同时点赞。", "SelectLike"),
                 new(
                     "支持的 UP 主 UID",

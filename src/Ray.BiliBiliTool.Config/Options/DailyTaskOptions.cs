@@ -27,9 +27,6 @@ public class DailyTaskOptions : BaseConfigOptions
     /// </summary>
     public int NumberOfCoins { get; set; } = 5;
 
-    [System.ComponentModel.DataAnnotations.Range(0, 1440)]
-    public int? RandomDelayMaxMinutes { get; set; }
-
     /// <summary>
     /// 要保留的硬币数量 [0,int_max]
     /// </summary>
@@ -119,10 +116,6 @@ public class DailyTaskOptions : BaseConfigOptions
                     IsDonateCoinForArticle.ToString().ToLower()
                 },
                 { $"{SectionName}:{nameof(NumberOfCoins)}", NumberOfCoins.ToString() },
-                {
-                    $"{SectionName}:{nameof(RandomDelayMaxMinutes)}",
-                    RandomDelayMaxMinutes?.ToString() ?? ""
-                },
                 {
                     $"{SectionName}:{nameof(NumberOfProtectedCoins)}",
                     NumberOfProtectedCoins.ToString()

@@ -21,7 +21,6 @@ public static class ServiceCollectionExtension
     public static IServiceCollection AddWebServices(this IServiceCollection services)
     {
         services.AddSingleton(TimeProvider.System);
-        services.AddSingleton<IScheduledDailyTaskDelay, ScheduledDailyTaskDelay>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<ILoginPageStateFactory, LoginPageStateFactory>();
         services.AddScoped<IAdminPageWorkflow, AdminPageWorkflow>();

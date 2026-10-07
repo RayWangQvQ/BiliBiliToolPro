@@ -81,7 +81,7 @@ public class BiliAccountProbe(
             }
 
             if (force)
-                await cookieTaskGuard.CheckNowAsync(ck.UserId, ck.ToString(), cancellationToken);
+                await cookieTaskGuard.CheckNowAsync(ck.UserId, ck.ToString(), timeout.Token);
             var userInfo = await accountDomainService.LoginByCookie(ck);
             if (userInfo is null)
             {

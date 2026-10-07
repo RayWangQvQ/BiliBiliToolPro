@@ -50,7 +50,7 @@ public abstract class BaseJob<TJob>(
                     }
                 }
                 logger.LogInformation($"{typeof(TJob).Name} started.");
-                await BeforeExecuteAsync(context, cancellationToken);
+                cancellationToken.ThrowIfCancellationRequested();
                 await DoExecuteAsync(context);
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
@@ -97,11 +97,6 @@ public abstract class BaseJob<TJob>(
             logger.LogWarning(ex, "Fail to push logs");
         }
     }
-
-    protected virtual Task BeforeExecuteAsync(
-        IJobExecutionContext context,
-        CancellationToken token
-    ) => Task.CompletedTask;
 
     protected abstract Task DoExecuteAsync(IJobExecutionContext context);
 }

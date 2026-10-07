@@ -309,6 +309,40 @@ public class ScheduleConfigurationTests : TestContext, IDisposable
     }
 
     [Fact]
+    public async Task DailyPageSavesScheduleWithLegacyDelaySettingWithoutExposingDelay()
+    {
+        _configuration["DailyTaskConfig:RandomDelayMaxMinutes"] = "15";
+        var scheduler = await PrepareAsync<DailyJob>(DailyJob.Key, "0 0 15 * * ?");
+        try
+        {
+            var page = RenderComponent<DailyJobConfig>();
+            Assert.DoesNotContain("后台随机延迟", page.Markup);
+            Assert.Empty(page.FindComponents<MudNumericField<int?>>());
+            page.Find("select[aria-label=小时]").Change("8");
+            page.Find("select[aria-label=分钟]").Change("45");
+            page.Find("form").Submit();
+            page.WaitForAssertion(() =>
+                Assert.Equal("0 45 8 * * ?", _configuration["DailyTaskConfig:Cron"])
+            );
+            Assert.Equal("15", _configuration["DailyTaskConfig:RandomDelayMaxMinutes"]);
+            var trigger = await scheduler.GetTrigger(
+                new TriggerKey($"{DailyJob.Key}.Cron.Trigger", Web.Constants.BiliJobGroup)
+            );
+            Assert.Equal(
+                "0 45 8 * * ?",
+                Assert.IsAssignableFrom<ICronTrigger>(trigger).CronExpressionString
+            );
+            _configuration.Reload();
+            Assert.Equal("0 45 8 * * ?", _configuration["DailyTaskConfig:Cron"]);
+            Assert.Equal("15", _configuration["DailyTaskConfig:RandomDelayMaxMinutes"]);
+        }
+        finally
+        {
+            await scheduler.Shutdown();
+        }
+    }
+
+    [Fact]
     public async Task MonthlyPage_SavePersistsDateAndTimeTogether()
     {
         var scheduler = await PrepareAsync<ChargeJob>(ChargeJob.Key, "0 0 12 28 * ?");

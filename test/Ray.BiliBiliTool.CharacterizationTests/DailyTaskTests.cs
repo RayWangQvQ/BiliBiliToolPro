@@ -19,10 +19,10 @@ using Ray.BiliBiliTool.Infrastructure.Cookie;
 namespace Ray.BiliBiliTool.CharacterizationTests;
 
 [Collection("Characterization")]
-public class DailyTaskCharacterizationTests
+public class DailyTaskTests
 {
     [Fact]
-    public async Task Daily_task_enabled_path_preserves_current_sequence_and_markers()
+    public async Task DoTaskAsync_EnabledTasks_PreservesSequenceAndDiagnostics()
     {
         var callLog = new List<string>();
         using var logging = TestLoggingContext.Create();
@@ -78,7 +78,7 @@ public class DailyTaskCharacterizationTests
     }
 
     [Fact]
-    public async Task Daily_task_multi_account_wrapper_continues_after_account_failure()
+    public async Task DoTaskAsync_FirstAccountFails_ContinuesWithNextAccount()
     {
         var callLog = new List<string>();
         using var logging = TestLoggingContext.Create();
