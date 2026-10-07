@@ -126,3 +126,22 @@ DOTNET_USE_POLLING_FILE_WATCHER=1
 ```
 
 This changes .NET configuration-change watching from inotify events to polling.
+
+
+## OpenAPI endpoint and isolated task builds
+
+The default OpenAPI endpoint is `http://localhost:5700`. An explicitly configured
+`QL_URL` keeps its value, including the legacy `http://localhost:5600` backend or
+an HTTPS endpoint. Set a complete HTTP or HTTPS address when the panel port or
+deployment topology differs. Cookie persistence confirms the authentication,
+query and save responses before reporting success.
+
+Scripts prefer the repository containing the running script. For tasks copied
+into the panel scripts directory, they require exactly one structurally valid
+checkout under the repository directory. Fork names, custom branches and paths
+with spaces are supported. Ambiguous or missing checkouts stop before cleanup.
+
+In `dotnet` mode, every task builds all referenced projects into its own temporary
+artifacts directory. Concurrent tasks keep separate outputs. Task completion,
+failure and termination remove only that invocation's artifacts while preserving
+the Console working directory, account configuration and original arguments.

@@ -360,8 +360,9 @@ public class LiveDomainService(
         }
         else
         {
-            logger.LogWarning("【分组结果】失败");
-            logger.LogWarning("【原因】{msg}", re.Message);
+            throw new BiliBusinessException(
+                $"移动关注到“天选时刻”分组失败：{re.Message}（错误码 {re.Code}）"
+            );
         }
     }
 
@@ -371,11 +372,23 @@ public class LiveDomainService(
     /// <returns></returns>
     private async Task<long> GetLastFollowUpId(BiliCookie ck)
     {
+        var followings = await GetFollowingList(ck);
+        return followings.FirstOrDefault()?.Mid ?? 0;
+    }
+
+    private async Task<List<UpInfoDto>> GetFollowingList(BiliCookie ck)
+    {
         var followings = await apiApi.GetFollowings(
             new GetFollowingsRequest(long.Parse(ck.UserId), FollowingsOrderType.TimeDesc),
             ck.ToString()
         );
-        return followings.Data?.List.FirstOrDefault()?.Mid ?? 0;
+        if (followings.Code != 0)
+            throw new BiliBusinessException(
+                $"获取关注列表失败：{followings.Message}（错误码 {followings.Code}）"
+            );
+        if (followings.Data?.List is null || followings.Data.List.Any(item => item is null))
+            throw new BiliBusinessException("获取关注列表未返回有效的关注数据");
+        return followings.Data.List;
     }
 
     /// <summary>
@@ -387,12 +400,9 @@ public class LiveDomainService(
         List<long> addUpIds = new();
 
         //获取最后一个upId之后关注的所有upId
-        var followings = await apiApi.GetFollowings(
-            new GetFollowingsRequest(long.Parse(ck.UserId), FollowingsOrderType.TimeDesc),
-            ck.ToString()
-        );
+        var followings = await GetFollowingList(ck);
 
-        foreach (UpInfoDto item in followings.Data?.List ?? [])
+        foreach (UpInfoDto item in followings)
         {
             if (item.Mid == _lastFollowUpId)
             {
@@ -423,30 +433,36 @@ public class LiveDomainService(
         long groupId = 0;
         string referer = string.Format(RelationApiConstant.GetTagsReferer, ck.UserId);
         var groups = await apiApi.GetTags(ck.ToString(), referer);
-        var tianXuanGroup = groups.Data?.FirstOrDefault(x => x.Name == "天选时刻");
+        if (groups.Code != 0)
+            throw new BiliBusinessException(
+                $"获取关注分组失败：{groups.Message}（错误码 {groups.Code}）"
+            );
+        if (groups.Data is null || groups.Data.Any(group => group is null))
+            throw new BiliBusinessException("获取关注分组未返回有效的分组数据");
+        var tianXuanGroup = groups.Data.FirstOrDefault(x => x.Name == "天选时刻");
         if (tianXuanGroup == null)
         {
             logger.LogInformation("“天选时刻”分组不存在，尝试创建...");
             //创建一个
             var createRe = await apiApi.CreateTag(
                 new CreateTagRequest { Tag = "天选时刻", Csrf = ck.BiliJct },
-                ck.ToString()
+                ck.ToString(),
+                referer
             );
-            if (createRe.Code != 0 || createRe.Data is null)
-            {
-                logger.LogWarning(
-                    "创建“天选时刻”分组失败：{message}({code})",
-                    createRe.Message,
-                    createRe.Code
+            if (createRe.Code != 0)
+                throw new BiliBusinessException(
+                    $"创建“天选时刻”分组失败：{createRe.Message}（错误码 {createRe.Code}）"
                 );
-                return 0;
-            }
+            if (createRe.Data is null || createRe.Data.Tagid <= 0)
+                throw new BiliBusinessException("创建“天选时刻”分组未返回有效的分组编号");
 
             groupId = createRe.Data.Tagid;
             logger.LogInformation("创建成功");
         }
         else
         {
+            if (tianXuanGroup.Tagid <= 0)
+                throw new BiliBusinessException("“天选时刻”分组编号无效");
             logger.LogInformation("“天选时刻”分组已存在");
             groupId = tianXuanGroup.Tagid;
         }
@@ -501,6 +517,8 @@ public class LiveDomainService(
         CancellationToken cancellationToken
     )
     {
+        if (!liveFansMedalTaskOptions.CurrentValue.IsEnable)
+            return;
         cancellationToken.ThrowIfCancellationRequested();
         if (action == "watchLive" && !await CheckLiveCookie(ck, cancellationToken))
             throw new BiliBusinessException("直播设备信息暂未获取，观看任务稍后重试");
@@ -538,11 +556,16 @@ public class LiveDomainService(
             foreach (var requestCookie in new[] { ck.ToString(), "" })
             {
                 token.ThrowIfCancellationRequested();
-                using var liveHome = await liveApi.GetLiveHome(requestCookie).WaitAsync(token);
+                using var liveHome = await AwaitLiveHomeResponseAsync(
+                    liveApi.GetLiveHome(requestCookie),
+                    token
+                );
+                token.ThrowIfCancellationRequested();
                 liveHome.EnsureSuccessStatusCode();
                 var liveHomeContent = JsonConvert.DeserializeObject<BiliApiResponse>(
                     await liveHome.Content.ReadAsStringAsync(token)
                 );
+                token.ThrowIfCancellationRequested();
                 if (liveHomeContent?.Code != 0)
                     throw new BiliBusinessException(
                         $"直播设备初始化失败，错误码 {liveHomeContent?.Code}"
@@ -573,6 +596,35 @@ public class LiveDomainService(
                 exception.GetType().Name
             );
             return false;
+        }
+    }
+
+    private static async Task<HttpResponseMessage> AwaitLiveHomeResponseAsync(
+        Task<HttpResponseMessage> pending,
+        CancellationToken token
+    )
+    {
+        try
+        {
+            return await pending.WaitAsync(token).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException) when (token.IsCancellationRequested)
+        {
+            // The legacy API cannot cancel its request. Dispose a late response and observe failures.
+            _ = DisposeLateLiveHomeResponseAsync(pending);
+            throw;
+        }
+    }
+
+    private static async Task DisposeLateLiveHomeResponseAsync(Task<HttpResponseMessage> pending)
+    {
+        try
+        {
+            using var response = await pending.ConfigureAwait(false);
+        }
+        catch (Exception)
+        {
+            // The caller has already received its cancellation.
         }
     }
 }

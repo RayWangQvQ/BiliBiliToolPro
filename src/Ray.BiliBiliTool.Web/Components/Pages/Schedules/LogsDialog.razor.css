@@ -70,6 +70,7 @@
 /* 日志消息 */
 .log-message {
     flex-grow: 1;
+    white-space: pre-wrap;
     word-break: break-word;
 }
 

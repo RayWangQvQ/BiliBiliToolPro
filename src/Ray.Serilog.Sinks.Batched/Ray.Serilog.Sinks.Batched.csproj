@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>Ray.Serilog.Sinks.Batched</AssemblyName>
+    <AssemblyVersion>0.1.5.0</AssemblyVersion>
+    <PackageId>Ray.Serilog.Sinks.Batched</PackageId>
+    <Version>0.1.5</Version>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Serilog" />
+  </ItemGroup>
+</Project>

@@ -11,7 +11,7 @@ public class LogsDialogWorkflowTests
         new LogsDialogWorkflow(repo ?? new FakeLogRepository());
 
     [Fact]
-    public async Task GetLatestRunInstanceIdAsync_ValidKeys_DelegatesToRepository()
+    public async Task GetLatestRunInstanceIdAsync_DelegatesToRepository()
     {
         var repo = new FakeLogRepository(instanceId: "instance-42");
         var workflow = CreateWorkflow(repo);
@@ -24,7 +24,7 @@ public class LogsDialogWorkflowTests
     }
 
     [Fact]
-    public async Task GetLatestRunInstanceIdAsync_RepositoryReturnsNull_ReturnsNull()
+    public async Task GetLatestRunInstanceIdAsync_ReturnsNullWhenRepositoryReturnsNull()
     {
         var workflow = CreateWorkflow(new FakeLogRepository(instanceId: null));
 
@@ -34,7 +34,30 @@ public class LogsDialogWorkflowTests
     }
 
     [Fact]
-    public async Task GetLogsForRunAsync_ValidRunId_DelegatesToRepository()
+    public async Task LatestLookup_ForwardsNullScopeAndCancellationWithoutBreakingLegacyCall()
+    {
+        var repo = new FakeLogRepository(instanceId: "synthetic-run");
+        var workflow = CreateWorkflow(repo);
+        using var cancellation = new System.Threading.CancellationTokenSource();
+        var result = await workflow.GetLatestRunInstanceIdAsync(
+            "synthetic-job",
+            null,
+            cancellation.Token
+        );
+        result.Should().Be("synthetic-run");
+        repo.LastTriggerName.Should().BeNull();
+        repo.LastCancellation.Should().Be(cancellation.Token);
+        cancellation.Cancel();
+        await Assert.ThrowsAnyAsync<System.OperationCanceledException>(() =>
+            workflow.GetLatestRunInstanceIdAsync("synthetic-job", null, cancellation.Token)
+        );
+        (await workflow.GetLatestRunInstanceIdAsync("synthetic-job", "named-trigger"))
+            .Should()
+            .Be("synthetic-run");
+    }
+
+    [Fact]
+    public async Task GetLogsForRunAsync_DelegatesToRepository()
     {
         var expectedLogs = new List<BiliLogs>
         {
@@ -58,8 +81,20 @@ public class LogsDialogWorkflowTests
         public string? LastTriggerName { get; private set; }
         public string? LastFireInstanceId { get; private set; }
         public int LastMaxCount { get; private set; }
+        public System.Threading.CancellationToken LastCancellation { get; private set; }
 
-        public Task<string?> GetLatestRunInstanceIdAsync(string jobName, string triggerName)
+        public Task<string?> GetLatestRunInstanceIdAsync(
+            string jobName,
+            string? triggerName,
+            System.Threading.CancellationToken token
+        )
+        {
+            LastCancellation = token;
+            token.ThrowIfCancellationRequested();
+            return GetLatestRunInstanceIdAsync(jobName, triggerName);
+        }
+
+        public Task<string?> GetLatestRunInstanceIdAsync(string jobName, string? triggerName)
         {
             LastJobName = jobName;
             LastTriggerName = triggerName;

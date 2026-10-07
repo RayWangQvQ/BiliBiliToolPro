@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
@@ -98,6 +98,14 @@ public class AccountDomainService(
     /// <param name="count"></param>
     public async Task UnfollowBatched(BiliCookie ck)
     {
+        int count = _unfollowBatchedTaskOptions.Count;
+        if (count < -1)
+            throw new BiliBusinessException("批量取关执行数量应为非负数或 -1");
+        if (count == 0)
+        {
+            logger.LogInformation("执行数量为 0，跳过取关");
+            return;
+        }
         logger.LogInformation("【分组名】{group}", _unfollowBatchedTaskOptions.GroupName);
 
         //根据分组名称获取tag
@@ -116,7 +124,8 @@ public class AccountDomainService(
             logger.LogWarning("分组下不存在up");
             return;
         }
-        int count = _unfollowBatchedTaskOptions.Count;
+        if (total < 0)
+            throw new BiliBusinessException("获取关注分组返回了无效的关注数量");
         if (count == -1)
             count = total;
 
@@ -127,52 +136,32 @@ public class AccountDomainService(
         int totalPage = (int)Math.Ceiling(total / (double)20);
 
         //从最后一页开始获取
-        var req = new GetSpecialFollowingsRequest(long.Parse(ck.UserId), tagId.Value)
-        {
-            Pn = totalPage,
-        };
-        BiliApiResponse<List<UpInfoDto>> followingsResponse = await apiApi.GetFollowingsByTag(
-            req,
-            ck.ToString()
-        );
-        if (followingsResponse.Code != 0 || followingsResponse.Data is null)
-        {
-            logger.LogWarning(
-                "获取分组下的up失败：{message}({code})",
-                followingsResponse.Message,
-                followingsResponse.Code
-            );
-            return;
-        }
-
-        List<UpInfoDto> followings = followingsResponse.Data;
-        followings.Reverse();
-
         var targetList = new List<UpInfoDto>();
-
-        if (count <= followings.Count)
+        var selectedIds = new HashSet<long>();
+        for (int page = totalPage; page > 0 && targetList.Count < count; page--)
         {
-            targetList = followings.Take(count).ToList();
-        }
-        else
-        {
-            int pn = totalPage;
-            while (targetList.Count < count)
+            var response = await apiApi.GetFollowingsByTag(
+                new GetSpecialFollowingsRequest(long.Parse(ck.UserId), tagId.Value) { Pn = page },
+                ck.ToString()
+            );
+            if (response.Code != 0)
+                throw new BiliBusinessException(
+                    $"获取分组关注第 {page} 页失败：{response.Message}（错误码 {response.Code}）"
+                );
+            if (response.Data is null || response.Data.Any(item => item is null || item.Mid <= 0))
+                throw new BiliBusinessException($"获取分组关注第 {page} 页未返回有效的关注数据");
+            foreach (var following in response.Data.AsEnumerable().Reverse())
             {
-                targetList.AddRange(followings);
-
-                //获取前一页
-                pn -= 1;
-                if (pn <= 0)
+                if (selectedIds.Add(following.Mid))
+                    targetList.Add(following);
+                if (targetList.Count >= count)
                     break;
-                req.Pn = pn;
-                followings = (await apiApi.GetFollowingsByTag(req, ck.ToString())).Data ?? [];
-                followings.Reverse();
             }
         }
 
         logger.LogInformation("开始取关..." + Environment.NewLine);
         int success = 0;
+        var failures = new List<int>();
         for (int i = 1; i <= targetList.Count && i <= count; i++)
         {
             UpInfoDto info = targetList[i - 1];
@@ -201,15 +190,33 @@ public class AccountDomainService(
             }
             else
             {
+                failures.Add(re.Code);
                 logger.LogInformation("【取关结果】失败");
-                logger.LogInformation("【原因】{msg}" + Environment.NewLine, re.Message);
+                logger.LogInformation(
+                    "【原因】{msg}（错误码 {code}）" + Environment.NewLine,
+                    re.Message,
+                    re.Code
+                );
             }
         }
 
         logger.LogInformation("【本次共取关】{count}人", success);
+        if (failures.Count > 0)
+            throw new BiliBusinessException(
+                $"批量取关成功 {success} 人，失败 {failures.Count} 人（错误码 {string.Join("、", failures.Distinct())}）"
+            );
 
         //计算剩余
-        tag = await GetTag(_unfollowBatchedTaskOptions.GroupName, ck);
+        try
+        {
+            tag = await GetTag(_unfollowBatchedTaskOptions.GroupName, ck);
+        }
+        catch (BiliBusinessException exception)
+        {
+            throw new BiliBusinessException(
+                $"本次已成功取关 {success} 人，剩余数量未确认：{exception.Message}"
+            );
+        }
         logger.LogInformation("【分组下剩余】{count}人", tag?.Count);
     }
 
@@ -222,8 +229,14 @@ public class AccountDomainService(
     private async Task<TagDto?> GetTag(string groupName, BiliCookie ck)
     {
         string getTagsReferer = string.Format(RelationApiConstant.GetTagsReferer, ck.UserId);
-        List<TagDto> tagList = (await apiApi.GetTags(ck.ToString(), getTagsReferer)).Data!;
-        var tag = tagList.FirstOrDefault(x => x.Name == groupName);
+        var response = await apiApi.GetTags(ck.ToString(), getTagsReferer);
+        if (response.Code != 0)
+            throw new BiliBusinessException(
+                $"获取关注分组失败：{response.Message}（错误码 {response.Code}）"
+            );
+        if (response.Data is null || response.Data.Any(group => group is null))
+            throw new BiliBusinessException("获取关注分组未返回有效的分组数据");
+        var tag = response.Data.FirstOrDefault(x => x.Name == groupName);
         return tag;
     }
 
@@ -234,42 +247,38 @@ public class AccountDomainService(
     /// <returns>升级时间</returns>
     public int CalculateUpgradeTime(UserInfo useInfo)
     {
-        double availableCoins =
-            decimal.ToDouble(useInfo.Money ?? 0) - _dailyTaskOptions.NumberOfProtectedCoins;
-        long needExp =
-            useInfo.Level_info != null
-                ? useInfo.Level_info.GetNext_expLong() - useInfo.Level_info.Current_exp
-                : 0;
-        int needDay;
+        var level = useInfo.Level_info;
+        if (level is null || level.Current_level >= 6)
+            return 0;
 
-        if (availableCoins < 0)
-            needDay = (int)(
-                (double)needExp / 25
-                + _dailyTaskOptions.NumberOfProtectedCoins
-                - Math.Abs(availableCoins)
-            );
+        decimal needExp = (decimal)level.GetNext_expLong() - level.Current_exp;
+        if (needExp <= 0)
+            return 0;
 
-        switch (_dailyTaskOptions.NumberOfCoins)
+        int dailyExp =
+            5 + (_dailyTaskOptions.IsWatchVideo ? 5 : 0) + (_dailyTaskOptions.IsShareVideo ? 5 : 0);
+        int coinLimit = _dailyTaskOptions.ShouldSkipCoinDonation(level.Current_level)
+            ? 0
+            : Math.Clamp(_dailyTaskOptions.NumberOfCoins, 0, 5);
+        decimal availableCoins =
+            decimal.Floor(useInfo.Money ?? 0)
+            - Math.Max(0, _dailyTaskOptions.NumberOfProtectedCoins);
+
+        // Forecast one login coin per day, spending only above the protected balance.
+        decimal ExpAfter(int days) =>
+            (decimal)days * dailyExp
+            + 10 * Math.Min((decimal)days * coinLimit, Math.Max(0, availableCoins + days));
+
+        int low = 1;
+        int high = int.MaxValue;
+        while (low < high)
         {
-            case 0:
-                needDay = (int)(needExp / 15);
-                break;
-            case 1:
-                needDay = (int)(needExp / 25);
-                break;
-            default:
-                int dailyExpAvailable = 15 + _dailyTaskOptions.NumberOfCoins * 10;
-                double needFrontDay = availableCoins / (_dailyTaskOptions.NumberOfCoins - 1);
-
-                if ((double)needExp / dailyExpAvailable > needFrontDay)
-                    needDay = (int)(
-                        needFrontDay + (needExp - dailyExpAvailable * needFrontDay) / 25
-                    );
-                else
-                    needDay = (int)(needExp / dailyExpAvailable);
-                break;
+            int middle = low + (high - low) / 2;
+            if (ExpAfter(middle) >= needExp)
+                high = middle;
+            else
+                low = middle + 1;
         }
-
-        return needDay;
+        return low;
     }
 }

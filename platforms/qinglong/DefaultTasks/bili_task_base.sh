@@ -73,18 +73,75 @@ MemoryWarn=${MemoryWarn:-""}
 DiskWarn=${DiskWarn:-""}
 
 dir_repo=${dir_repo:-"$QL_DIR/data/repo"}
-# 需要兼容老版本青龙，https://github.com/RayWangQvQ/BiliBiliToolPro/issues/728
-if [ ! -d "$dir_repo" ] && [ -d "$QL_DIR/repo" ]; then
-  dir_repo="$QL_DIR/repo"
-fi
-dir_shell=$QL_DIR/shell
-touch $dir_shell/env.sh && . $dir_shell/env.sh
+dir_shell="$QL_DIR/shell"
+
+touch "$dir_shell/env.sh" && . "$dir_shell/env.sh"
 touch /root/.bashrc && . /root/.bashrc
 
-# 目录
+# Preserve the legacy Qinglong repository layout after loading panel settings.
+dir_repo=${dir_repo:-"$QL_DIR/data/repo"}
+if [ ! -d "$dir_repo" ] && [ -d "$QL_DIR/repo" ]; then
+    dir_repo="$QL_DIR/repo"
+fi
+
+# Keep this resolver self-contained: Qinglong copies task scripts independently.
+is_bili_repo() {
+    local repo_root="$1"
+    local console_dir="$repo_root/src/Ray.BiliBiliTool.Console"
+    [[ -f "$console_dir/Ray.BiliBiliTool.Console.csproj" ]] || return 1
+    [[ ! -L "$console_dir/Ray.BiliBiliTool.Console.csproj" ]] || return 1
+    local resolved_console
+    resolved_console="$(cd -P -- "$console_dir" && pwd)" || return 1
+    [[ "$resolved_console" == "$console_dir" ]]
+}
+
+get_bili_repo_dir() {
+    local script_path source_root
+    script_path="$(readlink -f -- "${BASH_SOURCE[0]}")" || return 1
+    source_root="$(cd -P -- "$(dirname -- "$script_path")/../../.." && pwd)" || return 1
+    if [[ -z "${bili_branch:-}" ]] && is_bili_repo "$source_root"; then
+        printf '%s\n' "$source_root"
+        return 0
+    fi
+
+    local repo_parent candidate resolved selected=""
+    if [[ ! -d "$dir_repo" ]]; then
+        echo "未找到青龙仓库目录，请先完成拉库。" >&2
+        return 1
+    fi
+    repo_parent="$(cd -P -- "$dir_repo" && pwd)" || return 1
+    # Inspect immediate repositories only; never traverse links or nested backups.
+    for candidate in "$repo_parent"/*; do
+        [[ -d "$candidate" ]] || continue
+        # Preserve the existing inline branch override for copied task scripts.
+        if [[ -n "${bili_branch:-}" ]]; then
+            local requested_name="${bili_repo//\//_}${bili_branch}"
+            local candidate_name="${candidate##*/}"
+            if [[ "${candidate_name,,}" != "${requested_name,,}" && "${candidate_name,,}" != "${requested_name,,}_main" ]]; then
+                continue
+            fi
+        fi
+        resolved="$(cd -P -- "$candidate" && pwd)" || continue
+        [[ "$resolved" == "$repo_parent/"* ]] || continue
+        is_bili_repo "$resolved" || continue
+        if [[ -n "$selected" && "$selected" != "$resolved" ]]; then
+            echo "找到多个 BiliTool 仓库，无法确认任务来源。请从目标仓库中的任务脚本运行。" >&2
+            return 1
+        fi
+        selected="$resolved"
+    done
+    if [[ -z "$selected" ]]; then
+        echo "未找到完整的 BiliTool 仓库，请重新拉库后再运行。" >&2
+        return 1
+    fi
+    printf '%s\n' "$selected"
+}
+
 say "青龙repo目录: $dir_repo"
-qinglong_bili_repo="$(echo "$bili_repo" | sed 's/\//_/g')${bili_branch}"
-qinglong_bili_repo_dir="$(find $dir_repo -type d \( -iname $qinglong_bili_repo -o -iname ${qinglong_bili_repo}_main \) | head -1)"
+if ! qinglong_bili_repo_dir="$(get_bili_repo_dir)"; then
+    say_err "仓库定位失败，本次任务已停止。"
+    exit 1
+fi
 say "bili仓库目录: $qinglong_bili_repo_dir"
 
 current_linux_os="debian"  # 或alpine
@@ -94,8 +151,13 @@ machine_architecture="x64" # 或arm、arm64
 bilitool_installed_version=0
 
 # 以下操作仅在bilitool仓库的根bin文件下执行
-cd $qinglong_bili_repo_dir
-mkdir -p bin && cd $qinglong_bili_repo_dir/bin
+if [[ -L "$qinglong_bili_repo_dir/bin" ]]; then
+    say_err "仓库 bin 目录是符号链接，请检查仓库内容后再运行。"
+    exit 1
+fi
+cd -- "$qinglong_bili_repo_dir"
+mkdir -p -- bin
+cd -- "$qinglong_bili_repo_dir/bin"
 
 # 判断是否存在某指令
 machine_has() {
@@ -258,13 +320,31 @@ check_unzip() {
     fi
 }
 
+get_dotnet_major_version() {
+    local dotnet_command="${1:-dotnet}"
+    local dotnet_version
+    # Respect SDK selection (including global.json) and reject failed commands.
+    dotnet_version="$("$dotnet_command" --version 2>/dev/null)" || return 1
+    # Some wrappers return SDK-list rows instead of one selected version.
+    printf '%s\n' "$dotnet_version" | awk '
+        /^[[:space:]]*[0-9]+\.[0-9]+\.[0-9]+(-[[:alnum:].-]+)?(\+[[:alnum:].-]+)?([[:space:]]+\[[^]]+\])?[[:space:]]*$/ {
+            split($1, version, ".")
+            if (version[1] + 0 > highest) highest = version[1] + 0
+        }
+        END {
+            if (highest > 0) print highest
+            else exit 1
+        }
+    '
+}
+
 # 检查dotnet
 check_dotnet() {
     eval $invocation
 
-    dotnetVersion=$(dotnet --version 2>/dev/null || true)
-    dotnetMajor=$(echo "$dotnetVersion" | grep -oE '^[0-9]+' || true)
-    say "当前dotnet版本：$dotnetVersion"
+    local dotnetMajor
+    dotnetMajor="$(get_dotnet_major_version dotnet || true)"
+    say "当前dotnet主版本：${dotnetMajor:-未检测到可用SDK}"
     if [[ "$dotnetMajor" =~ ^[0-9]+$ && "$dotnetMajor" -ge 10 ]]; then
         say "已安装，且版本满足"
         say "which dotnet: $(which dotnet)"
@@ -279,7 +359,7 @@ remove_legacy_dotnet_entry() {
     local legacyDotnet="/usr/local/bin/dotnet"
     if [[ -e "$legacyDotnet" || -L "$legacyDotnet" ]]; then
         local legacyDotnetMajor
-        legacyDotnetMajor=$("$legacyDotnet" --version 2>/dev/null | grep -oE '^[0-9]+' || true)
+        legacyDotnetMajor="$(get_dotnet_major_version "$legacyDotnet" || true)"
         if ! [[ "$legacyDotnetMajor" =~ ^[0-9]+$ && "$legacyDotnetMajor" -ge 10 ]]; then
             rm -f "$legacyDotnet"
             hash -r
@@ -492,12 +572,25 @@ run_task() {
     export Ray_PlatformType=QingLong
     export Ray_RunTasks=$target_code
 
-    cd $qinglong_bili_repo_dir/src/Ray.BiliBiliTool.Console
+    cd -- "$qinglong_bili_repo_dir/src/Ray.BiliBiliTool.Console" || return 1
 
     if [ "$prefer_mode" == "dotnet" ]; then
-        dotnet run --ENVIRONMENT=Production
+        (
+            # Keep concurrent tasks and cache cleanup away from active build output.
+            local task_artifacts
+            task_artifacts="$(mktemp -d /tmp/bilitool-qinglong.XXXXXXXX)" || exit 1
+            cleanup_task_artifacts() {
+                if [[ "$task_artifacts" == /tmp/bilitool-qinglong.* && -d "$task_artifacts" && ! -L "$task_artifacts" ]]; then
+                    rm -rf -- "$task_artifacts"
+                fi
+            }
+            trap cleanup_task_artifacts EXIT
+            trap 'exit 130' INT
+            trap 'exit 143' TERM
+            dotnet run --artifacts-path "$task_artifacts" -- --ENVIRONMENT=Production
+        )
     else
-        cp -f $qinglong_bili_repo_dir/bin/Ray.BiliBiliTool.Console .
+        cp -f -- "$qinglong_bili_repo_dir/bin/Ray.BiliBiliTool.Console" .
         chmod +x ./Ray.BiliBiliTool.Console && ./Ray.BiliBiliTool.Console --ENVIRONMENT=Production
     fi
 }

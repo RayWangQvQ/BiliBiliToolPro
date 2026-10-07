@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Ray.BiliBiliTool.Application.Contracts;
+using Ray.BiliBiliTool.Application.Diagnostics;
 using Ray.BiliBiliTool.Domain;
 using Ray.BiliBiliTool.Infrastructure;
 using Rougamo;
@@ -78,6 +79,7 @@ public class TaskInterceptorAttribute(
             taskName,
             context.Exception?.Message ?? ""
         );
+        TaskFlowDiagnosticScope.RecordHandledFailure(context.Exception);
         context.HandledException(this, null);
     }
 

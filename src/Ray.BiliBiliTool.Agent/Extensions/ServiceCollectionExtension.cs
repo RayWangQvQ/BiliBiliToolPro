@@ -1,12 +1,9 @@
 using System.Net;
 using System.Text;
-using System.Text.RegularExpressions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Polly;
-using Polly.Extensions.Http;
 using Ray.BiliBiliTool.Agent.Baihu;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
@@ -22,8 +19,6 @@ namespace Ray.BiliBiliTool.Agent.Extensions;
 
 public static class ServiceCollectionExtension
 {
-    private const int MaxLoggedBodyLength = 2000;
-
     /// <summary>
     /// 注册强类型api客户端
     /// </summary>
@@ -71,11 +66,7 @@ public static class ServiceCollectionExtension
 
         services.AddBiliBiliClientApi<INavApi>(BiliHosts.Api, config, true);
 
-        services.AddBiliBiliClientApi<IApiApi>(
-            BiliHosts.Api,
-            config,
-            policy: BiliResiliencePolicies.MutatingPolicy()
-        );
+        services.AddBiliBiliClientApi<IApiApi>(BiliHosts.Api, config);
 
         services.AddBiliBiliClientApi<IShowApi>(BiliHosts.Show, config);
         services.AddBiliBiliClientApi<IPassportApi>(BiliHosts.Passport, config);
@@ -83,20 +74,31 @@ public static class ServiceCollectionExtension
         services.AddBiliBiliClientApi<IHomeApi>(BiliHosts.Www, config);
         services.AddBiliBiliClientApi<IMangaApi>(BiliHosts.Manga, config);
         services.AddBiliBiliClientApi<IAccountApi>(BiliHosts.Account, config);
-        services.AddBiliBiliClientApi<ILiveApi>(
-            BiliHosts.Live,
-            config,
-            policy: BiliResiliencePolicies.MutatingPolicy()
-        );
+        services.AddBiliBiliClientApi<ILiveApi>(BiliHosts.Live, config);
 
         //qinglong
-        var qinglongHost = configuration["QL_URL"] ?? "http://localhost:5600";
+        var qinglongHost = configuration["QL_URL"];
         services
             .AddRefitClient<IQingLongApi>()
             .ConfigureHttpClient(
                 (sp, c) =>
                 {
-                    c.BaseAddress = new Uri(qinglongHost);
+                    var endpoint = string.IsNullOrWhiteSpace(qinglongHost)
+                        ? "http://localhost:5700"
+                        : qinglongHost.Trim();
+                    if (
+                        !Uri.TryCreate(endpoint, UriKind.Absolute, out var address)
+                        || (
+                            address.Scheme != Uri.UriSchemeHttp
+                            && address.Scheme != Uri.UriSchemeHttps
+                        )
+                    )
+                    {
+                        throw new UriFormatException(
+                            "QL_URL 需要以 http:// 或 https:// 开头，并填写完整的服务地址。"
+                        );
+                    }
+                    c.BaseAddress = address;
                     c.DefaultRequestHeaders.Add(
                         "User-Agent",
                         sp.GetRequiredService<
@@ -106,7 +108,7 @@ public static class ServiceCollectionExtension
                     c.Timeout = BiliResiliencePolicies.HttpTimeout;
                 }
             )
-            .AddPolicyHandler(BiliResiliencePolicies.ReadOnlyPolicy());
+            .AddPolicyHandler(BiliResiliencePolicies.ForRequest);
 
         //baihu
         var baihuHost = configuration["BA_URL"] ?? "http://localhost:8052";
@@ -124,7 +126,7 @@ public static class ServiceCollectionExtension
                     );
                 }
             )
-            .AddPolicyHandler(BiliResiliencePolicies.ReadOnlyPolicy());
+            .AddPolicyHandler(BiliResiliencePolicies.ForRequest);
 
         //daidai（呆呆面板原生 Open API）
         var daidaiHost = configuration["DaiDai_URL"] ?? "http://127.0.0.1:5700";
@@ -142,7 +144,7 @@ public static class ServiceCollectionExtension
                     );
                 }
             )
-            .AddPolicyHandler(BiliResiliencePolicies.ReadOnlyPolicy());
+            .AddPolicyHandler(BiliResiliencePolicies.ForRequest);
 
         return services;
     }
@@ -158,8 +160,7 @@ public static class ServiceCollectionExtension
         this IServiceCollection services,
         string host,
         Action<IServiceProvider, HttpClient> config,
-        bool ignorWrid = false,
-        IAsyncPolicy<HttpResponseMessage>? policy = null
+        bool ignorWrid = false
     )
         where TInterface : class
     {
@@ -168,24 +169,23 @@ public static class ServiceCollectionExtension
             .ConfigureHttpClient((_, c) => c.BaseAddress = new Uri(host))
             .ConfigureHttpClient(config)
             .AddHttpMessageHandler<FormUrlEncodedKeyNormalizingDelegatingHandler>()
+            .AddHttpMessageHandler<VipPointAppHeadersDelegatingHandler>()
             .AddHttpMessageHandler<LogDelegatingHandler>()
             .AddHttpMessageHandler<BiliBiliCommonHeadersDelegatingHandler>()
             .AddHttpMessageHandler<IntervalDelegatingHandler>()
-            .AddPolicyHandler(policy ?? BiliResiliencePolicies.ReadOnlyPolicy());
+            .AddPolicyHandler(BiliResiliencePolicies.ForRequest);
 
         if (!ignorWrid)
         {
             httpClientBuilder.AddHttpMessageHandler<WridEncryptionDelegatingHandler>();
         }
 
-        if (typeof(TInterface) == typeof(ILiveApi) || typeof(TInterface) == typeof(ILiveTraceApi))
-        {
-            // Each live request supplies its account cookie explicitly. A pooled cookie jar
-            // can suppress device headers and share cookies between different accounts.
-            httpClientBuilder.ConfigurePrimaryHttpMessageHandler(() =>
-                new HttpClientHandler { UseCookies = false }
-            );
-        }
+        // Account cookies are supplied explicitly on each request. A pooled cookie jar
+        // would append another account's cookies and authenticate anonymous requests.
+        // Login flows continue to read and merge Set-Cookie response headers explicitly.
+        httpClientBuilder.ConfigurePrimaryHttpMessageHandler(() =>
+            new HttpClientHandler { UseCookies = false }
+        );
 
         return services;
     }
@@ -216,19 +216,18 @@ public static class ServiceCollectionExtension
                     return exception;
                 }
 
-                string body = await response.Content.ReadAsStringAsync();
-                if (body.Length > MaxLoggedBodyLength)
-                {
-                    body = body[..MaxLoggedBodyLength] + "...(已截断)";
-                }
+                string body = HttpDiagnosticRedactor.RedactBody(
+                    await response.Content.ReadAsStringAsync(),
+                    response.Content.Headers.ContentType?.MediaType
+                );
 
                 string reason = exception.Message.Replace('\r', ' ').Replace('\n', ' ');
 
                 string detail =
-                    $"响应解析失败 {request.Method} {Mask(request.RequestUri?.ToString() ?? "")} "
+                    $"响应解析失败 {request.Method} {HttpDiagnosticRedactor.RedactUri(request.RequestUri)} "
                     + $"| HTTP {(int)response.StatusCode} {response.ReasonPhrase} "
                     + $"| 真实原因({exception.GetType().Name}): {reason} "
-                    + $"| 响应体: {Mask(body.Replace('\r', ' ').Replace('\n', ' '))}";
+                    + $"| 响应体: {body}";
 
                 logger.LogWarning("{detail}", detail);
 
@@ -254,66 +253,47 @@ public static class ServiceCollectionExtension
         return settings;
     }
 
-    private static readonly Regex _sensitiveRegex = new(
-        @"(?<prefix>[?&; ]|^)(?<key>csrf|bili_jct|SESSDATA|access_key|access_token|refresh_token|app_secret|api_key|password|pwd|token|buvid3|buvid4)(?<rest>=[^&;]*)?",
-        RegexOptions.IgnoreCase | RegexOptions.Compiled
-    );
-
     /// <summary>
     /// 输出实际发出的请求（方法、完整URL、全部请求头、请求体），凭据类值一律掩码。
     /// </summary>
     private static async Task<string> DescribeRequestAsync(HttpRequestMessage request)
     {
         StringBuilder sb = new();
-        sb.Append(request.Method).Append(' ').Append(Mask(request.RequestUri?.ToString() ?? ""));
+        sb.Append(request.Method)
+            .Append(' ')
+            .Append(HttpDiagnosticRedactor.RedactUri(request.RequestUri));
 
         foreach ((string name, IEnumerable<string> values) in request.Headers)
         {
             string value = string.Join("; ", values);
-            if (name.Equals("Cookie", StringComparison.OrdinalIgnoreCase))
-            {
-                // 只保留Cookie名，值全部掩码，避免凭据进入日志与推送
-                value = string.Join(
-                    "; ",
-                    value
-                        .Split(
-                            ';',
-                            StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries
-                        )
-                        .Select(pair => pair.Split('=', 2)[0] + "=***")
-                );
-            }
-            else if (name.Equals("Authorization", StringComparison.OrdinalIgnoreCase))
-            {
-                value = "***";
-            }
-
-            sb.Append(" | ").Append(name).Append(": ").Append(Mask(value));
+            sb.Append(" | ")
+                .Append(name)
+                .Append(": ")
+                .Append(HttpDiagnosticRedactor.RedactHeader(name, value));
         }
 
         if (request.Content is not null)
         {
             foreach ((string name, IEnumerable<string> values) in request.Content.Headers)
             {
-                sb.Append(" | ").Append(name).Append(": ").Append(Mask(string.Join("; ", values)));
+                sb.Append(" | ")
+                    .Append(name)
+                    .Append(": ")
+                    .Append(HttpDiagnosticRedactor.RedactHeader(name, string.Join("; ", values)));
             }
 
             string content = await request.Content.ReadAsStringAsync();
-            if (content.Length > MaxLoggedBodyLength)
-            {
-                content = content[..MaxLoggedBodyLength] + "...(已截断)";
-            }
-            sb.Append(" | 请求体: ").Append(Mask(content.Replace('\r', ' ').Replace('\n', ' ')));
+            sb.Append(" | 请求体: ")
+                .Append(
+                    HttpDiagnosticRedactor.RedactBody(
+                        content,
+                        request.Content.Headers.ContentType?.MediaType
+                    )
+                );
         }
 
         return sb.ToString();
     }
-
-    private static string Mask(string text) =>
-        _sensitiveRegex.Replace(
-            text,
-            m => $"{m.Groups["prefix"].Value}{m.Groups["key"].Value}=***"
-        );
 
     /// <summary>
     /// 设置全局代理(如果配置了代理)

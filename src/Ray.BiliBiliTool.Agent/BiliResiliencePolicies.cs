@@ -19,11 +19,29 @@ public static class BiliResiliencePolicies
             .WaitAndRetryAsync(ReadOnlyRetryCount, _ => ReadOnlyRetryBackoff);
 
     /// <summary>
-    /// For side-effecting clients (coin donation, charge, live sign-in):
-    /// retries only on network-level failures, not on 5xx responses.
+    /// Never replay writes automatically: an error can arrive after the server applied them.
     /// </summary>
     public static IAsyncPolicy<HttpResponseMessage> MutatingPolicy() =>
-        HttpPolicyExtensions
-            .HandleTransientHttpError()
-            .WaitAndRetryAsync(ReadOnlyRetryCount, _ => ReadOnlyRetryBackoff);
+        Policy.NoOpAsync<HttpResponseMessage>();
+
+    public static IAsyncPolicy<HttpResponseMessage> ForRequest(HttpRequestMessage request)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        // These legacy GET routes perform actions rather than read state.
+        if (
+            request.RequestUri?.AbsolutePath
+            is "/xlive/web-ucenter/v1/sign/DoSign"
+                or "/pay/v1/Exchange/silver2coin"
+                or "/xlive/rdata-interface/v1/heartbeat/webHeartBeat"
+        )
+        {
+            return MutatingPolicy();
+        }
+        return
+            request.Method == HttpMethod.Get
+            || request.Method == HttpMethod.Head
+            || request.Method == HttpMethod.Options
+            ? ReadOnlyPolicy()
+            : MutatingPolicy();
+    }
 }

@@ -109,7 +109,10 @@ public class Program
         hostBuilder.UseSerilog(
             (context, services, configuration) =>
                 configuration.ReadFrom.Configuration(
-                    context.Configuration.WithTelegramMessageChunking()
+                    context
+                        .Configuration.WithCompatibleHttpNotifications()
+                        .WithTelegramMessageChunking()
+                        .WithWorkWeiXinMessageChunking()
                 )
         );
 

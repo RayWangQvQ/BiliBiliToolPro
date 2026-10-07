@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.ApiApi.VipBigPoint;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
@@ -23,7 +23,7 @@ public class VipServiceTests
             .CreateScope();
         var api = scope.ServiceProvider.GetRequiredService<IApiApi>();
         var res = await api.VipBigPointCompleteV2(
-            new ReceiveOrCompleteTaskRequest("dress-view"),
+            new VipPointV2TaskRequest("dress-view"),
             GetConfiguredCookie(scope.ServiceProvider)
         );
         Assert.Equal(0, res.Code);
@@ -37,7 +37,7 @@ public class VipServiceTests
             .CreateScope();
         var api = scope.ServiceProvider.GetRequiredService<IApiApi>();
         var res = await api.VipBigPointReceiveV2(
-            new ReceiveOrCompleteTaskRequest("ogvwatchnew"),
+            new VipPointV2TaskRequest("ogvwatchnew"),
             GetConfiguredCookie(scope.ServiceProvider)
         );
         Assert.Equal(0, res.Code);

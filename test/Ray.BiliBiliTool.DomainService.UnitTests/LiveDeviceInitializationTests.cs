@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Http;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -6,10 +7,10 @@ using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.LiveApi;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
+using Ray.BiliBiliTool.Agent.Extensions;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.Domain.Exceptions;
 using Ray.BiliBiliTool.DomainService;
-using Xunit;
 
 namespace Ray.BiliBiliTool.DomainService.UnitTests;
 
@@ -31,25 +32,8 @@ public class LiveDeviceInitializationTests
     public void LiveClientDoesNotShareImplicitCookiesBetweenAccounts(Type clientType)
     {
         var services = new ServiceCollection();
-        var method = typeof(Ray.BiliBiliTool.Agent.Extensions.ServiceCollectionExtension)
-            .GetMethods(
-                System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic
-            )
-            .Single(method =>
-                method.Name == "AddBiliBiliClientApi" && method.IsGenericMethodDefinition
-            );
-        method
-            .MakeGenericMethod(clientType)
-            .Invoke(
-                null,
-                [
-                    services,
-                    "https://api.live.bilibili.com",
-                    (Action<IServiceProvider, HttpClient>)((_, _) => { }),
-                    false,
-                    null,
-                ]
-            );
+        services.AddLogging();
+        services.AddBiliBiliClientApi(new ConfigurationBuilder().Build());
         using var provider = services.BuildServiceProvider();
         var configurations = provider
             .GetServices<IConfigureOptions<HttpClientFactoryOptions>>()

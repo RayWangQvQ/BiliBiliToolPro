@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.32112.339
@@ -118,12 +118,18 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ray.BiliBiliTool.Web.Integr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ray.BiliBiliTool.Infrastructure.IntegrationTests", "test\Ray.BiliBiliTool.Infrastructure.IntegrationTests\Ray.BiliBiliTool.Infrastructure.IntegrationTests.csproj", "{74F75BC5-2F33-4D98-A736-860E105F6E7B}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ray.Serilog.Sinks.Batched", "src\Ray.Serilog.Sinks.Batched\Ray.Serilog.Sinks.Batched.csproj", "{EDBA6D60-4973-49A6-B646-E456D6005A8F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EDBA6D60-4973-49A6-B646-E456D6005A8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EDBA6D60-4973-49A6-B646-E456D6005A8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EDBA6D60-4973-49A6-B646-E456D6005A8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EDBA6D60-4973-49A6-B646-E456D6005A8F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DB227D60-0737-45C2-8CEA-F55FDA711301}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DB227D60-0737-45C2-8CEA-F55FDA711301}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DB227D60-0737-45C2-8CEA-F55FDA711301}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -245,6 +251,7 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{EDBA6D60-4973-49A6-B646-E456D6005A8F} = {110D3D21-8E9B-45AB-9667-6DA1DB3862AC}
 		{38736647-2196-417E-8519-C48A012A63D9} = {AF21E067-3307-4E7F-8CE8-C695E6B61876}
 		{98051127-2868-4F5C-9B2C-2150975E05F3} = {AF21E067-3307-4E7F-8CE8-C695E6B61876}
 		{120917DC-474C-448B-9EBB-1B3BA3A20B9D} = {AF21E067-3307-4E7F-8CE8-C695E6B61876}

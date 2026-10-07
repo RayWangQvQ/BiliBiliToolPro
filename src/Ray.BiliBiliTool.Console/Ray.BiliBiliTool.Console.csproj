@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\common.props" />
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -87,5 +87,6 @@
   </Target>
   <ItemGroup>
     <Compile Include="../Shared/Telegram/*.cs" Link="Notifications/%(Filename)%(Extension)" />
+    <Compile Include="../Shared/WorkWeiXin/*.cs" Link="Notifications/%(Filename)%(Extension)" />
   </ItemGroup>
 </Project>

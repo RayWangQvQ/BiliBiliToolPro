@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.ApiApi.Article;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.ApiApi.Charge;
@@ -363,7 +363,7 @@ public interface IApiApi
     [Headers("Referer: https://big.bilibili.com/mobile/bigPoint/task")]
     [Post("/pgc/activity/score/task/receive/v2")]
     Task<BiliApiResponse> VipBigPointReceiveV2(
-        [Body(BodySerializationMethod.UrlEncoded)] ReceiveOrCompleteTaskRequest request,
+        [Body(BodySerializationMethod.UrlEncoded)] VipPointV2TaskRequest request,
         [Header("Cookie")] string ck
     );
 
@@ -377,7 +377,7 @@ public interface IApiApi
     [Headers("Referer: https://big.bilibili.com/mobile/bigPoint/task")]
     [Post("/pgc/activity/score/task/complete/v2")]
     Task<BiliApiResponse> VipBigPointCompleteV2(
-        [Body(BodySerializationMethod.UrlEncoded)] ReceiveOrCompleteTaskRequest request,
+        [Body(BodySerializationMethod.UrlEncoded)] VipPointV2TaskRequest request,
         [Header("Cookie")] string ck
     );
 

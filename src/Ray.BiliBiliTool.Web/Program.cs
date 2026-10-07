@@ -67,7 +67,9 @@ try
             lc
                 .ReadFrom.Configuration(
                     builder
-                        .Configuration.WithTelegramMessageChunking()
+                        .Configuration.WithCompatibleHttpNotifications()
+                        .WithTelegramMessageChunking()
+                        .WithWorkWeiXinMessageChunking()
                         .WithDailyServerChanNotifications()
                 )
                 .ReadFrom.Services(services)

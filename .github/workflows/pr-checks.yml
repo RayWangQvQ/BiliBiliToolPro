@@ -98,6 +98,16 @@ jobs:
           dotnet test Ray.BiliBiliTool.sln --configuration Release --no-build
           --filter "Category!=External" --nologo
 
+      - name: Qinglong compatibility fixtures
+        run: |
+          docker run --rm --network none --ulimit core=0 \
+            -v "$PWD:/src:ro" -w /src -e ISOLATED_QA=1 -e SOURCE_ROOT=/src \
+            mcr.microsoft.com/dotnet/sdk:10.0 bash -ec '
+              bash ./scripts/test-qinglong-dotnet.sh
+              bash ./scripts/test-qinglong-repo.sh
+              bash ./scripts/test-qinglong-build.sh
+            '
+
   # 发布脚本的 fixture 测试：在临时 git 仓库/模拟 PR 标题上验证算号与 notes 生成。
   # 发布逻辑是发布系统的命脉，但它不碰 .NET 代码，所以独立于 build-and-test。
   test-release-scripts:

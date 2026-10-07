@@ -53,7 +53,8 @@ public class MangaTaskAppService(
 
                 await MangaSign(ck);
                 await MangaRead(ck);
-            }
+            },
+            trackHandledFailures: true
         );
     }
 

@@ -1,5 +1,6 @@
+using System.Globalization;
+using System.Text.Json.Nodes;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -152,89 +153,122 @@ public class LoginDomainService(
         return biliCookie;
     }
 
+    private static readonly SemaphoreSlim CookieJsonSaveLock = new(1, 1);
+
     public async Task SaveCookieToJsonFileAsync(
         BiliCookie ckInfo,
         CancellationToken cancellationToken
     )
     {
-        //读取json
-        var path = hostingEnvironment.ContentRootPath;
-        var indexOfBin = path.LastIndexOf("bin");
-        if (indexOfBin != -1)
+        var accountId = GetCookieAccountId(ckInfo);
+        await CookieJsonSaveLock.WaitAsync(cancellationToken);
+        try
         {
-            path = path[..indexOfBin];
-        }
-        if (string.Equals(configuration["PlatformType"], "Web", StringComparison.OrdinalIgnoreCase))
-        {
-            path = Path.Combine(path, "config");
-        }
-        var fileProvider = new PhysicalFileProvider(path);
-        IFileInfo fileInfo = fileProvider.GetFileInfo("cookies.json");
-        logger.LogInformation("目标json地址：{path}", fileInfo.PhysicalPath);
-
-        if (!fileInfo.Exists)
-        {
-            await using var stream = File.Create(fileInfo.PhysicalPath!);
-            await using var sw = new StreamWriter(stream);
-            await sw.WriteAsync($"{{{Environment.NewLine}}}");
-        }
-
-        string json;
-        await using (var stream = new FileStream(fileInfo.PhysicalPath!, FileMode.Open))
-        {
-            using var reader = new StreamReader(stream);
-            json = await reader.ReadToEndAsync();
-        }
-        var lines = json.Split(Environment.NewLine).ToList();
-
-        var indexOfCkConfigKey = lines.FindIndex(x =>
-            x.TrimStart().StartsWith("\"BiliBiliCookies\"")
-        );
-        if (indexOfCkConfigKey == -1)
-        {
-            logger.LogInformation("未配置过cookie，初始化并新增");
-
-            var indexOfInsert = lines.FindIndex(x => x.TrimStart().StartsWith("{"));
-            lines.InsertRange(
-                indexOfInsert + 1,
-                new List<string>()
+            var directory = new DirectoryInfo(hostingEnvironment.ContentRootPath);
+            for (var current = directory; current.Parent is not null; current = current.Parent)
+            {
+                if (
+                    current.Name.Equals(
+                        "bin",
+                        OperatingSystem.IsWindows()
+                            ? StringComparison.OrdinalIgnoreCase
+                            : StringComparison.Ordinal
+                    )
+                )
                 {
-                    "  \"BiliBiliCookies\":[",
-                    $@"    ""{ckInfo.CookieStr}"",",
-                    "  ],",
+                    directory = current.Parent;
+                    break;
                 }
-            );
+            }
+            var path = directory.FullName;
+            if (
+                string.Equals(
+                    configuration["PlatformType"],
+                    "Web",
+                    StringComparison.OrdinalIgnoreCase
+                )
+            )
+                path = Path.Combine(path, "config");
+            Directory.CreateDirectory(path);
+            var file = Path.Combine(path, "cookies.json");
+            JsonObject document;
+            try
+            {
+                document = File.Exists(file)
+                    ? JsonNode.Parse(
+                        await File.ReadAllTextAsync(file, cancellationToken),
+                        documentOptions: new System.Text.Json.JsonDocumentOptions
+                        {
+                            CommentHandling = System.Text.Json.JsonCommentHandling.Skip,
+                            AllowTrailingCommas = true,
+                        }
+                    ) as JsonObject
+                        ?? throw new BiliValidationException("cookies.json 必须是 JSON 对象。")
+                    : new JsonObject();
+            }
+            catch (System.Text.Json.JsonException)
+            {
+                throw new BiliValidationException("cookies.json 格式错误，请修正后重新保存。");
+            }
+            var value = document["BiliBiliCookies"];
+            if (value is not null && value is not JsonArray)
+                throw new BiliValidationException("cookies.json 中 BiliBiliCookies 必须是列表。");
+            var cookies = value as JsonArray ?? new JsonArray();
+            if (value is null)
+                document["BiliBiliCookies"] = cookies;
+            var index = -1;
+            for (var position = 0; position < cookies.Count; position++)
+            {
+                if (
+                    cookies[position] is JsonValue stored
+                    && stored.TryGetValue<string>(out var existingCookie)
+                    && MatchesCookieAccount(existingCookie, accountId)
+                )
+                {
+                    index = position;
+                    break;
+                }
+            }
+            if (index < 0)
+                cookies.Add(ckInfo.CookieStr);
+            else
+                cookies[index] = ckInfo.CookieStr;
 
-            await SaveJson(lines, fileInfo);
-            logger.LogInformation("新增成功！");
-            return;
+            // Replace only after a complete write, preserving existing file permissions.
+            var temporary = file + "." + Guid.NewGuid().ToString("N") + ".tmp";
+            try
+            {
+                await File.WriteAllTextAsync(
+                    temporary,
+                    document.ToJsonString(
+                        new System.Text.Json.JsonSerializerOptions { WriteIndented = true }
+                    ),
+                    cancellationToken
+                );
+                if (!OperatingSystem.IsWindows())
+                    File.SetUnixFileMode(
+                        temporary,
+                        File.Exists(file)
+                            ? File.GetUnixFileMode(file)
+                            : UnixFileMode.UserRead | UnixFileMode.UserWrite
+                    );
+                cancellationToken.ThrowIfCancellationRequested();
+                if (File.Exists(file))
+                    File.Replace(temporary, file, null);
+                else
+                    File.Move(temporary, file);
+            }
+            finally
+            {
+                if (File.Exists(temporary))
+                    File.Delete(temporary);
+            }
+            logger.LogInformation(index < 0 ? "新增成功！" : "更新成功！");
         }
-
-        ckInfo.CookieItemDictionary.TryGetValue("DedeUserID", out var userId);
-        userId ??= ckInfo.CookieStr;
-        var indexOfCkConfigEnd = lines.FindIndex(
-            indexOfCkConfigKey,
-            x => x.TrimStart().StartsWith("]")
-        );
-        var indexOfTargetCk = lines.FindIndex(
-            indexOfCkConfigKey,
-            indexOfCkConfigEnd - indexOfCkConfigKey,
-            x => x.Contains(userId) && !x.TrimStart().StartsWith("//")
-        );
-
-        if (indexOfTargetCk == -1)
+        finally
         {
-            logger.LogInformation("不存在该用户，新增cookie");
-            lines.Insert(indexOfCkConfigEnd, $@"    ""{ckInfo.CookieStr}"",");
-            await SaveJson(lines, fileInfo);
-            logger.LogInformation("新增成功！");
-            return;
+            CookieJsonSaveLock.Release();
         }
-
-        logger.LogInformation("已存在该用户，更新cookie");
-        lines[indexOfTargetCk] = $@"    ""{ckInfo.CookieStr}"",";
-        await SaveJson(lines, fileInfo);
-        logger.LogInformation("更新成功！");
     }
 
     public async Task<bool> SaveCookieToQinLongAsync(
@@ -244,6 +278,7 @@ public class LoginDomainService(
     {
         try
         {
+            var accountId = GetCookieAccountId(ckInfo);
             var token = await GetQingLongAuthTokenAsync();
             if (string.IsNullOrEmpty(token))
             {
@@ -251,18 +286,18 @@ public class LoginDomainService(
             }
 
             var qlEnvList = await qingLongApi.GetEnvsAsync("Ray_BiliBiliCookies__", token);
-            if (qlEnvList.Code != 200)
+            if (qlEnvList.Code != 200 || qlEnvList.Data is null)
             {
-                throw new BiliIntegrationException($"查询环境变量失败：{qlEnvList.ToJsonStr()}");
+                logger.LogWarning("青龙环境变量查询未成功，状态码：{code}", qlEnvList.Code);
+                throw new BiliIntegrationException("青龙未返回环境变量列表");
             }
 
-            logger.LogDebug(qlEnvList.Data.ToJsonStr());
-            logger.LogDebug(ckInfo.ToString());
-
             var list = qlEnvList
-                .Data.Where(x => x.name.StartsWith("Ray_BiliBiliCookies__"))
+                .Data.Where(x =>
+                    x.name?.StartsWith("Ray_BiliBiliCookies__", StringComparison.Ordinal) == true
+                )
                 .ToList();
-            var oldEnv = list.FirstOrDefault(x => x.value.Contains(ckInfo.UserId));
+            var oldEnv = list.FirstOrDefault(x => MatchesCookieAccount(x.value, accountId));
 
             if (oldEnv != null)
             {
@@ -279,7 +314,18 @@ public class LoginDomainService(
                 };
 
                 var updateRe = await qingLongApi.UpdateEnvsAsync(update, token);
-                logger.LogInformation(updateRe.Code == 200 ? "更新成功！" : updateRe.ToJsonStr());
+                if (
+                    updateRe.Code != 200
+                    || updateRe.Data is null
+                    || updateRe.Data.id != update.id
+                    || updateRe.Data.name != update.name
+                    || updateRe.Data.value != update.value
+                )
+                {
+                    logger.LogWarning("青龙环境变量更新未确认，状态码：{code}", updateRe.Code);
+                    throw new BiliIntegrationException("青龙未确认环境变量更新");
+                }
+                logger.LogInformation("更新成功！");
 
                 return true;
             }
@@ -307,7 +353,16 @@ public class LoginDomainService(
                 remarks = $"bili-{ckInfo.UserId}",
             };
             var addRe = await qingLongApi.AddEnvsAsync([add], token);
-            logger.LogInformation(addRe.Code == 200 ? "新增成功！" : addRe.ToJsonStr());
+            if (
+                addRe.Code != 200
+                || addRe.Data is null
+                || !addRe.Data.Any(item => item.name == add.name && item.value == add.value)
+            )
+            {
+                logger.LogWarning("青龙环境变量新增未确认，状态码：{code}", addRe.Code);
+                throw new BiliIntegrationException("青龙未确认环境变量新增");
+            }
+            logger.LogInformation("新增成功！");
             return true;
         }
         catch
@@ -408,6 +463,7 @@ public class LoginDomainService(
     {
         try
         {
+            var accountId = GetCookieAccountId(ckInfo);
             var token = baihuOptions.Value.Token;
             if (string.IsNullOrEmpty(token))
             {
@@ -426,9 +482,11 @@ public class LoginDomainService(
             }
 
             var list = envListRe
-                .Data.Where(x => x.Name.StartsWith("Ray_BiliBiliCookies__"))
+                .Data.Where(x =>
+                    x.Name?.StartsWith("Ray_BiliBiliCookies__", StringComparison.Ordinal) == true
+                )
                 .ToList();
-            var oldEnv = list.FirstOrDefault(x => x.Value.Contains(ckInfo.UserId));
+            var oldEnv = list.FirstOrDefault(x => MatchesCookieAccount(x.Value, accountId));
 
             if (oldEnv != null)
             {
@@ -488,6 +546,7 @@ public class LoginDomainService(
     {
         try
         {
+            var accountId = GetCookieAccountId(ckInfo);
             // 先用 AppKey/AppSecret 换取 access_token
             var token = await GetDaiDaiAuthTokenAsync();
             if (string.IsNullOrEmpty(token))
@@ -499,10 +558,13 @@ public class LoginDomainService(
             var envListRe = await daiDaiApi.GetEnvsAsync("Ray_BiliBiliCookies__", "1", token);
 
             var list = (envListRe.Data ?? [])
-                .Where(x => x.Name != null && x.Name.StartsWith("Ray_BiliBiliCookies__"))
+                .Where(x =>
+                    x.Name != null
+                    && x.Name?.StartsWith("Ray_BiliBiliCookies__", StringComparison.Ordinal) == true
+                )
                 .ToList();
             var oldEnv = list.FirstOrDefault(x =>
-                x.Value != null && x.Value.Contains(ckInfo.UserId)
+                x.Value != null && MatchesCookieAccount(x.Value, accountId)
             );
 
             if (oldEnv != null)
@@ -643,12 +705,31 @@ public class LoginDomainService(
         return $"https://tool.lu/qrcode/basic.html?text={encode}";
     }
 
-    private async Task SaveJson(List<string> lines, IFileInfo fileInfo)
+    private static long GetCookieAccountId(BiliCookie cookie)
     {
-        var newJson = string.Join(Environment.NewLine, lines);
+        if (
+            !long.TryParse(
+                cookie.UserId,
+                NumberStyles.None,
+                CultureInfo.InvariantCulture,
+                out var accountId
+            )
+            || accountId <= 0
+        )
+            throw new BiliValidationException("Cookie 缺少有效的 DedeUserID，无法保存。");
+        return accountId;
+    }
 
-        await using var sw = new StreamWriter(fileInfo.PhysicalPath!);
-        await sw.WriteAsync(newJson);
+    private static bool MatchesCookieAccount(string? value, long accountId)
+    {
+        var existing = CookieStrFactory<BiliCookie>.CreateNew(value ?? "");
+        return long.TryParse(
+                existing.UserId,
+                NumberStyles.None,
+                CultureInfo.InvariantCulture,
+                out var existingId
+            )
+            && existingId == accountId;
     }
 
     #region qinglong
@@ -674,6 +755,20 @@ public class LoginDomainService(
             qingLongOptions.Value.ClientSecret!
         );
 
+        if (token.Code != 200)
+        {
+            logger.LogWarning("青龙 OpenAPI 鉴权失败，状态码：{code}", token.Code);
+            return "";
+        }
+        if (
+            token.Data is null
+            || string.IsNullOrWhiteSpace(token.Data.token_type)
+            || string.IsNullOrWhiteSpace(token.Data.token)
+        )
+        {
+            logger.LogWarning("青龙 OpenAPI 未返回完整授权信息");
+            return "";
+        }
         return $"{token.Data.token_type} {token.Data.token}";
     }
 
@@ -733,7 +828,9 @@ public class LoginDomainService(
         }
         else
         {
-            logger.LogError("持久化失败，青龙版本高于2.18，请手动添加环境变量到青龙");
+            logger.LogError(
+                "保存到青龙失败，请检查 OpenAPI 地址、应用权限及 ClientId／ClientSecret 配置。"
+            );
         }
 
         logger.LogWarning("变量Key：{key}", "Ray_BiliBiliCookies__0");

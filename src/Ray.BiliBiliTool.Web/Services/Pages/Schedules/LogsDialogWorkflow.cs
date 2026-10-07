@@ -4,8 +4,14 @@ namespace Ray.BiliBiliTool.Web.Services.Pages.Schedules;
 
 public class LogsDialogWorkflow(IExecutionLogRepository logRepository) : ILogsDialogWorkflow
 {
-    public Task<string?> GetLatestRunInstanceIdAsync(string jobName, string triggerName) =>
+    public Task<string?> GetLatestRunInstanceIdAsync(string jobName, string? triggerName) =>
         logRepository.GetLatestRunInstanceIdAsync(jobName, triggerName);
+
+    public Task<string?> GetLatestRunInstanceIdAsync(
+        string jobName,
+        string? triggerName,
+        CancellationToken cancellationToken
+    ) => logRepository.GetLatestRunInstanceIdAsync(jobName, triggerName, cancellationToken);
 
     public Task<List<BiliLogs>> GetLogsForRunAsync(
         string fireInstanceId,

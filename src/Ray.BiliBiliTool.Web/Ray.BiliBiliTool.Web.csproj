@@ -49,5 +49,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="../Shared/Telegram/*.cs" Link="Notifications/%(Filename)%(Extension)" />
+    <Compile Include="../Shared/WorkWeiXin/*.cs" Link="Notifications/%(Filename)%(Extension)" />
   </ItemGroup>
 </Project>

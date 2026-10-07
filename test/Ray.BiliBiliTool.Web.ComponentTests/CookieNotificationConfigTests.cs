@@ -101,7 +101,12 @@ public class CookieNotificationConfigTests : TestContext
             Assert.False(page.FindAll("input[type=checkbox]")[0].HasAttribute("disabled"));
         });
         page.FindAll("input[type=checkbox]")[0].Change(false);
-        page.WaitForAssertion(() => Assert.Empty(page.FindAll(".save-result")));
+        page.WaitForAssertion(() =>
+        {
+            Assert.Empty(page.FindAll(".save-result"));
+            Assert.False(page.Find("button").HasAttribute("disabled"));
+            Assert.Contains("手动模式", page.Markup);
+        });
     }
 
     [Fact]
