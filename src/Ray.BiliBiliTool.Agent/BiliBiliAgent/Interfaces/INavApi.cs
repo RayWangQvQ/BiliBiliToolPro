@@ -19,5 +19,8 @@ public interface INavApi
     /// </summary>
     /// <returns></returns>
     [Get("/x/web-interface/nav")]
-    Task<BiliApiResponse<UserInfo>> GetNavAsync([Header("Cookie")] string ck);
+    Task<BiliApiResponse<UserInfo>> GetNavAsync(
+        [Header("Cookie")] string ck,
+        CancellationToken cancellationToken = default
+    );
 }

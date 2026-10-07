@@ -1,6 +1,7 @@
 @page "/Configurations/MangaTaskConfig"
 @using Microsoft.AspNetCore.Authorization
 @using Ray.BiliBiliTool.Config.Options;
+@using Ray.BiliBiliTool.Web.Services
 @attribute [Authorize]
 @rendermode InteractiveServer
 @inherits BaseConfigComponent<MangaTaskOptions>
@@ -9,6 +10,7 @@
 
 <MudContainer Class="app-config-page">
     <PageHero Size="Size.Small" Title="漫画任务配置" Description="设置漫画任务的开关与执行选项。" />
+    <Ray.BiliBiliTool.Web.Components.Comps.TaskGuide TaskKey="MangaTaskAppService" Enabled="@(_isLoading ? (bool?)null : _config.IsEnable)" />
 
     @if (_isLoading)
     {
@@ -33,9 +35,8 @@
                                 Label="启用任务" Color="Color.Primary" />
                         </MudItem>
                         <MudItem xs="12" md="6">
-                            <MudTextField T="string" @bind-Value="_config.Cron" Label="定时任务Cron表达式"
-                                HelperText="例如：0 0 14 * * ? (每天下午2点执行)"
-                                Disabled="!_config.IsEnable" />
+                            <Ray.BiliBiliTool.Web.Components.Comps.ScheduleTimePicker @bind-Value="_config.Cron"
+                                For="@(() => _config.Cron)" Disabled="!_config.IsEnable" />
                         </MudItem>
                     </MudGrid>
                 </MudCardContent>
@@ -53,12 +54,12 @@
                     <MudCardContent>
                         <MudGrid>
                             <MudItem xs="12" md="6">
-                                <MudNumericField T="long" @bind-Value="_config.CustomComicId" Label="自定义漫画阅读 comic_id"
-                                    HelperText="若不清楚含义请勿修改" />
+                                <MudNumericField T="long" @bind-Value="_config.CustomComicId" Label="漫画编号"
+                                    HelperText="@(TaskHelpCatalog.SettingDescription("MangaTaskAppService", "CustomComicId"))" />
                             </MudItem>
                             <MudItem xs="12" md="6">
-                                <MudNumericField T="long" @bind-Value="_config.CustomEpId" Label="自定义漫画阅读 ep_id"
-                                    HelperText="若不清楚含义请勿修改" />
+                                <MudNumericField T="long" @bind-Value="_config.CustomEpId" Label="章节编号"
+                                    HelperText="@(TaskHelpCatalog.SettingDescription("MangaTaskAppService", "CustomEpId"))" />
                             </MudItem>
                         </MudGrid>
                     </MudCardContent>

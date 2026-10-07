@@ -9,6 +9,7 @@
 
 <MudContainer Class="app-config-page">
     <PageHero Size="Size.Small" Title="会员大积分配置" Description="设置会员大积分任务的开关与执行选项。" />
+    <Ray.BiliBiliTool.Web.Components.Comps.TaskGuide TaskKey="VipBigPointAppService" Enabled="@(_isLoading ? (bool?)null : _config.IsEnable)" />
 
     @if (_isLoading)
     {
@@ -33,9 +34,8 @@
                                 Label="启用任务" Color="Color.Primary" />
                         </MudItem>
                         <MudItem xs="12" md="6">
-                            <MudTextField T="string" @bind-Value="_config.Cron" Label="定时任务Cron表达式"
-                                HelperText="例如：0 7 1 * * ? (每天凌晨1点7分执行)"
-                                Disabled="!_config.IsEnable" />
+                            <Ray.BiliBiliTool.Web.Components.Comps.ScheduleTimePicker @bind-Value="_config.Cron"
+                                For="@(() => _config.Cron)" Disabled="!_config.IsEnable" />
                         </MudItem>
                     </MudGrid>
                 </MudCardContent>
@@ -53,8 +53,8 @@
                     <MudCardContent>
                         <MudGrid>
                             <MudItem xs="12">
-                                <MudTextField T="string" @bind-Value="_config.ViewBangumis" Label="自定义番剧的ssid"
-                                    HelperText="若不清楚含义请勿修改（默认为名侦探柯南），多个用逗号分隔" />
+                                <MudTextField T="string" @bind-Value="_config.ViewBangumis" Label="旧版番剧编号" Disabled="true"
+                                    HelperText="当前观看任务使用积分中心下发的流程，此项保留原值" />
                             </MudItem>
                         </MudGrid>
                     </MudCardContent>

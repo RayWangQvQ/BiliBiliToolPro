@@ -10,6 +10,25 @@ namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 [Headers("Host: api.live.bilibili.com")]
 public interface ILiveApi
 {
+    [Headers("Referer: https://live.bilibili.com/", "Origin: https://live.bilibili.com")]
+    [Get("/xlive/app-ucenter/v1/fansMedal/panel?page={page}&page_size=10")]
+    Task<BiliApiResponse<FansMedalPanelResponse>> GetFansMedalPanel(
+        int page,
+        [Header("Cookie")] string ck,
+        CancellationToken cancellationToken = default
+    );
+
+    [Headers("Referer: https://live.bilibili.com/", "Origin: https://live.bilibili.com")]
+    [Get(
+        "/xlive/app-ucenter/v1/fansMedal/GetActivatedMedalInfo?target_id={targetId}&csrf={csrf}&web_location=444.260"
+    )]
+    Task<BiliApiResponse<ActivatedMedalResponse>> GetActivatedMedalInfo(
+        long targetId,
+        string csrf,
+        [Header("Cookie")] string ck,
+        CancellationToken cancellationToken = default
+    );
+
     /// <summary>
     /// 直播签到
     /// </summary>

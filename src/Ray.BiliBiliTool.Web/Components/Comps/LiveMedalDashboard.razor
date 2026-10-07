@@ -1,0 +1,126 @@
+@using Ray.BiliBiliTool.Config.Options
+@using Ray.BiliBiliTool.Web.Services
+
+<section class="medal-dashboard" aria-label="粉丝牌与今日进度">
+    <div class="medal-dashboard-heading">
+        <div><h2>粉丝牌与今日进度</h2><p>选择要参与任务的主播。主播选择对所有账号生效，修改后请保存配置。</p></div>
+        <MudButton ButtonType="ButtonType.Button" Variant="Variant.Outlined" Color="Color.Primary"
+                   StartIcon="@Icons.Material.Filled.Refresh" Disabled="Loading" OnClick="Refresh">刷新进度</MudButton>
+    </div>
+    @if (Accounts.Count == 0)
+    {
+        <p class="medal-empty">添加 B 站账号后，可查看粉丝牌并选择参与任务的主播。</p>
+    }
+    else
+    {
+        <div class="medal-toolbar">
+            <label>查看账号<select class="medal-account-select" aria-label="查看账号" value="@AccountIndex" disabled="@Loading" @onchange="ChangeAccount">
+                @foreach (var account in Accounts) { <option value="@account.Index">@account.Label</option> }
+            </select></label>
+            <label class="medal-search">搜索主播或粉丝牌<input type="search" aria-label="搜索主播或粉丝牌" placeholder="输入名称" @bind="_search" @bind:event="oninput" /></label>
+            @if (Snapshot is not null) { <span class="medal-updated">更新于 @Snapshot.UpdatedAt.ToOffset(TimeSpan.FromHours(8)).ToString("MM-dd HH:mm")</span> }
+        </div>
+        @if (Loading)
+        {
+            <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-4" />
+            <p class="medal-empty" role="status">正在读取粉丝牌与今日任务进度…</p>
+        }
+        else if (Snapshot?.Error is not null)
+        {
+            <MudAlert Severity="Severity.Warning">@Snapshot.Error</MudAlert>
+        }
+        else if (Snapshot is not null)
+        {
+            <div class="medal-overview">
+                <div><span>粉丝牌</span><strong>@Snapshot.Medals.Count</strong></div>
+                <div><span>参与任务</span><strong>@Snapshot.Medals.Count(card => Participates(card.AnchorId))</strong></div>
+                <div><span>今日已完成</span><strong>@Snapshot.Medals.Count(card => card.Error is null && card.Tasks.Count > 0 && card.Tasks.All(task => task.Done))</strong></div>
+            </div>
+            <div class="medal-card-grid">
+                @foreach (var medal in FilteredMedals)
+                {
+                    var excluded = Excluded.Contains(medal.AnchorId);
+                    var participates = Participates(medal.AnchorId);
+                    <article class="medal-card @(!participates ? "medal-card-excluded" : "")" data-anchor="@medal.AnchorId">
+                        <div class="medal-card-top">
+                            <span class="medal-badge">@medal.MedalName <b>Lv.@medal.Level</b></span>
+                            <span class="medal-live @(medal.Live ? "is-live" : "")">@(medal.Live ? "直播中" : "未开播")</span>
+                        </div>
+                        <div class="medal-anchor-row">
+                            <h3>@medal.AnchorName</h3>
+                            <div class="medal-anchor-actions">
+                            @if (OnlySelectedAnchors)
+                            { <label class="medal-exclude"><input type="checkbox" aria-label="@($"选择主播 {medal.AnchorName}")" checked="@Included.Contains(medal.AnchorId)" @onchange="args => SetIncluded(medal.AnchorId, args)" />加入白名单</label> }
+                            <label class="medal-exclude"><input type="checkbox" aria-label="@($"排除主播 {medal.AnchorName}")" checked="@excluded" @onchange="args => SetExcluded(medal.AnchorId, args)" />排除此主播</label>
+                            </div>
+                        </div>
+                        <div class="medal-status-row">
+                            <span class="medal-status @(!participates ? "is-excluded" : "is-participating")">@(excluded ? "已排除" : participates ? "参与任务" : "未加入白名单")</span>
+                            @if (medal.Lighted.HasValue) { <span>@(medal.Lighted.Value ? "粉丝牌已点亮" : "粉丝牌待点亮")</span> }
+                            @if (medal.SavingsFull) { <span>亲密度储蓄已满</span> }
+                        </div>
+                        @if (medal.Error is not null)
+                        {
+                            <p class="medal-progress-message" role="status">@medal.Error</p>
+                        }
+                        else if (medal.Tasks.Count == 0)
+                        {
+                            <p class="medal-progress-message">暂无每日任务</p>
+                        }
+                        else
+                        {
+                            <div class="medal-task-list">
+                                @foreach (var task in medal.Tasks)
+                                {
+                                    <div class="medal-task">
+                                        <div class="medal-task-title"><span>@task.Title</span><span class="@(task.Done ? "medal-task-done" : "medal-task-pending")">@(task.Done ? "已完成" : "进行中")</span></div>
+                                        @if (task.Percent.HasValue)
+                                        {
+                                            <MudProgressLinear Color="@(task.Done ? Color.Success : Color.Primary)" Value="task.Percent.Value" aria-label="@task.Title" Class="medal-progress" />
+                                        }
+                                        <p>@task.Progress</p>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </article>
+                }
+            </div>
+            @if (!FilteredMedals.Any()) { <p class="medal-empty">@(Snapshot.Medals.Count == 0 ? "该账号暂无粉丝牌" : "没有匹配的主播或粉丝牌")</p> }
+        }
+    }
+</section>
+
+@code {
+    [Parameter] public IReadOnlyList<LiveMedalAccount> Accounts { get; set; } = [];
+    [Parameter] public int AccountIndex { get; set; }
+    [Parameter] public EventCallback<int> AccountIndexChanged { get; set; }
+    [Parameter] public LiveMedalSnapshot? Snapshot { get; set; }
+    [Parameter] public bool Loading { get; set; }
+    [Parameter] public bool OnlySelectedAnchors { get; set; }
+    [Parameter] public string IncludedAnchorIds { get; set; } = "";
+    [Parameter] public EventCallback<string> IncludedAnchorIdsChanged { get; set; }
+    private HashSet<long> Included => new LiveFansMedalTaskOptions { IncludedAnchorIds = IncludedAnchorIds }.GetIncludedAnchorIds();
+    private bool Participates(long id) => !Excluded.Contains(id) && (!OnlySelectedAnchors || Included.Contains(id));
+    private Task SetIncluded(long id, ChangeEventArgs args)
+    {
+        var included = Included;
+        if (args.Value is true) included.Add(id); else included.Remove(id);
+        return IncludedAnchorIdsChanged.InvokeAsync(string.Join(",", included.Order()));
+    }
+    [Parameter] public string ExcludedAnchorIds { get; set; } = "";
+    [Parameter] public EventCallback<string> ExcludedAnchorIdsChanged { get; set; }
+    [Parameter] public EventCallback Refresh { get; set; }
+    private string _search = "";
+    private HashSet<long> Excluded => new LiveFansMedalTaskOptions { ExcludedAnchorIds = ExcludedAnchorIds }.GetExcludedAnchorIds();
+    private IEnumerable<LiveMedalCard> FilteredMedals => (Snapshot?.Medals ?? [])
+        .Where(card => card.AnchorName.Contains(_search, StringComparison.OrdinalIgnoreCase) || card.MedalName.Contains(_search, StringComparison.OrdinalIgnoreCase));
+    private Task ChangeAccount(ChangeEventArgs args) => int.TryParse(args.Value?.ToString(), out var index)
+        ? AccountIndexChanged.InvokeAsync(index) : Task.CompletedTask;
+    private Task SetExcluded(long id, ChangeEventArgs args)
+    {
+        var excluded = Excluded;
+        if (args.Value is true) excluded.Add(id); else excluded.Remove(id);
+        return ExcludedAnchorIdsChanged.InvokeAsync(string.Join(",", excluded.Order()));
+    }
+}

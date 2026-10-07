@@ -5,10 +5,12 @@ using Ray.BiliBiliTool.Application.Contracts;
 using Ray.BiliBiliTool.Application.Extensions;
 using Ray.BiliBiliTool.Config.Extensions;
 using Ray.BiliBiliTool.DomainService.Extensions;
+using Ray.BiliBiliTool.Infrastructure.Extensions;
 using Ray.BiliBiliTool.Web.Auth;
 using Ray.BiliBiliTool.Web.Services;
 using Ray.BiliBiliTool.Web.Services.Pages.Admin;
 using Ray.BiliBiliTool.Web.Services.Pages.BiliAccount;
+using Ray.BiliBiliTool.Web.Services.Pages.Configs;
 using Ray.BiliBiliTool.Web.Services.Pages.Login;
 using Ray.BiliBiliTool.Web.Services.Pages.Schedules;
 
@@ -25,12 +27,25 @@ public static class ServiceCollectionExtension
         services.AddScoped<ILogsDialogWorkflow, LogsDialogWorkflow>();
         services.AddScoped<IHistoryDialogWorkflow, HistoryDialogWorkflow>();
         services.AddScoped<IBiliAccountPageWorkflow, BiliAccountPageWorkflow>();
+        services.AddScoped<
+            ICookieNotificationSettingsWorkflow,
+            CookieNotificationSettingsWorkflow
+        >();
+        services.AddScoped<INotificationSettingsWorkflow, NotificationSettingsWorkflow>();
+        services.AddMemoryCache();
+        services.AddScoped<ILiveMedalDashboardService, LiveMedalDashboardService>();
 
         // 应用版本：宿主程序集元数据，进程内不变，单例即可
         services.AddSingleton<IAppInfoProvider, AppInfoProvider>();
 
         // 「今日任务」相关
         services.AddSingleton<ITaskRecordWriter, TaskRecordWriter>();
+        services.AddSingleton<ITaskFailureBatchMonitor, TaskFailureBatchMonitor>();
+        services.AddHostedService<TaskFailureNotificationWorker>();
+        services.AddScoped<
+            ITaskFailureNotificationSettingsWorkflow,
+            TaskFailureNotificationSettingsWorkflow
+        >();
         services.AddSingleton<IBiliAccountProbe, BiliAccountProbe>();
         services.AddScoped<TaskRecoveryExecutor>();
         services.AddScoped<ITodayTaskService, TodayTaskService>();
@@ -68,6 +83,7 @@ public static class ServiceCollectionExtension
             .AddBiliBiliConfigs(configuration)
             .AddBiliBiliClientApi(configuration)
             .AddDomainServices()
+            .AddCookieMonitoring()
             .AddAppServices();
     }
 }

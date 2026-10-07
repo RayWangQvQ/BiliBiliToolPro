@@ -143,6 +143,13 @@ else
         {
             _probes[account.Index] = await Probe.ProbeAsync(uid, force: true);
         }
+        catch (Exception)
+        {
+            _probes[account.Index] = new BiliAccountProbeResult(
+                false, null, null, "检测失败，请刷新后重试", DateTimeOffset.UtcNow
+            );
+            Snackbar.Add("检测失败，请刷新后重试", Severity.Error);
+        }
         finally
         {
             _probePending.Remove(account.Index);

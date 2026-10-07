@@ -280,3 +280,109 @@ body {
 .darker-border-checkbox.form-check-input {
     border-color: #929292;
 }
+
+/* Task descriptions stay visible while detailed setting help expands on demand. */
+.task-guide { border: 1px solid var(--mud-palette-lines-default); border-radius: 12px; padding: 20px; margin-bottom: 24px; background: var(--mud-palette-surface); }
+.task-guide-heading { display: flex; align-items: center; gap: 8px; }
+.task-guide h2 { font-size: .9375rem; font-weight: 600; margin: 0; }
+.task-guide-introduction { margin: 10px 0 0; font-size: .875rem; line-height: 1.8; }
+.task-guide-timing { margin: 6px 0 16px; font-size: .8125rem; line-height: 1.7; color: var(--mud-palette-text-secondary); }
+.task-guide-details { border-top: 1px solid var(--mud-palette-lines-default); }
+.task-guide-location { margin: 0 0 16px; font-size: .8125rem; line-height: 1.8; color: var(--mud-palette-primary); }
+.task-guide-details h3 { margin: 20px 0 0; font-size: .875rem; font-weight: 600; }
+.task-guide-section-note, .task-setting-help { margin: 4px 0 0; font-size: .8125rem; line-height: 1.8; color: var(--mud-palette-text-secondary); }
+.task-guide-details summary { cursor: pointer; padding-top: 14px; font-size: .875rem; font-weight: 500; color: var(--mud-palette-primary); }
+.task-guide-details summary span { margin-left: 10px; font-size: .75rem; font-weight: 400; color: var(--mud-palette-text-secondary); }
+.task-guide-details summary:focus-visible { outline: 2px solid var(--mud-palette-primary); outline-offset: 4px; border-radius: 4px; }
+.task-guide-details dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 24px; margin: 20px 0 0; }
+.task-guide-details dt { font-size: .8125rem; font-weight: 600; margin-bottom: 6px; }
+.task-guide-details dd { margin: 0; font-size: .8125rem; line-height: 1.8; color: var(--mud-palette-text-secondary); overflow-wrap: anywhere; }
+.today-task-introduction { margin: 4px 0 0; max-width: 620px; font-size: .75rem; line-height: 1.7; color: var(--mud-palette-text-secondary); }
+.today-task-heading { min-width: 0; flex: 1 1 260px; }
+.today-task-help-link { font-size: .75rem; margin-top: 6px; display: inline-block; }
+@media (max-width: 600px) {
+    .task-guide { padding: 16px; }
+    .task-guide-details dl { grid-template-columns: minmax(0, 1fr); }
+    .task-guide-details summary span { display: block; margin: 4px 0 0 16px; }
+    .today-task-row { flex-wrap: wrap; gap: 8px; padding: 12px 0; }
+}
+
+/* Shared schedule controls also cover prerendered and interactive component trees. */
+.schedule-picker { border: 0; padding: 0; margin: 0; min-width: 0; }
+.schedule-picker legend { font-size: 1rem; font-weight: 600; margin-bottom: 16px; }
+.schedule-fields { display: flex; flex-wrap: wrap; gap: 16px; }
+.schedule-fields label, .schedule-time-field { display: flex; flex: 1 1 130px; flex-direction: column; gap: 8px; font-size: .8125rem; min-width: 0; color: var(--mud-palette-text-secondary); }
+.schedule-time-field { flex: 2 1 220px; }
+.schedule-select { display: block; position: relative; min-width: 0; }
+.schedule-select::after { content: ''; position: absolute; right: 16px; top: 18px; width: 7px; height: 7px; border-right: 2px solid var(--mud-palette-primary); border-bottom: 2px solid var(--mud-palette-primary); transform: rotate(45deg); pointer-events: none; }
+.schedule-fields select { appearance: none; width: 100%; min-height: 48px; padding: 11px 36px 11px 14px; border: 1px solid var(--mud-palette-lines-inputs); border-radius: 10px; background: var(--mud-palette-surface); color: var(--mud-palette-text-primary); font: inherit; font-size: .9375rem; font-weight: 500; cursor: pointer; transition: border-color .15s, box-shadow .15s; }
+.schedule-fields select:hover { border-color: var(--mud-palette-primary); }
+.schedule-fields select:focus-visible { outline: 2px solid var(--mud-palette-primary); outline-offset: 2px; }
+.schedule-time-values { display: flex; align-items: center; gap: 8px; }
+.schedule-time-values .schedule-select { flex: 1 1 0; }
+.schedule-time-with-seconds { flex-wrap: wrap; }
+.schedule-time-with-seconds .schedule-select { flex: 1 1 90px; }
+.schedule-time-with-seconds .schedule-time-separator { display: none; }
+.schedule-time-separator { color: var(--mud-palette-text-secondary); }
+.schedule-weekdays { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.schedule-weekdays label { display: flex; align-items: center; gap: 6px; padding: 8px 10px; border-radius: 8px; background: var(--mud-palette-background-gray); font-size: .875rem; cursor: pointer; }
+.schedule-weekdays input { accent-color: var(--mud-palette-primary); width: 17px; height: 17px; }
+.schedule-summary { margin: 16px 0 0; padding: 10px 14px; border-radius: 8px; background: var(--mud-palette-primary-hover); color: var(--mud-palette-primary); font-size: .875rem; }
+.schedule-hint { margin: 8px 0 0; color: var(--mud-palette-text-secondary); font-size: .75rem; }
+.schedule-error { margin: 8px 0 0; color: var(--mud-palette-error); font-size: .875rem; }
+.schedule-picker:disabled { opacity: .55; }
+.schedule-picker:disabled select { cursor: default; box-shadow: none; }
+
+/* Medal cards use theme colors for both light and dark modes. */
+.medal-dashboard { margin-bottom: 24px; padding: 24px; border: 1px solid var(--mud-palette-lines-default); border-radius: 16px; background: var(--mud-palette-surface); }
+.medal-dashboard-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.medal-dashboard h2 { font-size: 1.25rem; font-weight: 600; margin: 0; }
+.medal-dashboard-heading p { font-size: .875rem; color: var(--mud-palette-text-secondary); margin: 6px 0 0; }
+.medal-toolbar { display: flex; align-items: flex-end; flex-wrap: wrap; gap: 16px; margin: 24px 0 16px; }
+.medal-toolbar label { display: flex; flex-direction: column; gap: 8px; font-size: .8125rem; color: var(--mud-palette-text-secondary); }
+.medal-toolbar select, .medal-toolbar input { height: 42px; padding: 0 12px; border: 1px solid var(--mud-palette-lines-inputs); border-radius: 8px; font: inherit; font-size: .875rem; background: var(--mud-palette-surface); color: var(--mud-palette-text-primary); }
+.medal-account-select { min-width: 130px; cursor: pointer; }
+.medal-search { flex: 1 1 200px; max-width: 360px; }
+.medal-updated { margin-left: auto; align-self: center; color: var(--mud-palette-text-secondary); font-size: .75rem; }
+.medal-overview { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 20px 0; }
+.medal-overview > div { display: flex; flex-direction: column; gap: 6px; padding: 14px 18px; border-radius: 12px; background: var(--mud-palette-background-gray); }
+.medal-overview span { color: var(--mud-palette-text-secondary); font-size: .8125rem; }
+.medal-overview strong { font-size: 1.5rem; font-weight: 600; }
+.medal-card-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.medal-card { padding: 20px; border: 1px solid var(--mud-palette-lines-default); border-radius: 12px; min-width: 0; }
+.medal-card-excluded { background: var(--mud-palette-background-gray); border-style: dashed; }
+.medal-card-top, .medal-anchor-row, .medal-task-title { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.medal-card-top { margin-bottom: 16px; flex-wrap: wrap; }
+.medal-badge { display: inline-flex; align-items: center; gap: 12px; color: var(--mud-palette-primary); background: var(--mud-palette-primary-hover); border: 1px solid var(--mud-palette-primary); border-radius: 6px; padding: 4px 8px; font-size: .8125rem; font-weight: 500; }
+.medal-badge b { font-weight: 600; }
+.medal-live { font-size: .75rem; color: var(--mud-palette-text-secondary); }
+.medal-live.is-live { color: var(--mud-palette-success); }
+.medal-live.is-live::before { content: ''; display: inline-block; width: 6px; height: 6px; margin-right: 5px; border-radius: 50%; background: var(--mud-palette-success); }
+.medal-anchor-row { align-items: flex-start; flex-wrap: wrap; }
+.medal-anchor-row h3 { margin: 0; font-size: 1rem; font-weight: 600; overflow-wrap: anywhere; }
+.medal-anchor-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; }
+.medal-exclude { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: .75rem; color: var(--mud-palette-text-secondary); white-space: nowrap; }
+.medal-exclude input { width: 16px; height: 16px; accent-color: var(--mud-palette-primary); cursor: pointer; }
+.medal-status-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 12px 0 20px; font-size: .75rem; color: var(--mud-palette-text-secondary); }
+.medal-status { border-radius: 4px; padding: 3px 6px; }
+.medal-status.is-participating { color: var(--mud-palette-primary); background: var(--mud-palette-primary-hover); }
+.medal-status.is-excluded { border: 1px solid var(--mud-palette-lines-default); }
+.medal-task + .medal-task { margin-top: 16px; }
+.medal-task-title { font-size: .8125rem; align-items: flex-start; }
+.medal-task-title > span:first-child { flex: 1; overflow-wrap: anywhere; }
+.medal-task-done { color: var(--mud-palette-success); white-space: nowrap; }
+.medal-task-pending { color: var(--mud-palette-text-secondary); white-space: nowrap; }
+.medal-task p { margin: 6px 0 0; color: var(--mud-palette-text-secondary); font-size: .75rem; }
+.medal-task .medal-progress { height: 5px; margin-top: 8px; border-radius: 4px; }
+.medal-empty, .medal-progress-message { color: var(--mud-palette-text-secondary); font-size: .875rem; padding: 16px 0; }
+@media (max-width: 700px) {
+    .medal-dashboard { padding: 16px; }
+    .medal-card-grid { grid-template-columns: minmax(0, 1fr); }
+    .medal-updated { margin-left: 0; }
+    .medal-overview > div { padding: 12px; }
+}
+@media (max-width: 480px) {
+    .schedule-time-values { flex-wrap: wrap; }
+    .schedule-time-values .schedule-select { flex-basis: 90px; }
+    .schedule-time-separator { display: none; }
+}
