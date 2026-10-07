@@ -4,7 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Ray.BiliBiliTool.Console.Extensions;
 using Ray.BiliBiliTool.Infrastructure;
-using Ray.BiliBiliTool.Infrastructure.Notifications;
 using Serilog;
 using Serilog.Debugging;
 
@@ -108,9 +107,7 @@ public class Program
         SelfLog.Enable(x => System.Console.WriteLine(x ?? ""));
         hostBuilder.UseSerilog(
             (context, services, configuration) =>
-                configuration.ReadFrom.Configuration(
-                    context.Configuration.WithCompatibleHttpNotifications()
-                )
+                configuration.ReadFrom.Configuration(context.Configuration)
         );
 
         hostBuilder.ConfigureServices(

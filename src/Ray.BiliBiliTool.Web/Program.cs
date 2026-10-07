@@ -6,7 +6,6 @@ using Ray.BiliBiliTool.Config.SQLite;
 using Ray.BiliBiliTool.Infrastructure;
 using Ray.BiliBiliTool.Infrastructure.EF;
 using Ray.BiliBiliTool.Infrastructure.EF.Extensions;
-using Ray.BiliBiliTool.Infrastructure.Notifications;
 using Ray.BiliBiliTool.Web.Components;
 using Ray.BiliBiliTool.Web.Extensions;
 using Ray.BiliBiliTool.Web.Services.Pages.BiliAccount;
@@ -64,7 +63,7 @@ try
     builder.Services.AddSerilog(
         (services, lc) =>
             lc
-                .ReadFrom.Configuration(builder.Configuration.WithCompatibleHttpNotifications())
+                .ReadFrom.Configuration(builder.Configuration)
                 .ReadFrom.Services(services)
                 .Enrich.FromLogContext()
                 .WriteTo.SQLite(

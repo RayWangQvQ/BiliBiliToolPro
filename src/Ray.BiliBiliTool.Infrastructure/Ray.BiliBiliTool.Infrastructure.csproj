@@ -11,7 +11,6 @@
     <PackageReference Include="Microsoft.Extensions.Http" />
     <PackageReference Include="Ray.Infrastructure" />
     <PackageReference Include="Serilog" />
-    <PackageReference Include="Ray.Serilog.Sinks.GotifyBatched" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Ray.BiliBiliTool.Application.Contracts\Ray.BiliBiliTool.Application.Contracts.csproj" />

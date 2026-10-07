@@ -168,7 +168,6 @@ public static class ServiceCollectionExtension
             .ConfigureHttpClient((_, c) => c.BaseAddress = new Uri(host))
             .ConfigureHttpClient(config)
             .AddHttpMessageHandler<FormUrlEncodedKeyNormalizingDelegatingHandler>()
-            .AddHttpMessageHandler<VipPointAppHeadersDelegatingHandler>()
             .AddHttpMessageHandler<LogDelegatingHandler>()
             .AddHttpMessageHandler<BiliBiliCommonHeadersDelegatingHandler>()
             .AddHttpMessageHandler<IntervalDelegatingHandler>()
