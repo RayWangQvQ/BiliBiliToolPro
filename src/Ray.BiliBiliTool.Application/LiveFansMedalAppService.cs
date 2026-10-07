@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Application.Attributes;
 using Ray.BiliBiliTool.Application.Contracts;
+using Ray.BiliBiliTool.Application.Contracts.Cookies;
 using Ray.BiliBiliTool.Application.Diagnostics;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Interfaces;
@@ -17,9 +18,16 @@ public class LiveFansMedalAppService(
     ILiveDomainService liveDomainService,
     ILoginDomainService loginDomainService,
     IConfiguration configuration,
-    CookieStrFactory<BiliCookie> cookieStrFactory
+    CookieStrFactory<BiliCookie> cookieStrFactory,
+    ICookieTaskGuard cookieTaskGuard
 )
-    : BaseMultiAccountsAppService(logger, cookieStrFactory, loginDomainService, configuration),
+    : BaseMultiAccountsAppService(
+        logger,
+        cookieStrFactory,
+        loginDomainService,
+        configuration,
+        cookieTaskGuard
+    ),
         ILiveFansMedalAppService
 {
     [TaskInterceptor("直播间互动", TaskLevel.One)]
@@ -40,28 +48,28 @@ public class LiveFansMedalAppService(
                 }
 
                 await SetCookiesAsync(ck, cancellationToken);
-                await SendDanmaku(ck);
-                await Like(ck);
-                await HeartBeat(ck);
+                await SendDanmaku(ck, cancellationToken);
+                await Like(ck, cancellationToken);
+                await HeartBeat(ck, cancellationToken);
             }
         );
     }
 
     [TaskInterceptor("发送弹幕", TaskLevel.Two, false)]
-    private async Task SendDanmaku(BiliCookie ck)
+    private async Task SendDanmaku(BiliCookie ck, CancellationToken cancellationToken)
     {
-        await liveDomainService.SendDanmakuToFansMedalLive(ck);
+        await liveDomainService.SendDanmakuToFansMedalLive(ck, cancellationToken);
     }
 
     [TaskInterceptor("点赞直播间", TaskLevel.Two, false)]
-    private async Task Like(BiliCookie ck)
+    private async Task Like(BiliCookie ck, CancellationToken cancellationToken)
     {
-        await liveDomainService.LikeFansMedalLive(ck);
+        await liveDomainService.LikeFansMedalLive(ck, cancellationToken);
     }
 
     [TaskInterceptor("直播时长挂机", TaskLevel.Two, false)]
-    private async Task HeartBeat(BiliCookie ck)
+    private async Task HeartBeat(BiliCookie ck, CancellationToken cancellationToken)
     {
-        await liveDomainService.SendHeartBeatToFansMedalLive(ck);
+        await liveDomainService.SendHeartBeatToFansMedalLive(ck, cancellationToken);
     }
 }

@@ -1,5 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Ray.BiliBiliTool.Application.Contracts;
 using Ray.BiliBiliTool.Application.Diagnostics;
 using Ray.BiliBiliTool.Infrastructure;
 using Rougamo;
@@ -44,6 +45,8 @@ public class TaskInterceptorAttribute(
 
     public override void OnException(MethodContext context)
     {
+        if (context.Exception is not OperationCanceledException)
+            TaskExecutionFailureScope.MarkFailed();
         if (rethrowWhenException)
         {
             _logger.LogError("程序发生异常：{msg}", context.Exception?.Message ?? "");

@@ -73,7 +73,8 @@ public class HandledFailureFlowTests
                 manga,
                 null!,
                 configuration,
-                new CookieStrFactory<BiliCookie>(configuration)
+                new CookieStrFactory<BiliCookie>(configuration),
+                new AllowCookieTaskGuard()
             );
             await Assert.ThrowsAsync<AggregateException>(() => service.DoTaskForAccountAsync(1));
             Assert.True(read);

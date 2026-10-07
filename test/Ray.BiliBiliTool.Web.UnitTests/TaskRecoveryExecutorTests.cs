@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Application.Contracts;
+using Ray.BiliBiliTool.Application.Contracts.Cookies;
 using Ray.BiliBiliTool.Infrastructure.Cookie;
 
 namespace Ray.BiliBiliTool.Web.UnitTests;
@@ -50,8 +51,18 @@ public class TaskRecoveryExecutorTests
             null!,
             null!,
             services.BuildServiceProvider(),
-            NullLogger<TaskRecoveryExecutor>.Instance
+            NullLogger<TaskRecoveryExecutor>.Instance,
+            new AllowGuard()
         );
+    }
+
+    private sealed class AllowGuard : ICookieTaskGuard
+    {
+        public Task EnsureValidAsync(
+            string userId,
+            string cookie,
+            CancellationToken token = default
+        ) => Task.CompletedTask;
     }
 
     [Fact]

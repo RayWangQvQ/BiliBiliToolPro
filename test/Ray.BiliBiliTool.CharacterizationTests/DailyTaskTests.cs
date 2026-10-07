@@ -7,8 +7,10 @@ using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.ApiApi.Daily;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.ApiApi.Video;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.NavApi;
+using Ray.BiliBiliTool.Application.Contracts;
 using Ray.BiliBiliTool.CharacterizationTests.Support;
 using Ray.BiliBiliTool.Config.Options;
+using Ray.BiliBiliTool.Domain;
 using Ray.BiliBiliTool.DomainService.Dtos;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 using Ray.BiliBiliTool.Infrastructure;
@@ -120,6 +122,87 @@ public class DailyTaskTests
         logging.Collector.Entries.Should().Contain(entry => entry.Message.Contains("异常："));
     }
 
+    [Fact]
+    public async Task Suppressed_check_failure_is_recorded_and_does_not_contaminate_next_account()
+    {
+        var calls = new List<string>();
+        var writer = new CaptureWriter();
+        using var logging = TestLoggingContext.Create(writer);
+        var configuration = BuildConfiguration(
+            "Web",
+            CreateCookieString("301", true),
+            CreateCookieString("302", true)
+        );
+        var service = CreateService(
+            configuration,
+            logging,
+            calls,
+            new AccountDomainServiceDouble(calls),
+            new VideoDomainServiceDouble(calls, failFirst: true),
+            new ArticleDomainServiceDouble(calls),
+            new DonateCoinDomainServiceDouble(calls),
+            new VipPrivilegeDomainServiceDouble(calls),
+            new LoginDomainServiceDouble(calls),
+            new DailyTaskOptions
+            {
+                IsEnable = true,
+                IsWatchVideo = true,
+                IsShareVideo = true,
+            }
+        );
+        await service.DoTaskAsync();
+        Assert.Equal(new[] { TaskRecordStatus.Failed, TaskRecordStatus.Success }, writer.Statuses);
+        Assert.Equal(2, calls.Count(call => call == "AddCoinsForVideos"));
+    }
+
+    [Fact]
+    public async Task Suppressed_check_failure_in_manual_recovery_is_not_reported_as_success()
+    {
+        var calls = new List<string>();
+        using var logging = TestLoggingContext.Create();
+        var configuration = BuildConfiguration("Web", CreateCookieString("301", true));
+        var service = CreateService(
+            configuration,
+            logging,
+            calls,
+            new AccountDomainServiceDouble(calls),
+            new VideoDomainServiceDouble(calls, failFirst: true),
+            new ArticleDomainServiceDouble(calls),
+            new DonateCoinDomainServiceDouble(calls),
+            new VipPrivilegeDomainServiceDouble(calls),
+            new LoginDomainServiceDouble(calls),
+            new DailyTaskOptions
+            {
+                IsEnable = true,
+                IsWatchVideo = true,
+                IsShareVideo = true,
+            }
+        );
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            service.DoTaskForAccountAsync(301)
+        );
+        Assert.Contains("AddCoinsForVideos", calls);
+    }
+
+    private sealed class CaptureWriter : ITaskRecordWriter
+    {
+        public List<TaskRecordStatus> Statuses { get; } = [];
+
+        public Task WriteAsync(
+            long userId,
+            string taskKey,
+            string? itemKey,
+            TaskRecordStatus status,
+            string? message,
+            TaskRecordTrigger trigger,
+            CancellationToken cancellationToken = default
+        )
+        {
+            Statuses.Add(status);
+            return Task.CompletedTask;
+        }
+    }
+
     private static Ray.BiliBiliTool.Application.DailyTaskAppService CreateService(
         IConfiguration configuration,
         TestLoggingContext logging,
@@ -143,7 +226,8 @@ public class DailyTaskTests
             new StaticOptionsMonitor<DailyTaskOptions>(options),
             loginDomainService,
             configuration,
-            new CookieStrFactory<BiliCookie>(configuration)
+            new CookieStrFactory<BiliCookie>(configuration),
+            new AllowCookieTaskGuard()
         );
     }
 
@@ -233,8 +317,11 @@ public class DailyTaskTests
         }
     }
 
-    private sealed class VideoDomainServiceDouble(List<string> callLog) : IVideoDomainService
+    private sealed class VideoDomainServiceDouble(List<string> callLog, bool failFirst = false)
+        : IVideoDomainService
     {
+        private int _watchCalls;
+
         public Task<VideoDetail> GetVideoDetail(string aid)
         {
             throw new NotSupportedException();
@@ -258,6 +345,8 @@ public class DailyTaskTests
         public Task WatchAndShareVideo(DailyTaskInfo dailyTaskStatus, BiliCookie ck)
         {
             callLog.Add(nameof(WatchAndShareVideo));
+            if (failFirst && ++_watchCalls == 1)
+                throw new InvalidOperationException("synthetic check failure");
             return Task.CompletedTask;
         }
 
@@ -427,11 +516,13 @@ public class DailyTaskTests
 
         public TestLogCollector Collector { get; } = collector;
 
-        public static TestLoggingContext Create()
+        public static TestLoggingContext Create(ITaskRecordWriter? writer = null)
         {
             var collector = new TestLogCollector();
             var services = new ServiceCollection();
             services.AddLogging(builder => builder.ClearProviders().AddProvider(collector));
+            if (writer is not null)
+                services.AddSingleton(writer);
 
             var serviceProvider = services.BuildServiceProvider();
             Global.ServiceProviderRoot = serviceProvider;
