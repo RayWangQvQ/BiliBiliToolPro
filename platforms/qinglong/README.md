@@ -87,6 +87,23 @@ https://gh-proxy.com/https://github.com/RayWangQvQ/BiliBiliToolPro.git
 
 Third-party proxy availability is not guaranteed.
 
+## Environment variables
+
+The scripts read the following optional variables. Set them in the panel **Configuration File** so every scheduled task inherits them.
+
+```bash
+export BILI_REPO=raywangqvq/bilibilitoolpro          # repository to pull and download releases from
+export BILI_BRANCH=                                  # branch suffix; leave empty for main
+export BILITOOL_LOCK_WAIT_SECONDS=7200              # seconds to wait for the shared task lock
+export BILITOOL_STOP_GRACE_SECONDS=10               # seconds to wait after a stop signal before SIGKILL
+export BILITOOL_UPDATE_CHECK_INTERVAL_SECONDS=86400 # seconds between remote bilitool update checks
+```
+
+- `BILI_REPO` / `BILI_BRANCH` - override the default repository (`raywangqvq/bilibilitoolpro`) and branch. The repository directory name is built from both values, so change them only when running from a fork. Forks that use an extra branch such as `_develop` append that suffix to the directory name.
+- `BILITOOL_LOCK_WAIT_SECONDS` - how long a scheduled task waits for the shared run lock before it gives up. Default `7200` (2 hours); lower it when a stuck task should fail fast.
+- `BILITOOL_STOP_GRACE_SECONDS` - after a stop signal (TERM/INT/HUP) the wrapper waits this many seconds for the runtime to exit before sending SIGKILL. Default `10`.
+- `BILITOOL_UPDATE_CHECK_INTERVAL_SECONDS` - minimum interval between remote bilitool release checks when `BILI_MODE=bilitool`. Default `86400` (24 hours). The last check time is cached in the repository checkout under `bin/.bilitool-update-checked-at`.
+
 ## Troubleshooting
 
 ### .NET installation fails
