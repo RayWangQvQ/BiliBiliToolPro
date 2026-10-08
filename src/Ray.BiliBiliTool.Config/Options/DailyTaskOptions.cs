@@ -37,6 +37,18 @@ public class DailyTaskOptions : BaseConfigOptions
     /// </summary>
     public bool SaveCoinsWhenLv6 { get; set; } = false;
 
+    [System.ComponentModel.DataAnnotations.Range(0, 6)]
+    public int CoinDonationStopLevel { get; set; }
+
+    // A configured threshold takes precedence over the legacy Lv.6 switch.
+    public int EffectiveCoinDonationStopLevel =>
+        CoinDonationStopLevel > 0 ? CoinDonationStopLevel
+        : SaveCoinsWhenLv6 ? 6
+        : 0;
+
+    public bool ShouldSkipCoinDonation(int? currentLevel) =>
+        EffectiveCoinDonationStopLevel > 0 && currentLevel >= EffectiveCoinDonationStopLevel;
+
     /// <summary>
     /// 投币时是否点赞[false,true]
     /// </summary>
@@ -111,6 +123,10 @@ public class DailyTaskOptions : BaseConfigOptions
                 {
                     $"{SectionName}:{nameof(SaveCoinsWhenLv6)}",
                     SaveCoinsWhenLv6.ToString().ToLower()
+                },
+                {
+                    $"{SectionName}:{nameof(CoinDonationStopLevel)}",
+                    CoinDonationStopLevel.ToString()
                 },
                 { $"{SectionName}:{nameof(SelectLike)}", SelectLike.ToString().ToLower() },
                 { $"{SectionName}:{nameof(SupportUpIds)}", SupportUpIds ?? "" },

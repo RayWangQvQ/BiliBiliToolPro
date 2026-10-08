@@ -47,9 +47,9 @@ public static class TaskHelpCatalog
                     "IsDonateCoinForArticle"
                 ),
                 new(
-                    "六级后停止投币",
-                    "账号达到 Lv.6 后停止投币，其他已开启的日常操作继续执行。",
-                    "SaveCoinsWhenLv6"
+                    "达到指定等级后停止投币",
+                    "选择 Lv.1～6，按每个 B 站账号的等级判断。达到所选等级后停止视频、专栏和补做投币，其他已开启的日常操作继续执行。选择「不按等级停止」后继续投币。",
+                    "CoinDonationStopLevel"
                 ),
                 new("投币时点赞", "给视频投币时同时点赞。", "SelectLike"),
                 new(
