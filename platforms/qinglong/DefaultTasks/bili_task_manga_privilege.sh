@@ -5,4 +5,4 @@
 . bili_task_base.sh
 
 target_task_code="MangaPrivilege"
-run_task "${target_task_code}"
+run_bilitool_job "${target_task_code}"
