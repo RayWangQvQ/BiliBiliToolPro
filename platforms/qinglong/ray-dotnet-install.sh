@@ -6,13 +6,24 @@ required_dotnet_major=10
 get_dotnet_major_version() {
     local dotnet_command="${1:-dotnet}"
     local dotnet_version
-    dotnet_version="$("$dotnet_command" --version 2>/dev/null || true)"
-    echo "${dotnet_version%%.*}"
+    # Respect SDK selection (including global.json) and reject failed commands.
+    dotnet_version="$("$dotnet_command" --version 2>/dev/null)" || return 1
+    # Some wrappers return SDK-list rows instead of one selected version.
+    printf '%s\n' "$dotnet_version" | awk '
+        /^[[:space:]]*[0-9]+\.[0-9]+\.[0-9]+(-[[:alnum:].-]+)?(\+[[:alnum:].-]+)?([[:space:]]+\[[^]]+\])?[[:space:]]*$/ {
+            split($1, version, ".")
+            if (version[1] + 0 > highest) highest = version[1] + 0
+        }
+        END {
+            if (highest > 0) print highest
+            else exit 1
+        }
+    '
 }
 
 has_required_dotnet_version() {
     local dotnet_major
-    dotnet_major="$(get_dotnet_major_version "$1")"
+    dotnet_major="$(get_dotnet_major_version "${1:-dotnet}" || true)"
     [[ "$dotnet_major" =~ ^[0-9]+$ && "$dotnet_major" -ge "$required_dotnet_major" ]]
 }
 
