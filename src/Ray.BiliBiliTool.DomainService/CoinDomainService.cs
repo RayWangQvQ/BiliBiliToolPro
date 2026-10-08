@@ -16,7 +16,9 @@ public class CoinDomainService(IAccountApi accountApi, IApiApi apiApi) : ICoinDo
     public async Task<decimal> GetCoinBalance(BiliCookie ck)
     {
         var response = await accountApi.GetCoinBalanceAsync(ck.ToString());
-        return response.Data!.Money ?? 0;
+        if (response is null || response.Code != 0 || response.Data is null)
+            throw new InvalidOperationException($"获取硬币余额失败：{response?.Message}");
+        return response.Data.Money ?? 0;
     }
 
     /// <summary>
@@ -35,7 +37,10 @@ public class CoinDomainService(IAccountApi accountApi, IApiApi apiApi) : ICoinDo
     /// <returns></returns>
     private async Task<int> GetDonateCoinExp(BiliCookie ck)
     {
-        return (await apiApi.GetDonateCoinExpAsync(ck.ToString())).Data;
+        var response = await apiApi.GetDonateCoinExpAsync(ck.ToString());
+        if (response is null || response.Code != 0)
+            throw new InvalidOperationException($"获取投币经验失败：{response?.Message}");
+        return response.Data;
     }
     #endregion
 }
