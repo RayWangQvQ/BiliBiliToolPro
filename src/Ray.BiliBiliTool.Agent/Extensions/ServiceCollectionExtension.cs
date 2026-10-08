@@ -77,6 +77,15 @@ public static class ServiceCollectionExtension
             policy: BiliResiliencePolicies.MutatingPolicy()
         );
 
+        // gaia device fingerprint: the report must use GaiaDeviceFingerprintTemplate.UserAgent
+        // (declared on IGaiaApi), so the global User-Agent is deliberately not applied here.
+        // w_rid signing is skipped because these endpoints do not use it.
+        Action<IServiceProvider, HttpClient> configGaia = (_, c) =>
+        {
+            c.Timeout = BiliResiliencePolicies.HttpTimeout;
+        };
+        services.AddBiliBiliClientApi<IGaiaApi>(BiliHosts.Api, configGaia, ignorWrid: true);
+
         services.AddBiliBiliClientApi<IShowApi>(BiliHosts.Show, config);
         services.AddBiliBiliClientApi<IPassportApi>(BiliHosts.Passport, config);
         services.AddBiliBiliClientApi<ILiveTraceApi>(BiliHosts.LiveTrace, config);
