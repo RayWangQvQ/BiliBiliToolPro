@@ -13,15 +13,8 @@ public static class CookieMonitoringServiceCollectionExtensions
     {
         services.TryAddSingleton(TimeProvider.System);
         services.AddSingleton<ICookieCheckStateStore, FileCookieCheckStateStore>();
-        services.AddSingleton<ICookieExpiryNotifier, ServerChanCookieExpiryNotifier>();
         services.AddSingleton<ITaskFailureBatchStateStore, FileTaskFailureBatchStateStore>();
-        services.AddSingleton<ITaskFailureNotifier, ServerChanTaskFailureNotifier>();
-        services
-            .AddHttpClient(
-                ServerChanCookieExpiryNotifier.ClientName,
-                client => client.Timeout = TimeSpan.FromSeconds(20)
-            )
-            .RemoveAllLoggers();
+        services.AddSingleton<INotificationService, SerilogNotificationAdapter>();
         return services;
     }
 }

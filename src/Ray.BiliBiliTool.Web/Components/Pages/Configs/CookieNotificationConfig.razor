@@ -13,8 +13,8 @@
     <PageHero Size="Size.Small" Title="检查与提醒" Description="设置登录状态检查、过期提醒和任务失败汇总。" />
     <Ray.BiliBiliTool.Web.Components.Comps.TaskGuide TaskKey="Notification" />
     <MudGrid Spacing="3">
-        <MudItem xs="12" md="6">
-            <MudCard Class="mud-height-full">
+        <MudItem xs="12">
+            <MudCard>
                 <MudCardContent>
                     <MudText Typo="Typo.h6" Class="mb-2">登录状态检查</MudText>
                     <MudSwitch T="bool" @bind-Value="_automatic" @bind-Value:after="SettingsChanged"
@@ -26,26 +26,6 @@
                     <MudSwitch T="bool" @bind-Value="_expiryEnabled" @bind-Value:after="SettingsChanged"
                                Label="Cookie 过期提醒" Color="Color.Primary" />
                     <MudText Typo="Typo.body2" Style="color: var(--mud-palette-text-secondary)">同一账号每天最多发送一次过期提醒。</MudText>
-                </MudCardContent>
-            </MudCard>
-        </MudItem>
-        <MudItem xs="12" md="6">
-            <MudCard Class="mud-height-full">
-                <MudCardContent>
-                    <MudText Typo="Typo.h6" Class="mb-2">Server 酱</MudText>
-                    <MudText Typo="Typo.body2" Style="color: var(--mud-palette-text-secondary)" Class="mb-3">过期提醒和任务失败汇总共用此密钥。</MudText>
-                    <MudChip T="string" Color="@(_hasKey ? Color.Success : Color.Warning)" Variant="Variant.Outlined"
-                             Icon="@(_hasKey ? Icons.Material.Filled.CheckCircle : Icons.Material.Filled.WarningAmber)" Class="mb-3">
-                        @(_hasKey ? "SendKey 已配置" : "请配置 SendKey")
-                    </MudChip>
-                    <MudTextField T="string" Value="@_newSendKey" ValueChanged="SendKeyChanged" Label="SendKey"
-                                  InputType="InputType.Password" Placeholder="@(_hasKey ? "********" : "请输入 SendKey")"
-                                  HelperText="@(_hasKey ? "输入新密钥即可更换，留空保留已保存的密钥。" : "填写 SendKey 后保存。")" />
-                    @if (!string.IsNullOrWhiteSpace(_newSendKey))
-                    {
-                        <MudText Typo="Typo.caption" Color="Color.Warning">新密钥待保存</MudText>
-                    }
-                    <MudLink Href="https://sct.ftqq.com/sendkey/" Target="_blank">获取 SendKey</MudLink>
                 </MudCardContent>
             </MudCard>
         </MudItem>
@@ -90,8 +70,6 @@
     private bool _automatic;
     private bool _expiryEnabled;
     private bool _failureEnabled;
-    private bool _hasKey;
-    private string _newSendKey = "";
     private List<TaskSwitch> _tasks = [];
     private string? _message;
     private bool _success;
@@ -101,29 +79,20 @@
         var settings = Workflow.Read();
         _automatic = settings.Cookie.AutoCheckEnabled;
         _expiryEnabled = settings.Cookie.NotifyEnabled;
-        _hasKey = settings.Cookie.HasSendKey;
         _failureEnabled = settings.TaskFailure.Enabled;
         _tasks = settings.TaskFailure.Tasks.Select(task => new TaskSwitch(task.TaskKey, task.DisplayName, task.Enabled)).ToList();
     }
 
     private void SettingsChanged() => _message = null;
 
-    private void SendKeyChanged(string value)
-    {
-        _newSendKey = value;
-        SettingsChanged();
-    }
-
     private void Save()
     {
         try
         {
-            Workflow.Save(_automatic, _expiryEnabled, _failureEnabled, _newSendKey,
+            Workflow.Save(_automatic, _expiryEnabled, _failureEnabled,
                 _tasks.ToDictionary(task => task.TaskKey, task => task.Enabled));
-            _hasKey = Workflow.Read().Cookie.HasSendKey;
-            _newSendKey = "";
             _success = true;
-            _message = _hasKey ? "设置已保存。SendKey 已配置。" : "设置已保存。";
+            _message = "设置已保存。";
         }
         catch (Exception error)
         {

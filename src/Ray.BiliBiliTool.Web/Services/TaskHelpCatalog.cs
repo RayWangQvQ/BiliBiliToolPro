@@ -294,7 +294,7 @@ public static class TaskHelpCatalog
         new(
             "Notification",
             "NotificationConfig",
-            "管理活动前的登录状态检查、Cookie 过期提醒和后台定时任务的失败汇总，通知通过 Server 酱发送。",
+            "管理活动前的登录状态检查、Cookie 过期提醒和后台定时任务的失败汇总，通知通过统一的推送通道发送。",
             "过期提醒同一账号每天最多一条，任务失败在一批后台任务结束后汇总发送。",
             [
                 new(
@@ -313,11 +313,6 @@ public static class TaskHelpCatalog
                     "接收失败提醒的任务",
                     "选择需要接收失败提醒的任务。手动执行和补做操作不进入失败推送。",
                     "TaskKeys"
-                ),
-                new(
-                    "SendKey",
-                    "填写 Server 酱 SendKey 并保存。保存后显示已配置状态和掩码，两个提醒共用该配置。",
-                    "SendKey"
                 ),
             ]
         ),

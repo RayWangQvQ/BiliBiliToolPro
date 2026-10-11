@@ -4,13 +4,14 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Application.Contracts.Cookies;
+using Ray.BiliBiliTool.Application.Contracts.Notifications;
 
 namespace Ray.BiliBiliTool.Application;
 
 public sealed class CookieTaskGuard(
     INavApi navApi,
     ICookieCheckStateStore stateStore,
-    ICookieExpiryNotifier notifier,
+    INotificationService notificationService,
     TimeProvider timeProvider,
     ILogger<CookieTaskGuard> logger,
     IConfiguration configuration
@@ -112,28 +113,17 @@ public sealed class CookieTaskGuard(
             {
                 state = state with { NotificationAttempt = now };
                 await stateStore.WriteAsync(userId, state, cancellationToken);
-                try
-                {
-                    var maskedAccount = "***" + userId[^Math.Min(4, userId.Length)..];
-                    if (await notifier.SendAsync(maskedAccount, cancellationToken))
-                    {
-                        state = state with { NotifiedDate = today };
-                        await stateStore.WriteAsync(userId, state, cancellationToken);
-                    }
-                    else
-                        logger.LogWarning(
-                            "Cookie 过期提醒未发送，请检查 Server 酱通知配置。稍后自动重试"
-                        );
-                }
-                catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
-                {
-                    throw;
-                }
-                catch (Exception)
-                {
-                    // Provider exceptions can contain the SendKey in the request URL.
-                    logger.LogWarning("Cookie 过期提醒发送失败，稍后自动重试");
-                }
+                var maskedAccount = "***" + userId[^Math.Min(4, userId.Length)..];
+                await notificationService.SendAsync(
+                    new NotificationMessage(
+                        "BiliBili Cookie 已过期",
+                        $"账号 {maskedAccount} 的登录凭证已失效，本次活动已自动跳过。\n\n请打开 BiliBiliToolPro 面板，在「账号管理」中重新扫码登录。\n\n同一账号每天最多发送一次过期提醒。",
+                        NotificationLevel.Warning
+                    ),
+                    userId
+                );
+                state = state with { NotifiedDate = today };
+                await stateStore.WriteAsync(userId, state, cancellationToken);
             }
 
             throw new InvalidOperationException(
