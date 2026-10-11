@@ -1,5 +1,4 @@
 using Ray.BiliBiliTool.Config.SQLite;
-using Ray.BiliBiliTool.Infrastructure.Notifications;
 
 namespace Ray.BiliBiliTool.Web.Services.Pages.Configs;
 
@@ -11,7 +10,6 @@ public sealed record TaskFailureNotificationSetting(
 
 public sealed record TaskFailureNotificationSettings(
     bool Enabled,
-    bool HasSendKey,
     IReadOnlyList<TaskFailureNotificationSetting> Tasks
 );
 
@@ -27,10 +25,6 @@ public sealed class TaskFailureNotificationSettingsWorkflow(IConfiguration confi
     public TaskFailureNotificationSettings Read() =>
         new(
             configuration.GetValue("TaskFailureNotification:Enabled", true),
-            ServerChanCookieExpiryNotifier.CreateEndpoint(
-                ServerChanCookieExpiryNotifier.GetSendKey(configuration)
-            )
-                is not null,
             TaskFailureNotificationCatalog
                 .All.Select(task => new TaskFailureNotificationSetting(
                     task.TaskKey,
@@ -45,8 +39,6 @@ public sealed class TaskFailureNotificationSettingsWorkflow(IConfiguration confi
 
     public void Save(bool enabled, IReadOnlyDictionary<string, bool> tasks)
     {
-        if (enabled && !Read().HasSendKey)
-            throw new InvalidOperationException("请填写有效的 Server 酱 SendKey");
         if (
             tasks.Keys.Any(key =>
                 !TaskFailureNotificationCatalog.All.Any(task => task.TaskKey == key)

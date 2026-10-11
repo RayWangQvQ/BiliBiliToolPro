@@ -23,13 +23,12 @@ public class NotificationSettingsWorkflowTests : IDisposable
     }
 
     [Fact]
-    public void UnifiedSave_PersistsAllSwitchesAndKey_ThenRetainsKeyWhenInputIsEmpty()
+    public void UnifiedSave_PersistsAllSwitches()
     {
         _workflow.Save(
             false,
             true,
             true,
-            "SCT123synthetic",
             new Dictionary<string, bool>
             {
                 ["DailyTaskAppService"] = false,
@@ -40,7 +39,6 @@ public class NotificationSettingsWorkflowTests : IDisposable
         var settings = _workflow.Read();
         Assert.False(settings.Cookie.AutoCheckEnabled);
         Assert.True(settings.Cookie.NotifyEnabled);
-        Assert.True(settings.Cookie.HasSendKey);
         Assert.True(settings.TaskFailure.Enabled);
         Assert.Equal(11, settings.TaskFailure.Tasks.Count);
         Assert.False(
@@ -53,34 +51,26 @@ public class NotificationSettingsWorkflowTests : IDisposable
             true,
             false,
             false,
-            "",
             new Dictionary<string, bool> { ["DailyTaskAppService"] = true }
         );
-        Assert.Equal("SCT123synthetic", _configuration["CookieCheck:ServerChanSendKey"]);
         Assert.True(_workflow.Read().Cookie.AutoCheckEnabled);
         Assert.False(_workflow.Read().Cookie.NotifyEnabled);
         Assert.False(_workflow.Read().TaskFailure.Enabled);
-        Assert.DoesNotContain("SCT123synthetic", _workflow.Read().ToString());
     }
 
     [Fact]
-    public void InvalidSave_LeavesAllExistingSettingsIntact()
+    public void InvalidTaskSave_LeavesAllExistingSettingsIntact()
     {
         var tasks = new Dictionary<string, bool> { ["DailyTaskAppService"] = true };
-        _workflow.Save(true, true, true, "SCT123synthetic", tasks);
-        Assert.Throws<InvalidOperationException>(() =>
-            _workflow.Save(false, false, false, "invalid", tasks)
-        );
+        _workflow.Save(true, true, true, tasks);
         Assert.Throws<InvalidOperationException>(() =>
             _workflow.Save(
                 false,
                 false,
                 false,
-                "SCT456replacement",
                 new Dictionary<string, bool> { ["UnknownTask"] = true }
             )
         );
-        Assert.Equal("SCT123synthetic", _configuration["CookieCheck:ServerChanSendKey"]);
         var restored = _workflow.Read();
         Assert.True(restored.Cookie.AutoCheckEnabled);
         Assert.True(restored.Cookie.NotifyEnabled);
@@ -88,11 +78,11 @@ public class NotificationSettingsWorkflowTests : IDisposable
     }
 
     [Fact]
-    public void ManualCheckingCanBeSavedWithoutKey_WhenBothRemindersAreOff()
+    public void ManualCheckingCanBeSavedWithoutAnyReminder()
     {
-        _workflow.Save(false, false, false, null, new Dictionary<string, bool>());
+        _workflow.Save(false, false, false, new Dictionary<string, bool>());
         Assert.False(_workflow.Read().Cookie.AutoCheckEnabled);
-        Assert.False(_workflow.Read().Cookie.HasSendKey);
+        Assert.False(_workflow.Read().Cookie.NotifyEnabled);
         Assert.False(_workflow.Read().TaskFailure.Enabled);
     }
 

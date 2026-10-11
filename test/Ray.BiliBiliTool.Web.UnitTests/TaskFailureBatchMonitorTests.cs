@@ -19,18 +19,20 @@ public class TaskFailureBatchMonitorTests
         );
         f.Clock.Advance(10);
         await f.Monitor.FlushReadyAsync();
-        Assert.Empty(f.Notifier.Summaries);
+        Assert.Empty(f.Notifier.Messages);
         first.Dispose();
         second.Dispose();
         await f.Monitor.FlushReadyAsync();
-        Assert.Empty(f.Notifier.Summaries);
+        Assert.Empty(f.Notifier.Messages);
         f.Clock.Advance(2);
         await Task.WhenAll(f.Monitor.FlushReadyAsync(), f.Monitor.FlushReadyAsync());
-        var summary = Assert.Single(f.Notifier.Summaries);
-        Assert.Equal(2, summary.Items.Count);
-        var daily = summary.Items.Single(item => item.TaskName == "每日任务");
-        Assert.Equal(2, daily.FailureCount);
-        Assert.Equal("***3456", Assert.Single(daily.MaskedAccounts));
+        var message = Assert.Single(f.Notifier.Messages);
+        Assert.Equal("BiliBili 任务失败汇总", message.Title);
+        Assert.Equal(NotificationLevel.Warning, message.Level);
+        Assert.Contains("每日任务", message.Body);
+        Assert.Contains("漫画签到/阅读", message.Body);
+        Assert.Contains("2 次失败", message.Body);
+        Assert.Contains("***3456", message.Body);
         Assert.Null(f.Store.State);
     }
 
@@ -45,10 +47,12 @@ public class TaskFailureBatchMonitorTests
             await f.Monitor.RecordFailureAsync(2, "MangaTaskAppService");
         f.Clock.Advance(1);
         await f.Monitor.FlushReadyAsync();
-        Assert.Empty(f.Notifier.Summaries);
+        Assert.Empty(f.Notifier.Messages);
         f.Clock.Advance(1);
         await f.Monitor.FlushReadyAsync();
-        Assert.Equal(2, Assert.Single(f.Notifier.Summaries).Items.Count);
+        var message = Assert.Single(f.Notifier.Messages);
+        Assert.Contains("每日任务", message.Body);
+        Assert.Contains("漫画签到/阅读", message.Body);
     }
 
     [Fact]
@@ -63,31 +67,11 @@ public class TaskFailureBatchMonitorTests
         f.Clock.Advance(2);
         await f.Monitor.FlushReadyAsync();
         Assert.Null(f.Store.State);
-        Assert.Empty(f.Notifier.Summaries);
+        Assert.Empty(f.Notifier.Messages);
         f.Config["TaskFailureNotification:Enabled"] = "false";
         f.Config[TaskFailureNotificationCatalog.SettingKey("DailyTaskAppService")] = "true";
         await f.Monitor.RecordFailureAsync(1, "DailyTaskAppService");
         Assert.Null(f.Store.State);
-    }
-
-    [Fact]
-    public async Task FailedDelivery_RemainsPendingAndRetriesAfterBackoffAcrossRestart()
-    {
-        var f = new Fixture();
-        f.Notifier.Accept = false;
-        await f.Monitor.RecordFailureAsync(1, "DailyTaskAppService");
-        f.Clock.Advance(2);
-        await f.Monitor.FlushReadyAsync();
-        Assert.NotNull(f.Store.State);
-        await f.CreateMonitor().FlushReadyAsync();
-        Assert.Single(f.Notifier.Summaries);
-        f.Clock.Advance(15);
-        f.Notifier.Accept = true;
-        await f.CreateMonitor().FlushReadyAsync();
-        Assert.Equal(2, f.Notifier.Summaries.Count);
-        Assert.Null(f.Store.State);
-        await f.CreateMonitor().FlushReadyAsync();
-        Assert.Equal(2, f.Notifier.Summaries.Count);
     }
 
     [Fact]
@@ -97,7 +81,7 @@ public class TaskFailureBatchMonitorTests
         using (f.Monitor.BeginBatch()) { }
         f.Clock.Advance(2);
         await f.Monitor.FlushReadyAsync();
-        Assert.Empty(f.Notifier.Summaries);
+        Assert.Empty(f.Notifier.Messages);
         for (var i = 0; i < 2; i++)
         {
             using (f.Monitor.BeginBatch())
@@ -105,7 +89,7 @@ public class TaskFailureBatchMonitorTests
             f.Clock.Advance(2);
             await f.Monitor.FlushReadyAsync();
         }
-        Assert.Equal(2, f.Notifier.Summaries.Count);
+        Assert.Equal(2, f.Notifier.Messages.Count);
     }
 
     [Fact]
@@ -132,9 +116,9 @@ public class TaskFailureBatchMonitorTests
         Assert.Equal(scheduledState, f.Store.State);
         f.Clock.Advance(1);
         await f.Monitor.FlushReadyAsync();
-        var item = Assert.Single(Assert.Single(f.Notifier.Summaries).Items);
-        Assert.Equal("每日任务", item.TaskName);
-        Assert.Equal(1, item.FailureCount);
+        var message = Assert.Single(f.Notifier.Messages);
+        Assert.Contains("每日任务", message.Body);
+        Assert.DoesNotContain("漫画签到/阅读", message.Body);
     }
 
     [Fact]
@@ -160,7 +144,9 @@ public class TaskFailureBatchMonitorTests
         await recovery;
         f.Clock.Advance(2);
         await f.Monitor.FlushReadyAsync();
-        Assert.Equal("每日任务", Assert.Single(Assert.Single(f.Notifier.Summaries).Items).TaskName);
+        var message = Assert.Single(f.Notifier.Messages);
+        Assert.Contains("每日任务", message.Body);
+        Assert.DoesNotContain("漫画签到/阅读", message.Body);
     }
 
     [Fact]
@@ -213,15 +199,17 @@ public class TaskFailureBatchMonitorTests
         }
     }
 
-    private sealed class FakeNotifier : ITaskFailureNotifier
+    private sealed class FakeNotifier : INotificationService
     {
-        public bool Accept { get; set; } = true;
-        public List<TaskFailureSummary> Summaries { get; } = [];
+        public List<NotificationMessage> Messages { get; } = [];
 
-        public Task<bool> SendAsync(TaskFailureSummary summary, CancellationToken token)
+        public Task SendAsync(NotificationMessage message, string groupKey)
         {
-            Summaries.Add(summary);
-            return Task.FromResult(Accept);
+            Messages.Add(message);
+            return Task.CompletedTask;
         }
+
+        public Task SendSummaryAsync(string title, SummaryLine[] lines, string groupKey) =>
+            Task.CompletedTask;
     }
 }

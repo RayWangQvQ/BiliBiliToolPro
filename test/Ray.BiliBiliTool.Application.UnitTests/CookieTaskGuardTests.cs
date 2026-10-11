@@ -6,6 +6,7 @@ using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.NavApi;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Application;
 using Ray.BiliBiliTool.Application.Contracts.Cookies;
+using Ray.BiliBiliTool.Application.Contracts.Notifications;
 using Ray.BiliBiliTool.Infrastructure.Cookie;
 using Xunit;
 
@@ -101,7 +102,8 @@ public class CookieTaskGuardTests
             );
         Assert.Equal(1, fixture.Api.Calls);
         Assert.Equal(1, fixture.Notifier.Calls);
-        Assert.Equal("***3456", fixture.Notifier.LastAccount);
+        Assert.Equal("BiliBili Cookie 已过期", fixture.Notifier.LastTitle);
+        Assert.Contains("***3456", fixture.Notifier.LastBody);
         fixture.Clock.Now += TimeSpan.FromDays(1);
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
             fixture.Guard.EnsureValidAsync("123456", Cookie)
@@ -143,26 +145,20 @@ public class CookieTaskGuardTests
     }
 
     [Fact]
-    public async Task FailedPush_IsRetriedAfterDelayAndNotMarkedAsDelivered()
+    public async Task ExpiryNotification_IsMarkedDeliveredImmediatelyAfterDispatch()
     {
         var fixture = new Fixture();
         fixture.Api.Response = new() { Code = -101 };
-        fixture.Notifier.Delivered = false;
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
             fixture.Guard.EnsureValidAsync("123456", Cookie)
         );
+        Assert.Equal(1, fixture.Notifier.Calls);
+        Assert.NotNull((await fixture.Store.ReadAsync("123456", default))!.NotifiedDate);
+        // No further notification until the next local day.
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
             fixture.CreateGuard().EnsureValidAsync("123456", Cookie)
         );
         Assert.Equal(1, fixture.Notifier.Calls);
-        Assert.Null((await fixture.Store.ReadAsync("123456", default))!.NotifiedDate);
-        fixture.Clock.Now += TimeSpan.FromMinutes(16);
-        fixture.Notifier.Delivered = true;
-        await Assert.ThrowsAsync<InvalidOperationException>(() =>
-            fixture.Guard.EnsureValidAsync("123456", Cookie)
-        );
-        Assert.Equal(2, fixture.Notifier.Calls);
-        Assert.NotNull((await fixture.Store.ReadAsync("123456", default))!.NotifiedDate);
     }
 
     [Fact]
@@ -317,18 +313,22 @@ public class CookieTaskGuardTests
         }
     }
 
-    private sealed class FakeNotifier : ICookieExpiryNotifier
+    private sealed class FakeNotifier : INotificationService
     {
         public int Calls { get; private set; }
-        public bool Delivered { get; set; } = true;
-        public string? LastAccount { get; private set; }
+        public string? LastTitle { get; private set; }
+        public string? LastBody { get; private set; }
 
-        public Task<bool> SendAsync(string maskedAccount, CancellationToken cancellationToken)
+        public Task SendAsync(NotificationMessage message, string groupKey)
         {
             Calls++;
-            LastAccount = maskedAccount;
-            return Task.FromResult(Delivered);
+            LastTitle = message.Title;
+            LastBody = message.Body;
+            return Task.CompletedTask;
         }
+
+        public Task SendSummaryAsync(string title, SummaryLine[] lines, string groupKey) =>
+            Task.CompletedTask;
     }
 
     private sealed class FakeClock : TimeProvider

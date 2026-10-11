@@ -1,3 +1,4 @@
+using System.Text;
 using Ray.BiliBiliTool.Application.Contracts.Notifications;
 
 namespace Ray.BiliBiliTool.Web.Services;
@@ -16,7 +17,7 @@ public interface ITaskFailureBatchMonitor
 public sealed class TaskFailureBatchMonitor(
     IConfiguration configuration,
     ITaskFailureBatchStateStore store,
-    ITaskFailureNotifier notifier,
+    INotificationService notificationService,
     TimeProvider timeProvider,
     ILogger<TaskFailureBatchMonitor> logger
 ) : ITaskFailureBatchMonitor
@@ -126,10 +127,23 @@ public sealed class TaskFailureBatchMonitor(
                     group.Sum(entry => entry.Count)
                 ))
                 .ToArray();
-            if (await notifier.SendAsync(new(state.StartedAtUtc, now, items), cancellationToken))
-                await store.WriteAsync(null, cancellationToken);
-            else
-                logger.LogWarning("任务失败汇总未发送，请检查 Server 酱通知配置。稍后自动重试");
+            var body = new StringBuilder("本批任务执行完毕，以下任务执行失败：\n\n");
+            foreach (var item in items)
+                body.AppendLine(
+                    $"- {item.TaskName}：{item.FailureCount} 次失败（账号 {string.Join("、", item.MaskedAccounts)}）"
+                );
+            body.AppendLine(
+                "\n请打开面板「今日任务」或执行记录查看详情，按需补做。\n\n本消息为本批任务的统一汇总提醒。"
+            );
+            await notificationService.SendAsync(
+                new NotificationMessage(
+                    "BiliBili 任务失败汇总",
+                    body.ToString(),
+                    NotificationLevel.Warning
+                ),
+                "task-failure"
+            );
+            await store.WriteAsync(null, cancellationToken);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
@@ -137,7 +151,6 @@ public sealed class TaskFailureBatchMonitor(
         }
         catch (Exception)
         {
-            // Provider exception messages can contain the SendKey.
             logger.LogWarning("任务失败汇总发送失败，稍后自动重试");
         }
         finally

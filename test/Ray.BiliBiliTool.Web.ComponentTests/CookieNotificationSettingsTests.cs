@@ -25,34 +25,23 @@ public class CookieNotificationSettingsTests : IDisposable
     }
 
     [Fact]
-    public void Save_ValidKeyPersistsWithoutReturningSecret_EmptyInputKeepsKey()
+    public void Save_PersistsSwitches()
     {
-        _workflow.Save(true, true, "SCT123synthetic");
-        Assert.True(_workflow.Read().HasSendKey);
-        Assert.DoesNotContain("SCT123synthetic", _workflow.Read().ToString());
-        _workflow.Save(false, false, "");
-        Assert.False(_workflow.Read().NotifyEnabled);
-        Assert.False(_workflow.Read().AutoCheckEnabled);
-        Assert.Equal("SCT123synthetic", _configuration["CookieCheck:ServerChanSendKey"]);
-        _workflow.Save(true, true, "");
+        _workflow.Save(true, true);
+        Assert.True(_workflow.Read().AutoCheckEnabled);
         Assert.True(_workflow.Read().NotifyEnabled);
-    }
-
-    [Fact]
-    public void Save_InvalidKeyDoesNotOverwriteExistingConfiguration()
-    {
-        _workflow.Save(true, true, "SCT123synthetic");
-        Assert.Throws<InvalidOperationException>(() => _workflow.Save(true, true, "invalid-key"));
-        Assert.Equal("SCT123synthetic", _configuration["CookieCheck:ServerChanSendKey"]);
-    }
-
-    [Fact]
-    public void ManualModeCanBeSavedBeforeSendKeyIsConfigured()
-    {
-        Assert.False(_workflow.Read().NotifyEnabled);
-        _workflow.Save(false, false, null);
+        _workflow.Save(false, false);
         Assert.False(_workflow.Read().AutoCheckEnabled);
-        Assert.False(_workflow.Read().HasSendKey);
+        Assert.False(_workflow.Read().NotifyEnabled);
+    }
+
+    [Fact]
+    public void ManualModeCanBeSaved()
+    {
+        Assert.True(_workflow.Read().NotifyEnabled);
+        _workflow.Save(false, false);
+        Assert.False(_workflow.Read().AutoCheckEnabled);
+        Assert.False(_workflow.Read().NotifyEnabled);
     }
 
     public void Dispose()

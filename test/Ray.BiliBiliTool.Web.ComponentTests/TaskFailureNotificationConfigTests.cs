@@ -25,11 +25,10 @@ public class TaskFailureNotificationConfigTests : TestContext
         Assert.True(workflow.Tasks["MangaTaskAppService"]);
         Assert.Contains("设置已保存", page.Find("[role=status]").TextContent);
         Assert.Contains("2 分钟", page.Markup);
-        Assert.Contains("SendKey 已配置", page.Markup);
     }
 
     [Fact]
-    public void Settings_PersistAcrossReload_WithoutChangingCookieSettingsOrSendKey()
+    public void Settings_PersistAcrossReload()
     {
         var directory = Directory.CreateTempSubdirectory("failure-settings-");
         try
@@ -38,7 +37,7 @@ public class TaskFailureNotificationConfigTests : TestContext
                 .AddSqlite($"Data Source={Path.Combine(directory.FullName, "settings.db")}")
                 .Build();
             using var configurationLifetime = root as IDisposable;
-            new CookieNotificationSettingsWorkflow(root).Save(false, false, "SCT123synthetic");
+            new CookieNotificationSettingsWorkflow(root).Save(false, false);
             var workflow = new TaskFailureNotificationSettingsWorkflow(root);
             workflow.Save(
                 true,
@@ -57,10 +56,8 @@ public class TaskFailureNotificationConfigTests : TestContext
             Assert.True(
                 restored.Tasks.Single(task => task.TaskKey == "MangaTaskAppService").Enabled
             );
-            Assert.Equal("SCT123synthetic", root["CookieCheck:ServerChanSendKey"]);
             Assert.False(root.GetValue<bool>("CookieCheck:AutoCheckEnabled"));
             Assert.False(root.GetValue<bool>("CookieCheck:NotifyEnabled"));
-            Assert.DoesNotContain("SCT123synthetic", restored.ToString());
         }
         finally
         {
@@ -70,7 +67,7 @@ public class TaskFailureNotificationConfigTests : TestContext
     }
 
     [Fact]
-    public void EnableWithoutKey_IsRejected_AndDisabledConfigurationCanBeSaved()
+    public void InvalidTask_IsRejected_AndDisabledConfigurationCanBeSaved()
     {
         var directory = Directory.CreateTempSubdirectory("failure-settings-");
         try
@@ -81,7 +78,7 @@ public class TaskFailureNotificationConfigTests : TestContext
             using var configurationLifetime = root as IDisposable;
             var workflow = new TaskFailureNotificationSettingsWorkflow(root);
             Assert.Throws<InvalidOperationException>(() =>
-                workflow.Save(true, new Dictionary<string, bool>())
+                workflow.Save(true, new Dictionary<string, bool> { ["UnknownTask"] = true })
             );
             workflow.Save(false, new Dictionary<string, bool>());
             Assert.False(workflow.Read().Enabled);
@@ -99,9 +96,8 @@ public class TaskFailureNotificationConfigTests : TestContext
 
         public NotificationSettings Read() =>
             new(
-                new(true, true, true),
+                new(true, true),
                 new(
-                    true,
                     true,
                     [
                         new("DailyTaskAppService", "每日任务", true),
@@ -114,7 +110,6 @@ public class TaskFailureNotificationConfigTests : TestContext
             bool autoCheckEnabled,
             bool expiryNotifyEnabled,
             bool failureNotifyEnabled,
-            string? newSendKey,
             IReadOnlyDictionary<string, bool> tasks
         ) => Tasks = new(tasks);
     }
