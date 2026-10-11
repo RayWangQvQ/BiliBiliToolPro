@@ -87,6 +87,15 @@ https://gh-proxy.com/https://github.com/RayWangQvQ/BiliBiliToolPro.git
 
 Third-party proxy availability is not guaranteed.
 
+## Environment variables
+
+`BILI_REPO` and `BILI_BRANCH` override which repository and branch the scripts look for. They default to `raywangqvq/bilibilitoolpro` and the main branch, so set them only when running from a fork.
+
+```bash
+export BILI_REPO=raywangqvq/bilibilitoolpro # repository owner/name
+export BILI_BRANCH=                        # branch suffix; leave empty for main
+```
+
 ## Troubleshooting
 
 ### .NET installation fails

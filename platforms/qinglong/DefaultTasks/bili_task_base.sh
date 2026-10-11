@@ -11,8 +11,8 @@ set -u
 set -o pipefail
 
 verbose=false                          # 开启debug日志
-bili_repo="raywangqvq/bilibilitoolpro" # 仓库地址
-bili_branch=""                         # 分支名，空或_develop
+bili_repo=${BILI_REPO:-"raywangqvq/bilibilitoolpro"} # 仓库地址
+bili_branch=${BILI_BRANCH:-""}         # 分支名，空或_develop
 prefer_mode=${BILI_MODE:-"dotnet"}     # dotnet或bilitool，需要通过环境变量配置
 github_proxy=${BILI_GITHUB_PROXY:-""}  # 下载github release包时使用的代理，会拼在地址前面，需要通过环境变量配置
 export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1 # 解决抽风问题
@@ -78,14 +78,21 @@ if [ ! -d "$dir_repo" ] && [ -d "$QL_DIR/repo" ]; then
   dir_repo="$QL_DIR/repo"
 fi
 dir_shell=$QL_DIR/shell
-touch $dir_shell/env.sh && . $dir_shell/env.sh
+touch "$dir_shell/env.sh" && . "$dir_shell/env.sh"
 touch /root/.bashrc && . /root/.bashrc
 
 # 目录
 say "青龙repo目录: $dir_repo"
 qinglong_bili_repo="$(echo "$bili_repo" | sed 's/\//_/g')${bili_branch}"
-qinglong_bili_repo_dir="$(find $dir_repo -type d \( -iname $qinglong_bili_repo -o -iname ${qinglong_bili_repo}_main \) | head -1)"
+qinglong_bili_repo_dir="$(find "$dir_repo" -type d \( -iname "$qinglong_bili_repo" -o -iname "${qinglong_bili_repo}_main" \) | head -1)"
 say "bili仓库目录: $qinglong_bili_repo_dir"
+
+if [ -z "$qinglong_bili_repo_dir" ]; then
+    say_err "未找到 bili 仓库目录"
+    say_err "查找目标：$qinglong_bili_repo"
+    say_err "请确认已在青龙中拉取仓库 ${bili_repo}${bili_branch}，或通过环境变量 BILI_REPO / BILI_BRANCH 覆盖默认值"
+    exit 1
+fi
 
 current_linux_os="debian"  # 或alpine
 current_os="linux"         # 或linux-musl
@@ -94,8 +101,10 @@ machine_architecture="x64" # 或arm、arm64
 bilitool_installed_version=0
 
 # 以下操作仅在bilitool仓库的根bin文件下执行
-cd $qinglong_bili_repo_dir
-mkdir -p bin && cd $qinglong_bili_repo_dir/bin
+cd "$qinglong_bili_repo_dir"
+mkdir -p bin && cd "$qinglong_bili_repo_dir/bin"
+bilitool_runtime_link="$qinglong_bili_repo_dir/bin/.bilitool-current"
+bilitool_installed_dir="$qinglong_bili_repo_dir/bin"
 
 # 判断是否存在某指令
 machine_has() {
@@ -309,9 +318,17 @@ remove_legacy_dotnet_entry() {
 check_bilitool() {
     eval $invocation
 
-    TAG_FILE="./tag.txt"
-    touch $TAG_FILE
-    local STORED_TAG=$(cat $TAG_FILE 2>/dev/null)
+    local runtime_dir="$qinglong_bili_repo_dir/bin"
+    local runtime_link="${bilitool_runtime_link:-$qinglong_bili_repo_dir/bin/.bilitool-current}"
+    if [ -e "$runtime_link" ]; then
+        runtime_dir="$runtime_link"
+    fi
+
+    TAG_FILE="$runtime_dir/tag.txt"
+    local STORED_TAG=""
+    if [ -f "$TAG_FILE" ]; then
+        STORED_TAG="$(cat "$TAG_FILE")"
+    fi
 
     #如果STORED_TAG为空，则返回1
     if [[ -z $STORED_TAG ]]; then
@@ -322,9 +339,10 @@ check_bilitool() {
     say "tag.txt记录的版本：$STORED_TAG"
 
     # 查找当前目录下是否有叫Ray.BiliBiliTool.Console的文件
-    if [ -f "./Ray.BiliBiliTool.Console" ]; then
+    if [ -f "$runtime_dir/Ray.BiliBiliTool.Console" ]; then
         say "bilitool已安装"
         bilitool_installed_version=$STORED_TAG
+        bilitool_installed_dir="$runtime_dir"
         return 0
     else
         say "bilitool未安装"
@@ -374,7 +392,7 @@ install_dotnet() {
     if [[ $current_linux_os == "debian" ]]; then
         say "使用apt安装"
 
-        if ! (curl -s -m 5 www.google.com >/dev/nul); then
+        if ! (curl -s -m 5 www.google.com >/dev/null); then
             say "机器位于墙内，切换为包源为国内镜像源"
             cp /etc/apt/sources.list /etc/apt/sources.list.bak
             sed -i 's/https:\/\/deb.debian.org/https:\/\/mirrors.ustc.edu.cn/g' /etc/apt/sources.list
@@ -401,7 +419,7 @@ install_dotnet() {
             say_err "请升级到 Alpine 3.23 或设置 BILI_MODE=bilitool"
             return 1
         fi
-        if ! (curl -s -m 5 www.google.com >/dev/nul); then
+        if ! (curl -s -m 5 www.google.com >/dev/null); then
             say "机器位于墙内，切换为包源为国内镜像源"
             cp /etc/apk/repositories /etc/apk/repositories.bak
             sed -i 's/https:\/\/dl-cdn.alpinelinux.org/https:\/\/mirrors.ustc.edu.cn/g' /etc/apk/repositories
@@ -431,45 +449,126 @@ get_download_url() {
     eval $invocation
 
     tag=$1
-    url="${github_proxy}https://github.com/RayWangQvQ/BiliBiliToolPro/releases/download/$tag/bilibili-tool-pro-v$tag-$current_os-$machine_architecture.zip"
+    url="${github_proxy}https://github.com/${bili_repo}/releases/download/$tag/bilibili-tool-pro-v$tag-$current_os-$machine_architecture.zip"
     say "下载地址：$url"
     echo $url
     return 0
 }
 
-# 安装bilitool
+# 原子替换bilitool运行目录，失败时保留旧版本
+replace_bilitool_files_atomically() {
+    local extracted_dir="$1"
+    local staged_tag="$2"
+    local _backup_dir="$3"
+    local source
+    local file_name
+    local release_dir
+    local runtime_link="${bilitool_runtime_link:-$qinglong_bili_repo_dir/bin/.bilitool-current}"
+    local staged_link="$qinglong_bili_repo_dir/bin/.bilitool-current.tmp.$$"
+
+    if ! release_dir="$(mktemp -d "$qinglong_bili_repo_dir/bin/.bilitool-release.XXXXXX")"; then
+        return 1
+    fi
+    for source in "$extracted_dir"/* "$staged_tag"; do
+        [ -f "$source" ] || continue
+        file_name="$(basename "$source")"
+        case "$file_name" in
+            appsettings.*)
+                continue
+                ;;
+        esac
+        if ! cp -f "$source" "$release_dir/$file_name"; then
+            rm -rf "$release_dir"
+            return 1
+        fi
+    done
+
+    if [ -e "$runtime_link" ] && [ ! -L "$runtime_link" ]; then
+        rm -rf "$release_dir"
+        return 1
+    fi
+    if ! ln -s "$release_dir" "$staged_link"; then
+        rm -rf "$release_dir"
+        return 1
+    fi
+    if ! mv -Tf "$staged_link" "$runtime_link"; then
+        rm -rf "$staged_link"
+        rm -rf "$release_dir"
+        return 1
+    fi
+    bilitool_installed_dir="$runtime_link"
+}
+
+# 安装或更新bilitool
 install_bilitool() {
     eval $invocation
 
     say "开始安装bilitool"
-    # 获取最新的release信息
-    LATEST_RELEASE=$(curl -s https://api.github.com/repos/$bili_repo/releases/latest)
+    local latest_release
+    local latest_tag
+    local asset_url
+    local temp_dir
+    local zip_file_name
+    local staged_tag
 
-    # 解析最新的tag名称
-    check_jq
-    LATEST_TAG=$(echo $LATEST_RELEASE | jq -r '.tag_name')
-    say "最新版本：$LATEST_TAG"
-
-    # 读取之前存储的tag并比较
-    if [ "$LATEST_TAG" != "$bilitool_installed_version" ]; then
-        # 如果不一样，则需要更新安装
-        ASSET_URL=$(get_download_url $LATEST_TAG)
-
-        # 使用curl下载文件到当前目录下的test.zip文件
-        local zip_file_name="bilitool-$LATEST_TAG.zip"
-        curl -L -o "$zip_file_name" $ASSET_URL
-
-        # 解压
-        check_unzip
-        unzip -jo "$zip_file_name" -d ./ &&
-            rm "$zip_file_name" &&
-            rm -f appsettings.*
-
-        # 更新tag.txt文件
-        echo $LATEST_TAG >./tag.txt
-    else
-        say "已经是最新版本，无需下载。"
+    if ! latest_release="$(curl --fail --show-error --location --retry 3 "https://api.github.com/repos/$bili_repo/releases/latest")"; then
+        say_err "无法获取GitHub最新版本信息"
+        return 1
     fi
+
+    if ! check_jq; then
+        return 1
+    fi
+    if ! latest_tag="$(printf '%s' "$latest_release" | jq -r '.tag_name')"; then
+        say_err "无法解析GitHub最新版本信息"
+        return 1
+    fi
+    if [ -z "$latest_tag" ] || [ "$latest_tag" = "null" ]; then
+        say_err "无法从GitHub获取有效的最新版本号"
+        return 1
+    fi
+    say "最新版本：$latest_tag"
+
+    if [ "$latest_tag" = "$bilitool_installed_version" ]; then
+        say "已经是最新版本，无需下载。"
+        return 0
+    fi
+
+    asset_url="$(get_download_url "$latest_tag")"
+    if ! temp_dir="$(mktemp -d "$qinglong_bili_repo_dir/bin/.bilitool-update.XXXXXX")"; then
+        say_err "无法创建bilitool更新临时目录"
+        return 1
+    fi
+    zip_file_name="$temp_dir/bilitool-$latest_tag.zip"
+    staged_tag="$temp_dir/tag.txt"
+
+    if ! curl --fail --show-error --location --retry 3 -o "$zip_file_name" "$asset_url"; then
+        rm -rf "$temp_dir"
+        say_err "bilitool下载失败，保留当前版本"
+        return 1
+    fi
+    if ! check_unzip; then
+        rm -rf "$temp_dir"
+        return 1
+    fi
+    mkdir -p "$temp_dir/extracted"
+    if ! unzip -jo "$zip_file_name" -d "$temp_dir/extracted"; then
+        rm -rf "$temp_dir"
+        say_err "bilitool解压失败，保留当前版本"
+        return 1
+    fi
+    if [ ! -f "$temp_dir/extracted/Ray.BiliBiliTool.Console" ]; then
+        rm -rf "$temp_dir"
+        say_err "下载包中未找到Ray.BiliBiliTool.Console"
+        return 1
+    fi
+    printf '%s\n' "$latest_tag" >"$staged_tag"
+    if ! replace_bilitool_files_atomically "$temp_dir/extracted" "$staged_tag" "$temp_dir/backup"; then
+        rm -rf "$temp_dir"
+        say_err "bilitool替换失败，保留当前版本"
+        return 1
+    fi
+    rm -rf "$temp_dir"
 }
 
 ## 安装dotnet（如果未安装过）
@@ -515,7 +614,7 @@ run_task() {
     if [ "$prefer_mode" == "dotnet" ]; then
         dotnet run --ENVIRONMENT=Production
     else
-        cp -f $qinglong_bili_repo_dir/bin/Ray.BiliBiliTool.Console .
+        cp -f "$bilitool_installed_dir/Ray.BiliBiliTool.Console" .
         chmod +x ./Ray.BiliBiliTool.Console && ./Ray.BiliBiliTool.Console --ENVIRONMENT=Production
     fi
 }
