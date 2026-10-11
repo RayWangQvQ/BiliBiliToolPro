@@ -8,24 +8,44 @@
 
 <PageHero Size="Size.Small" Title="关于 BiliTool" Description="了解项目版本、源码与反馈渠道。" />
 
-<MudCard Class="app-about-card">
-    <MudCardHeader>
-        <MudText Typo="Typo.h6">项目信息</MudText>
-    </MudCardHeader>
-    <MudCardContent>
-        <MudText Typo="Typo.body1">版本号：@AppInfoProvider.AppVersion</MudText>
-        <MudText Typo="Typo.body2" Class="mt-3">
-            B 站每日任务自动化工具。多宿主（面板 / 命令行 / 云函数），开源免费。
-        </MudText>
-        <MudText Typo="Typo.body2" Class="mt-2">
-            版本号由 CI 在构建时注入。显示「开发版」说明这份产物不是 CI 构建的，
-            报问题时请一并说明获取方式。
-        </MudText>
-    </MudCardContent>
-    <MudCardActions>
-        <MudButton Variant="Variant.Text" Color="Color.Primary"
-                   Href="@ConfigConstants.SourceCodeUrl" Target="_blank">源码仓库</MudButton>
-        <MudButton Variant="Variant.Text" Color="Color.Primary"
-                   Href="@(ConfigConstants.SourceCodeUrl + "/issues")" Target="_blank">问题反馈</MudButton>
-    </MudCardActions>
-</MudCard>
+<div class="app-about-grid">
+    <MudCard Class="app-about-card">
+        <MudCardHeader>
+            <MudText Typo="Typo.h6">项目信息</MudText>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudStack Spacing="3">
+                <MudText Typo="Typo.h6" Class="app-version">版本号：@AppInfoProvider.AppVersion</MudText>
+                <MudText Typo="Typo.body2">
+                    B 站每日任务自动化工具。多宿主（面板 / 命令行 / 云函数），开源免费。
+                </MudText>
+                <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true">
+                    版本号由 CI 在构建时注入，显示「开发版」说明非 CI 构建产物。
+                </MudAlert>
+            </MudStack>
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary"
+                       Href="@ConfigConstants.SourceCodeUrl" Target="_blank"
+                       StartIcon="@Icons.Material.Filled.Code">源码仓库</MudButton>
+            <MudButton Variant="Variant.Outlined" Color="Color.Primary"
+                       Href="@(ConfigConstants.SourceCodeUrl + "/issues")" Target="_blank"
+                       StartIcon="@Icons.Material.Filled.BugReport">问题反馈</MudButton>
+        </MudCardActions>
+    </MudCard>
+
+    <MudCard Class="app-about-card">
+        <MudCardHeader>
+            <MudText Typo="Typo.h6">赞助</MudText>
+        </MudCardHeader>
+        <MudCardContent Class="d-flex flex-column align-center">
+            <MudText Typo="Typo.body1" Class="font-weight-bold text-center">
+                开源不易，扫码赞助 1 元。每一笔赞助，都是投给理想世界的一票！
+            </MudText>
+            <img src="images/donate.jpg" alt="赞助码（微信 / 支付宝）" class="donate-qr align-self-center" />
+            <MudText Typo="Typo.body2" Color="Color.Secondary" Class="mt-2 text-center">
+                想加入交流群的朋友，赞助时请在留言中留下你的微信号。
+            </MudText>
+        </MudCardContent>
+    </MudCard>
+</div>
