@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Ray.BiliBiliTool.Agent;
@@ -8,11 +6,9 @@ using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.ApiApi.UpInfo;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.LiveApi;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
-using Ray.BiliBiliTool.Agent.FunctionalTests;
 using Ray.BiliBiliTool.Console;
-using Xunit;
 
-namespace BiliAgentTest
+namespace Ray.BiliBiliTool.Agent.FunctionalTests
 {
     [Trait("Category", "External")]
     public class LiveApiTests : IDisposable
