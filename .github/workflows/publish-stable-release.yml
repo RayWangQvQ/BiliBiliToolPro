@@ -85,13 +85,19 @@ jobs:
           SINCE: ${{ needs.determine-version.outputs.since }}
         run: bash ./scripts/release-notes.sh notes --since "$SINCE" > release_notes.md
 
-      # 已存在则更新，不报错：重跑失败的发版（同一 run 的 retry）不会撞车
+      # 已存在则更新，不报错：重跑失败的发版（同一 run 的 retry）不会撞车。
+      # generate_release_notes 让 GitHub 自动生成 What's Changed / New Contributors /
+      # Full Changelog（旧版 release 里被误删的那部分）；body_path 的中文分类条目会被
+      # prepend 到自动 notes 之前，两者叠加成与 4.0.2 一致的完整 body。
+      # previous_tag 显式指定比较基准（即上个稳定 tag），避免 GitHub 自动判断基准出错。
       - name: Create GitHub Release and tag
         uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ needs.determine-version.outputs.version }}
           name: BiliBiliToolPro-V${{ needs.determine-version.outputs.version }}
           body_path: release_notes.md
+          generate_release_notes: "true"
+          previous_tag: ${{ needs.determine-version.outputs.since }}
           files: ./src/Ray.BiliBiliTool.Console/bin/Publish/*.zip
           discussion_category_name: Announcements
           make_latest: "true"
