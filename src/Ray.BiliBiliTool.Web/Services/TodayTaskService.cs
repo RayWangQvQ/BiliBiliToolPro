@@ -166,9 +166,6 @@ public class TodayTaskService(
                             IsBiliPending = pending,
                             CanAutoRedo =
                                 !pending && TaskStatusEvaluator.CanAutoRedo(ctx, evaluated),
-                            CanDisableShare =
-                                item.ItemKey == TaskCatalog.ShareItemKey
-                                && item.IsEnabled(configuration),
                         }
                     );
                 }
@@ -238,13 +235,6 @@ public class TodayTaskService(
         }
 
         return count;
-    }
-
-    public async Task DisableShareAsync(CancellationToken cancellationToken = default)
-    {
-        await SaveSettingsAsync(
-            new Dictionary<string, string> { ["DailyTaskConfig:IsShareVideo"] = "false" }
-        );
     }
 
     public async Task SaveAutoRecoverSettingsAsync(

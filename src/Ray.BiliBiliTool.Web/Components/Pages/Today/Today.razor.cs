@@ -20,9 +20,6 @@ public partial class Today : ComponentBase
     [Inject]
     private ISnackbar Snackbar { get; set; } = null!;
 
-    [Inject]
-    private IDialogService DialogService { get; set; } = null!;
-
     private List<AccountTodayTasksDto> _accounts = [];
     private bool _loadingLocal;
     private bool _busy;
@@ -175,41 +172,6 @@ public partial class Today : ComponentBase
         await ManualRefreshAsync();
     }
 
-    /// <summary>
-    /// 关闭分享任务。这是全局开关（对所有账号生效），所以先弹确认，
-    /// 并且不挂在单个任务行上——放在设置区才对得上它的作用范围。
-    /// </summary>
-    private async Task DisableShareAsync()
-    {
-        var confirmed = await DialogService.ShowMessageBoxAsync(
-            "不再尝试分享",
-            "这会关闭所有账号的分享任务，之后不再自动尝试分享。确定吗？",
-            "确定关闭",
-            "取消"
-        );
-        if (confirmed != true)
-        {
-            return;
-        }
-
-        _busy = true;
-        try
-        {
-            await TodayTaskService.DisableShareAsync();
-            Snackbar.Add("已关闭分享任务，之后不再尝试分享", Severity.Success);
-        }
-        catch (Exception ex)
-        {
-            Snackbar.Add($"关闭失败：{ex.Message}", Severity.Error);
-        }
-        finally
-        {
-            _busy = false;
-        }
-
-        await ManualRefreshAsync();
-    }
-
     private async Task SaveSettingsAsync()
     {
         _busy = true;
@@ -231,10 +193,6 @@ public partial class Today : ComponentBase
             _busy = false;
         }
     }
-
-    /// <summary>是否有任何一项提供了「不再尝试分享」的入口（分享任务仍开启时才会有）</summary>
-    private bool AnyShareDisable =>
-        _accounts.SelectMany(a => a.Groups).SelectMany(g => g.Items).Any(i => i.CanDisableShare);
 
     /// <summary>
     /// 整任务算一项的任务（<see cref="TodayTaskItemDto.ItemKey"/> 为 null，如「充电」「批量取关」）：

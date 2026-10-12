@@ -29,9 +29,6 @@ public sealed class TodayTaskItemDto
 
     /// <summary>是否允许自动补做（分享恒为 false，见 TaskStatusEvaluator.CanAutoRedo）</summary>
     public bool CanAutoRedo { get; init; }
-
-    /// <summary>是否显示「不再尝试」按钮（仅分享且仍开启时）</summary>
-    public bool CanDisableShare { get; init; }
 }
 
 /// <summary>一个任务（页面上的一组）</summary>
@@ -84,9 +81,6 @@ public interface ITodayTaskService
 
     /// <summary>补做全部账号所有可补做的项，返回执行条数</summary>
     Task<int> RedoAllMissingAsync(CancellationToken cancellationToken = default);
-
-    /// <summary>一键关闭分享任务</summary>
-    Task DisableShareAsync(CancellationToken cancellationToken = default);
 
     /// <summary>保存自动补做设置</summary>
     Task SaveAutoRecoverSettingsAsync(

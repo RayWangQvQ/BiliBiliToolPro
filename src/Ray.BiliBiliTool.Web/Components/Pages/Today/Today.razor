@@ -14,6 +14,9 @@
         <MudProgressLinear Indeterminate="true" Color="Color.Primary" Class="mb-3" />
     }
 
+    @* 任务介绍 *@
+    <Ray.BiliBiliTool.Web.Components.Comps.TaskGuide TaskKey="AutoRecover" />
+
     @* 操作区：时间信息 + 刷新 / 一键补做 *@
     <MudPaper Class="pa-3 mb-3" Elevation="1">
         <div class="d-flex flex-wrap align-center gap-3">
@@ -41,8 +44,7 @@
         </div>
     </MudPaper>
 
-    @* 设置区：自动补做 + 关闭分享 *@
-    <Ray.BiliBiliTool.Web.Components.Comps.TaskGuide TaskKey="AutoRecover" />
+    @* 设置区：自动补做 *@
     <MudPaper Class="pa-3 mb-4" Elevation="1">
         <div class="d-flex align-center gap-2 mb-2">
             <MudIcon Icon="@Icons.Material.Filled.Settings" Size="Size.Small" Class="mud-text-secondary" />
@@ -60,18 +62,6 @@
                        Disabled="_busy" OnClick="SaveSettingsAsync">保存设置</MudButton>
         </div>
 
-        @if (AnyShareDisable)
-        {
-            <MudDivider Class="my-3" />
-            <div class="d-flex flex-wrap align-center gap-2">
-                <MudButton Variant="Variant.Outlined" Color="Color.Warning" Size="Size.Small"
-                           StartIcon="@Icons.Material.Filled.Block"
-                           Disabled="_busy" OnClick="DisableShareAsync">不再尝试分享</MudButton>
-                <MudText Typo="Typo.caption" Class="mud-text-secondary">
-                    对所有账号生效：关闭后不再自动尝试分享任务。
-                </MudText>
-            </div>
-        }
     </MudPaper>
 
     @if (_loadingLocal)
