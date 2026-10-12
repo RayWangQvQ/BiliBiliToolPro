@@ -1,3 +1,10 @@
+## 4.2.1
+- feat(web): refine account login and today-task page (#1226)
+- feat(web): add sponsor section to About page (#1224)
+- fix(qinglong): harden the install and update path (#1216)
+- test: add IGaiaApi functional tests and fix LiveApiTests namespace (#1223)
+- ci(release): restore GitHub auto-generated release notes (#1222)
+- docs(changelog): 4.2.0 (#1221)
 ## 4.2.0
 - feat: enroll the web device fingerprint to fix share -403 (#1214)
 - feat(daily): configure an account level threshold for coin donation (#1207)
