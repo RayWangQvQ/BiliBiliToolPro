@@ -19,12 +19,6 @@
                     <MudText Typo="Typo.body2" Class="mb-2">请使用Bilibili App扫描二维码</MudText>
                     <img src="data:image/png;base64,@_qrImageBase64" alt="QR Code"
                          style="width:200px;height:200px;border:1px solid #e0e0e0;border-radius:4px;" />
-                    @if (!string.IsNullOrEmpty(_onlineUrl))
-                    {
-                        <MudText Typo="Typo.caption" Class="mt-1">
-                            <MudLink Href="@_onlineUrl" Target="_blank">扫码失败？查看高清二维码</MudLink>
-                        </MudText>
-                    }
                     <MudText Typo="Typo.caption" Class="mt-2">@($"等待扫描... {_pollCount}/10")</MudText>
                     <MudProgressLinear Value="@(_pollCount * 10)" Color="Color.Primary" Class="mt-1" Style="width:200px;" />
                 </div>
