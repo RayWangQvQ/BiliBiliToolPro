@@ -62,11 +62,7 @@ public sealed class CookieTaskGuard(
                 bool valid;
                 try
                 {
-                    using var timeout = CancellationTokenSource.CreateLinkedTokenSource(
-                        cancellationToken
-                    );
-                    timeout.CancelAfter(TimeSpan.FromSeconds(15));
-                    var response = await navApi.GetNavAsync(cookie, timeout.Token);
+                    var response = await navApi.GetNavAsync(cookie, cancellationToken);
                     if (
                         response.Code == -101
                         || (response.Code == 0 && response.Data?.IsLogin == false)
@@ -81,9 +77,16 @@ public sealed class CookieTaskGuard(
                 {
                     throw;
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     // A transport or business error is not evidence of an expired session.
+                    // Timeout is governed by HttpClient.Timeout (30s), not a local CancelAfter.
+                    logger.LogWarning(
+                        ex,
+                        "Cookie check failed for user {UserId}: {Message}",
+                        userId,
+                        ex.Message
+                    );
                     throw new InvalidOperationException(
                         "登录态检查暂时失败，本次活动已跳过，稍后自动重试"
                     );
