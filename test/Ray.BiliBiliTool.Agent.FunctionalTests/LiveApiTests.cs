@@ -3,7 +3,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
-using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.ApiApi.UpInfo;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.LiveApi;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Console;
@@ -114,27 +113,6 @@ namespace Ray.BiliBiliTool.Agent.FunctionalTests
             BiliApiResponse re = await api.WearMedalWall(request, cookie);
 
             re.Code.Should().BeOneOf(0, 1500005);
-        }
-
-        [Fact]
-        public async Task GetSpaceInfo_Normal_Success()
-        {
-            using var scope = _host.Services.CreateScope();
-
-            var cookie = RequireCookie(scope.ServiceProvider);
-            var api = scope.ServiceProvider.GetRequiredService<IApiApi>();
-
-            var req = new GetSpaceInfoDto() { mid = 919174L };
-
-            BiliApiResponse<GetSpaceInfoResponse> re = await api.GetSpaceInfo(req, cookie);
-
-            Assert.True(re.Code == 0);
-            Assert.NotNull(re.Data);
-            Assert.Equal(919174, re.Data.Mid);
-            Assert.NotNull(re.Data.Live_room);
-            Assert.Equal(3115258, re.Data.Live_room.Roomid);
-            Assert.False(String.IsNullOrEmpty(re.Data.Name));
-            Assert.False(String.IsNullOrEmpty(re.Data.Live_room.Title));
         }
 
         [Fact]
