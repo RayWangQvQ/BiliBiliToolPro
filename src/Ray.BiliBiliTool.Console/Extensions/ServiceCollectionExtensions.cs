@@ -18,6 +18,7 @@ public static class ServiceCollectionExtensions
             .AddBiliBiliConfigs(configuration)
             .AddBiliBiliClientApi(configuration)
             .AddDomainServices()
-            .AddAppServices();
+            .AddAppServices()
+            .AddBiliBiliNotification();
     }
 }

@@ -1,0 +1,133 @@
+@page "/Configurations/NotificationConfig"
+@using Microsoft.AspNetCore.Authorization
+@using Ray.BiliBiliTool.Config.Options;
+@attribute [Authorize]
+@rendermode InteractiveServer
+@inherits BaseConfigComponent<NotificationOptions>
+
+<PageTitle>消息通知配置</PageTitle>
+
+<MudContainer Class="app-config-page">
+    <PageHero Size="Size.Small" Title="消息通知配置" Description="配置每日任务执行结果的消息通知：Telegram 机器人或自定义 Webhook（如 Bark、飞书机器人等），两者可同时启用。" />
+
+    @if (_isLoading)
+    {
+        <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+    }
+    else
+    {
+        <EditForm Model="@_config" OnValidSubmit="HandleValidSubmitAsync">
+            <DataAnnotationsValidator />
+
+            <!-- 总开关 -->
+            <MudCard Class="mb-4">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6">通知总开关</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudSwitch T="bool" @bind-Value="_config.IsEnable" Label="启用消息通知" Color="Color.Primary" />
+                    <MudText Typo="Typo.body2" Class="mt-1">总开关关闭后，所有通道都不会发送通知。</MudText>
+                </MudCardContent>
+            </MudCard>
+
+            @if (_config.IsEnable)
+            {
+                <!-- Telegram 通道 -->
+                <MudCard Class="mb-4">
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h6">Telegram 机器人</MudText>
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <MudGrid>
+                            <MudItem xs="12" md="4">
+                                <MudSwitch T="bool" @bind-Value="_config.IsTelegramEnabled" Label="启用 Telegram 通知" Color="Color.Primary" />
+                            </MudItem>
+                            <MudItem xs="12" md="4">
+                                <MudTextField T="string" @bind-Value="_config.TelegramBotToken" Label="Bot Token"
+                                    HelperText="向 @@BotFather 创建机器人后获取" Disabled="!_config.IsTelegramEnabled" />
+                            </MudItem>
+                            <MudItem xs="12" md="4">
+                                <MudTextField T="string" @bind-Value="_config.TelegramChatId" Label="Chat ID"
+                                    HelperText="接收消息的对话 ID（需先与机器人建立会话）" Disabled="!_config.IsTelegramEnabled" />
+                            </MudItem>
+                            <MudItem xs="12" md="12">
+                                <MudTextField T="string" @bind-Value="_config.TelegramApiHost" Label="Telegram API 地址"
+                                    HelperText="默认 https://api.telegram.org，可填反代地址" Disabled="!_config.IsTelegramEnabled" />
+                            </MudItem>
+                        </MudGrid>
+                    </MudCardContent>
+                </MudCard>
+
+                <!-- 自定义 Webhook 通道 -->
+                <MudCard Class="mb-4">
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h6">自定义 Webhook</MudText>
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <MudGrid>
+                            <MudItem xs="12" md="4">
+                                <MudSwitch T="bool" @bind-Value="_config.IsWebhookEnabled" Label="启用 Webhook 通知" Color="Color.Primary" />
+                            </MudItem>
+                            <MudItem xs="12" md="8">
+                                <MudTextField T="string" @bind-Value="_config.WebhookUrl" Label="Webhook 地址"
+                                    HelperText="兼容 Bark、飞书自定义机器人、自建服务等支持 JSON POST 的地址" Disabled="!_config.IsWebhookEnabled" />
+                            </MudItem>
+                            <MudItem xs="12" md="12">
+                                <MudTextField T="string" @bind-Value="_config.WebhookContentType" Label="Content-Type"
+                                    HelperText="默认 application/json" Disabled="!_config.IsWebhookEnabled" />
+                            </MudItem>
+                        </MudGrid>
+                    </MudCardContent>
+                </MudCard>
+
+                <!-- 通知时机 -->
+                <MudCard Class="mb-4">
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h6">通知时机</MudText>
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <MudGrid>
+                            <MudItem xs="12" md="6">
+                                <MudSwitch T="bool" @bind-Value="_config.SendSummaryOnSuccess" Label="每日任务执行完成后发送摘要" Color="Color.Primary" />
+                            </MudItem>
+                            <MudItem xs="12" md="6">
+                                <MudSwitch T="bool" @bind-Value="_config.SendOnError" Label="每日任务执行失败时发送错误通知" Color="Color.Primary" />
+                            </MudItem>
+                        </MudGrid>
+                    </MudCardContent>
+                </MudCard>
+            }
+
+            <!-- 操作按钮 -->
+            <MudCard Class="mt-4">
+                <MudCardActions>
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">保存配置</MudButton>
+                    <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="LoadConfigAsync" Class="ml-2">重新加载</MudButton>
+                    <MudButton Variant="Variant.Outlined" Color="Color.Info" OnClick="SendTestNotificationAsync" Class="ml-2">发送测试通知</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </EditForm>
+
+        @if (_testMessage.HasValue)
+        {
+            <MudAlert Severity="@(_testSuccess ? Severity.Success : Severity.Info)" Class="mt-3">
+                @_testMessage
+            </MudAlert>
+        }
+
+        @if (_saveMessage.HasValue)
+        {
+            <MudAlert Severity="@(_saveSuccess ? Severity.Success : Severity.Error)" Class="mt-3">
+                @_saveMessage
+            </MudAlert>
+        }
+    }
+</MudContainer>

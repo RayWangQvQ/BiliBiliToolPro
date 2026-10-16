@@ -45,7 +45,8 @@ public static class ServiceCollectionExtension
             .Configure<DaiDaiOptions>(configuration.GetSection("DaiDaiConfig"))
             .Configure<AutoRecoverOptions>(
                 configuration.GetSection(AutoRecoverOptions.SectionName)
-            );
+            )
+            .Configure<NotificationOptions>(configuration.GetSection("NotificationConfig"));
 
         return services;
     }
