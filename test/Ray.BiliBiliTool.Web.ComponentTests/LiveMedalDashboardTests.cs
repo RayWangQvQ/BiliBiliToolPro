@@ -17,7 +17,7 @@ using Xunit;
 
 namespace Ray.BiliBiliTool.Web.ComponentTests;
 
-public class LiveMedalDashboardTests : TestContext
+public class LiveMedalDashboardTests : ComponentTestBase
 {
     public LiveMedalDashboardTests()
     {
@@ -29,7 +29,7 @@ public class LiveMedalDashboardTests : TestContext
     public void WhitelistSelection_PreservesOtherAccountsAndExclusionsWin()
     {
         string? selected = null;
-        var cut = RenderComponent<LiveMedalDashboard>(p =>
+        var cut = Render<LiveMedalDashboard>(p =>
             p.Add(x => x.Accounts, [new(0, "示例账号")])
                 .Add(x => x.Snapshot, Example())
                 .Add(x => x.OnlySelectedAnchors, true)
@@ -41,7 +41,7 @@ public class LiveMedalDashboardTests : TestContext
         Assert.Contains("已排除", cut.Find("article[data-anchor='22']").TextContent);
         cut.Find("article[data-anchor='11'] input[aria-label='选择主播 星河']").Change(true);
         Assert.Equal("11,22,333", selected);
-        cut.SetParametersAndRender(p => p.Add(x => x.IncludedAnchorIds, selected!));
+        cut.Render(p => p.Add(x => x.IncludedAnchorIds, selected!));
         Assert.Contains("参与任务", cut.Find("article[data-anchor='11']").TextContent);
         Assert.Contains("已排除", cut.Find("article[data-anchor='22']").TextContent);
     }
@@ -49,7 +49,7 @@ public class LiveMedalDashboardTests : TestContext
     [Fact]
     public void Cards_ShowLevelsProgressAndKeepExcludedAnchorsVisible()
     {
-        var cut = RenderComponent<LiveMedalDashboard>(p =>
+        var cut = Render<LiveMedalDashboard>(p =>
             p.Add(x => x.Accounts, [new(0, "示例账号")])
                 .Add(x => x.Snapshot, Example())
                 .Add(x => x.ExcludedAnchorIds, "22")
@@ -74,16 +74,12 @@ public class LiveMedalDashboardTests : TestContext
         if (directory is not null)
         {
             cut.Find("input[type=search]").Input("");
-            var theme = RenderComponent<MudThemeProvider>();
-            var guide = RenderComponent<TaskGuide>(p =>
-                p.Add(x => x.TaskKey, "LiveFansMedalAppService")
-            );
-            var brief = RenderComponent<TaskBrief>(p =>
+            var theme = Render<MudThemeProvider>();
+            var guide = Render<TaskGuide>(p => p.Add(x => x.TaskKey, "LiveFansMedalAppService"));
+            var brief = Render<TaskBrief>(p =>
                 p.Add(x => x.TaskKey, "DailyTaskAppService").Add(x => x.ItemKey, "DonateCoin")
             );
-            var schedule = RenderComponent<ScheduleTimePicker>(p =>
-                p.Add(x => x.Value, "0 5 0 * * ?")
-            );
+            var schedule = Render<ScheduleTimePicker>(p => p.Add(x => x.Value, "0 5 0 * * ?"));
             Directory.CreateDirectory(directory);
             File.WriteAllText(
                 Path.Combine(directory, "preview.html"),
@@ -105,7 +101,7 @@ public class LiveMedalDashboardTests : TestContext
     public void ExclusionTogglePreservesSelectionsAcrossAccounts()
     {
         string? result = null;
-        var cut = RenderComponent<LiveMedalDashboard>(p =>
+        var cut = Render<LiveMedalDashboard>(p =>
             p.Add(x => x.Accounts, [new(0, "账号 1")])
                 .Add(x => x.Snapshot, Example())
                 .Add(x => x.ExcludedAnchorIds, "22,333")
@@ -113,7 +109,7 @@ public class LiveMedalDashboardTests : TestContext
         );
         cut.Find("article[data-anchor='11'] input").Change(true);
         Assert.Equal("11,22,333", result);
-        cut.SetParametersAndRender(p => p.Add(x => x.ExcludedAnchorIds, result!));
+        cut.Render(p => p.Add(x => x.ExcludedAnchorIds, result!));
         cut.Find("article[data-anchor='22'] input").Change(false);
         Assert.Equal("11,333", result);
     }

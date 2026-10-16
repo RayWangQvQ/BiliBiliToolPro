@@ -6,13 +6,14 @@ using MudBlazor;
 using MudBlazor.Services;
 using Ray.BiliBiliTool.Domain;
 using Ray.BiliBiliTool.Web.Components.Pages.Schedules;
+using Ray.BiliBiliTool.Web.ComponentTests;
 using Ray.BiliBiliTool.Web.Services.Pages.Schedules;
 using Xunit;
 using BzKey = BlazingQuartz.Core.Models.Key;
 
 namespace Ray.BiliBiliTool.Web.ComponentTests.Schedules;
 
-public class LogsDialogTests : TestContext
+public class LogsDialogTests : ComponentTestBase
 {
     public LogsDialogTests()
     {
@@ -26,7 +27,7 @@ public class LogsDialogTests : TestContext
         var workflow = new FakeLogsDialogWorkflow(instanceId: null);
         Services.AddSingleton<ILogsDialogWorkflow>(workflow);
 
-        RenderComponent<LogsDialog>(parameters =>
+        Render<LogsDialog>(parameters =>
             parameters
                 .Add(p => p.JobKey, new BzKey("job1", "DEFAULT"))
                 .Add(p => p.TriggerKey, new BzKey("trigger1", "DEFAULT"))
@@ -53,7 +54,7 @@ public class LogsDialogTests : TestContext
         );
         Services.AddSingleton<ILogsDialogWorkflow>(workflow);
 
-        var provider = RenderComponent<MudDialogProvider>();
+        var provider = Render<MudDialogProvider>();
         var parameters = new DialogParameters
         {
             [nameof(LogsDialog.JobKey)] = new BzKey("job1", "DEFAULT"),

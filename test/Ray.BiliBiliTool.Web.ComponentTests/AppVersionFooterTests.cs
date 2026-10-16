@@ -12,7 +12,7 @@ namespace Ray.BiliBiliTool.Web.ComponentTests;
 /// <summary>
 /// 侧边栏底部常驻的「应用版本」。
 /// </summary>
-public class AppVersionFooterTests : TestContext
+public class AppVersionFooterTests : ComponentTestBase
 {
     private const string TestVersion = "4.0.8-alpha.3";
 
@@ -26,7 +26,7 @@ public class AppVersionFooterTests : TestContext
     {
         Services.AddSingleton<IAppInfoProvider>(new FakeAppInfoProvider(TestVersion));
 
-        var cut = RenderComponent<AppVersionFooter>();
+        var cut = Render<AppVersionFooter>();
 
         cut.Markup.Should().Contain($"版本号：{TestVersion}");
     }
@@ -38,7 +38,7 @@ public class AppVersionFooterTests : TestContext
             new FakeAppInfoProvider(AppVersion.LocalBuildDisplay)
         );
 
-        var cut = RenderComponent<AppVersionFooter>();
+        var cut = Render<AppVersionFooter>();
 
         cut.Markup.Should().Contain(AppVersion.LocalBuildDisplay);
         cut.Markup.Should().NotContain("0.0.0-dev");

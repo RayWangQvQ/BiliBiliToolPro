@@ -6,13 +6,14 @@ using MudBlazor;
 using MudBlazor.Services;
 using Ray.BiliBiliTool.Domain;
 using Ray.BiliBiliTool.Web.Components.Pages.Schedules;
+using Ray.BiliBiliTool.Web.ComponentTests;
 using Ray.BiliBiliTool.Web.Services.Pages.Schedules;
 using Xunit;
 using BzKey = BlazingQuartz.Core.Models.Key;
 
 namespace Ray.BiliBiliTool.Web.ComponentTests.Schedules;
 
-public class HistoryDialogTests : TestContext
+public class HistoryDialogTests : ComponentTestBase
 {
     public HistoryDialogTests()
     {
@@ -77,7 +78,7 @@ public class HistoryDialogTests : TestContext
 
     private async Task<IRenderedComponent<MudDialogProvider>> ShowHistoryDialogAsync()
     {
-        var provider = RenderComponent<MudDialogProvider>();
+        var provider = Render<MudDialogProvider>();
         var parameters = new DialogParameters
         {
             [nameof(HistoryDialog.JobKey)] = new BzKey("job1", "DEFAULT"),
