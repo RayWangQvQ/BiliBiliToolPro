@@ -1,6 +1,6 @@
 using BlazingQuartz;
 using BlazingQuartz.Core;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using MudBlazor.Services;
 using Ray.BiliBiliTool.Config.SQLite;
 using Ray.BiliBiliTool.Infrastructure;
