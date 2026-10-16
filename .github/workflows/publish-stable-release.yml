@@ -78,24 +78,19 @@ jobs:
           RELEASE_VERSION: ${{ needs.determine-version.outputs.version }}
         run: bash ./scripts/publish.sh --runtime all
 
-      # notes 取自上个稳定 tag 以来合并的 PR 标题（不合规标题原样收录）。
-      # 若期间没有任何合并，脚本会报错让发版失败 —— 不允许发空版本。
-      - name: Collect release notes
-        env:
-          SINCE: ${{ needs.determine-version.outputs.since }}
-        run: bash ./scripts/release-notes.sh notes --since "$SINCE" > release_notes.md
-
       # 已存在则更新，不报错：重跑失败的发版（同一 run 的 retry）不会撞车。
-      # generate_release_notes 让 GitHub 自动生成 What's Changed / New Contributors /
-      # Full Changelog（旧版 release 里被误删的那部分）；body_path 的中文分类条目会被
-      # prepend 到自动 notes 之前，两者叠加成与 4.0.2 一致的完整 body。
-      # previous_tag 显式指定比较基准（即上个稳定 tag），避免 GitHub 自动判断基准出错。
+      # release notes 只由 GitHub 自动生成（generate_release_notes），不再传 body_path：
+      # 4.2.1/4.2.2 里 body_path 的中文标题列表和自动的 What's Changed 把同一批 PR
+      # 列了两遍。previous_tag 显式指定比较基准（即上个稳定 tag），避免 GitHub 自动
+      # 判断基准出错。
+      # 空版本防御：空版本时 generate_release_notes 仍会建 release（只有 Full Changelog
+      # 链接），下游 update-changelog job 的 release-notes.sh 会报错让整 run 标红，维护者
+      # 据此判断该版本是否误发；纯文档重复问题优先于这道非强制的空版本防线。
       - name: Create GitHub Release and tag
         uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ needs.determine-version.outputs.version }}
           name: BiliBiliToolPro-V${{ needs.determine-version.outputs.version }}
-          body_path: release_notes.md
           generate_release_notes: "true"
           previous_tag: ${{ needs.determine-version.outputs.since }}
           files: ./src/Ray.BiliBiliTool.Console/bin/Publish/*.zip
