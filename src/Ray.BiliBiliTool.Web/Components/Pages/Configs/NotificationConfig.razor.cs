@@ -16,6 +16,30 @@ public partial class NotificationConfig : BaseConfigComponent<NotificationOption
     [Inject]
     private CustomWebhookNotificationService WebhookNotificationService { get; set; } = null!;
 
+    [Inject]
+    private PushPlusNotificationService PushPlusNotificationService { get; set; } = null!;
+
+    [Inject]
+    private ServerChanNotificationService ServerChanNotificationService { get; set; } = null!;
+
+    [Inject]
+    private DingTalkNotificationService DingTalkNotificationService { get; set; } = null!;
+
+    [Inject]
+    private WorkWeiXinNotificationService WorkWeiXinNotificationService { get; set; } = null!;
+
+    [Inject]
+    private WorkWeiXinAppNotificationService WorkWeiXinAppNotificationService { get; set; } = null!;
+
+    [Inject]
+    private CoolPushNotificationService CoolPushNotificationService { get; set; } = null!;
+
+    [Inject]
+    private MicrosoftTeamsNotificationService TeamsNotificationService { get; set; } = null!;
+
+    [Inject]
+    private GotifyNotificationService GotifyNotificationService { get; set; } = null!;
+
     protected override IOptionsMonitor<NotificationOptions> OptionsMonitor =>
         NotificationOptionsMonitor;
 
@@ -48,6 +72,54 @@ public partial class NotificationConfig : BaseConfigComponent<NotificationOption
                 await WebhookNotificationService.SendTestAsync(_config);
                 sentChannels.Add("自定义Webhook");
             }
+
+            if (_config.IsPushPlusEnabled)
+            {
+                await PushPlusNotificationService.SendTestAsync(_config);
+                sentChannels.Add("PushPlus");
+            }
+
+            if (_config.IsServerChanEnabled)
+            {
+                await ServerChanNotificationService.SendTestAsync(_config);
+                sentChannels.Add("Server酱");
+            }
+
+            if (_config.IsDingTalkEnabled)
+            {
+                await DingTalkNotificationService.SendTestAsync(_config);
+                sentChannels.Add("钉钉");
+            }
+
+            if (_config.IsWorkWeiXinEnabled)
+            {
+                await WorkWeiXinNotificationService.SendTestAsync(_config);
+                sentChannels.Add("企业微信群机器人");
+            }
+
+            if (_config.IsWorkWeiXinAppEnabled)
+            {
+                await WorkWeiXinAppNotificationService.SendTestAsync(_config);
+                sentChannels.Add("企业微信应用");
+            }
+
+            if (_config.IsCoolPushEnabled)
+            {
+                await CoolPushNotificationService.SendTestAsync(_config);
+                sentChannels.Add("CoolPush");
+            }
+
+            if (_config.IsTeamsEnabled)
+            {
+                await TeamsNotificationService.SendTestAsync(_config);
+                sentChannels.Add("Microsoft Teams");
+            }
+
+            if (_config.IsGotifyEnabled)
+            {
+                await GotifyNotificationService.SendTestAsync(_config);
+                sentChannels.Add("Gotify");
+            }
         }
         catch (Exception ex)
         {
@@ -59,6 +131,6 @@ public partial class NotificationConfig : BaseConfigComponent<NotificationOption
         _testSuccess = sentChannels.Count > 0;
         _testMessage = sentChannels.Count > 0
             ? new MarkupString($"测试通知已发送到：{string.Join("、", sentChannels)}")
-            : new MarkupString("未启用任何通知通道，请先勾选 Telegram 或自定义 Webhook。");
+            : new MarkupString("未启用任何通知通道，请至少勾选一个通知渠道。");
     }
 }

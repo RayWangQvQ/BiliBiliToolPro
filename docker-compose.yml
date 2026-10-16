@@ -1,0 +1,23 @@
+services:
+  bili_tool_web:
+    # 直接从你的 GitHub 仓库拉取并构建（含消息通知新功能）
+    # buildkit 会在 docker compose up -d --build 时自动 clone 该仓库
+    image: bili_tool_web:zonbar
+    build:
+      context: https://github.com/zonbar/BiliBiliToolPro.git
+      dockerfile: Dockerfile
+    container_name: bili_tool_web
+    restart: unless-stopped
+    tty: true
+    volumes:
+      # 日志
+      - ./Logs:/app/Logs
+      # 配置与数据库（账号、各任务配置、通知配置都存这里）
+      - ./config:/app/config
+    ports:
+      # 宿主机 22330 -> 容器 8080
+      - "22330:8080"
+    environment:
+      TZ: "Asia/Shanghai"
+      # 每日任务默认 Cron，可按需改
+      DailyTaskConfig__Cron: "0 0 15 * * ?"

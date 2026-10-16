@@ -65,7 +65,7 @@ public class CustomWebhookNotificationService(
     {
         var payload = new WebhookPayload
         {
-            Title = "BiliTool 消息通知测试",
+            Title = options.NotificationTitle,
             Text = "BiliTool 消息通知测试：如果你收到这条消息，说明 Webhook 配置正确 ✅",
             Level = NotificationLevel.Info.ToString(),
             GroupKey = "test",

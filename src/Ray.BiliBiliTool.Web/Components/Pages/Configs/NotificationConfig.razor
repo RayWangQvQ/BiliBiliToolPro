@@ -8,7 +8,7 @@
 <PageTitle>消息通知配置</PageTitle>
 
 <MudContainer Class="app-config-page">
-    <PageHero Size="Size.Small" Title="消息通知配置" Description="配置每日任务执行结果的消息通知：Telegram 机器人或自定义 Webhook（如 Bark、飞书机器人等），两者可同时启用。" />
+    <PageHero Size="Size.Small" Title="消息通知配置" Description="配置每日任务执行结果的消息通知。支持 Telegram、自定义Webhook（Bark/飞书等）、PushPlus、Server酱、钉钉、企业微信群机器人/应用、CoolPush、Microsoft Teams、Gotify，可同时启用多个渠道。" />
 
     @if (_isLoading)
     {
@@ -83,6 +83,211 @@
                                     HelperText="默认 application/json" Disabled="!_config.IsWebhookEnabled" />
                             </MudItem>
                         </MudGrid>
+                    </MudCardContent>
+                </MudCard>
+
+                <!-- PushPlus 通道 -->
+                <MudCard Class="mb-4">
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h6">PushPlus</MudText>
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <MudGrid>
+                            <MudItem xs="12" md="4">
+                                <MudSwitch T="bool" @bind-Value="_config.IsPushPlusEnabled" Label="启用 PushPlus 通知" Color="Color.Primary" />
+                            </MudItem>
+                            <MudItem xs="12" md="8">
+                                <MudTextField T="string" @bind-Value="_config.PushPlusToken" Label="PushPlus Token"
+                                    HelperText="www.pushplus.plus 个人中心获取" Disabled="!_config.IsPushPlusEnabled" />
+                            </MudItem>
+                            <MudItem xs="12" md="4">
+                                <MudTextField T="string" @bind-Value="_config.PushPlusChannel" Label="渠道 channel"
+                                    HelperText="值域[wechat,webhook,cp,sms,mail]，默认微信公众号可留空" Disabled="!_config.IsPushPlusEnabled" />
+                            </MudItem>
+                            <MudItem xs="12" md="4">
+                                <MudTextField T="string" @bind-Value="_config.PushPlusTopic" Label="群组编码 topic"
+                                    HelperText="群发用，不填仅发给自己" Disabled="!_config.IsPushPlusEnabled" />
+                            </MudItem>
+                            <MudItem xs="12" md="4">
+                                <MudTextField T="string" @bind-Value="_config.PushPlusWebhook" Label="webhook 编码"
+                                    HelperText="仅 channel=webhook/cp 时填写" Disabled="!_config.IsPushPlusEnabled" />
+                            </MudItem>
+                        </MudGrid>
+                    </MudCardContent>
+                </MudCard>
+
+                <!-- Server酱 通道 -->
+                <MudCard Class="mb-4">
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h6">Server酱</MudText>
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <MudGrid>
+                            <MudItem xs="12" md="4">
+                                <MudSwitch T="bool" @bind-Value="_config.IsServerChanEnabled" Label="启用 Server酱 通知" Color="Color.Primary" />
+                            </MudItem>
+                            <MudItem xs="12" md="8">
+                                <MudTextField T="string" @bind-Value="_config.ServerChanSendKey" Label="Server酱 Turbo SendKey"
+                                    HelperText="sct.ftqq.com 获取，优先使用" Disabled="!_config.IsServerChanEnabled" />
+                            </MudItem>
+                            <MudItem xs="12" md="12">
+                                <MudTextField T="string" @bind-Value="_config.ServerChanScKey" Label="老版 SCKEY"
+                                    HelperText="sc.ftqq.com 老版，已过时可留空" Disabled="!_config.IsServerChanEnabled" />
+                            </MudItem>
+                        </MudGrid>
+                    </MudCardContent>
+                </MudCard>
+
+                <!-- 钉钉 通道 -->
+                <MudCard Class="mb-4">
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h6">钉钉</MudText>
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <MudGrid>
+                            <MudItem xs="12" md="4">
+                                <MudSwitch T="bool" @bind-Value="_config.IsDingTalkEnabled" Label="启用钉钉通知" Color="Color.Primary" />
+                            </MudItem>
+                            <MudItem xs="12" md="8">
+                                <MudTextField T="string" @bind-Value="_config.DingTalkWebhook" Label="钉钉自定义机器人 Webhook"
+                                    HelperText="群机器人安全设置中获取" Disabled="!_config.IsDingTalkEnabled" />
+                            </MudItem>
+                        </MudGrid>
+                    </MudCardContent>
+                </MudCard>
+
+                <!-- 企业微信群机器人 通道 -->
+                <MudCard Class="mb-4">
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h6">企业微信群机器人</MudText>
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <MudGrid>
+                            <MudItem xs="12" md="4">
+                                <MudSwitch T="bool" @bind-Value="_config.IsWorkWeiXinEnabled" Label="启用企业微信群机器人通知" Color="Color.Primary" />
+                            </MudItem>
+                            <MudItem xs="12" md="8">
+                                <MudTextField T="string" @bind-Value="_config.WorkWeiXinWebhook" Label="群机器人 Webhook 地址"
+                                    HelperText="企业微信群里添加机器人后获取" Disabled="!_config.IsWorkWeiXinEnabled" />
+                            </MudItem>
+                        </MudGrid>
+                    </MudCardContent>
+                </MudCard>
+
+                <!-- 企业微信应用 通道 -->
+                <MudCard Class="mb-4">
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h6">企业微信应用</MudText>
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <MudGrid>
+                            <MudItem xs="12" md="4">
+                                <MudSwitch T="bool" @bind-Value="_config.IsWorkWeiXinAppEnabled" Label="启用企业微信应用通知" Color="Color.Primary" />
+                            </MudItem>
+                            <MudItem xs="12" md="4">
+                                <MudTextField T="string" @bind-Value="_config.WorkWeiXinCorpId" Label="Corp ID"
+                                    Disabled="!_config.IsWorkWeiXinAppEnabled" />
+                            </MudItem>
+                            <MudItem xs="12" md="4">
+                                <MudTextField T="string" @bind-Value="_config.WorkWeiXinAgentId" Label="Agent ID"
+                                    Disabled="!_config.IsWorkWeiXinAppEnabled" />
+                            </MudItem>
+                            <MudItem xs="12" md="6">
+                                <MudTextField T="string" @bind-Value="_config.WorkWeiXinSecret" Label="应用 Secret"
+                                    Disabled="!_config.IsWorkWeiXinAppEnabled" />
+                            </MudItem>
+                            <MudItem xs="12" md="6">
+                                <MudTextField T="string" @bind-Value="_config.WorkWeiXinToUser" Label="接收成员"
+                                    HelperText="@@all 表示全员" Disabled="!_config.IsWorkWeiXinAppEnabled" />
+                            </MudItem>
+                        </MudGrid>
+                    </MudCardContent>
+                </MudCard>
+
+                <!-- CoolPush 通道 -->
+                <MudCard Class="mb-4">
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h6">CoolPush</MudText>
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <MudGrid>
+                            <MudItem xs="12" md="4">
+                                <MudSwitch T="bool" @bind-Value="_config.IsCoolPushEnabled" Label="启用 CoolPush 通知" Color="Color.Primary" />
+                            </MudItem>
+                            <MudItem xs="12" md="8">
+                                <MudTextField T="string" @bind-Value="_config.CoolPushSKey" Label="CoolPush SKey"
+                                    HelperText="push.xuthus.cc 注册获取" Disabled="!_config.IsCoolPushEnabled" />
+                            </MudItem>
+                        </MudGrid>
+                    </MudCardContent>
+                </MudCard>
+
+                <!-- Microsoft Teams 通道 -->
+                <MudCard Class="mb-4">
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h6">Microsoft Teams</MudText>
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <MudGrid>
+                            <MudItem xs="12" md="4">
+                                <MudSwitch T="bool" @bind-Value="_config.IsTeamsEnabled" Label="启用 Microsoft Teams 通知" Color="Color.Primary" />
+                            </MudItem>
+                            <MudItem xs="12" md="8">
+                                <MudTextField T="string" @bind-Value="_config.TeamsWebhook" Label="团队 Webhook 完整地址"
+                                    HelperText="Teams 频道连接器获取" Disabled="!_config.IsTeamsEnabled" />
+                            </MudItem>
+                        </MudGrid>
+                    </MudCardContent>
+                </MudCard>
+
+                <!-- Gotify 通道 -->
+                <MudCard Class="mb-4">
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h6">Gotify</MudText>
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <MudGrid>
+                            <MudItem xs="12" md="4">
+                                <MudSwitch T="bool" @bind-Value="_config.IsGotifyEnabled" Label="启用 Gotify 通知" Color="Color.Primary" />
+                            </MudItem>
+                            <MudItem xs="12" md="4">
+                                <MudTextField T="string" @bind-Value="_config.GotifyHost" Label="Gotify 服务地址"
+                                    HelperText="如 https://gotify.example.com" Disabled="!_config.IsGotifyEnabled" />
+                            </MudItem>
+                            <MudItem xs="12" md="4">
+                                <MudTextField T="string" @bind-Value="_config.GotifyToken" Label="应用 Token"
+                                    Disabled="!_config.IsGotifyEnabled" />
+                            </MudItem>
+                        </MudGrid>
+                    </MudCardContent>
+                </MudCard>
+
+                <!-- 推送标题 -->
+                <MudCard Class="mb-4">
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h6">推送标题</MudText>
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <MudTextField T="string" @bind-Value="_config.NotificationTitle" Label="自定义推送标题"
+                            HelperText="所有渠道发送时的消息标题；纯文本渠道（Telegram、钉钉、企业微信、Teams、CoolPush）会作为正文首行" />
                     </MudCardContent>
                 </MudCard>
 

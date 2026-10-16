@@ -49,6 +49,7 @@ public class TelegramNotificationService(
 
     private async Task SendTextAsync(string text, NotificationOptions options)
     {
+        text = $"【{options.NotificationTitle}】\n{text}";
         string host = string.IsNullOrWhiteSpace(options.TelegramApiHost)
             ? "https://api.telegram.org"
             : options.TelegramApiHost.TrimEnd('/');

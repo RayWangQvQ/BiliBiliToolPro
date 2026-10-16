@@ -21,7 +21,7 @@ public static class ServiceCollectionExtension
     }
 
     /// <summary>
-    /// 注册消息通知服务（本地日志 + Telegram + 自定义Webhook），由 NotificationConfig 控制启停。
+    /// 注册消息通知服务（本地日志 + Telegram + 自定义Webhook + PushPlus + Server酱 + 钉钉 + 企业微信 + CoolPush + Teams + Gotify），由 NotificationConfig 控制启停。
     /// </summary>
     public static IServiceCollection AddBiliBiliNotification(this IServiceCollection services)
     {
@@ -31,6 +31,14 @@ public static class ServiceCollectionExtension
         services.AddSingleton<SerilogNotificationAdapter>();
         services.AddSingleton<TelegramNotificationService>();
         services.AddSingleton<CustomWebhookNotificationService>();
+        services.AddSingleton<PushPlusNotificationService>();
+        services.AddSingleton<ServerChanNotificationService>();
+        services.AddSingleton<DingTalkNotificationService>();
+        services.AddSingleton<WorkWeiXinNotificationService>();
+        services.AddSingleton<WorkWeiXinAppNotificationService>();
+        services.AddSingleton<CoolPushNotificationService>();
+        services.AddSingleton<MicrosoftTeamsNotificationService>();
+        services.AddSingleton<GotifyNotificationService>();
 
         // 调度器聚合所有通道，对外暴露为 INotificationService
         services.AddSingleton<CompositeNotificationService>();
