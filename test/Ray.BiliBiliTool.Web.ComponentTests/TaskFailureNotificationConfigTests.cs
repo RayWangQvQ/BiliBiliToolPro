@@ -9,7 +9,7 @@ using Xunit;
 
 namespace Ray.BiliBiliTool.Web.ComponentTests;
 
-public class TaskFailureNotificationConfigTests : TestContext
+public class TaskFailureNotificationConfigTests : ComponentTestBase
 {
     [Fact]
     public void PerTaskSwitch_SavesIndependentlyAndShowsSuccessFeedback()
@@ -18,7 +18,7 @@ public class TaskFailureNotificationConfigTests : TestContext
         Services.AddMudServices();
         JSInterop.Mode = JSRuntimeMode.Loose;
         Services.AddSingleton<INotificationSettingsWorkflow>(workflow);
-        var page = RenderComponent<CookieNotificationConfig>();
+        var page = Render<CookieNotificationConfig>();
         page.Find("[data-task-key=DailyTaskAppService] input").Change(false);
         page.Find("button").Click();
         Assert.False(workflow.Tasks["DailyTaskAppService"]);

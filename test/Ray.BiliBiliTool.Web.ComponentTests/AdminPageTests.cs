@@ -17,7 +17,7 @@ namespace Ray.BiliBiliTool.Web.ComponentTests;
 /// Uses FakeAdminPageWorkflow to control the outcome of each account mutation
 /// and FakeAuthService for the account header (OnInitializedAsync).
 /// </summary>
-public class AdminPageTests : TestContext
+public class AdminPageTests : ComponentTestBase
 {
     private const string TestUsername = "testadmin";
 
@@ -37,7 +37,7 @@ public class AdminPageTests : TestContext
     [Fact]
     public void RenderComponent_AuthenticatedAdmin_DisplaysAccountFromAuthService()
     {
-        var cut = RenderComponent<Admin>();
+        var cut = Render<Admin>();
 
         cut.Markup.Should().Contain(TestUsername);
         // The role is persisted as "Administrator" and must not leak into the UI untranslated.
@@ -48,7 +48,7 @@ public class AdminPageTests : TestContext
     [Fact]
     public void RenderComponent_DefaultState_RendersAccountAndPasswordForms()
     {
-        var cut = RenderComponent<Admin>();
+        var cut = Render<Admin>();
 
         cut.FindAll("#admin-new-username").Count.Should().Be(1);
         cut.FindAll("#admin-rename-current-password").Count.Should().Be(1);
@@ -62,7 +62,7 @@ public class AdminPageTests : TestContext
     public async Task Submit_PasswordWorkflowError_ShowsErrorSnackbar()
     {
         _workflow.Result = new AdminAccountChangeResult(false, "当前密码不正确", null);
-        var cut = RenderComponent<Admin>();
+        var cut = Render<Admin>();
         FillPasswordForm(cut, current: "wrong", newPassword: "newpass", confirmation: "newpass");
 
         await Submit(cut, PasswordButtonLabel);
@@ -76,7 +76,7 @@ public class AdminPageTests : TestContext
     public async Task Submit_PasswordWorkflowSuccess_ShowsSuccessSnackbarAndLogsOut()
     {
         _workflow.Result = new AdminAccountChangeResult(true, null, "密码修改成功");
-        var cut = RenderComponent<Admin>();
+        var cut = Render<Admin>();
         FillPasswordForm(cut, current: "current", newPassword: "newpass", confirmation: "newpass");
 
         await Submit(cut, PasswordButtonLabel);
@@ -90,7 +90,7 @@ public class AdminPageTests : TestContext
     public async Task Submit_MismatchedPasswordConfirmation_DoesNotCallWorkflow()
     {
         _workflow.Result = new AdminAccountChangeResult(true, null, "密码修改成功");
-        var cut = RenderComponent<Admin>();
+        var cut = Render<Admin>();
         FillPasswordForm(cut, current: "current", newPassword: "newpass", confirmation: "other");
 
         await Submit(cut, PasswordButtonLabel);
@@ -104,7 +104,7 @@ public class AdminPageTests : TestContext
     public async Task Submit_EmptyPasswordFields_DoesNotCallWorkflow()
     {
         _workflow.Result = new AdminAccountChangeResult(true, null, "密码修改成功");
-        var cut = RenderComponent<Admin>();
+        var cut = Render<Admin>();
 
         await Submit(cut, PasswordButtonLabel);
 
@@ -116,7 +116,7 @@ public class AdminPageTests : TestContext
     public async Task Submit_UsernameWorkflowSuccess_ShowsMessageAndLogsOut()
     {
         _workflow.Result = new AdminAccountChangeResult(true, null, "用户名已更新");
-        var cut = RenderComponent<Admin>();
+        var cut = Render<Admin>();
         FillUsernameForm(cut, newUsername: "renamed", currentPassword: "current");
 
         await Submit(cut, UsernameButtonLabel);
@@ -132,7 +132,7 @@ public class AdminPageTests : TestContext
     public async Task Submit_UsernameWorkflowError_StaysOnPage()
     {
         _workflow.Result = new AdminAccountChangeResult(false, "当前密码不正确", null);
-        var cut = RenderComponent<Admin>();
+        var cut = Render<Admin>();
         FillUsernameForm(cut, newUsername: "renamed", currentPassword: "wrong");
 
         await Submit(cut, UsernameButtonLabel);

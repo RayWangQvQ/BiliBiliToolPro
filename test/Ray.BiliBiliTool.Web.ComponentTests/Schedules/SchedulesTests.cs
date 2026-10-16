@@ -7,13 +7,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using MudBlazor.Services;
 using Quartz;
+using Ray.BiliBiliTool.Web.ComponentTests;
 using Ray.BiliBiliTool.Web.Services.Pages.Schedules;
 using Xunit;
 using SchedulesPage = Ray.BiliBiliTool.Web.Components.Pages.Schedules.Schedules;
 
 namespace Ray.BiliBiliTool.Web.ComponentTests.Schedules;
 
-public class SchedulesTests : TestContext
+public class SchedulesTests : ComponentTestBase
 {
     public SchedulesTests()
     {
@@ -30,7 +31,7 @@ public class SchedulesTests : TestContext
     {
         Services.AddSingleton<ISchedulerPageWorkflow>(new FakeSchedulerPageWorkflow());
 
-        var cut = RenderComponent<SchedulesPage>();
+        var cut = Render<SchedulesPage>();
 
         cut.Find("h1").TextContent.Should().Be("计划任务");
     }
@@ -40,7 +41,7 @@ public class SchedulesTests : TestContext
     {
         Services.AddSingleton<ISchedulerPageWorkflow>(new FakeSchedulerPageWorkflow());
 
-        var cut = RenderComponent<SchedulesPage>();
+        var cut = Render<SchedulesPage>();
 
         // MudDataGrid is rendered (table element present)
         cut.Markup.Should().Contain("mud-table");

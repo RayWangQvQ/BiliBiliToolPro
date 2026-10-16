@@ -23,7 +23,7 @@ public class CoinDonationPolicyTests
         var directory = Directory.CreateTempSubdirectory("coin-level-settings-");
         try
         {
-            using var context = new TestContext();
+            await using var context = new BunitContext();
             var config = new ConfigurationBuilder()
                 .AddSqlite($"Data Source={Path.Combine(directory.FullName, "settings.db")}")
                 .Build();
@@ -54,7 +54,7 @@ public class CoinDonationPolicyTests
             );
             try
             {
-                var page = context.RenderComponent<DailyJobConfig>();
+                var page = context.Render<DailyJobConfig>();
                 Assert.Contains(
                     "达到所选等级后停止视频、专栏和补做投币",
                     page.Find("form").TextContent

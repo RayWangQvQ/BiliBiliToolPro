@@ -15,7 +15,7 @@ using Xunit;
 
 namespace Ray.BiliBiliTool.Web.ComponentTests;
 
-public class ScheduleConfigurationTests : TestContext, IDisposable
+public class ScheduleConfigurationTests : ComponentTestBase
 {
     private readonly DirectoryInfo _directory = Directory.CreateTempSubdirectory(
         "schedule-settings-"
@@ -71,7 +71,7 @@ public class ScheduleConfigurationTests : TestContext, IDisposable
         var scheduler = await PrepareAsync<DailyJob>(DailyJob.Key, "0 0 15 * * ?");
         try
         {
-            var page = RenderComponent<DailyJobConfig>();
+            var page = Render<DailyJobConfig>();
             page.Find("select[aria-label=小时]").Change("8");
             page.Find("select[aria-label=分钟]").Change("45");
             page.Find("form").Submit();
@@ -100,7 +100,7 @@ public class ScheduleConfigurationTests : TestContext, IDisposable
         var scheduler = await PrepareAsync<ChargeJob>(ChargeJob.Key, "0 0 12 28 * ?");
         try
         {
-            var page = RenderComponent<ChargeTaskConfig>();
+            var page = Render<ChargeTaskConfig>();
             page.Find("select[aria-label=日期]").Change("21");
             page.Find("select[aria-label=小时]").Change("23");
             page.Find("select[aria-label=分钟]").Change("10");
@@ -129,7 +129,7 @@ public class ScheduleConfigurationTests : TestContext, IDisposable
         var scheduler = await PrepareAsync<DailyJob>(DailyJob.Key, "0 0 15 * * ?");
         try
         {
-            var page = RenderComponent<DailyJobConfig>();
+            var page = Render<DailyJobConfig>();
             page.Find("select[aria-label=小时]").Change("");
             page.Find("form").Submit();
             Assert.Contains("请选择执行时间", page.Markup);
@@ -154,7 +154,7 @@ public class ScheduleConfigurationTests : TestContext, IDisposable
         var scheduler = await PrepareAsync<LiveFansMedalJob>(LiveFansMedalJob.Key, "0 5 0 * * ?");
         try
         {
-            var page = RenderComponent<LiveFansMedalTaskConfig>();
+            var page = Render<LiveFansMedalTaskConfig>();
             Assert.DoesNotContain("粉丝牌等级 >= 20", page.Markup);
             Assert.Contains("执行目标", page.Markup);
             var switches = page.FindComponents<MudBlazor.MudSwitch<bool>>();
@@ -183,9 +183,9 @@ public class ScheduleConfigurationTests : TestContext, IDisposable
         }
     }
 
-    public new void Dispose()
+    protected override async ValueTask DisposeAsyncCore()
     {
-        base.Dispose();
+        await base.DisposeAsyncCore();
         (_configuration as IDisposable)?.Dispose();
         SqliteConnection.ClearAllPools();
         _directory.Delete(recursive: true);
@@ -206,7 +206,7 @@ public class ScheduleConfigurationTests : TestContext, IDisposable
     public void DailyGuideEditableItemsMatchEnabledFormControls()
     {
         Services.Configure<DailyTaskOptions>(options => options.IsEnable = false);
-        var page = RenderComponent<DailyJobConfig>();
+        var page = Render<DailyJobConfig>();
         Assert.Contains("开启「启用任务」", page.Find(".task-guide-location").TextContent);
         Assert.Empty(page.FindAll("form .task-setting-help"));
         page.Find("form input[type=checkbox]").Change(true);
@@ -226,7 +226,7 @@ public class ScheduleConfigurationTests : TestContext, IDisposable
         if (directory is not null)
         {
             Directory.CreateDirectory(directory);
-            var theme = RenderComponent<MudBlazor.MudThemeProvider>();
+            var theme = Render<MudBlazor.MudThemeProvider>();
             File.WriteAllText(
                 Path.Combine(directory, "controls.html"),
                 "<!doctype html><html lang='zh-CN'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><link rel='stylesheet' href='MudBlazor.min.css'><link rel='stylesheet' href='app.css'></head><body>"
@@ -253,7 +253,7 @@ public class ScheduleConfigurationTests : TestContext, IDisposable
             var options = ((IServiceProvider)Services).GetRequiredService<
                 IOptionsMonitor<LiveFansMedalTaskOptions>
             >();
-            var page = RenderComponent<LiveFansMedalTaskConfig>();
+            var page = Render<LiveFansMedalTaskConfig>();
             const string checkbox = "article[data-anchor='11'] input[aria-label='排除主播 星河']";
             page.WaitForAssertion(() => Assert.Equal(2, page.FindAll("article").Count));
             page.Find(checkbox).Change(!initiallyExcluded);
@@ -282,7 +282,7 @@ public class ScheduleConfigurationTests : TestContext, IDisposable
                 Assert.Equal(!initiallyExcluded, page.Find(checkbox).HasAttribute("checked"))
             );
             page.Dispose();
-            var reopened = RenderComponent<LiveFansMedalTaskConfig>();
+            var reopened = Render<LiveFansMedalTaskConfig>();
             reopened.WaitForAssertion(() =>
                 Assert.Equal(!initiallyExcluded, reopened.Find(checkbox).HasAttribute("checked"))
             );
@@ -310,7 +310,7 @@ public class ScheduleConfigurationTests : TestContext, IDisposable
             var options = ((IServiceProvider)Services).GetRequiredService<
                 IOptionsMonitor<LiveFansMedalTaskOptions>
             >();
-            var page = RenderComponent<LiveFansMedalTaskConfig>();
+            var page = Render<LiveFansMedalTaskConfig>();
             page.FindComponents<MudBlazor.MudSwitch<bool>>()
                 .Single(c => c.Instance.Label == "仅为白名单主播执行任务")
                 .Find("input")
@@ -331,7 +331,7 @@ public class ScheduleConfigurationTests : TestContext, IDisposable
                 Assert.Equal("11", options.CurrentValue.IncludedAnchorIds);
             });
             page.Dispose();
-            var reopened = RenderComponent<LiveFansMedalTaskConfig>();
+            var reopened = Render<LiveFansMedalTaskConfig>();
             reopened.WaitForAssertion(() =>
                 Assert.True(
                     reopened

@@ -7,7 +7,7 @@ using Xunit;
 
 namespace Ray.BiliBiliTool.Web.ComponentTests;
 
-public class CookieNotificationConfigTests : TestContext
+public class CookieNotificationConfigTests : ComponentTestBase
 {
     private readonly FakeWorkflow _workflow = new();
 
@@ -21,7 +21,7 @@ public class CookieNotificationConfigTests : TestContext
     [Fact]
     public void AutomaticSwitch_CanBeSavedAsManualMode()
     {
-        var page = RenderComponent<CookieNotificationConfig>();
+        var page = Render<CookieNotificationConfig>();
         page.FindAll("input[type=checkbox]")[0].Change(false);
         page.Find("button").Click();
         Assert.False(_workflow.Automatic);
@@ -31,7 +31,7 @@ public class CookieNotificationConfigTests : TestContext
     [Fact]
     public void UnifiedPage_ShowsAllSettingsAndOneSaveAction()
     {
-        var page = RenderComponent<CookieNotificationConfig>();
+        var page = Render<CookieNotificationConfig>();
         Assert.Contains("登录状态检查", page.Markup);
         Assert.Contains("任务失败汇总", page.Markup);
         Assert.Contains("后台定时任务结束后等待 2 分钟", page.Markup);
@@ -45,7 +45,7 @@ public class CookieNotificationConfigTests : TestContext
     [Fact]
     public void EditingSwitch_ClearsPreviousSaveFeedback()
     {
-        var page = RenderComponent<CookieNotificationConfig>();
+        var page = Render<CookieNotificationConfig>();
         page.Find("button").Click();
         Assert.Single(page.FindAll("[role=status]"));
         page.FindAll("input[type=checkbox]")[0].Change(false);
