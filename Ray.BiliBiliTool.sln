@@ -54,7 +54,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{61613EF4-3644-42D4-A620-70547291FB38}"
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\close-stale-issues.yml = .github\workflows\close-stale-issues.yml
-		.github\workflows\deploy-tencent-scf.yml = .github\workflows\deploy-tencent-scf.yml
 		.github\workflows\pr-checks.yml = .github\workflows\pr-checks.yml
 		.github\workflows\publish-alpha-docker-images.yml = .github\workflows\publish-alpha-docker-images.yml
 		.github\workflows\publish-stable-release.yml = .github\workflows\publish-stable-release.yml
