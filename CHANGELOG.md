@@ -1,3 +1,7 @@
+## 4.2.2
+- Fix cookie check false 'login failed' due to timeout race (#1231)
+- test: consolidate IApiApi tests into ApiApiTests (#1230)
+- docs(changelog): 4.2.1 (#1229)
 ## 4.2.1
 - feat(web): refine account login and today-task page (#1226)
 - feat(web): add sponsor section to About page (#1224)
