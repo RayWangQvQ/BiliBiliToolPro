@@ -105,6 +105,16 @@ public interface ILiveApi
     );
 
     /// <summary>
+    /// 获取直播列表（v3，无需 WBI 签名，规避 second/getList 风控 -352）
+    /// </summary>
+    [Headers("Referer: https://live.bilibili.com/", "Origin: https://live.bilibili.com")]
+    [Get("/room/v3/area/getRoomList")]
+    Task<BiliApiResponse<GetListResponse>> GetRoomListV3(
+        [Query] GetRoomListV3Request request,
+        [Header("Cookie")] string ck
+    );
+
+    /// <summary>
     /// 检查天选时刻抽奖
     /// </summary>
     /// <param name="roomId"></param>
