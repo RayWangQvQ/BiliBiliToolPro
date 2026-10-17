@@ -1,0 +1,116 @@
+using Bunit;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using MudBlazor.Services;
+using Ray.BiliBiliTool.Config.SQLite;
+using Ray.BiliBiliTool.Web.Components.Pages.Configs;
+using Ray.BiliBiliTool.Web.Services.Pages.Configs;
+using Xunit;
+
+namespace Ray.BiliBiliTool.Web.ComponentTests;
+
+public class TaskFailureNotificationConfigTests : ComponentTestBase
+{
+    [Fact]
+    public void PerTaskSwitch_SavesIndependentlyAndShowsSuccessFeedback()
+    {
+        var workflow = new FakeWorkflow();
+        Services.AddMudServices();
+        JSInterop.Mode = JSRuntimeMode.Loose;
+        Services.AddSingleton<INotificationSettingsWorkflow>(workflow);
+        var page = Render<CookieNotificationConfig>();
+        page.Find("[data-task-key=DailyTaskAppService] input").Change(false);
+        page.Find("button").Click();
+        Assert.False(workflow.Tasks["DailyTaskAppService"]);
+        Assert.True(workflow.Tasks["MangaTaskAppService"]);
+        Assert.Contains("设置已保存", page.Find("[role=status]").TextContent);
+        Assert.Contains("2 分钟", page.Markup);
+    }
+
+    [Fact]
+    public void Settings_PersistAcrossReload()
+    {
+        var directory = Directory.CreateTempSubdirectory("failure-settings-");
+        try
+        {
+            var root = new ConfigurationBuilder()
+                .AddSqlite($"Data Source={Path.Combine(directory.FullName, "settings.db")}")
+                .Build();
+            using var configurationLifetime = root as IDisposable;
+            new CookieNotificationSettingsWorkflow(root).Save(false, false);
+            var workflow = new TaskFailureNotificationSettingsWorkflow(root);
+            workflow.Save(
+                true,
+                new Dictionary<string, bool>
+                {
+                    ["DailyTaskAppService"] = false,
+                    ["MangaTaskAppService"] = true,
+                }
+            );
+            root.Reload();
+            var restored = new TaskFailureNotificationSettingsWorkflow(root).Read();
+            Assert.True(restored.Enabled);
+            Assert.False(
+                restored.Tasks.Single(task => task.TaskKey == "DailyTaskAppService").Enabled
+            );
+            Assert.True(
+                restored.Tasks.Single(task => task.TaskKey == "MangaTaskAppService").Enabled
+            );
+            Assert.False(root.GetValue<bool>("CookieCheck:AutoCheckEnabled"));
+            Assert.False(root.GetValue<bool>("CookieCheck:NotifyEnabled"));
+        }
+        finally
+        {
+            Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools();
+            directory.Delete(recursive: true);
+        }
+    }
+
+    [Fact]
+    public void InvalidTask_IsRejected_AndDisabledConfigurationCanBeSaved()
+    {
+        var directory = Directory.CreateTempSubdirectory("failure-settings-");
+        try
+        {
+            var root = new ConfigurationBuilder()
+                .AddSqlite($"Data Source={Path.Combine(directory.FullName, "settings.db")}")
+                .Build();
+            using var configurationLifetime = root as IDisposable;
+            var workflow = new TaskFailureNotificationSettingsWorkflow(root);
+            Assert.Throws<InvalidOperationException>(() =>
+                workflow.Save(true, new Dictionary<string, bool> { ["UnknownTask"] = true })
+            );
+            workflow.Save(false, new Dictionary<string, bool>());
+            Assert.False(workflow.Read().Enabled);
+        }
+        finally
+        {
+            Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools();
+            directory.Delete(recursive: true);
+        }
+    }
+
+    private sealed class FakeWorkflow : INotificationSettingsWorkflow
+    {
+        public Dictionary<string, bool> Tasks { get; private set; } = [];
+
+        public NotificationSettings Read() =>
+            new(
+                new(true, true),
+                new(
+                    true,
+                    [
+                        new("DailyTaskAppService", "每日任务", true),
+                        new("MangaTaskAppService", "漫画签到/阅读", true),
+                    ]
+                )
+            );
+
+        public void Save(
+            bool autoCheckEnabled,
+            bool expiryNotifyEnabled,
+            bool failureNotifyEnabled,
+            IReadOnlyDictionary<string, bool> tasks
+        ) => Tasks = new(tasks);
+    }
+}

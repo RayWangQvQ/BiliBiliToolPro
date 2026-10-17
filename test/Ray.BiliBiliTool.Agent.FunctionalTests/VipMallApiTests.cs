@@ -24,7 +24,7 @@ public class VipMallApiTests
             //"HTTPS_PROXY=localhost:8888"
         };
         IHost host = Program.CreateHost(envs.ToArray());
-        _ck = host.Services.GetRequiredService<BiliCookie>();
+        _ck = ExternalCookie.Require(host.Services);
         _api = host.Services.GetRequiredService<IShowApi>();
     }
 
@@ -35,7 +35,7 @@ public class VipMallApiTests
         var req = new ViewVipMallRequest() { Csrf = _ck.BiliJct };
 
         // Act
-        BiliApiResponse re = await _api.ViewVipMallAsync(req, null);
+        BiliApiResponse re = await _api.ViewVipMallAsync(req, _ck.ToString());
 
         // Assert
         re.Code.Should().Be(0);

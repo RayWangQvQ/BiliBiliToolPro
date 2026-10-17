@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using Ray.BiliBiliTool.Agent;
+using Ray.BiliBiliTool.Application.Contracts.Cookies;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 using Ray.BiliBiliTool.Infrastructure.Cookie;
 
@@ -36,7 +37,8 @@ public interface IBiliAccountProbe
 public class BiliAccountProbe(
     CookieStrFactory<BiliCookie> cookieStrFactory,
     IAccountDomainService accountDomainService,
-    ILogger<BiliAccountProbe> logger
+    ILogger<BiliAccountProbe> logger,
+    ICookieTaskGuard cookieTaskGuard
 ) : IBiliAccountProbe
 {
     private static readonly TimeSpan CacheLifetime = TimeSpan.FromSeconds(60);
@@ -60,24 +62,26 @@ public class BiliAccountProbe(
             }
         }
 
-        var ck = FindCookie(userId);
-        if (ck is null)
-        {
-            return new BiliAccountProbeResult(
-                false,
-                null,
-                null,
-                "未找到该账号的 Cookie",
-                DateTimeOffset.UtcNow
-            );
-        }
-
         using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         timeout.CancelAfter(ProbeTimeout);
 
         BiliAccountProbeResult result;
         try
         {
+            var ck = FindCookie(userId);
+            if (ck is null)
+            {
+                return new BiliAccountProbeResult(
+                    false,
+                    null,
+                    null,
+                    "未找到该账号的 Cookie",
+                    DateTimeOffset.UtcNow
+                );
+            }
+
+            if (force)
+                await cookieTaskGuard.CheckNowAsync(ck.UserId, ck.ToString(), timeout.Token);
             var userInfo = await accountDomainService.LoginByCookie(ck);
             if (userInfo is null)
             {

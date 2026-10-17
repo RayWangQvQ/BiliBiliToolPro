@@ -1,0 +1,39 @@
+﻿using System;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Ray.BiliBiliTool.Console;
+using Ray.BiliBiliTool.Infrastructure;
+using Ray.Serilog.Sinks.MicrosoftTeamsBatched;
+using Xunit;
+
+namespace Ray.BiliBiliTool.Notification.FunctionalTests
+{
+    [Trait("Category", "External")]
+    public class MicrosoftTeamsNotificationTests
+    {
+        private string _webhook;
+
+        public MicrosoftTeamsNotificationTests()
+        {
+            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
+            Program.CreateHost(new string[] { "ENVIRONMENT=Development" });
+
+            _webhook = Global.ConfigurationRoot["Serilog:WriteTo:10:Args:webhook"];
+        }
+
+        [Fact]
+        public async Task PushMessageAsync_ConfiguredWebhook_ReturnsOk()
+        {
+            var client = new MicrosoftTeamsApiClient(webhook: _webhook);
+
+            var msg = LogConstants.Msg2;
+
+            var result = await client.PushMessageAsync(msg);
+            Debug.WriteLine(await result.Content.ReadAsStringAsync());
+
+            Assert.True(result.StatusCode == System.Net.HttpStatusCode.OK);
+        }
+    }
+}

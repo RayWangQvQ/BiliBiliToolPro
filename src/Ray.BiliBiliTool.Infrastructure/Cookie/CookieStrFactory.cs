@@ -35,24 +35,37 @@ public class CookieStrFactory<TCookieInfo>(IConfiguration configuration)
     private Dictionary<int, Dictionary<string, string>> CookeStrListToCookieDic(List<string> ckList)
     {
         var dic = new Dictionary<int, Dictionary<string, string>>();
-        ckList ??= [];
-
-        for (int i = 0; i < ckList?.Count; i++)
+        foreach (var cookie in ckList)
         {
-            dic.Add(i, CkStrToDictionary(ckList[i]));
+            var parsed = CkStrToDictionary(cookie);
+            if (parsed.Count > 0)
+                dic.Add(dic.Count, parsed);
         }
 
         return dic;
     }
 
-    private static Dictionary<string, string> CkStrToDictionary(string ckStr)
+    private static Dictionary<string, string> CkStrToDictionary(string? ckStr)
     {
         var dic = new Dictionary<string, string>();
-        var ckItemList = ckStr.Split(";", StringSplitOptions.TrimEntries).Distinct();
+        if (string.IsNullOrWhiteSpace(ckStr))
+            return dic;
+
+        var ckItemList = ckStr.Split(
+            ';',
+            StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries
+        );
         foreach (var item in ckItemList)
         {
-            var key = item[..item.IndexOf("=", StringComparison.Ordinal)].Trim();
-            var value = item[(item.IndexOf("=", StringComparison.Ordinal) + 1)..].Trim();
+            var separator = item.IndexOf('=');
+            if (separator <= 0)
+                continue;
+
+            var key = item[..separator].Trim();
+            if (key.Length == 0)
+                continue;
+
+            var value = item[(separator + 1)..].Trim();
             dic.AddIfNotExist(new KeyValuePair<string, string>(key, value), p => p.Key == key);
         }
         return dic;

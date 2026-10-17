@@ -200,6 +200,18 @@ public class VideoDomainService(
         var request = new ShareVideoRequest(long.Parse(videoInfo.Aid), ck.BiliJct);
         BiliApiResponse apiResponse = await apiApi.ShareVideo(request, ck.ToString());
 
+        // -403 is an account-level risk-control marker: retrying, refreshing the device
+        // profile or switching devices does not help and only makes the marker worse,
+        // so skip today's share without retrying.
+        if (apiResponse.Code == -403)
+        {
+            logger.LogWarning(
+                "视频分享被-403拒绝（账号级风控标记），跳过当日分享，aid：{aid}",
+                videoInfo.Aid
+            );
+            return;
+        }
+
         if (apiResponse.Code == 0)
         {
             _expDic.TryGetValue("每日观看视频", out int exp);

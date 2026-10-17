@@ -110,6 +110,8 @@ Follow [releases](https://github.com/RayWangQvQ/BiliBiliToolPro/releases) for pu
 
 Code and documentation contributions are welcome:
 
+For test naming, levels, and safe local execution, see the [testing guide](docs/testing.md).
+
 1. Search existing issues before starting. For substantial or uncertain changes, open an issue to discuss the approach first.
 2. Fork the repository and make changes based on `main`.
 3. Open a pull request targeting `main` with a clear title and description. After review and successful checks, maintainers squash-merge accepted changes.
@@ -118,9 +120,13 @@ Documentation fixes, clarifications, and corrections are just as valuable as cod
 
 ## Support the project
 
-If BiliTool helps you, you can support its maintenance through the donation QR code below. Include a name and message if you would like the maintainer to recognize your donation.
+If BiliTool helps you, you can support its maintenance through the donation QR code below. 
+
+Every sponsorship is a vote for your ideal world!
 
 ![Donation QR code](docs/imgs/donate.jpg)
+
+(If you would like to join the discussion group, please include your WeChat ID in the message when making a donation.)
 
 Some creator-ID settings use the maintainer's Bilibili ID as a **default configuration value**. You can change those settings through the configuration file, secrets, or environment variables to support a different creator.
 

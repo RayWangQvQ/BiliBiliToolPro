@@ -1,9 +1,11 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Services;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Utils;
+using Refit;
 
 namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.LiveTraceApi;
 
-public class HeartBeatRequest
+public class HeartBeatRequest : IWrid
 {
     public HeartBeatRequest(
         long roomId,
@@ -18,19 +20,22 @@ public class HeartBeatRequest
         string secretKey,
         string csrf,
         string uuid,
-        string device
+        string device,
+        int heartbeatInterval = 60,
+        long anchorId = 0
     )
     {
         Id = JsonConvert.SerializeObject(new[] { parentId, areaID, seqNumber, roomId });
         Ets = ets;
         Benchmark = secretKey;
-        Time = 60;
+        Time = heartbeatInterval;
         Ts = timestamp;
         Ua = userAgent;
         Csrf = csrf;
         Device = device;
+        Ruid = anchorId;
 
-        // 构造哈希值
+        // Build the heartbeat signature.
         var json = new
         {
             platform = "web",
@@ -41,7 +46,7 @@ public class HeartBeatRequest
             buvid,
             uuid,
             ets,
-            time = 60,
+            time = heartbeatInterval,
             ts = timestamp,
         };
         string jsonString = JsonConvert.SerializeObject(json);
@@ -50,25 +55,47 @@ public class HeartBeatRequest
         Visit_id = "";
     }
 
+    [AliasAs("s")]
     public string S { get; set; }
 
+    [AliasAs("id")]
     public string Id { get; set; }
 
+    [AliasAs("ets")]
     public long Ets { get; set; }
 
+    [AliasAs("benchmark")]
     public string Benchmark { get; set; }
 
+    [AliasAs("time")]
     public long Time { get; set; }
 
+    [AliasAs("ts")]
     public long Ts { get; set; }
 
+    [AliasAs("ua")]
     public string Ua { get; set; }
 
+    [AliasAs("csrf_token")]
     public string Csrf_token => Csrf;
 
+    [AliasAs("csrf")]
     public string Csrf { get; set; }
 
+    [AliasAs("visit_id")]
     public string Visit_id { get; set; }
 
+    [AliasAs("device")]
     public string Device { get; }
+
+    [AliasAs("ruid")]
+    public long Ruid { get; set; }
+
+    [AliasAs("trackid")]
+    public string Trackid { get; set; } = "-99998";
+
+    [AliasAs("web_location")]
+    public string Web_location { get; set; } = "444.8";
+    public long wts { get; set; }
+    public string? w_rid { get; set; }
 }

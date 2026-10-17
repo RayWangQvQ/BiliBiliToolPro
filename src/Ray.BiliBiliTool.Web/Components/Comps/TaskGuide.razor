@@ -1,0 +1,61 @@
+@using Ray.BiliBiliTool.Web.Services
+
+@if (TaskHelpCatalog.Find(TaskKey) is { } help)
+{
+    <section class="task-guide" aria-label="任务介绍" data-task-guide="@TaskKey">
+        <div class="task-guide-heading"><MudIcon Icon="@Icons.Material.Outlined.Info" Size="Size.Small" Color="Color.Primary" /><h2>任务介绍</h2></div>
+        <p class="task-guide-introduction">@help.Introduction</p>
+        <p class="task-guide-timing">@help.Timing</p>
+        @if (TaskKey != "Notification" && TaskKey != "AutoRecover")
+        {
+            <p class="task-guide-location">
+                @if (TaskKey == "LiveFansMedalAppService" && Enabled == false)
+                {
+                    <text>在粉丝牌卡片中勾选「排除此主播」可设置排除名单。开启下方的「启用任务」后，会显示互动设置。</text>
+                }
+                else if (!help.Features.Any(item => item.SettingKey is not null))
+                {
+                    <text>下方可设置任务开关与执行时间。任务步骤自动执行。</text>
+                }
+                else if (Enabled == false)
+                {
+                    <text>在下方开启「启用任务」后，会显示此任务的详细配置。</text>
+                }
+                else
+                {
+                    <text>可配置项在下方表单中调整，修改后点击「保存配置」。</text>
+                }
+            </p>
+        }
+        <details class="task-guide-details">
+            <summary>任务说明<span>查看可配置项与执行内容</span></summary>
+            <h3>可配置项</h3>
+            <dl>
+                @if (!string.IsNullOrEmpty(help.ConfigurationPage) && TaskKey != "Notification")
+                {
+                    <div><dt>启用任务与执行时间</dt><dd>开启任务后，选择执行周期和时间，保存后按计划运行。</dd></div>
+                }
+                @foreach (var feature in help.Features.Where(item => item.SettingKey is not null))
+                {
+                    <div><dt>@feature.Name</dt><dd>@feature.Description</dd></div>
+                }
+            </dl>
+            @if (help.Features.Any(item => item.SettingKey is null))
+            {
+                <h3>执行内容与领取条件</h3>
+                <p class="task-guide-section-note">以下内容说明任务的执行过程和适用条件。</p>
+                <dl>
+                    @foreach (var feature in help.Features.Where(item => item.SettingKey is null))
+                    {
+                        <div><dt>@feature.Name</dt><dd>@feature.Description</dd></div>
+                    }
+                </dl>
+            }
+        </details>
+    </section>
+}
+
+@code {
+    [Parameter, EditorRequired] public string TaskKey { get; set; } = "";
+    [Parameter] public bool? Enabled { get; set; }
+}

@@ -16,8 +16,9 @@ namespace Ray.BiliBiliTool.Web.Jobs;
 public class AutoRecoverJob(
     ILogger<AutoRecoverJob> logger,
     IOptionsMonitor<AutoRecoverOptions> options,
-    ITodayTaskService todayTaskService
-) : BaseJob<AutoRecoverJob>(logger)
+    ITodayTaskService todayTaskService,
+    ITaskFailureBatchMonitor? failureMonitor = null
+) : BaseJob<AutoRecoverJob>(logger, failureMonitor)
 {
     public static readonly JobKey Key = new(nameof(AutoRecoverJob), Constants.BiliJobGroup);
     public static readonly TriggerKey TriggerKeyValue = new(

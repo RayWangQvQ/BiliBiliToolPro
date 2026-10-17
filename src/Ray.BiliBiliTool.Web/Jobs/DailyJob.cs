@@ -3,6 +3,7 @@ using Quartz;
 using Ray.BiliBiliTool.Application.Contracts;
 using Ray.BiliBiliTool.Application.Contracts.Notifications;
 using Ray.BiliBiliTool.Config.Options;
+using Ray.BiliBiliTool.Web.Services;
 
 namespace Ray.BiliBiliTool.Web.Jobs;
 
@@ -12,6 +13,8 @@ public class DailyJob(
     INotificationService notificationService,
     IOptionsMonitor<NotificationOptions> notificationOptions
 ) : BaseJob<DailyJob>(logger)
+    ITaskFailureBatchMonitor? failureMonitor = null
+) : BaseJob<DailyJob>(logger, failureMonitor)
 {
     public static readonly JobKey Key = new(nameof(DailyJob), Constants.BiliJobGroup);
 

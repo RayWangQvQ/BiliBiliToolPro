@@ -93,7 +93,7 @@ public static class TaskCatalog
                     "VipPrivilege",
                     "大会员福利",
                     TaskItemSource.ExecutionRecord,
-                    c => c.GetValue("DailyTaskConfig:IsEnable", true)
+                    c => c.GetValue("VipPrivilegeConfig:IsEnable", true)
                 ),
             ]
         ),

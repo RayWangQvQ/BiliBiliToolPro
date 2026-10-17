@@ -11,7 +11,7 @@ public class LogsDialogWorkflowTests
         new LogsDialogWorkflow(repo ?? new FakeLogRepository());
 
     [Fact]
-    public async Task GetLatestRunInstanceIdAsync_DelegatesToRepository()
+    public async Task GetLatestRunInstanceIdAsync_ValidKeys_DelegatesToRepository()
     {
         var repo = new FakeLogRepository(instanceId: "instance-42");
         var workflow = CreateWorkflow(repo);
@@ -24,7 +24,7 @@ public class LogsDialogWorkflowTests
     }
 
     [Fact]
-    public async Task GetLatestRunInstanceIdAsync_ReturnsNullWhenRepositoryReturnsNull()
+    public async Task GetLatestRunInstanceIdAsync_RepositoryReturnsNull_ReturnsNull()
     {
         var workflow = CreateWorkflow(new FakeLogRepository(instanceId: null));
 
@@ -34,7 +34,7 @@ public class LogsDialogWorkflowTests
     }
 
     [Fact]
-    public async Task GetLogsForRunAsync_DelegatesToRepository()
+    public async Task GetLogsForRunAsync_ValidRunId_DelegatesToRepository()
     {
         var expectedLogs = new List<BiliLogs>
         {

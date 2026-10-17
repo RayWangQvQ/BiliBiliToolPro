@@ -1,0 +1,15 @@
+@using Ray.BiliBiliTool.Web.Services
+
+@if (TaskHelpCatalog.Introduction(TaskKey, ItemKey) is { } introduction)
+{
+    <p class="today-task-introduction">@introduction</p>
+    @if (TaskHelpCatalog.ConfigurationUrl(TaskKey, ItemKey) is { } url)
+    {
+        <MudLink Href="@url" Class="today-task-help-link">功能说明与设置</MudLink>
+    }
+}
+
+@code {
+    [Parameter, EditorRequired] public string TaskKey { get; set; } = "";
+    [Parameter] public string? ItemKey { get; set; }
+}

@@ -8,7 +8,7 @@ using Xunit;
 
 namespace Ray.BiliBiliTool.Web.ComponentTests;
 
-public class PageHeroTests : TestContext
+public class PageHeroTests : ComponentTestBase
 {
     public PageHeroTests()
     {
@@ -20,9 +20,12 @@ public class PageHeroTests : TestContext
     [InlineData(Size.Large, "app-hero-large")]
     [InlineData(Size.Medium, "app-hero-medium")]
     [InlineData(Size.Small, "app-hero-small")]
-    public void PageHero_RendersAccessibleHeadingAndTier(Size size, string cssClass)
+    public void RenderComponent_SelectedSize_RendersAccessibleHeadingAndTier(
+        Size size,
+        string cssClass
+    )
     {
-        var cut = RenderComponent<PageHero>(parameters =>
+        var cut = Render<PageHero>(parameters =>
             parameters
                 .Add(p => p.Size, size)
                 .Add(p => p.Title, "页面标题")
@@ -35,9 +38,9 @@ public class PageHeroTests : TestContext
     }
 
     [Fact]
-    public void PageHero_RendersExistingActionsWhenProvided()
+    public void RenderComponent_ProvidedActions_RendersActionContent()
     {
-        var cut = RenderComponent<PageHero>(parameters =>
+        var cut = Render<PageHero>(parameters =>
             parameters
                 .Add(p => p.Title, "账号管理")
                 .Add(p => p.Description, "管理账号")

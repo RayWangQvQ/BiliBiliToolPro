@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Application.Contracts;
+using Ray.BiliBiliTool.Application.Contracts.Cookies;
 using Ray.BiliBiliTool.Domain;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 using Ray.BiliBiliTool.Infrastructure;
@@ -15,7 +16,8 @@ public abstract class BaseMultiAccountsAppService(
     ILogger logger,
     CookieStrFactory<BiliCookie> cookieStrFactory,
     ILoginDomainService loginDomainService,
-    IConfiguration configuration
+    IConfiguration configuration,
+    ICookieTaskGuard cookieTaskGuard
 ) : AppService, IAccountTaskAppService
 {
     /// <summary>
@@ -36,14 +38,20 @@ public abstract class BaseMultiAccountsAppService(
             var ck = cookieStrFactory.GetCookie(i);
             try
             {
+                await cookieTaskGuard.EnsureValidAsync(ck.UserId, ck.ToString(), cancellationToken);
+                using var failureScope = new TaskExecutionFailureScope();
                 await DoTaskAccountAsync(ck, cancellationToken);
                 await WriteRecordAsync(
                     ck,
-                    TaskRecordStatus.Success,
-                    null,
+                    failureScope.HasFailures ? TaskRecordStatus.Failed : TaskRecordStatus.Success,
+                    failureScope.HasFailures ? "任务检查项执行失败，请查看面板执行记录" : null,
                     TaskRecordTrigger.Scheduled,
                     cancellationToken
                 );
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                throw;
             }
             catch (Exception e)
             {
@@ -74,7 +82,11 @@ public abstract class BaseMultiAccountsAppService(
             if (ck.UserId == userId.ToString())
             {
                 logger.LogInformation("######### 账号 {num}（补做） #########", i);
+                await cookieTaskGuard.EnsureValidAsync(ck.UserId, ck.ToString(), cancellationToken);
+                using var failureScope = new TaskExecutionFailureScope();
                 await DoTaskAccountAsync(ck, cancellationToken);
+                if (failureScope.HasFailures)
+                    throw new InvalidOperationException("任务检查项执行失败，请查看面板执行记录");
                 return;
             }
         }

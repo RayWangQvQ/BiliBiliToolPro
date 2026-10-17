@@ -11,7 +11,7 @@ namespace Ray.BiliBiliTool.Web.ComponentTests;
 /// <summary>
 /// /about：版本号 + 开源链接，且不需要登录即可访问（页面本身不加 [Authorize]）。
 /// </summary>
-public class AboutPageTests : TestContext
+public class AboutPageTests : ComponentTestBase
 {
     private const string TestVersion = "4.0.8-alpha.3";
 
@@ -22,21 +22,21 @@ public class AboutPageTests : TestContext
     }
 
     [Fact]
-    public void About_Renders_ShowsAppVersion()
+    public void RenderComponent_ConfiguredVersion_ShowsAppVersion()
     {
         Services.AddSingleton<IAppInfoProvider>(new FakeAppInfoProvider(TestVersion));
 
-        var cut = RenderComponent<About>();
+        var cut = Render<About>();
 
         cut.Markup.Should().Contain($"版本号：{TestVersion}");
     }
 
     [Fact]
-    public void About_Renders_LinksToSourceRepo()
+    public void RenderComponent_DefaultState_LinksToSourceRepo()
     {
         Services.AddSingleton<IAppInfoProvider>(new FakeAppInfoProvider(TestVersion));
 
-        var cut = RenderComponent<About>();
+        var cut = Render<About>();
 
         cut.Markup.Should().Contain("github.com/RayWangQvQ/BiliBiliToolPro");
     }

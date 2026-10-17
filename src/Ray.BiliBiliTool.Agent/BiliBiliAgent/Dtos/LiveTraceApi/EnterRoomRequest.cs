@@ -1,8 +1,10 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Services;
+using Refit;
 
 namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.LiveTraceApi;
 
-public class EnterRoomRequest
+public class EnterRoomRequest : IWrid
 {
     public EnterRoomRequest(
         long roomId,
@@ -28,23 +30,38 @@ public class EnterRoomRequest
         Device = device;
     }
 
+    [AliasAs("id")]
     public string Id { get; set; }
 
+    [AliasAs("ruid")]
     public long Ruid { get; set; }
 
+    [AliasAs("ts")]
     public long Ts { get; set; }
 
+    [AliasAs("is_patch")]
     public int Is_patch { get; set; }
 
+    [AliasAs("heart_beat")]
     public string Heart_beat { get; set; }
 
+    [AliasAs("ua")]
     public string Ua { get; set; }
 
+    [AliasAs("csrf_token")]
     public string Csrf_token => Csrf;
 
+    [AliasAs("csrf")]
     public string Csrf { get; set; }
 
+    [AliasAs("visit_id")]
     public string Visit_id { get; set; }
 
+    [AliasAs("device")]
     public string Device { get; set; }
+
+    [AliasAs("web_location")]
+    public string Web_location { get; set; } = "444.8";
+    public long wts { get; set; }
+    public string? w_rid { get; set; }
 }

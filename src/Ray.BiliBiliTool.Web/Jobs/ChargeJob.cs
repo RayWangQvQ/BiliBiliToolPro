@@ -1,10 +1,14 @@
 using Quartz;
 using Ray.BiliBiliTool.Application.Contracts;
+using Ray.BiliBiliTool.Web.Services;
 
 namespace Ray.BiliBiliTool.Web.Jobs;
 
-public class ChargeJob(ILogger<ChargeJob> logger, IChargeTaskAppService appService)
-    : BaseJob<ChargeJob>(logger)
+public class ChargeJob(
+    ILogger<ChargeJob> logger,
+    IChargeTaskAppService appService,
+    ITaskFailureBatchMonitor? failureMonitor = null
+) : BaseJob<ChargeJob>(logger, failureMonitor)
 {
     public static readonly JobKey Key = new(nameof(ChargeJob), Constants.BiliJobGroup);
 

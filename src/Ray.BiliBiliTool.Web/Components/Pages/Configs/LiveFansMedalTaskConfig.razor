@@ -1,6 +1,7 @@
 @page "/Configurations/LiveFansMedalTaskConfig"
 @using Microsoft.AspNetCore.Authorization
 @using Ray.BiliBiliTool.Config.Options;
+@using Ray.BiliBiliTool.Web.Services
 @attribute [Authorize]
 @rendermode InteractiveServer
 @inherits BaseConfigComponent<LiveFansMedalTaskOptions>
@@ -9,6 +10,7 @@
 
 <MudContainer Class="app-config-page">
     <PageHero Size="Size.Small" Title="直播粉丝牌任务配置" Description="设置粉丝牌任务的开关与执行选项。" />
+    <Ray.BiliBiliTool.Web.Components.Comps.TaskGuide TaskKey="LiveFansMedalAppService" Enabled="@(_isLoading ? (bool?)null : _config.IsEnable)" />
 
     @if (_isLoading)
     {
@@ -19,7 +21,18 @@
         <EditForm Model="@_config" OnValidSubmit="HandleValidSubmitAsync">
             <DataAnnotationsValidator />
 
-            <!-- 基础配置卡片 -->
+            <MudCard Class="mb-4"><MudCardContent>
+                <MudSwitch T="bool" @bind-Value="_config.OnlySelectedAnchors" Label="仅为白名单主播执行任务" Color="Color.Primary" />
+                <Ray.BiliBiliTool.Web.Components.Comps.TaskSettingHelp TaskKey="LiveFansMedalAppService" SettingKey="OnlySelectedAnchors" />
+                @if (_config.OnlySelectedAnchors)
+                { <MudText Typo="Typo.body2" Color="Color.Secondary">在粉丝牌卡片上勾选主播。白名单为空时暂停全部粉丝牌任务，排除设置优先生效。</MudText> }
+            </MudCardContent></MudCard>
+            <Ray.BiliBiliTool.Web.Components.Comps.LiveMedalDashboard Accounts="_accounts" AccountIndex="_accountIndex"
+                AccountIndexChanged="ChangeAccountAsync" Snapshot="_snapshot" Loading="_medalsLoading"
+                OnlySelectedAnchors="_config.OnlySelectedAnchors" @bind-IncludedAnchorIds="_config.IncludedAnchorIds"
+                @bind-ExcludedAnchorIds="_config.ExcludedAnchorIds" Refresh="RefreshMedalsAsync" />
+
+            <!-- Base settings. -->
             <MudCard Class="mb-4">
                 <MudCardHeader>
                     <CardHeaderContent>
@@ -33,59 +46,84 @@
                                 Label="启用任务" Color="Color.Primary" />
                         </MudItem>
                         <MudItem xs="12" md="6">
-                            <MudTextField T="string" @bind-Value="_config.Cron" Label="定时任务Cron表达式"
-                                HelperText="例如：0 5 0 * * ? (每天凌晨0点5分执行)"
-                                Disabled="!_config.IsEnable" />
+                            <Ray.BiliBiliTool.Web.Components.Comps.ScheduleTimePicker @bind-Value="_config.Cron"
+                                For="@(() => _config.Cron)" Disabled="!_config.IsEnable" />
                         </MudItem>
                     </MudGrid>
                 </MudCardContent>
             </MudCard>
 
-            <!-- 详细配置卡片 -->
             @if (_config.IsEnable)
             {
-                <MudCard>
-                    <MudCardHeader>
-                        <CardHeaderContent>
-                            <MudText Typo="Typo.h6">详细配置</MudText>
-                        </CardHeaderContent>
-                    </MudCardHeader>
+                <MudCard Class="mb-4">
+                    <MudCardHeader><CardHeaderContent><MudText Typo="Typo.h6">执行目标</MudText></CardHeaderContent></MudCardHeader>
+                    <MudCardContent>
+                        <MudSwitch T="bool" @bind-Value="_config.FollowDailyTaskLimit" Label="跟随 B 站每日任务量" Color="Color.Primary" />
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">
+                            @(_config.FollowDailyTaskLimit
+                                ? "读取每个粉丝牌当天剩余的任务量，完成已开启的点赞、弹幕和观看任务。观看时长由 B 站当前任务要求决定。"
+                                : "按下面设置的次数和时长执行，每个粉丝牌分别计算。已完成的任务会自动跳过。")
+                        </MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary" Class="mt-2">所有等级的粉丝牌均可参与，亲密度储蓄已满时暂停升级任务。</MudText>
+                    </MudCardContent>
+                </MudCard>
+                <MudCard Class="mb-4">
+                    <MudCardHeader><CardHeaderContent><MudText Typo="Typo.h6">互动设置</MudText></CardHeaderContent></MudCardHeader>
                     <MudCardContent>
                         <MudGrid>
-                            <MudItem xs="12" md="6">
-                                <MudTextField T="string" @bind-Value="_config.DanmakuContent" Label="自定义发送弹幕内容"
-                                    HelperText="如 '打卡' 等来触发直播间内机器人关键词" />
-
-                                <MudNumericField T="int" @bind-Value="_config.HeartBeatNumber" Label="心跳包发送的个数/挂机的时间(分钟)"
-                                    Min="1" Class="mt-3" />
-
-                                <MudNumericField T="int" @bind-Value="_config.HeartBeatSendGiveUpThreshold" Label="心跳包发送连续失败多少次时放弃"
-                                    Min="1" Class="mt-3" />
-
-                                <MudSwitch T="bool" @bind-Value="_config.IsSkipLevel20Medal"
-                                    Label="是否跳过粉丝牌等级 >= 20 的" Color="Color.Primary" Class="mt-3" />
+                            <MudItem xs="12" md="4">
+                                <MudSwitch T="bool" @bind-Value="_config.EnableLike" Label="点赞" Color="Color.Primary" />
+                                <Ray.BiliBiliTool.Web.Components.Comps.TaskSettingHelp TaskKey="LiveFansMedalAppService" SettingKey="EnableLike" />
+                                <MudNumericField T="int" @bind-Value="_config.LikeNumber" For="@(() => _config.LikeNumber)"
+                                    Label="每个粉丝牌的点赞次数" Min="0" Max="5000" Disabled="@(_config.FollowDailyTaskLimit || !_config.EnableLike)"
+                                    HelperText="@(TaskHelpCatalog.SettingDescription("LiveFansMedalAppService", "LikeNumber"))" />
                             </MudItem>
-
-                            <MudItem xs="12" md="6">
-                                <MudNumericField T="int" @bind-Value="_config.LikeNumber" Label="点赞次数"
-                                    Min="0" HelperText="默认值为30（用于点亮粉丝勋章）" />
-
-                                <MudNumericField T="int" @bind-Value="_config.SendDanmakuNumber" Label="发送弹幕次数"
-                                    Min="0" Class="mt-3" />
-
-                                <MudNumericField T="int" @bind-Value="_config.SendDanmakugiveUpThreshold" Label="弹幕发送失败多少次时放弃"
-                                    Min="1" Class="mt-3" />
+                            <MudItem xs="12" md="4">
+                                <MudSwitch T="bool" @bind-Value="_config.EnableDanmaku" Label="弹幕" Color="Color.Primary" />
+                                <Ray.BiliBiliTool.Web.Components.Comps.TaskSettingHelp TaskKey="LiveFansMedalAppService" SettingKey="EnableDanmaku" />
+                                <MudNumericField T="int" @bind-Value="_config.SendDanmakuNumber" For="@(() => _config.SendDanmakuNumber)"
+                                    Label="每个粉丝牌的弹幕次数" Min="0" Max="100" Disabled="@(_config.FollowDailyTaskLimit || !_config.EnableDanmaku)"
+                                    HelperText="@(TaskHelpCatalog.SettingDescription("LiveFansMedalAppService", "SendDanmakuNumber"))" />
+                                <MudTextField T="string" @bind-Value="_config.DanmakuContent" For="@(() => _config.DanmakuContent)"
+                                    Label="弹幕内容" Disabled="!_config.EnableDanmaku" Class="mt-3"
+                                    HelperText="@(TaskHelpCatalog.SettingDescription("LiveFansMedalAppService", "DanmakuContent"))" />
+                                <MudSwitch T="bool" @bind-Value="_config.DanmakuOnlyWhenOffline" Label="仅在主播未开播时发弹幕"
+                                    Disabled="!_config.EnableDanmaku" Color="Color.Primary" />
+                                <Ray.BiliBiliTool.Web.Components.Comps.TaskSettingHelp TaskKey="LiveFansMedalAppService" SettingKey="DanmakuOnlyWhenOffline" />
+                            </MudItem>
+                            <MudItem xs="12" md="4">
+                                <MudSwitch T="bool" @bind-Value="_config.EnableWatch" Label="观看直播" Color="Color.Primary" />
+                                <Ray.BiliBiliTool.Web.Components.Comps.TaskSettingHelp TaskKey="LiveFansMedalAppService" SettingKey="EnableWatch" />
+                                <MudNumericField T="int" @bind-Value="_config.HeartBeatNumber" For="@(() => _config.HeartBeatNumber)"
+                                    Label="每个粉丝牌的观看时长（分钟）" Min="0" Max="1440" Disabled="@(_config.FollowDailyTaskLimit || !_config.EnableWatch)"
+                                    HelperText="@(TaskHelpCatalog.SettingDescription("LiveFansMedalAppService", "HeartBeatNumber"))" />
                             </MudItem>
                         </MudGrid>
                     </MudCardContent>
                 </MudCard>
+                <MudExpansionPanels>
+                    <MudExpansionPanel Text="异常处理">
+                        <MudGrid>
+                            <MudItem xs="12" md="6">
+                                <MudNumericField T="int" @bind-Value="_config.HeartBeatSendGiveUpThreshold" For="@(() => _config.HeartBeatSendGiveUpThreshold)"
+                                    Label="观看连续失败次数上限" Min="1" Max="10"
+                                    HelperText="@(TaskHelpCatalog.SettingDescription("LiveFansMedalAppService", "HeartBeatSendGiveUpThreshold"))" />
+                            </MudItem>
+                            <MudItem xs="12" md="6">
+                                <MudNumericField T="int" @bind-Value="_config.SendDanmakugiveUpThreshold" For="@(() => _config.SendDanmakugiveUpThreshold)"
+                                    Label="弹幕连续失败次数上限" Min="1" Max="10"
+                                    HelperText="@(TaskHelpCatalog.SettingDescription("LiveFansMedalAppService", "SendDanmakugiveUpThreshold"))" />
+                            </MudItem>
+                        </MudGrid>
+                    </MudExpansionPanel>
+                </MudExpansionPanels>
             }
 
-            <!-- 操作按钮 -->
+            <!-- Save and reload. -->
             <MudCard Class="mt-4">
                 <MudCardActions>
                     <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">保存配置</MudButton>
-                    <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="LoadConfigAsync" Class="ml-2">重新加载</MudButton>
+                    <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="ReloadAsync" Class="ml-2">重新加载</MudButton>
                 </MudCardActions>
             </MudCard>
         </EditForm>

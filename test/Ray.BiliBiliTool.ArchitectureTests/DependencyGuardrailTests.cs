@@ -101,7 +101,7 @@ public class DependencyGuardrailTests
         .As("notification adapter layer");
 
     [Fact]
-    public void Quartz_jobs_should_not_reach_directly_into_lower_layers()
+    public void Check_QuartzJobs_DoNotDependDirectlyOnLowerLayers()
     {
         IArchRule rule = Types()
             .That()
@@ -116,7 +116,7 @@ public class DependencyGuardrailTests
     }
 
     [Fact]
-    public void Application_should_not_depend_on_web_scheduler_or_transport_dto_types()
+    public void Check_ApplicationLayer_DoesNotDependOnWebSchedulerOrTransportTypes()
     {
         IArchRule rule = Types()
             .That()
@@ -131,7 +131,7 @@ public class DependencyGuardrailTests
     }
 
     [Fact]
-    public void Application_transport_dto_dependencies_should_stay_within_the_known_legacy_allowlist()
+    public void Check_ApplicationTransportDtoDependencies_StayWithinLegacyAllowlist()
     {
         string applicationProjectDir = GetApplicationProjectDirectory();
 
@@ -143,7 +143,7 @@ public class DependencyGuardrailTests
                     @"Ray\.BiliBiliTool\.Agent\.BiliBiliAgent\.Dtos"
                 )
             )
-            .Select(file => Path.GetFileName(file)!)
+            .Select(file => Path.GetRelativePath(applicationProjectDir, file))
             .OrderBy(file => file)
             .ToArray();
 
@@ -160,7 +160,7 @@ public class DependencyGuardrailTests
     }
 
     [Fact]
-    public void Domain_and_domain_service_should_not_depend_on_web_ef_or_scheduler_types()
+    public void Check_DomainLayers_DoNotDependOnWebEfOrSchedulerTypes()
     {
         IArchRule rule = Types()
             .That()
@@ -175,7 +175,7 @@ public class DependencyGuardrailTests
     }
 
     [Fact]
-    public void Web_component_code_behind_classes_should_not_directly_depend_on_infrastructure()
+    public void Check_WebComponents_DoNotDependDirectlyOnInfrastructure()
     {
         IArchRule rule = Types()
             .That()
@@ -190,7 +190,7 @@ public class DependencyGuardrailTests
     }
 
     [Fact]
-    public void Application_should_not_depend_on_notification_adapters()
+    public void Check_ApplicationLayer_DoesNotDependOnNotificationAdapters()
     {
         IArchRule rule = Types()
             .That()

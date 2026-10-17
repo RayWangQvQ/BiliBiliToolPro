@@ -1,6 +1,7 @@
 @page "/Configurations/UnfollowBatchedTaskConfig"
 @using Microsoft.AspNetCore.Authorization
 @using Ray.BiliBiliTool.Config.Options;
+@using Ray.BiliBiliTool.Web.Services
 @attribute [Authorize]
 @rendermode InteractiveServer
 @inherits BaseConfigComponent<UnfollowBatchedTaskOptions>
@@ -9,6 +10,7 @@
 
 <MudContainer Class="app-config-page">
     <PageHero Size="Size.Small" Title="批量取关任务配置" Description="设置批量取关的开关与执行选项。" />
+    <Ray.BiliBiliTool.Web.Components.Comps.TaskGuide TaskKey="UnfollowBatchedTaskAppService" Enabled="@(_isLoading ? (bool?)null : _config.IsEnable)" />
 
     @if (_isLoading)
     {
@@ -33,9 +35,8 @@
                                 Label="启用任务" Color="Color.Primary" />
                         </MudItem>
                         <MudItem xs="12" md="6">
-                            <MudTextField T="string" @bind-Value="_config.Cron" Label="定时任务Cron表达式"
-                                HelperText="例如：0 0 6 1 * ? (每月1号早上6点执行)"
-                                Disabled="!_config.IsEnable" />
+                            <Ray.BiliBiliTool.Web.Components.Comps.ScheduleTimePicker @bind-Value="_config.Cron"
+                                For="@(() => _config.Cron)" Disabled="!_config.IsEnable" />
                         </MudItem>
                     </MudGrid>
                 </MudCardContent>
@@ -54,15 +55,15 @@
                         <MudGrid>
                             <MudItem xs="12" md="6">
                                 <MudTextField T="string" @bind-Value="_config.GroupName" Label="取关的分组名称"
-                                    HelperText="默认为'天选时刻'" />
+                                    HelperText="@(TaskHelpCatalog.SettingDescription("UnfollowBatchedTaskAppService", "GroupName"))" />
 
                                 <MudNumericField T="int" @bind-Value="_config.Count" Label="本次取关个数"
-                                    Min="0" HelperText="倒序，从后往前取关" Class="mt-3" />
+                                    Min="0" HelperText="@(TaskHelpCatalog.SettingDescription("UnfollowBatchedTaskAppService", "Count"))" Class="mt-3" />
                             </MudItem>
 
                             <MudItem xs="12" md="6">
-                                <MudTextField T="string" @bind-Value="_config.RetainUids" Label="白名单（保留的UpId）"
-                                    HelperText="多个用英文逗号分隔，配置后，批量取关时不会取关配置的Up" />
+                                <MudTextField T="string" @bind-Value="_config.RetainUids" Label="保留的 UP 主 UID"
+                                    HelperText="@(TaskHelpCatalog.SettingDescription("UnfollowBatchedTaskAppService", "RetainUids"))" />
                             </MudItem>
                         </MudGrid>
                     </MudCardContent>

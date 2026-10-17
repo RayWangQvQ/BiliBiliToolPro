@@ -1,6 +1,6 @@
 # Tencent Cloud Function (SCF) deployment
 
-The repository includes a [CustomRuntime configuration](./serverless.yml), bootstrap scripts, a [publish script](./publish.sh), and a [GitHub Actions deployment workflow](../../.github/workflows/deploy-tencent-scf.yml). See [Tencent Cloud's SCF documentation](https://cloud.tencent.com/document/product/583) for platform details.
+The repository includes a [CustomRuntime configuration](./serverless.yml), bootstrap scripts, and a [publish script](./publish.sh). The GitHub Actions deployment workflow ([`deploy-tencent-scf.yml`](../../.github/workflows/deploy-tencent-scf.yml)) has been archived to [`platforms/gitHubActions/bak/`](../gitHubActions/bak/deploy-tencent-scf.yml) and no longer runs; deploy from a release ZIP instead (see [Option 2](#option-2-upload-a-release-zip)). See [Tencent Cloud's SCF documentation](https://cloud.tencent.com/document/product/583) for platform details.
 
 > **Compatibility check:** This is a console-based deployment, separate from the current Web image. The SCF workflow uses Node.js 16 and `publish.sh` builds the console without explicitly installing .NET 10 in the workflow; check tool availability and supported runtime versions before relying on automatic deployment. Cloud pricing and quotas change: verify the current terms in your own account rather than assuming use is free.
 
@@ -9,6 +9,8 @@ The repository includes a [CustomRuntime configuration](./serverless.yml), boots
 Register with Tencent Cloud and activate SCF in your account. Check its current pricing, quotas, and logging charges before deploying.
 
 ## Option 1: deploy from GitHub Actions
+
+> **Archived.** The `Deploy Tencent SCF` workflow has been archived to `platforms/gitHubActions/bak/` and is no longer active. This section is kept for historical reference only. Use [Option 2](#option-2-upload-a-release-zip) to deploy from a release ZIP.
 
 This workflow can be triggered manually. Its schedule runs on Monday, Wednesday, and Friday at `02:00 UTC` **only if** `IS_AUTO_DEPLOY_TENCENT_SCF` is set to `true`.
 

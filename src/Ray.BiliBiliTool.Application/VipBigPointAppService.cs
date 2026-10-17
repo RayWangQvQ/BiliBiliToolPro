@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent;
@@ -7,6 +7,7 @@ using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.ApiApi.VipBigPoint;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.NavApi;
 using Ray.BiliBiliTool.Application.Attributes;
 using Ray.BiliBiliTool.Application.Contracts;
+using Ray.BiliBiliTool.Application.Contracts.Cookies;
 using Ray.BiliBiliTool.Application.Diagnostics;
 using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Interfaces;
@@ -21,9 +22,16 @@ public class VipBigPointAppService(
     IVipBigPointDomainService vipBigPointDomainService,
     ILoginDomainService loginDomainService,
     IConfiguration configuration,
-    CookieStrFactory<BiliCookie> cookieFactory
+    CookieStrFactory<BiliCookie> cookieFactory,
+    ICookieTaskGuard cookieTaskGuard
 )
-    : BaseMultiAccountsAppService(logger, cookieFactory, loginDomainService, configuration),
+    : BaseMultiAccountsAppService(
+        logger,
+        cookieFactory,
+        loginDomainService,
+        configuration,
+        cookieTaskGuard
+    ),
         IVipBigPointAppService
 {
     [TaskInterceptor("大会员大积分", TaskLevel.One)]

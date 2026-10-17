@@ -9,6 +9,7 @@
 
 <MudContainer Class="app-config-page">
     <PageHero Size="Size.Small" Title="银瓜子兑换硬币任务配置" Description="设置银瓜子兑换硬币的开关与执行选项。" />
+    <Ray.BiliBiliTool.Web.Components.Comps.TaskGuide TaskKey="Silver2CoinTaskAppService" Enabled="@(_isLoading ? (bool?)null : _config.IsEnable)" />
 
     @if (_isLoading)
     {
@@ -33,9 +34,8 @@
                                 Label="启用任务" Color="Color.Primary" />
                         </MudItem>
                         <MudItem xs="12" md="6">
-                            <MudTextField T="string" @bind-Value="_config.Cron" Label="定时任务Cron表达式"
-                                HelperText="例如：0 0 8 * * ? (每天早上8点执行)"
-                                Disabled="!_config.IsEnable" />
+                            <Ray.BiliBiliTool.Web.Components.Comps.ScheduleTimePicker @bind-Value="_config.Cron"
+                                For="@(() => _config.Cron)" Disabled="!_config.IsEnable" />
                         </MudItem>
                     </MudGrid>
                 </MudCardContent>

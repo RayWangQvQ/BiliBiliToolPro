@@ -234,42 +234,36 @@ public class AccountDomainService(
     /// <returns>升级时间</returns>
     public int CalculateUpgradeTime(UserInfo useInfo)
     {
-        double availableCoins =
-            decimal.ToDouble(useInfo.Money ?? 0) - _dailyTaskOptions.NumberOfProtectedCoins;
-        long needExp =
-            useInfo.Level_info != null
-                ? useInfo.Level_info.GetNext_expLong() - useInfo.Level_info.Current_exp
-                : 0;
-        int needDay;
+        var level = useInfo.Level_info;
+        if (level is null || level.Current_level >= 6)
+            return 0;
 
-        if (availableCoins < 0)
-            needDay = (int)(
-                (double)needExp / 25
-                + _dailyTaskOptions.NumberOfProtectedCoins
-                - Math.Abs(availableCoins)
-            );
+        decimal needExp = (decimal)level.GetNext_expLong() - level.Current_exp;
+        if (needExp <= 0)
+            return 0;
 
-        switch (_dailyTaskOptions.NumberOfCoins)
+        int dailyExp =
+            5 + (_dailyTaskOptions.IsWatchVideo ? 5 : 0) + (_dailyTaskOptions.IsShareVideo ? 5 : 0);
+        int coinLimit = Math.Clamp(_dailyTaskOptions.NumberOfCoins, 0, 5);
+        decimal availableCoins =
+            decimal.Floor(useInfo.Money ?? 0)
+            - Math.Max(0, _dailyTaskOptions.NumberOfProtectedCoins);
+
+        // Forecast one login coin per day, spending only above the protected balance.
+        decimal ExpAfter(int days) =>
+            (decimal)days * dailyExp
+            + 10 * Math.Min((decimal)days * coinLimit, Math.Max(0, availableCoins + days));
+
+        int low = 1;
+        int high = int.MaxValue;
+        while (low < high)
         {
-            case 0:
-                needDay = (int)(needExp / 15);
-                break;
-            case 1:
-                needDay = (int)(needExp / 25);
-                break;
-            default:
-                int dailyExpAvailable = 15 + _dailyTaskOptions.NumberOfCoins * 10;
-                double needFrontDay = availableCoins / (_dailyTaskOptions.NumberOfCoins - 1);
-
-                if ((double)needExp / dailyExpAvailable > needFrontDay)
-                    needDay = (int)(
-                        needFrontDay + (needExp - dailyExpAvailable * needFrontDay) / 25
-                    );
-                else
-                    needDay = (int)(needExp / dailyExpAvailable);
-                break;
+            int middle = low + (high - low) / 2;
+            if (ExpAfter(middle) >= needExp)
+                high = middle;
+            else
+                low = middle + 1;
         }
-
-        return needDay;
+        return low;
     }
 }

@@ -15,10 +15,10 @@
 
 <PageHero Title="账号管理" Description="账号列表直接读取本地配置，打开即显示。「昵称 / 等级」需要访问 B 站，点「检测」按需获取。">
     <Actions>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add"
-                   OnClick="OpenAddDialog">添加账号</MudButton>
-        <MudButton Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.QrCodeScanner"
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.QrCodeScanner"
                    OnClick="OpenQrLoginDialog">扫码登录</MudButton>
+        <MudButton Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add"
+                   OnClick="OpenAddDialog">手动添加</MudButton>
         <MudButton Variant="Variant.Outlined" Color="Color.Info" StartIcon="@Icons.Material.Filled.HealthAndSafety"
                    Disabled="@(_accounts.Count == 0 || _probingAll)"
                    OnClick="ProbeAllAsync">检测全部账号</MudButton>
@@ -143,6 +143,13 @@ else
         {
             _probes[account.Index] = await Probe.ProbeAsync(uid, force: true);
         }
+        catch (Exception)
+        {
+            _probes[account.Index] = new BiliAccountProbeResult(
+                false, null, null, "检测失败，请刷新后重试", DateTimeOffset.UtcNow
+            );
+            Snackbar.Add("检测失败，请刷新后重试", Severity.Error);
+        }
         finally
         {
             _probePending.Remove(account.Index);
@@ -195,7 +202,7 @@ else
 
     private async Task OpenAddDialog()
     {
-        var dialog = await DialogService.ShowAsync<AddAccountDialog>("添加账号");
+        var dialog = await DialogService.ShowAsync<AddAccountDialog>("手动添加");
         var result = await dialog.Result;
         if (!result.Canceled && result.Data is string cookieStr)
         {

@@ -2,6 +2,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Application.Contracts;
+using Ray.BiliBiliTool.Application.Contracts.Cookies;
+using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.DomainService.Interfaces;
 using Ray.BiliBiliTool.Infrastructure.Cookie;
 
@@ -19,7 +21,8 @@ public class TaskRecoveryExecutor(
     IDonateCoinDomainService donateCoinDomainService,
     IVipPrivilegeDomainService vipPrivilegeDomainService,
     IServiceProvider serviceProvider,
-    ILogger<TaskRecoveryExecutor> logger
+    ILogger<TaskRecoveryExecutor> logger,
+    ICookieTaskGuard cookieTaskGuard
 )
 {
     /// <summary>
@@ -33,6 +36,7 @@ public class TaskRecoveryExecutor(
     )
     {
         var ck = FindCookie(userId) ?? throw new Exception($"未找到 UID 为 {userId} 的账号");
+        await cookieTaskGuard.EnsureValidAsync(ck.UserId, ck.ToString(), cancellationToken);
 
         if (item.ItemKey is null)
         {
@@ -71,6 +75,17 @@ public class TaskRecoveryExecutor(
             }
 
             case "DonateCoin":
+                var donationOptions =
+                    configuration.GetSection("DailyTaskConfig").Get<DailyTaskOptions>() ?? new();
+                if (donationOptions.EffectiveCoinDonationStopLevel > 0)
+                {
+                    var account = await accountDomainService.LoginByCookie(ck);
+                    if (donationOptions.ShouldSkipCoinDonation(account.Level_info?.Current_level))
+                    {
+                        logger.LogInformation("已达到停止投币等级，跳过补做投币");
+                        break;
+                    }
+                }
                 if (configuration.GetValue("DailyTaskConfig:IsDonateCoinForArticle", false))
                 {
                     logger.LogInformation("已开启专栏投币，补做走视频投币分支");

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Quartz;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Application.Contracts;
+using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.Config.SQLite;
 using Ray.BiliBiliTool.Domain;
 using Ray.BiliBiliTool.DomainService.Interfaces;
@@ -81,6 +82,8 @@ public class TodayTaskService(
             rewards = await rewardTask;
         }
 
+        var donationOptions =
+            configuration.GetSection("DailyTaskConfig").Get<DailyTaskOptions>() ?? new();
         var result = new List<AccountTodayTasksDto>();
 
         foreach (var (account, userId) in accounts)
@@ -132,7 +135,12 @@ public class TodayTaskService(
                         Task = task,
                         Item = item,
                         IsTaskEnabled = task.IsEnabled(configuration),
-                        IsItemEnabled = item.IsEnabled(configuration),
+                        IsItemEnabled =
+                            item.IsEnabled(configuration)
+                            && (
+                                item.ItemKey != "DonateCoin"
+                                || !donationOptions.ShouldSkipCoinDonation(profile?.Level)
+                            ),
                         HasFireTimeToday = due.HasFireTimeToday,
                         IsPastDueTime = due.IsPastDueTime,
                         BiliReward = biliReward,
@@ -158,9 +166,6 @@ public class TodayTaskService(
                             IsBiliPending = pending,
                             CanAutoRedo =
                                 !pending && TaskStatusEvaluator.CanAutoRedo(ctx, evaluated),
-                            CanDisableShare =
-                                item.ItemKey == TaskCatalog.ShareItemKey
-                                && item.IsEnabled(configuration),
                         }
                     );
                 }
@@ -182,6 +187,7 @@ public class TodayTaskService(
         CancellationToken cancellationToken = default
     )
     {
+        using var notificationScope = new TaskFailureNotificationScope(suppress: true);
         var task = TaskCatalog.All.FirstOrDefault(t => t.TaskKey == taskKey);
         if (task is null)
         {
@@ -210,6 +216,7 @@ public class TodayTaskService(
         CancellationToken cancellationToken = default
     )
     {
+        using var notificationScope = new TaskFailureNotificationScope(suppress: true);
         var status = await GetTodayStatusAsync(true, true, cancellationToken);
         var account = status.FirstOrDefault(a => a.UserId == userId);
         return account is null ? 0 : await RedoAccountAsync(account, cancellationToken);
@@ -217,6 +224,7 @@ public class TodayTaskService(
 
     public async Task<int> RedoAllMissingAsync(CancellationToken cancellationToken = default)
     {
+        using var notificationScope = new TaskFailureNotificationScope(suppress: true);
         // 只查一次状态，避免逐账号重复请求 B 站接口
         var status = await GetTodayStatusAsync(true, true, cancellationToken);
 
@@ -227,13 +235,6 @@ public class TodayTaskService(
         }
 
         return count;
-    }
-
-    public async Task DisableShareAsync(CancellationToken cancellationToken = default)
-    {
-        await SaveSettingsAsync(
-            new Dictionary<string, string> { ["DailyTaskConfig:IsShareVideo"] = "false" }
-        );
     }
 
     public async Task SaveAutoRecoverSettingsAsync(

@@ -6,25 +6,49 @@ dir_shell=$QL_DIR/shell
 . $dir_shell/share.sh
 . /root/.bashrc
 
-bili_repo="raywangqvq_bilibilitoolpro"
-bili_branch=""
+bili_repo=${BILI_REPO:-"raywangqvq/bilibilitoolpro"}
+bili_branch=${BILI_BRANCH:-""}
 
 echo "青龙repo目录: $dir_repo"
 qinglong_bili_repo="$(echo "$bili_repo" | sed 's/\//_/g')${bili_branch}"
-qinglong_bili_repo_dir="$(find $dir_repo -type d \( -iname $qinglong_bili_repo -o -iname ${qinglong_bili_repo}_main \) | head -1)"
+qinglong_bili_repo_dir="$(find "$dir_repo" -type d \( -iname "$qinglong_bili_repo" -o -iname "${qinglong_bili_repo}_main" \) | head -1)"
 echo "bili仓库目录: $qinglong_bili_repo_dir"
 
+if [ -z "$qinglong_bili_repo_dir" ]; then
+    echo "未找到 bili 仓库目录"
+    echo "查找目标：$qinglong_bili_repo"
+    echo "请确认已在青龙中拉取仓库 ${bili_repo}${bili_branch}，或通过环境变量 BILI_REPO / BILI_BRANCH 覆盖默认值"
+    exit 1
+fi
+
 echo -e "清理缓存...\n"
-cd $qinglong_bili_repo_dir
+cd "$qinglong_bili_repo_dir"
 find . -type d -name "bin" -exec rm -rf {} +
 find . -type d -name "obj" -exec rm -rf {} +
 echo -e "清理完成\n"
 
+get_dotnet_major_version() {
+    local dotnet_command="${1:-dotnet}"
+    local dotnet_version
+    # Respect SDK selection (including global.json) and reject failed commands.
+    dotnet_version="$("$dotnet_command" --version 2>/dev/null)" || return 1
+    # Some wrappers return SDK-list rows instead of one selected version.
+    printf '%s\n' "$dotnet_version" | awk '
+        /^[[:space:]]*[0-9]+\.[0-9]+\.[0-9]+(-[[:alnum:].-]+)?(\+[[:alnum:].-]+)?([[:space:]]+\[[^]]+\])?[[:space:]]*$/ {
+            split($1, version, ".")
+            if (version[1] + 0 > highest) highest = version[1] + 0
+        }
+        END {
+            if (highest > 0) print highest
+            else exit 1
+        }
+    '
+}
+
 echo "检测dotnet..."
 requiredDotnetMajor=10
-dotnetVersion=$(dotnet --version 2>/dev/null || true)
-dotnetMajor=$(echo "$dotnetVersion" | grep -oE '^[0-9]+' || true)
-echo "当前dotnet版本：$dotnetVersion"
+dotnetMajor="$(get_dotnet_major_version dotnet || true)"
+echo "当前dotnet主版本：${dotnetMajor:-未检测到可用SDK}"
 if [[ "$dotnetMajor" =~ ^[0-9]+$ && "$dotnetMajor" -ge "$requiredDotnetMajor" ]]; then
     echo "已安装，且版本满足"
 else
@@ -35,12 +59,11 @@ else
         exit 1
     fi
     . /root/.bashrc
-    dotnetVersion=$(dotnet --version 2>/dev/null || true)
-    dotnetMajor=$(echo "$dotnetVersion" | grep -oE '^[0-9]+' || true)
+    dotnetMajor="$(get_dotnet_major_version dotnet || true)"
     if ! [[ "$dotnetMajor" =~ ^[0-9]+$ && "$dotnetMajor" -ge "$requiredDotnetMajor" ]]; then
         echo ".NET $requiredDotnetMajor SDK 安装后不可用"
         exit 1
     fi
-    echo "当前dotnet版本：$dotnetVersion"
+    echo "当前dotnet主版本：$dotnetMajor"
 fi
 echo "检测dotnet结束"

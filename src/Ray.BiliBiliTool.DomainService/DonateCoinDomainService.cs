@@ -47,13 +47,36 @@ public class DonateCoinDomainService(
     /// </summary>
     public async Task AddCoinsForVideos(BiliCookie ck)
     {
-        int needCoins = await GetNeedDonateCoinNum(ck);
+        // Pre-condition queries (today's donated count, coin balance) usually fail because
+        // of API hiccups or risk-control side effects. They must not abort the account's
+        // remaining daily tasks, so degrade to skipping this coin donation run.
+        int needCoins;
+        try
+        {
+            needCoins = await GetNeedDonateCoinNum(ck);
+        }
+        catch (InvalidOperationException ex)
+        {
+            logger.LogWarning("获取今日已投币数失败，跳过本次投币：{message}", ex.Message);
+            return;
+        }
+
         int protectedCoins = _dailyTaskOptions.NumberOfProtectedCoins;
         if (needCoins <= 0)
             return;
 
         //投币前硬币余额
-        decimal coinBalance = await coinDomainService.GetCoinBalance(ck);
+        decimal coinBalance;
+        try
+        {
+            coinBalance = await coinDomainService.GetCoinBalance(ck);
+        }
+        catch (InvalidOperationException ex)
+        {
+            logger.LogWarning("获取硬币余额失败，跳过本次投币：{message}", ex.Message);
+            return;
+        }
+
         logger.LogInformation("【投币前余额】 : {coinBalance}", coinBalance);
         _ = int.TryParse(
             decimal.Truncate(coinBalance - protectedCoins).ToString(),
@@ -117,7 +140,7 @@ public class DonateCoinDomainService(
 
         logger.LogInformation(
             "【硬币余额】{coin}",
-            (await accountApi.GetCoinBalanceAsync(ck.ToString())).Data?.Money ?? 0
+            (await accountApi.GetCoinBalanceAsync(ck.ToString()))?.Data?.Money ?? 0
         );
     }
 

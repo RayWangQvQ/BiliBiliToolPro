@@ -87,11 +87,22 @@ https://gh-proxy.com/https://github.com/RayWangQvQ/BiliBiliToolPro.git
 
 Third-party proxy availability is not guaranteed.
 
+## Environment variables
+
+`BILI_REPO` and `BILI_BRANCH` override which repository and branch the scripts look for. They default to `raywangqvq/bilibilitoolpro` and the main branch, so set them only when running from a fork.
+
+```bash
+export BILI_REPO=raywangqvq/bilibilitoolpro # repository owner/name
+export BILI_BRANCH=                        # branch suffix; leave empty for main
+```
+
 ## Troubleshooting
 
 ### .NET installation fails
 
 `dotnet` mode requires the .NET 10 SDK. The scripts check the installed version and install or upgrade it if needed. Qinglong has Alpine (`whyour/qinglong:latest`) and Debian (`whyour/qinglong:debian`) image variants; check the actual OS version inside your container. On Alpine, the scripts use the `dotnet10-sdk` package when the image is Alpine 3.23 or newer. On an older Alpine image, upgrade it or switch to `bilitool` mode.
+
+SDK detection accepts a single version or multiple SDK-list rows, including installation paths. It still checks `dotnet --version` in the current directory: a `global.json` selection failure or a selected SDK below .NET 10 is not treated as a usable installation merely because `dotnet --list-sdks` contains a newer SDK.
 
 Add these lines in the panel **Configuration File** to use a release binary instead:
 

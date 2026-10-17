@@ -74,6 +74,11 @@ public abstract class BaseConfigComponent<T> : ComponentBase
 
         try
         {
+            // Validate the generated schedule before persisting settings.
+            if (string.IsNullOrWhiteSpace(_config.Cron))
+                _config.Cron = Ray.BiliBiliTool.Web.Services.TaskSchedulePlan.DefaultCron;
+            _ = new CronExpression(_config.Cron);
+
             // 保存配置
             var sqliteProvider = GetSqliteConfigurationProvider();
             if (sqliteProvider == null)
@@ -83,6 +88,8 @@ public abstract class BaseConfigComponent<T> : ComponentBase
 
             var configValues = _config.ToConfigDictionary();
             sqliteProvider.BatchSet(configValues);
+            // Publish the persisted draft to options monitors before updating the scheduler.
+            ((IConfigurationRoot)Configuration).Reload();
 
             // 如果有对应的定时任务，同步更新 Quartz 任务状态和 Cron 表达式
             var jobKey = GetJobKey();

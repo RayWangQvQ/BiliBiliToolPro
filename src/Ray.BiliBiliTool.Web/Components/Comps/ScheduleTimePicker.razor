@@ -1,0 +1,238 @@
+@using System.Globalization
+@using System.Linq.Expressions
+@using Ray.BiliBiliTool.Web.Services
+@implements IDisposable
+
+<fieldset class="schedule-picker" disabled="@Disabled">
+    <legend>执行时间</legend>
+    @if (!_supported)
+    {
+        <p class="schedule-summary">已保存自定义执行计划</p>
+        <MudButton ButtonType="ButtonType.Button" Variant="Variant.Outlined" Color="Color.Primary"
+                   Disabled="Disabled" OnClick="ResetAsync">重新选择时间</MudButton>
+    }
+    else
+    {
+        <div class="schedule-fields">
+            <label>
+                <span>执行周期</span>
+                <span class="schedule-select"><select aria-label="执行周期" value="@_plan.Period" @onchange="ChangePeriodAsync">
+                    <option value="Daily">每天</option>
+                    <option value="Weekly">每周</option>
+                    <option value="Monthly">每月</option>
+                    <option value="Yearly">每年</option>
+                    <option value="Hours">每隔几小时</option>
+                    <option value="Minutes">每隔几分钟</option>
+                </select></span>
+            </label>
+            @if (_plan.Period == SchedulePeriod.Yearly)
+            {
+                <label><span>月份</span>
+                    <span class="schedule-select"><select aria-label="月份" value="@_plan.Month" @onchange="ChangeMonthAsync">
+                        @for (var m = 1; m <= 12; m++) { <option value="@m">@m 月</option> }
+                    </select></span>
+                </label>
+            }
+            @if (_plan.Period is SchedulePeriod.Monthly or SchedulePeriod.Yearly)
+            {
+                <label><span>日期</span>
+                    <span class="schedule-select"><select aria-label="日期" value="@_plan.Day" @onchange="ChangeDayAsync">
+                        @for (var d = 1; d <= MaxDay; d++) { <option value="@d">@d 日</option> }
+                        @if (_plan.Period == SchedulePeriod.Monthly) { <option value="0">最后一天</option> }
+                    </select></span>
+                </label>
+            }
+            @if (_plan.Period is SchedulePeriod.Hours or SchedulePeriod.Minutes)
+            {
+                <label><span>执行间隔</span>
+                    <span class="schedule-select"><select aria-label="执行间隔" value="@_plan.Interval" @onchange="ChangeIntervalAsync">
+                        @foreach (var n in Intervals) { <option value="@n">@n @(_plan.Period == SchedulePeriod.Hours ? "小时" : "分钟")</option> }
+                    </select></span>
+                </label>
+                @if (_plan.Period == SchedulePeriod.Hours)
+                {
+                    <label><span>每小时的执行分钟</span>
+                        <span class="schedule-select"><select aria-label="执行分钟" value="@_plan.Time.Minutes" @onchange="ChangeMinuteAsync">
+                            @for (var n = 0; n < 60; n++) { <option value="@n">@n 分</option> }
+                        </select></span>
+                    </label>
+                }
+            }
+            else
+            {
+                <div class="schedule-time-field">
+                    <span>选择执行时间</span>
+                    <div class="schedule-time-values @(_plan.Time.Seconds != 0 ? "schedule-time-with-seconds" : null)" role="group" aria-label="执行时间">
+                        <span class="schedule-select"><select aria-label="小时" value="@_plan.Time.Hours" @onchange="ChangeHourAsync">
+                            @for (var h = 0; h < 24; h++) { <option value="@h">@(h.ToString("00")) 时</option> }
+                        </select></span>
+                        <span class="schedule-time-separator" aria-hidden="true">:</span>
+                        <span class="schedule-select"><select aria-label="分钟" value="@_plan.Time.Minutes" @onchange="ChangeTimeMinuteAsync">
+                            @for (var m = 0; m < 60; m++) { <option value="@m">@(m.ToString("00")) 分</option> }
+                        </select></span>
+                        @if (_plan.Time.Seconds != 0)
+                        {
+                            <span class="schedule-time-separator" aria-hidden="true">:</span>
+                            <span class="schedule-select"><select aria-label="秒" value="@_plan.Time.Seconds" @onchange="ChangeSecondAsync">
+                                @for (var s = 0; s < 60; s++) { <option value="@s">@(s.ToString("00")) 秒</option> }
+                            </select></span>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+        @if (_plan.Period == SchedulePeriod.Weekly)
+        {
+            <div class="schedule-weekdays" role="group" aria-label="执行星期">
+                @foreach (var day in new[] { 2, 3, 4, 5, 6, 7, 1 })
+                {
+                    var selectedDay = day;
+                    <label><input type="checkbox" checked="@_plan.Days.Contains(day)" @onchange="e => ChangeWeekDayAsync(selectedDay, e)" />周@("日一二三四五六"[day - 1])</label>
+                }
+            </div>
+        }
+        @if (_error == null)
+        {
+            <p class="schedule-summary" role="status">@_plan.Summary</p>
+            @if (_plan.Period == SchedulePeriod.Monthly && _plan.Day > 28)
+            {
+                <p class="schedule-hint">在包含 @_plan.Day 日的月份执行</p>
+            }
+            @if (_plan.Period == SchedulePeriod.Yearly && _plan.Month == 2 && _plan.Day == 29)
+            {
+                <p class="schedule-hint">在闰年执行</p>
+            }
+        }
+    }
+    @if (_error != null) { <p class="schedule-error" role="alert">@_error</p> }
+</fieldset>
+
+@code {
+    [Parameter] public string? Value { get; set; }
+    [Parameter] public EventCallback<string?> ValueChanged { get; set; }
+    [Parameter] public Expression<Func<string?>>? For { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+    [CascadingParameter] private EditContext? FormContext { get; set; }
+    private EditContext? _context;
+    private ValidationMessageStore? _messages;
+    private FieldIdentifier? _field;
+    private TaskSchedulePlan _plan = new();
+    private bool _supported;
+    private bool _loaded;
+    private string? _lastValue;
+    private string _timeText = "08:00";
+    private string? _error;
+    private int MaxDay => _plan.Period == SchedulePeriod.Yearly ? DateTime.DaysInMonth(2000, _plan.Month) : 31;
+    private int[] Intervals => _plan.Period == SchedulePeriod.Hours ? TaskSchedulePlan.HourIntervals : TaskSchedulePlan.MinuteIntervals;
+
+    protected override void OnParametersSet()
+    {
+        if (_context != FormContext)
+        {
+            DetachContext();
+            _context = FormContext;
+            if (_context != null)
+            {
+                _messages = new(_context);
+                _context.OnValidationRequested += Validate;
+            }
+        }
+        _field = For == null ? null : FieldIdentifier.Create(For);
+        if (!_loaded || Value != _lastValue)
+        {
+            _loaded = true;
+            _lastValue = Value;
+            _supported = TaskSchedulePlan.TryParse(Value, out _plan);
+            _timeText = _plan.TimeText;
+            _error = null;
+            if (!_supported)
+            {
+                try { _ = new Quartz.CronExpression(Value ?? ""); }
+                catch (FormatException) { _error = "请选择执行周期和时间"; }
+            }
+        }
+        UpdateValidation();
+    }
+
+    private void Validate(object? sender, ValidationRequestedEventArgs e) => UpdateValidation();
+    private void UpdateValidation()
+    {
+        if (_messages == null || _field == null) return;
+        _messages.Clear(_field.Value);
+        if (!Disabled && _error != null) _messages.Add(_field.Value, _error);
+        _context!.NotifyValidationStateChanged();
+    }
+
+    private async Task PublishAsync()
+    {
+        if (Disabled) return;
+        try
+        {
+            if (_plan.Period is not (SchedulePeriod.Hours or SchedulePeriod.Minutes) &&
+                !TimeSpan.TryParseExact(_timeText, [@"hh\:mm", @"hh\:mm\:ss"], CultureInfo.InvariantCulture, out var time))
+                throw new FormatException("请选择执行时间");
+            if (_plan.Period is not (SchedulePeriod.Hours or SchedulePeriod.Minutes))
+                _plan.Time = TimeSpan.ParseExact(_timeText, [@"hh\:mm", @"hh\:mm\:ss"], CultureInfo.InvariantCulture);
+            var cron = _plan.ToCron();
+            _error = null;
+            _lastValue = cron;
+            Value = cron;
+            await ValueChanged.InvokeAsync(cron);
+        }
+        catch (FormatException ex) { _error = ex.Message; }
+        if (_field != null) _context?.NotifyFieldChanged(_field.Value);
+        UpdateValidation();
+    }
+
+    private async Task ResetAsync()
+    {
+        if (Disabled) return;
+        _plan = new(); _timeText = _plan.TimeText; _supported = true;
+        await PublishAsync();
+    }
+    private async Task ChangePeriodAsync(ChangeEventArgs e)
+    {
+        if (Disabled) return;
+        _plan.Period = Enum.Parse<SchedulePeriod>(e.Value!.ToString()!);
+        _plan.Interval = 1;
+        if (_plan.Day == 0 && _plan.Period == SchedulePeriod.Yearly) _plan.Day = 1;
+        _plan.Day = Math.Min(_plan.Day, MaxDay);
+        await PublishAsync();
+    }
+    private Task ChangeHourAsync(ChangeEventArgs e) => ChangeTimePartAsync(e, 0);
+    private Task ChangeTimeMinuteAsync(ChangeEventArgs e) => ChangeTimePartAsync(e, 1);
+    private Task ChangeSecondAsync(ChangeEventArgs e) => ChangeTimePartAsync(e, 2);
+    private async Task ChangeTimePartAsync(ChangeEventArgs e, int part)
+    {
+        if (Disabled) return;
+        if (!int.TryParse(e.Value?.ToString(), out var value) || value < 0 || value > (part == 0 ? 23 : 59))
+        {
+            _timeText = "";
+        }
+        else
+        {
+            var time = _plan.Time;
+            _plan.Time = new(part == 0 ? value : time.Hours, part == 1 ? value : time.Minutes, part == 2 ? value : time.Seconds);
+            _timeText = _plan.TimeText;
+        }
+        await PublishAsync();
+    }
+    private async Task ChangeDayAsync(ChangeEventArgs e) { if (Disabled) return; _plan.Day = int.Parse(e.Value!.ToString()!); await PublishAsync(); }
+    private async Task ChangeMonthAsync(ChangeEventArgs e) { if (Disabled) return; _plan.Month = int.Parse(e.Value!.ToString()!); _plan.Day = Math.Min(_plan.Day, MaxDay); await PublishAsync(); }
+    private async Task ChangeIntervalAsync(ChangeEventArgs e) { if (Disabled) return; _plan.Interval = int.Parse(e.Value!.ToString()!); await PublishAsync(); }
+    private async Task ChangeMinuteAsync(ChangeEventArgs e) { if (Disabled) return; _plan.Time = new(0, int.Parse(e.Value!.ToString()!), _plan.Time.Seconds); await PublishAsync(); }
+    private async Task ChangeWeekDayAsync(int day, ChangeEventArgs e)
+    {
+        if (Disabled) return;
+        if (e.Value is true) _plan.Days.Add(day); else _plan.Days.Remove(day);
+        await PublishAsync();
+    }
+    private void DetachContext()
+    {
+        if (_context == null) return;
+        _context.OnValidationRequested -= Validate;
+        _messages?.Clear();
+        _context.NotifyValidationStateChanged();
+    }
+    public void Dispose() => DetachContext();
+}

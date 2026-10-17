@@ -35,6 +35,7 @@ bld/
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/
+.codegraph/
 # Uncomment if you have tasks that create the project's static files in wwwroot
 #wwwroot/
 
@@ -371,6 +372,8 @@ platforms/krew/pkg/utils/fixtures
 kustomization.yaml
 
 # cookie config
+**/cookie-check-state.json*
+**/task-failure-batch.json*
 **/Ray.BiliBiliTool.Console/cookies.json
 **/Ray.BiliBiliTool.Web/config/cookies.json
 

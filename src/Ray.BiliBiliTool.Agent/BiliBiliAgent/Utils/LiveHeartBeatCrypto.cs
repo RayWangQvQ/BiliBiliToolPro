@@ -31,7 +31,11 @@ public class LiveHeartBeatCrypto
                     result = Hash(result, key, "HMACSHA384");
                     break;
                 default:
-                    break;
+                    throw new ArgumentOutOfRangeException(
+                        nameof(rules),
+                        rule,
+                        "Unsupported heartbeat signature rule"
+                    );
             }
         }
         return result;
@@ -39,11 +43,17 @@ public class LiveHeartBeatCrypto
 
     private static string Hash(string text, string key, string algorithmName)
     {
+        if (algorithmName == "HMACSHA224")
+            return Convert.ToHexStringLower(
+                Sha224.Hmac(Encoding.UTF8.GetBytes(key), Encoding.UTF8.GetBytes(text))
+            );
         HMAC hamc = algorithmName.ToUpperInvariant() switch
         {
             "HMACSHA256" => new HMACSHA256(Encoding.UTF8.GetBytes(key)),
             "HMACSHA1" => new HMACSHA1(Encoding.UTF8.GetBytes(key)),
             "HMACMD5" => new HMACMD5(Encoding.UTF8.GetBytes(key)),
+            "HMACSHA384" => new HMACSHA384(Encoding.UTF8.GetBytes(key)),
+            "HMACSHA512" => new HMACSHA512(Encoding.UTF8.GetBytes(key)),
             _ => throw new ArgumentException($"Unsupported algorithm: {algorithmName}"),
         };
 

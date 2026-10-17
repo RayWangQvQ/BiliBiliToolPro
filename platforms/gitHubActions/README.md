@@ -1,6 +1,6 @@
 # GitHub Actions task runner (archived)
 
-> **Archived recipe — not deployable as-is.** The Bilibili task workflows exist only under [`bak/`](./bak/), not under `.github/workflows/`. GitHub Actions will not discover or run workflows from `platforms/gitHubActions/bak/`. The root [`.github/workflows/`](../../.github/workflows/) contains CI, release, fork-sync, and Tencent SCF workflows, but no Bilibili daily-task runner. Forking the repository, enabling Actions, and adding `COOKIESTR` **will not** run Bilibili tasks.
+> **Archived recipe — not deployable as-is.** The Bilibili task workflows exist only under [`bak/`](./bak/), not under `.github/workflows/`. GitHub Actions will not discover or run workflows from `platforms/gitHubActions/bak/`. The root [`.github/workflows/`](../../.github/workflows/) contains CI, release, and fork-sync workflows, but no Bilibili daily-task runner and no Tencent SCF deploy workflow. Forking the repository, enabling Actions, and adding `COOKIESTR` **will not** run Bilibili tasks.
 
 This page preserves the original setup intent and screenshots for historical reference; it is not an installation walkthrough for a supported current deployment. The archived [daily](./bak/bilibili-daily-task.yml), [live-lottery](./bak/live-lottery-task.yml), [unfollow](./bak/unfollow-batched-task.yml), and [manual/empty](./bak/empty-task.yml) YAML files need review and updates before anyone could use them. In particular, they install .NET 6 while the project targets .NET 10; the daily task's pre-check references `IsOpenDailyTask` without defining it, and the older workflows use deprecated `::set-output` syntax. Do **not** copy them into `.github/workflows/` and assume they will run.
 
@@ -18,7 +18,7 @@ The archived daily-task workflow maps the `COOKIESTR` repository secret to `Ray_
 
 ## Historical workflow screenshots
 
-The screenshots below show how the old task workflow was manually started and how its logs appeared. **There is no matching task workflow in the current Actions tab.** Enabling Actions on a fork does not restore it. The existing Tencent SCF deploy workflow is a different deployment target.
+The screenshots below show how the old task workflow was manually started and how its logs appeared. **There is no matching task workflow in the current Actions tab.** Enabling Actions on a fork does not restore it. The Tencent SCF deploy workflow was also archived to `bak/` — Tencent SCF deployment is now handled by the stable release pipeline.
 
 ![Run a workflow](../../docs/imgs/run-workflow.png)
 
@@ -29,4 +29,4 @@ The screenshots below show how the old task workflow was manually started and ho
 
 The archived [daily YAML](./bak/bilibili-daily-task.yml) schedules `0 16 * * *` (16:00 UTC, midnight in UTC+8) and the old instructions recommended avoiding the hour to spread API traffic. The archived [`empty-task.yml`](./bak/empty-task.yml) was a manually triggered test task. Neither runs from its current location. The old instructions also described a 0–30 minute random startup delay, but the console's checked-in `appsettings.json` currently sets `Security:RandomSleepMaxMin` to `0`; do not rely on the old default. A newly written workflow would need its own verified schedule, current .NET setup, and configuration.
 
-For an existing GitHub Actions deployment path, see the separate [SCF deployment guide](../tencentScf/README.md); its workflow deploys a cloud function and is **not** a daily Bilibili task runner.
+For Tencent SCF deployment, see the separate [SCF deployment guide](../tencentScf/README.md); the deploy workflow itself is archived under `bak/` and is **not** a daily Bilibili task runner.
