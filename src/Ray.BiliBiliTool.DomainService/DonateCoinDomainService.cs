@@ -457,7 +457,7 @@ public class DonateCoinDomainService(
 
             //获取该视频可投币数量
             int limitCoinNum =
-                (await videoDomainService.GetVideoDetail(aid)).Copyright == 1
+                (await videoDomainService.GetVideoDetail(aid, ck)).Copyright == 1
                     ? 2 //原创，最多可投2枚
                     : 1; //转载，最多可投1枚
             logger.LogDebug("该视频的最大投币数为{num}", limitCoinNum);

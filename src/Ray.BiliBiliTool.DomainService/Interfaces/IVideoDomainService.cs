@@ -13,11 +13,12 @@ namespace Ray.BiliBiliTool.DomainService.Interfaces;
 public interface IVideoDomainService : IDomainService
 {
     /// <summary>
-    /// 获取视频详情
+    /// 获取视频详情（WBI 签名版，避免 -412）
     /// </summary>
     /// <param name="aid"></param>
+    /// <param name="ck"></param>
     /// <returns></returns>
-    Task<VideoDetail> GetVideoDetail(string aid);
+    Task<VideoDetail> GetVideoDetail(string aid, BiliCookie ck);
 
     /// <summary>
     /// 从排行榜获取一个随机视频
