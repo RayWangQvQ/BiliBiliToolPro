@@ -39,7 +39,11 @@ public abstract class BaseJob<TJob>(
             try
             {
                 logger.LogInformation($"{typeof(TJob).Name} started.");
+                DateTimeOffset startedAt = DateTimeOffset.Now;
+
                 await DoExecuteAsync(context);
+
+                await SendCompletedNotificationAsync(context, DateTimeOffset.Now - startedAt);
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
             {
@@ -48,6 +52,7 @@ public abstract class BaseJob<TJob>(
             catch (Exception e)
             {
                 logger.LogError(e, e.Message);
+                await SendErrorNotificationAsync(context, e);
                 var taskKey = TaskFailureNotificationCatalog.TaskKeyForJob(typeof(TJob).Name);
                 if (
                     !TaskFailureNotificationScope.IsSuppressed
@@ -87,4 +92,20 @@ public abstract class BaseJob<TJob>(
     }
 
     protected abstract Task DoExecuteAsync(IJobExecutionContext context);
+
+    /// <summary>
+    /// 任务执行成功后的通知钩子，子类按需重写（默认不通知）。
+    /// </summary>
+    protected virtual Task SendCompletedNotificationAsync(
+        IJobExecutionContext context,
+        TimeSpan duration
+    ) => Task.CompletedTask;
+
+    /// <summary>
+    /// 任务执行失败时的通知钩子，子类按需重写（默认不通知）。
+    /// </summary>
+    protected virtual Task SendErrorNotificationAsync(
+        IJobExecutionContext context,
+        Exception exception
+    ) => Task.CompletedTask;
 }

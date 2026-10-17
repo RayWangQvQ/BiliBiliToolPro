@@ -48,7 +48,8 @@ public static class ServiceCollectionExtension
             )
             .Configure<AutoRecoverOptions>(
                 configuration.GetSection(AutoRecoverOptions.SectionName)
-            );
+            )
+            .Configure<NotificationOptions>(configuration.GetSection("NotificationConfig"));
 
         return services;
     }
