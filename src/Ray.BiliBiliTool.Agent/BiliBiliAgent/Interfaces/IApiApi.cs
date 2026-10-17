@@ -253,10 +253,15 @@ public interface IApiApi
     Task<GetBangumiBySsidResponse> GetBangumiBySsid(long ssid, [Header("Cookie")] string ck);
 
     /// <summary>
-    /// 获取视频详情（不需要传递Cookie）
+    /// 获取视频详情（WBI 签名版，避免 -412）。
+    /// 通过 wts 触发 WridEncryptionDelegatingHandler 签名，
+    /// 并显式传递 Cookie 以便获取 WBI 密钥。
     /// </summary>
-    [Get("/x/web-interface/view?aid={aid}")]
-    Task<BiliApiResponse<VideoDetail>> GetVideoDetail(string aid);
+    [Get("/x/web-interface/wbi/view")]
+    Task<BiliApiResponse<VideoDetail>> GetVideoDetail(
+        [Query] GetVideoDetailRequest request,
+        [Header("Cookie")] string ck
+    );
 
     /// <summary>
     /// 获取排行榜

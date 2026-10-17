@@ -278,7 +278,10 @@ public class ApiApiTests : IDisposable
     [Fact]
     public async Task GetVideoDetail_Normal_Success()
     {
-        BiliApiResponse<VideoDetail> re = await _api.GetVideoDetail("246364184");
+        BiliApiResponse<VideoDetail> re = await _api.GetVideoDetail(
+            new GetVideoDetailRequest { aid = "246364184" },
+            _ck.ToString()
+        );
 
         re.Code.Should().Be(0);
         re.Data.Should().NotBeNull();

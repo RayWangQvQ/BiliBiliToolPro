@@ -26,13 +26,17 @@ public class VideoDomainService(
     private readonly Dictionary<string, int> _expDic = Config.Constants.ExpDic;
 
     /// <summary>
-    /// 获取视频详情
+    /// 获取视频详情（WBI 签名版，避免 -412）
     /// </summary>
     /// <param name="aid"></param>
+    /// <param name="ck"></param>
     /// <returns></returns>
-    public async Task<VideoDetail> GetVideoDetail(string aid)
+    public async Task<VideoDetail> GetVideoDetail(string aid, BiliCookie ck)
     {
-        var re = await apiApi.GetVideoDetail(aid);
+        var re = await apiApi.GetVideoDetail(
+            new GetVideoDetailRequest { aid = aid },
+            ck.ToString()
+        );
         return re.Data!;
     }
 

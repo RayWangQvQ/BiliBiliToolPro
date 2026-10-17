@@ -355,7 +355,7 @@ public class DailyTaskTests
     {
         private int _watchCalls;
 
-        public Task<VideoDetail> GetVideoDetail(string aid)
+        public Task<VideoDetail> GetVideoDetail(string aid, BiliCookie ck)
         {
             throw new NotSupportedException();
         }
