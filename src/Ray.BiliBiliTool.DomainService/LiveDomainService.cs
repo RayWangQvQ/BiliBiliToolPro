@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -163,20 +164,19 @@ public class LiveDomainService(
         {
             logger.LogInformation("【扫描分区】{area}..." + Environment.NewLine, area.Name);
 
-            string defaultSort = "";
-            //每个分区下搜索5页
-            for (int i = 1; i < 6; i++)
+            //每个分区下搜索若干页（v3 接口，逐房间校验天选挂件）
+            for (int i = 1; i < 4; i++)
             {
-                var request = new GetListRequest
+                var request = new GetRoomListV3Request
                 {
                     platform = "web",
                     parent_area_id = area.Id,
                     area_id = 0,
-                    sort_type = defaultSort,
+                    sort_type = "online",
                     page = i,
-                    wts = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+                    page_size = 99,
                 };
-                BiliApiResponse<GetListResponse> listResponse = await liveApi.GetList(
+                BiliApiResponse<GetListResponse> listResponse = await liveApi.GetRoomListV3(
                     request,
                     ck.ToString()
                 );
@@ -187,31 +187,23 @@ public class LiveDomainService(
                         listResponse.Message,
                         listResponse.Code
                     );
-                    return;
+                    break;
                 }
 
                 var reData = listResponse.Data;
 
                 foreach (var item in reData.List)
                 {
-                    if (item.Pendant_info == null || item.Pendant_info.Count == 0)
-                        continue;
-                    var suc = item.Pendant_info.TryGetValue("2", out var pendant);
-                    if (!suc)
-                        continue;
-                    if (pendant?.Pendent_id != 504)
+                    if (!IsTianXuanPendant(item.Pendant_info))
                         continue;
                     count++;
 
                     await TryJoinTianXuan(item, ck);
                 }
 
-                if (reData.Has_more != 1)
+                if (reData.List.Count < 99)
                     break;
-                defaultSort = reData.New_tags.FirstOrDefault()?.Sort_type ?? "";
             }
-
-            defaultSort = "";
         }
 
         if (count == 0)
@@ -219,6 +211,30 @@ public class LiveDomainService(
             logger.LogInformation("未搜索到直播间");
             return;
         }
+    }
+
+    /// <summary>
+    /// 天选时刻挂件 id：504 为旧版，1432 为「天选之旅」新版
+    /// </summary>
+    private static readonly long[] TianXuanPendantIds = [504, 1432];
+
+    internal static bool IsTianXuanPendant(JsonElement? pendantInfo)
+    {
+        // pendant_info 形状偶发异常（[]/标量/null），逐层校验避免整轮反序列化崩溃
+        if (pendantInfo is null || pendantInfo.Value.ValueKind != JsonValueKind.Object)
+            return false;
+        if (
+            !pendantInfo.Value.TryGetProperty("2", out var pendant)
+            || pendant.ValueKind != JsonValueKind.Object
+        )
+            return false;
+        if (
+            !pendant.TryGetProperty("pendent_id", out var pid)
+            || pid.ValueKind != JsonValueKind.Number
+            || !pid.TryGetInt64(out var pidVal)
+        )
+            return false;
+        return TianXuanPendantIds.Contains(pidVal);
     }
 
     public async Task TryJoinTianXuan(ListItemDto target, BiliCookie ck)

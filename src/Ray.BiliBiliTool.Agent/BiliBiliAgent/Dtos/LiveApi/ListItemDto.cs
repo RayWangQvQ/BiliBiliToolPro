@@ -1,4 +1,6 @@
-﻿namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.LiveApi;
+﻿using System.Text.Json;
+
+namespace Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.LiveApi;
 
 public class GetListResponse
 {
@@ -48,26 +50,9 @@ public class ListItemDto
     public string? Area_name { get; set; }
 
     /// <summary>
-    ///
+    /// 挂件信息。形状偶发异常（[]/标量/null），用 JsonElement 容忍解析，避免整轮反序列化崩溃。
     /// </summary>
     /// <sample>1：百人成就</sample>
     /// <sample>2：天选时刻、新星主播</sample>
-    public Dictionary<string, PendantInfo>? Pendant_info { get; set; }
-}
-
-public class PendantInfo
-{
-    /// <summary>
-    /// Id
-    /// </summary>
-    /// <sample>504：天选</sample>
-    /// <sample>426：百人成就</sample>
-    /// <sample>397：新星主播</sample>
-    public long Pendent_id { get; set; }
-
-    /// <summary>
-    /// 内容
-    /// </summary>
-    /// <sample>天选时刻</sample>
-    public string? Content { get; set; }
+    public JsonElement? Pendant_info { get; set; }
 }
