@@ -1,3 +1,13 @@
+## 4.2.3
+- feat(live-lottery): pre-filter TianXuan by pendant 504/1432 + live list API v3 (#1092)
+- fix: view 接口改用 WBI 签名，修复 -412 (request was banned) (#1239)
+- fix(release): dedup release notes by dropping body_path (#1235)
+- Bump coverlet.collector from 6.0.4 to 10.1.0 (#1199)
+- Migrate bunit 1.x to 2.x API (#1126)
+- Bump Swashbuckle.AspNetCore from 8.1.4 to 10.2.3 (#1200)
+- Bump xunit.runner.visualstudio from 3.1.5 to 4.0.0 (#1201)
+- chore(ci): archive Tencent SCF deploy workflow (#1236)
+- docs(changelog): 4.2.2 (#1233)
 ## 4.2.2
 - Fix cookie check false 'login failed' due to timeout race (#1231)
 - test: consolidate IApiApi tests into ApiApiTests (#1230)
