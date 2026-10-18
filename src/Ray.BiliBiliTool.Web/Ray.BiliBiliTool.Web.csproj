@@ -47,4 +47,7 @@
   <ItemGroup>
     <Folder Include="Logs\" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Include="../Shared/Telegram/*.cs" Link="Notifications/%(Filename)%(Extension)" />
+  </ItemGroup>
 </Project>
