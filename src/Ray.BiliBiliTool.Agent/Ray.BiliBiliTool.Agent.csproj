@@ -8,6 +8,7 @@
     <PackageReference Include="Microsoft.Extensions.Http.Polly" />
     <PackageReference Include="Refit" />
     <PackageReference Include="Refit.HttpClientFactory" />
+    <PackageReference Include="Refit.Reflection" />
     <PackageReference Include="Scrutor" />
   </ItemGroup>
   <ItemGroup>
