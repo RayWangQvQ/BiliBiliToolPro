@@ -50,16 +50,16 @@
     <PackageVersion Include="Serilog.Sinks.File" Version="6.0.0" />
     <PackageVersion Include="Serilog.Sinks.SQLite.Microsoft" Version="1.0.0" />
     <!-- Ray Serilog Sinks -->
-    <PackageVersion Include="Ray.Serilog.Sinks.CoolPushBatched" Version="0.1.5" />
-    <PackageVersion Include="Ray.Serilog.Sinks.DingTalkBatched" Version="0.1.5" />
-    <PackageVersion Include="Ray.Serilog.Sinks.GotifyBatched" Version="0.1.5" />
-    <PackageVersion Include="Ray.Serilog.Sinks.MicrosoftTeamsBatched" Version="0.1.5" />
-    <PackageVersion Include="Ray.Serilog.Sinks.OtherApiBatched" Version="0.1.5" />
-    <PackageVersion Include="Ray.Serilog.Sinks.PushPlusBatched" Version="0.1.5" />
-    <PackageVersion Include="Ray.Serilog.Sinks.ServerChanBatched" Version="0.1.5" />
-    <PackageVersion Include="Ray.Serilog.Sinks.TelegramBatched" Version="0.1.5" />
-    <PackageVersion Include="Ray.Serilog.Sinks.WorkWeiXinAppBatched" Version="0.1.5" />
-    <PackageVersion Include="Ray.Serilog.Sinks.WorkWeiXinBatched" Version="0.1.5" />
+    <PackageVersion Include="Ray.Serilog.Sinks.CoolPushBatched" Version="0.1.6" />
+    <PackageVersion Include="Ray.Serilog.Sinks.DingTalkBatched" Version="0.1.6" />
+    <PackageVersion Include="Ray.Serilog.Sinks.GotifyBatched" Version="0.1.6" />
+    <PackageVersion Include="Ray.Serilog.Sinks.MicrosoftTeamsBatched" Version="0.1.6" />
+    <PackageVersion Include="Ray.Serilog.Sinks.OtherApiBatched" Version="0.1.6" />
+    <PackageVersion Include="Ray.Serilog.Sinks.PushPlusBatched" Version="0.1.6" />
+    <PackageVersion Include="Ray.Serilog.Sinks.ServerChanBatched" Version="0.1.6" />
+    <PackageVersion Include="Ray.Serilog.Sinks.TelegramBatched" Version="0.1.6" />
+    <PackageVersion Include="Ray.Serilog.Sinks.WorkWeiXinAppBatched" Version="0.1.6" />
+    <PackageVersion Include="Ray.Serilog.Sinks.WorkWeiXinBatched" Version="0.1.6" />
     <!-- Quartz -->
     <PackageVersion Include="Quartz" Version="4.1.1" />
     <PackageVersion Include="Quartz.AspNetCore" Version="4.1.1" />
