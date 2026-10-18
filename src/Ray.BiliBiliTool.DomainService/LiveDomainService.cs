@@ -1,7 +1,6 @@
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.ApiApi.Relation;
@@ -13,6 +12,7 @@ using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.Domain.Exceptions;
 using Ray.BiliBiliTool.DomainService.Dtos;
 using Ray.BiliBiliTool.DomainService.Interfaces;
+using Ray.BiliBiliTool.Infrastructure;
 using Ray.BiliBiliTool.Infrastructure.Extensions;
 using UpInfoDto = Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.ApiApi.UpInfo.UpInfo;
 
@@ -519,8 +519,9 @@ public class LiveDomainService(
 
             // 请求主播主页来正确配置 cookie
             var liveHome = await liveApi.GetLiveHome(ck.ToString());
-            var liveHomeContent = JsonConvert.DeserializeObject<BiliApiResponse>(
-                await liveHome.Content.ReadAsStringAsync()
+            var liveHomeContent = JsonSerializer.Deserialize<BiliApiResponse>(
+                await liveHome.Content.ReadAsStringAsync(),
+                JsonSerializerOptionsBuilder.DefaultOptions
             );
             if (liveHomeContent?.Code != 0)
             {
