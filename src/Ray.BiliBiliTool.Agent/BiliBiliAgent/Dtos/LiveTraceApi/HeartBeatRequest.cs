@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+using System.Text.Json;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Services;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Utils;
 using Refit;
@@ -25,7 +25,7 @@ public class HeartBeatRequest : IWrid
         long anchorId = 0
     )
     {
-        Id = JsonConvert.SerializeObject(new[] { parentId, areaID, seqNumber, roomId });
+        Id = JsonSerializer.Serialize(new[] { parentId, areaID, seqNumber, roomId });
         Ets = ets;
         Benchmark = secretKey;
         Time = heartbeatInterval;
@@ -49,7 +49,7 @@ public class HeartBeatRequest : IWrid
             time = heartbeatInterval,
             ts = timestamp,
         };
-        string jsonString = JsonConvert.SerializeObject(json);
+        string jsonString = JsonSerializer.Serialize(json);
         S = LiveHeartBeatCrypto.Sypder(jsonString, secretRule, secretKey);
 
         Visit_id = "";

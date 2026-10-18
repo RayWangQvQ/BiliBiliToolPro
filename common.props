@@ -5,6 +5,9 @@
          通过 -p:Version= 显式注入。本地构建产物版本恒为 0.0.0-dev，无需维护。 -->
     <VersionPrefix>0.0.0</VersionPrefix>
     <VersionSuffix>dev</VersionSuffix>
-    <NoWarn>$(NoWarn);CS1591;CS0436</NoWarn>
+    <!-- NU1902: Ray.Infrastructure 传递引入 ZXing.Net.Bindings.ImageSharp.V2 -> SixLabors.ImageSharp 2.1.13
+         （GHSA-gwg2-r3hj-4w44，2.x 系无安全补丁）。本仓库未使用 BarCodeHelper，待 Ray.Infrastructure 升级到
+         ImageSharp 3.x 后移除本条。 -->
+    <NoWarn>$(NoWarn);CS1591;CS0436;NU1902</NoWarn>
   </PropertyGroup>
 </Project>

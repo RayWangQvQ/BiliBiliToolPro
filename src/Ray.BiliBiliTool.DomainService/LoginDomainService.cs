@@ -1,11 +1,11 @@
 using System.Security.Cryptography;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using QRCoder;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.Baihu;
@@ -22,6 +22,7 @@ using Ray.BiliBiliTool.Config.Options;
 using Ray.BiliBiliTool.Domain.Exceptions;
 using Ray.BiliBiliTool.DomainService.Dtos;
 using Ray.BiliBiliTool.DomainService.Interfaces;
+using Ray.BiliBiliTool.Infrastructure;
 using Ray.BiliBiliTool.Infrastructure.Cookie;
 
 namespace Ray.BiliBiliTool.DomainService;
@@ -81,7 +82,10 @@ public class LoginDomainService(
             }
 
             var contentStr = await check.Content.ReadAsStringAsync(cancellationToken);
-            var content = JsonConvert.DeserializeObject<BiliApiResponse<TokenDto>>(contentStr);
+            var content = JsonSerializer.Deserialize<BiliApiResponse<TokenDto>>(
+                contentStr,
+                JsonSerializerOptionsBuilder.DefaultOptions
+            );
             if (content?.Code != 0 || content.Data is null)
             {
                 logger.LogWarning("调用检测接口异常：{msg}", check.ToJsonStr());
@@ -291,22 +295,22 @@ public class LoginDomainService(
     /// </summary>
     private static string BuildGaiaPayload(string deviceUuid)
     {
-        var payload = JObject.Parse(GaiaDeviceFingerprintTemplate.PayloadJson);
+        var payload = JsonNode.Parse(GaiaDeviceFingerprintTemplate.PayloadJson)!.AsObject();
         payload["5062"] = DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString();
         payload["03bf"] = "https%3A%2F%2Fwww.bilibili.com%2F";
         payload["39c8"] = "333.1007.fp.risk";
         payload["df35"] = deviceUuid;
 
-        var fingerprint = (JObject)payload["3c43"]!;
+        var fingerprint = payload["3c43"]!.AsObject();
         var (width, height, availHeight) = ScreenProfiles[
             Random.Shared.Next(ScreenProfiles.Length)
         ];
-        fingerprint["748e"] = new JArray(width, height);
-        fingerprint["d61f"] = new JArray(width, availHeight);
-        fingerprint["13ab"] = PerturbCanvasTail((string)fingerprint["13ab"]!);
-        fingerprint["bfe9"] = PerturbCanvasTail((string)fingerprint["bfe9"]!);
+        fingerprint["748e"] = new JsonArray(width, height);
+        fingerprint["d61f"] = new JsonArray(width, availHeight);
+        fingerprint["13ab"] = PerturbCanvasTail(fingerprint["13ab"]!.GetValue<string>());
+        fingerprint["bfe9"] = PerturbCanvasTail(fingerprint["bfe9"]!.GetValue<string>());
 
-        return payload.ToString(Formatting.None);
+        return payload.ToJsonString();
     }
 
     /// <summary>
@@ -596,7 +600,10 @@ public class LoginDomainService(
         }
 
         var contentStr = await check.Content.ReadAsStringAsync(cancellationToken);
-        var content = JsonConvert.DeserializeObject<BiliApiResponse<TokenDto>>(contentStr);
+        var content = JsonSerializer.Deserialize<BiliApiResponse<TokenDto>>(
+            contentStr,
+            JsonSerializerOptionsBuilder.DefaultOptions
+        );
         if (content?.Code != 0 || content.Data is null)
         {
             return new QrLoginCheckResult

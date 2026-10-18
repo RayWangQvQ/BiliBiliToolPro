@@ -21,13 +21,13 @@ public class PasswordHelper
     private static string ComputeHash(string password, string salt)
     {
         byte[] saltBytes = Convert.FromBase64String(salt);
-        using var pbkdf2 = new Rfc2898DeriveBytes(
+        byte[] hashBytes = Rfc2898DeriveBytes.Pbkdf2(
             password,
             saltBytes,
             100_000,
-            HashAlgorithmName.SHA256
+            HashAlgorithmName.SHA256,
+            32
         );
-        byte[] hashBytes = pbkdf2.GetBytes(32);
 
         return Convert.ToBase64String(hashBytes);
     }

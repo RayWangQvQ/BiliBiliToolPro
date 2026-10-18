@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+using System.Text.Json;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Services;
 using Refit;
 
@@ -18,7 +18,7 @@ public class EnterRoomRequest : IWrid
         string device
     )
     {
-        Id = JsonConvert.SerializeObject(new[] { parentId, areaID, seqNumber, roomId });
+        Id = JsonSerializer.Serialize(new[] { parentId, areaID, seqNumber, roomId });
         Ts = timestamp;
         Ua = userAgent;
         Csrf = csrf;
