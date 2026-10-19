@@ -67,9 +67,9 @@
     <PackageVersion Include="CronExpressionDescriptor" Version="2.51.0" />
     <!-- Other packages - 修复版本兼容性问题 -->
     <PackageVersion Include="Ray.Infrastructure" Version="0.1.2" />
-    <PackageVersion Include="Refit" Version="15.2.0" />
+    <PackageVersion Include="Refit" Version="16.4.0" />
     <PackageVersion Include="Refit.HttpClientFactory" Version="15.2.0" />
-    <PackageVersion Include="Refit.Reflection" Version="15.2.0" />
+    <PackageVersion Include="Refit.Reflection" Version="16.4.0" />
     <PackageVersion Include="Scrutor" Version="7.0.0" />
     <PackageVersion Include="QRCoder" Version="1.8.1" />
     <PackageVersion Include="MudBlazor" Version="9.10.0" />
