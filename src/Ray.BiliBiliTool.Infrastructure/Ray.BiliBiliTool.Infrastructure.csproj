@@ -10,6 +10,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
     <PackageReference Include="Microsoft.Extensions.Http" />
     <PackageReference Include="Ray.Infrastructure" />
+    <PackageReference Include="Refit" />
     <PackageReference Include="Serilog" />
   </ItemGroup>
   <ItemGroup>
