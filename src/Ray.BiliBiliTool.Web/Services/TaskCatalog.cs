@@ -130,6 +130,12 @@ public static class TaskCatalog
             "批量取关",
             "UnfollowBatchedTaskConfig"
         ),
+        TaskLevel(
+            "WatchLaterCleanupAppService",
+            "WatchLaterCleanupJob",
+            "稍后再看清理",
+            "WatchLaterCleanupTaskConfig"
+        ),
     ];
 
     /// <summary>整任务作为一个检查项（ItemKey 为 null）</summary>

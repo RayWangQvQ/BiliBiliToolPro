@@ -292,6 +292,40 @@ public static class TaskHelpCatalog
             ]
         ),
         new(
+            "WatchLaterCleanupAppService",
+            "WatchLaterCleanupTaskConfig",
+            "清理「稍后再看」列表，默认只删除已看完或已失效的条目，避免列表长期堆积。删除后无法恢复，建议保留清理前备份。",
+            "适合每天凌晨执行一次。只想清空整个列表时，把「只清理已看完」关掉。",
+            [
+                new(
+                    "只清理已看完",
+                    "只删除已看完（含进度达到阈值）和已失效的条目；关闭后清空整个稍后再看列表。",
+                    "OnlyViewed"
+                ),
+                new(
+                    "已看完判定阈值",
+                    "历史记录中的播放进度占比不低于该值时视为已看完，默认 0.95。",
+                    "ViewedThreshold"
+                ),
+                new(
+                    "用历史记录交叉判断",
+                    "稍后再看列表自带的观看位置不总是可靠，开启后额外核对历史记录，判定更准确但会多几次请求。",
+                    "UseHistoryCrossCheck"
+                ),
+                new(
+                    "删除间隔",
+                    "每条删除之间的等待毫秒数，默认 1000ms。调小会更快，但更容易触发风控。",
+                    "DeleteIntervalMs"
+                ),
+                new("清理前备份", "清理前把列表导出为 JSON 文件，默认开启。", "BackupBeforeClean"),
+                new(
+                    "备份保留天数",
+                    "超过天数的备份文件会被自动删除，设置为 0 表示永久保留。",
+                    "BackupRetentionDays"
+                ),
+            ]
+        ),
+        new(
             "Notification",
             "NotificationConfig",
             "管理活动前的登录状态检查、Cookie 过期提醒和后台定时任务的失败汇总，通知通过统一的推送通道发送。",

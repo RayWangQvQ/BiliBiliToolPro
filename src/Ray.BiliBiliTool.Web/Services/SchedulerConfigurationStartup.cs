@@ -21,6 +21,7 @@ public sealed class SchedulerConfigurationStartup(
             [LiveLotteryJob.Key] = "LiveLotteryTaskConfig",
             [LiveFansMedalJob.Key] = "LiveFansMedalTaskConfig",
             [UnfollowBatchedJob.Key] = "UnfollowBatchedTaskConfig",
+            [WatchLaterCleanupJob.Key] = "WatchLaterCleanupTaskConfig",
         };
 
     // All lifecycle StartingAsync hooks finish before Quartz starts firing jobs.
