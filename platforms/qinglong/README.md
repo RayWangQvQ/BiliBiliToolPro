@@ -52,13 +52,15 @@ After a successful pull, Qinglong should register the Bilibili task scripts.
 
 To let QR sign-in save Cookies to Qinglong environment variables, set up an application with panel API access. See the [Qinglong API preparation instructions](https://qinglong.online/api/preparation).
 
-1. In Qinglong, go to **System Settings → Application Settings** and create an application.
+1. In Qinglong, go to **System Settings → Application Settings** and create an application, granting it the **environment variables** scope (`envs`). Without that scope the OpenAPI calls are rejected.
 
    ![Qinglong application](../../docs/imgs/qinglong-application.png)
 
 2. Add its two values as environment variables named `Ray_QingLongConfig__ClientId` and `Ray_QingLongConfig__ClientSecret`.
 
    ![Qinglong application credentials](../../docs/imgs/qinglong-application-key.png)
+
+3. If Qinglong does not listen on the built-in default (`http://localhost:5600`), also set `Ray_QL_URL`. Qinglong 2.10 and later listen on port **5700** by default, e.g. `Ray_QL_URL=http://localhost:5700`.
 
 ## Sign in to Bilibili
 
