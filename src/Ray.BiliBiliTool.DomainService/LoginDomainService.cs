@@ -548,8 +548,9 @@ public class LoginDomainService(
             logger.LogInformation(addRe.Code == 200 ? "新增成功！" : addRe.ToJsonStr());
             return true;
         }
-        catch
+        catch (Exception e)
         {
+            logger.LogError("保存到青龙失败：{msg}", e.Message);
             await PrintIfSaveCookieFailAsync(ckInfo, cancellationToken);
             return false;
         }
@@ -974,7 +975,13 @@ public class LoginDomainService(
         }
         else
         {
-            logger.LogError("持久化失败，青龙版本高于2.18，请手动添加环境变量到青龙");
+            logger.LogError("持久化失败，请手动添加环境变量到青龙");
+            logger.LogInformation(
+                "提示：在青龙面板「系统设置->应用设置」新建应用（授权范围需包含「环境变量」），配置环境变量 Ray_QingLongConfig__ClientId / Ray_QingLongConfig__ClientSecret 后，程序可尝试自动保存。"
+            );
+            logger.LogInformation(
+                "提示：若已配置仍失败，请确认青龙面板端口（青龙2.10+默认为5700），必要时配置环境变量 Ray_QL_URL，如 http://localhost:5700。"
+            );
         }
 
         logger.LogWarning("变量Key：{key}", "Ray_BiliBiliCookies__0");
