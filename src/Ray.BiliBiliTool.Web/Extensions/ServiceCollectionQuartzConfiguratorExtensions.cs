@@ -109,6 +109,14 @@ public static class ServiceCollectionQuartzConfiguratorExtensions
             configuration
         );
 
+        // Watch later cleanup job
+        AddBiliJob<WatchLaterCleanupJob>(
+            quartz,
+            WatchLaterCleanupJob.Key,
+            "WatchLaterCleanupTaskConfig:Cron",
+            configuration
+        );
+
         // 自动补做 job：固定间隔触发（不是 Cron），用于补跑今天漏做的任务
         var autoRecoverInterval = Math.Clamp(
             configuration.GetValue("AutoRecoverConfig:IntervalHours", 2),
