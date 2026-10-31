@@ -55,11 +55,11 @@
                         <MudGrid>
                             <MudItem xs="12" md="6">
                                 <MudSwitch T="bool" @bind-Value="_config.OnlyViewed"
-                                    Label="只清理已看完" Color="Color.Primary"
-                                    HelperText="@(TaskHelpCatalog.SettingDescription("WatchLaterCleanupAppService", "OnlyViewed"))" />
+                                    Label="只清理已看完" Color="Color.Primary" />
+                                <Ray.BiliBiliTool.Web.Components.Comps.TaskSettingHelp TaskKey="WatchLaterCleanupAppService" SettingKey="OnlyViewed" />
                                 <MudSwitch T="bool" @bind-Value="_config.DeleteInvalid"
-                                    Label="同时删除失效视频" Color="Color.Primary" Class="mt-3"
-                                    HelperText="被 UP 主删除或不可播放的条目会一并清理。" />
+                                    Label="同时删除失效视频" Color="Color.Primary" Class="mt-3" />
+                                <Ray.BiliBiliTool.Web.Components.Comps.TaskSettingHelp TaskKey="WatchLaterCleanupAppService" SettingKey="DeleteInvalid" />
 
                                 <MudNumericField T="double" @bind-Value="_config.ViewedThreshold" Label="已看完判定阈值"
                                     Min="0" Max="1" Step="0.01" Class="mt-3"
@@ -68,8 +68,8 @@
 
                             <MudItem xs="12" md="6">
                                 <MudSwitch T="bool" @bind-Value="_config.UseHistoryCrossCheck"
-                                    Label="用历史记录交叉判断" Color="Color.Primary"
-                                    HelperText="@(TaskHelpCatalog.SettingDescription("WatchLaterCleanupAppService", "UseHistoryCrossCheck"))" />
+                                    Label="用历史记录交叉判断" Color="Color.Primary" />
+                                <Ray.BiliBiliTool.Web.Components.Comps.TaskSettingHelp TaskKey="WatchLaterCleanupAppService" SettingKey="UseHistoryCrossCheck" />
 
                                 <MudNumericField T="int" @bind-Value="_config.HistoryMaxPages" Label="历史记录最多拉取页数"
                                     Min="0" Class="mt-3"
@@ -82,8 +82,8 @@
 
                             <MudItem xs="12" md="6">
                                 <MudSwitch T="bool" @bind-Value="_config.BackupBeforeClean"
-                                    Label="清理前备份" Color="Color.Primary"
-                                    HelperText="@(TaskHelpCatalog.SettingDescription("WatchLaterCleanupAppService", "BackupBeforeClean"))" />
+                                    Label="清理前备份" Color="Color.Primary" />
+                                <Ray.BiliBiliTool.Web.Components.Comps.TaskSettingHelp TaskKey="WatchLaterCleanupAppService" SettingKey="BackupBeforeClean" />
 
                                 <MudNumericField T="int" @bind-Value="_config.BackupRetentionDays" Label="备份保留天数"
                                     Min="0" Class="mt-3"

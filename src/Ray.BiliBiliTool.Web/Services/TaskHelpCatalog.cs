@@ -303,6 +303,11 @@ public static class TaskHelpCatalog
                     "OnlyViewed"
                 ),
                 new(
+                    "同时删除失效视频",
+                    "被 UP 主删除或已不可播放的条目会一并清理，默认开启。",
+                    "DeleteInvalid"
+                ),
+                new(
                     "已看完判定阈值",
                     "历史记录中的播放进度占比不低于该值时视为已看完，默认 0.95。",
                     "ViewedThreshold"
