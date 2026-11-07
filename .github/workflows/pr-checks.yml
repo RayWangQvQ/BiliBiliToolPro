@@ -121,6 +121,9 @@ jobs:
       - name: Update changelog fixtures
         run: bash ./scripts/test-update-changelog.sh
 
+      - name: Alpine .NET version check fixtures
+        run: bash ./scripts/test-alpine-dotnet-version.sh
+
       # alpha workflow 的版本计算步骤在 PR 上的 dry-run 冒烟（只算不推）
       - name: Alpha version dry-run
         run: |
