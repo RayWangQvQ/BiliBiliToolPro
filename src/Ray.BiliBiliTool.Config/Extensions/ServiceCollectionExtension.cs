@@ -46,6 +46,9 @@ public static class ServiceCollectionExtension
             .Configure<DeviceCookieOptions>(
                 configuration.GetSection(DeviceCookieOptions.SectionName)
             )
+            .Configure<WatchLaterCleanupTaskOptions>(
+                configuration.GetSection("WatchLaterCleanupTaskConfig")
+            )
             .Configure<AutoRecoverOptions>(
                 configuration.GetSection(AutoRecoverOptions.SectionName)
             );

@@ -98,6 +98,13 @@ public static class ServiceCollectionExtension
             policy: BiliResiliencePolicies.MutatingPolicy()
         );
 
+        //稍后再看清理：含删除操作，按会改动服务端状态处理（5xx 不重试，避免重复删除）
+        services.AddBiliBiliClientApi<IWatchLaterApi>(
+            BiliHosts.Api,
+            config,
+            policy: BiliResiliencePolicies.MutatingPolicy()
+        );
+
         //qinglong
         var qinglongHost = configuration["QL_URL"] ?? "http://localhost:5600";
         services

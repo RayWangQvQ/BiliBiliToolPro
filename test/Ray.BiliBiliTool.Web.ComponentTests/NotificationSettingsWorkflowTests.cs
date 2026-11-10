@@ -40,7 +40,7 @@ public class NotificationSettingsWorkflowTests : IDisposable
         Assert.False(settings.Cookie.AutoCheckEnabled);
         Assert.True(settings.Cookie.NotifyEnabled);
         Assert.True(settings.TaskFailure.Enabled);
-        Assert.Equal(11, settings.TaskFailure.Tasks.Count);
+        Assert.Equal(12, settings.TaskFailure.Tasks.Count);
         Assert.False(
             settings.TaskFailure.Tasks.Single(task => task.TaskKey == "DailyTaskAppService").Enabled
         );

@@ -20,6 +20,7 @@ public static class TaskTypeFactory
         typeof(ILiveLotteryTaskAppService),
         typeof(IVipBigPointAppService),
         typeof(IUnfollowBatchedTaskAppService),
+        typeof(IWatchLaterCleanupAppService),
     ];
 
     private static readonly List<TaskTypeItem> All = [];
