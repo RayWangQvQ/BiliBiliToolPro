@@ -56,10 +56,19 @@ install_by_official_script() {
     configure_script_installed_dotnet_path
 }
 
+# dotnet10-sdk is in the Alpine community repo from 3.23 on, so try apk there.
+alpine_has_dotnet10_package() {
+    local major minor
+    IFS=. read -r major minor _ <<<"${1:-}"
+    minor=${minor%%[!0-9]*}
+    [[ "$major" =~ ^[0-9]+$ && "$minor" =~ ^[0-9]+$ ]] || return 1
+    ((10#$major > 3 || (10#$major == 3 && 10#$minor >= 23)))
+}
+
 install_for_alpine() {
-    if [[ "${VERSION_ID:-}" != 3.23* ]]; then
+    if ! alpine_has_dotnet10_package "${VERSION_ID:-}"; then
         echo "Alpine ${VERSION_ID:-unknown} does not provide .NET 10 packages for Qinglong."
-        echo "Please upgrade to Alpine 3.23 or set BILI_MODE=bilitool."
+        echo "Please upgrade to Alpine 3.23 or later, or set BILI_MODE=bilitool."
         return 1
     fi
 
