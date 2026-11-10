@@ -3,7 +3,7 @@
 # The scripts run top-level code when executed, so each function under test is
 # extracted by name and evaluated in isolation.
 #
-# Local/CI: bash ./scripts/test-alpine-dotnet-version.sh
+# Local: bash ./scripts/test-alpine-dotnet-version.sh
 set -euo pipefail
 
 repo_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
