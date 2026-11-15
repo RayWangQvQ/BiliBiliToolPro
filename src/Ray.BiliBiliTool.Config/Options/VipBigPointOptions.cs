@@ -6,6 +6,13 @@ public class VipBigPointOptions : BaseConfigOptions
 
     public string? ViewBangumis { get; set; }
 
+    /// <summary>
+    /// Android client build number sent with the big-point requests. Empty means "use the built-in
+    /// default" (<c>BaseAppRequest.DefaultBuild</c>); raise it when Bilibili answers
+    /// 6007000 "please update to the latest version".
+    /// </summary>
+    public string? AppBuild { get; set; }
+
     public List<long> ViewBangumiList
     {
         get
@@ -32,6 +39,7 @@ public class VipBigPointOptions : BaseConfigOptions
             new Dictionary<string, string>
             {
                 { $"{SectionName}:{nameof(ViewBangumis)}", ViewBangumis ?? "" },
+                { $"{SectionName}:{nameof(AppBuild)}", AppBuild ?? "" },
             }
         );
     }

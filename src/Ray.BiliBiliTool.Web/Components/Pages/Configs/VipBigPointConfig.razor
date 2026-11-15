@@ -56,6 +56,10 @@
                                 <MudTextField T="string" @bind-Value="_config.ViewBangumis" Label="旧版番剧编号" Disabled="true"
                                     HelperText="当前观看任务使用积分中心下发的流程，此项保留原值" />
                             </MudItem>
+                            <MudItem xs="12" md="6">
+                                <MudTextField T="string" @bind-Value="_config.AppBuild" Label="客户端 build 号"
+                                    HelperText="留空使用内置默认值（9120300，对应 App 9.12.0）；日志出现 6007000「请更新客户端」时可调高" />
+                            </MudItem>
                         </MudGrid>
                     </MudCardContent>
                 </MudCard>

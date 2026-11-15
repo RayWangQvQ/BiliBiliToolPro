@@ -5,8 +5,10 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.ApiApi.Coin;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.ApiApi.Relation;
+using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos.ApiApi.VipBigPoint;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Interfaces;
 using Ray.BiliBiliTool.Agent.Extensions;
 using Ray.BiliBiliTool.Agent.HttpClientDelegatingHandlers;
@@ -67,6 +69,33 @@ public class RequestParameterKeyTests
                 "aid=1776&multiply=1&select_like=1&cross_domain=true"
                     + "&csrf=some_jct&eab_x=2&ramval=3&source=web_normal&ga=1"
             );
+        captured.ContentType.Should().Be("application/x-www-form-urlencoded");
+    }
+
+    /// <summary>
+    /// receive/v2 validates the client build: without a build field it answers 6007000
+    /// ("please update to the latest version") and the daily task can never be claimed.
+    /// </summary>
+    [Fact]
+    public async Task VipBigPointReceiveV2_SendsBuildAndLowercaseTaskCode()
+    {
+        var captured = new CapturingHandler();
+        using var normalizing = new FormUrlEncodedKeyNormalizingDelegatingHandler
+        {
+            InnerHandler = captured,
+        };
+        using var client = new HttpClient(normalizing)
+        {
+            BaseAddress = new Uri("https://api.bilibili.com"),
+        };
+        var api = RestService.For<IApiApi>(client);
+
+        _ = await api.VipBigPointReceiveV2(new ReceiveOrCompleteTaskRequest("ogvwatch"), "cookie");
+
+        captured
+            .Body.Should()
+            .Contain("taskCode=ogvwatch")
+            .And.Contain($"build={BaseAppRequest.DefaultBuild}");
         captured.ContentType.Should().Be("application/x-www-form-urlencoded");
     }
 

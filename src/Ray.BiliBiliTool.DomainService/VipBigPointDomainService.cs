@@ -29,7 +29,7 @@ public class VipBigPointDomainService(
     public async Task<VipBigPointCombine> GetCombineAsync(BiliCookie ck)
     {
         var allTasks = await apiApi.GetCombineAsync(
-            new GetCombineRequest { csrf = ck.BiliJct, buvid = ck.Buvid },
+            WithAppBuild(new GetCombineRequest { csrf = ck.BiliJct, buvid = ck.Buvid }),
             ck.ToString()
         );
         if (allTasks.Code != 0 || allTasks.Data is null)
@@ -98,7 +98,7 @@ public class VipBigPointDomainService(
     public async Task SignAsync(BiliCookie ck)
     {
         var signInfo = await apiApi.GetThreeDaySignAsync(
-            new ThreeDaySignRequest { csrf = ck.BiliJct },
+            WithAppBuild(new ThreeDaySignRequest { csrf = ck.BiliJct }),
             ck.ToString()
         );
         if (signInfo.Data?.three_day_sign.signed == true)
@@ -120,7 +120,7 @@ public class VipBigPointDomainService(
         logger.LogInformation(re.Data.ToString());
 
         signInfo = await apiApi.GetThreeDaySignAsync(
-            new ThreeDaySignRequest { csrf = ck.BiliJct },
+            WithAppBuild(new ThreeDaySignRequest { csrf = ck.BiliJct }),
             ck.ToString()
         );
         signInfo.Data?.LogPointInfo(logger);
@@ -195,7 +195,7 @@ public class VipBigPointDomainService(
 
     public async Task<bool> CompleteAsync(string taskCode, BiliCookie ck)
     {
-        var request = new ReceiveOrCompleteTaskRequest(taskCode);
+        var request = WithAppBuild(new ReceiveOrCompleteTaskRequest(taskCode));
         var re = await apiApi.VipBigPointCompleteAsync(request, ck.ToString());
         if (re.Code == 0)
         {
@@ -222,7 +222,7 @@ public class VipBigPointDomainService(
         logger.LogInformation("开始浏览");
         await Task.Delay(10 * 1000);
 
-        var request = new ViewRequest(channel);
+        var request = WithAppBuild(new ViewRequest(channel));
         var re = await apiApi.VipBigPointViewComplete(request, ck.ToString());
         if (re.Code == 0)
         {
@@ -247,7 +247,7 @@ public class VipBigPointDomainService(
 
     public async Task<bool> CompleteV2Async(string taskCode, BiliCookie ck)
     {
-        var request = new ReceiveOrCompleteTaskRequest(taskCode);
+        var request = WithAppBuild(new ReceiveOrCompleteTaskRequest(taskCode));
         var re = await apiApi.VipBigPointCompleteV2(request, ck.ToString());
         if (re.Code == 0)
         {
@@ -262,6 +262,21 @@ public class VipBigPointDomainService(
     #region private
 
     /// <summary>
+    /// Apply the configured client build to an app-style request. Empty configuration keeps the
+    /// built-in default, so only users who hit 6007000 need to touch it.
+    /// </summary>
+    private T WithAppBuild<T>(T request)
+        where T : BaseAppRequest
+    {
+        if (!string.IsNullOrWhiteSpace(_vipBigPointOptions.AppBuild))
+        {
+            request.build = _vipBigPointOptions.AppBuild!;
+        }
+
+        return request;
+    }
+
+    /// <summary>
     /// 领取任务
     /// </summary>
     private async Task TryReceive(string taskCode, BiliCookie ck)
@@ -269,7 +284,7 @@ public class VipBigPointDomainService(
         BiliApiResponse? re = null;
         try
         {
-            var request = new ReceiveOrCompleteTaskRequest(taskCode);
+            var request = WithAppBuild(new ReceiveOrCompleteTaskRequest(taskCode));
             re = await apiApi.VipBigPointReceiveV2(request, ck.ToString());
             if (re.Code == 0)
                 logger.LogInformation("领取任务成功");
