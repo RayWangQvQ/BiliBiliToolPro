@@ -384,6 +384,17 @@ These creator IDs are excluded from batch unfollowing.
 | Accepted value | Series `ssid` (`season_id`) |
 | Default | `33378` (Detective Conan) |
 
+<a id="markdown-362-客户端版本号" name="362-客户端版本号"></a>
+#### 3.6.2. Client build number
+
+The big-point claim/complete endpoints validate the Android client build and answer `6007000` ("please update to the latest version") when it is too low. Leave the key empty to use the built-in default; raise it when that error shows up in the logs, no release needed.
+
+| Field | Value |
+| --- | --- |
+| Configuration key | `VipBigPointConfig__AppBuild` |
+| Accepted value | Build number string such as `9120300` (App 9.12.0) |
+| Default | Empty in Console and Web `appsettings.json` (the built-in `BaseAppRequest.DefaultBuild` applies) |
+
 <a id="markdown-37-免费b币券充电" name="37-免费b币券充电"></a>
 ### 3.7. Free B-coin coupon charging
 

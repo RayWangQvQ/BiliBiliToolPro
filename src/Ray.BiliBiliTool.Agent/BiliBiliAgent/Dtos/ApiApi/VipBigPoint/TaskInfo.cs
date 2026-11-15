@@ -8,10 +8,15 @@ public class TaskInfo
 
     public List<ModuleItem> Modules { get; set; } = [];
 
+    /// <summary>
+    /// The combine API omits this node for some accounts and days, so it must stay optional:
+    /// a `required` member makes System.Text.Json throw "missing required properties" and the whole
+    /// response is discarded, hiding the rest of the task list.
+    /// </summary>
     [Obsolete(
         "The sign result comes from combine API is not correct, use IVipBigPointApi.GetThreeDaySignAsync instead."
     )]
-    public required SingTaskItem Sing_task_item { get; set; }
+    public SingTaskItem? Sing_task_item { get; set; }
 }
 
 public class SingTaskItem
