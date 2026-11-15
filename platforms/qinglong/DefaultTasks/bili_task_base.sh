@@ -383,6 +383,15 @@ install_dotnet_by_script() {
     . $exportFile
 }
 
+# dotnet10-sdk is in the Alpine community repo from 3.23 on, so try apk there.
+alpine_has_dotnet10_package() {
+    local major minor
+    IFS=. read -r major minor _ <<<"${1:-}"
+    minor=${minor%%[!0-9]*}
+    [[ "$major" =~ ^[0-9]+$ && "$minor" =~ ^[0-9]+$ ]] || return 1
+    ((10#$major > 3 || (10#$major == 3 && 10#$minor >= 23)))
+}
+
 # 安装dotnet环境
 install_dotnet() {
     eval $invocation
@@ -414,9 +423,9 @@ install_dotnet() {
     else
         say "使用apk安装"
         . /etc/os-release
-        if [[ "${VERSION_ID:-}" != 3.23* ]]; then
+        if ! alpine_has_dotnet10_package "${VERSION_ID:-}"; then
             say_err "Alpine ${VERSION_ID:-unknown} 不支持通过包管理器安装 .NET 10"
-            say_err "请升级到 Alpine 3.23 或设置 BILI_MODE=bilitool"
+            say_err "请升级到 Alpine 3.23 或更高版本，或设置 BILI_MODE=bilitool"
             return 1
         fi
         if ! (curl -s -m 5 www.google.com >/dev/null); then
